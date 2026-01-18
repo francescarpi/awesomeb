@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "astro",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["astro/client"],
+    "paths": {
+      "@main/*": ["./src/main/*"],
+      "@preload/*": ["./src/preload/*"],
+      "@renderer/*": ["./src/renderer/*"],
+      "@shared/*": ["./src/shared/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.astro", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
+}

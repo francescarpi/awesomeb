@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "noEmitOnError": true,
+    "paths": {
+      "@main/*": ["./src/main/*"],
+      "@shared/*": ["./src/shared/*"]
+    }
+  },
+  "include": [
+    "src/main/**/*.ts",
+    "src/shared/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/renderer",
+    "src/preload"
+  ]
+}

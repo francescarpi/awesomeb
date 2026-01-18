@@ -1,0 +1,31 @@
+{
+  "name": "awesomeb-astro",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "pnpm run build:main && pnpm run build:preload && concurrently \"astro dev\" \"sleep 1 && electron .\"",
+    "build": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron",
+    "build:mac": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron:mac",
+    "build:astro": "astro build",
+    "build:electron": "electron-builder",
+    "build:electron:mac": "electron-builder --mac",
+    "build:main": "tsc --project tsconfig.main.json",
+    "build:preload": "tsc --project tsconfig.preload.json",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.0",
+  "devDependencies": {
+    "astro": "5.16.11",
+    "concurrently": "^9.2.1",
+    "electron": "40.0.0",
+    "electron-builder": "26.4.0",
+    "prettier": "3.8.0",
+    "prettier-plugin-astro": "0.14.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.1"
+  }
+}

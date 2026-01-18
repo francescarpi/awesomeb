@@ -1,0 +1,21 @@
+{
+  "appId": "com.farpi.awesomeb",
+  "productName": "AwesomeB",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "package.json"
+  ],
+  "mac": {
+    "category": "public.app-category.utilities"
+  },
+  "win": {
+    "target": "nsis"
+  },
+  "linux": {
+    "target": "AppImage"
+  }
+}
+
