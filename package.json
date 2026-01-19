@@ -1,6 +1,6 @@
 {
-  "name": "awesomeb-astro",
-  "version": "0.0.1",
+  "name": "AwesomeB",
+  "version": "0.0.1a",
   "description": "",
   "main": "dist/main/index.js",
   "scripts": {
@@ -10,21 +10,22 @@
     "build:astro": "astro build",
     "build:electron": "electron-builder",
     "build:electron:mac": "electron-builder --mac",
-    "build:main": "tsc --project tsconfig.main.json",
+    "build:main": "tsc --project tsconfig.main.json && tsc-alias -p tsconfig.main.json",
     "build:preload": "tsc --project tsconfig.preload.json",
     "start": "electron ."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.28.0",
   "devDependencies": {
     "astro": "5.16.11",
-    "concurrently": "^9.2.1",
+    "concurrently": "9.2.1",
     "electron": "40.0.0",
     "electron-builder": "26.4.0",
     "prettier": "3.8.0",
     "prettier-plugin-astro": "0.14.1",
+    "tsc-alias": "^1.8.16",
     "typescript": "5.9.3",
     "vite": "7.3.1"
   }

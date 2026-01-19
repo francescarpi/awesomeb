@@ -1,9 +1,9 @@
 import { app } from 'electron';
-import { Window } from '@main/core';
+import { BrowserWindow } from '@main/core';
 
 function init() {
-  const w1 = new Window({ id: 1 });
-  const w2 = new Window({ id: 2 });
+  const w1 = new BrowserWindow();
+  const w2 = new BrowserWindow();
 }
 
 app.whenReady().then(init);
