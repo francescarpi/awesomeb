@@ -49,7 +49,18 @@ export class LSWindow extends BrowserWindow {
 
   setLayout(layout: LSLayout) {
     this.rootLayout = layout;
+    this._addChildView(layout);
     this.refreshLayout();
+  }
+
+  private _addChildView(layout: LSLayout) {
+    for (const child of layout.children) {
+      if (child instanceof LSView) {
+        this.contentView.addChildView(child);
+      } else if (child instanceof LSLayout) {
+        this._addChildView(child);
+      }
+    }
   }
 
   refreshLayout() {

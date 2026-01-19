@@ -27,10 +27,6 @@ export class BrowserWindow extends LSWindow {
     root.add(sidebar);
     root.add(rightLayout);
 
-    this.contentView.addChildView(sidebar);
-    this.contentView.addChildView(content);
-    this.contentView.addChildView(urlbar);
-
     this.setLayout(root);
   }
 }
