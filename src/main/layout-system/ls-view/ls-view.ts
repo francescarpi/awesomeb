@@ -1,9 +1,13 @@
 import { WebContentsView, app } from 'electron';
 import path from 'path';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
+import { IProps } from './types';
 
 export class LSView extends WebContentsView {
-  constructor(id: string) {
+  constructor(
+    id: string,
+    public readonly props: IProps = {},
+  ) {
     super({
       webPreferences: {
         nodeIntegration: false,

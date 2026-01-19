@@ -37,5 +37,8 @@ vi.mock('electron', () => ({
       loadURL: () => {},
     };
     setBounds() {}
+    getBounds() {
+      return { x: 0, y: 0, width: 400, height: 400 };
+    }
   },
 }));
