@@ -21,15 +21,17 @@
   "license": "MIT",
   "packageManager": "pnpm@10.28.0",
   "devDependencies": {
+    "@astrojs/check": "0.9.6",
     "astro": "5.16.11",
     "concurrently": "9.2.1",
     "electron": "40.0.0",
     "electron-builder": "26.4.0",
+    "electron-log": "5.4.3",
     "prettier": "3.8.0",
     "prettier-plugin-astro": "0.14.1",
-    "tsc-alias": "^1.8.16",
+    "tsc-alias": "1.8.16",
     "typescript": "5.9.3",
     "vite": "7.3.1",
-    "vitest": "^4.0.17"
+    "vitest": "4.0.17"
   }
 }

@@ -1,0 +1,1 @@
+export { setupLogs } from './logs';

@@ -1,9 +1,15 @@
 import { app } from 'electron';
-import { BrowserWindow } from '@main/core';
+import { Browser } from '@main/core';
+import { setupLogs } from './boot';
+
+setupLogs();
 
 function init() {
-  const w1 = new BrowserWindow();
-  const w2 = new BrowserWindow();
+  const browser = new Browser();
+  browser.init();
+
+  const w1 = browser.createWindow();
+  const w2 = browser.createWindow();
 }
 
 app.whenReady().then(init);

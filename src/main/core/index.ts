@@ -1,1 +1,2 @@
-export * from './browser-window';
+export * from './window';
+export * from './browser';

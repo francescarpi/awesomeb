@@ -4,9 +4,10 @@ import { resolve } from 'path';
 export default defineConfig({
   test: {
     setupFiles: ['config-test.ts'],
+    exclude: ['node_modules', 'dist'],
     alias: {
-      '@': resolve('src/main'),
-      '~': resolve('src/shared'),
+      '@main': resolve('src/main'),
+      '@shared': resolve('src/shared'),
     },
   },
 });
