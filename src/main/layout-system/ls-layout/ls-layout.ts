@@ -13,7 +13,7 @@ export class LSLayout {
 
   refreshBounds(containerBounds: Rectangle) {
     if (this._orientation === 'vertical') {
-      const viewWidth = Math.floor(containerBounds.width / this._views.length);
+      const viewWidth = Math.ceil(containerBounds.width / this._views.length);
       this._views.forEach((view, index) => {
         view.setBounds({
           x: index * viewWidth,
@@ -23,7 +23,7 @@ export class LSLayout {
         });
       });
     } else {
-      const viewHeight = Math.floor(containerBounds.height / this._views.length);
+      const viewHeight = Math.ceil(containerBounds.height / this._views.length);
       this._views.forEach((view, index) => {
         view.setBounds({
           x: 0,

@@ -2,6 +2,7 @@ import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
 import path from 'path';
 import { LSLayout } from '../ls-layout';
+import { registerWindowEvents } from './events';
 
 export class LSWindow extends BrowserWindow {
   private _layout: null | LSLayout = null;
@@ -37,10 +38,16 @@ export class LSWindow extends BrowserWindow {
     }
 
     // this.webContents.openDevTools();
+
+    registerWindowEvents(this);
   }
 
   get wcId(): number {
     return this.webContents.id;
+  }
+
+  get layout(): LSLayout | null {
+    return this._layout;
   }
 
   show() {
