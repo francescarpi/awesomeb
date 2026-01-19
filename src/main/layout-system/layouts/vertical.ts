@@ -30,7 +30,7 @@ export class LSVerticalLayout extends LSLayout {
       const width = (child as any).props?.width ?? usableWidth - margins.left - margins.right;
       const height = (child as any).props?.height ?? usableHeight - margins.top - margins.bottom;
 
-      child.layout({ x, y, width: 100, height: 100 });
+      child.layout({ x, y, width, height });
 
       x += width + margins.right;
     }

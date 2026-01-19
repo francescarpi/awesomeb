@@ -12,7 +12,7 @@ export class BrowserWindow extends LSWindow {
       margins: { left: 5, top: 5, right: 5, bottom: 5 },
     });
 
-    const content = new LSView('main-view', { margins: { left: 5, top: 0, right: 5, bottom: 5 } });
+    const content = new LSView('main-view', { margins: { left: 0, top: 5, right: 5, bottom: 5 } });
 
     root.add(sidebar);
     root.add(content);
