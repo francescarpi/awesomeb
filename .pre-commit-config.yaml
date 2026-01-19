@@ -18,7 +18,15 @@ repos:
         entry: pnpm exec prettier --check src
         language: system
         pass_filenames: false
-        files: \.(ts|tsx|js|jsx|json|css|md)$
+        files: \.(ts|tsx|js|jsx|json|css|md|astro)$
+        stages: [pre-commit]
+
+      - id: tests
+        name: Tests
+        entry: pnpm test run
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx|js|jsx|json|astro)$
         stages: [pre-commit]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
