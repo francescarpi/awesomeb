@@ -7,7 +7,7 @@ import { IMargins } from '@shared/types';
 export class LSView extends WebContentsView implements LSLayoutNode {
   constructor(
     page: string,
-    public props?: { width?: number; height?: number; margins?: IMargins },
+    public props?: { width?: number; height?: number; margin?: IMargins },
   ) {
     super({
       webPreferences: {

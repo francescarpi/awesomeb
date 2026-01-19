@@ -2,6 +2,8 @@ import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
 import path from 'path';
 import { LSLayout } from './layouts';
+import { LSView } from './view';
+import { LSLayoutNode } from './types';
 
 export class LSWindow extends BrowserWindow {
   private rootLayout?: LSLayout;
