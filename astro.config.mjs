@@ -11,5 +11,8 @@ export default defineConfig({
         "@shared/*": ["./src/shared/*"]
       }
     }
+  },
+  devToolbar: {
+    enabled: false
   }
 });

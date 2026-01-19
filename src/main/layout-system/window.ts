@@ -36,6 +36,8 @@ export class LSWindow extends BrowserWindow {
       this.loadURL('http://localhost:4321/window');
     }
 
+    this._enableAutoLayout();
+
     // this.webContents.openDevTools();
   }
 
@@ -61,7 +63,7 @@ export class LSWindow extends BrowserWindow {
     });
   }
 
-  enableAutoLayout() {
+  private _enableAutoLayout() {
     this.on('resize', () => this.refreshLayout());
     this.on('move', () => this.refreshLayout());
   }

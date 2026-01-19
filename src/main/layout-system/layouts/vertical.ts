@@ -3,28 +3,38 @@ import { Rectangle } from 'electron';
 
 export class LSVerticalLayout extends LSLayout {
   layout(rect: Rectangle) {
-    const usableWidth = rect.width - this.padding * 2;
-    const usableHeight = rect.height - this.padding * 2;
+    const usableWidth = rect.width;
+    const usableHeight = rect.height;
 
-    const fixed = this.children.filter((c: any) => c.fixedSize?.width);
-    const flexible = this.children.filter((c: any) => !c.fixedSize?.width);
+    const fixed = this.children.filter((c: any) => c.props?.width);
+    const flexible = this.children.filter((c: any) => !c.props?.width);
 
-    const fixedWidth = fixed.reduce((s, c: any) => s + (c.fixedSize!.width ?? 0), 0);
-    const flexWidth = (usableWidth - fixedWidth) / flexible.length;
+    const fixedWidth = fixed.reduce(
+      (s, c: any) =>
+        s + (c.props!.width ?? 0) + (c.props?.margins[3] ?? 0) + (c.props?.margins[1] ?? 0),
+      0,
+    );
 
-    let x = rect.x + this.padding;
+    const flexMargins = flexible.reduce(
+      (s, c: any) => s + (c.props?.margins[3] ?? 0) + (c.props?.margins[1] ?? 0),
+      0,
+    );
+    const flexWidth = (usableWidth - fixedWidth - flexMargins) / flexible.length;
+
+    let x = rect.x;
 
     for (const child of this.children) {
-      const w = (child as any).fixedSize?.width ?? flexWidth;
+      const w = (child as any).props?.width ?? flexWidth;
 
       child.layout({
         x,
-        y: rect.y + this.padding,
-        width: w,
+        y: rect.y,
+        width:
+          w + ((child as any).props?.margins[3] ?? 0) + ((child as any).props?.margins[1] ?? 0),
         height: usableHeight,
       });
 
-      x += w;
+      x += w + ((child as any).props?.margins[3] ?? 0) + ((child as any).props?.margins[1] ?? 0);
     }
   }
 }

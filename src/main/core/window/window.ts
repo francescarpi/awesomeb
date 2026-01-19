@@ -5,18 +5,15 @@ export class BrowserWindow extends LSWindow {
   constructor(props?: IProps) {
     super();
 
-    this.enableAutoLayout();
-
     const root = new LSVerticalLayout();
-    root.padding = 5;
 
-    const sidebar = new LSView('sidebar', { width: 255 });
+    const sidebar = new LSView('sidebar', { width: 255, margins: [5, 0, 5, 5] });
 
     const rightLayout = new LSHorizontalLayout();
-    rightLayout.padding = 5;
 
-    const urlbar = new LSView('urlbar', { height: 40 });
-    const content = new LSView('main-view');
+    const urlbar = new LSView('urlbar', { height: 40, margins: [5, 5, 0, 0] });
+
+    const content = new LSView('main-view', { margins: [0, 5, 5, 0] });
 
     rightLayout.add(urlbar);
     rightLayout.add(content);
