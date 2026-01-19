@@ -7,24 +7,51 @@ export class BrowserWindow extends LSWindow {
 
     const root = new LSVerticalLayout();
 
-    const sidebar = new LSView('sidebar', { width: 255, margins: [5, 0, 5, 5] });
+    const sidebar = new LSView('sidebar', {
+      width: 255,
+      margins: { left: 5, top: 5, right: 5, bottom: 5 },
+    });
 
-    const rightLayout = new LSHorizontalLayout();
-
-    const urlbar = new LSView('urlbar', { height: 40, margins: [5, 5, 0, 0] });
-
-    const content = new LSView('main-view', { margins: [0, 5, 5, 0] });
-
-    rightLayout.add(urlbar);
-    rightLayout.add(content);
+    const content = new LSView('main-view', { margins: { left: 5, top: 0, right: 5, bottom: 5 } });
 
     root.add(sidebar);
-    root.add(rightLayout);
+    root.add(content);
 
     this.contentView.addChildView(sidebar);
     this.contentView.addChildView(content);
-    this.contentView.addChildView(urlbar);
 
     this.setLayout(root);
   }
+
+  // constructor(props?: IProps) {
+  //   super();
+  //
+  //   const root = new LSVerticalLayout();
+  //
+  //   const sidebar = new LSView('sidebar', {
+  //     width: 255,
+  //     margins: { left: 5, top: 5, right: 5, bottom: 5 },
+  //   });
+  //
+  //   const rightLayout = new LSHorizontalLayout();
+  //
+  //   const urlbar = new LSView('urlbar', {
+  //     height: 40,
+  //     margins: { left: 5, top: 5, right: 5, bottom: 0 },
+  //   });
+  //
+  //   const content = new LSView('main-view', { margins: { left: 5, top: 0, right: 5, bottom: 5 } });
+  //
+  //   rightLayout.add(urlbar);
+  //   rightLayout.add(content);
+  //
+  //   root.add(sidebar);
+  //   root.add(rightLayout);
+  //
+  //   this.contentView.addChildView(sidebar);
+  //   this.contentView.addChildView(content);
+  //   this.contentView.addChildView(urlbar);
+  //
+  //   this.setLayout(root);
+  // }
 }
