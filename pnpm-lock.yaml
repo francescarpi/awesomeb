@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       electron-log:
-        specifier: ^5.4.3
+        specifier: 5.4.3
         version: 5.4.3
     devDependencies:
       '@astrojs/check':
