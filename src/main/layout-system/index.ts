@@ -1,3 +1,3 @@
-export * from './ls-window';
-export * from './ls-layout';
-export * from './ls-view';
+export * from './window';
+export * from './layouts';
+export * from './view';

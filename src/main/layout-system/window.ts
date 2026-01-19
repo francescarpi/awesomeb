@@ -1,11 +1,10 @@
 import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
 import path from 'path';
-import { LSLayout } from '../ls-layout';
-import { registerWindowEvents } from './events';
+import { LSLayout } from './layouts';
 
 export class LSWindow extends BrowserWindow {
-  private _layout: null | LSLayout = null;
+  private rootLayout?: LSLayout;
 
   constructor() {
     super({
@@ -38,29 +37,36 @@ export class LSWindow extends BrowserWindow {
     }
 
     // this.webContents.openDevTools();
-
-    registerWindowEvents(this);
   }
 
   get wcId(): number {
     return this.webContents.id;
   }
 
-  get layout(): LSLayout | null {
-    return this._layout;
+  setLayout(layout: LSLayout) {
+    this.rootLayout = layout;
+    this.refreshLayout();
+  }
+
+  refreshLayout() {
+    if (!this.rootLayout) return;
+
+    const [w, h] = this.getContentSize();
+
+    this.rootLayout.layout({
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+    });
+  }
+
+  enableAutoLayout() {
+    this.on('resize', () => this.refreshLayout());
+    this.on('move', () => this.refreshLayout());
   }
 
   show() {
     super.show();
-  }
-
-  addLayout(layout: LSLayout) {
-    this._layout = layout;
-
-    this._layout.refreshBounds(this.getBounds());
-
-    for (const view of layout.views) {
-      this.contentView.addChildView(view);
-    }
   }
 }
