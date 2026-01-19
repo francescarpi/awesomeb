@@ -12,7 +12,8 @@
     "build:electron:mac": "electron-builder --mac",
     "build:main": "tsc --project tsconfig.main.json && tsc-alias -p tsconfig.main.json",
     "build:preload": "tsc --project tsconfig.preload.json",
-    "start": "electron ."
+    "start": "electron .",
+    "format": "prettier --write src"
   },
   "keywords": [],
   "author": "",

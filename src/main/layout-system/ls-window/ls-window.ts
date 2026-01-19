@@ -7,8 +7,19 @@ export class LSWindow {
 
   constructor() {
     this._browserWindow = new BrowserWindow({
+      title: app.name,
+      minWidth: 800,
+      minHeight: 400,
       width: 800,
       height: 600,
+      frame: false,
+      visualEffectState: 'followWindow',
+      transparent: false,
+      resizable: true,
+      backgroundMaterial: 'none',
+      backgroundColor: process.platform === 'darwin' ? '#00000000' : '#000000',
+      vibrancy: 'fullscreen-ui',
+      roundedCorners: true,
       webPreferences: {
         preload: path.join(PRELOAD_FOLDER, 'index.js'),
         nodeIntegration: false,
