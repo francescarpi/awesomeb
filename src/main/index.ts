@@ -9,7 +9,10 @@ function init() {
   browser.init();
 
   const w1 = browser.createWindow();
-  const w2 = browser.createWindow();
+  w1.show();
+
+  // const w2 = browser.createWindow();
+  // w2.show();
 }
 
 app.whenReady().then(init);

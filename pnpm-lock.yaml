@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      electron-log:
+        specifier: ^5.4.3
+        version: 5.4.3
     devDependencies:
       '@astrojs/check':
         specifier: 0.9.6
@@ -23,9 +27,6 @@ importers:
       electron-builder:
         specifier: 26.4.0
         version: 26.4.0(electron-builder-squirrel-windows@26.4.0)
-      electron-log:
-        specifier: ^5.4.3
-        version: 5.4.3
       prettier:
         specifier: 3.8.0
         version: 3.8.0

@@ -3,8 +3,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   test: {
-    setupFiles: ['config-test.ts'],
-    exclude: ['node_modules', 'dist'],
+    setupFiles: ['vitest.setup.ts'],
+    exclude: ['node_modules/**', 'dist/**'],
     alias: {
       '@main': resolve('src/main'),
       '@shared': resolve('src/shared'),

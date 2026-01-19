@@ -23,5 +23,18 @@ vi.mock('electron', () => ({
     get id() {
       return 1;
     }
+    contentView = {
+      addChildView: () => {},
+    };
+    getBounds() {
+      return { x: 0, y: 0, width: 800, height: 600 };
+    }
+  },
+  WebContentsView: class {
+    webContents = {
+      loadFile: () => {},
+      loadURL: () => {},
+    };
+    setBounds() {}
   },
 }));

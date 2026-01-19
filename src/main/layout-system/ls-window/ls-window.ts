@@ -1,12 +1,13 @@
 import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
 import path from 'path';
+import { LSLayout } from '../ls-layout';
 
-export class LSWindow {
-  private readonly _browserWindow: BrowserWindow;
+export class LSWindow extends BrowserWindow {
+  private _layout: null | LSLayout = null;
 
   constructor() {
-    this._browserWindow = new BrowserWindow({
+    super({
       title: app.name,
       minWidth: 800,
       minHeight: 400,
@@ -20,8 +21,9 @@ export class LSWindow {
       backgroundColor: process.platform === 'darwin' ? '#00000000' : '#000000',
       vibrancy: 'fullscreen-ui',
       roundedCorners: true,
+      show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'index.js'),
+        preload: path.join(PRELOAD_FOLDER, 'browser.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -29,19 +31,29 @@ export class LSWindow {
     });
 
     if (app.isPackaged) {
-      this._browserWindow.loadFile(path.join(RENDERER_FOLDER, 'window', 'index.html'));
+      this.loadFile(path.join(RENDERER_FOLDER, 'window', 'index.html'));
     } else {
-      this._browserWindow.loadURL('http://localhost:4321/window');
+      this.loadURL('http://localhost:4321/window');
     }
 
-    this._browserWindow.webContents.openDevTools();
-  }
-
-  get id(): number {
-    return this._browserWindow.id;
+    // this.webContents.openDevTools();
   }
 
   get wcId(): number {
-    return this._browserWindow.webContents.id;
+    return this.webContents.id;
+  }
+
+  show() {
+    super.show();
+  }
+
+  addLayout(layout: LSLayout) {
+    this._layout = layout;
+
+    this._layout.refreshBounds(this.getBounds());
+
+    for (const view of layout.views) {
+      this.contentView.addChildView(view);
+    }
   }
 }
