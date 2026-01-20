@@ -15,6 +15,9 @@ importers:
       '@astrojs/check':
         specifier: 0.9.6
         version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.0)(typescript@5.9.3)
+      '@eslint/js':
+        specifier: ^9.39.2
+        version: 9.39.2
       astro:
         specifier: 5.16.11
         version: 5.16.11(@types/node@25.0.9)(jiti@2.6.1)(rollup@4.55.1)(typescript@5.9.3)(yaml@2.8.2)
@@ -28,13 +31,13 @@ importers:
         specifier: 26.4.0
         version: 26.4.0(electron-builder-squirrel-windows@26.4.0)
       eslint:
-        specifier: ^9.39.2
+        specifier: 9.39.2
         version: 9.39.2(jiti@2.6.1)
       eslint-js:
         specifier: github:eslint/js
         version: https://codeload.github.com/eslint/js/tar.gz/80033b85614e3183ec340ac4fbdb6f73b393dd2d
       globals:
-        specifier: ^17.0.0
+        specifier: 17.0.0
         version: 17.0.0
       prettier:
         specifier: 3.8.0
@@ -49,7 +52,7 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.53.1
+        specifier: 8.53.1
         version: 8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       vite:
         specifier: 7.3.1

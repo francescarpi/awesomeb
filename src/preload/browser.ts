@@ -1,1 +1,10 @@
-console.log('Hello from browser preload script!');
+import { TWindowId } from '@shared/types';
+import { contextBridge, ipcRenderer } from 'electron';
+
+const awesomeAPI = {
+  closeModal: (winId: TWindowId): void => {
+    ipcRenderer.send('layout-system:close-modal', winId);
+  },
+};
+
+contextBridge.exposeInMainWorld('awesome', awesomeAPI);

@@ -20,5 +20,7 @@ export class BrowserWindow extends LSWindow {
     root.add(rightLayout);
 
     this.setLayout(root);
+
+    this.openModal('modal');
   }
 }

@@ -1,13 +1,15 @@
+import path from 'path';
 import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
-import path from 'path';
 import { LSLayout } from './layouts';
 import { LSView } from './view';
 import { TPage } from '@shared/types';
+import { LSModal, IProps as IModalProps } from './modal';
 
 export class LSWindow extends BrowserWindow {
   private rootLayout?: LSLayout;
   private readonly _views: Map<string, LSView> = new Map();
+  private _modal: LSModal | null = null;
 
   constructor() {
     super({
@@ -113,5 +115,20 @@ export class LSWindow extends BrowserWindow {
       view.setHeight(height);
       this.refreshLayout();
     }
+  }
+
+  openModal(page: TPage, props?: IModalProps) {
+    this._modal = new LSModal(this, page, props);
+  }
+
+  closeModal() {
+    if (this._modal) {
+      this._modal.close();
+      this._modal = null;
+    }
+  }
+
+  get modal(): LSModal | null {
+    return this._modal;
   }
 }
