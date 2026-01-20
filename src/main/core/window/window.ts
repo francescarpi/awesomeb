@@ -21,8 +21,11 @@ export class BrowserWindow extends LSWindow {
 
     this.setLayout(root);
 
-    this.openModal('modal');
+    // this.openModal('modal');
+    // this.openModal('modal-2');
 
-    this.openModal('modal-2');
+    this.showNotification('This is an info notification.');
+    // this.showNotification('This is a warning notification.', 'warning');
+    // this.showNotification('This is an error notification.', 'error');
   }
 }

@@ -1,10 +1,10 @@
 import path from 'path';
-import { app } from 'electron';
-import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
+import { PRELOAD_FOLDER } from '@main/utils';
 import { BrowserWindow } from 'electron';
 import { LSWindow } from '../window';
 import { IProps } from './types';
 import { TPage } from '@shared/types';
+import { loadPage } from '../helpers';
 
 export class LSModal extends BrowserWindow {
   constructor(
@@ -13,8 +13,6 @@ export class LSModal extends BrowserWindow {
     private readonly _props?: IProps,
   ) {
     super({
-      minWidth: 400,
-      minHeight: 300,
       width: 400,
       height: 300,
       frame: false,
@@ -33,15 +31,8 @@ export class LSModal extends BrowserWindow {
       },
     });
 
-    if (app.isPackaged) {
-      this.loadFile(path.join(RENDERER_FOLDER, _page, 'index.html'), {
-        query: {
-          winId: this._parent.id.toString(),
-        },
-      });
-    } else {
-      this.loadURL(`http://localhost:4321/${_page}?winId=${this._parent.id}`);
-    }
+    const query = { winId: this._parent.id.toString() };
+    loadPage(this.webContents, this._page, query);
 
     // this.webContents.openDevTools();
 

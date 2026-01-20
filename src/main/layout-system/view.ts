@@ -1,8 +1,9 @@
 import path from 'path';
-import { WebContentsView, Rectangle, app } from 'electron';
-import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
+import { WebContentsView, Rectangle } from 'electron';
+import { PRELOAD_FOLDER } from '@main/utils';
 import { LSLayoutNode } from './types';
 import { IMargins, TPage } from '@shared/types';
+import { loadPage } from './helpers';
 
 export class LSView extends WebContentsView implements LSLayoutNode {
   private _margins: IMargins = { l: 0, t: 0, r: 0, b: 0 };
@@ -24,11 +25,7 @@ export class LSView extends WebContentsView implements LSLayoutNode {
       },
     });
 
-    if (app.isPackaged) {
-      this.webContents.loadFile(path.join(RENDERER_FOLDER, page, 'index.html'));
-    } else {
-      this.webContents.loadURL(`http://localhost:4321/${page}`);
-    }
+    loadPage(this.webContents, page);
 
     // this.webContents.openDevTools();
 

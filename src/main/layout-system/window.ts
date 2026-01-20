@@ -1,15 +1,20 @@
 import path from 'path';
 import { BrowserWindow, app } from 'electron';
-import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
+import { PRELOAD_FOLDER } from '@main/utils';
 import { LSLayout } from './layouts';
 import { LSView } from './view';
 import { TPage } from '@shared/types';
 import { LSModal, IProps as IModalProps } from './modal';
+import { NotificationsContainer, TNotificationSeverity, Notification } from './notifications';
+import { loadPage } from './helpers';
 
 export class LSWindow extends BrowserWindow {
   private rootLayout?: LSLayout;
   private readonly _views: Map<string, LSView> = new Map();
   private _modal: LSModal | null = null;
+
+  private _notificationsContainer: NotificationsContainer;
+  private _notifications: Notification[] = [];
 
   constructor() {
     super({
@@ -35,13 +40,11 @@ export class LSWindow extends BrowserWindow {
       },
     });
 
-    if (app.isPackaged) {
-      this.loadFile(path.join(RENDERER_FOLDER, 'window', 'index.html'));
-    } else {
-      this.loadURL('http://localhost:4321/window');
-    }
+    loadPage(this.webContents, 'window');
 
     this._enableAutoLayout();
+
+    this._notificationsContainer = new NotificationsContainer(this);
 
     // this.webContents.openDevTools();
 
@@ -135,5 +138,14 @@ export class LSWindow extends BrowserWindow {
 
   get modal(): LSModal | null {
     return this._modal;
+  }
+
+  showNotification(message: string, type: TNotificationSeverity = 'info') {
+    const notification = new Notification(message, type);
+    this._notifications.push(notification);
+
+    if (!this._notificationsContainer.isVisible()) {
+      this._notificationsContainer.show();
+    }
   }
 }

@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Base.astro';
+---
+
+<Layout backgroundColor="black">
+  <div class="info">
+    <p id="message">No message provider</p>
+  </div>
+</Layout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  // const message = params.get('message') || 'No message provided';
+  // const type = params.get('type') || 'info';
+  //
+  // const messageElement = document.getElementById('message');
+  // if (messageElement) {
+  //   messageElement.textContent = message;
+  // }
+  //
+  // const container = document.querySelector('div');
+  // if (container) {
+  //   container.classList.add(type);
+  // }
+</script>
+
+<style>
+  div {
+    app-region: no-drag;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 1rem;
+    color: white;
+  }
+</style>
