@@ -30,6 +30,7 @@ vi.mock('electron', () => ({
       return { x: 0, y: 0, width: 800, height: 600 };
     }
     on() {}
+    once() {}
     getContentSize() {
       return [800, 600];
     }

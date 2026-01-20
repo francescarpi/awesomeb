@@ -44,6 +44,10 @@ export class LSWindow extends BrowserWindow {
     this._enableAutoLayout();
 
     // this.webContents.openDevTools();
+
+    this.once('ready-to-show', () => {
+      this.show();
+    });
   }
 
   get wcId(): number {
@@ -79,10 +83,6 @@ export class LSWindow extends BrowserWindow {
   private _enableAutoLayout() {
     this.on('resize', () => this.refreshLayout());
     this.on('move', () => this.refreshLayout());
-  }
-
-  show() {
-    super.show();
   }
 
   setViewVisibility(page: TPage, visible: boolean) {

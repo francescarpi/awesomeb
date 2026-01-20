@@ -12,11 +12,7 @@ function init() {
 
   browser.init();
 
-  const w1 = browser.createWindow();
-  w1.show();
-
-  // const w2 = browser.createWindow();
-  // w2.show();
+  const _w1 = browser.createWindow();
 }
 
 app.whenReady().then(init);

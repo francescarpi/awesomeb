@@ -2,7 +2,7 @@ import { TWindowId } from '@shared/types';
 import { contextBridge, ipcRenderer } from 'electron';
 
 const awesomeAPI = {
-  closeModal: (winId: TWindowId): void => {
+  closeModal: (winId: TWindowId) => {
     ipcRenderer.send('layout-system:close-modal', winId);
   },
 };

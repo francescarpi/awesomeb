@@ -24,6 +24,7 @@ export class LSModal extends BrowserWindow {
       modal: true,
       resizable: false,
       movable: false,
+      show: false,
       webPreferences: {
         preload: path.join(PRELOAD_FOLDER, 'browser.js'),
         nodeIntegration: false,
@@ -43,6 +44,10 @@ export class LSModal extends BrowserWindow {
     }
 
     // this.webContents.openDevTools();
+
+    this.once('ready-to-show', () => {
+      this.show();
+    });
   }
 
   get wcId(): number {
