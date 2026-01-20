@@ -43,7 +43,7 @@ export class LSModal extends BrowserWindow {
       this.loadURL(`http://localhost:4321/${_page}?winId=${this._parent.id}`);
     }
 
-    // this.webContents.openDevTools();
+    this.webContents.openDevTools();
 
     this.once('ready-to-show', () => {
       this.show();

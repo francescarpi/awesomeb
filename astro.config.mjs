@@ -8,6 +8,9 @@ export default defineConfig({
   output: 'static',
   srcDir: 'src/renderer',
   outDir: 'dist/renderer',
+  build: {
+    inlineStylesheets: 'always',
+  },
   vite: {
     resolve: {
       alias: {
