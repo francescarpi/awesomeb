@@ -1,10 +1,15 @@
 ---
 import Layout from '../layouts/Base.astro';
+import { Button } from 'accessible-astro-components';
+import { Icon } from 'astro-icon/components';
 ---
 
 <Layout backgroundColor="orange" borderRadius="10px">
   <div>
-    <button>Close</button>
+    <Button type="primary">
+      <Icon name="close" size="1rem" />
+      Close
+    </Button>
   </div>
 </Layout>
 

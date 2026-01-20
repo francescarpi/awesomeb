@@ -123,6 +123,7 @@ export class LSWindow extends BrowserWindow {
 
   closeModal() {
     if (this._modal) {
+      this._modal.hide();
       this._modal.close();
       this._modal = null;
     }

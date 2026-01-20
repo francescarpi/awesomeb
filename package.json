@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "pnpm run build:main && pnpm run build:preload && concurrently \"astro dev\" \"sleep 1 && electron .\"",
+    "dev": "pnpm run build:main && pnpm run build:preload && concurrently --kill-others \"astro dev\" \"sleep 1 && electron .\"",
     "build": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron",
     "build:mac": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron:mac",
     "build:astro": "astro build",
@@ -40,6 +40,8 @@
     "vitest": "4.0.17"
   },
   "dependencies": {
+    "accessible-astro-components": "5.1.1",
+    "astro-icon": "1.1.5",
     "electron-log": "5.4.3"
   }
 }
