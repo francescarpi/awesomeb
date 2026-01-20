@@ -45,6 +45,7 @@ export class LSWindow extends BrowserWindow {
     this._enableAutoLayout();
 
     this._notificationsContainer = new NotificationsContainer(this);
+    this.contentView.addChildView(this._notificationsContainer, 2);
 
     // this.webContents.openDevTools();
 
@@ -143,9 +144,5 @@ export class LSWindow extends BrowserWindow {
   showNotification(message: string, type: TNotificationSeverity = 'info') {
     const notification = new Notification(message, type);
     this._notifications.push(notification);
-
-    if (!this._notificationsContainer.isVisible()) {
-      this._notificationsContainer.show();
-    }
   }
 }
