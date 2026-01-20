@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import icon from 'astro-icon'
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   integrations: [icon({
@@ -12,6 +13,7 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         "@main/*": ["./src/main/*"],

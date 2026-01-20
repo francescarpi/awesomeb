@@ -30,6 +30,8 @@ export class LSView extends WebContentsView implements LSLayoutNode {
       this.webContents.loadURL(`http://localhost:4321/${page}`);
     }
 
+    // this.webContents.openDevTools();
+
     this._width = props?.width;
     this._height = props?.height;
 

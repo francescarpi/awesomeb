@@ -1,20 +1,19 @@
 ---
 import Layout from '../layouts/Base.astro';
-import { Button } from 'accessible-astro-components';
 import { Icon } from 'astro-icon/components';
 ---
 
 <Layout backgroundColor="orange" borderRadius="10px">
-  <div class="content">
-    <Button type="primary">
+  <div>
+    <button class="btn btn-primary btn-sm">
       <Icon name="close" size="1rem" />
       Close
-    </Button>
+    </button>
   </div>
 </Layout>
 
 <style>
-  .content {
+  div {
     app-region: no-drag;
     display: flex;
     justify-content: center;

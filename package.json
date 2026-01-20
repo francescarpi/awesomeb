@@ -24,8 +24,11 @@
   "devDependencies": {
     "@astrojs/check": "0.9.6",
     "@eslint/js": "9.39.2",
+    "@tailwindcss/vite": "4.1.18",
     "astro": "5.16.11",
+    "astro-icon": "1.1.5",
     "concurrently": "9.2.1",
+    "daisyui": "5.5.14",
     "electron": "40.0.0",
     "electron-builder": "26.4.0",
     "eslint": "9.39.2",
@@ -33,6 +36,7 @@
     "globals": "17.0.0",
     "prettier": "3.8.0",
     "prettier-plugin-astro": "0.14.1",
+    "tailwindcss": "4.1.18",
     "tsc-alias": "1.8.16",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
@@ -40,8 +44,6 @@
     "vitest": "4.0.17"
   },
   "dependencies": {
-    "accessible-astro-components": "5.1.1",
-    "astro-icon": "1.1.5",
     "electron-log": "5.4.3"
   }
 }
