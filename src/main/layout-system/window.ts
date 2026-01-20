@@ -118,6 +118,10 @@ export class LSWindow extends BrowserWindow {
   }
 
   openModal(page: TPage, props?: IModalProps) {
+    if (this._modal) {
+      this.closeModal();
+    }
+
     this._modal = new LSModal(this, page, props);
   }
 

@@ -34,6 +34,8 @@ vi.mock('electron', () => ({
     getContentSize() {
       return [800, 600];
     }
+    hide() {}
+    close() {}
   },
   WebContentsView: class {
     webContents = {
