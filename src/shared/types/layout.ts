@@ -1,6 +1,8 @@
 export interface IMargins {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
+  l: number;
+  r: number;
+  t: number;
+  b: number;
 }
+
+export type TPage = string;

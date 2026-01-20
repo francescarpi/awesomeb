@@ -1,9 +1,10 @@
 ---
 interface Props {
   backgroundColor?: string;
+  borderRadius?: string;
 }
 
-const { backgroundColor } = Astro.props;
+const { backgroundColor, borderRadius } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,15 +17,18 @@ const { backgroundColor } = Astro.props;
     />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
-  <body><slot /></body>
+  <body><div class="rootContainer"><slot /></div></body>
 </html>
 
-<style define:vars={{ backgroundColor: backgroundColor || 'white' }}>
-  body {
+<style
+  define:vars={{ backgroundColor: backgroundColor || 'white', borderRadius: borderRadius || '0px' }}
+>
+  .rootContainer {
     position: fixed;
     inset: 0;
     background-color: var(--backgroundColor);
     app-region: drag;
     color: black;
+    border-radius: var(--borderRadius);
   }
 </style>

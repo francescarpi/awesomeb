@@ -3,10 +3,11 @@ import { PRELOAD_FOLDER, RENDERER_FOLDER } from '@main/utils';
 import path from 'path';
 import { LSLayout } from './layouts';
 import { LSView } from './view';
-import { LSLayoutNode } from './types';
+import { TPage } from '@shared/types';
 
 export class LSWindow extends BrowserWindow {
   private rootLayout?: LSLayout;
+  private readonly _views: Map<string, LSView> = new Map();
 
   constructor() {
     super({
@@ -49,22 +50,19 @@ export class LSWindow extends BrowserWindow {
 
   setLayout(layout: LSLayout) {
     this.rootLayout = layout;
-    this._addChildView(layout);
+
+    for (const view of this.rootLayout.views) {
+      this.contentView.addChildView(view);
+      this._views.set(view.page, view);
+    }
+
     this.refreshLayout();
   }
 
-  private _addChildView(layout: LSLayout) {
-    for (const child of layout.children) {
-      if (child instanceof LSView) {
-        this.contentView.addChildView(child);
-      } else if (child instanceof LSLayout) {
-        this._addChildView(child);
-      }
-    }
-  }
-
   refreshLayout() {
-    if (!this.rootLayout) return;
+    if (!this.rootLayout) {
+      return;
+    }
 
     const [w, h] = this.getContentSize();
 
@@ -83,5 +81,37 @@ export class LSWindow extends BrowserWindow {
 
   show() {
     super.show();
+  }
+
+  setViewVisibility(page: TPage, visible: boolean) {
+    const view = this._views.get(page);
+    if (view) {
+      view.setVisible(visible);
+      this.refreshLayout();
+    }
+  }
+
+  setMargins(page: TPage, margins: Partial<{ l: number; t: number; r: number; b: number }>) {
+    const view = this._views.get(page);
+    if (view) {
+      view.setMargins(margins);
+      this.refreshLayout();
+    }
+  }
+
+  setWidth(page: TPage, width: number) {
+    const view = this._views.get(page);
+    if (view) {
+      view.setWidth(width);
+      this.refreshLayout();
+    }
+  }
+
+  setHeight(page: TPage, height: number) {
+    const view = this._views.get(page);
+    if (view) {
+      view.setHeight(height);
+      this.refreshLayout();
+    }
   }
 }

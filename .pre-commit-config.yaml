@@ -13,6 +13,14 @@ repos:
         files: \.(ts|astro)$
         stages: [pre-commit]
 
+      - id: eslint
+        name: Linter check
+        entry: pnpm lint
+        language: system
+        pass_filenames: false
+        files: \.(ts|astro|js)$
+        stages: [pre-commit]
+
       - id: prettier
         name: Prettier
         entry: pnpm exec prettier --check src
