@@ -19,7 +19,7 @@ export class Window extends UIWindow {
     });
 
     const rightLayout = new UIHorizontalLayout();
-    const urlbar = new UIView('urlbar', { height: 40, margin: { l: 0, t: 5, r: 5, b: 0 } });
+    const urlbar = new UIView('urlbar', { height: 32, margin: { l: 0, t: 5, r: 5, b: 0 } });
     const content = new UIView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
 
     rightLayout.add(urlbar);

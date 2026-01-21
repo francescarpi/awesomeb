@@ -1,0 +1,1 @@
+export { mainMenu } from './main';

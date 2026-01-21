@@ -1,10 +1,14 @@
 import { Window } from '@main/core';
 import { TWindowId } from '@shared/types';
+import { mainMenu } from '@main/menu';
+import { Menu } from 'electron';
 
 export class Browser {
   private readonly _windows: Map<TWindowId, Window> = new Map();
 
-  init() {}
+  async init() {
+    await this.refreshMainMenu();
+  }
 
   createWindow(): Window {
     const w = new Window();
@@ -18,5 +22,10 @@ export class Browser {
 
   getWindowById(id: TWindowId): Window | null {
     return this._windows.get(id) || null;
+  }
+
+  async refreshMainMenu() {
+    const items = await mainMenu(this, false);
+    Menu.setApplicationMenu(items);
   }
 }
