@@ -1,16 +1,14 @@
 import path from 'path';
 import { PRELOAD_FOLDER } from '@main/utils';
 import { BrowserWindow } from 'electron';
-import { LSWindow } from '../window';
-import { IProps } from './types';
+import { UIWindow } from '../window';
 import { TPage } from '@shared/types';
 import { loadPage } from '../helpers';
 
-export class LSModal extends BrowserWindow {
+export class UIModal extends BrowserWindow {
   constructor(
-    private readonly _parent: LSWindow,
+    private readonly _parent: UIWindow,
     private readonly _page: TPage,
-    private readonly _props?: IProps,
   ) {
     super({
       width: 400,

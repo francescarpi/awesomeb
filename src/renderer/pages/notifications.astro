@@ -2,30 +2,66 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout backgroundColor="black">
-  <div class="info">
-    <p id="message">No message provider</p>
+<Layout backgroundColor="rgba(0, 0, 0, 0.8)">
+  <div class="container">
+    <p class="message">No message provided</p>
+    <div class="count"></div>
+    <div class="countdown"></div>
   </div>
 </Layout>
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  // const message = params.get('message') || 'No message provided';
-  // const type = params.get('type') || 'info';
-  //
-  // const messageElement = document.getElementById('message');
-  // if (messageElement) {
-  //   messageElement.textContent = message;
-  // }
-  //
-  // const container = document.querySelector('div');
-  // if (container) {
-  //   container.classList.add(type);
-  // }
+  const DEFAULT_COUNTER = 5;
+
+  let intervalRef: NodeJS.Timeout | null = null;
+  let countdown = DEFAULT_COUNTER;
+
+  awesomeUI.onRefreshNotifications((_e, winId, notifications) => {
+    if (winId.toString() !== params.get('winId')) {
+      return;
+    }
+
+    const messageEl: HTMLParagraphElement = document.querySelector('.message')!;
+    const countEl: HTMLDivElement = document.querySelector('.count')!;
+    const countdownEl: HTMLDivElement = document.querySelector('.countdown')!;
+
+    countEl.textContent = notifications.length > 1 ? notifications.length.toString() : '';
+    countEl.style.display = notifications.length > 1 ? 'flex' : 'none';
+
+    // No notifications to show, clear everything
+    if (notifications.length === 0) {
+      if (intervalRef) {
+        clearInterval(intervalRef);
+      }
+      messageEl.textContent = '';
+      countdownEl.textContent = '';
+      return;
+    }
+
+    messageEl.textContent = notifications[0].message;
+
+    countdown = DEFAULT_COUNTER;
+    countdownEl.textContent = countdown.toString();
+
+    if (intervalRef) {
+      clearInterval(intervalRef);
+    }
+
+    intervalRef = setInterval(() => {
+      countdown -= 1;
+
+      if (countdown <= 0) {
+        clearInterval(intervalRef!);
+        awesomeUI.nextNotification(winId);
+      }
+      countdownEl.textContent = countdown.toString();
+    }, 1000);
+  });
 </script>
 
 <style>
-  div {
+  .container {
     app-region: no-drag;
     display: flex;
     justify-content: flex-start;
@@ -36,5 +72,34 @@ import Layout from '../layouts/Base.astro';
     text-align: center;
     font-size: 1rem;
     color: white;
+    position: relative;
+    border: 1px solid white;
+  }
+
+  .count {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.75rem;
+    background: white;
+    color: black;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .countdown {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

@@ -1,5 +1,5 @@
 import { Rectangle } from 'electron';
 
-export interface LSLayoutNode {
+export interface ILayoutNode {
   layout(rect: Rectangle): void;
 }

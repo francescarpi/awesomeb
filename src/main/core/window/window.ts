@@ -1,17 +1,17 @@
-import { LSWindow, LSVerticalLayout, LSView, LSHorizontalLayout } from '@main/layout-system';
+import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@main/ui';
 import type { IProps } from './types';
 
-export class BrowserWindow extends LSWindow {
+export class BrowserWindow extends UIWindow {
   constructor(_props?: IProps) {
     super();
 
-    const root = new LSVerticalLayout();
+    const root = new UIVerticalLayout();
 
-    const sidebar = new LSView('sidebar', { width: 255, margin: { l: 5, t: 5, r: 5, b: 5 } });
+    const sidebar = new UIView('sidebar', { width: 255, margin: { l: 5, t: 5, r: 5, b: 5 } });
 
-    const rightLayout = new LSHorizontalLayout();
-    const urlbar = new LSView('urlbar', { height: 40, margin: { l: 0, t: 5, r: 5, b: 0 } });
-    const content = new LSView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
+    const rightLayout = new UIHorizontalLayout();
+    const urlbar = new UIView('urlbar', { height: 40, margin: { l: 0, t: 5, r: 5, b: 0 } });
+    const content = new UIView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
 
     rightLayout.add(urlbar);
     rightLayout.add(content);
@@ -21,11 +21,14 @@ export class BrowserWindow extends LSWindow {
 
     this.setLayout(root);
 
-    // this.openModal('modal');
+    this.modal.open('modal');
     // this.openModal('modal-2');
 
-    this.showNotification('This is an info notification.');
-    // this.showNotification('This is a warning notification.', 'warning');
-    // this.showNotification('This is an error notification.', 'error');
+    setTimeout(() => {
+      this.notifications.show('INFO');
+      setTimeout(() => {
+        this.notifications.show('ERROR', 'error');
+      }, 3000);
+    }, 1000);
   }
 }

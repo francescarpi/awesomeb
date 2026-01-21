@@ -1,7 +1,7 @@
-import { LSLayout } from './base';
+import { UILayout } from './base';
 import { Rectangle } from 'electron';
 
-export class LSHorizontalLayout extends LSLayout {
+export class UIHorizontalLayout extends UILayout {
   layout(rect: Rectangle) {
     const usableWidth = rect.width;
     const usableHeight = rect.height;

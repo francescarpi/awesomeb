@@ -1,20 +1,19 @@
 import path from 'path';
 import { BrowserWindow, app } from 'electron';
 import { PRELOAD_FOLDER } from '@main/utils';
-import { LSLayout } from './layouts';
-import { LSView } from './view';
+import { UILayout } from './layouts';
+import { UIView } from './view';
 import { TPage } from '@shared/types';
-import { LSModal, IProps as IModalProps } from './modal';
-import { NotificationsContainer, TNotificationSeverity, Notification } from './notifications';
+import { UIModalManager } from './modal';
 import { loadPage } from './helpers';
+import { UINotificationsManager } from './notifications';
 
-export class LSWindow extends BrowserWindow {
-  private rootLayout?: LSLayout;
-  private readonly _views: Map<string, LSView> = new Map();
-  private _modal: LSModal | null = null;
+export class UIWindow extends BrowserWindow {
+  private rootLayout?: UILayout;
+  private readonly _views: Map<string, UIView> = new Map();
 
-  private _notificationsContainer: NotificationsContainer;
-  private _notifications: Notification[] = [];
+  private readonly _notificationsManager: UINotificationsManager;
+  private readonly _modalManager: UIModalManager;
 
   constructor() {
     super({
@@ -44,8 +43,8 @@ export class LSWindow extends BrowserWindow {
 
     this._enableAutoLayout();
 
-    this._notificationsContainer = new NotificationsContainer(this);
-    this.contentView.addChildView(this._notificationsContainer, 2);
+    this._modalManager = new UIModalManager(this);
+    this._notificationsManager = new UINotificationsManager(this);
 
     // this.webContents.openDevTools();
 
@@ -58,11 +57,13 @@ export class LSWindow extends BrowserWindow {
     return this.webContents.id;
   }
 
-  setLayout(layout: LSLayout) {
+  setLayout(layout: UILayout) {
     this.rootLayout = layout;
 
+    this.contentView.addChildView(this.notifications.notificationContainer, 1);
+
     for (const view of this.rootLayout.views) {
-      this.contentView.addChildView(view);
+      this.contentView.addChildView(view, 0);
       this._views.set(view.page, view);
     }
 
@@ -82,6 +83,8 @@ export class LSWindow extends BrowserWindow {
       width: w,
       height: h,
     });
+
+    // TODO Refresh notifications container position
   }
 
   private _enableAutoLayout() {
@@ -121,28 +124,11 @@ export class LSWindow extends BrowserWindow {
     }
   }
 
-  openModal(page: TPage, props?: IModalProps) {
-    if (this._modal) {
-      this.closeModal();
-    }
-
-    this._modal = new LSModal(this, page, props);
+  get notifications(): UINotificationsManager {
+    return this._notificationsManager;
   }
 
-  closeModal() {
-    if (this._modal) {
-      this._modal.hide();
-      this._modal.close();
-      this._modal = null;
-    }
-  }
-
-  get modal(): LSModal | null {
-    return this._modal;
-  }
-
-  showNotification(message: string, type: TNotificationSeverity = 'info') {
-    const notification = new Notification(message, type);
-    this._notifications.push(notification);
+  get modal(): UIModalManager {
+    return this._modalManager;
   }
 }

@@ -1,11 +1,11 @@
 import path from 'path';
 import { WebContentsView, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@main/utils';
-import { LSLayoutNode } from './types';
+import { ILayoutNode } from './types';
 import { IMargins, TPage } from '@shared/types';
 import { loadPage } from './helpers';
 
-export class LSView extends WebContentsView implements LSLayoutNode {
+export class UIView extends WebContentsView implements ILayoutNode {
   private _margins: IMargins = { l: 0, t: 0, r: 0, b: 0 };
   private _width: number | undefined;
   private _height: number | undefined;

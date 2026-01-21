@@ -1,16 +1,16 @@
 import { expect, test } from 'vitest';
-import { LSVerticalLayout } from './vertical';
-import { LSView } from '../view';
-import { LSHorizontalLayout } from './horizontal';
+import { UIVerticalLayout } from './vertical';
+import { UIView } from '../view';
+import { UIHorizontalLayout } from './horizontal';
 
-function createLayout(): LSVerticalLayout {
-  const layout1 = new LSVerticalLayout();
+function createLayout(): UIVerticalLayout {
+  const layout1 = new UIVerticalLayout();
 
-  const v1 = new LSView('v1');
+  const v1 = new UIView('v1');
 
-  const layout2 = new LSHorizontalLayout();
-  const v2 = new LSView('v2');
-  const v3 = new LSView('v3');
+  const layout2 = new UIHorizontalLayout();
+  const v2 = new UIView('v2');
+  const v3 = new UIView('v3');
 
   layout2.add(v2);
   layout2.add(v3);

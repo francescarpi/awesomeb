@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import { Browser } from '@main/core';
-import { setupLayoutSystemIPC } from '@main/layout-system';
+import { setupUIIPC } from '@main/ui';
 import { setupLogs } from './boot';
 
 setupLogs();
@@ -8,11 +8,11 @@ setupLogs();
 function init() {
   const browser = new Browser();
 
-  setupLayoutSystemIPC(browser);
+  setupUIIPC(browser);
 
   browser.init();
 
-  const _w1 = browser.createWindow();
+  browser.createWindow();
 }
 
 app.whenReady().then(init);

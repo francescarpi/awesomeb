@@ -1,10 +1,18 @@
-import { TWindowId } from '@shared/types';
-import { contextBridge, ipcRenderer } from 'electron';
+import { TWindowId, INotification } from '@shared/types';
+import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-const awesomeAPI = {
+const awesomeUI = {
   closeModal: (winId: TWindowId) => {
-    ipcRenderer.send('layout-system:close-modal', winId);
+    ipcRenderer.send('ui:close-modal', winId);
+  },
+  onRefreshNotifications: (
+    callback: (e: IpcRendererEvent, winId: TWindowId, notifications: INotification[]) => void,
+  ) => {
+    ipcRenderer.on('ui:refresh-notifications', callback);
+  },
+  nextNotification: (winId: TWindowId) => {
+    ipcRenderer.send('ui:next-notification', winId);
   },
 };
 
-contextBridge.exposeInMainWorld('awesome', awesomeAPI);
+contextBridge.exposeInMainWorld('awesomeUI', awesomeUI);
