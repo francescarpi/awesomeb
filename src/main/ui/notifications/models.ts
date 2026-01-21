@@ -8,8 +8,6 @@ import { WIDTH, HEIGHT, MARGIN_TOP, MARGIN_RIGHT } from './constants';
 
 export class UINotificationsContainer extends WebContentsView {
   constructor(private readonly _parent: UIWindow) {
-    const parentBounds = _parent.getBounds();
-
     super({
       webPreferences: {
         preload: path.join(PRELOAD_FOLDER, 'browser.js'),
@@ -20,12 +18,7 @@ export class UINotificationsContainer extends WebContentsView {
       },
     });
 
-    this.setBounds({
-      x: parentBounds.width - WIDTH - MARGIN_RIGHT,
-      y: MARGIN_TOP,
-      width: WIDTH,
-      height: HEIGHT,
-    });
+    this.refreshBounds();
 
     this.setVisible(false);
 
@@ -36,6 +29,16 @@ export class UINotificationsContainer extends WebContentsView {
 
   get wcId(): number {
     return this.webContents.id;
+  }
+
+  refreshBounds() {
+    const parentBounds = this._parent.getBounds();
+    this.setBounds({
+      x: parentBounds.width - WIDTH - MARGIN_RIGHT,
+      y: MARGIN_TOP,
+      width: WIDTH,
+      height: HEIGHT,
+    });
   }
 }
 

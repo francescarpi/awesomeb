@@ -21,7 +21,7 @@ export class BrowserWindow extends UIWindow {
 
     this.setLayout(root);
 
-    this.modal.open('modal');
+    // this.modal.open('modal');
     // this.openModal('modal-2');
 
     setTimeout(() => {

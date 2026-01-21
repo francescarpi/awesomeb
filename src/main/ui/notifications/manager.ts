@@ -49,4 +49,12 @@ export class UINotificationsManager {
   hideContainer() {
     this._notificationsContainer.setVisible(false);
   }
+
+  get isVisible(): boolean {
+    return this._notificationsContainer.getVisible();
+  }
+
+  refreshContainerBounds() {
+    this._notificationsContainer.refreshBounds();
+  }
 }

@@ -84,7 +84,9 @@ export class UIWindow extends BrowserWindow {
       height: h,
     });
 
-    // TODO Refresh notifications container position
+    if (this.notifications.isVisible) {
+      this.notifications.refreshContainerBounds();
+    }
   }
 
   private _enableAutoLayout() {
