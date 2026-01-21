@@ -4,9 +4,10 @@ import '../assets/app.css';
 interface Props {
   backgroundColor?: string;
   borderRadius?: string;
+  backgroundImage?: string;
 }
 
-const { backgroundColor, borderRadius } = Astro.props;
+const { backgroundColor, borderRadius, backgroundImage } = Astro.props;
 ---
 
 <!doctype html>
@@ -23,14 +24,18 @@ const { backgroundColor, borderRadius } = Astro.props;
 </html>
 
 <style
-  define:vars={{ backgroundColor: backgroundColor || 'white', borderRadius: borderRadius || '0px' }}
+  define:vars={{
+    backgroundColor: backgroundColor || 'transparent',
+    borderRadius: borderRadius || '0px',
+    backgroundImage: backgroundImage || 'none',
+  }}
 >
   .rootContainer {
     position: fixed;
     inset: 0;
     background-color: var(--backgroundColor);
-    app-region: drag;
     color: black;
     border-radius: var(--borderRadius);
+    background-image: var(--backgroundImage);
   }
 </style>

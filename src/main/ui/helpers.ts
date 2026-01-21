@@ -10,3 +10,10 @@ export async function loadPage(wc: WebContents, page: string, query: Record<stri
     await wc.loadURL(`http://localhost:4321/${page}?${params.toString()}`);
   }
 }
+
+export function openDevTools(wc: WebContents, expectedTarget: string) {
+  const target = process.env.AB_DEVTOOLS;
+  if (target === expectedTarget) {
+    wc.openDevTools();
+  }
+}

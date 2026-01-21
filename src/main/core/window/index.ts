@@ -1,1 +1,2 @@
-export { BrowserWindow } from './window';
+export { Window } from './window';
+export { setupWindowIPC } from './ipc';

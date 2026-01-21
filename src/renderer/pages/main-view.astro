@@ -2,4 +2,19 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout backgroundColor="blue" borderRadius="0 0 10px 0"> Main view </Layout>
+<Layout borderRadius="10px" backgroundColor="rgba(255, 255, 255, 0.1)">
+  <div>
+    <p>Press Cmd/Ctrl + P to open the commands tool</p>
+  </div>
+</Layout>
+
+<style>
+  div {
+    app-region: drag;
+    color: rgb(255, 255, 255, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+</style>

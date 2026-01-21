@@ -23,13 +23,12 @@ import { Icon } from 'astro-icon/components';
 </style>
 
 <script>
-  const btn = document.querySelector('button');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      const winId = new URLSearchParams(window.location.search).get('winId');
-      if (winId) {
-        awesomeUI.closeModal(parseInt(winId, 10));
-      }
-    });
-  }
+  import { getWinId } from '../../scripts/window';
+
+  const btn = document.querySelector('button')!;
+  const winId = getWinId();
+
+  btn.addEventListener('click', () => {
+    abModal.closeModal(winId);
+  });
 </script>

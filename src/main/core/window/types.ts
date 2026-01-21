@@ -1,3 +1,5 @@
+import { Theme } from '../themes';
+
 export interface IProps {
-  foo?: string;
+  theme?: Theme;
 }

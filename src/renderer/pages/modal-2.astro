@@ -29,7 +29,7 @@ import { Icon } from 'astro-icon/components';
     btn.addEventListener('click', () => {
       const winId = new URLSearchParams(window.location.search).get('winId');
       if (winId) {
-        awesomeUI.closeModal(parseInt(winId, 10));
+        abModal.closeModal(parseInt(winId, 10));
       }
     });
   }

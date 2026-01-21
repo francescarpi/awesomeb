@@ -1,5 +1,17 @@
 ---
 import Layout from '../layouts/Base.astro';
+import WindowActions from '../../components/sidebar/WindowActions.astro';
 ---
 
-<Layout backgroundColor="yellow" borderRadius="10px 0 0 10px"> Sidebar </Layout>
+<Layout borderRadius="10px 0 0 10px">
+  <div class="sidebar">
+    <WindowActions />
+  </div>
+</Layout>
+
+<style>
+  .sidebar {
+    app-region: drag;
+    height: 100vh;
+  }
+</style>

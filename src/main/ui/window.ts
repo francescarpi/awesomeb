@@ -5,17 +5,18 @@ import { UILayout } from './layouts';
 import { UIView } from './view';
 import { TPage } from '@shared/types';
 import { UIModalManager } from './modal';
-import { loadPage } from './helpers';
+import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
+import { Theme } from '@main/core';
 
 export class UIWindow extends BrowserWindow {
   private rootLayout?: UILayout;
-  private readonly _views: Map<string, UIView> = new Map();
+  private readonly _views: Map<TPage, UIView> = new Map();
 
   private readonly _notificationsManager: UINotificationsManager;
   private readonly _modalManager: UIModalManager;
 
-  constructor() {
+  constructor(theme: Theme) {
     super({
       title: app.name,
       minWidth: 800,
@@ -39,14 +40,19 @@ export class UIWindow extends BrowserWindow {
       },
     });
 
-    loadPage(this.webContents, 'window');
+    loadPage(this.webContents, 'window', {
+      primary: theme.primary,
+      secondary: theme.secondary,
+      degrees: theme.degrees.toString(),
+      winId: this.id.toString(),
+    });
 
     this._enableAutoLayout();
 
     this._modalManager = new UIModalManager(this);
     this._notificationsManager = new UINotificationsManager(this);
 
-    // this.webContents.openDevTools();
+    openDevTools(this.webContents, 'window');
 
     this.once('ready-to-show', () => {
       this.show();
@@ -124,6 +130,10 @@ export class UIWindow extends BrowserWindow {
       view.setHeight(height);
       this.refreshLayout();
     }
+  }
+
+  getView(page: TPage): UIView | null {
+    return this._views.get(page) || null;
   }
 
   get notifications(): UINotificationsManager {

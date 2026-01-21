@@ -17,7 +17,7 @@ import Layout from '../layouts/Base.astro';
   let intervalRef: NodeJS.Timeout | null = null;
   let countdown = DEFAULT_COUNTER;
 
-  awesomeUI.onRefreshNotifications((_e, winId, notifications) => {
+  abNotifications.onRefreshNotifications((_e, winId, notifications) => {
     if (winId.toString() !== params.get('winId')) {
       return;
     }
@@ -53,7 +53,7 @@ import Layout from '../layouts/Base.astro';
 
       if (countdown <= 0) {
         clearInterval(intervalRef!);
-        awesomeUI.nextNotification(winId);
+        abNotifications.nextNotification(winId);
       }
       countdownEl.textContent = countdown.toString();
     }, 1000);

@@ -4,11 +4,11 @@ import log from 'electron-log';
 import { UINotification } from './notifications';
 import { INotification, TWindowId } from '@shared/types';
 
-const scopeLog = log.scope('IPCLayoutSystem');
+const scopeLog = log.scope('IPCUI');
 
 export function setupUIIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('ui:close-modal', (event, winId: number) => {
+  ipcMain.on('ui:close-modal', async (event, winId: number) => {
     scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
 
     const win = browser.getWindowById(winId);
@@ -28,7 +28,7 @@ export function setupUIIPC(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('ui:next-notification', (event, winId: number) => {
+  ipcMain.on('ui:next-notification', async (event, winId: number) => {
     scopeLog.info(`IPC Received: ui:next-notification for window ID ${winId}`);
 
     const win = browser.getWindowById(winId);

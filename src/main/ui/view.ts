@@ -1,9 +1,9 @@
 import path from 'path';
 import { WebContentsView, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@main/utils';
-import { ILayoutNode } from './types';
+import { ILayoutNode, IProps } from './types';
 import { IMargins, TPage } from '@shared/types';
-import { loadPage } from './helpers';
+import { loadPage, openDevTools } from './helpers';
 
 export class UIView extends WebContentsView implements ILayoutNode {
   private _margins: IMargins = { l: 0, t: 0, r: 0, b: 0 };
@@ -12,7 +12,7 @@ export class UIView extends WebContentsView implements ILayoutNode {
 
   constructor(
     public readonly page: TPage,
-    props?: { width?: number; height?: number; margin?: IMargins },
+    props?: IProps,
   ) {
     super({
       webPreferences: {
@@ -25,9 +25,9 @@ export class UIView extends WebContentsView implements ILayoutNode {
       },
     });
 
-    loadPage(this.webContents, page);
+    loadPage(this.webContents, page, props?.query);
 
-    // this.webContents.openDevTools();
+    openDevTools(this.webContents, page);
 
     this._width = props?.width;
     this._height = props?.height;

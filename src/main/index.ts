@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { Browser } from '@main/core';
+import { Browser, setupWindowIPC } from '@main/core';
 import { setupUIIPC } from '@main/ui';
 import { setupLogs } from './boot';
 
@@ -9,6 +9,7 @@ function init() {
   const browser = new Browser();
 
   setupUIIPC(browser);
+  setupWindowIPC(browser);
 
   browser.init();
 

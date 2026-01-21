@@ -2,4 +2,15 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout backgroundColor="red"> Window </Layout>
+<Layout backgroundImage="linear-gradient(var(--bg-deg), var(--bg-primary), var(--bg-secondary))" />
+
+<script>
+  const search = new URLSearchParams(window.location.search);
+  const primary = search.get('primary')!;
+  const secondary = search.get('secondary')!;
+  const degrees = parseInt(search.get('degrees')!, 10);
+
+  document.documentElement.style.setProperty('--bg-primary', primary);
+  document.documentElement.style.setProperty('--bg-secondary', secondary);
+  document.documentElement.style.setProperty('--bg-deg', `${degrees}deg`);
+</script>

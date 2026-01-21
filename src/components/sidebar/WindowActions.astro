@@ -1,0 +1,48 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<div>
+  <Icon name="close" id="close" />
+  <Icon name="down" id="minimize" />
+  <Icon name="up" id="maximize" />
+</div>
+
+<script>
+  import { getWinId } from '../../scripts/window';
+
+  const closeEl: SVGElement = document.querySelector('#close')!;
+  const minimizeEl: SVGElement = document.querySelector('#minimize')!;
+  const maximizeEl: SVGElement = document.querySelector('#maximize')!;
+  const winId = getWinId();
+
+  closeEl.addEventListener('click', () => {
+    abWindow.close(winId);
+  });
+
+  minimizeEl.addEventListener('click', () => {
+    abWindow.minimize(winId);
+  });
+
+  maximizeEl.addEventListener('click', () => {
+    abWindow.maximize(winId);
+  });
+</script>
+
+<style>
+  div {
+    app-region: no-drag;
+    display: flex;
+    gap: 0.2rem;
+    padding: 0.4rem;
+  }
+  svg {
+    cursor: pointer;
+    color: white;
+  }
+
+  svg:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+</style>
