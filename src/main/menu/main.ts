@@ -8,6 +8,9 @@ const scopeLog = log.scope('MainMenu');
 export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   scopeLog.info('Setting up main menu');
 
+  const focusedWindow = browser.getFocusedWindow();
+  console.log('focusedWindow', focusedWindow);
+
   const menu = Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
     fileMenu(browser, showRootIcon),

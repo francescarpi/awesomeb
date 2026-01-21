@@ -8,6 +8,8 @@ import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import { Theme } from '@main/core';
+import { registerWindowEvents } from './events';
+import EventEmitter from 'events';
 
 export class UIWindow extends BrowserWindow {
   private rootLayout?: UILayout;
@@ -16,7 +18,10 @@ export class UIWindow extends BrowserWindow {
   private readonly _notificationsManager: UINotificationsManager;
   private readonly _modalManager: UIModalManager;
 
-  constructor(theme: Theme) {
+  constructor(
+    public readonly eventsChannel: EventEmitter,
+    theme: Theme,
+  ) {
     super({
       title: app.name,
       minWidth: 800,
@@ -29,6 +34,7 @@ export class UIWindow extends BrowserWindow {
       resizable: true,
       backgroundMaterial: 'none',
       backgroundColor: process.platform === 'darwin' ? '#00000000' : '#000000',
+      focusable: true,
       vibrancy: 'fullscreen-ui',
       roundedCorners: true,
       show: false,
@@ -47,7 +53,7 @@ export class UIWindow extends BrowserWindow {
       winId: this.id.toString(),
     });
 
-    this._enableAutoLayout();
+    registerWindowEvents(this);
 
     this._modalManager = new UIModalManager(this);
     this._notificationsManager = new UINotificationsManager(this);
@@ -56,6 +62,7 @@ export class UIWindow extends BrowserWindow {
 
     this.once('ready-to-show', () => {
       this.show();
+      this.focus();
     });
   }
 
@@ -93,11 +100,6 @@ export class UIWindow extends BrowserWindow {
     if (this.notifications.isVisible) {
       this.notifications.refreshContainerBounds();
     }
-  }
-
-  private _enableAutoLayout() {
-    this.on('resize', () => this.refreshLayout());
-    this.on('move', () => this.refreshLayout());
   }
 
   setViewVisibility(page: TPage, visible: boolean) {
