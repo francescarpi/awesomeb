@@ -44,6 +44,9 @@ vi.mock('electron', () => {
       isVisible() {
         return true;
       }
+      static getAllWindows() {
+        return [];
+      }
     },
     WebContentsView: class {
       webContents = webContents;

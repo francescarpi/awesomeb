@@ -1,9 +1,12 @@
 import { Window } from '@main/core';
 import { TWindowId } from '@shared/types';
 import { mainMenu } from '@main/menu';
-import { Menu, BrowserWindow, app } from 'electron';
+import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';
+import log from 'electron-log';
+
+const scopeLog = log.scope('Browser');
 
 export class Browser {
   private readonly _windows: Map<TWindowId, Window> = new Map();
@@ -20,6 +23,12 @@ export class Browser {
   createWindow(): Window {
     const w = new Window(this.eventsChannel);
     this._windows.set(w.id, w);
+
+    scopeLog.info(
+      `Created window with id ${w.id} ` +
+        `(Total windows: ${BrowserWindow.getAllWindows().length})`,
+    );
+
     return w;
   }
 

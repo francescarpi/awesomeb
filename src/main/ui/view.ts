@@ -5,16 +5,17 @@ import { ILayoutNode, IProps } from './types';
 import { IMargins, TPage } from '@shared/types';
 import { loadPage, openDevTools } from './helpers';
 
-export class UIView extends WebContentsView implements ILayoutNode {
+export class UIView implements ILayoutNode {
   private _margins: IMargins = { l: 0, t: 0, r: 0, b: 0 };
   private _width: number | undefined;
   private _height: number | undefined;
+  public readonly wcv: WebContentsView;
 
   constructor(
     public readonly page: TPage,
     props?: IProps,
   ) {
-    super({
+    this.wcv = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -25,9 +26,9 @@ export class UIView extends WebContentsView implements ILayoutNode {
       },
     });
 
-    loadPage(this.webContents, page, props?.query);
+    loadPage(this.wcv.webContents, page, props?.query);
 
-    openDevTools(this.webContents, page);
+    openDevTools(this.wcv.webContents, page);
 
     this._width = props?.width;
     this._height = props?.height;
@@ -38,7 +39,7 @@ export class UIView extends WebContentsView implements ILayoutNode {
   }
 
   layout(rect: Rectangle) {
-    this.setBounds(rect);
+    this.wcv.setBounds(rect);
   }
 
   setMargins(margins: Partial<IMargins>) {

@@ -33,7 +33,7 @@ export abstract class UILayout implements ILayoutNode {
 
   get visibleChildren(): ILayoutNode[] {
     return this.children.filter((c) => {
-      return c instanceof UIView ? c.getVisible() : true;
+      return c instanceof UIView ? c.wcv.getVisible() : true;
     });
   }
 }

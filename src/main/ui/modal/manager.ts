@@ -17,8 +17,8 @@ export class UIModalManager {
 
   close() {
     if (this._modal) {
-      this._modal.hide();
-      this._modal.close();
+      this._modal.bw.hide();
+      this._modal.bw.close();
       this._modal = null;
     }
   }
@@ -28,6 +28,6 @@ export class UIModalManager {
   }
 
   get id(): number | null {
-    return this._modal ? this._modal.webContents.id : null;
+    return this._modal ? this._modal.bw.webContents.id : null;
   }
 }

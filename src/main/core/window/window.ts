@@ -1,18 +1,14 @@
 import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@main/ui';
 import type { IProps } from './types';
-import { defaultTheme, Theme } from '@main/core';
+import { defaultTheme } from '@main/core';
 import EventEmitter from 'events';
 
 export class Window extends UIWindow {
-  public theme: Theme;
-
   constructor(
     public readonly eventsChannel: EventEmitter,
     props?: IProps,
   ) {
-    const theme = props?.theme || defaultTheme;
-    super(eventsChannel, theme);
-    this.theme = theme;
+    super(eventsChannel, props?.theme || defaultTheme);
 
     const root = new UIVerticalLayout();
 

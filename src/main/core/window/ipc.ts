@@ -20,7 +20,7 @@ async function checkSender(
   }
 
   const view = win.getView(page);
-  if (!view || view.webContents.id !== event.sender.id) {
+  if (!view || view.wcv.webContents.id !== event.sender.id) {
     scopeLog.warn(
       `Sender webContents id ${event.sender.id} does not match window id ${winId} and page ${page}`,
     );
@@ -36,7 +36,7 @@ export function setupWindowIPC(browser: Browser) {
     scopeLog.info(`IPC window:close ${winId}`);
     return await checkSender(event, browser, winId, 'sidebar', (window, _view) => {
       // TODO Use a command instead work with webcontents directly
-      window.close();
+      window.bw.close();
     });
   });
 
@@ -45,7 +45,7 @@ export function setupWindowIPC(browser: Browser) {
     scopeLog.info(`IPC window:minimize ${winId}`);
     return await checkSender(event, browser, winId, 'sidebar', (window, _view) => {
       // TODO Use a command instead work with webcontents directly
-      window.minimize();
+      window.bw.minimize();
     });
   });
 
@@ -54,10 +54,10 @@ export function setupWindowIPC(browser: Browser) {
     scopeLog.info(`IPC window:maximize ${winId}`);
     return await checkSender(event, browser, winId, 'sidebar', (window, _view) => {
       // TODO Use a command instead work with webcontents directly
-      if (window.isMaximized()) {
-        window.unmaximize();
+      if (window.bw.isMaximized()) {
+        window.bw.unmaximize();
       } else {
-        window.maximize();
+        window.bw.maximize();
       }
     });
   });

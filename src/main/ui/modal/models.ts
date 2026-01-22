@@ -5,16 +5,17 @@ import { UIWindow } from '../window';
 import { TPage } from '@shared/types';
 import { loadPage } from '../helpers';
 
-export class UIModal extends BrowserWindow {
+export class UIModal {
+  public readonly bw: BrowserWindow;
   constructor(
     private readonly _parent: UIWindow,
     private readonly _page: TPage,
   ) {
-    super({
+    this.bw = new BrowserWindow({
       width: 400,
       height: 300,
       frame: false,
-      parent: _parent,
+      parent: _parent.bw,
       transparent: true,
       roundedCorners: true,
       modal: true,
@@ -30,16 +31,16 @@ export class UIModal extends BrowserWindow {
     });
 
     const query = { winId: this._parent.id.toString() };
-    loadPage(this.webContents, this._page, query);
+    loadPage(this.bw.webContents, this._page, query);
 
     // this.webContents.openDevTools();
 
-    this.once('ready-to-show', () => {
-      this.show();
+    this.bw.once('ready-to-show', () => {
+      this.bw.show();
     });
   }
 
   get wcId(): number {
-    return this.webContents.id;
+    return this.bw.webContents.id;
   }
 }

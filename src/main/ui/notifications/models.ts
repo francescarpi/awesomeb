@@ -32,7 +32,7 @@ export class UINotificationsContainer extends WebContentsView {
   }
 
   refreshBounds() {
-    const parentBounds = this._parent.getBounds();
+    const parentBounds = this._parent.bw.getBounds();
     this.setBounds({
       x: parentBounds.width - WIDTH - MARGIN_RIGHT,
       y: MARGIN_TOP,

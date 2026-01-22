@@ -1,5 +1,5 @@
 import path from 'path';
-import { BrowserWindow, app } from 'electron';
+import { BrowserWindow, WebContents, app } from 'electron';
 import { PRELOAD_FOLDER } from '@main/utils';
 import { UILayout } from './layouts';
 import { UIView } from './view';
@@ -11,18 +11,19 @@ import { Theme } from '@main/core';
 import { registerWindowEvents } from './events';
 import EventEmitter from 'events';
 
-export class UIWindow extends BrowserWindow {
+export class UIWindow {
   private rootLayout?: UILayout;
   private readonly _views: Map<TPage, UIView> = new Map();
+  public readonly bw: BrowserWindow;
 
   private readonly _notificationsManager: UINotificationsManager;
   private readonly _modalManager: UIModalManager;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
-    theme: Theme,
+    public theme: Theme,
   ) {
-    super({
+    this.bw = new BrowserWindow({
       title: app.name,
       minWidth: 800,
       minHeight: 400,
@@ -46,7 +47,7 @@ export class UIWindow extends BrowserWindow {
       },
     });
 
-    loadPage(this.webContents, 'window', {
+    loadPage(this.bw.webContents, 'window', {
       primary: theme.primary,
       secondary: theme.secondary,
       degrees: theme.degrees.toString(),
@@ -58,25 +59,28 @@ export class UIWindow extends BrowserWindow {
     this._modalManager = new UIModalManager(this);
     this._notificationsManager = new UINotificationsManager(this);
 
-    openDevTools(this.webContents, 'window');
+    openDevTools(this.wc, 'window');
+  }
 
-    this.once('ready-to-show', () => {
-      this.show();
-      this.focus();
-    });
+  get id(): number {
+    return this.bw.id;
   }
 
   get wcId(): number {
-    return this.webContents.id;
+    return this.wc.id;
+  }
+
+  get wc(): WebContents {
+    return this.bw.webContents;
   }
 
   setLayout(layout: UILayout) {
     this.rootLayout = layout;
 
-    this.contentView.addChildView(this.notifications.notificationContainer, 1);
+    this.bw.contentView.addChildView(this.notifications.notificationContainer, 1);
 
     for (const view of this.rootLayout.views) {
-      this.contentView.addChildView(view, 0);
+      this.bw.contentView.addChildView(view.wcv, 0);
       this._views.set(view.page, view);
     }
 
@@ -88,7 +92,7 @@ export class UIWindow extends BrowserWindow {
       return;
     }
 
-    const [w, h] = this.getContentSize();
+    const [w, h] = this.bw.getContentSize();
 
     this.rootLayout.layout({
       x: 0,
@@ -105,7 +109,7 @@ export class UIWindow extends BrowserWindow {
   setViewVisibility(page: TPage, visible: boolean) {
     const view = this._views.get(page);
     if (view) {
-      view.setVisible(visible);
+      view.wcv.setVisible(visible);
       this.refreshLayout();
     }
   }

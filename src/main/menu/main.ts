@@ -1,4 +1,4 @@
-import { Browser } from '@main/core';
+import { Browser, Window } from '@main/core';
 import { MenuItemConstructorOptions, Menu } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -9,11 +9,10 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   scopeLog.info('Setting up main menu');
 
   const focusedWindow = browser.getFocusedWindow();
-  console.log('focusedWindow', focusedWindow);
 
   const menu = Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
-    fileMenu(browser, showRootIcon),
+    fileMenu(browser, showRootIcon, focusedWindow),
   ]);
 
   return menu;
@@ -49,7 +48,11 @@ function appMenu(browser: Browser, showRootIcon: boolean): MenuItemConstructorOp
   };
 }
 
-function fileMenu(browser: Browser, showRootIcon: boolean): MenuItemConstructorOptions {
+function fileMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  focusedWindow: Window | null,
+): MenuItemConstructorOptions {
   return {
     label: 'File',
     icon: showRootIcon ? getIcon(EIcon.File) : undefined,
@@ -57,8 +60,13 @@ function fileMenu(browser: Browser, showRootIcon: boolean): MenuItemConstructorO
       {
         label: 'Perform command',
         accelerator: 'CmdOrCtrl+P',
+        enabled: !!focusedWindow,
         icon: getIcon(EIcon.Command),
-        // click: () => (focusedWindow ? browser.showPerformCommandDialog(focusedWindow.id) : null),
+        click: () => {
+          if (focusedWindow) {
+            console.log('Perform command clicked on window:', focusedWindow?.id);
+          }
+        },
       },
       // { type: 'separator' },
       // {
