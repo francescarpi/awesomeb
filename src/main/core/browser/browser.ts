@@ -37,6 +37,18 @@ export class Browser {
   }
 
   getFocusedWindow(): Window | null {
+    console.log('process.type:', process.type);
+    console.log('process.pid:', process.pid);
+    console.log({
+      focused: BrowserWindow.getFocusedWindow()?.id ?? null,
+      // active: app.isActive(),
+      windows: BrowserWindow.getAllWindows().map((w) => ({
+        id: w.id,
+        focused: w.isFocused(),
+        visible: w.isVisible(),
+        focusable: w.isFocusable(),
+      })),
+    });
     const focusedWindow = BrowserWindow.getFocusedWindow();
     console.log('focusedWindow in browser', focusedWindow);
     return focusedWindow ? this.getWindowById(focusedWindow.id as TWindowId) : null;

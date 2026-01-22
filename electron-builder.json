@@ -1,6 +1,6 @@
 {
   "appId": "com.farpi.awesomeb",
-  "productName": "AwesomeB",
+  "productName": "AwesomeB.Astro",
   "directories": {
     "output": "release"
   },
@@ -18,4 +18,3 @@
     "target": "AppImage"
   }
 }
-
