@@ -2,13 +2,18 @@ import { Browser } from '@main/core';
 import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
-import { INotification, TWindowId } from '@shared/types';
+import {
+  INotification,
+  TWindowId,
+  TListWithSearchEntity,
+  IListWithSearchEntity,
+} from '@shared/types';
 
 const scopeLog = log.scope('IPCUI');
 
 export function setupUIIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('ui:close-modal', async (event, winId: number) => {
+  ipcMain.on('modal:close', async (event, winId: TWindowId) => {
     scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
 
     const win = browser.getWindowById(winId);
@@ -29,8 +34,8 @@ export function setupUIIPC(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('ui:next-notification', async (event, winId: number) => {
-    scopeLog.info(`IPC Received: ui:next-notification for window ID ${winId}`);
+  ipcMain.on('notifications:next', async (event, winId: TWindowId) => {
+    scopeLog.info(`IPC Received: notifications:next for window ID ${winId}`);
 
     const win = browser.getWindowById(winId);
     if (!win) {
@@ -54,6 +59,53 @@ export function setupUIIPC(browser: Browser) {
       win.notifications.hideContainer();
     }
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.handle(
+    'list-with-search:get-entities',
+    async (event, winId: TWindowId, entity: TListWithSearchEntity) => {
+      scopeLog.info(
+        `IPC Received: list-with-search:get-entities for window ID ${winId} and entity ${entity}`,
+      );
+
+      // TODO validate winId!!
+      // TODO switch command
+
+      const resp: IListWithSearchEntity[] = [
+        {
+          id: 'close-window',
+          label: 'Close Window',
+          extra: 'Close the current window',
+        },
+        {
+          id: 'minimize-window',
+          label: 'Minimize Window',
+          extra: 'Minimize the current window',
+        },
+        {
+          id: 'maximize-window',
+          label: 'Maximize Window',
+          extra: 'Maximize the current window',
+        },
+        {
+          id: 'item-4',
+          label: 'Item 4',
+          extra: 'Extra info for item 4',
+        },
+        {
+          id: 'item-5',
+          label: 'Item 5',
+          extra: 'Extra info for item 5',
+        },
+        {
+          id: 'item-6',
+          label: 'Item 6',
+          extra: 'Extra info for item 6',
+        },
+      ];
+      return resp;
+    },
+  );
 }
 
 //--------------------------------------------------------------------------------------
@@ -70,5 +122,5 @@ export function refreshNotifications(
     severity: n.severity,
   }));
 
-  wc.send('ui:refresh-notifications', winId, data);
+  wc.send('notifications:on-refresh', winId, data);
 }

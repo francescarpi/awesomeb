@@ -1,9 +1,9 @@
-import { TWindowId, INotification } from '@shared/types';
+import { TWindowId, INotification, TListWithSearchEntity } from '@shared/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 const abModal = {
   closeModal: (winId: TWindowId) => {
-    ipcRenderer.send('ui:close-modal', winId);
+    ipcRenderer.send('modal:close', winId);
   },
 };
 
@@ -11,10 +11,10 @@ const abNotifications = {
   onRefreshNotifications: (
     callback: (e: IpcRendererEvent, winId: TWindowId, notifications: INotification[]) => void,
   ) => {
-    ipcRenderer.on('ui:refresh-notifications', callback);
+    ipcRenderer.on('notifications:on-refresh', callback);
   },
   nextNotification: (winId: TWindowId) => {
-    ipcRenderer.send('ui:next-notification', winId);
+    ipcRenderer.send('notifications:next', winId);
   },
 };
 
@@ -30,6 +30,13 @@ const abWindow = {
   },
 };
 
+const abListWithSearch = {
+  getEntities: async (winId: TWindowId, entity: TListWithSearchEntity) => {
+    return await ipcRenderer.invoke('list-with-search:get-entities', winId, entity);
+  },
+};
+
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abWindow', abWindow);
+contextBridge.exposeInMainWorld('abListWithSearch', abListWithSearch);

@@ -1,4 +1,9 @@
-import { TWindowId, INotification } from '@shared/types';
+import {
+  TWindowId,
+  INotification,
+  TListWithSearchEntity,
+  IListWithSearchEntity,
+} from '@shared/types';
 import { IpcRendererEvent } from 'electron';
 
 export {};
@@ -19,5 +24,12 @@ declare global {
     close: (winId: TWindowId) => void;
     minimize: (winId: TWindowId) => void;
     maximize: (winId: TWindowId) => void;
+  };
+
+  const abListWithSearch: {
+    getEntities: (
+      winId: TWindowId,
+      entity: TListWithSearchEntity,
+    ) => Promise<IListWithSearchEntity[]>;
   };
 }

@@ -13,6 +13,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   const menu = Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
     fileMenu(browser, showRootIcon, focusedWindow),
+    editMenu(browser, showRootIcon, focusedWindow),
   ]);
 
   return menu;
@@ -98,6 +99,55 @@ function fileMenu(
       //           trigger: 'select-tab-container',
       //         })
       //       : null,
+      // },
+    ],
+  };
+}
+
+function editMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  focusedWindow: Window | null,
+): MenuItemConstructorOptions {
+  return {
+    label: 'Edit',
+    // icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteAndMatchStyle' },
+      { role: 'delete' },
+      { role: 'selectAll' },
+      { type: 'separator' },
+      // {
+      //   label: 'Copy URL',
+      //   accelerator: 'CmdOrCtrl+Shift+C',
+      //   icon: getIcon(EIcon.Copy),
+      //   enabled: Boolean(selectedTab),
+      //   click: () => browser.performCommand({ trigger: 'copy-url', params: { windowId: focusedWindow.id } }),
+      // },
+      // {
+      //   label: 'Edit URL',
+      //   accelerator: 'CmdOrCtrl+E',
+      //   icon: getIcon(EIcon.Edit),
+      //   enabled: Boolean(selectedTab),
+      //   click: () => browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'edit-url' }),
+      // },
+      // { type: 'separator' },
+      // {
+      //   label: 'Find in page...',
+      //   accelerator: 'CmdOrCtrl+F',
+      //   icon: getIcon(EIcon.Search),
+      //   enabled: Boolean(selectedTab) && selectedTab?.hasTabPreview === false,
+      //   click: () =>
+      //     browser.performCommand({
+      //       trigger: 'find-in-page',
+      //       params: { windowId: focusedWindow.id, tabId: selectedTab!.id },
+      //     }),
       // },
     ],
   };

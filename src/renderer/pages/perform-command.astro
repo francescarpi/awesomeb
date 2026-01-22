@@ -1,24 +1,19 @@
 ---
 import Layout from '../layouts/Base.astro';
-import List from '../../components/common/List.astro';
+import ListWithSearch from '../../components/common/ListWithSearch.astro';
 ---
 
 <Layout>
-  <div class="bg-black text-white h-full p-4">
-    <h1 class="text-lg mb-2">Perform Command</h1>
-    <input
-      class="input w-full text-black"
-      placeholder="Start typing to search commands..."
-      autofocus
-    />
-    <div class="h-[calc(100%-96px)] overflow-y-auto mt-4">
-      <List />
-    </div>
+  <div class="bg-black text-white p-4 flex flex-col gap-2 h-full">
+    <h1 class="text-lg">Perform Command</h1>
+    <ListWithSearch placeholder="Start typing to search commands..." id="commands" />
   </div>
 </Layout>
 
 <script>
   import { getWinId } from '../../scripts/window';
+  import { manageListWithSearch } from '../../scripts/list-with-search';
+
   const winId = getWinId();
 
   document.addEventListener('keydown', function (event) {
@@ -26,4 +21,11 @@ import List from '../../components/common/List.astro';
       abModal.closeModal(winId);
     }
   });
+
+  const commandsEl = document.getElementById('commands');
+  if (commandsEl) {
+    manageListWithSearch(commandsEl, 'commands', (item) => {
+      alert(item.id);
+    });
+  }
 </script>

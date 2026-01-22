@@ -6,3 +6,11 @@ export interface IMargins {
 }
 
 export type TPage = string;
+
+export type TListWithSearchEntity = 'commands';
+
+export interface IListWithSearchEntity {
+  id: string;
+  label: string;
+  extra?: string;
+}
