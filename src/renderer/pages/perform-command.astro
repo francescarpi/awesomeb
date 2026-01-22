@@ -1,8 +1,21 @@
 ---
 import Layout from '../layouts/Base.astro';
+import List from '../../components/common/List.astro';
 ---
 
-<Layout backgroundColor="black"> Perform Command </Layout>
+<Layout>
+  <div class="bg-black text-white h-full p-4">
+    <h1 class="text-lg mb-2">Perform Command</h1>
+    <input
+      class="input w-full text-black"
+      placeholder="Start typing to search commands..."
+      autofocus
+    />
+    <div class="h-[calc(100%-96px)] overflow-y-auto mt-4">
+      <List />
+    </div>
+  </div>
+</Layout>
 
 <script>
   import { getWinId } from '../../scripts/window';

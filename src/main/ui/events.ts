@@ -28,6 +28,6 @@ export function registerWindowEvents(win: UIWindow) {
   //--------------------------------------------------------------------------------------
   win.bw.once('ready-to-show', () => {
     win.bw.show();
-    win.bw.focus();
+    win.focus();
   });
 }

@@ -27,8 +27,8 @@ export class UIWindow {
       title: app.name,
       minWidth: 800,
       minHeight: 400,
-      width: 800,
-      height: 600,
+      width: 1200,
+      height: 800,
       frame: false,
       visualEffectState: 'followWindow',
       transparent: false,
@@ -142,6 +142,10 @@ export class UIWindow {
     return this._views.get(page) || null;
   }
 
+  focus() {
+    this.bw.focus();
+  }
+
   get notifications(): UINotificationsManager {
     return this._notificationsManager;
   }
@@ -151,6 +155,9 @@ export class UIWindow {
   }
 
   performCommand() {
-    this.modal.open('perform-command');
+    this.modal.open('perform-command', {
+      width: 500,
+      height: 500,
+    });
   }
 }

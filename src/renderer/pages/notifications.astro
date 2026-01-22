@@ -2,13 +2,19 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout backgroundColor="rgba(0, 0, 0, 0.8)">
-  <div class="container">
-    <p class="message">No message provided</p>
-    <div class="count"></div>
-    <div class="countdown"></div>
+<Layout>
+  <div class="border border-white h-full rounded-lg bg-black/80 text-white text-sm p-2 relative">
+    <p id="message">No message provided</p>
+    <div id="count" class="fixed bottom-2 right-2 text-xs"></div>
+    <div id="countdown" class="fixed bottom-2 left-2 text-xs"></div>
   </div>
 </Layout>
+
+<style>
+  .container {
+    app-region: no-drag;
+  }
+</style>
 
 <script>
   const params = new URLSearchParams(window.location.search);
@@ -22,9 +28,9 @@ import Layout from '../layouts/Base.astro';
       return;
     }
 
-    const messageEl: HTMLParagraphElement = document.querySelector('.message')!;
-    const countEl: HTMLDivElement = document.querySelector('.count')!;
-    const countdownEl: HTMLDivElement = document.querySelector('.countdown')!;
+    const messageEl: HTMLParagraphElement = document.querySelector('#message')!;
+    const countEl: HTMLDivElement = document.querySelector('#count')!;
+    const countdownEl: HTMLDivElement = document.querySelector('#countdown')!;
 
     countEl.textContent = notifications.length > 1 ? notifications.length.toString() : '';
     countEl.style.display = notifications.length > 1 ? 'flex' : 'none';
@@ -59,47 +65,3 @@ import Layout from '../layouts/Base.astro';
     }, 1000);
   });
 </script>
-
-<style>
-  .container {
-    app-region: no-drag;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    height: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: 1rem;
-    color: white;
-    position: relative;
-    border: 1px solid white;
-  }
-
-  .count {
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    font-size: 0.75rem;
-    background: white;
-    color: black;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    display: none;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .countdown {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    font-size: 0.75rem;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-</style>

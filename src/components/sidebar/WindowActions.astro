@@ -2,7 +2,7 @@
 import { Icon } from 'astro-icon/components';
 ---
 
-<div>
+<div class="flex p-1 gap-1">
   <Icon name="close" id="close" />
   <Icon name="down" id="minimize" />
   <Icon name="up" id="maximize" />
@@ -32,10 +32,8 @@ import { Icon } from 'astro-icon/components';
 <style>
   div {
     app-region: no-drag;
-    display: flex;
-    gap: 0.2rem;
-    padding: 0.4rem;
   }
+
   svg {
     cursor: pointer;
     color: white;

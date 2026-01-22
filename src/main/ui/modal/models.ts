@@ -4,16 +4,18 @@ import { BrowserWindow } from 'electron';
 import { UIWindow } from '../window';
 import { TPage } from '@shared/types';
 import { loadPage } from '../helpers';
+import { IProps } from './types';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
   constructor(
     private readonly _parent: UIWindow,
     private readonly _page: TPage,
+    props?: IProps,
   ) {
     this.bw = new BrowserWindow({
-      width: 400,
-      height: 300,
+      width: props?.width || 400,
+      height: props?.height || 300,
       frame: false,
       parent: _parent.bw,
       transparent: true,

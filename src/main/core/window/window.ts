@@ -29,15 +29,5 @@ export class Window extends UIWindow {
     root.add(rightLayout);
 
     this.setLayout(root);
-
-    // this.modal.open('modal');
-    // this.openModal('modal-2');
-
-    // setTimeout(() => {
-    //   this.notifications.show('INFO');
-    //   setTimeout(() => {
-    //     this.notifications.show('ERROR', 'error');
-    //   }, 3000);
-    // }, 1000);
   }
 }

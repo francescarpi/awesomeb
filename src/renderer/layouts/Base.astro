@@ -20,7 +20,7 @@ const { backgroundColor, borderRadius, backgroundImage } = Astro.props;
     />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
-  <body><div class="rootContainer"><slot /></div></body>
+  <body><div class="rootContainer fixed inset-0"><slot /></div></body>
 </html>
 
 <style
@@ -31,10 +31,7 @@ const { backgroundColor, borderRadius, backgroundImage } = Astro.props;
   }}
 >
   .rootContainer {
-    position: fixed;
-    inset: 0;
     background-color: var(--backgroundColor);
-    color: black;
     border-radius: var(--borderRadius);
     background-image: var(--backgroundImage);
   }

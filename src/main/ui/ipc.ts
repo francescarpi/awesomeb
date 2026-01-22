@@ -25,6 +25,7 @@ export function setupUIIPC(browser: Browser) {
     }
 
     win.modal.close();
+    win.focus();
   });
 
   //--------------------------------------------------------------------------------------
