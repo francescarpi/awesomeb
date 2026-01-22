@@ -64,7 +64,7 @@ function fileMenu(
         icon: getIcon(EIcon.Command),
         click: () => {
           if (focusedWindow) {
-            console.log('Perform command clicked on window:', focusedWindow?.id);
+            focusedWindow.performCommand();
           }
         },
       },

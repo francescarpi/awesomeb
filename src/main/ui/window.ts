@@ -149,4 +149,8 @@ export class UIWindow {
   get modal(): UIModalManager {
     return this._modalManager;
   }
+
+  performCommand() {
+    this.modal.open('perform-command');
+  }
 }

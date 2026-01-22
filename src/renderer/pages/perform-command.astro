@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Base.astro';
+---
+
+<Layout backgroundColor="black"> Perform Command </Layout>
+
+<script>
+  import { getWinId } from '../../scripts/window';
+  const winId = getWinId();
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      abModal.closeModal(winId);
+    }
+  });
+</script>

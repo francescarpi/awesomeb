@@ -10,7 +10,7 @@ export default defineConfig({
   srcDir: 'src/renderer',
   outDir: 'dist/renderer',
   build: {
-    inlineStylesheets: 'always',
+    assetsPrefix: '../',
   },
   vite: {
     plugins: [tailwindcss()],

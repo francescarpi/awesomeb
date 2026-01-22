@@ -33,7 +33,7 @@ export class UIModal {
     const query = { winId: this._parent.id.toString() };
     loadPage(this.bw.webContents, this._page, query);
 
-    // this.webContents.openDevTools();
+    // this.bw.webContents.openDevTools();
 
     this.bw.once('ready-to-show', () => {
       this.bw.show();
