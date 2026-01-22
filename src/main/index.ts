@@ -8,8 +8,6 @@ setupLogs();
 setupAbout();
 
 app.whenReady().then(() => {
-  console.log('CREATOR PID', process.pid);
-
   const browser = new Browser();
 
   setupUIIPC(browser);
@@ -17,7 +15,7 @@ app.whenReady().then(() => {
 
   browser.init();
 
-  // browser.createWindow();
+  browser.createWindow();
 });
 
 registerAppEvents();
