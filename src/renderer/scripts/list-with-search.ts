@@ -4,7 +4,8 @@ import { getWinId } from './window';
 export async function manageListWithSearch(
   listEl: HTMLElement,
   entity: TEntityType,
-  callback: (item: IEntity) => void,
+  onAccept: (item: IEntity) => void,
+  onEscape: () => void,
 ) {
   // Validate elements
   const tpl = listEl.querySelector('#row-template') as HTMLTemplateElement;
@@ -41,7 +42,15 @@ export async function manageListWithSearch(
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const selectedEntity = filteredEntities[indexSelected];
-      callback(selectedEntity);
+      onAccept(selectedEntity);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      if (input.value.length > 0) {
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        onEscape();
+      }
     }
   });
 

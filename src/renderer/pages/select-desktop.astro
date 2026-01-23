@@ -12,14 +12,18 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 
 <script>
   import { getWinId } from '../scripts/window';
-  const winId = getWinId();
-
-  import { closeModalOnEsc } from '../scripts/modals';
-  closeModalOnEsc();
-
   import { manageListWithSearch } from '../scripts/list-with-search';
+
+  const winId = getWinId();
   const commandsEl = document.getElementById('list')!;
-  manageListWithSearch(commandsEl, 'desktops', (item) => {
-    abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
-  });
+  manageListWithSearch(
+    commandsEl,
+    'desktops',
+    (item) => {
+      abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
+    },
+    () => {
+      abModal.closeModal(winId);
+    },
+  );
 </script>
