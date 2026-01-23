@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { Browser, setupWindowIPC } from '@main/core';
+import { Browser, setupCommandsIPC } from '@main/core';
 import { setupUIIPC } from '@main/ui';
 import { setupLogs, setupAbout } from './boot';
 import { registerAppEvents } from './events';
@@ -11,7 +11,7 @@ app.whenReady().then(() => {
   const browser = new Browser();
 
   setupUIIPC(browser);
-  setupWindowIPC(browser);
+  setupCommandsIPC(browser);
 
   browser.init();
 

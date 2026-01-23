@@ -25,7 +25,7 @@ import ListWithSearch from '../../components/common/ListWithSearch.astro';
   const commandsEl = document.getElementById('commands');
   if (commandsEl) {
     manageListWithSearch(commandsEl, 'commands', (item) => {
-      alert(item.id);
+      abCommands.perform(winId, item.id, {});
     });
   }
 </script>

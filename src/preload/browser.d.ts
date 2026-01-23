@@ -20,16 +20,14 @@ declare global {
     nextNotification: (winId: TWindowId) => void;
   };
 
-  const abWindow: {
-    close: (winId: TWindowId) => void;
-    minimize: (winId: TWindowId) => void;
-    maximize: (winId: TWindowId) => void;
-  };
-
   const abListWithSearch: {
     getEntities: (
       winId: TWindowId,
       entity: TListWithSearchEntity,
     ) => Promise<IListWithSearchEntity[]>;
+  };
+
+  const abCommands: {
+    perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => void;
   };
 }

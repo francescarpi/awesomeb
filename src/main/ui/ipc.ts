@@ -1,5 +1,5 @@
-import { Browser, Window, getAllCommands } from '@main/core';
-import { ipcMain, WebContents, IpcMainInvokeEvent } from 'electron';
+import { Browser, getCommands } from '@main/core';
+import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
 import {
@@ -8,31 +8,9 @@ import {
   TListWithSearchEntity,
   IListWithSearchEntity,
 } from '@shared/types';
-import { UIModalManager } from './modal';
+import { checkModalSender } from '@main/utils';
 
 const scopeLog = log.scope('IPCUI');
-
-async function checkModalSender(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  winId: TWindowId,
-  callback: (window: Window, modalManager: UIModalManager) => void,
-): Promise<void> {
-  const win = browser.getWindowById(winId);
-  if (!win || !win.modal) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
-  }
-
-  if (win.modal.id !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: modal WC ID ${win.modal.id} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(win, win.modal);
-}
 
 export function setupUIIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -83,7 +61,7 @@ export function setupUIIPC(browser: Browser) {
 
         switch (entity) {
           case 'commands': {
-            result = getAllCommands(browser).map((cmd) => ({
+            result = getCommands(browser).map((cmd) => ({
               id: cmd.trigger,
               label: cmd.name,
               extra: cmd.description,

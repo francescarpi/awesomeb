@@ -18,8 +18,9 @@ export async function manageListWithSearch(
 
   // Load entities & render
   const winId = getWinId();
-  const entities = await abListWithSearch.getEntities(winId, entity);
-  renderCommands(ul, tpl, entities);
+  const originalEntities = await abListWithSearch.getEntities(winId, entity);
+  let filteredEntities = originalEntities;
+  renderCommands(ul, tpl, filteredEntities);
 
   // Initial selection
   let indexSelected = 0;
@@ -38,7 +39,7 @@ export async function manageListWithSearch(
       selectItemAtIndex(ul, indexSelected);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      const selectedEntity = entities[indexSelected];
+      const selectedEntity = filteredEntities[indexSelected];
       callback(selectedEntity);
     }
 
@@ -49,11 +50,11 @@ export async function manageListWithSearch(
 
   // handle input change
   input.addEventListener('input', () => {
-    const entitiesFiltered = entities.filter((ent) =>
+    filteredEntities = originalEntities.filter((ent) =>
       ent.label.toLowerCase().includes(input.value.toLowerCase()),
     );
 
-    renderCommands(ul, tpl, entitiesFiltered);
+    renderCommands(ul, tpl, filteredEntities);
     indexSelected = 0;
     selectItemAtIndex(ul, indexSelected);
   });

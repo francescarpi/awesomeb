@@ -17,15 +17,15 @@ import { Icon } from 'astro-icon/components';
   const winId = getWinId();
 
   closeEl.addEventListener('click', () => {
-    abWindow.close(winId);
+    abCommands.perform(winId, 'close-window');
   });
 
   minimizeEl.addEventListener('click', () => {
-    abWindow.minimize(winId);
+    abCommands.perform(winId, 'minimize-window');
   });
 
   maximizeEl.addEventListener('click', () => {
-    abWindow.maximize(winId);
+    abCommands.perform(winId, 'maximize-window');
   });
 </script>
 

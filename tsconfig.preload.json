@@ -6,6 +6,7 @@
     "outDir": "dist",
     "noEmitOnError": true,
     "paths": {
+      // "@main/*": ["./src/main/*"],
       "@preload/*": ["./src/preload/*"],
       "@shared/*": ["./src/shared/*"]
     }

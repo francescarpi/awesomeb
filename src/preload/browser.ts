@@ -18,25 +18,19 @@ const abNotifications = {
   },
 };
 
-const abWindow = {
-  close: (winId: TWindowId) => {
-    ipcRenderer.send('window:close', winId);
-  },
-  minimize: (winId: TWindowId) => {
-    ipcRenderer.send('window:minimize', winId);
-  },
-  maximize: (winId: TWindowId) => {
-    ipcRenderer.send('window:maximize', winId);
-  },
-};
-
 const abListWithSearch = {
   getEntities: async (winId: TWindowId, entity: TListWithSearchEntity) => {
     return await ipcRenderer.invoke('list-with-search:get-entities', winId, entity);
   },
 };
 
+const abCommands = {
+  perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => {
+    ipcRenderer.send('commands:perform', winId, trigger, params);
+  },
+};
+
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
-contextBridge.exposeInMainWorld('abWindow', abWindow);
 contextBridge.exposeInMainWorld('abListWithSearch', abListWithSearch);
+contextBridge.exposeInMainWorld('abCommands', abCommands);
