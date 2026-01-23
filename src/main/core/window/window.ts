@@ -3,9 +3,11 @@ import type { IProps } from './types';
 import { defaultTheme, Desktop } from '@main/core';
 import EventEmitter from 'events';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
+import { TDesktopId } from '@shared/types';
 
 export class Window extends UIWindow {
-  public readonly desktops: Desktop[];
+  private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
+  private _selectedDesktopId: number;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -13,12 +15,16 @@ export class Window extends UIWindow {
   ) {
     super(eventsChannel, props?.theme || defaultTheme);
 
+    this._selectedDesktopId = props?.selectedDesktopId || 1;
+
     if (props?.desktops) {
-      this.desktops = props.desktops;
+      for (const deskProps of props.desktops) {
+        this._desktops.set(deskProps.id, deskProps);
+      }
     } else {
-      this.desktops = [];
       for (let i = 0; i < MIN_DESKTOPS; i++) {
-        this.desktops.push(new Desktop(i + 1));
+        const desk = new Desktop(i + 1);
+        this._desktops.set(desk.id, desk);
       }
     }
 
@@ -56,5 +62,13 @@ export class Window extends UIWindow {
     }
 
     this.refreshLayout();
+  }
+
+  get desktops(): Desktop[] {
+    return Array.from(this._desktops.values());
+  }
+
+  get selectedDesktop(): Desktop {
+    return this._desktops.get(this._selectedDesktopId)!;
   }
 }

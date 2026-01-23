@@ -6,11 +6,3 @@ export interface IMargins {
 }
 
 export type TPage = string;
-
-export type TEntityType = 'commands' | 'desktops';
-
-export interface IEntity {
-  id: string;
-  label: string;
-  extra?: string;
-}

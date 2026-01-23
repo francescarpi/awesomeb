@@ -16,7 +16,7 @@ declare global {
   };
 
   const abEntities: {
-    fetch: (winId: TWindowId, entity: TEntityType) => Promise<IEntity[]>;
+    fetch: <T>(winId: TWindowId, entity: TEntityType) => Promise<T[]>;
   };
 
   const abCommands: {

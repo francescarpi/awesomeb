@@ -47,6 +47,9 @@ vi.mock('electron', () => {
       static getAllWindows() {
         return [];
       }
+      static getFocusedWindow() {
+        return null;
+      }
     },
     WebContentsView: class {
       webContents = webContents;

@@ -5,12 +5,14 @@ import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';
 import log from 'electron-log';
+import { BrowserRenderer } from './renderer';
 
 const scopeLog = log.scope('Browser');
 
 export class Browser {
   private readonly _windows: Map<TWindowId, Window> = new Map();
   public readonly eventsChannel = new EventEmitter();
+  public readonly renderer = new BrowserRenderer(this);
 
   constructor() {
     registerBrowserEvents(this);

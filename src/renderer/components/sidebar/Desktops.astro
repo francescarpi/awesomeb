@@ -2,47 +2,90 @@
 
 ---
 
-<ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
+<div class="flex flex-col items-center gap-1">
+  <ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
+  <span class="text-sm" id="name"></span>
+</div>
 
 <template id="desktop-template">
-  <li class="border rounded-full flex justify-center items-center cursor-pointer"></li>
+  <li
+    class="border rounded-full cursor-pointer select-none flex flex-col items-center justify-center"
+  >
+    <span class="flex justify-center items-center w-full" id="id"></span>
+    <div class="flex justify-center items-center gap-0.5 -mt-0.5 hidden" id="indicators">
+      <div class="w-[2px] h-[2px] bg-white rounded-full" id="has-tabs"></div>
+      <div class="w-[2px] h-[2px] bg-white rounded-full" id="has-active-tabs"></div>
+    </div>
+    <div
+      class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-ping hidden"
+      id="require-attention"
+    >
+    </div>
+  </li>
 </template>
 
 <script>
   import { getWinId } from '../../scripts/window';
-  import { IEntity, TDesktopId } from '@shared/types';
+  import { IDesktopEntity } from '@shared/types';
 
-  const tpl = document.querySelector('#desktop-template') as HTMLTemplateElement;
+  const tplEl = document.querySelector('#desktop-template') as HTMLTemplateElement;
+  const nameEl = document.getElementById('name')!;
+  const ulEl = document.querySelector('ul')!;
 
   const winId = getWinId();
 
-  let desktops: IEntity[] = [];
-  let active: TDesktopId = 1;
+  let desktops: IDesktopEntity[] = [];
 
   async function fetchDesktops() {
-    desktops = await abEntities.fetch(winId, 'desktops');
+    desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
     renderDesktops();
   }
 
   fetchDesktops();
 
   function renderDesktops() {
-    const ul = document.querySelector('ul')!;
-    ul.innerHTML = '';
+    ulEl.innerHTML = '';
 
     desktops.forEach((desktop) => {
-      const clone = tpl.content.cloneNode(true) as HTMLElement;
-      const li = clone.querySelector('li')!;
+      const clone = tplEl.content.cloneNode(true) as HTMLElement;
 
-      li.textContent = desktop.id;
+      const liEl = clone.querySelector('li')!;
+      const desktopIdEl = clone.querySelector('#id')!;
+      const indicatorsEl = clone.querySelector('#indicators')!;
+      const hasTabsEl = clone.querySelector('#has-tabs')!;
+      const hasActiveTabsEl = clone.querySelector('#has-active-tabs')!;
+      const requireAttentionEl = clone.querySelector('#require-attention')!;
 
-      if (desktop.id === active.toString()) {
-        li.classList.add('active');
+      desktopIdEl.textContent = desktop.id;
+
+      if (desktop.selected) {
+        liEl.classList.add('active');
+        nameEl.textContent = desktop.name;
       } else {
-        li.classList.remove('active');
+        liEl.classList.remove('active');
       }
 
-      ul.appendChild(clone);
+      if (desktop.hasTabs) {
+        indicatorsEl.classList.remove('hidden');
+        hasTabsEl.classList.remove('hidden');
+      } else {
+        indicatorsEl.classList.add('hidden');
+        hasTabsEl.classList.add('hidden');
+      }
+
+      if (desktop.hasActiveTabs) {
+        hasActiveTabsEl.classList.remove('hidden');
+      } else {
+        hasActiveTabsEl.classList.add('hidden');
+      }
+
+      if (desktop.requireAttention) {
+        requireAttentionEl.classList.remove('hidden');
+      } else {
+        requireAttentionEl.classList.add('hidden');
+      }
+
+      ulEl.appendChild(clone);
     });
   }
 </script>
@@ -51,8 +94,9 @@
   @reference "../../assets/app.css";
 
   li {
-    @apply hidden sidebar:flex w-[20px] h-[20px] text-xs sidebar:w-[35px] sidebar:h-[35px] sidebar:text-base;
+    @apply hidden sidebar:flex w-[20px] h-[20px] text-xs sidebar:w-[35px] sidebar:h-[35px] sidebar:text-base relative;
   }
+
   li.active {
     @apply bg-white/20 flex;
   }

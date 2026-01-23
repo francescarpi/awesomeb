@@ -18,7 +18,7 @@ export async function manageListWithSearch(
 
   // Load entities & render
   const winId = getWinId();
-  const originalEntities = await abEntities.fetch(winId, entity);
+  const originalEntities = await abEntities.fetch<IEntity>(winId, entity);
   let filteredEntities = originalEntities;
   renderCommands(ul, tpl, filteredEntities);
 
