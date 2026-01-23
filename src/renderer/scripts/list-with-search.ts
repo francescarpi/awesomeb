@@ -23,7 +23,8 @@ export async function manageListWithSearch(
   renderCommands(ul, tpl, filteredEntities);
 
   // Initial selection
-  let indexSelected = 0;
+  const entitySelectedIndex = originalEntities.findIndex((ent) => ent.selected);
+  let indexSelected = entitySelectedIndex >= 0 ? entitySelectedIndex : 0;
   selectItemAtIndex(ul, indexSelected);
 
   // Handle keyboard navigation
@@ -42,10 +43,6 @@ export async function manageListWithSearch(
       const selectedEntity = filteredEntities[indexSelected];
       callback(selectedEntity);
     }
-
-    // Fix scrolling to selected item
-    const selectedItem = items[indexSelected] as HTMLElement;
-    selectedItem.scrollIntoView({ block: 'nearest' });
   });
 
   // handle input change
@@ -65,6 +62,7 @@ function selectItemAtIndex(ul: HTMLElement, index: number) {
   items.forEach((item, i) => {
     if (i === index) {
       item.classList.add('bg-white/20');
+      item.scrollIntoView({ block: 'nearest' });
     } else {
       item.classList.remove('bg-white/20');
     }

@@ -3,7 +3,7 @@ import { PRELOAD_FOLDER } from '@main/utils';
 import { BrowserWindow } from 'electron';
 import { UIWindow } from '../window';
 import { TPage } from '@shared/types';
-import { loadPage } from '../helpers';
+import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
 
 export class UIModal {
@@ -35,7 +35,7 @@ export class UIModal {
     const query = { winId: this._parent.id.toString() };
     loadPage(this.bw.webContents, this._page, query);
 
-    // this.bw.webContents.openDevTools();
+    openDevTools(this.bw.webContents, 'modal');
 
     this.bw.once('ready-to-show', () => {
       this.bw.show();
