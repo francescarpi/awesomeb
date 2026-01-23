@@ -31,4 +31,8 @@ export class UIModalManager {
   get id(): number | null {
     return this._modal ? this._modal.bw.webContents.id : null;
   }
+
+  get isOpen(): boolean {
+    return this._modal !== null;
+  }
 }

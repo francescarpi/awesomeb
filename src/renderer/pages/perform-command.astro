@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Base.astro';
-import ListWithSearch from '../../components/common/ListWithSearch.astro';
+import ListWithSearch from '../components/common/ListWithSearch.astro';
 ---
 
 <Layout>
@@ -11,8 +11,8 @@ import ListWithSearch from '../../components/common/ListWithSearch.astro';
 </Layout>
 
 <script>
-  import { getWinId } from '../../scripts/window';
-  import { manageListWithSearch } from '../../scripts/list-with-search';
+  import { getWinId } from '../scripts/window';
+  import { manageListWithSearch } from '../scripts/list-with-search';
 
   const winId = getWinId();
 

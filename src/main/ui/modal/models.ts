@@ -40,6 +40,10 @@ export class UIModal {
     this.bw.once('ready-to-show', () => {
       this.bw.show();
     });
+
+    this.bw.once('closed', () => {
+      this._parent.focus();
+    });
   }
 
   get wcId(): number {

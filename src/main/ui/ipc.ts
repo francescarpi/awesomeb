@@ -18,7 +18,6 @@ export function setupUIIPC(browser: Browser) {
     scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
     return await checkModalSender(event, browser, winId, (win, modalManager) => {
       modalManager.close();
-      win.focus();
     });
   });
 
@@ -56,7 +55,7 @@ export function setupUIIPC(browser: Browser) {
       scopeLog.info(
         `IPC Received: list-with-search:get-entities for window ID ${winId} and entity ${entity}`,
       );
-      return await checkModalSender(event, browser, winId, () => {
+      return await checkModalSender(event, browser, winId, (window) => {
         let result: IListWithSearchEntity[] = [];
 
         switch (entity) {
@@ -65,6 +64,14 @@ export function setupUIIPC(browser: Browser) {
               id: cmd.trigger,
               label: cmd.name,
               extra: cmd.description,
+            }));
+            break;
+          }
+          case 'desktops': {
+            result = window.desktops.map((desk) => ({
+              id: desk.id.toString(),
+              label: desk.label,
+              extra: '',
             }));
             break;
           }

@@ -1,16 +1,31 @@
 import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@main/ui';
 import type { IProps } from './types';
-import { defaultTheme } from '@main/core';
+import { defaultTheme, Desktop } from '@main/core';
 import EventEmitter from 'events';
-import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
+import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
 
 export class Window extends UIWindow {
+  public readonly desktops: Desktop[];
+
   constructor(
     public readonly eventsChannel: EventEmitter,
     props?: IProps,
   ) {
     super(eventsChannel, props?.theme || defaultTheme);
 
+    if (props?.desktops) {
+      this.desktops = props.desktops;
+    } else {
+      this.desktops = [];
+      for (let i = 0; i < MIN_DESKTOPS; i++) {
+        this.desktops.push(new Desktop(i + 1));
+      }
+    }
+
+    this.buildLayout();
+  }
+
+  private buildLayout() {
     const root = new UIVerticalLayout();
 
     const sidebar = new UIView('sidebar', {

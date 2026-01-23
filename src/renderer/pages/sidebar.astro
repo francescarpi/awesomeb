@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Base.astro';
-import WindowActions from '../../components/sidebar/WindowActions.astro';
-import ButtonIcon from '../../components/common/ButtonIcon.astro';
+import WindowActions from '../components/sidebar/WindowActions.astro';
+import ButtonIcon from '../components/common/ButtonIcon.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
@@ -14,8 +14,8 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
 </Layout>
 
 <script>
-  import { onClick } from '../../scripts/buttons';
-  import { getWinId } from '../../scripts/window';
+  import { onClick } from '../scripts/buttons';
+  import { getWinId } from '../scripts/window';
 
   const winId = getWinId();
 
