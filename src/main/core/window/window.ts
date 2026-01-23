@@ -2,6 +2,7 @@ import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@main/ui
 import type { IProps } from './types';
 import { defaultTheme } from '@main/core';
 import EventEmitter from 'events';
+import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 
 export class Window extends UIWindow {
   constructor(
@@ -13,7 +14,7 @@ export class Window extends UIWindow {
     const root = new UIVerticalLayout();
 
     const sidebar = new UIView('sidebar', {
-      width: 255,
+      width: SIDEBAR_DEFAULT_WIDTH,
       margin: { l: 5, t: 5, r: 5, b: 5 },
       query: { winId: this.id.toString() },
     });
@@ -29,5 +30,16 @@ export class Window extends UIWindow {
     root.add(rightLayout);
 
     this.setLayout(root);
+  }
+
+  toggleSidebar() {
+    const view = this.getView('sidebar')!;
+    if (view.width === SIDEBAR_DEFAULT_WIDTH) {
+      view.setWidth(SIDEBAR_MIN_WIDTH);
+    } else {
+      view.setWidth(SIDEBAR_DEFAULT_WIDTH);
+    }
+
+    this.refreshLayout();
   }
 }

@@ -14,6 +14,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
     fileMenu(browser, showRootIcon, focusedWindow),
     editMenu(browser, showRootIcon, focusedWindow),
+    windowMenu(browser, showRootIcon, focusedWindow),
   ]);
 
   return menu;
@@ -111,7 +112,7 @@ function editMenu(
 ): MenuItemConstructorOptions {
   return {
     label: 'Edit',
-    // icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
+    icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
     submenu: [
       { role: 'undo' },
       { role: 'redo' },
@@ -149,6 +150,30 @@ function editMenu(
       //       params: { windowId: focusedWindow.id, tabId: selectedTab!.id },
       //     }),
       // },
+    ],
+  };
+}
+
+function windowMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  focusedWindow: Window | null,
+): MenuItemConstructorOptions {
+  return {
+    label: 'Window',
+    icon: showRootIcon ? getIcon(EIcon.Windows) : undefined,
+    submenu: [
+      {
+        label: 'Toggle sidebar',
+        accelerator: 'CmdOrCtrl+S',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Sidebar),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'toggle-sidebar');
+          }
+        },
+      },
     ],
   };
 }

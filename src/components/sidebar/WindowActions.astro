@@ -2,7 +2,7 @@
 import { Icon } from 'astro-icon/components';
 ---
 
-<div class="flex p-1 gap-1">
+<div class="gap-1 hidden sidebar:flex">
   <Icon name="close" id="close" />
   <Icon name="down" id="minimize" />
   <Icon name="up" id="maximize" />
@@ -10,23 +10,13 @@ import { Icon } from 'astro-icon/components';
 
 <script>
   import { getWinId } from '../../scripts/window';
+  import { onClick } from '../../scripts/buttons';
 
-  const closeEl: SVGElement = document.querySelector('#close')!;
-  const minimizeEl: SVGElement = document.querySelector('#minimize')!;
-  const maximizeEl: SVGElement = document.querySelector('#maximize')!;
   const winId = getWinId();
 
-  closeEl.addEventListener('click', () => {
-    abCommands.perform(winId, 'close-window');
-  });
-
-  minimizeEl.addEventListener('click', () => {
-    abCommands.perform(winId, 'minimize-window');
-  });
-
-  maximizeEl.addEventListener('click', () => {
-    abCommands.perform(winId, 'maximize-window');
-  });
+  onClick('close', () => abCommands.perform(winId, 'close-window'));
+  onClick('minimize', () => abCommands.perform(winId, 'minimize-window'));
+  onClick('maximize', () => abCommands.perform(winId, 'maximize-window'));
 </script>
 
 <style>

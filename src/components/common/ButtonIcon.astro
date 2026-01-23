@@ -1,0 +1,16 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  icon: string;
+}
+
+const { icon } = Astro.props;
+---
+
+<Icon
+  name={icon}
+  id={icon}
+  class="text-2xl hover:bg-white/30 rounded cursor-pointer"
+  style="app-region:no-drag;"
+/>

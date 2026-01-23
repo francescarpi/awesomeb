@@ -1,16 +1,23 @@
 ---
 import Layout from '../layouts/Base.astro';
 import WindowActions from '../../components/sidebar/WindowActions.astro';
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
-  <div class="sidebar h-full">
+  <div class="h-full flex flex-col gap-4 px-1 pt-0.5" style="app-region:drag;">
     <WindowActions />
+    <section>
+      <ButtonIcon icon="sidebar" />
+    </section>
   </div>
 </Layout>
 
-<style>
-  .sidebar {
-    app-region: drag;
-  }
-</style>
+<script>
+  import { onClick } from '../../scripts/buttons';
+  import { getWinId } from '../../scripts/window';
+
+  const winId = getWinId();
+
+  onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
+</script>

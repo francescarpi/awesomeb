@@ -1,4 +1,4 @@
-import { Browser, getCommand, TCommandTrigger } from '@main/core';
+import { Browser, TCommandTrigger } from '@main/core';
 import { ipcMain } from 'electron';
 import { TWindowId } from '@shared/types';
 import log from 'electron-log';
@@ -18,13 +18,11 @@ export function setupCommandsIPC(browser: Browser) {
         winId,
         ['sidebar'],
         (win, modalManager) => {
-          const command = getCommand(trigger);
-          if (!command) {
-            scopeLog.error(`Command not found for trigger: ${trigger}`);
+          const success = browser.performCommand(win, trigger, params);
+          if (!success) {
+            scopeLog.error(`Failed to perform command for trigger: ${trigger}`);
             return;
           }
-
-          command.handler(browser, win, params);
 
           if (modalManager) {
             modalManager.close();

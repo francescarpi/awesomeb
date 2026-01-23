@@ -106,10 +106,14 @@ export class UIWindow {
     }
   }
 
-  setViewVisibility(page: TPage, visible: boolean) {
+  toggleViewVisibility(page: TPage) {
     const view = this._views.get(page);
     if (view) {
-      view.wcv.setVisible(visible);
+      if (view.isVisible) {
+        view.hide();
+      } else {
+        view.show();
+      }
       this.refreshLayout();
     }
   }

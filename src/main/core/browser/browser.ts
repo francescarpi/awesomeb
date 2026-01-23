@@ -1,4 +1,4 @@
-import { Window } from '@main/core';
+import { getCommand, TCommandTrigger, Window } from '@main/core';
 import { TWindowId } from '@shared/types';
 import { mainMenu } from '@main/menu';
 import { Menu, BrowserWindow } from 'electron';
@@ -48,5 +48,19 @@ export class Browser {
   getFocusedWindow(): Window | null {
     const focusedWindow = BrowserWindow.getFocusedWindow();
     return focusedWindow ? this.getWindowById(focusedWindow.id as TWindowId) : null;
+  }
+
+  performCommand(
+    window: Window,
+    trigger: TCommandTrigger,
+    params?: Record<string, unknown>,
+  ): boolean {
+    const command = getCommand(trigger);
+    if (!command) {
+      scopeLog.error(`Command not found for trigger: ${trigger}`);
+      return false;
+    }
+    command.handler(this, window, params);
+    return true;
   }
 }

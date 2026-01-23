@@ -65,4 +65,16 @@ export class UIView implements ILayoutNode {
   get height() {
     return this._height;
   }
+
+  get isVisible() {
+    return this.wcv.getVisible();
+  }
+
+  show() {
+    this.wcv.setVisible(true);
+  }
+
+  hide() {
+    this.wcv.setVisible(false);
+  }
 }
