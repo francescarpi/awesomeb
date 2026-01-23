@@ -7,9 +7,9 @@ export interface IMargins {
 
 export type TPage = string;
 
-export type TListWithSearchEntity = 'commands' | 'desktops';
+export type TEntityType = 'commands' | 'desktops';
 
-export interface IListWithSearchEntity {
+export interface IEntity {
   id: string;
   label: string;
   extra?: string;

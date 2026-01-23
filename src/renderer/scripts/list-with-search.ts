@@ -1,10 +1,10 @@
-import { TListWithSearchEntity, IListWithSearchEntity } from '@shared/types';
+import { TEntityType, IEntity } from '@shared/types';
 import { getWinId } from './window';
 
 export async function manageListWithSearch(
   listEl: HTMLElement,
-  entity: TListWithSearchEntity,
-  callback: (item: IListWithSearchEntity) => void,
+  entity: TEntityType,
+  callback: (item: IEntity) => void,
 ) {
   // Validate elements
   const tpl = listEl.querySelector('#row-template') as HTMLTemplateElement;
@@ -18,7 +18,7 @@ export async function manageListWithSearch(
 
   // Load entities & render
   const winId = getWinId();
-  const originalEntities = await abListWithSearch.getEntities(winId, entity);
+  const originalEntities = await abEntities.fetch(winId, entity);
   let filteredEntities = originalEntities;
   renderCommands(ul, tpl, filteredEntities);
 
@@ -71,11 +71,7 @@ function selectItemAtIndex(ul: HTMLElement, index: number) {
   });
 }
 
-function renderCommands(
-  ul: HTMLElement,
-  tpl: HTMLTemplateElement,
-  entities: IListWithSearchEntity[],
-) {
+function renderCommands(ul: HTMLElement, tpl: HTMLTemplateElement, entities: IEntity[]) {
   ul.innerHTML = '';
   for (const [i, item] of entities.entries()) {
     const clone = tpl.content.cloneNode(true) as HTMLElement;

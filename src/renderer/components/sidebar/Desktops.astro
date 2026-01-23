@@ -1,0 +1,59 @@
+---
+
+---
+
+<ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
+
+<template id="desktop-template">
+  <li class="border rounded-full flex justify-center items-center cursor-pointer"></li>
+</template>
+
+<script>
+  import { getWinId } from '../../scripts/window';
+  import { IEntity, TDesktopId } from '@shared/types';
+
+  const tpl = document.querySelector('#desktop-template') as HTMLTemplateElement;
+
+  const winId = getWinId();
+
+  let desktops: IEntity[] = [];
+  let active: TDesktopId = 1;
+
+  async function fetchDesktops() {
+    desktops = await abEntities.fetch(winId, 'desktops');
+    renderDesktops();
+  }
+
+  fetchDesktops();
+
+  function renderDesktops() {
+    const ul = document.querySelector('ul')!;
+    ul.innerHTML = '';
+
+    desktops.forEach((desktop) => {
+      const clone = tpl.content.cloneNode(true) as HTMLElement;
+      const li = clone.querySelector('li')!;
+
+      li.textContent = desktop.id;
+
+      if (desktop.id === active.toString()) {
+        li.classList.add('active');
+      } else {
+        li.classList.remove('active');
+      }
+
+      ul.appendChild(clone);
+    });
+  }
+</script>
+
+<style>
+  @reference "../../assets/app.css";
+
+  li {
+    @apply hidden sidebar:flex w-[20px] h-[20px] text-xs sidebar:w-[35px] sidebar:h-[35px] sidebar:text-base;
+  }
+  li.active {
+    @apply bg-white/20 flex;
+  }
+</style>

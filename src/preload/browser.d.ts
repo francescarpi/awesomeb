@@ -1,9 +1,4 @@
-import {
-  TWindowId,
-  INotification,
-  TListWithSearchEntity,
-  IListWithSearchEntity,
-} from '@shared/types';
+import { TWindowId, INotification, TEntityType, IEntity } from '@shared/types';
 import { IpcRendererEvent } from 'electron';
 
 export {};
@@ -20,11 +15,8 @@ declare global {
     nextNotification: (winId: TWindowId) => void;
   };
 
-  const abListWithSearch: {
-    getEntities: (
-      winId: TWindowId,
-      entity: TListWithSearchEntity,
-    ) => Promise<IListWithSearchEntity[]>;
+  const abEntities: {
+    fetch: (winId: TWindowId, entity: TEntityType) => Promise<IEntity[]>;
   };
 
   const abCommands: {

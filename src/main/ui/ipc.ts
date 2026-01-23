@@ -2,13 +2,8 @@ import { Browser, getCommands } from '@main/core';
 import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
-import {
-  INotification,
-  TWindowId,
-  TListWithSearchEntity,
-  IListWithSearchEntity,
-} from '@shared/types';
-import { checkModalSender } from '@main/utils';
+import { INotification, TWindowId, TEntityType, IEntity } from '@shared/types';
+import { checkModalAndPagesSender, checkModalSender } from '@main/utils';
 
 const scopeLog = log.scope('IPCUI');
 
@@ -49,37 +44,32 @@ export function setupUIIPC(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle(
-    'list-with-search:get-entities',
-    async (event, winId: TWindowId, entity: TListWithSearchEntity) => {
-      scopeLog.info(
-        `IPC Received: list-with-search:get-entities for window ID ${winId} and entity ${entity}`,
-      );
-      return await checkModalSender(event, browser, winId, (window) => {
-        let result: IListWithSearchEntity[] = [];
+  ipcMain.handle('entities:fetch', async (event, winId: TWindowId, entity: TEntityType) => {
+    scopeLog.info(`IPC Received: entities:fetch for window ID ${winId} and entity ${entity}`);
+    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], (window) => {
+      let result: IEntity[] = [];
 
-        switch (entity) {
-          case 'commands': {
-            result = getCommands(browser).map((cmd) => ({
-              id: cmd.trigger,
-              label: cmd.name,
-              extra: cmd.description,
-            }));
-            break;
-          }
-          case 'desktops': {
-            result = window.desktops.map((desk) => ({
-              id: desk.id.toString(),
-              label: desk.label,
-              extra: '',
-            }));
-            break;
-          }
+      switch (entity) {
+        case 'commands': {
+          result = getCommands(browser).map((cmd) => ({
+            id: cmd.trigger,
+            label: cmd.name,
+            extra: cmd.description,
+          }));
+          break;
         }
-        return result;
-      });
-    },
-  );
+        case 'desktops': {
+          result = window.desktops.map((desk) => ({
+            id: desk.id.toString(),
+            label: desk.label,
+            extra: '',
+          }));
+          break;
+        }
+      }
+      return result;
+    });
+  });
 }
 
 //--------------------------------------------------------------------------------------
