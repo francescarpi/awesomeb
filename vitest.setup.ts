@@ -11,6 +11,7 @@ vi.mock('electron', () => {
     id: 1,
     loadFile: () => {},
     loadURL: () => {},
+    send: () => {},
   };
 
   return {
