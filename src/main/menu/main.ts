@@ -184,6 +184,9 @@ function desktopsMenu(
   showRootIcon: boolean,
   focusedWindow: Window | null,
 ): MenuItemConstructorOptions {
+  const desktops = focusedWindow?.desktops || [];
+  const selectedDesktop = focusedWindow?.selectedDesktop;
+
   return {
     label: 'Desktops',
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
@@ -199,6 +202,17 @@ function desktopsMenu(
           }
         },
       },
+      { type: 'separator' },
+      ...desktops.map((desktop) => ({
+        label: `Desktop ${desktop.id}`,
+        accelerator: `Shift+CmdOrCtrl+${desktop.id}`,
+        enabled: !selectedDesktop || selectedDesktop.id !== desktop.id,
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'select-desktop', { desktopId: desktop.id });
+          }
+        },
+      })),
       { type: 'separator' },
       {
         label: 'Previous',

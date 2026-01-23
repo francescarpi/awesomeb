@@ -65,6 +65,7 @@ export class Browser {
       return false;
     }
     command.handler(this, window, params);
+    this.refreshMainMenu();
     return true;
   }
 }
