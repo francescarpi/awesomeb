@@ -34,16 +34,20 @@
 
   const winId = getWinId();
 
-  let desktops: IDesktopEntity[] = [];
-
+  // Initial fetch of desktops
   async function fetchDesktops() {
-    desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
-    renderDesktops();
+    const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
+    renderDesktops(desktops);
   }
 
   fetchDesktops();
 
-  function renderDesktops() {
+  abDesktops.onRefresh((_e, desktops) => {
+    renderDesktops(desktops);
+  });
+  // End Initial fetch of desktops
+
+  function renderDesktops(desktops: IDesktopEntity[]) {
     ulEl.innerHTML = '';
 
     desktops.forEach((desktop) => {

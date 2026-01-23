@@ -2,8 +2,11 @@ import path from 'path';
 
 export enum EIcon {
   Command = 'command.png',
+  Desktop = 'desktop.png',
   Edit = 'edit.png',
   File = 'file.png',
+  Next = 'next.png',
+  Previous = 'previous.png',
   Sidebar = 'sidebar.png',
   Windows = 'windows.png',
 }

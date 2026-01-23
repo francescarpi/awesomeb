@@ -1,4 +1,4 @@
-import { TWindowId, INotification, TEntityType } from '@shared/types';
+import { TWindowId, INotification, TEntityType, IDesktopEntity } from '@shared/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 const abModal = {
@@ -30,7 +30,14 @@ const abCommands = {
   },
 };
 
+const abDesktops = {
+  onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => {
+    ipcRenderer.on('desktops:refresh', callback);
+  },
+};
+
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
+contextBridge.exposeInMainWorld('abDesktops', abDesktops);

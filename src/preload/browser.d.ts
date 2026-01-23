@@ -1,4 +1,4 @@
-import { TWindowId, INotification, TEntityType, IEntity } from '@shared/types';
+import { TWindowId, INotification, TEntityType, IEntity, IDesktopEntity } from '@shared/types';
 import { IpcRendererEvent } from 'electron';
 
 export {};
@@ -21,5 +21,9 @@ declare global {
 
   const abCommands: {
     perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => void;
+  };
+
+  const abDesktops: {
+    onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
   };
 }

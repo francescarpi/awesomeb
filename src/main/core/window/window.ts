@@ -71,4 +71,23 @@ export class Window extends UIWindow {
   get selectedDesktop(): Desktop {
     return this._desktops.get(this._selectedDesktopId)!;
   }
+
+  goDesktop(target: 'next' | 'prev' | TDesktopId) {
+    const deskIds = Array.from(this._desktops.keys()).sort((a, b) => a - b);
+    const currentIndex = deskIds.indexOf(this._selectedDesktopId);
+
+    let newIndex: number;
+
+    if (target === 'next') {
+      newIndex = (currentIndex + 1) % deskIds.length;
+    } else if (target === 'prev') {
+      newIndex = (currentIndex - 1 + deskIds.length) % deskIds.length;
+    } else {
+      newIndex = deskIds.indexOf(target);
+      if (newIndex === -1) return; // Invalid desktop id
+    }
+
+    this._selectedDesktopId = deskIds[newIndex];
+    this.eventsChannel.emit('window:selected-desktop-did-change', this, this._selectedDesktopId);
+  }
 }

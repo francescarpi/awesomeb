@@ -77,4 +77,8 @@ export class UIView implements ILayoutNode {
   hide() {
     this.wcv.setVisible(false);
   }
+
+  send(channel: string, ...args: any[]) {
+    this.wcv.webContents.send(channel, ...args);
+  }
 }

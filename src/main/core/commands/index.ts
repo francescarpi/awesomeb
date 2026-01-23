@@ -7,12 +7,16 @@ import * as windowMinimize from './window-minimize';
 import * as windowMaximize from './window-maximize';
 import * as windowClose from './window-close';
 import * as windowToggleSidebar from './window-toggle-sidebar';
+import * as desktopNext from './desktop-next';
+import * as desktopPrev from './desktop-prev';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
   [windowMaximize.TRIGGER]: windowMaximize.Command,
   [windowClose.TRIGGER]: windowClose.Command,
   [windowToggleSidebar.TRIGGER]: windowToggleSidebar.Command,
+  [desktopNext.TRIGGER]: desktopNext.Command,
+  [desktopPrev.TRIGGER]: desktopPrev.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

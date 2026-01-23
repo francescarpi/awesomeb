@@ -15,6 +15,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
     fileMenu(browser, showRootIcon, focusedWindow),
     editMenu(browser, showRootIcon, focusedWindow),
     windowMenu(browser, showRootIcon, focusedWindow),
+    desktopsMenu(browser, showRootIcon, focusedWindow),
   ]);
 
   return menu;
@@ -171,6 +172,41 @@ function windowMenu(
         click: () => {
           if (focusedWindow) {
             browser.performCommand(focusedWindow, 'toggle-sidebar');
+          }
+        },
+      },
+    ],
+  };
+}
+
+function desktopsMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  focusedWindow: Window | null,
+): MenuItemConstructorOptions {
+  return {
+    label: 'Desktops',
+    icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
+    submenu: [
+      {
+        label: 'Previous',
+        accelerator: 'Shift+CmdOrCtrl+[',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Previous),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'previous-desktop');
+          }
+        },
+      },
+      {
+        label: 'Next',
+        accelerator: 'Shift+CmdOrCtrl+]',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Next),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'next-desktop');
           }
         },
       },
