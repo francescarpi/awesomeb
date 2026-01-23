@@ -15,7 +15,7 @@ export class UIModal {
   ) {
     this.bw = new BrowserWindow({
       width: props?.width || 400,
-      height: props?.height || 300,
+      height: props?.height || 400,
       frame: false,
       parent: _parent.bw,
       transparent: true,

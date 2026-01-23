@@ -5,8 +5,8 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 
 <Layout>
   <div class="bg-black text-white p-4 flex flex-col gap-2 h-full">
-    <h1 class="text-lg">Perform Command</h1>
-    <ListWithSearch placeholder="Start typing to search commands..." id="list" />
+    <h1 class="text-lg">Select Desktop</h1>
+    <ListWithSearch placeholder="Filter and select desktop..." id="list" />
   </div>
 </Layout>
 
@@ -19,7 +19,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 
   import { manageListWithSearch } from '../scripts/list-with-search';
   const commandsEl = document.getElementById('list')!;
-  manageListWithSearch(commandsEl, 'commands', (item) => {
-    abCommands.perform(winId, item.id, {});
+  manageListWithSearch(commandsEl, 'desktops', (item) => {
+    abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
   });
 </script>

@@ -9,6 +9,7 @@ import * as windowClose from './window-close';
 import * as windowToggleSidebar from './window-toggle-sidebar';
 import * as desktopNext from './desktop-next';
 import * as desktopPrev from './desktop-prev';
+import * as desktopSelect from './desktop-select';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -17,6 +18,7 @@ const COMMANDS = {
   [windowToggleSidebar.TRIGGER]: windowToggleSidebar.Command,
   [desktopNext.TRIGGER]: desktopNext.Command,
   [desktopPrev.TRIGGER]: desktopPrev.Command,
+  [desktopSelect.TRIGGER]: desktopSelect.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

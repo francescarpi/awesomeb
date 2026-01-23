@@ -189,6 +189,18 @@ function desktopsMenu(
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
+        label: 'Select...',
+        accelerator: 'CmdOrCtrl+D',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Desktop),
+        click: () => {
+          if (focusedWindow) {
+            focusedWindow.modal.open('select-desktop');
+          }
+        },
+      },
+      { type: 'separator' },
+      {
         label: 'Previous',
         accelerator: 'Shift+CmdOrCtrl+[',
         enabled: !!focusedWindow,
