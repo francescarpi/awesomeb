@@ -37,6 +37,15 @@ const abDesktops = {
   select: (winId: TWindowId, desktopId: string) => {
     ipcRenderer.send('desktops:select', winId, desktopId);
   },
+  getTheme: async (winId: TWindowId) => {
+    return await ipcRenderer.invoke('desktops:get-theme', winId);
+  },
+};
+
+const abWindow = {
+  readyToShow: (winId: TWindowId) => {
+    ipcRenderer.send('window:ready-to-show', winId);
+  },
 };
 
 contextBridge.exposeInMainWorld('abModal', abModal);
@@ -44,3 +53,4 @@ contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
 contextBridge.exposeInMainWorld('abDesktops', abDesktops);
+contextBridge.exposeInMainWorld('abWindow', abWindow);

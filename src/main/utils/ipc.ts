@@ -84,3 +84,25 @@ export async function checkModalAndPagesSender(
 
   return callback(win, win.modal);
 }
+
+export async function checkWindowSender(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  winId: TWindowId,
+  callback: (window: Window) => void,
+): Promise<void> {
+  const win = browser.getWindowById(winId);
+  if (!win) {
+    scopeLog.error(`No window found with ID ${winId}`);
+    return;
+  }
+
+  if (win.wcId !== event.sender.id) {
+    scopeLog.error(
+      `WebContents ID mismatch: window WC ID ${win.wcId} does not match sender WC ID ${event.sender.id}`,
+    );
+    return;
+  }
+
+  return callback(win);
+}

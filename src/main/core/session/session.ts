@@ -1,7 +1,7 @@
 import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import type { ISessionStore, ISessionWindow } from './types';
-import { Browser, defaultTheme } from '@/core';
+import { Browser } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('Session');
@@ -53,8 +53,7 @@ export class Session extends Store<ISessionStore> {
         return {
           id: desktop.id,
           name: desktop.name,
-          // theme: desktop.theme.name,
-          theme: defaultTheme.name, // TODO Fix!!
+          theme: desktop.theme.name,
           // tabContainers: tabContainers,
         };
       }),

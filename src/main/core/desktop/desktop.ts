@@ -1,10 +1,18 @@
 import { TDesktopId } from '~/types';
+import { defaultTheme, Theme } from '@/core';
+import { IProps } from './types';
 
 export class Desktop {
   private _name: string | null = null;
   private _requireAttention: boolean = false;
+  private _theme: Theme;
 
-  constructor(public readonly id: TDesktopId) {}
+  constructor(
+    public readonly id: TDesktopId,
+    props?: IProps,
+  ) {
+    this._theme = props?.theme || defaultTheme;
+  }
 
   setName(name: string) {
     if (name === this._name) {
@@ -36,5 +44,9 @@ export class Desktop {
   get hasActiveTabs(): boolean {
     // TODO implement
     return false;
+  }
+
+  get theme(): Theme {
+    return this._theme;
   }
 }

@@ -5,6 +5,7 @@ import {
   IEntity,
   IDesktopEntity,
   TDesktopId,
+  ITheme,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -33,5 +34,10 @@ declare global {
   const abDesktops: {
     onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
     select: (winId: TWindowId, desktopId: TDesktopId) => void;
+    getTheme: (winId: TWindowId) => Promise<ITheme>;
+  };
+
+  const abWindow: {
+    readyToShow: (winId: TWindowId) => void;
   };
 }

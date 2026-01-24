@@ -7,7 +7,6 @@ import { TPage } from '~/types';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
-import { Theme } from '@/core';
 import { registerWindowEvents } from './events';
 import EventEmitter from 'events';
 
@@ -21,7 +20,6 @@ export class UIWindow {
 
   constructor(
     public readonly eventsChannel: EventEmitter,
-    public theme: Theme,
     bounds?: Rectangle,
   ) {
     const windowBounds = bounds || {
@@ -53,9 +51,6 @@ export class UIWindow {
     });
 
     loadPage(this.bw.webContents, 'window', {
-      primary: theme.primary,
-      secondary: theme.secondary,
-      degrees: theme.degrees.toString(),
       winId: this.id.toString(),
     });
 
@@ -153,6 +148,10 @@ export class UIWindow {
 
   focus() {
     this.bw.focus();
+  }
+
+  show() {
+    this.bw.show();
   }
 
   get notifications(): UINotificationsManager {

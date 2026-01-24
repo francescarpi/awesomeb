@@ -2,15 +2,15 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout backgroundImage="linear-gradient(var(--bg-deg), var(--bg-primary), var(--bg-secondary))" />
+<Layout />
 
 <script>
-  const search = new URLSearchParams(window.location.search);
-  const primary = search.get('primary')!;
-  const secondary = search.get('secondary')!;
-  const degrees = parseInt(search.get('degrees')!, 10);
+  import { getWinId } from '../scripts/window';
+  const winId = getWinId();
 
-  document.documentElement.style.setProperty('--bg-primary', primary);
-  document.documentElement.style.setProperty('--bg-secondary', secondary);
-  document.documentElement.style.setProperty('--bg-deg', `${degrees}deg`);
+  abDesktops.getTheme(winId).then((theme) => {
+    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
+    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+    abWindow.readyToShow(winId);
+  });
 </script>

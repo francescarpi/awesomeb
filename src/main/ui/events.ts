@@ -24,10 +24,4 @@ export function registerWindowEvents(win: UIWindow) {
   win.bw.on('move', () => {
     win.refreshLayout();
   });
-
-  //--------------------------------------------------------------------------------------
-  win.bw.once('ready-to-show', () => {
-    win.bw.show();
-    win.focus();
-  });
 }

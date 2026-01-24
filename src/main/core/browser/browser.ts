@@ -1,4 +1,12 @@
-import { getCommand, TCommandTrigger, Window, Session, IWindowProps } from '@/core';
+import {
+  getCommand,
+  TCommandTrigger,
+  Window,
+  Session,
+  IWindowProps,
+  Desktop,
+  getTheme,
+} from '@/core';
 import { TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
@@ -24,8 +32,14 @@ export class Browser {
     const session = new Session(this);
 
     for (const winStore of session.windows) {
+      const desktops = winStore.desktops.map((deskStore, idx) => {
+        const theme = getTheme(deskStore.theme);
+        return new Desktop(idx + 1, { theme });
+      });
+
       this.createWindow({
         bounds: winStore.bounds,
+        desktops,
       });
     }
 

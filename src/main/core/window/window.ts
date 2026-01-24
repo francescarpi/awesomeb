@@ -1,6 +1,6 @@
 import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@/ui';
 import type { IProps } from './types';
-import { defaultTheme, Desktop } from '@/core';
+import { Desktop } from '@/core';
 import EventEmitter from 'events';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
 import { TDesktopId } from '~/types';
@@ -16,7 +16,7 @@ export class Window extends UIWindow {
     public readonly eventsChannel: EventEmitter,
     props?: IProps,
   ) {
-    super(eventsChannel, props?.theme || defaultTheme, props?.bounds);
+    super(eventsChannel, props?.bounds);
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
 
