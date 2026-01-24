@@ -22,6 +22,16 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron/main',
           },
+          plugins: [
+            viteStaticCopy({
+              targets: [
+                {
+                  src: 'src/main/assets/icons',
+                  dest: 'assets',
+                },
+              ],
+            }),
+          ],
           resolve: {
             alias: commonAliases,
           }
@@ -51,16 +61,7 @@ export default defineConfig({
     assetsPrefix: '../',
   },
   vite: {
-    plugins: [tailwindcss(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'src/main/assets/icons',
-          dest: '.',
-        },
-      ],
-    }),
-    ],
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         ...commonAliases,

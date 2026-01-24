@@ -13,5 +13,5 @@ export enum EIcon {
 }
 
 export function getIcon(name: EIcon): string {
-  return path.join(__dirname, '..', 'assets', 'icons', name);
+  return path.join(__dirname, 'assets', 'icons', name);
 }
