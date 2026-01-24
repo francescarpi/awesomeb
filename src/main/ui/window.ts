@@ -22,13 +22,18 @@ export class UIWindow {
   constructor(
     public readonly eventsChannel: EventEmitter,
     public theme: Theme,
+    bounds?: Rectangle,
   ) {
+    const windowBounds = bounds || {
+      width: 1200,
+      height: 800,
+    };
+
     this.bw = new BrowserWindow({
+      ...windowBounds,
       title: app.name,
       minWidth: 800,
       minHeight: 400,
-      width: 1200,
-      height: 800,
       frame: false,
       visualEffectState: 'followWindow',
       transparent: false,

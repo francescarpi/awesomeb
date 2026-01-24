@@ -15,9 +15,7 @@ app.whenReady().then(() => {
   setupBrowserIPC(browser);
   setupDesktopIPC(browser);
 
-  browser.init();
-
-  browser.createWindow();
+  browser.loadSession();
 
   registerAppEvents(browser);
 });

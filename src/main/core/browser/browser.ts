@@ -1,4 +1,4 @@
-import { getCommand, TCommandTrigger, Window } from '@/core';
+import { getCommand, TCommandTrigger, Window, Session, IWindowProps } from '@/core';
 import { TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
@@ -20,12 +20,20 @@ export class Browser {
     registerBrowserEvents(this);
   }
 
-  async init() {
+  async loadSession() {
+    const session = new Session(this);
+
+    for (const winStore of session.windows) {
+      this.createWindow({
+        bounds: winStore.bounds,
+      });
+    }
+
     await this.refreshMainMenu();
   }
 
-  createWindow(): Window {
-    const w = new Window(this.eventsChannel);
+  createWindow(props?: IWindowProps): Window {
+    const w = new Window(this.eventsChannel, props);
     this._windows.set(w.id, w);
 
     scopeLog.info(

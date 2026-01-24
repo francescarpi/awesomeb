@@ -16,7 +16,7 @@ export class Window extends UIWindow {
     public readonly eventsChannel: EventEmitter,
     props?: IProps,
   ) {
-    super(eventsChannel, props?.theme || defaultTheme);
+    super(eventsChannel, props?.theme || defaultTheme, props?.bounds);
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
 
