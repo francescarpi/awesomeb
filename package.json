@@ -2,17 +2,9 @@
   "name": "AwesomeB.Astro",
   "version": "0.0.1a",
   "description": "",
-  "main": "dist/main/index.js",
+  "main": "dist-electron/main/index.js",
   "scripts": {
-    "dev": "pnpm run build:main && pnpm run build:preload && concurrently --kill-others \"astro dev\" \"sleep 1 && electron .\"",
-    "build": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron",
-    "build:mac": "pnpm run build:main && pnpm run build:preload && pnpm run build:astro && pnpm run build:electron:mac",
-    "build:astro": "astro build",
-    "build:electron": "electron-builder",
-    "build:electron:mac": "electron-builder --mac",
-    "build:main": "tsc --project tsconfig.main.json && tsc-alias -p tsconfig.main.json && pnpm run copy:assets",
-    "build:preload": "tsc --project tsconfig.preload.json",
-    "copy:assets": "cp -r src/main/assets dist/main",
+    "dev": "pnpm astro dev",
     "start": "electron .",
     "format": "prettier --write src",
     "test": "vitest",
@@ -24,6 +16,7 @@
   "packageManager": "pnpm@10.28.0",
   "devDependencies": {
     "@astrojs/check": "0.9.6",
+    "@electron-toolkit/tsconfig": "^2.0.0",
     "@eslint/js": "9.39.2",
     "@tailwindcss/vite": "4.1.18",
     "astro": "5.16.15",
@@ -42,9 +35,12 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
     "vite": "7.3.1",
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vite-plugin-static-copy": "^3.1.6",
     "vitest": "4.0.18"
   },
   "dependencies": {
+    "astro-electron": "^0.5.0",
     "electron-log": "5.4.3",
     "electron-store": "11.0.2"
   }

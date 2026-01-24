@@ -1,0 +1,18 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+  "include": [
+    "src/main/**/*",
+    "src/preload/**/*",
+    "src/shared/**/*"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "moduleResolution": "bundler",
+    "types": ["electron-vite/node", "chrome", "astro-electron"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/main/*"],
+      "~/*": ["src/shared/*"]
+    }
+  }
+}
