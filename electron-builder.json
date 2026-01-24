@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/refs/heads/master/packages/app-builder-lib/scheme.json",
   "appId": "com.farpi.awesomeb",
   "productName": "AwesomeB.Astro",
   "directories": {
@@ -6,15 +7,71 @@
   },
   "files": [
     "dist-electron/**/*",
-    "package.json"
+    "!src/*",
+    "!electron.vite.config.{js,ts,mjs,cjs}",
+    "!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc,dev-app-update.yml}",
+    "!{CHANGELOG.md,README.md,CONTRIBUTING.md,docs/**}",
+    "!{.env,.env.*,.npmrc,bun.lock}",
+    "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
   ],
   "mac": {
-    "category": "public.app-category.utilities"
+    "category": "public.app-category.utilities",
+    "entitlementsInherit": "./build/entitlements.mac.plist",
+    "notarize": false
+  },
+  "dmg": {
+    "artifactName": "${name}-${version}-${arch}.${ext}"
   },
   "win": {
     "target": "nsis"
   },
   "linux": {
     "target": "AppImage"
-  }
+  },
+  "protocols": [
+    {
+      "name": "HyperText Transfer Protocol",
+      "schemes": [
+        "http",
+        "https"
+      ]
+    }
+  ],
+  "fileAssociations": [
+    {
+      "ext": "htm",
+      "name": "HyperText Markup File",
+      "role": "Viewer"
+    },
+    {
+      "ext": "html",
+      "description": "HTML Document",
+      "role": "Viewer"
+    },
+    {
+      "ext": "mhtml",
+      "description": "MHTML Document",
+      "role": "Viewer"
+    },
+    {
+      "ext": "shtml",
+      "name": "HyperText Markup File",
+      "role": "Viewer"
+    },
+    {
+      "ext": "xhtml",
+      "name": "Extensible HyperText Markup File",
+      "role": "Viewer"
+    },
+    {
+      "ext": "xhtm",
+      "name": "Extensible HyperText Markup File",
+      "role": "Viewer"
+    },
+    {
+      "ext": "pdf",
+      "description": "PDF Document",
+      "role": "Viewer"
+    }
+  ]
 }
