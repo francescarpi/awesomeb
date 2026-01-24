@@ -23,6 +23,7 @@ const electronMainConfig = {
   entry: 'src/main/index.ts',
   vite: {
     build: {
+      // minify: 'esbuild',
       outDir: 'dist-electron/main',
     },
     plugins: [
@@ -46,7 +47,7 @@ const electronMainConfig = {
 const electronPreloadConfig = {
   vite: {
     build: {
-      minify: 'esbuild',
+      // minify: 'esbuild',
       rollupOptions: {
         input: {
           'preload/browser': 'src/preload/browser.ts',
