@@ -5,6 +5,10 @@
   "main": "dist-electron/main/index.js",
   "scripts": {
     "dev": "pnpm astro dev",
+    "build": "astro build && electron-builder",
+    "build:mac": "astro build && electron-builder --mac",
+    "build:win": "astro build && electron-builder --win",
+    "build:linux": "astro build && electron-builder --linux",
     "start": "electron .",
     "format": "prettier --write src",
     "test": "vitest",

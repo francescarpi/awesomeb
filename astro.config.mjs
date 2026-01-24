@@ -5,6 +5,8 @@ import electron from "astro-electron";
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import path from 'path'
 
+const MINIFY = false;
+
 // Shared aliases between main process and preload
 const electronAliases = {
   "@": path.resolve("src/main"),
@@ -23,11 +25,11 @@ const electronMainConfig = {
   entry: 'src/main/index.ts',
   vite: {
     build: {
-      // minify: 'esbuild',
+      minify: MINIFY ? 'esbuild' : false,
       outDir: 'dist-electron/main',
     },
     plugins: [
-      // Copia los iconos del main process
+      // Copy icons for the main process
       viteStaticCopy({
         targets: [
           {
@@ -47,7 +49,7 @@ const electronMainConfig = {
 const electronPreloadConfig = {
   vite: {
     build: {
-      // minify: 'esbuild',
+      minify: MINIFY ? 'esbuild' : false,
       rollupOptions: {
         input: {
           'preload/browser': 'src/preload/browser.ts',
@@ -79,7 +81,7 @@ export default defineConfig({
   // === ASTRO CONFIG ===
   output: 'static',
   srcDir: 'src/renderer',
-  outDir: 'dist/renderer',
+  outDir: 'dist-electron/renderer',
 
   build: {
     assetsPrefix: '../',
