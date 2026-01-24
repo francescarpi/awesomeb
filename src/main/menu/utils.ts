@@ -5,6 +5,7 @@ export enum EIcon {
   Desktop = 'desktop.png',
   Edit = 'edit.png',
   File = 'file.png',
+  Maximize = 'maximize.png',
   Next = 'next.png',
   Previous = 'previous.png',
   Sidebar = 'sidebar.png',

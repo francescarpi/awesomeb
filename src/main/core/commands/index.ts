@@ -10,6 +10,7 @@ import * as windowToggleSidebar from './window-toggle-sidebar';
 import * as desktopNext from './desktop-next';
 import * as desktopPrev from './desktop-prev';
 import * as desktopSelect from './desktop-select';
+import * as windowToggleMaximizeArea from './window-toggle-maximize-area';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -19,6 +20,7 @@ const COMMANDS = {
   [desktopNext.TRIGGER]: desktopNext.Command,
   [desktopPrev.TRIGGER]: desktopPrev.Command,
   [desktopSelect.TRIGGER]: desktopSelect.Command,
+  [windowToggleMaximizeArea.TRIGGER]: windowToggleMaximizeArea.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

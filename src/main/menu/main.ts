@@ -175,6 +175,17 @@ function windowMenu(
           }
         },
       },
+      {
+        label: 'Toggle maximize area',
+        accelerator: 'CmdOrCtrl+I',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Maximize),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'toggle-maximize-area');
+          }
+        },
+      },
     ],
   };
 }

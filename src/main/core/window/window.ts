@@ -54,11 +54,29 @@ export class Window extends UIWindow {
   }
 
   toggleSidebar() {
-    const view = this.getView('sidebar')!;
-    if (view.width === SIDEBAR_DEFAULT_WIDTH) {
-      view.setWidth(SIDEBAR_MIN_WIDTH);
+    const sidebar = this.getView('sidebar')!;
+    if (sidebar.width === SIDEBAR_DEFAULT_WIDTH) {
+      sidebar.setWidth(SIDEBAR_MIN_WIDTH);
     } else {
-      view.setWidth(SIDEBAR_DEFAULT_WIDTH);
+      sidebar.setWidth(SIDEBAR_DEFAULT_WIDTH);
+    }
+
+    this.refreshLayout();
+  }
+
+  toggleMaximizeArea() {
+    const urlbar = this.getView('urlbar')!;
+    const sidebar = this.getView('sidebar')!;
+    const mainView = this.getView('main-view')!;
+
+    if (urlbar.isVisible) {
+      urlbar.hide();
+      sidebar.hide();
+      mainView.setMargins({ l: 5 });
+    } else {
+      urlbar.show();
+      sidebar.show();
+      mainView.setMargins({ l: 0 });
     }
 
     this.refreshLayout();
