@@ -1,4 +1,4 @@
-import { TDesktopId } from '@shared/types';
+import { TDesktopId } from '~/types';
 
 export class Desktop {
   private _name: string | null = null;

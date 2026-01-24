@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { Session, Browser } from '@main/core';
+import { Session, Browser } from '@/core';
 
 export function registerAppEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { TNotificationSeverity } from '@shared/types';
+import { TNotificationSeverity } from '~/types';
 import { UIWindow } from '../window';
 import { UINotificationsContainer, UINotification } from './models';
 import { refreshNotifications } from '../ipc';

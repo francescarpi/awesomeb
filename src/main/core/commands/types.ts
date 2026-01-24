@@ -1,5 +1,5 @@
-import { Browser, Window } from '@main/core';
-import { TPage } from '@shared/types';
+import { Browser, Window } from '@/core';
+import { TPage } from '~/types';
 
 export interface ICommand<T> {
   trigger: string;

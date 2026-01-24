@@ -1,4 +1,4 @@
-import { TEntityType, IEntity } from '@shared/types';
+import { TEntityType, IEntity } from '~/types';
 import { getWinId } from './window';
 
 export async function manageListWithSearch(

@@ -1,8 +1,8 @@
 import path from 'path';
 import { WebContentsView, Rectangle } from 'electron';
-import { PRELOAD_FOLDER } from '@main/paths';
+import { PRELOAD_FOLDER } from '@/paths';
 import { ILayoutNode, IProps } from './types';
-import { IMargins, TPage } from '@shared/types';
+import { IMargins, TPage } from '~/types';
 import { loadPage, openDevTools } from './helpers';
 
 export class UIView implements ILayoutNode {

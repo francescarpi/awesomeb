@@ -1,6 +1,6 @@
 import { UIModal } from './models';
 import { UIWindow } from '../window';
-import { TPage } from '@shared/types';
+import { TPage } from '~/types';
 import { IProps } from './types';
 
 export class UIModalManager {

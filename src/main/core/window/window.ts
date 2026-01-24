@@ -1,9 +1,9 @@
-import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@main/ui';
+import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@/ui';
 import type { IProps } from './types';
-import { defaultTheme, Desktop } from '@main/core';
+import { defaultTheme, Desktop } from '@/core';
 import EventEmitter from 'events';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
-import { TDesktopId } from '@shared/types';
+import { TDesktopId } from '~/types';
 
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();

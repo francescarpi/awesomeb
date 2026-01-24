@@ -1,13 +1,13 @@
 import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
-import { PRELOAD_FOLDER } from '@main/paths';
+import { PRELOAD_FOLDER } from '@/paths';
 import { UILayout } from './layouts';
 import { UIView } from './view';
-import { TPage } from '@shared/types';
+import { TPage } from '~/types';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
-import { Theme } from '@main/core';
+import { Theme } from '@/core';
 import { registerWindowEvents } from './events';
 import EventEmitter from 'events';
 

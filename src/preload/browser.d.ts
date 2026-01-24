@@ -1,4 +1,4 @@
-import { TWindowId, INotification, TEntityType, IEntity, IDesktopEntity } from '@shared/types';
+import { TWindowId, INotification, TEntityType, IEntity, IDesktopEntity } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
 export {};

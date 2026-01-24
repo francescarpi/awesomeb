@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Browser } from '@main/core';
+import { Browser } from '@/core';
 
 test('should create a browser window successfully', () => {
   const browser = new Browser();

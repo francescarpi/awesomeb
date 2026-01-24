@@ -1,5 +1,5 @@
 import { ICommand } from './types';
-import { Browser } from '@main/core';
+import { Browser } from '@/core';
 
 export { setupCommandsIPC } from './ipc';
 

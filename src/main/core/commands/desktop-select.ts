@@ -1,4 +1,4 @@
-import { TDesktopId } from '@shared/types';
+import { TDesktopId } from '~/types';
 import { ICommand } from './types';
 
 export interface ICommandParams {

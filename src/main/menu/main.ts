@@ -1,4 +1,4 @@
-import { Browser, Window } from '@main/core';
+import { Browser, Window } from '@/core';
 import { MenuItemConstructorOptions, Menu } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';

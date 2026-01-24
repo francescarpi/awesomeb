@@ -1,4 +1,4 @@
-import { TDesktopId } from '@shared/types';
+import { TDesktopId } from '~/types';
 import { Rectangle } from 'electron';
 
 export interface ISessionStore {

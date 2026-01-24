@@ -1,6 +1,6 @@
-import { getCommand, TCommandTrigger, Window } from '@main/core';
-import { TWindowId } from '@shared/types';
-import { mainMenu } from '@main/menu';
+import { getCommand, TCommandTrigger, Window } from '@/core';
+import { TWindowId } from '~/types';
+import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';

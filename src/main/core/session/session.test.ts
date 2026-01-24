@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Browser, Session } from '@main/core';
+import { Browser, Session } from '@/core';
 
 test('session data structure should match expected format', () => {
   const browser = new Browser();

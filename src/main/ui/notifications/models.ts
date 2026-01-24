@@ -1,8 +1,8 @@
 import path from 'path';
-import { PRELOAD_FOLDER } from '@main/paths';
+import { PRELOAD_FOLDER } from '@/paths';
 import { WebContentsView } from 'electron';
 import { UIWindow } from '../window';
-import { TNotificationSeverity } from '@shared/types';
+import { TNotificationSeverity } from '~/types';
 import { loadPage } from '../helpers';
 import { WIDTH, HEIGHT, MARGIN_TOP, MARGIN_RIGHT } from './constants';
 

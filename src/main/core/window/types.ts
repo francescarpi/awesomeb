@@ -1,5 +1,5 @@
 import { Theme } from '../themes';
-import { Desktop } from '@main/core';
+import { Desktop } from '@/core';
 
 export interface IProps {
   theme?: Theme;

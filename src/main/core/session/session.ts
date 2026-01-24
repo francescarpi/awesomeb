@@ -1,7 +1,7 @@
 import Store from 'electron-store';
-import { userDataPath } from '@main/paths';
+import { userDataPath } from '@/paths';
 import type { ISessionStore, ISessionWindow } from './types';
-import { Browser, defaultTheme } from '@main/core';
+import { Browser, defaultTheme } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('Session');

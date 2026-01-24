@@ -1,8 +1,8 @@
-import { Browser, getCommand, TCommandTrigger } from '@main/core';
+import { Browser, getCommand, TCommandTrigger } from '@/core';
 import { ipcMain } from 'electron';
-import { TWindowId } from '@shared/types';
+import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { checkModalAndPagesSender } from '@main/utils';
+import { checkModalAndPagesSender } from '@/utils';
 
 const scopeLog = log.scope('IPCCommands');
 

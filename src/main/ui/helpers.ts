@@ -1,6 +1,6 @@
 import { app, WebContents } from 'electron';
 import path from 'path';
-import { RENDERER_FOLDER } from '@main/paths';
+import { RENDERER_FOLDER } from '@/paths';
 
 export async function loadPage(wc: WebContents, page: string, query: Record<string, string> = {}) {
   if (app.isPackaged) {

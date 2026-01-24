@@ -1,4 +1,4 @@
-import { TWindowId, INotification, TEntityType, IDesktopEntity } from '@shared/types';
+import { TWindowId, INotification, TEntityType, IDesktopEntity } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 const abModal = {

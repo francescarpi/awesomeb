@@ -1,5 +1,5 @@
 import { Rectangle } from 'electron';
-import { IMargins } from '@shared/types';
+import { IMargins } from '~/types';
 
 export interface ILayoutNode {
   layout(rect: Rectangle): void;

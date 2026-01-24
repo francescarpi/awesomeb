@@ -1,4 +1,4 @@
-import { Browser, Window } from '@main/core';
+import { Browser, Window } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');

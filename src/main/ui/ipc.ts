@@ -1,9 +1,9 @@
-import { Browser } from '@main/core';
+import { Browser } from '@/core';
 import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
-import { INotification, TWindowId, TEntityType, IEntity } from '@shared/types';
-import { checkModalAndPagesSender, checkModalSender } from '@main/utils';
+import { INotification, TWindowId, TEntityType, IEntity } from '~/types';
+import { checkModalAndPagesSender, checkModalSender } from '@/utils';
 
 const scopeLog = log.scope('IPCUI');
 

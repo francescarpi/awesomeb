@@ -1,5 +1,5 @@
-import { TDesktopId, TWindowId } from '@shared/types';
-import { Browser, Window } from '@main/core';
+import { TDesktopId, TWindowId } from '~/types';
+import { Browser, Window } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserEvents');

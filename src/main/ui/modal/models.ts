@@ -1,8 +1,8 @@
 import path from 'path';
-import { PRELOAD_FOLDER } from '@main/paths';
+import { PRELOAD_FOLDER } from '@/paths';
 import { BrowserWindow } from 'electron';
 import { UIWindow } from '../window';
-import { TPage } from '@shared/types';
+import { TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
 

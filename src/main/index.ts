@@ -1,6 +1,6 @@
 import { app } from 'electron';
-import { Browser, setupCommandsIPC } from '@main/core';
-import { setupUIIPC } from '@main/ui';
+import { Browser, setupCommandsIPC } from '@/core';
+import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout } from './boot';
 import { registerAppEvents } from './events';
 

@@ -1,5 +1,5 @@
-import { IEntity, IDesktopEntity } from '@shared/types';
-import { Browser, getCommands, Window } from '@main/core';
+import { IEntity, IDesktopEntity } from '~/types';
+import { Browser, getCommands, Window } from '@/core';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}

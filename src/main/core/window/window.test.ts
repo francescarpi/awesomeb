@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { Browser } from '@main/core';
+import { Browser } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 
 test('recent created window should have MIN_DESKTOPS', () => {

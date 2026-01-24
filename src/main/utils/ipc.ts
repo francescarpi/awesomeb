@@ -1,8 +1,8 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { Browser, Window } from '@main/core';
-import { TWindowId } from '@shared/types';
+import { Browser, Window } from '@/core';
+import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { UIModalManager, UIView } from '@main/ui';
+import { UIModalManager, UIView } from '@/ui';
 
 const scopeLog = log.scope('UtilsIPC');
 
