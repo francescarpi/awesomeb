@@ -26,11 +26,13 @@
 
 <script>
   import { getWinId } from '../../scripts/window';
-  import { IDesktopEntity } from '~/types';
+  import { IDesktopEntity, TDesktopId } from '~/types';
 
   const tplEl = document.querySelector('#desktop-template') as HTMLTemplateElement;
   const nameEl = document.getElementById('name')!;
   const ulEl = document.querySelector('ul')!;
+
+  registerClickEvents();
 
   const winId = getWinId();
 
@@ -54,6 +56,8 @@
       const clone = tplEl.content.cloneNode(true) as HTMLElement;
 
       const liEl = clone.querySelector('li')!;
+      liEl.dataset.id = desktop.id;
+
       const desktopIdEl = clone.querySelector('#id')!;
       const indicatorsEl = clone.querySelector('#indicators')!;
       const hasTabsEl = clone.querySelector('#has-tabs')!;
@@ -90,6 +94,18 @@
       }
 
       ulEl.appendChild(clone);
+    });
+  }
+
+  function registerClickEvents() {
+    ulEl.addEventListener('click', (e) => {
+      const liEl = (e.target as HTMLElement).closest('li');
+      if (!liEl) return;
+
+      const desktopId = liEl.dataset.id;
+      if (!desktopId) return;
+
+      abDesktops.select(winId, parseInt(desktopId, 10));
     });
   }
 </script>

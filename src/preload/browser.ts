@@ -34,6 +34,9 @@ const abDesktops = {
   onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => {
     ipcRenderer.on('desktops:refresh', callback);
   },
+  select: (winId: TWindowId, desktopId: string) => {
+    ipcRenderer.send('desktops:select', winId, desktopId);
+  },
 };
 
 contextBridge.exposeInMainWorld('abModal', abModal);

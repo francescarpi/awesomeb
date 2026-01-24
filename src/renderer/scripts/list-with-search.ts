@@ -80,7 +80,7 @@ function selectItemAtIndex(ul: HTMLElement, index: number) {
 
 function renderCommands(ul: HTMLElement, tpl: HTMLTemplateElement, entities: IEntity[]) {
   ul.innerHTML = '';
-  for (const [i, item] of entities.entries()) {
+  for (const item of entities) {
     const clone = tpl.content.cloneNode(true) as HTMLElement;
 
     const container = clone.querySelector('p') as HTMLElement;

@@ -21,7 +21,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   return menu;
 }
 
-function appMenu(browser: Browser, showRootIcon: boolean): MenuItemConstructorOptions {
+function appMenu(_browser: Browser, _showRootIcon: boolean): MenuItemConstructorOptions {
   return {
     role: 'appMenu',
     // icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
@@ -52,7 +52,7 @@ function appMenu(browser: Browser, showRootIcon: boolean): MenuItemConstructorOp
 }
 
 function fileMenu(
-  browser: Browser,
+  _browser: Browser,
   showRootIcon: boolean,
   focusedWindow: Window | null,
 ): MenuItemConstructorOptions {
@@ -107,9 +107,9 @@ function fileMenu(
 }
 
 function editMenu(
-  browser: Browser,
+  _browser: Browser,
   showRootIcon: boolean,
-  focusedWindow: Window | null,
+  _focusedWindow: Window | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'Edit',

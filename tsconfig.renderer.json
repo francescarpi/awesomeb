@@ -1,9 +1,9 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
-    "src/main/**/*",
-    "src/preload/**/*",
-    "src/shared/**/*"
+    "src/shared/**/*",
+    "src/renderer/**/*",
+    "src/preload/*.d.ts"
   ],
   "compilerOptions": {
     "composite": true,
@@ -11,7 +11,6 @@
     "types": [],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/main/*"],
       "~/*": ["src/shared/*"]
     }
   }

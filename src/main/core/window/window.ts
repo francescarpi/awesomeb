@@ -4,6 +4,9 @@ import { defaultTheme, Desktop } from '@/core';
 import EventEmitter from 'events';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
 import { TDesktopId } from '~/types';
+import log from 'electron-log';
+
+const scopeLog = log.scope('Window');
 
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
@@ -114,7 +117,10 @@ export class Window extends UIWindow {
       newIndex = (currentIndex - 1 + deskIds.length) % deskIds.length;
     } else {
       newIndex = deskIds.indexOf(target);
-      if (newIndex === -1) return; // Invalid desktop id
+      if (newIndex === -1) {
+        scopeLog.warn(`Attempted to go to invalid desktop ID: ${target}`);
+        return; // Invalid desktop id
+      }
     }
 
     this._selectedDesktopId = deskIds[newIndex];

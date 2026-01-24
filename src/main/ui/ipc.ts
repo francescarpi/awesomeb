@@ -2,8 +2,8 @@ import { Browser } from '@/core';
 import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
-import { INotification, TWindowId, TEntityType, IEntity } from '~/types';
-import { checkModalAndPagesSender, checkModalSender } from '@/utils';
+import { INotification, TWindowId } from '~/types';
+import { checkModalSender } from '@/utils';
 
 const scopeLog = log.scope('IPCUI');
 
@@ -11,7 +11,7 @@ export function setupUIIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
   ipcMain.on('modal:close', async (event, winId: TWindowId) => {
     scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
-    return await checkModalSender(event, browser, winId, (win, modalManager) => {
+    return await checkModalSender(event, browser, winId, (_win, modalManager) => {
       modalManager.close();
     });
   });
@@ -41,19 +41,6 @@ export function setupUIIPC(browser: Browser) {
     if (win.notifications.all.length === 0) {
       win.notifications.hideContainer();
     }
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.handle('entities:fetch', async (event, winId: TWindowId, entity: TEntityType) => {
-    scopeLog.info(`IPC Received: entities:fetch for window ID ${winId} and entity ${entity}`);
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], (window) => {
-      switch (entity) {
-        case 'commands':
-          return browser.renderer.commands();
-        case 'desktops':
-          return browser.renderer.desktops(window);
-      }
-    });
   });
 }
 

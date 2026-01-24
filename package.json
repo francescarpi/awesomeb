@@ -12,7 +12,10 @@
     "start": "electron .",
     "format": "prettier --write src",
     "test": "vitest",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "tscheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "tscheck:renderer": "tsc --noEmit -p tsconfig.renderer.json --composite false",
+    "tscheck": "npm run tscheck:node && npm run tscheck:renderer"
   },
   "keywords": [],
   "author": "",

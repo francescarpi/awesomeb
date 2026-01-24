@@ -6,7 +6,7 @@ repos:
   - repo: local
     hooks:
       - id: astro
-        name: Astro check
+        name: Astro
         entry: pnpm astro check
         language: system
         pass_filenames: false
@@ -14,7 +14,7 @@ repos:
         stages: [pre-commit]
 
       - id: eslint
-        name: Linter check
+        name: Linter
         entry: pnpm lint
         language: system
         pass_filenames: false
@@ -27,6 +27,14 @@ repos:
         language: system
         pass_filenames: false
         files: \.(ts|tsx|js|jsx|json|css|md|astro)$
+        stages: [pre-commit]
+
+      - id: tscheck
+        name: Typescript
+        entry: pnpm tscheck
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx|js|jsx|astro)$
         stages: [pre-commit]
 
       - id: tests

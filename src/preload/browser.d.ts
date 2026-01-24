@@ -1,4 +1,11 @@
-import { TWindowId, INotification, TEntityType, IEntity, IDesktopEntity } from '~/types';
+import {
+  TWindowId,
+  INotification,
+  TEntityType,
+  IEntity,
+  IDesktopEntity,
+  TDesktopId,
+} from '~/types';
 import { IpcRendererEvent } from 'electron';
 
 export {};
@@ -25,5 +32,6 @@ declare global {
 
   const abDesktops: {
     onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
+    select: (winId: TWindowId, desktopId: TDesktopId) => void;
   };
 }
