@@ -1,6 +1,6 @@
 import path from 'path';
 import { WebContentsView, Rectangle } from 'electron';
-import { PRELOAD_FOLDER } from '@main/utils';
+import { PRELOAD_FOLDER } from '@main/paths';
 import { ILayoutNode, IProps } from './types';
 import { IMargins, TPage } from '@shared/types';
 import { loadPage, openDevTools } from './helpers';

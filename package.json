@@ -26,7 +26,7 @@
     "@astrojs/check": "0.9.6",
     "@eslint/js": "9.39.2",
     "@tailwindcss/vite": "4.1.18",
-    "astro": "5.16.14",
+    "astro": "5.16.15",
     "astro-icon": "1.1.5",
     "concurrently": "9.2.1",
     "daisyui": "5.5.14",
@@ -45,6 +45,7 @@
     "vitest": "4.0.18"
   },
   "dependencies": {
-    "electron-log": "5.4.3"
+    "electron-log": "5.4.3",
+    "electron-store": "11.0.2"
   }
 }

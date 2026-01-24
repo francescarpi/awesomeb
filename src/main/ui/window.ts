@@ -1,6 +1,6 @@
 import path from 'path';
-import { BrowserWindow, WebContents, app } from 'electron';
-import { PRELOAD_FOLDER } from '@main/utils';
+import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
+import { PRELOAD_FOLDER } from '@main/paths';
 import { UILayout } from './layouts';
 import { UIView } from './view';
 import { TPage } from '@shared/types';
@@ -163,5 +163,9 @@ export class UIWindow {
       width: 500,
       height: 500,
     });
+  }
+
+  get bounds(): Rectangle {
+    return this.bw.getBounds();
   }
 }

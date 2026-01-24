@@ -54,6 +54,8 @@ export class Window extends UIWindow {
   }
 
   toggleSidebar() {
+    // TODO if area is maximized, sidebar should appear over the main view
+
     const sidebar = this.getView('sidebar')!;
     if (sidebar.width === SIDEBAR_DEFAULT_WIDTH) {
       sidebar.setWidth(SIDEBAR_MIN_WIDTH);
@@ -62,6 +64,11 @@ export class Window extends UIWindow {
     }
 
     this.refreshLayout();
+  }
+
+  get isSidebarCollapsed(): boolean {
+    const sidebar = this.getView('sidebar')!;
+    return sidebar.width === SIDEBAR_MIN_WIDTH;
   }
 
   toggleMaximizeArea() {
@@ -80,6 +87,11 @@ export class Window extends UIWindow {
     }
 
     this.refreshLayout();
+  }
+
+  get isAreaMaximized(): boolean {
+    const urlbar = this.getView('urlbar')!;
+    return !urlbar.isVisible;
   }
 
   get desktops(): Desktop[] {

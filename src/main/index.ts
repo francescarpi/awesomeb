@@ -16,6 +16,6 @@ app.whenReady().then(() => {
   browser.init();
 
   browser.createWindow();
-});
 
-registerAppEvents();
+  registerAppEvents(browser);
+});

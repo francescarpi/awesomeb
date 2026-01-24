@@ -1,5 +1,5 @@
 import path from 'path';
-import { PRELOAD_FOLDER } from '@main/utils';
+import { PRELOAD_FOLDER } from '@main/paths';
 import { WebContentsView } from 'electron';
 import { UIWindow } from '../window';
 import { TNotificationSeverity } from '@shared/types';
