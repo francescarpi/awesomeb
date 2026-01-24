@@ -26,87 +26,199 @@
 
 <script>
   import { getWinId } from '../../scripts/window';
-  import { IDesktopEntity, TDesktopId } from '~/types';
+  import { IDesktopEntity } from '~/types';
 
-  const tplEl = document.querySelector('#desktop-template') as HTMLTemplateElement;
-  const nameEl = document.getElementById('name')!;
-  const ulEl = document.querySelector('ul')!;
+  // ========================================
+  // DOM Elements & Constants
+  // ========================================
 
-  registerClickEvents();
+  const TEMPLATE_ELEMENT = document.querySelector('#desktop-template') as HTMLTemplateElement;
+  const DESKTOP_NAME_ELEMENT = document.getElementById('name')!;
+  const DESKTOP_LIST_ELEMENT = document.querySelector('ul')!;
+  const WINDOW_ID = getWinId();
 
-  const winId = getWinId();
+  // ========================================
+  // Initialization
+  // ========================================
 
-  // Initial fetch of desktops
-  async function fetchDesktops() {
-    const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
-    renderDesktops(desktops);
+  initializeDesktopsComponent();
+
+  async function initializeDesktopsComponent() {
+    setupEventListeners();
+    await loadAndRenderDesktops();
+    subscribeToDesktopUpdates();
   }
 
-  fetchDesktops();
+  // ========================================
+  // Event Handling
+  // ========================================
 
-  abDesktops.onRefresh((_e, desktops) => {
-    renderDesktops(desktops);
-  });
-  // End Initial fetch of desktops
+  /**
+   * Sets up click event listener for desktop selection
+   */
+  function setupEventListeners() {
+    DESKTOP_LIST_ELEMENT.addEventListener('click', handleDesktopClick);
+  }
 
+  /**
+   * Handles click events on desktop items
+   */
+  function handleDesktopClick(event: Event) {
+    const clickedElement = event.target as HTMLElement;
+    const desktopItem = clickedElement.closest('li');
+
+    if (!desktopItem) return;
+
+    const desktopId = desktopItem.dataset.id;
+    if (!desktopId) return;
+
+    const numericDesktopId = parseInt(desktopId, 10);
+    abDesktops.select(WINDOW_ID, numericDesktopId);
+  }
+
+  // ========================================
+  // Data Management
+  // ========================================
+
+  /**
+   * Loads initial desktop data and renders it
+   */
+  async function loadAndRenderDesktops() {
+    try {
+      const desktops = await abEntities.fetch<IDesktopEntity>(WINDOW_ID, 'desktops');
+      renderDesktops(desktops);
+    } catch (error) {
+      console.error('Failed to load desktops:', error);
+    }
+  }
+
+  /**
+   * Subscribes to desktop update events
+   */
+  function subscribeToDesktopUpdates() {
+    abDesktops.onRefresh((_event, desktops) => {
+      renderDesktops(desktops);
+    });
+  }
+
+  // ========================================
+  // Rendering Logic
+  // ========================================
+
+  /**
+   * Renders the list of desktops
+   */
   function renderDesktops(desktops: IDesktopEntity[]) {
-    ulEl.innerHTML = '';
+    clearDesktopList();
 
     desktops.forEach((desktop) => {
-      const clone = tplEl.content.cloneNode(true) as HTMLElement;
-
-      const liEl = clone.querySelector('li')!;
-      liEl.dataset.id = desktop.id;
-
-      const desktopIdEl = clone.querySelector('#id')!;
-      const indicatorsEl = clone.querySelector('#indicators')!;
-      const hasTabsEl = clone.querySelector('#has-tabs')!;
-      const hasActiveTabsEl = clone.querySelector('#has-active-tabs')!;
-      const requireAttentionEl = clone.querySelector('#require-attention')!;
-
-      desktopIdEl.textContent = desktop.id;
-
-      if (desktop.selected) {
-        liEl.classList.add('active');
-        nameEl.textContent = desktop.name;
-      } else {
-        liEl.classList.remove('active');
-      }
-
-      if (desktop.hasTabs) {
-        indicatorsEl.classList.remove('hidden');
-        hasTabsEl.classList.remove('hidden');
-      } else {
-        indicatorsEl.classList.add('hidden');
-        hasTabsEl.classList.add('hidden');
-      }
-
-      if (desktop.hasActiveTabs) {
-        hasActiveTabsEl.classList.remove('hidden');
-      } else {
-        hasActiveTabsEl.classList.add('hidden');
-      }
-
-      if (desktop.requireAttention) {
-        requireAttentionEl.classList.remove('hidden');
-      } else {
-        requireAttentionEl.classList.add('hidden');
-      }
-
-      ulEl.appendChild(clone);
+      const desktopElement = createDesktopElement(desktop);
+      DESKTOP_LIST_ELEMENT.appendChild(desktopElement);
     });
   }
 
-  function registerClickEvents() {
-    ulEl.addEventListener('click', (e) => {
-      const liEl = (e.target as HTMLElement).closest('li');
-      if (!liEl) return;
+  /**
+   * Clears the desktop list container
+   */
+  function clearDesktopList() {
+    DESKTOP_LIST_ELEMENT.innerHTML = '';
+  }
 
-      const desktopId = liEl.dataset.id;
-      if (!desktopId) return;
+  /**
+   * Creates a desktop list item element from template
+   */
+  function createDesktopElement(desktop: IDesktopEntity): DocumentFragment {
+    const clonedTemplate = TEMPLATE_ELEMENT.content.cloneNode(true) as DocumentFragment;
 
-      abDesktops.select(winId, parseInt(desktopId, 10));
-    });
+    // Get references to template elements
+    const elements = getDesktopElementReferences(clonedTemplate);
+
+    // Configure the desktop item
+    configureDesktopItem(elements, desktop);
+
+    return clonedTemplate;
+  }
+
+  /**
+   * Gets references to all relevant elements in the cloned template
+   */
+  function getDesktopElementReferences(template: DocumentFragment) {
+    return {
+      listItem: template.querySelector('li')!,
+      desktopId: template.querySelector('#id')!,
+      indicators: template.querySelector('#indicators')!,
+      hasTabsIndicator: template.querySelector('#has-tabs')!,
+      hasActiveTabsIndicator: template.querySelector('#has-active-tabs')!,
+      requireAttentionIndicator: template.querySelector('#require-attention')!,
+    };
+  }
+
+  /**
+   * Configures all aspects of a desktop item element
+   */
+  function configureDesktopItem(
+    elements: ReturnType<typeof getDesktopElementReferences>,
+    desktop: IDesktopEntity,
+  ) {
+    // Set basic desktop information
+    elements.listItem.dataset.id = desktop.id;
+    elements.desktopId.textContent = desktop.id;
+
+    // Handle selection state
+    updateSelectionState(elements.listItem, desktop.selected, desktop.name);
+
+    // Handle tab indicators
+    updateTabIndicators(elements, desktop);
+
+    // Handle attention indicator
+    updateAttentionIndicator(elements.requireAttentionIndicator, desktop.requireAttention);
+  }
+
+  /**
+   * Updates the selection state of a desktop item
+   */
+  function updateSelectionState(listItem: HTMLLIElement, isSelected: boolean, desktopName: string) {
+    if (isSelected) {
+      listItem.classList.add('active');
+      DESKTOP_NAME_ELEMENT.textContent = desktopName;
+    } else {
+      listItem.classList.remove('active');
+    }
+  }
+
+  /**
+   * Updates tab-related indicators for a desktop item
+   */
+  function updateTabIndicators(
+    elements: ReturnType<typeof getDesktopElementReferences>,
+    desktop: IDesktopEntity,
+  ) {
+    const { indicators, hasTabsIndicator, hasActiveTabsIndicator } = elements;
+
+    // Show/hide general tab indicator
+    toggleElementVisibility(indicators, desktop.hasTabs);
+    toggleElementVisibility(hasTabsIndicator, desktop.hasTabs);
+
+    // Show/hide active tabs indicator
+    toggleElementVisibility(hasActiveTabsIndicator, desktop.hasActiveTabs);
+  }
+
+  /**
+   * Updates the attention indicator for a desktop item
+   */
+  function updateAttentionIndicator(indicator: Element, requiresAttention: boolean) {
+    toggleElementVisibility(indicator, requiresAttention);
+  }
+
+  /**
+   * Toggles element visibility using the 'hidden' class
+   */
+  function toggleElementVisibility(element: Element, shouldShow: boolean) {
+    if (shouldShow) {
+      element.classList.remove('hidden');
+    } else {
+      element.classList.add('hidden');
+    }
   }
 </script>
 
