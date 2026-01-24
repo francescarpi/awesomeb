@@ -6,8 +6,8 @@ export default defineConfig({
     setupFiles: ['vitest.setup.ts'],
     exclude: ['node_modules/**', 'dist/**'],
     alias: {
-      '@main': resolve('src/main'),
-      '@shared': resolve('src/shared'),
+      '@': resolve('src/main'),
+      '~': resolve('src/shared'),
     },
   },
 });
