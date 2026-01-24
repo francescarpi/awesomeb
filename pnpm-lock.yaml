@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       astro-electron:
-        specifier: ^0.5.0
+        specifier: 0.5.0
         version: 0.5.0(astro@5.16.15(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.55.1)(typescript@5.9.3)(yaml@2.8.2))(electron@40.0.0)(vite-plugin-electron-renderer@0.14.6)
       electron-log:
         specifier: 5.4.3
@@ -22,7 +22,7 @@ importers:
         specifier: 0.9.6
         version: 0.9.6(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.9.3)
       '@electron-toolkit/tsconfig':
-        specifier: ^2.0.0
+        specifier: 2.0.0
         version: 2.0.0(@types/node@25.0.9)
       '@eslint/js':
         specifier: 9.39.2
@@ -79,10 +79,10 @@ importers:
         specifier: 7.3.1
         version: 7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
       vite-plugin-electron-renderer:
-        specifier: ^0.14.6
+        specifier: 0.14.6
         version: 0.14.6
       vite-plugin-static-copy:
-        specifier: ^3.1.6
+        specifier: 3.1.6
         version: 3.1.6(vite@7.3.1(@types/node@25.0.9)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
       vitest:
         specifier: 4.0.18
