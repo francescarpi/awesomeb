@@ -1,20 +1,17 @@
 ---
-import Layout from '../layouts/Base.astro';
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '../components/common/ListWithSearch.astro';
 ---
 
-<Layout>
-  <div class="bg-black text-white p-4 flex flex-col gap-2 h-full">
-    <h1 class="text-lg">Select Desktop</h1>
-    <ListWithSearch placeholder="Filter and select desktop..." id="list" />
-  </div>
-</Layout>
+<BlackBgWithTitle title="Select Desktop">
+  <ListWithSearch placeholder="Filter and select desktop..." id="list" />
+</BlackBgWithTitle>
 
 <script>
-  import { getWinId } from '../scripts/window';
+  import { getSearchParams } from '../scripts/url';
   import { manageListWithSearch } from '../scripts/list-with-search';
 
-  const winId = getWinId();
+  const { winId } = getSearchParams();
   const commandsEl = document.getElementById('list')!;
   manageListWithSearch(
     commandsEl,
@@ -23,7 +20,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
     },
     () => {
-      abModal.closeModal(winId);
+      abModal.close(winId);
     },
   );
 </script>

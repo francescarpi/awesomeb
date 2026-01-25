@@ -5,8 +5,8 @@ import Layout from '../layouts/Base.astro';
 <Layout />
 
 <script>
-  import { getWinId } from '../scripts/window';
-  const winId = getWinId();
+  import { getSearchParams } from '../scripts/url';
+  const { winId } = getSearchParams();
 
   abDesktops.getTheme(winId).then((theme) => {
     const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;

@@ -1,5 +1,5 @@
 import { TEntityType, IEntity } from '~/types';
-import { getWinId } from './window';
+import { getSearchParams } from './url';
 
 export async function manageListWithSearch(
   listEl: HTMLElement,
@@ -18,7 +18,7 @@ export async function manageListWithSearch(
   if (!input) throw new Error('Input element not found in list element');
 
   // Load entities & render
-  const winId = getWinId();
+  const { winId } = getSearchParams();
   const originalEntities = await abEntities.fetch<IEntity>(winId, entity);
   let filteredEntities = originalEntities;
   renderCommands(ul, tpl, filteredEntities);

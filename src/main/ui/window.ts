@@ -147,7 +147,9 @@ export class UIWindow {
   }
 
   focus() {
-    this.bw.focus();
+    if (!this.bw.isDestroyed()) {
+      this.bw.focus();
+    }
   }
 
   show() {

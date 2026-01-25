@@ -1,6 +1,7 @@
 import { TDesktopId } from '~/types';
-import { defaultTheme, Theme } from '@/core';
+import { defaultTheme, Theme, Window } from '@/core';
 import { IProps } from './types';
+import EventEmitter from 'events';
 
 export class Desktop {
   private _name: string | null = null;
@@ -8,10 +9,13 @@ export class Desktop {
   private _theme: Theme;
 
   constructor(
+    public readonly eventsChannel: EventEmitter,
+    public readonly window: Window,
     public readonly id: TDesktopId,
     props?: IProps,
   ) {
     this._theme = props?.theme || defaultTheme;
+    this._name = props?.name || null;
   }
 
   setName(name: string) {
@@ -21,7 +25,7 @@ export class Desktop {
 
     this._name = name;
 
-    // TODO emit event to channel
+    this.eventsChannel.emit('desktop:name-did-change', this.window, this);
   }
 
   get name(): string | null {

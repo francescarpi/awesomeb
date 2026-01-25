@@ -13,7 +13,7 @@ export {};
 
 declare global {
   const abModal: {
-    closeModal: (winId: TWindowId) => void;
+    close: (winId: TWindowId) => void;
   };
 
   const abNotifications: {
@@ -28,7 +28,7 @@ declare global {
   };
 
   const abCommands: {
-    perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => void;
+    perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => Promise<void>;
   };
 
   const abDesktops: {

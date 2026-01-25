@@ -8,7 +8,7 @@ const scopeLog = log.scope('IPCCommands');
 
 export function setupCommandsIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on(
+  ipcMain.handle(
     'commands:perform',
     async (event, winId: TWindowId, trigger: TCommandTrigger, params?: Record<string, unknown>) => {
       scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
@@ -26,9 +26,9 @@ export function setupCommandsIPC(browser: Browser) {
 
           const comesFromPerformCommand = event.sender.getURL().includes('perform-command');
 
-          if (comesFromPerformCommand && command.page) {
+          if (comesFromPerformCommand && command.modal) {
             // Show command page...
-            window.modal.open(command.page);
+            window.modal.open(command.modal.page, command.modal.props);
             return;
           }
 

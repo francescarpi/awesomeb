@@ -9,10 +9,10 @@ import { Icon } from 'astro-icon/components';
 </div>
 
 <script>
-  import { getWinId } from '../../scripts/window';
+  import { getSearchParams } from '../../scripts/url';
   import { onClick } from '../../scripts/buttons';
 
-  const winId = getWinId();
+  const { winId } = getSearchParams();
 
   onClick('close', () => abCommands.perform(winId, 'close-window'));
   onClick('minimize', () => abCommands.perform(winId, 'minimize-window'));

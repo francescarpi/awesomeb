@@ -10,6 +10,8 @@ import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout } from './boot';
 import { registerAppEvents } from './events';
 
+export type { IModalProps } from './ui';
+
 setupLogs();
 setupAbout();
 

@@ -11,6 +11,8 @@ test("commands renderer shouldn' return any command becaise there is no focused 
 test('desktops renderer sould return expected data', () => {
   const browser = new Browser();
   const w = browser.createWindow();
+  w.createDefaultDesktops();
+
   expect(browser.renderer.desktops(w)).toEqual([
     {
       id: '1',

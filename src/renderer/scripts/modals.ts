@@ -1,10 +1,10 @@
-import { getWinId } from './window';
+import { getSearchParams } from './url';
 
 export function closeModalOnEsc() {
-  const winId = getWinId();
+  const { winId } = getSearchParams();
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
-      abModal.closeModal(winId);
+      abModal.close(winId);
     }
   });
 }

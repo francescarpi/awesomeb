@@ -18,4 +18,12 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshDesktops(window);
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'desktop:name-did-change',
+    async (window: Window, _selectedDesktopId: TDesktopId) => {
+      browser.rendererEmmiter.refreshDesktops(window);
+    },
+  );
 }

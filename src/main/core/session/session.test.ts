@@ -3,7 +3,9 @@ import { Browser, Session } from '@/core';
 
 test('session data structure should match expected format', () => {
   const browser = new Browser();
-  browser.createWindow();
+  const w = browser.createWindow();
+  w.createDefaultDesktops();
+
   const session = new Session(browser);
 
   expect(session.sessionToStore()).toEqual([

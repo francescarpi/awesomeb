@@ -17,9 +17,9 @@ import Desktops from '../components/sidebar/Desktops.astro';
 
 <script>
   import { onClick } from '../scripts/buttons';
-  import { getWinId } from '../scripts/window';
 
-  const winId = getWinId();
+  import { getSearchParams } from '../scripts/url';
+  const { winId } = getSearchParams();
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
 </script>

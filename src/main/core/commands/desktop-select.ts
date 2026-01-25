@@ -11,9 +11,11 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Select Desktop',
   description: 'Switch to a specific desktop',
-  page: 'select-desktop',
+  modal: {
+    page: 'select-desktop',
+  },
   visibility: ({ focusedWindow }) => !!focusedWindow,
   async handler(_browser, window, params) {
-    window.goDesktop(params.desktopId);
+    window.selectDesktop(params.desktopId);
   },
 };

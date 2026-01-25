@@ -4,7 +4,7 @@
 
 <div class="flex flex-col items-center gap-1">
   <ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
-  <span class="text-sm" id="name"></span>
+  <span class="text-xs" id="name"></span>
 </div>
 
 <template id="desktop-template">
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import { getWinId } from '../../scripts/window';
+  import { getSearchParams } from '../../scripts/url';
   import { IDesktopEntity } from '~/types';
 
   // ========================================
@@ -35,7 +35,7 @@
   const TEMPLATE_ELEMENT = document.querySelector('#desktop-template') as HTMLTemplateElement;
   const DESKTOP_NAME_ELEMENT = document.getElementById('name')!;
   const DESKTOP_LIST_ELEMENT = document.querySelector('ul')!;
-  const WINDOW_ID = getWinId();
+  const { winId: WINDOW_ID } = getSearchParams();
 
   // ========================================
   // Initialization

@@ -1,8 +1,8 @@
 import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@/ui';
 import type { IProps } from './types';
-import { Desktop } from '@/core';
+import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
-import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH, MIN_DESKTOPS } from './constants';
+import { MIN_DESKTOPS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 import { TDesktopId } from '~/types';
 import log from 'electron-log';
 
@@ -19,17 +19,6 @@ export class Window extends UIWindow {
     super(eventsChannel, props?.bounds);
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
-
-    if (props?.desktops) {
-      for (const deskProps of props.desktops) {
-        this._desktops.set(deskProps.id, deskProps);
-      }
-    } else {
-      for (let i = 0; i < MIN_DESKTOPS; i++) {
-        const desk = new Desktop(i + 1);
-        this._desktops.set(desk.id, desk);
-      }
-    }
 
     this.buildLayout();
   }
@@ -105,7 +94,7 @@ export class Window extends UIWindow {
     return this._desktops.get(this._selectedDesktopId)!;
   }
 
-  goDesktop(target: 'next' | 'prev' | TDesktopId) {
+  selectDesktop(target: 'next' | 'prev' | TDesktopId): Desktop | null {
     const deskIds = Array.from(this._desktops.keys()).sort((a, b) => a - b);
     const currentIndex = deskIds.indexOf(this._selectedDesktopId);
 
@@ -119,11 +108,25 @@ export class Window extends UIWindow {
       newIndex = deskIds.indexOf(target);
       if (newIndex === -1) {
         scopeLog.warn(`Attempted to go to invalid desktop ID: ${target}`);
-        return; // Invalid desktop id
+        return null;
       }
     }
 
     this._selectedDesktopId = deskIds[newIndex];
     this.eventsChannel.emit('window:selected-desktop-did-change', this, this._selectedDesktopId);
+
+    return this.selectedDesktop;
+  }
+
+  createDesktop(id: TDesktopId, props?: IDesktopProps): Desktop {
+    const newDesktop = new Desktop(this.eventsChannel, this, id, props);
+    this._desktops.set(id, newDesktop);
+    return newDesktop;
+  }
+
+  createDefaultDesktops() {
+    for (let numDesktop = 0; numDesktop < MIN_DESKTOPS; numDesktop++) {
+      this.createDesktop(numDesktop + 1);
+    }
   }
 }

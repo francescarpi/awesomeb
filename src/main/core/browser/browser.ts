@@ -1,12 +1,4 @@
-import {
-  getCommand,
-  TCommandTrigger,
-  Window,
-  Session,
-  IWindowProps,
-  Desktop,
-  getTheme,
-} from '@/core';
+import { getCommand, TCommandTrigger, Window, Session, IWindowProps, getTheme } from '@/core';
 import { TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
@@ -31,16 +23,23 @@ export class Browser {
   async loadSession() {
     const session = new Session(this);
 
+    if (session.windows.length === 0) {
+      const newWindow = this.createWindow();
+      newWindow.createDefaultDesktops();
+      await this.refreshMainMenu();
+      return;
+    }
+
     for (const winStore of session.windows) {
-      const desktops = winStore.desktops.map((deskStore, idx) => {
-        const theme = getTheme(deskStore.theme);
-        return new Desktop(idx + 1, { theme });
+      const newWindow = this.createWindow({
+        bounds: winStore.bounds,
       });
 
-      this.createWindow({
-        bounds: winStore.bounds,
-        desktops,
-      });
+      for (const [deskIdx, deskStore] of winStore.desktops.entries()) {
+        const theme = getTheme(deskStore.theme);
+        const { name } = deskStore;
+        newWindow.createDesktop(deskIdx + 1, { theme, name });
+      }
     }
 
     await this.refreshMainMenu();

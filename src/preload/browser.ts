@@ -2,7 +2,7 @@ import { TWindowId, INotification, TEntityType, IDesktopEntity } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 const abModal = {
-  closeModal: (winId: TWindowId) => {
+  close: (winId: TWindowId) => {
     ipcRenderer.send('modal:close', winId);
   },
 };
@@ -25,8 +25,8 @@ const abEntities = {
 };
 
 const abCommands = {
-  perform: (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => {
-    ipcRenderer.send('commands:perform', winId, trigger, params);
+  perform: async (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => {
+    await ipcRenderer.invoke('commands:perform', winId, trigger, params);
   },
 };
 

@@ -13,7 +13,7 @@ export function setupDesktopIPC(browser: Browser) {
       `IPC Received: desktops:select for window ID ${winId} and desktop ID ${desktopId}`,
     );
     return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], (window) => {
-      window.goDesktop(desktopId);
+      window.selectDesktop(desktopId);
     });
   });
 

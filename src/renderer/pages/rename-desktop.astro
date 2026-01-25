@@ -1,0 +1,49 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Rename Desktop">
+  <input
+    class="input w-full text-black rounded-full"
+    placeholder="Set new desktop name..."
+    autofocus
+  />
+</BlackBgWithTitle>
+
+<script>
+  import { IDesktopEntity } from '~/types';
+  import { getSearchParams } from '../scripts/url';
+  const { winId, searchParams } = getSearchParams();
+  const desktopId = searchParams.get('desktopId');
+
+  const inputEl = document.querySelector('input')! as HTMLInputElement;
+
+  abEntities.fetch(winId, 'desktops').then((desktops) => {
+    const desktopEntities = desktops as IDesktopEntity[];
+    const selectedDesktop = desktopId
+      ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)
+      : desktopEntities.find((d) => d.selected);
+
+    if (selectedDesktop) {
+      inputEl.defaultValue = selectedDesktop.name || '';
+    }
+
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const newName = inputEl.value.trim();
+        if (selectedDesktop && newName.length > 0) {
+          abCommands
+            .perform(winId, 'rename-desktop', {
+              desktopId: parseInt(selectedDesktop.id, 10),
+              newName,
+            })
+            .then(() => {
+              abModal.close(winId);
+            });
+        }
+      } else if (e.key === 'Escape') {
+        abModal.close(winId);
+      }
+    });
+  });
+</script>
