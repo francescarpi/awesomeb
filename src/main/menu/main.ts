@@ -71,16 +71,17 @@ function fileMenu(
           }
         },
       },
-      // { type: 'separator' },
-      // {
-      //   label: 'New tab',
-      //   accelerator: 'CmdOrCtrl+T',
-      //   icon: getIcon(EIcon.Tab),
-      //   click: () =>
-      //     focusedWindow
-      //       ? browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'new-tab' })
-      //       : null,
-      // },
+      { type: 'separator' },
+      {
+        label: 'New tab',
+        accelerator: 'CmdOrCtrl+T',
+        icon: getIcon(EIcon.Tab),
+        click: () => {
+          if (focusedWindow) {
+            focusedWindow.modal.open('new-tab', { height: 450 });
+          }
+        },
+      },
       // { type: 'separator' },
       // {
       //   label: 'Select desktop',

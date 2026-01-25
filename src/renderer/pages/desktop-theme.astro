@@ -10,7 +10,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 <script>
   import { IDesktopEntity, IThemeEntity } from '~/types';
   import { getSearchParams } from '../scripts/url';
-  import { manageListWithSearch } from '../scripts/list-with-search';
+  import { listWithSearchManager } from '../scripts/list-with-search';
 
   const listEl = document.getElementById('list')!;
   const { winId, searchParams } = getSearchParams();
@@ -26,24 +26,23 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       : desktopEntities.find((d) => d.selected)!;
 
     // Load themes for the selected desktop
-    manageListWithSearch(
-      listEl,
-      'themes',
-      (item) => {
+    listWithSearchManager(listEl, {
+      entity: 'themes',
+      onAccept: (item) => {
         abCommands.perform(winId, 'desktop-theme', {
           desktopId: parseInt(selectedDesktop.id, 10),
           themeName: item.id,
         });
       },
-      () => {
+      onEscape: () => {
         abModal.close(winId);
       },
-      (item, el) => {
+      renderExtra: (item, el) => {
         const entity = item as IThemeEntity;
         const style = `background-image: linear-gradient(${entity.degrees}deg, ${entity.primary}, ${entity.secondary})`;
         el.innerHTML = `<div class="w-[15px] h-[15px] bg-white" style="${style}"></div>`;
       },
-    );
+    });
   }
   setup();
 </script>

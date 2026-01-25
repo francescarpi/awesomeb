@@ -1,0 +1,93 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '../components/common/ListWithSearch.astro';
+---
+
+<BlackBgWithTitle title="New Tab">
+  <div id="pagesIndicator"></div>
+  <ListWithSearch placeholder="Enter a query or a valid url..." id="query" />
+  <ListWithSearch placeholder="Select a profile..." id="partition" />
+  <ListWithSearch placeholder="Select a target" id="target" />
+
+  <script>
+    import { listWithSearchManager } from '../scripts/list-with-search';
+    import { getSearchParams } from '../scripts/url';
+
+    const queryEl = document.getElementById('query')!;
+    const partitionEl = document.getElementById('partition')!;
+    const targetEl = document.getElementById('target')!;
+
+    let activePage = queryEl;
+    const pages = [queryEl, partitionEl, targetEl];
+    const { winId } = getSearchParams();
+
+    // ------------------------------------------------------
+    refreshPageVisible();
+    refreshPageIndicator();
+
+    // ------------------------------------------------------
+    listWithSearchManager(queryEl, {
+      entity: 'desktops',
+      onEscape: () => abModal.close(winId),
+      onTab: () => nextPage(),
+      onShiftTab: () => previousPage(),
+    });
+
+    listWithSearchManager(partitionEl, {
+      entity: 'desktops',
+      onEscape: () => abModal.close(winId),
+      onTab: () => nextPage(),
+      onShiftTab: () => previousPage(),
+    });
+
+    listWithSearchManager(targetEl, {
+      entity: 'desktops',
+      onEscape: () => abModal.close(winId),
+      onTab: () => nextPage(),
+      onShiftTab: () => previousPage(),
+    });
+
+    // ------------------------------------------------------
+    function refreshPageVisible() {
+      for (const page of pages) {
+        if (page === activePage) {
+          page.style.display = 'grid';
+          page.querySelector('input')!.focus();
+        } else {
+          page.style.display = 'none';
+        }
+      }
+    }
+
+    // ------------------------------------------------------
+    function refreshPageIndicator() {
+      const pagesIndicatorEl = document.getElementById('pagesIndicator')!;
+      pagesIndicatorEl.innerHTML = '';
+
+      pages.forEach((page) => {
+        const dot = document.createElement('span');
+        dot.className = 'mx-1 text-white select-none';
+        dot.innerText = page === activePage ? '●' : '○';
+        pagesIndicatorEl.appendChild(dot);
+      });
+    }
+
+    // ------------------------------------------------------
+    function nextPage() {
+      const currentIndex = pages.indexOf(activePage);
+      const nextIndex = (currentIndex + 1) % pages.length;
+      activePage = pages[nextIndex];
+      refreshPageVisible();
+      refreshPageIndicator();
+    }
+
+    // ------------------------------------------------------
+    function previousPage() {
+      const currentIndex = pages.indexOf(activePage);
+      const previousIndex = (currentIndex - 1 + pages.length) % pages.length;
+      activePage = pages[previousIndex];
+      refreshPageVisible();
+      refreshPageIndicator();
+    }
+  </script>
+</BlackBgWithTitle>

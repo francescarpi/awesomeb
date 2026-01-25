@@ -1,28 +1,31 @@
 import { TEntityType, IEntity } from '~/types';
 import { getSearchParams } from './url';
 
-export async function manageListWithSearch(
+export async function listWithSearchManager(
   listEl: HTMLElement,
-  entity: TEntityType,
-  onAccept: (item: IEntity) => void,
-  onEscape: () => void,
-  renderExtra?: (item: IEntity, el: HTMLElement) => void,
+  props: {
+    entity: TEntityType;
+    onAccept?: (item: IEntity) => void;
+    onEscape?: () => void;
+    onTab?: () => void;
+    onShiftTab?: () => void;
+    renderExtra?: (item: IEntity, el: HTMLElement) => void;
+  },
 ) {
   // Validate elements
   const tpl = listEl.querySelector('#row-template') as HTMLTemplateElement;
-  if (!tpl) throw new Error('Row template not found in list element');
-
   const ul = listEl.querySelector('ul');
-  if (!ul) throw new Error('UL element not found in list element');
-
   const input = listEl.querySelector('input');
+
+  if (!tpl) throw new Error('Row template not found in list element');
+  if (!ul) throw new Error('UL element not found in list element');
   if (!input) throw new Error('Input element not found in list element');
 
   // Load entities & render
   const { winId } = getSearchParams();
-  const originalEntities = await abEntities.fetch<IEntity>(winId, entity);
+  const originalEntities = await abEntities.fetch<IEntity>(winId, props.entity);
   let filteredEntities = originalEntities;
-  renderEntity(ul, tpl, filteredEntities, renderExtra);
+  renderEntity(ul, tpl, filteredEntities, props.renderExtra);
 
   // Initial selection
   const entitySelectedIndex = originalEntities.findIndex((ent) => ent.selected);
@@ -42,15 +45,30 @@ export async function manageListWithSearch(
       selectItemAtIndex(ul, indexSelected);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      const selectedEntity = filteredEntities[indexSelected];
-      onAccept(selectedEntity);
+      if (props.onAccept) {
+        const selectedEntity = filteredEntities[indexSelected];
+        props.onAccept(selectedEntity);
+      }
     } else if (e.key === 'Escape') {
       e.preventDefault();
       if (input.value.length > 0) {
         input.value = '';
         input.dispatchEvent(new Event('input', { bubbles: true }));
       } else {
-        onEscape();
+        if (props.onEscape) {
+          props.onEscape();
+        }
+      }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      if (e.shiftKey) {
+        if (props.onShiftTab) {
+          props.onShiftTab();
+        }
+      } else {
+        if (props.onTab) {
+          props.onTab();
+        }
       }
     }
   });
@@ -61,7 +79,7 @@ export async function manageListWithSearch(
       ent.label.toLowerCase().includes(input.value.toLowerCase()),
     );
 
-    renderEntity(ul, tpl, filteredEntities, renderExtra);
+    renderEntity(ul, tpl, filteredEntities, props.renderExtra);
     indexSelected = 0;
     selectItemAtIndex(ul, indexSelected);
   });
