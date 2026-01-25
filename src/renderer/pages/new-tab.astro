@@ -12,7 +12,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   <script>
     import { listWithSearchManager } from '../scripts/list-with-search';
     import { getSearchParams } from '../scripts/url';
-    import { IPartitionEntity } from '~/types';
+    import { IEntity, IPartitionEntity } from '~/types';
 
     const queryEl = document.getElementById('query')!;
     const partitionEl = document.getElementById('partition')!;
@@ -21,6 +21,11 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
     let activePage = queryEl;
     const pages = [queryEl, partitionEl, targetEl];
     const { winId } = getSearchParams();
+
+    let query = '';
+    let searchEngine: IEntity | null = null;
+    let partition: IPartitionEntity | null = null;
+    let target: IEntity | null = null;
 
     // ------------------------------------------------------
     refreshPageVisible();
@@ -33,6 +38,14 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       onEscape: () => abModal.close(winId),
       onTab: () => nextPage(),
       onShiftTab: () => previousPage(),
+      onChange: (inputValue, entity) => {
+        searchEngine = entity;
+        query = inputValue;
+      },
+      onAccept: (searchEngine) => {
+        searchEngine = searchEngine;
+        handleSelect();
+      },
     });
 
     listWithSearchManager(partitionEl, {
@@ -45,6 +58,13 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
         const style = `background-color: ${entity.color}`;
         rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
       },
+      onChange: (_inputValue, entity) => {
+        partition = entity as IPartitionEntity;
+      },
+      onAccept: (selectedPartition) => {
+        partition = selectedPartition as IPartitionEntity;
+        handleSelect();
+      },
     });
 
     listWithSearchManager(targetEl, {
@@ -52,6 +72,13 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       onEscape: () => abModal.close(winId),
       onTab: () => nextPage(),
       onShiftTab: () => previousPage(),
+      onChange: (_inputValue, entity) => {
+        target = entity;
+      },
+      onAccept: (selectedTarget) => {
+        target = selectedTarget;
+        handleSelect();
+      },
     });
 
     // ------------------------------------------------------
@@ -95,6 +122,19 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       activePage = pages[previousIndex];
       refreshPageVisible();
       refreshPageIndicator();
+    }
+
+    // ------------------------------------------------------
+    function handleSelect() {
+      if (query.trim().length > 0) {
+        abCommands.perform(winId, 'new-tab', {
+          query,
+          partitionId: partition!.id,
+          searchEngineCode: searchEngine!.id,
+          targetId: target!.id,
+        });
+        abModal.close(winId);
+      }
     }
   </script>
 </BlackBgWithTitle>

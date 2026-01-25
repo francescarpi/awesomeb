@@ -1,3 +1,5 @@
+export type TSearchEngineCode = string;
+
 export interface IConfigPartition {
   name: string;
   color: string;
@@ -5,7 +7,7 @@ export interface IConfigPartition {
 }
 
 export interface IConfigSearchEngine {
-  code: string;
+  code: TSearchEngineCode;
   label: string;
   url: string;
 }

@@ -71,7 +71,7 @@ export class BrowserRenderer {
         label: 'Current desktop & window',
       },
       {
-        id: 'selected-tab-container',
+        id: 'into-selected-tab-container',
         label: 'Split into selected tab',
       },
       {

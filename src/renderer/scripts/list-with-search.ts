@@ -11,6 +11,7 @@ export async function listWithSearchManager(
     onShiftTab?: () => void;
     renderExtra?: (item: IEntity, el: HTMLElement) => void;
     filtering?: boolean;
+    onChange?: (inputValue: string, entity: IEntity) => void;
   },
 ) {
   // Validate elements
@@ -25,6 +26,11 @@ export async function listWithSearchManager(
   // Load entities & render
   const { winId } = getSearchParams();
   const originalEntities = await abEntities.fetch<IEntity>(winId, props.entity);
+
+  if (props.onChange && originalEntities.length > 0) {
+    props.onChange(input.value, originalEntities[0]);
+  }
+
   let filteredEntities = originalEntities;
   renderEntity(ul, tpl, filteredEntities, props.renderExtra);
 
@@ -40,10 +46,12 @@ export async function listWithSearchManager(
       e.preventDefault();
       indexSelected = (indexSelected + 1) % items.length;
       selectItemAtIndex(ul, indexSelected);
+      if (props.onChange) props.onChange(input.value, filteredEntities[indexSelected]);
     } else if (e.key === 'ArrowUp' || e.key === 'K') {
       e.preventDefault();
       indexSelected = (indexSelected - 1 + items.length) % items.length;
       selectItemAtIndex(ul, indexSelected);
+      if (props.onChange) props.onChange(input.value, filteredEntities[indexSelected]);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (props.onAccept) {
@@ -76,6 +84,10 @@ export async function listWithSearchManager(
 
   // handle input change
   input.addEventListener('input', () => {
+    if (props.onChange && filteredEntities.length > 0) {
+      props.onChange(input.value, filteredEntities[indexSelected]);
+    }
+
     if (props.filtering === false) {
       return;
     }
