@@ -52,13 +52,13 @@ export async function checkWindowViewSender(
   callback(win, view);
 }
 
-export async function checkModalAndPagesSender(
+export async function checkModalAndPagesSender<T>(
   event: IpcMainInvokeEvent,
   browser: Browser,
   winId: TWindowId,
   pages: string[],
-  callback: (window: Window, modalManager: UIModalManager | null) => void,
-): Promise<void> {
+  callback: (window: Window, modalManager: UIModalManager | null) => Promise<T>,
+) {
   const win = browser.getWindowById(winId);
   if (!win || !win.modal) {
     scopeLog.error(`No window found with ID ${winId}`);
@@ -82,7 +82,7 @@ export async function checkModalAndPagesSender(
     return;
   }
 
-  return callback(win, win.modal);
+  return await callback(win, win.modal);
 }
 
 export async function checkWindowSender(

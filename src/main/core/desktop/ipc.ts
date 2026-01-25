@@ -12,7 +12,7 @@ export function setupDesktopIPC(browser: Browser) {
     scopeLog.info(
       `IPC Received: desktops:select for window ID ${winId} and desktop ID ${desktopId}`,
     );
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], (window) => {
+    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
       window.selectDesktop(desktopId);
     });
   });

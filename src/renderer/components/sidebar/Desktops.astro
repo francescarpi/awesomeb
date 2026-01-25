@@ -89,9 +89,8 @@
     const desktopId = desktopItem.dataset.id;
     if (!desktopId) return;
 
-    const { x, y } = desktopItem.getBoundingClientRect();
     const numericDesktopId = parseInt(desktopId, 10);
-    abMenu.contextMenu(WINDOW_ID, 'desktop', Math.round(x + 10), Math.round(y + 45), {
+    abMenu.contextMenu(WINDOW_ID, 'desktop', {
       desktopId: numericDesktopId,
     });
   }

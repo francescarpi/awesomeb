@@ -1,0 +1,14 @@
+---
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
+---
+
+<ButtonIcon icon="menu" />
+
+<script>
+  import { getSearchParams } from '../../scripts/url';
+  const { winId } = getSearchParams();
+  const iconEl = document.querySelector('svg')!;
+  iconEl.addEventListener('click', () => {
+    abMenu.contextMenu(winId, 'main');
+  });
+</script>

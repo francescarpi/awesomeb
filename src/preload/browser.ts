@@ -59,14 +59,8 @@ const abWindow = {
 
 //--------------------------------------------------------------------------------------
 const abMenu = {
-  contextMenu: (
-    winId: TWindowId,
-    type: TMenuType,
-    x: number,
-    y: number,
-    params: Record<string, unknown>,
-  ) => {
-    ipcRenderer.send('menu:context-menu', winId, type, x, y, params);
+  contextMenu: (winId: TWindowId, type: TMenuType, params: Record<string, unknown>) => {
+    ipcRenderer.send('menu:context-menu', winId, type, params);
   },
 };
 

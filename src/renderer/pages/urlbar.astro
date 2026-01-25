@@ -1,8 +1,12 @@
 ---
 import Layout from '../layouts/Base.astro';
 import Url from '../components/urlbar/Url.astro';
+import IconMenu from '../components/urlbar/IconMenu.astro';
 ---
 
 <Layout borderRadius="0 10px 0 0">
-  <Url />
+  <div class="flex items-center gap-2 pr-1">
+    <Url />
+    <IconMenu />
+  </div>
 </Layout>

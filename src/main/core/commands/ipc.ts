@@ -17,7 +17,7 @@ export function setupCommandsIPC(browser: Browser) {
         browser,
         winId,
         ['sidebar'],
-        (window, modalManager) => {
+        async (window, modalManager) => {
           const command = getCommand(trigger);
           if (!command) {
             scopeLog.error(`Command not found for trigger: ${trigger}`);

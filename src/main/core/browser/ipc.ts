@@ -10,7 +10,7 @@ export function setupBrowserIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
   ipcMain.handle('entities:fetch', async (event, winId: TWindowId, entity: TEntityType) => {
     scopeLog.info(`IPC Received: entities:fetch for window ID ${winId} and entity ${entity}`);
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], (window) => {
+    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
       switch (entity) {
         case 'commands':
           return browser.renderer.commands();

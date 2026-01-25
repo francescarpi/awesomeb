@@ -51,12 +51,6 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abMenu: {
-    contextMenu: (
-      winId: TWindowId,
-      type: TMenuType,
-      x: number,
-      y: number,
-      params: Record<string, unknown>,
-    ) => void;
+    contextMenu: (winId: TWindowId, type: TMenuType, params?: Record<string, unknown>) => void;
   };
 }
