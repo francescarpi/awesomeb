@@ -1,0 +1,61 @@
+import { TSearchEngineCode, ITarget } from '~/types';
+import { config, Browser, TabContainer } from '@/core';
+
+export function parseQuery(query: string, searchEngineCode?: TSearchEngineCode): string | null {
+  const { valid, url } = isValidUrl(query);
+  let parsedURL: string = url;
+
+  if (!valid) {
+    const engines = config.getProperty('searchEngines');
+    const engine = searchEngineCode
+      ? engines.find((se) => se.code === searchEngineCode)
+      : config.defaultSearchEngine;
+
+    if (!engine) {
+      return null;
+    }
+
+    parsedURL = engine.url.replace('{query}', encodeURIComponent(query.trim()));
+  }
+
+  return parsedURL;
+}
+
+export function isValidUrl(url: string): { valid: boolean; url: string } {
+  if (!url) {
+    return { valid: false, url };
+  }
+
+  // If url does not start with http or https, we are going to add it, but only if seems to be a real url.
+  // It means, the url ends with .com, .net, .org, etc.
+  if (
+    !url.startsWith('http://') &&
+    !url.startsWith('https://') &&
+    url.match(/^[a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$/)
+  ) {
+    url = `https://${url}`;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    return { valid: true, url: parsedUrl.toString() };
+  } catch {
+    return { valid: false, url };
+  }
+}
+
+export function parseTarget(browser: Browser, targetId?: string): ITarget | null {
+  if (targetId === 'current-desktop-window') {
+    const window = browser.getFocusedWindow();
+    if (!window) {
+      return null;
+    }
+
+    const desktop = window.selectedDesktop;
+    const tabContainer = new TabContainer(window.eventsChannel);
+
+    return { window, desktop, tabContainer };
+  }
+
+  return null;
+}

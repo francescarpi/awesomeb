@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 import slugify from 'slugify';
 import log from 'electron-log';
-import { TPartitionId } from '~/types';
+import { IConfigSearchEngine, TPartitionId } from '~/types';
 
 const scopeLog = log.scope('Config');
 
@@ -61,6 +61,11 @@ export class Config extends Store<IConfigStore> {
   setProperty<K extends keyof IConfigStore>(key: K, value: IConfigStore[K]): void {
     scopeLog.debug(`Set config property: ${String(key)} = ${String(value)}`);
     this.set(key, value);
+  }
+
+  get defaultSearchEngine(): IConfigSearchEngine {
+    const searchEngines = this.getProperty('searchEngines');
+    return searchEngines[0];
   }
 
   moveSearchEngine(position: 'top' | 'up' | 'down', code: string) {

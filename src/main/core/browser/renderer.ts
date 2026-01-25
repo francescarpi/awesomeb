@@ -1,5 +1,5 @@
-import { IEntity, IDesktopEntity, IThemeEntity, IPartitionEntity } from '~/types';
-import { Browser, Config, getCommands, getPartitions, getThemes, Window } from '@/core';
+import { IEntity, IDesktopEntity, IThemeEntity, IPartitionEntity, ITabContainer } from '~/types';
+import { Browser, config, getCommands, getPartitions, getThemes, Window } from '@/core';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -45,7 +45,6 @@ export class BrowserRenderer {
   }
 
   searchEngines(): IEntity[] {
-    const config = new Config();
     const searchEngines = config.getProperty('searchEngines');
 
     return searchEngines.map((engine) => ({
@@ -55,8 +54,7 @@ export class BrowserRenderer {
   }
 
   partitions(): IPartitionEntity[] {
-    const config = new Config();
-    const partitions = getPartitions(config);
+    const partitions = getPartitions();
     return Array.from(partitions.values()).map((partition) => ({
       id: partition.id,
       label: partition.name,
@@ -103,5 +101,32 @@ export class BrowserRenderer {
     }
 
     return result;
+  }
+
+  tabContainers(window: Window): ITabContainer[] {
+    const desktop = window.selectedDesktop;
+    return desktop.tabContainers.map((tc) => ({
+      id: tc.id,
+      selected: false, // TODO
+      divider: tc.divider,
+      tabs: tc.tabs.map((tab) => ({
+        id: tab.id,
+        desktopId: desktop.id,
+        windowId: window.id,
+        title: tab.title,
+        url: tab.url,
+        selected: false, // TODO
+        partition: {
+          name: tab.partition.name,
+          color: tab.partition.color,
+          private: tab.partition.private,
+        },
+        suspended: tab.suspended,
+        loading: tab.loading,
+        favicon: tab.favicon,
+        hasTabPreview: tab.hasTabPreview,
+        requireAttention: tab.requireAttention,
+      })),
+    }));
   }
 }

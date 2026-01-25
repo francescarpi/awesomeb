@@ -1,0 +1,7 @@
+import { TPartitionId, TSearchEngineCode } from '~/types';
+
+export interface IOpenUrlProps {
+  partitionId?: TPartitionId;
+  searchEngineCode?: TSearchEngineCode;
+  targetId?: string;
+}

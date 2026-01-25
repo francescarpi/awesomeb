@@ -7,6 +7,7 @@ import {
   TDesktopId,
   ITheme,
   TMenuType,
+  ITabContainer,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -52,5 +53,10 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abMenu: {
     contextMenu: (winId: TWindowId, type: TMenuType, params?: Record<string, unknown>) => void;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abTabs: {
+    getTabContainers: (winId: TWindowId) => Promise<ITabContainer[]>;
   };
 }

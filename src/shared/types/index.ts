@@ -6,3 +6,5 @@ export * from './entities';
 export * from './menu';
 export * from './config';
 export * from './partitions';
+export * from './browser';
+export * from './tab';

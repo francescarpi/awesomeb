@@ -1,11 +1,12 @@
 import { TPartitionId } from '~/types';
 import { Partition } from './partition';
-import { Config } from '@/core';
+import { config } from '@/core';
+export { Partition } from './partition';
 
 export const defaultPartition = new Partition('Default', '#ffffff', false);
 export const privatePartition = new Partition('Private', '#000000', true);
 
-export function getPartitions(config: Config): Map<TPartitionId, Partition> {
+export function getPartitions(): Map<TPartitionId, Partition> {
   const partitions = new Map<TPartitionId, Partition>();
 
   partitions.set(defaultPartition.id, defaultPartition);

@@ -5,6 +5,7 @@ import {
   setupBrowserIPC,
   setupDesktopIPC,
   setupWindowIPC,
+  setupTabIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout } from './boot';
@@ -25,6 +26,7 @@ app.whenReady().then(() => {
   setupDesktopIPC(browser);
   setupWindowIPC(browser);
   setupMenuIPC(browser);
+  setupTabIPC(browser);
 
   browser.loadSession();
 

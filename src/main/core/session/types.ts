@@ -1,4 +1,4 @@
-import { TDesktopId } from '~/types';
+import { TDesktopId, TPartitionId } from '~/types';
 import { Rectangle } from 'electron';
 
 export interface ISessionStore {
@@ -14,17 +14,15 @@ export interface ISessionWindow {
     id: TDesktopId;
     name: string | null;
     theme: string;
-    //   tabContainers: {
-    //     id: TTabContainerId;
-    //     divider: boolean;
-    //     layout: ETabContainerLayout;
-    //     tabs: {
-    //       id: TTabId;
-    //       partitionId: TPartitionId;
-    //       title: string | null;
-    //       customTitle: string | null;
-    //       url: string | null;
-    //     }[];
-    //   }[];
+    tabContainers: {
+      divider: boolean;
+      // layout: ETabContainerLayout;
+      tabs: {
+        partitionId: TPartitionId;
+        title: string | null;
+        customTitle: string | null;
+        url: string | null;
+      }[];
+    }[];
   }[];
 }

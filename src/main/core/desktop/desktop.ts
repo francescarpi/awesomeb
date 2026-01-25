@@ -1,5 +1,5 @@
-import { TDesktopId } from '~/types';
-import { defaultTheme, Theme, Window } from '@/core';
+import { TDesktopId, TTabContainerId } from '~/types';
+import { defaultTheme, Theme, Window, TabContainer } from '@/core';
 import { IProps } from './types';
 import EventEmitter from 'events';
 
@@ -7,6 +7,7 @@ export class Desktop {
   private _name: string | null = null;
   private _requireAttention: boolean = false;
   private _theme: Theme;
+  private readonly _tabContainers: Map<TTabContainerId, TabContainer> = new Map();
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -61,5 +62,13 @@ export class Desktop {
 
     this._theme = theme;
     this.eventsChannel.emit('desktop:theme-did-change', this.window, this);
+  }
+
+  get tabContainers(): TabContainer[] {
+    return Array.from(this._tabContainers.values());
+  }
+
+  setTabContainer(tabContainer: TabContainer) {
+    this._tabContainers.set(tabContainer.id, tabContainer);
   }
 }

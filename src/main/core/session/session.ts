@@ -33,28 +33,28 @@ export class Session extends Store<ISessionStore> {
       sidebarCollapsed: window.isSidebarCollapsed,
       areaMaximized: window.isAreaMaximized,
       desktops: window.desktops.map((desktop) => {
-        // const tabContainers = desktop.tabContainers
-        //   .map((tabContainer) => ({
-        //     id: tabContainer.id,
-        //     divider: tabContainer.divider,
-        //     layout: tabContainer.layout,
-        //     tabs: tabContainer.tabs
-        //       .filter((tab) => !tab.partition.private)
-        //       .map((tab) => ({
-        //         id: tab.id,
-        //         partitionId: tab.partition.id,
-        //         title: tab.title,
-        //         customTitle: tab.customTitle,
-        //         url: tab.url,
-        //       })),
-        //   }))
-        //   .filter((tabContainer) => tabContainer.tabs.length > 0);
+        const tabContainers = desktop.tabContainers
+          .map((tabContainer) => ({
+            id: tabContainer.id,
+            divider: tabContainer.divider,
+            // layout: tabContainer.layout,
+            tabs: tabContainer.tabs
+              .filter((tab) => !tab.partition.private)
+              .map((tab) => ({
+                id: tab.id,
+                partitionId: tab.partition.id,
+                title: tab.title,
+                customTitle: tab.customTitle,
+                url: tab.url,
+              })),
+          }))
+          .filter((tabContainer) => tabContainer.tabs.length > 0);
 
         return {
           id: desktop.id,
           name: desktop.name,
           theme: desktop.theme.name,
-          // tabContainers: tabContainers,
+          tabContainers: tabContainers,
         };
       }),
     }));

@@ -1,0 +1,35 @@
+---
+
+---
+
+<ul id="tabContainers">TabContainer</ul>
+
+<template id="tab-container-template">
+  <li class="">
+    <ul></ul>
+  </li>
+</template>
+
+<template id="tab-template">
+  <li class=""></li>
+</template>
+
+<script>
+  import { ITabContainer } from '~/types';
+  import { getSearchParams } from '../../scripts/url';
+
+  const { winId } = getSearchParams();
+  let tabContainers: ITabContainer[] = [];
+
+  async function fetchTabContainers() {
+    tabContainers = await abTabs.getTabContainers(winId);
+    refreshTabContainers();
+  }
+
+  fetchTabContainers();
+
+  //----------------------------------------------------------------
+  function refreshTabContainers() {
+    console.log(tabContainers);
+  }
+</script>
