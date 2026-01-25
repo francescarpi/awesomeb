@@ -4,3 +4,5 @@ export * from './notifications';
 export * from './desktop';
 export * from './entities';
 export * from './menu';
+export * from './config';
+export * from './partitions';

@@ -12,6 +12,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   <script>
     import { listWithSearchManager } from '../scripts/list-with-search';
     import { getSearchParams } from '../scripts/url';
+    import { IPartitionEntity } from '~/types';
 
     const queryEl = document.getElementById('query')!;
     const partitionEl = document.getElementById('partition')!;
@@ -27,21 +28,27 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 
     // ------------------------------------------------------
     listWithSearchManager(queryEl, {
-      entity: 'desktops',
+      entity: 'searchEngines',
+      filtering: false,
       onEscape: () => abModal.close(winId),
       onTab: () => nextPage(),
       onShiftTab: () => previousPage(),
     });
 
     listWithSearchManager(partitionEl, {
-      entity: 'desktops',
+      entity: 'partitions',
       onEscape: () => abModal.close(winId),
       onTab: () => nextPage(),
       onShiftTab: () => previousPage(),
+      renderExtra: (item, rowEl) => {
+        const entity = item as IPartitionEntity;
+        const style = `background-color: ${entity.color}`;
+        rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
+      },
     });
 
     listWithSearchManager(targetEl, {
-      entity: 'desktops',
+      entity: 'targets',
       onEscape: () => abModal.close(winId),
       onTab: () => nextPage(),
       onShiftTab: () => previousPage(),

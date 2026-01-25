@@ -1,5 +1,5 @@
-import { IEntity, IDesktopEntity, IThemeEntity } from '~/types';
-import { Browser, getCommands, getThemes, Window } from '@/core';
+import { IEntity, IDesktopEntity, IThemeEntity, IPartitionEntity } from '~/types';
+import { Browser, Config, getCommands, getPartitions, getThemes, Window } from '@/core';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -38,6 +38,67 @@ export class BrowserRenderer {
         primary: theme.primary,
         secondary: theme.secondary,
         degrees: theme.degrees,
+      });
+    }
+
+    return result;
+  }
+
+  searchEngines(): IEntity[] {
+    const config = new Config();
+    const searchEngines = config.getProperty('searchEngines');
+
+    return searchEngines.map((engine) => ({
+      id: engine.code,
+      label: engine.label,
+    }));
+  }
+
+  partitions(): IPartitionEntity[] {
+    const config = new Config();
+    const partitions = getPartitions(config);
+    return Array.from(partitions.values()).map((partition) => ({
+      id: partition.id,
+      label: partition.name,
+      color: partition.color,
+    }));
+  }
+
+  targets(browser: Browser, window: Window): IEntity[] {
+    const result = [
+      {
+        id: 'current-desktop-window',
+        label: 'Current desktop & window',
+      },
+      {
+        id: 'selected-tab-container',
+        label: 'Split into selected tab',
+      },
+      {
+        id: 'new-window',
+        label: 'New window',
+      },
+      {
+        id: 'new-window-left',
+        label: 'New left window',
+      },
+      {
+        id: 'new-window-right',
+        label: 'New right window',
+      },
+    ];
+
+    for (const win of browser.windows) {
+      result.push({
+        id: `window-${win.id}`,
+        label: `Window ${win.id}`,
+      });
+    }
+
+    for (const desk of window.desktops) {
+      result.push({
+        id: `desktop-${desk.id}`,
+        label: desk.label,
       });
     }
 

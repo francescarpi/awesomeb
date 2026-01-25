@@ -1,4 +1,10 @@
-export type TEntityType = 'commands' | 'desktops' | 'themes';
+export type TEntityType =
+  | 'commands'
+  | 'desktops'
+  | 'themes'
+  | 'searchEngines'
+  | 'partitions'
+  | 'targets';
 
 export interface IEntity {
   id: string;
@@ -18,4 +24,8 @@ export interface IThemeEntity extends IEntity {
   primary: string;
   secondary: string;
   degrees: number;
+}
+
+export interface IPartitionEntity extends IEntity {
+  color: string;
 }

@@ -10,6 +10,7 @@ export async function listWithSearchManager(
     onTab?: () => void;
     onShiftTab?: () => void;
     renderExtra?: (item: IEntity, el: HTMLElement) => void;
+    filtering?: boolean;
   },
 ) {
   // Validate elements
@@ -75,6 +76,10 @@ export async function listWithSearchManager(
 
   // handle input change
   input.addEventListener('input', () => {
+    if (props.filtering === false) {
+      return;
+    }
+
     filteredEntities = originalEntities.filter((ent) =>
       ent.label.toLowerCase().includes(input.value.toLowerCase()),
     );

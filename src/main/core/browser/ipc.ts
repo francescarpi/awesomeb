@@ -18,6 +18,12 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.desktops(window);
         case 'themes':
           return browser.renderer.themes(window);
+        case 'searchEngines':
+          return browser.renderer.searchEngines();
+        case 'partitions':
+          return browser.renderer.partitions();
+        case 'targets':
+          return browser.renderer.targets(browser, window);
       }
     });
   });
