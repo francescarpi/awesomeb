@@ -6,6 +6,7 @@ export async function manageListWithSearch(
   entity: TEntityType,
   onAccept: (item: IEntity) => void,
   onEscape: () => void,
+  renderExtra?: (item: IEntity, el: HTMLElement) => void,
 ) {
   // Validate elements
   const tpl = listEl.querySelector('#row-template') as HTMLTemplateElement;
@@ -21,7 +22,7 @@ export async function manageListWithSearch(
   const { winId } = getSearchParams();
   const originalEntities = await abEntities.fetch<IEntity>(winId, entity);
   let filteredEntities = originalEntities;
-  renderCommands(ul, tpl, filteredEntities);
+  renderEntity(ul, tpl, filteredEntities, renderExtra);
 
   // Initial selection
   const entitySelectedIndex = originalEntities.findIndex((ent) => ent.selected);
@@ -60,7 +61,7 @@ export async function manageListWithSearch(
       ent.label.toLowerCase().includes(input.value.toLowerCase()),
     );
 
-    renderCommands(ul, tpl, filteredEntities);
+    renderEntity(ul, tpl, filteredEntities, renderExtra);
     indexSelected = 0;
     selectItemAtIndex(ul, indexSelected);
   });
@@ -78,17 +79,26 @@ function selectItemAtIndex(ul: HTMLElement, index: number) {
   });
 }
 
-function renderCommands(ul: HTMLElement, tpl: HTMLTemplateElement, entities: IEntity[]) {
+function renderEntity(
+  ul: HTMLElement,
+  tpl: HTMLTemplateElement,
+  entities: IEntity[],
+  renderExtra?: (item: IEntity, el: HTMLElement) => void,
+) {
   ul.innerHTML = '';
   for (const item of entities) {
     const clone = tpl.content.cloneNode(true) as HTMLElement;
+    const extra = clone.querySelector('small') as HTMLElement;
 
     const container = clone.querySelector('p') as HTMLElement;
     container.textContent = item.label;
 
     if (item.extra) {
-      const container = clone.querySelector('small') as HTMLElement;
-      container.textContent = `(${item.extra})`;
+      extra.textContent = `(${item.extra})`;
+    }
+
+    if (renderExtra) {
+      renderExtra(item, extra);
     }
 
     ul.appendChild(clone);
