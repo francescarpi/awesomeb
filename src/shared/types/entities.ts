@@ -1,4 +1,4 @@
-export type TEntityType = 'commands' | 'desktops';
+export type TEntityType = 'commands' | 'desktops' | 'themes';
 
 export interface IEntity {
   id: string;
@@ -12,4 +12,10 @@ export interface IDesktopEntity extends IEntity {
   requireAttention: boolean;
   hasTabs: boolean;
   hasActiveTabs: boolean;
+}
+
+export interface IThemeEntity extends IEntity {
+  primary: string;
+  secondary: string;
+  degrees: number;
 }

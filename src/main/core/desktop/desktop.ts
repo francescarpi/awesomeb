@@ -53,4 +53,13 @@ export class Desktop {
   get theme(): Theme {
     return this._theme;
   }
+
+  setTheme(theme: Theme) {
+    if (theme.name === this._theme.name) {
+      return;
+    }
+
+    this._theme = theme;
+    this.eventsChannel.emit('desktop:theme-did-change', this.window, this);
+  }
 }

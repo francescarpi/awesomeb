@@ -117,7 +117,7 @@ export class Window extends UIWindow {
     }
 
     this._selectedDesktopId = deskIds[newIndex];
-    this.eventsChannel.emit('window:selected-desktop-did-change', this, this._selectedDesktopId);
+    this.eventsChannel.emit('window:selected-desktop-did-change', this, this.selectedDesktop);
 
     return this.selectedDesktop;
   }

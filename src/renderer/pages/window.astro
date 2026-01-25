@@ -13,4 +13,9 @@ import Layout from '../layouts/Base.astro';
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
     abWindow.readyToShow(winId);
   });
+
+  abDesktops.onThemeRefresh((_e, theme) => {
+    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
+    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+  });
 </script>

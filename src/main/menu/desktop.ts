@@ -17,11 +17,21 @@ export function desktopMenu(_browser: Browser, window: Window, desktop: Desktop)
     },
     { type: 'separator' },
     {
-      label: 'Rename desktop',
+      label: 'Rename',
       icon: getIcon(EIcon.Edit),
       click: () => {
         window.modal.open('rename-desktop', {
           height: 150,
+          query: { desktopId: desktop.id.toString() },
+        });
+      },
+    },
+    {
+      label: 'Change theme',
+      icon: getIcon(EIcon.Theme),
+      click: () => {
+        window.modal.open('desktop-theme', {
+          height: 500,
           query: { desktopId: desktop.id.toString() },
         });
       },

@@ -16,6 +16,8 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.commands();
         case 'desktops':
           return browser.renderer.desktops(window);
+        case 'themes':
+          return browser.renderer.themes(window);
       }
     });
   });

@@ -4,7 +4,7 @@
 
 <div class="flex flex-col items-center gap-1">
   <ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
-  <span class="text-xs" id="name"></span>
+  <span class="text-xs self-start: sidebar:self-center" id="name"></span>
 </div>
 
 <template id="desktop-template">
@@ -89,8 +89,11 @@
     const desktopId = desktopItem.dataset.id;
     if (!desktopId) return;
 
+    const { x, y } = desktopItem.getBoundingClientRect();
     const numericDesktopId = parseInt(desktopId, 10);
-    abMenu.contextMenu(WINDOW_ID, 'desktop', { desktopId: numericDesktopId });
+    abMenu.contextMenu(WINDOW_ID, 'desktop', Math.round(x + 10), Math.round(y + 45), {
+      desktopId: numericDesktopId,
+    });
   }
 
   // ========================================

@@ -1,0 +1,44 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '../components/common/ListWithSearch.astro';
+---
+
+<BlackBgWithTitle title="Desktop Theme">
+  <ListWithSearch placeholder="Filter and select theme..." id="list" />
+</BlackBgWithTitle>
+
+<script>
+  import { IDesktopEntity } from '~/types';
+  import { getSearchParams } from '../scripts/url';
+  import { manageListWithSearch } from '../scripts/list-with-search';
+
+  const listEl = document.getElementById('list')!;
+  const { winId, searchParams } = getSearchParams();
+  const desktopId = searchParams.get('desktopId');
+
+  async function setup() {
+    // Fetch desktops
+    const desktopEntities = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
+
+    // Find selected desktop
+    const selectedDesktop = desktopId
+      ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)!
+      : desktopEntities.find((d) => d.selected)!;
+
+    // Load themes for the selected desktop
+    manageListWithSearch(
+      listEl,
+      'themes',
+      (item) => {
+        abCommands.perform(winId, 'desktop-theme', {
+          desktopId: parseInt(selectedDesktop.id, 10),
+          themeName: item.id,
+        });
+      },
+      () => {
+        abModal.close(winId);
+      },
+    );
+  }
+  setup();
+</script>

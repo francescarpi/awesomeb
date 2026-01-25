@@ -18,19 +18,22 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
   const inputEl = document.querySelector('input')! as HTMLInputElement;
 
-  abEntities.fetch(winId, 'desktops').then((desktops) => {
-    const desktopEntities = desktops as IDesktopEntity[];
-    const selectedDesktop = desktopId
-      ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)
-      : desktopEntities.find((d) => d.selected);
+  async function setup() {
+    // Fetch desktops
+    const desktopEntities = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
 
-    if (selectedDesktop) {
-      inputEl.defaultValue = selectedDesktop.name || '';
-      if (inputEl.defaultValue.length > 0) {
-        inputEl.select();
-      }
+    // Find selected desktop
+    const selectedDesktop = desktopId
+      ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)!
+      : desktopEntities.find((d) => d.selected)!;
+
+    // Pre-fill input with current desktop name
+    inputEl.defaultValue = selectedDesktop.name || '';
+    if (inputEl.defaultValue.length > 0) {
+      inputEl.select();
     }
 
+    // Handle input events
     inputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const newName = inputEl.value.trim();
@@ -48,5 +51,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
         abModal.close(winId);
       }
     });
-  });
+  }
+
+  setup();
 </script>

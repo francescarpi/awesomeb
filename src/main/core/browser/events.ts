@@ -1,5 +1,5 @@
-import { TDesktopId, TWindowId } from '~/types';
-import { Browser, Window } from '@/core';
+import { TWindowId } from '~/types';
+import { Browser, Window, Desktop } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserEvents');
@@ -14,16 +14,19 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on(
     'window:selected-desktop-did-change',
-    async (window: Window, _selectedDesktopId: TDesktopId) => {
+    async (window: Window, desktop: Desktop) => {
       browser.rendererEmmiter.refreshDesktops(window);
+      browser.rendererEmmiter.refreshThemes(window, desktop);
     },
   );
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on(
-    'desktop:name-did-change',
-    async (window: Window, _selectedDesktopId: TDesktopId) => {
-      browser.rendererEmmiter.refreshDesktops(window);
-    },
-  );
+  browser.eventsChannel.on('desktop:name-did-change', async (window: Window, _desktop: Desktop) => {
+    browser.rendererEmmiter.refreshDesktops(window);
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('desktop:theme-did-change', async (window: Window, desktop: Desktop) => {
+    browser.rendererEmmiter.refreshThemes(window, desktop);
+  });
 }

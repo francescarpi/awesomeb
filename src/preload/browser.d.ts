@@ -41,6 +41,7 @@ declare global {
     onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
     select: (winId: TWindowId, desktopId: TDesktopId) => void;
     getTheme: (winId: TWindowId) => Promise<ITheme>;
+    onThemeRefresh: (callback: (event: IpcRendererEvent, theme: ITheme) => void) => void;
   };
 
   //--------------------------------------------------------------------------------------
@@ -50,6 +51,12 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abMenu: {
-    contextMenu: (winId: TWindowId, type: TMenuType, params: Record<string, unknown>) => void;
+    contextMenu: (
+      winId: TWindowId,
+      type: TMenuType,
+      x: number,
+      y: number,
+      params: Record<string, unknown>,
+    ) => void;
   };
 }

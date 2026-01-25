@@ -45,6 +45,9 @@ const abDesktops = {
   getTheme: async (winId: TWindowId) => {
     return await ipcRenderer.invoke('desktops:get-theme', winId);
   },
+  onThemeRefresh: (callback: (event: IpcRendererEvent, theme: unknown) => void) => {
+    ipcRenderer.on('desktop:theme-refresh', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------
@@ -56,8 +59,14 @@ const abWindow = {
 
 //--------------------------------------------------------------------------------------
 const abMenu = {
-  contextMenu: (winId: TWindowId, type: TMenuType, params: Record<string, unknown>) => {
-    ipcRenderer.send('menu:context-menu', winId, type, params);
+  contextMenu: (
+    winId: TWindowId,
+    type: TMenuType,
+    x: number,
+    y: number,
+    params: Record<string, unknown>,
+  ) => {
+    ipcRenderer.send('menu:context-menu', winId, type, x, y, params);
   },
 };
 

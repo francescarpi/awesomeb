@@ -12,9 +12,9 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { manageListWithSearch } from '../scripts/list-with-search';
 
   const { winId } = getSearchParams();
-  const commandsEl = document.getElementById('list')!;
+  const listEl = document.getElementById('list')!;
   manageListWithSearch(
-    commandsEl,
+    listEl,
     'desktops',
     (item) => {
       abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
