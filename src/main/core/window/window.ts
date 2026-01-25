@@ -90,6 +90,10 @@ export class Window extends UIWindow {
     return Array.from(this._desktops.values());
   }
 
+  getDesktop(id: TDesktopId): Desktop | null {
+    return this._desktops.get(id) || null;
+  }
+
   get selectedDesktop(): Desktop {
     return this._desktops.get(this._selectedDesktopId)!;
   }

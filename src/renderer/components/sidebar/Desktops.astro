@@ -58,6 +58,7 @@
    */
   function setupEventListeners() {
     DESKTOP_LIST_ELEMENT.addEventListener('click', handleDesktopClick);
+    DESKTOP_LIST_ELEMENT.addEventListener('contextmenu', handleContextMenu);
   }
 
   /**
@@ -74,6 +75,22 @@
 
     const numericDesktopId = parseInt(desktopId, 10);
     abDesktops.select(WINDOW_ID, numericDesktopId);
+  }
+
+  /**
+   * Handles context menu events on desktop items
+   */
+  function handleContextMenu(event: Event) {
+    const clickedElement = event.target as HTMLElement;
+    const desktopItem = clickedElement.closest('li');
+
+    if (!desktopItem) return;
+
+    const desktopId = desktopItem.dataset.id;
+    if (!desktopId) return;
+
+    const numericDesktopId = parseInt(desktopId, 10);
+    abMenu.contextMenu(WINDOW_ID, 'desktop', { desktopId: numericDesktopId });
   }
 
   // ========================================

@@ -23,7 +23,7 @@ export const Command: ICommand<ICommandParams> = {
   },
   visibility: ({ focusedWindow }) => !!focusedWindow,
   async handler(_browser, window, params) {
-    const desktop = window.selectDesktop(params.desktopId);
+    const desktop = window.getDesktop(params.desktopId);
     if (!desktop) {
       scopeLog.error(`Desktop with ID ${params.desktopId} not found`);
       return;

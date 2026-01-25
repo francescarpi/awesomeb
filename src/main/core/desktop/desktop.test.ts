@@ -6,7 +6,7 @@ test('rename desktop works correctly', () => {
   const w = browser.createWindow();
   w.createDefaultDesktops();
 
-  const d = w.selectDesktop(2)!;
+  const d = w.getDesktop(2)!;
   expect(d.label).toBe('2: Unnamed');
 
   d.setName('Work');

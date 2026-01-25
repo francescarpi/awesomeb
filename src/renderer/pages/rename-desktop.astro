@@ -26,6 +26,9 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
     if (selectedDesktop) {
       inputEl.defaultValue = selectedDesktop.name || '';
+      if (inputEl.defaultValue.length > 0) {
+        inputEl.select();
+      }
     }
 
     inputEl.addEventListener('keydown', (e) => {

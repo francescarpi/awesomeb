@@ -209,7 +209,7 @@ function desktopsMenu(
         icon: getIcon(EIcon.Desktop),
         click: () => {
           if (focusedWindow) {
-            focusedWindow.modal.open('select-desktop');
+            focusedWindow.modal.open('select-desktop', { height: 450 });
           }
         },
       },

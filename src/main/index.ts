@@ -9,6 +9,7 @@ import {
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout } from './boot';
 import { registerAppEvents } from './events';
+import { setupMenuIPC } from '@/menu';
 
 export type { IModalProps } from './ui';
 
@@ -23,6 +24,7 @@ app.whenReady().then(() => {
   setupBrowserIPC(browser);
   setupDesktopIPC(browser);
   setupWindowIPC(browser);
+  setupMenuIPC(browser);
 
   browser.loadSession();
 

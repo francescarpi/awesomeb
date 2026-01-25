@@ -32,7 +32,7 @@ export class UIModal {
       },
     });
 
-    const query = { winId: this._parent.id.toString() };
+    const query = { winId: this._parent.id.toString(), ...(props?.query || {}) };
     loadPage(this.bw.webContents, this._page, query);
 
     openDevTools(this.bw.webContents, 'modal');
