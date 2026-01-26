@@ -6,7 +6,7 @@ import { UIModalManager } from './modal';
 import { UIView } from './view';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
-import { registerWindowEvents } from './events';
+import { registerUIWindowEvents } from './events';
 import EventEmitter from 'events';
 
 export class UIWindow {
@@ -52,7 +52,7 @@ export class UIWindow {
       winId: this.id.toString(),
     });
 
-    registerWindowEvents(this);
+    registerUIWindowEvents(this);
 
     this._modalManager = new UIModalManager(this);
     this._notificationsManager = new UINotificationsManager(this);

@@ -46,7 +46,7 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
 
 export function parseTarget(browser: Browser, targetId?: string): ITarget | null {
   if (targetId === undefined || targetId === 'current-desktop-window') {
-    const window = browser.getFocusedWindow();
+    const window = browser.activeWindow;
     if (!window) {
       return null;
     }

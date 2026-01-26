@@ -6,8 +6,16 @@ const scopeLog = log.scope('BrowserEvents');
 
 export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('ui:window-focused', async (_winId: TWindowId) => {
-    scopeLog.info('Window focused event received, refreshing main menu');
+  browser.eventsChannel.on('window:focus', async (winId: TWindowId) => {
+    scopeLog.info('Window focused event received');
+    browser.setActiveWindowId(winId);
+    await browser.refreshMainMenu();
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:blur', async (_winId: TWindowId) => {
+    scopeLog.info('Window blur event received');
+    browser.setActiveWindowId(null);
     await browser.refreshMainMenu();
   });
 

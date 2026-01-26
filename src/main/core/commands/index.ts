@@ -32,7 +32,7 @@ const COMMANDS = {
 export type TCommandTrigger = keyof typeof COMMANDS;
 
 export function getCommands(browser: Browser): ICommand<any>[] {
-  const focusedWindow = browser.getFocusedWindow();
+  const focusedWindow = browser.activeWindow;
 
   return Object.values(COMMANDS)
     .filter((c) => c.visibility === undefined || c.visibility({ focusedWindow }))

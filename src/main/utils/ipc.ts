@@ -65,12 +65,12 @@ export async function checkModalAndPagesSender<T>(
     return;
   }
 
-  if (!win.modal.isOpen) {
-    scopeLog.error(`Modal is not open for window ID ${winId}`);
-    return;
+  const allowedSenders: number[] = [];
+
+  if (win.modal.id) {
+    allowedSenders.push(win.modal.id);
   }
 
-  const allowedSenders = [win.modal.id];
   for (const page of pages) {
     const view = win.getNode<UIPageView>(page);
     if (view) {

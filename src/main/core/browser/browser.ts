@@ -24,6 +24,7 @@ const scopeLog = log.scope('Browser');
 
 export class Browser {
   private readonly _windows: Map<TWindowId, Window> = new Map();
+  private _activeWindowId: TWindowId | null = null;
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
   public readonly rendererEmmiter = new BrowserRendererEmmiter(this);
@@ -87,6 +88,8 @@ export class Browser {
         `(Total windows: ${BrowserWindow.getAllWindows().length})`,
     );
 
+    this._activeWindowId = w.id;
+
     return w;
   }
 
@@ -103,15 +106,15 @@ export class Browser {
     Menu.setApplicationMenu(items);
   }
 
-  getFocusedWindow(): Window | null {
-    const focusedWindow = BrowserWindow.getFocusedWindow();
-    if (focusedWindow) {
-      console.log(focusedWindow);
-      scopeLog.info(`Focused window ID: ${focusedWindow.id}`);
-    } else {
-      scopeLog.warn('No focused window found');
+  setActiveWindowId(id: TWindowId | null) {
+    this._activeWindowId = id;
+  }
+
+  get activeWindow(): Window | null {
+    if (this._activeWindowId === null) {
+      return null;
     }
-    return focusedWindow ? this.getWindowById(focusedWindow.id as TWindowId) : null;
+    return this.getWindowById(this._activeWindowId);
   }
 
   performCommand(
@@ -167,6 +170,11 @@ export class Browser {
     desktop.setTabContainer(tabContainer);
 
     window.addToMainView(tabContainer.layout);
+
+    // No esta clar en quin moment afegir els views al browserwindow. Ara ho fa el setLayout, pero aixo no esta be
+
+    // By default all tabcontainers visibility is false
+    // Create a method win window to show only the active tabcontainer
 
     return { window, desktop, tabContainer, tab };
   }

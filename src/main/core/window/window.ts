@@ -5,6 +5,7 @@ import EventEmitter from 'events';
 import { MIN_DESKTOPS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 import { TDesktopId } from '~/types';
 import log from 'electron-log';
+import { registerWindowEvents } from './events';
 
 const scopeLog = log.scope('Window');
 
@@ -17,6 +18,8 @@ export class Window extends UIWindow {
     props?: IProps,
   ) {
     super(eventsChannel, props?.bounds);
+
+    registerWindowEvents(this);
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
 
@@ -143,7 +146,13 @@ export class Window extends UIWindow {
     const mainView = this.getNode<UIPageView>('main-view')!;
     mainView.hide();
 
-    // mainView.add(layout);
+    const rightContainer = this.getNode<UIHorizontalLayout>('urlbar-webview')!;
+    rightContainer.add(layout);
+
+    for (const view of layout.views) {
+      this.bw.contentView.addChildView(view.wcv, 0);
+    }
+
     this.refreshLayout();
   }
 }
