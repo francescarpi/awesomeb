@@ -9,7 +9,7 @@ function createLayout(): UIVerticalLayout {
 
   const v1 = new UIPageView('v1');
   const v2 = new UIPageView('v2');
-  const v3 = new UIView('v3');
+  const v3 = new UIView();
 
   layout2.add(v2);
   layout2.add(v3);
@@ -25,9 +25,9 @@ test('layout should return expected views', () => {
   expect(root.id).toBe('l1');
 
   expect(root.views.length).toBe(3);
-  expect(root.views[0].id).toContain('v1');
-  expect(root.views[1].id).toContain('v2');
-  expect(root.views[2].id).toContain('v3');
+  expect(root.views[0].id).toBe('v1');
+  expect(root.views[1].id).toBe('v2');
+  expect(root.views[2].id).toBe(1);
 });
 
 test('layout should epected visible children', () => {
@@ -38,9 +38,9 @@ test('layout should epected visible children', () => {
 test('should access to specific view or layout by id', () => {
   const root = createLayout();
 
-  const v3 = root.getNodeById('v3');
+  const v3 = root.getNodeById(1);
   expect(v3).not.toBeNull();
-  expect(v3!.id).toBe('v3');
+  expect(v3!.id).toBe(1);
 
   const l2 = root.getNodeById('l2');
   expect(l2).not.toBeNull();

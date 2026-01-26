@@ -31,4 +31,8 @@ export class TabContainer {
   get divider(): boolean {
     return this._divider;
   }
+
+  get layout(): UIVerticalLayout {
+    return this._layout;
+  }
 }

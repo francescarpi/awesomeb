@@ -2,7 +2,6 @@ import { Rectangle } from 'electron';
 import { IMargins } from '~/types';
 
 export interface ILayoutNode {
-  id: string;
   layout(rect: Rectangle): void;
 }
 

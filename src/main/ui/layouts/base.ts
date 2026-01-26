@@ -39,19 +39,19 @@ export abstract class UILayout implements ILayoutNode {
     });
   }
 
-  getNodeById(id: string): ILayoutNode | null {
+  getNodeById<T extends { id: number | string }>(id: string | number): T | null {
     if (this.id === id) {
-      return this;
+      return this as unknown as T;
     }
 
     for (const child of this.children) {
-      if (child.id === id) {
-        return child;
+      if ((child as unknown as T).id === id) {
+        return child as unknown as T;
       }
       if ('getNodeById' in child) {
         const result = (child as UILayout).getNodeById(id);
         if (result) {
-          return result;
+          return result as unknown as T;
         }
       }
     }

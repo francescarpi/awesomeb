@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { Partition } from '@/core';
 import { ITabProps } from './types';
-import { UIView, UIHorizontalLayout } from '@/ui';
+import { UIView, UIHorizontalLayout, UIVerticalLayout } from '@/ui';
 
 export class Tab {
   private readonly _partition: Partition;
@@ -12,7 +12,7 @@ export class Tab {
   private _loading: boolean = false;
   private _favicon: string | null = null;
   private _view: UIView;
-  private _layout: UIHorizontalLayout;
+  private _layout: UIHorizontalLayout | UIVerticalLayout;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -23,8 +23,12 @@ export class Tab {
     this._customTitle = props.customTitle ?? null;
     this._url = props.url ?? null;
 
-    this._view = new UIView(`tab-view-${this.id}`);
-    this._layout = new UIHorizontalLayout(`tab-${this.id}`);
+    this._view = new UIView();
+    this._layout = new UIHorizontalLayout(`tab-${this._view.id}`);
+  }
+
+  get id(): number {
+    return this._view.id as number;
   }
 
   get partition(): Partition {
@@ -61,5 +65,9 @@ export class Tab {
 
   get customTitle(): string | null {
     return this._customTitle;
+  }
+
+  get layout(): UIHorizontalLayout | UIVerticalLayout {
+    return this._layout;
   }
 }

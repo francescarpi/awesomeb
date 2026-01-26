@@ -56,7 +56,7 @@ export class Browser {
         const desktop = newWindow.createDesktop(deskIdx + 1, { theme, name });
 
         for (const tabConStore of deskStore.tabContainers) {
-          const tabContainer = new TabContainer(this.eventsChannel, {
+          const tabContainer = new TabContainer(this.eventsChannel, this.nextTabContainerId, {
             divider: tabConStore.divider,
           });
 

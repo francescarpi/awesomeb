@@ -11,10 +11,7 @@ export class UIView implements ILayoutNode {
   private _height: number | undefined;
   public readonly wcv: WebContentsView;
 
-  constructor(
-    public readonly id: string,
-    props?: IViewProps,
-  ) {
+  constructor(props?: IViewProps) {
     this.wcv = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
@@ -32,6 +29,10 @@ export class UIView implements ILayoutNode {
     if (props?.margin) {
       this._margins = props.margin;
     }
+  }
+
+  get id(): number | string {
+    return this.wcv.webContents.id;
   }
 
   layout(rect: Rectangle) {
@@ -84,9 +85,13 @@ export class UIPageView extends UIView {
     public readonly page: TPage,
     props?: IPageViewProps,
   ) {
-    super(page, props);
+    super(props);
 
     loadPage(this.wcv.webContents, page, props?.query);
     openDevTools(this.wcv.webContents, page);
+  }
+
+  get id(): string {
+    return this.page;
   }
 }

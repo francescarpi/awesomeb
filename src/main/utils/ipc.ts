@@ -2,7 +2,7 @@ import { IpcMainInvokeEvent } from 'electron';
 import { Browser, Window } from '@/core';
 import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { UIModalManager, UIView, UIPageView } from '@/ui';
+import { UIModalManager, UIPageView } from '@/ui';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -33,7 +33,7 @@ export async function checkWindowViewSender(
   browser: Browser,
   winId: TWindowId,
   page: string,
-  callback: (window: Window, view: UIView) => void,
+  callback: (window: Window, view: UIPageView) => void,
 ) {
   const win = browser.getWindowById(winId);
   if (!win) {
