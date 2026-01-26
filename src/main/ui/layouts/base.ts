@@ -5,6 +5,8 @@ import { UIView } from '../view';
 export abstract class UILayout implements ILayoutNode {
   public children: ILayoutNode[] = [];
 
+  constructor(public readonly id: string) {}
+
   add(node: ILayoutNode) {
     this.children.push(node);
   }
@@ -35,5 +37,25 @@ export abstract class UILayout implements ILayoutNode {
     return this.children.filter((c) => {
       return c instanceof UIView ? c.wcv.getVisible() : true;
     });
+  }
+
+  getNodeById(id: string): ILayoutNode | null {
+    if (this.id === id) {
+      return this;
+    }
+
+    for (const child of this.children) {
+      if (child.id === id) {
+        return child;
+      }
+      if ('getNodeById' in child) {
+        const result = (child as UILayout).getNodeById(id);
+        if (result) {
+          return result;
+        }
+      }
+    }
+
+    return null;
   }
 }

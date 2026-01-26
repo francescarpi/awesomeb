@@ -1,15 +1,14 @@
 import { expect, test } from 'vitest';
 import { UIVerticalLayout } from './vertical';
-import { UIView } from '../view';
+import { UIView, UIPageView } from '../view';
 import { UIHorizontalLayout } from './horizontal';
 
 function createLayout(): UIVerticalLayout {
-  const layout1 = new UIVerticalLayout();
+  const layout1 = new UIVerticalLayout('l1');
+  const layout2 = new UIHorizontalLayout('l2');
 
-  const v1 = new UIView('v1');
-
-  const layout2 = new UIHorizontalLayout();
-  const v2 = new UIView('v2');
+  const v1 = new UIPageView('v1');
+  const v2 = new UIPageView('v2');
   const v3 = new UIView('v3');
 
   layout2.add(v2);
@@ -23,13 +22,27 @@ function createLayout(): UIVerticalLayout {
 
 test('layout should return expected views', () => {
   const root = createLayout();
+  expect(root.id).toBe('l1');
+
   expect(root.views.length).toBe(3);
-  expect(root.views[0].page).toContain('v1');
-  expect(root.views[1].page).toContain('v2');
-  expect(root.views[2].page).toContain('v3');
+  expect(root.views[0].id).toContain('v1');
+  expect(root.views[1].id).toContain('v2');
+  expect(root.views[2].id).toContain('v3');
 });
 
 test('layout should epected visible children', () => {
   const root = createLayout();
   expect(root.visibleChildren.length).toBe(2);
+});
+
+test('should access to specific view or layout by id', () => {
+  const root = createLayout();
+
+  const v3 = root.getNodeById('v3');
+  expect(v3).not.toBeNull();
+  expect(v3!.id).toBe('v3');
+
+  const l2 = root.getNodeById('l2');
+  expect(l2).not.toBeNull();
+  expect(l2!.id).toBe('l2');
 });

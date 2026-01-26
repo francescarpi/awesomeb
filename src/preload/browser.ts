@@ -1,11 +1,4 @@
-import {
-  TWindowId,
-  INotification,
-  TEntityType,
-  IDesktopEntity,
-  TMenuType,
-  ITabContainer,
-} from '~/types';
+import { TWindowId, INotification, TEntityType, IDesktopEntity, TMenuType } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 //--------------------------------------------------------------------------------------

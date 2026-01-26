@@ -2,7 +2,7 @@ import { IpcMainInvokeEvent } from 'electron';
 import { Browser, Window } from '@/core';
 import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { UIModalManager, UIView } from '@/ui';
+import { UIModalManager, UIView, UIPageView } from '@/ui';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -41,7 +41,7 @@ export async function checkWindowViewSender(
     return;
   }
 
-  const view = win.getView(page);
+  const view = win.getNode<UIPageView>(page);
   if (!view || view.wcv.webContents.id !== event.sender.id) {
     scopeLog.warn(
       `Sender webContents id ${event.sender.id} does not match window id ${winId} and page ${page}`,
@@ -67,7 +67,7 @@ export async function checkModalAndPagesSender<T>(
 
   const allowedSenders = [win.modal.id];
   for (const page of pages) {
-    const view = win.getView(page);
+    const view = win.getNode<UIPageView>(page);
     if (view) {
       allowedSenders.push(view.wcv.webContents.id);
     }

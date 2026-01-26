@@ -1,4 +1,4 @@
-import { UIWindow, UIVerticalLayout, UIView, UIHorizontalLayout } from '@/ui';
+import { UIWindow, UIVerticalLayout, UIPageView, UIHorizontalLayout } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
@@ -24,21 +24,21 @@ export class Window extends UIWindow {
   }
 
   private buildLayout() {
-    const root = new UIVerticalLayout();
+    const root = new UIVerticalLayout('root');
 
-    const sidebar = new UIView('sidebar', {
+    const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       margin: { l: 5, t: 5, r: 5, b: 5 },
       query: { winId: this.id.toString() },
     });
 
-    const rightLayout = new UIHorizontalLayout();
-    const urlbar = new UIView('urlbar', {
+    const rightLayout = new UIHorizontalLayout('urlbar-webview');
+    const urlbar = new UIPageView('urlbar', {
       height: 32,
       margin: { l: 0, t: 5, r: 5, b: 0 },
       query: { winId: this.id.toString() },
     });
-    const content = new UIView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
+    const content = new UIPageView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
 
     rightLayout.add(urlbar);
     rightLayout.add(content);
@@ -52,7 +52,7 @@ export class Window extends UIWindow {
   toggleSidebar() {
     // TODO if area is maximized, sidebar should appear over the main view
 
-    const sidebar = this.getView('sidebar')!;
+    const sidebar = this.getNode<UIPageView>('sidebar')!;
     if (sidebar.width === SIDEBAR_DEFAULT_WIDTH) {
       sidebar.setWidth(SIDEBAR_MIN_WIDTH);
     } else {
@@ -63,14 +63,14 @@ export class Window extends UIWindow {
   }
 
   get isSidebarCollapsed(): boolean {
-    const sidebar = this.getView('sidebar')!;
+    const sidebar = this.getNode<UIPageView>('sidebar')!;
     return sidebar.width === SIDEBAR_MIN_WIDTH;
   }
 
   toggleMaximizeArea() {
-    const urlbar = this.getView('urlbar')!;
-    const sidebar = this.getView('sidebar')!;
-    const mainView = this.getView('main-view')!;
+    const urlbar = this.getNode<UIPageView>('urlbar')!;
+    const sidebar = this.getNode<UIPageView>('sidebar')!;
+    const mainView = this.getNode<UIPageView>('main-view')!;
 
     if (urlbar.isVisible) {
       urlbar.hide();
@@ -86,7 +86,7 @@ export class Window extends UIWindow {
   }
 
   get isAreaMaximized(): boolean {
-    const urlbar = this.getView('urlbar')!;
+    const urlbar = this.getNode<UIPageView>('urlbar')!;
     return !urlbar.isVisible;
   }
 

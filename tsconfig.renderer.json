@@ -11,6 +11,7 @@
     "types": [],
     "baseUrl": ".",
     "paths": {
+      "@/*": ["src/main/*"],
       "~/*": ["src/shared/*"]
     }
   }

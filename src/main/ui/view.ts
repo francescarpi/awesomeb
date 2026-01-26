@@ -1,7 +1,7 @@
 import path from 'path';
 import { WebContentsView, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
-import { ILayoutNode, IProps } from './types';
+import { ILayoutNode, IViewProps, IPageViewProps } from './types';
 import { IMargins, TPage } from '~/types';
 import { loadPage, openDevTools } from './helpers';
 
@@ -12,8 +12,8 @@ export class UIView implements ILayoutNode {
   public readonly wcv: WebContentsView;
 
   constructor(
-    public readonly page: TPage,
-    props?: IProps,
+    public readonly id: string,
+    props?: IViewProps,
   ) {
     this.wcv = new WebContentsView({
       webPreferences: {
@@ -25,10 +25,6 @@ export class UIView implements ILayoutNode {
         transparent: true,
       },
     });
-
-    loadPage(this.wcv.webContents, page, props?.query);
-
-    openDevTools(this.wcv.webContents, page);
 
     this._width = props?.width;
     this._height = props?.height;
@@ -80,5 +76,17 @@ export class UIView implements ILayoutNode {
 
   send(channel: string, ...args: any[]) {
     this.wcv.webContents.send(channel, ...args);
+  }
+}
+
+export class UIPageView extends UIView {
+  constructor(
+    public readonly page: TPage,
+    props?: IPageViewProps,
+  ) {
+    super(page, props);
+
+    loadPage(this.wcv.webContents, page, props?.query);
+    openDevTools(this.wcv.webContents, page);
   }
 }

@@ -67,7 +67,10 @@ function fileMenu(
         icon: getIcon(EIcon.Command),
         click: () => {
           if (focusedWindow) {
-            focusedWindow.performCommand();
+            focusedWindow.modal.open('perform-command', {
+              width: 500,
+              height: 500,
+            });
           }
         },
       },

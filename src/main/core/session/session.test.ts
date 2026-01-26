@@ -21,26 +21,31 @@ test('session data structure should match expected format', () => {
         {
           id: 1,
           name: null,
+          tabContainers: [],
           theme: 'blue',
         },
         {
           id: 2,
           name: null,
+          tabContainers: [],
           theme: 'blue',
         },
         {
           id: 3,
           name: null,
+          tabContainers: [],
           theme: 'blue',
         },
         {
           id: 4,
           name: null,
+          tabContainers: [],
           theme: 'blue',
         },
         {
           id: 5,
           name: null,
+          tabContainers: [],
           theme: 'blue',
         },
       ],

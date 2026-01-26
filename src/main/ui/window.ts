@@ -2,9 +2,8 @@ import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UILayout } from './layouts';
-import { UIView } from './view';
-import { TPage } from '~/types';
 import { UIModalManager } from './modal';
+import { UIView } from './view';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import { registerWindowEvents } from './events';
@@ -12,7 +11,6 @@ import EventEmitter from 'events';
 
 export class UIWindow {
   private rootLayout?: UILayout;
-  private readonly _views: Map<TPage, UIView> = new Map();
   public readonly bw: BrowserWindow;
 
   private readonly _notificationsManager: UINotificationsManager;
@@ -81,7 +79,6 @@ export class UIWindow {
 
     for (const view of this.rootLayout.views) {
       this.bw.contentView.addChildView(view.wcv, 0);
-      this._views.set(view.page, view);
     }
 
     this.refreshLayout();
@@ -106,8 +103,8 @@ export class UIWindow {
     }
   }
 
-  toggleViewVisibility(page: TPage) {
-    const view = this._views.get(page);
+  toggleViewVisibility(id: string) {
+    const view = this.getNode<UIView>(id);
     if (view) {
       if (view.isVisible) {
         view.hide();
@@ -118,32 +115,32 @@ export class UIWindow {
     }
   }
 
-  setMargins(page: TPage, margins: Partial<{ l: number; t: number; r: number; b: number }>) {
-    const view = this._views.get(page);
+  setMargins(id: string, margins: Partial<{ l: number; t: number; r: number; b: number }>) {
+    const view = this.getNode<UIView>(id);
     if (view) {
       view.setMargins(margins);
       this.refreshLayout();
     }
   }
 
-  setWidth(page: TPage, width: number) {
-    const view = this._views.get(page);
+  setWidth(id: string, width: number) {
+    const view = this.getNode<UIView>(id);
     if (view) {
       view.setWidth(width);
       this.refreshLayout();
     }
   }
 
-  setHeight(page: TPage, height: number) {
-    const view = this._views.get(page);
+  setHeight(id: string, height: number) {
+    const view = this.getNode<UIView>(id);
     if (view) {
       view.setHeight(height);
       this.refreshLayout();
     }
   }
 
-  getView(page: TPage): UIView | null {
-    return this._views.get(page) || null;
+  getNode<T>(id: string): T | null {
+    return (this.rootLayout?.getNodeById(id) as T) || null;
   }
 
   focus() {
@@ -162,13 +159,6 @@ export class UIWindow {
 
   get modal(): UIModalManager {
     return this._modalManager;
-  }
-
-  performCommand() {
-    this.modal.open('perform-command', {
-      width: 500,
-      height: 500,
-    });
   }
 
   get bounds(): Rectangle {

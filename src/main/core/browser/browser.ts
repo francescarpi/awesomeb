@@ -132,10 +132,11 @@ export class Browser {
       return null;
     }
 
-    const { window, desktop, tabContainer } = result;
-    const tab = tabContainer.createTab();
+    const { window, desktop, tabContainer, partition } = result;
+    const tab = tabContainer.createTab({ partition });
 
     // TODO tab.loadURL(url);
+    console.log(url);
 
     desktop.setTabContainer(tabContainer);
 
