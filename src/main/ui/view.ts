@@ -1,5 +1,5 @@
 import path from 'path';
-import { WebContentsView, Rectangle } from 'electron';
+import { WebContentsView, Rectangle, WebContents } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { ILayoutNode, IViewProps, IPageViewProps } from './types';
 import { IMargins, TPage } from '~/types';
@@ -32,7 +32,7 @@ export class UIView implements ILayoutNode {
   }
 
   get id(): number | string {
-    return this.wcv.webContents.id;
+    return this.webContents.id;
   }
 
   layout(rect: Rectangle) {
@@ -76,7 +76,11 @@ export class UIView implements ILayoutNode {
   }
 
   send(channel: string, ...args: any[]) {
-    this.wcv.webContents.send(channel, ...args);
+    this.webContents.send(channel, ...args);
+  }
+
+  get webContents(): WebContents {
+    return this.wcv.webContents;
   }
 }
 
@@ -87,8 +91,8 @@ export class UIPageView extends UIView {
   ) {
     super(props);
 
-    loadPage(this.wcv.webContents, page, props?.query);
-    openDevTools(this.wcv.webContents, page);
+    loadPage(this.webContents, page, props?.query);
+    openDevTools(this.webContents, page);
   }
 
   get id(): string {

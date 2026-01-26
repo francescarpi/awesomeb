@@ -65,6 +65,11 @@ export async function checkModalAndPagesSender<T>(
     return;
   }
 
+  if (!win.modal.isOpen) {
+    scopeLog.error(`Modal is not open for window ID ${winId}`);
+    return;
+  }
+
   const allowedSenders = [win.modal.id];
   for (const page of pages) {
     const view = win.getNode<UIPageView>(page);
@@ -77,7 +82,7 @@ export async function checkModalAndPagesSender<T>(
     scopeLog.error(
       `WebContents ID mismatch: modal and pages WC IDs ${allowedSenders.join(
         ', ',
-      )} do not match sender WC ID ${event.sender.id}`,
+      )} do not match sender WC ID ${event.sender.id} and url ${event.sender.getURL()}`,
     );
     return;
   }

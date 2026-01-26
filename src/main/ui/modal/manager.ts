@@ -29,7 +29,7 @@ export class UIModalManager {
   }
 
   get id(): number | null {
-    return this._modal ? this._modal.bw.webContents.id : null;
+    return this._modal ? this._modal.wcId : null;
   }
 
   get isOpen(): boolean {

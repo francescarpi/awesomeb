@@ -11,7 +11,7 @@ export function setupCommandsIPC(browser: Browser) {
   ipcMain.handle(
     'commands:perform',
     async (event, winId: TWindowId, trigger: TCommandTrigger, params?: Record<string, unknown>) => {
-      scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
+      scopeLog.info(`IPC Received: commands:perform for window ID ${winId}`);
       return await checkModalAndPagesSender(
         event,
         browser,
@@ -23,6 +23,8 @@ export function setupCommandsIPC(browser: Browser) {
             scopeLog.error(`Command not found for trigger: ${trigger}`);
             return;
           }
+
+          scopeLog.info(`Performing command for trigger: ${trigger}`);
 
           const comesFromPerformCommand = event.sender.getURL().includes('perform-command');
 

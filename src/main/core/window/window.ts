@@ -38,6 +38,7 @@ export class Window extends UIWindow {
       margin: { l: 0, t: 5, r: 5, b: 0 },
       query: { winId: this.id.toString() },
     });
+
     const content = new UIPageView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
 
     rightLayout.add(urlbar);
@@ -136,5 +137,13 @@ export class Window extends UIWindow {
     for (let numDesktop = 0; numDesktop < MIN_DESKTOPS; numDesktop++) {
       this.createDesktop(numDesktop + 1);
     }
+  }
+
+  addToMainView(layout: UIVerticalLayout | UIHorizontalLayout) {
+    const mainView = this.getNode<UIPageView>('main-view')!;
+    mainView.hide();
+
+    // mainView.add(layout);
+    this.refreshLayout();
   }
 }

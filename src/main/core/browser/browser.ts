@@ -105,6 +105,12 @@ export class Browser {
 
   getFocusedWindow(): Window | null {
     const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (focusedWindow) {
+      console.log(focusedWindow);
+      scopeLog.info(`Focused window ID: ${focusedWindow.id}`);
+    } else {
+      scopeLog.warn('No focused window found');
+    }
     return focusedWindow ? this.getWindowById(focusedWindow.id as TWindowId) : null;
   }
 
@@ -138,7 +144,14 @@ export class Browser {
   }
 
   openURL(query: string, props?: IOpenUrlProps): IWinDesConTab | null {
+    scopeLog.info(`Opening URL with query: ${query}`);
+
     const url = parseQuery(query, props?.searchEngineCode);
+    if (!url) {
+      scopeLog.error(`Invalid URL or query provided: ${query}`);
+      return null;
+    }
+
     const result = parseTarget(this, props?.targetId);
 
     if (!result) {
@@ -149,10 +162,11 @@ export class Browser {
     const { window, desktop, tabContainer, partition } = result;
     const tab = tabContainer.createTab({ partition });
 
-    // TODO tab.loadURL(url);
-    console.log(url);
+    tab.loadURL(url);
 
     desktop.setTabContainer(tabContainer);
+
+    window.addToMainView(tabContainer.layout);
 
     return { window, desktop, tabContainer, tab };
   }

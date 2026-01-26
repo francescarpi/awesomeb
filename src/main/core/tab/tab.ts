@@ -70,4 +70,18 @@ export class Tab {
   get layout(): UIHorizontalLayout | UIVerticalLayout {
     return this._layout;
   }
+
+  activate() {
+    if (this._suspended) {
+      this._suspended = false;
+    }
+  }
+
+  async loadURL(url: string) {
+    if (this._suspended) {
+      this.activate();
+    }
+
+    await this._view.webContents.loadURL(url);
+  }
 }
