@@ -8,3 +8,20 @@ test('should create a browser window successfully', () => {
   expect(w1).toBeDefined();
   expect(browser.getWindowById(w1.id)).toBe(w1);
 });
+
+test('openURL in active window/desktop should create a new tabcontainer and tab', () => {
+  const browser = new Browser();
+  const w = browser.createWindow();
+  w.createDefaultDesktops();
+
+  const desktop = w.selectedDesktop;
+  expect(desktop.tabContainers.length).toBe(0);
+
+  const result = browser.openURL('https://example.com');
+  expect(result).not.toBeNull();
+
+  expect(desktop.tabContainers.length).toBe(1);
+  expect(desktop.tabContainers[0].id).toBe(1);
+
+  expect(desktop.tabContainers[0].tabs.length).toBe(1);
+});

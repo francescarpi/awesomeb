@@ -49,7 +49,12 @@ vi.mock('electron', () => {
         return [];
       }
       static getFocusedWindow() {
-        return null;
+        return {
+          id: 1,
+        };
+      }
+      isMinimized() {
+        return false;
       }
     },
     WebContentsView: class {

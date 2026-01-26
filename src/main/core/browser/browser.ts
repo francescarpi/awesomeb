@@ -9,7 +9,7 @@ import {
   getPartitions,
   defaultPartition,
 } from '@/core';
-import { IWinDesConTab, TWindowId } from '~/types';
+import { IWinDesConTab, TTabContainerId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
@@ -121,6 +121,20 @@ export class Browser {
     command.handler(this, window, params);
     this.refreshMainMenu();
     return true;
+  }
+
+  get nextTabContainerId(): TTabContainerId {
+    let maxId = 0;
+    for (const window of this._windows.values()) {
+      for (const desktop of window.desktops) {
+        for (const tabContainer of desktop.tabContainers) {
+          if (tabContainer.id > maxId) {
+            maxId = tabContainer.id;
+          }
+        }
+      }
+    }
+    return (maxId + 1) as TTabContainerId;
   }
 
   openURL(query: string, props?: IOpenUrlProps): IWinDesConTab | null {

@@ -45,14 +45,14 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
 }
 
 export function parseTarget(browser: Browser, targetId?: string): ITarget | null {
-  if (targetId === 'current-desktop-window') {
+  if (targetId === undefined || targetId === 'current-desktop-window') {
     const window = browser.getFocusedWindow();
     if (!window) {
       return null;
     }
 
     const desktop = window.selectedDesktop;
-    const tabContainer = new TabContainer(window.eventsChannel);
+    const tabContainer = new TabContainer(window.eventsChannel, browser.nextTabContainerId);
 
     // TODO if desktop has a selected tab, use its partition, if not, use defaultPartition
     const partition = defaultPartition;
