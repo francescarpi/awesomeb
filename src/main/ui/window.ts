@@ -8,6 +8,11 @@ import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import { registerUIWindowEvents } from './events';
 import EventEmitter from 'events';
+import { UINewLayout } from './new-layout';
+import log from 'electron-log';
+import { UINewView } from './new-view';
+
+const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
   private rootLayout?: UILayout;
@@ -81,10 +86,10 @@ export class UIWindow {
       this.bw.contentView.addChildView(view.wcv, 0);
     }
 
-    this.refreshLayout();
+    this.refreshLayoutDeprecated();
   }
 
-  refreshLayout() {
+  refreshLayoutDeprecated() {
     if (!this.rootLayout) {
       return;
     }
@@ -111,7 +116,7 @@ export class UIWindow {
       } else {
         view.show();
       }
-      this.refreshLayout();
+      this.refreshLayoutDeprecated();
     }
   }
 
@@ -119,7 +124,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setMargins(margins);
-      this.refreshLayout();
+      this.refreshLayoutDeprecated();
     }
   }
 
@@ -127,7 +132,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setWidth(width);
-      this.refreshLayout();
+      this.refreshLayoutDeprecated();
     }
   }
 
@@ -135,7 +140,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setHeight(height);
-      this.refreshLayout();
+      this.refreshLayoutDeprecated();
     }
   }
 
@@ -163,5 +168,39 @@ export class UIWindow {
 
   get bounds(): Rectangle {
     return this.bw.getBounds();
+  }
+
+  isViewChildOfContentView(view: UINewView): boolean {
+    return this.bw.contentView.children.includes(view.webContentsView);
+  }
+
+  render(layout: UINewLayout, parentBounds: Rectangle) {
+    if (typeof layout.type === 'string') {
+      layout.setBounds(parentBounds);
+      scopeLog.info(`Setting layout ${layout.id} bounds to`, parentBounds);
+    }
+
+    scopeLog.info('Layout children count:', layout.children.length);
+
+    for (const child of layout.children) {
+      if (child instanceof UINewLayout) {
+        return this.render(child, layout.bounds);
+      }
+
+      child.setBounds({
+        x: layout.bounds.x,
+        y: layout.bounds.y,
+        width: child.width || layout.bounds.width,
+        height: child.height || layout.bounds.height,
+      });
+
+      scopeLog.info(`Setting view ${child.page} bounds to`, child.webContentsView.getBounds());
+
+      if (!this.isViewChildOfContentView(child)) {
+        this.bw.contentView.addChildView(child.webContentsView, 0);
+      }
+    }
+
+    scopeLog.info('Rendered layout', layout.id, 'with', layout.children.length, 'children');
   }
 }

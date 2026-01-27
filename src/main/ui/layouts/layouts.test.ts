@@ -3,6 +3,7 @@ import { UIVerticalLayout } from './vertical';
 import { UIView, UIPageView } from '../view';
 import { UIHorizontalLayout } from './horizontal';
 
+// TODO: This file is deprecated
 function createLayout(): UIVerticalLayout {
   const layout1 = new UIVerticalLayout('l1');
   const layout2 = new UIHorizontalLayout('l2');
