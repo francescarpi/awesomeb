@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { UINewLayout } from './new-layout';
 import { UINewPageView } from './new-view';
+import { transformMargin } from './helpers';
 
 test('should create a basic vertical layout', () => {
   const layout = new UINewLayout('test-layout', 'vertical');
@@ -26,4 +27,11 @@ test('should create a basic fixed layout', () => {
 test('should create a new page view', () => {
   const pageView = new UINewPageView('test-page');
   expect(pageView.page).toBe('test-page');
+});
+
+test('should transform margin correctly', () => {
+  expect(transformMargin('10')).toEqual({ l: 10, t: 10, r: 10, b: 10 });
+  expect(transformMargin('10 20')).toEqual({ l: 20, t: 10, r: 20, b: 10 });
+  expect(transformMargin('10 20 30')).toEqual({ l: 20, t: 10, r: 20, b: 30 });
+  expect(transformMargin('10 20 30 40')).toEqual({ l: 40, t: 10, r: 20, b: 30 });
 });

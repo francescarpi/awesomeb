@@ -8,7 +8,7 @@ export class UINewLayout {
   constructor(
     public readonly id: string,
     public readonly type: TLayoutType,
-    props?: ILayoutProps,
+    private readonly _props?: ILayoutProps,
   ) {
     if (typeof type !== 'string') {
       this._bounds = type;

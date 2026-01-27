@@ -4,7 +4,6 @@ import {
   UIPageView,
   UIHorizontalLayout,
   UINewLayout,
-  UINewView,
   UINewPageView,
 } from '@/ui';
 import type { IProps } from './types';
@@ -35,45 +34,34 @@ export class Window extends UIWindow {
   }
 
   private buildLayout() {
-    const mainLayout = new UINewLayout('main-layout', 'vertical', {
-      margin: { l: 5, t: 5, r: 5, b: 5 },
-    });
+    const mainLayout = new UINewLayout('main-layout', 'vertical');
+    this.setRootLayout(mainLayout);
 
     const sidebar = new UINewPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       query: { winId: this.id.toString() },
+      margins: '5',
     });
 
+    const urlbar = new UINewPageView('urlbar', {
+      height: 32,
+      query: { winId: this.id.toString() },
+      margins: '5 5 0 0',
+    });
+
+    const noTab = new UINewPageView('no-tab', {
+      margins: '5 5 5 0',
+    });
+
+    const urlbarWebviewLayout = new UINewLayout('urlbar-and-tab', 'horizontal');
+
+    urlbarWebviewLayout.addChild(urlbar);
+    urlbarWebviewLayout.addChild(noTab);
+
     mainLayout.addChild(sidebar);
+    mainLayout.addChild(urlbarWebviewLayout);
 
-    const { width, height } = this.bw.getBounds();
-    this.render(mainLayout, { x: 0, y: 0, width, height });
-
-    // /// DEPRECATED: code below
-    // const root = new UIVerticalLayout('root');
-    //
-    // const oldSidebar = new UIPageView('sidebar', {
-    //   width: SIDEBAR_DEFAULT_WIDTH,
-    //   margin: { l: 5, t: 5, r: 5, b: 5 },
-    //   query: { winId: this.id.toString() },
-    // });
-    //
-    // const rightLayout = new UIHorizontalLayout('urlbar-webview');
-    // const urlbar = new UIPageView('urlbar', {
-    //   height: 32,
-    //   margin: { l: 0, t: 5, r: 5, b: 0 },
-    //   query: { winId: this.id.toString() },
-    // });
-    //
-    // const content = new UIPageView('main-view', { margin: { l: 0, t: 5, r: 5, b: 5 } });
-    //
-    // rightLayout.add(urlbar);
-    // rightLayout.add(content);
-    //
-    // root.add(oldSidebar);
-    // root.add(rightLayout);
-    //
-    // this.setLayout(root);
+    this.render();
   }
 
   toggleSidebar() {

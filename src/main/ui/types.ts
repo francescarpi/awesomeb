@@ -1,5 +1,4 @@
 import { Rectangle } from 'electron';
-import { IMargins } from '~/types';
 import { UINewLayout } from './new-layout';
 import { UINewView } from './new-view';
 
@@ -10,6 +9,7 @@ export interface ILayoutNode {
 export interface IViewProps {
   width?: number;
   height?: number;
+  margins?: string;
 }
 
 export interface IPageViewProps extends IViewProps {
@@ -20,6 +20,4 @@ export type TLayoutType = 'vertical' | 'horizontal' | Rectangle;
 
 export type TLayoutChildren = UINewLayout | UINewView;
 
-export interface ILayoutProps {
-  margin: IMargins;
-}
+export interface ILayoutProps {}

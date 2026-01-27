@@ -53,6 +53,7 @@ const electronPreloadConfig = {
       rollupOptions: {
         input: {
           'preload/browser': 'src/preload/browser.ts',
+          'preload/tab': 'src/preload/tab.ts',
         },
       },
     },

@@ -1,7 +1,6 @@
 import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
-import { UILayout } from './layouts';
 import { UIModalManager } from './modal';
 import { UIView } from './view';
 import { loadPage, openDevTools } from './helpers';
@@ -15,7 +14,7 @@ import { UINewView } from './new-view';
 const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
-  private rootLayout?: UILayout;
+  private rootLayout?: UINewLayout;
   public readonly bw: BrowserWindow;
 
   private readonly _notificationsManager: UINotificationsManager;
@@ -77,35 +76,8 @@ export class UIWindow {
     return this.bw.webContents;
   }
 
-  setLayout(layout: UILayout) {
+  setRootLayout(layout: UINewLayout) {
     this.rootLayout = layout;
-
-    this.bw.contentView.addChildView(this.notifications.notificationContainer, 1);
-
-    for (const view of this.rootLayout.views) {
-      this.bw.contentView.addChildView(view.wcv, 0);
-    }
-
-    this.refreshLayoutDeprecated();
-  }
-
-  refreshLayoutDeprecated() {
-    if (!this.rootLayout) {
-      return;
-    }
-
-    const [w, h] = this.bw.getContentSize();
-
-    this.rootLayout.layout({
-      x: 0,
-      y: 0,
-      width: w,
-      height: h,
-    });
-
-    if (this.notifications.isVisible) {
-      this.notifications.refreshContainerBounds();
-    }
   }
 
   toggleViewVisibility(id: string) {
@@ -116,7 +88,7 @@ export class UIWindow {
       } else {
         view.show();
       }
-      this.refreshLayoutDeprecated();
+      this.render();
     }
   }
 
@@ -124,7 +96,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setMargins(margins);
-      this.refreshLayoutDeprecated();
+      this.render();
     }
   }
 
@@ -132,7 +104,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setWidth(width);
-      this.refreshLayoutDeprecated();
+      this.render();
     }
   }
 
@@ -140,7 +112,7 @@ export class UIWindow {
     const view = this.getNode<UIView>(id);
     if (view) {
       view.setHeight(height);
-      this.refreshLayoutDeprecated();
+      this.render();
     }
   }
 
@@ -174,30 +146,53 @@ export class UIWindow {
     return this.bw.contentView.children.includes(view.webContentsView);
   }
 
-  render(layout: UINewLayout, parentBounds: Rectangle) {
-    if (typeof layout.type === 'string') {
-      layout.setBounds(parentBounds);
-      scopeLog.info(`Setting layout ${layout.id} bounds to`, parentBounds);
+  render(initialLayout?: UINewLayout, initialParentBounds?: Rectangle) {
+    let layout = initialLayout;
+    let parentBounds = initialParentBounds;
+
+    if (!layout) {
+      layout = this.rootLayout!;
     }
 
-    scopeLog.info('Layout children count:', layout.children.length);
+    if (!parentBounds) {
+      const { width, height } = this.bw.getBounds();
+      parentBounds = { x: 0, y: 0, width, height };
+    }
+
+    if (typeof layout.type === 'string') {
+      layout.setBounds(parentBounds);
+    }
+
+    let x = layout.bounds.x;
+    let y = layout.bounds.y;
 
     for (const child of layout.children) {
       if (child instanceof UINewLayout) {
-        return this.render(child, layout.bounds);
+        const childBounds = {
+          x,
+          y,
+          width: layout.bounds.width - x,
+          height: layout.bounds.height - y,
+        };
+        return this.render(child, childBounds);
       }
 
       child.setBounds({
-        x: layout.bounds.x,
-        y: layout.bounds.y,
-        width: child.width || layout.bounds.width,
-        height: child.height || layout.bounds.height,
+        x: x + child.margins.l,
+        y: y + child.margins.t,
+        width: (child.width || layout.bounds.width) - child.margins.l - child.margins.r,
+        height: (child.height || layout.bounds.height) - child.margins.t - child.margins.b - y,
       });
 
-      scopeLog.info(`Setting view ${child.page} bounds to`, child.webContentsView.getBounds());
-
+      // TODO evaluate if set a falg in view as "added"
       if (!this.isViewChildOfContentView(child)) {
         this.bw.contentView.addChildView(child.webContentsView, 0);
+      }
+
+      if (layout.type === 'horizontal') {
+        y += child.bounds.height + child.margins.t + child.margins.b;
+      } else if (layout.type === 'vertical') {
+        x += child.bounds.width + child.margins.l + child.margins.r;
       }
     }
 

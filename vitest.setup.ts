@@ -31,6 +31,7 @@ vi.mock('electron', () => {
       }
       contentView = {
         addChildView: () => {},
+        children: [],
       };
       getBounds() {
         return { x: 0, y: 0, width: 800, height: 600 };
