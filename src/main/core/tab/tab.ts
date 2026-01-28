@@ -24,7 +24,7 @@ export class Tab {
     this._url = props.url ?? null;
 
     // The view is not visible initially until method to refresh visible tabs is called.
-    this._view = new UIView({ visible: false });
+    this._view = new UIView({ visible: false, margins: '5 5 5 0' });
 
     // The tab layout will be used to show, for instance, the find in page view below the webview.
     this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');

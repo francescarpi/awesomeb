@@ -134,7 +134,8 @@ export class UIWindow {
           width: layout.bounds.width - x + parentBounds.x,
           height: layout.bounds.height - y + parentBounds.y,
         };
-        return this.render(child, childBounds);
+        this.render(child, childBounds);
+        continue;
       }
 
       // child is a view
@@ -151,7 +152,7 @@ export class UIWindow {
         x: x + child.margins.l,
         y: y + child.margins.t,
         width: childWidth - child.margins.l - child.margins.r,
-        height: childHeight - child.margins.t - child.margins.b - y,
+        height: childHeight - child.margins.t - child.margins.b,
       });
 
       console.log(child.id, child.bounds);
