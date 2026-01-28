@@ -1,86 +1,100 @@
 import path from 'path';
+import { IMargins, TPage } from '~/types';
 import { WebContentsView, Rectangle, WebContents } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
-import { ILayoutNode, IViewProps, IPageViewProps } from './types';
-import { IMargins, TPage } from '~/types';
-import { loadPage, openDevTools } from './helpers';
+import { IViewProps, IPageViewProps } from './types';
+import { loadPage, openDevTools, transformMargin } from './helpers';
 
-export class UIView implements ILayoutNode {
-  private _margins: IMargins = { l: 0, t: 0, r: 0, b: 0 };
-  private _width: number | undefined;
-  private _height: number | undefined;
-  public readonly wcv: WebContentsView;
+export class UIView {
+  protected readonly _webContentsView: WebContentsView;
+  protected _margins: IMargins = { t: 0, r: 0, b: 0, l: 0 };
+  protected _width: number | null = null;
+  protected _height: number | null = null;
 
   constructor(props?: IViewProps) {
-    this.wcv = new WebContentsView({
+    this._webContentsView = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        preload: path.join(PRELOAD_FOLDER, 'browser.js'),
+        preload: this.getPreloadScript(),
         webSecurity: true,
         transparent: true,
       },
     });
 
-    this._width = props?.width;
-    this._height = props?.height;
-
-    if (props?.margin) {
-      this._margins = props.margin;
-    }
+    this._margins = props?.margins ? transformMargin(props.margins) : this._margins;
+    this._width = props?.width || null;
+    this._height = props?.height || null;
   }
 
   get id(): number | string {
     return this.webContents.id;
   }
 
-  layout(rect: Rectangle) {
-    this.wcv.setBounds(rect);
+  get webContentsId(): number {
+    // Dont delete - used in some places
+    return this.webContents.id;
   }
 
-  setMargins(margins: Partial<IMargins>) {
-    this._margins = { ...this._margins, ...margins };
+  protected getPreloadScript(): string {
+    return path.join(PRELOAD_FOLDER, 'tab.js');
   }
 
-  get margin() {
+  get webContentsView(): WebContentsView {
+    return this._webContentsView;
+  }
+
+  get webContents(): WebContents {
+    return this._webContentsView.webContents;
+  }
+
+  setBounds(bounds: Rectangle) {
+    this._webContentsView.setBounds(bounds);
+  }
+
+  get bounds(): Rectangle {
+    return this._webContentsView.getBounds();
+  }
+
+  get margins(): IMargins {
     return this._margins;
+  }
+
+  get isVisible(): boolean {
+    return this.webContentsView.getVisible();
+  }
+
+  get width(): number | null {
+    return this._width;
+  }
+
+  get height(): number | null {
+    return this._height;
+  }
+
+  hide() {
+    this.webContentsView.setVisible(false);
+  }
+
+  show() {
+    this.webContentsView.setVisible(true);
+  }
+
+  setMargins(margins: string) {
+    this._margins = transformMargin(margins);
   }
 
   setWidth(width: number) {
     this._width = width;
   }
 
-  get width() {
-    return this._width;
-  }
-
   setHeight(height: number) {
     this._height = height;
   }
 
-  get height() {
-    return this._height;
-  }
-
-  get isVisible() {
-    return this.wcv.getVisible();
-  }
-
-  show() {
-    this.wcv.setVisible(true);
-  }
-
-  hide() {
-    this.wcv.setVisible(false);
-  }
-
   send(channel: string, ...args: any[]) {
     this.webContents.send(channel, ...args);
-  }
-
-  get webContents(): WebContents {
-    return this.wcv.webContents;
   }
 }
 
@@ -90,9 +104,12 @@ export class UIPageView extends UIView {
     props?: IPageViewProps,
   ) {
     super(props);
-
     loadPage(this.webContents, page, props?.query);
     openDevTools(this.webContents, page);
+  }
+
+  protected getPreloadScript(): string {
+    return path.join(PRELOAD_FOLDER, 'browser.js');
   }
 
   get id(): string {

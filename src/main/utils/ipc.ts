@@ -41,8 +41,8 @@ export async function checkWindowViewSender(
     return;
   }
 
-  const view = win.getNode<UIPageView>(page);
-  if (!view || view.wcv.webContents.id !== event.sender.id) {
+  const view = win.getChild<UIPageView>(page);
+  if (!view || view.webContentsId !== event.sender.id) {
     scopeLog.warn(
       `Sender webContents id ${event.sender.id} does not match window id ${winId} and page ${page}`,
     );
@@ -72,9 +72,9 @@ export async function checkModalAndPagesSender<T>(
   }
 
   for (const page of pages) {
-    const view = win.getNode<UIPageView>(page);
+    const view = win.getChild<UIPageView>(page);
     if (view) {
-      allowedSenders.push(view.wcv.webContents.id);
+      allowedSenders.push(view.webContentsId);
     }
   }
 

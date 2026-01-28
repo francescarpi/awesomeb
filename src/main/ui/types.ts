@@ -1,6 +1,6 @@
 import { Rectangle } from 'electron';
-import { UINewLayout } from './new-layout';
-import { UINewView } from './new-view';
+import { UILayout } from './layout';
+import { UIView } from './view';
 
 export interface ILayoutNode {
   layout(rect: Rectangle): void;
@@ -18,6 +18,4 @@ export interface IPageViewProps extends IViewProps {
 
 export type TLayoutType = 'vertical' | 'horizontal' | Rectangle;
 
-export type TLayoutChildren = UINewLayout | UINewView;
-
-export interface ILayoutProps {}
+export type TLayoutChildren = UILayout | UIView;

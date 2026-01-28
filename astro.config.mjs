@@ -55,6 +55,9 @@ const electronPreloadConfig = {
           'preload/browser': 'src/preload/browser.ts',
           'preload/tab': 'src/preload/tab.ts',
         },
+        output: {
+          inlineDynamicImports: false
+        }
       },
     },
     resolve: {

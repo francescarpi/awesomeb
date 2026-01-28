@@ -2,19 +2,19 @@ import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
-import { UIView } from './view';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import { registerUIWindowEvents } from './events';
 import EventEmitter from 'events';
-import { UINewLayout } from './new-layout';
+import { UILayout } from './layout';
 import log from 'electron-log';
-import { UINewView } from './new-view';
+import { UIPageView, UIView } from './view';
+import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 
 const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
-  private rootLayout?: UINewLayout;
+  private rootLayout?: UILayout;
   public readonly bw: BrowserWindow;
 
   private readonly _notificationsManager: UINotificationsManager;
@@ -62,6 +62,60 @@ export class UIWindow {
     this._notificationsManager = new UINotificationsManager(this);
 
     openDevTools(this.wc, 'window');
+
+    this.buildLayout();
+  }
+
+  private buildLayout() {
+    const mainLayout = new UILayout('main-layout', 'vertical');
+    this.setRootLayout(mainLayout);
+
+    const sidebar = new UIPageView('sidebar', {
+      width: SIDEBAR_DEFAULT_WIDTH,
+      query: { winId: this.id.toString() },
+      margins: '5',
+    });
+
+    const urlbar = new UIPageView('urlbar', {
+      height: 32,
+      query: { winId: this.id.toString() },
+      margins: '5 5 0 0',
+    });
+
+    const noTab = new UIPageView('no-tab', {
+      margins: '5 5 5 0',
+    });
+
+    const urlbarWebviewLayout = new UILayout('urlbar-and-tab', 'horizontal');
+
+    urlbarWebviewLayout.addChild(urlbar);
+    urlbarWebviewLayout.addChild(noTab);
+
+    mainLayout.addChild(sidebar);
+    mainLayout.addChild(urlbarWebviewLayout);
+
+    this.render();
+  }
+
+  getChild<T>(id: string | number, initialLayout?: UILayout): T | null {
+    const layout = initialLayout || this.rootLayout!;
+
+    if (layout.id === id) {
+      return layout as T;
+    }
+
+    for (const child of layout.children) {
+      if (child instanceof UILayout) {
+        const foundInChild = this.getChild<T>(id, child);
+        if (foundInChild) {
+          return foundInChild;
+        }
+      } else if (child.id === id) {
+        return child as T;
+      }
+    }
+
+    return null;
   }
 
   get id(): number {
@@ -76,12 +130,12 @@ export class UIWindow {
     return this.bw.webContents;
   }
 
-  setRootLayout(layout: UINewLayout) {
+  setRootLayout(layout: UILayout) {
     this.rootLayout = layout;
   }
 
   toggleViewVisibility(id: string) {
-    const view = this.getNode<UIView>(id);
+    const view = this.getChild<UIView>(id);
     if (view) {
       if (view.isVisible) {
         view.hide();
@@ -92,8 +146,8 @@ export class UIWindow {
     }
   }
 
-  setMargins(id: string, margins: Partial<{ l: number; t: number; r: number; b: number }>) {
-    const view = this.getNode<UIView>(id);
+  setMargins(id: string, margins: string) {
+    const view = this.getChild<UIView>(id);
     if (view) {
       view.setMargins(margins);
       this.render();
@@ -101,7 +155,7 @@ export class UIWindow {
   }
 
   setWidth(id: string, width: number) {
-    const view = this.getNode<UIView>(id);
+    const view = this.getChild<UIView>(id);
     if (view) {
       view.setWidth(width);
       this.render();
@@ -109,15 +163,11 @@ export class UIWindow {
   }
 
   setHeight(id: string, height: number) {
-    const view = this.getNode<UIView>(id);
+    const view = this.getChild<UIView>(id);
     if (view) {
       view.setHeight(height);
       this.render();
     }
-  }
-
-  getNode<T>(id: string): T | null {
-    return (this.rootLayout?.getNodeById(id) as T) || null;
   }
 
   focus() {
@@ -142,11 +192,11 @@ export class UIWindow {
     return this.bw.getBounds();
   }
 
-  isViewChildOfContentView(view: UINewView): boolean {
+  isViewChildOfContentView(view: UIView): boolean {
     return this.bw.contentView.children.includes(view.webContentsView);
   }
 
-  render(initialLayout?: UINewLayout, initialParentBounds?: Rectangle) {
+  render(initialLayout?: UILayout, initialParentBounds?: Rectangle) {
     let layout = initialLayout;
     let parentBounds = initialParentBounds;
 
@@ -167,7 +217,7 @@ export class UIWindow {
     let y = layout.bounds.y;
 
     for (const child of layout.children) {
-      if (child instanceof UINewLayout) {
+      if (child instanceof UILayout) {
         const childBounds = {
           x,
           y,
@@ -175,6 +225,11 @@ export class UIWindow {
           height: layout.bounds.height - y,
         };
         return this.render(child, childBounds);
+      }
+
+      // child is a view
+      if (!child.isVisible) {
+        continue;
       }
 
       child.setBounds({
@@ -197,5 +252,55 @@ export class UIWindow {
     }
 
     scopeLog.info('Rendered layout', layout.id, 'with', layout.children.length, 'children');
+  }
+
+  toggleSidebar() {
+    // TODO if area is maximized, sidebar should appear over the main view
+
+    const sidebar = this.getChild<UIPageView>('sidebar')!;
+    if (sidebar.width === SIDEBAR_DEFAULT_WIDTH) {
+      sidebar.setWidth(SIDEBAR_MIN_WIDTH);
+    } else {
+      sidebar.setWidth(SIDEBAR_DEFAULT_WIDTH);
+    }
+
+    this.render();
+  }
+
+  get isSidebarCollapsed(): boolean {
+    const sidebar = this.getChild<UIPageView>('sidebar')!;
+    return sidebar.width === SIDEBAR_MIN_WIDTH;
+  }
+
+  toggleMaximizeArea() {
+    const urlbar = this.getChild<UIPageView>('urlbar')!;
+    const sidebar = this.getChild<UIPageView>('sidebar')!;
+    const noTabView = this.getChild<UIPageView>('no-tab')!;
+
+    if (urlbar.isVisible) {
+      urlbar.hide();
+      sidebar.hide();
+      noTabView.setMargins('5');
+    } else {
+      urlbar.show();
+      sidebar.show();
+      noTabView.setMargins('5 5 5 0');
+    }
+
+    this.render();
+  }
+
+  get isAreaMaximized(): boolean {
+    const urlbar = this.getChild<UIPageView>('urlbar')!;
+    return !urlbar.isVisible;
+  }
+
+  addToMainView(_layout: UILayout) {
+    // const mainView = this.getChild<UIPageView>('main-view')!;
+    // mainView.hide();
+    // const rightContainer = this.getChild<UILayout>('urlbar-webview')!;
+    // rightContainer.add(layout);
+    //
+    // this.render();
   }
 }

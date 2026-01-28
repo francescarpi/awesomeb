@@ -1,14 +1,13 @@
-import { TLayoutType, TLayoutChildren, ILayoutProps } from './types';
+import { TLayoutType, TLayoutChildren } from './types';
 import { Rectangle } from 'electron';
 
-export class UINewLayout {
+export class UILayout {
   private readonly _children: TLayoutChildren[] = [];
   private _bounds: Rectangle = { x: 0, y: 0, width: 100, height: 100 };
 
   constructor(
     public readonly id: string,
     public readonly type: TLayoutType,
-    private readonly _props?: ILayoutProps,
   ) {
     if (typeof type !== 'string') {
       this._bounds = type;
