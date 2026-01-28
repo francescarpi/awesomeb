@@ -5,6 +5,7 @@ export { Partition } from './partition';
 
 export const defaultPartition = new Partition('Default', '#ffffff', false);
 export const privatePartition = new Partition('Private', '#000000', true);
+export const internalPartition = new Partition('Internal', '#00000000', false);
 
 export function getPartitions(): Map<TPartitionId, Partition> {
   const partitions = new Map<TPartitionId, Partition>();

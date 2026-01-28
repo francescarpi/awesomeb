@@ -1,10 +1,11 @@
 import path from 'path';
 import { PRELOAD_FOLDER } from '@/paths';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, session } from 'electron';
 import { UIWindow } from '../window';
 import { TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
+import { internalPartition } from '@/core';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
@@ -32,6 +33,7 @@ export class UIModal {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
+        session: session.fromPartition(internalPartition.id),
       },
     });
 

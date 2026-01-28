@@ -15,6 +15,9 @@ vi.mock('electron', () => {
   };
 
   return {
+    session: {
+      fromPartition: () => ({}),
+    },
     app: {
       name: 'TestApp',
       isPackaged: false,

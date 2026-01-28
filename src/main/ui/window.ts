@@ -1,5 +1,5 @@
 import path from 'path';
-import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
+import { BrowserWindow, WebContents, app, Rectangle, session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { getOnlyViews, loadPage, openDevTools } from './helpers';
@@ -11,6 +11,7 @@ import log from 'electron-log';
 import { UIPageView, UIView } from './view';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 import { TViewId } from './types';
+import { internalPartition } from '@/core';
 
 const scopeLog = log.scope('UIWindow');
 
@@ -52,6 +53,7 @@ export class UIWindow {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
+        session: session.fromPartition(internalPartition.id),
       },
     });
 

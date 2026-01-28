@@ -1,9 +1,10 @@
 import path from 'path';
 import { IMargins, TPage } from '~/types';
-import { WebContentsView, Rectangle, WebContents } from 'electron';
+import { WebContentsView, Rectangle, WebContents, session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools, transformMargin } from './helpers';
+import { internalPartition } from '@/core';
 
 export class UIView {
   protected readonly _webContentsView: WebContentsView;
@@ -20,8 +21,11 @@ export class UIView {
         preload: this.getPreloadScript(),
         webSecurity: true,
         transparent: true,
+        session: session.fromPartition(internalPartition.id),
       },
     });
+
+    this._webContentsView.setBorderRadius(props?.borderRadius || 0);
 
     this._margins = props?.margins ? transformMargin(props.margins) : this._margins;
     this._width = props?.width || null;

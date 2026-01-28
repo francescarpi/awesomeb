@@ -1,10 +1,11 @@
 import path from 'path';
 import { PRELOAD_FOLDER } from '@/paths';
-import { WebContentsView } from 'electron';
+import { WebContentsView, session } from 'electron';
 import { UIWindow } from '../window';
 import { TNotificationSeverity } from '~/types';
 import { loadPage } from '../helpers';
 import { WIDTH, HEIGHT, MARGIN_TOP, MARGIN_RIGHT } from './constants';
+import { internalPartition } from '@/core';
 
 export class UINotificationsContainer extends WebContentsView {
   constructor(private readonly _parent: UIWindow) {
@@ -15,6 +16,7 @@ export class UINotificationsContainer extends WebContentsView {
         contextIsolation: true,
         sandbox: true,
         transparent: true,
+        session: session.fromPartition(internalPartition.id),
       },
     });
 
