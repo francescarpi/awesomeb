@@ -320,6 +320,8 @@ export class UIWindow {
   refreshTabContainerLayoutView(visible: TViewId[]) {
     const views = getOnlyViews(this._tabContainerLayout!, ['urlbar']);
 
+    // TODO remove no-tab.
+
     for (const view of views) {
       if (visible.includes(view.id)) {
         view.show();
