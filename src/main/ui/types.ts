@@ -10,6 +10,7 @@ export interface IViewProps {
   width?: number;
   height?: number;
   margins?: string;
+  visible?: boolean;
 }
 
 export interface IPageViewProps extends IViewProps {
@@ -19,3 +20,5 @@ export interface IPageViewProps extends IViewProps {
 export type TLayoutType = 'vertical' | 'horizontal' | Rectangle;
 
 export type TLayoutChildren = UILayout | UIView;
+
+export type TViewId = number | string;

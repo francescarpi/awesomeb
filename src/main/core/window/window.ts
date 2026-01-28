@@ -6,6 +6,7 @@ import { MIN_DESKTOPS } from './constants';
 import { TDesktopId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
+import { TViewId } from '@/ui/types';
 
 const scopeLog = log.scope('Window');
 
@@ -70,5 +71,19 @@ export class Window extends UIWindow {
     for (let numDesktop = 0; numDesktop < MIN_DESKTOPS; numDesktop++) {
       this.createDesktop(numDesktop + 1);
     }
+  }
+
+  refreshVisibleTabView() {
+    const visible: TViewId[] = [];
+    const desktop = this.selectedDesktop;
+    const tabContainer = desktop.selectedTabContainer;
+
+    if (tabContainer) {
+      for (const tab of tabContainer.tabs) {
+        visible.push(tab.view.id);
+      }
+    }
+
+    this.refreshTabContainerLayoutView(visible);
   }
 }

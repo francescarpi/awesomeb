@@ -61,7 +61,7 @@ export class Browser {
             divider: tabConStore.divider,
           });
 
-          desktop.setTabContainer(tabContainer);
+          desktop.addTabContainer(tabContainer);
 
           for (const tabStore of tabConStore.tabs) {
             const partition = partitions.get(tabStore.partitionId) || defaultPartition;
@@ -167,14 +167,11 @@ export class Browser {
 
     tab.loadURL(url);
 
-    desktop.setTabContainer(tabContainer);
+    desktop.addTabContainer(tabContainer);
+    desktop.selectTabContainer(tabContainer.id);
 
-    window.addToMainView(tabContainer.layout);
-
-    // No esta clar en quin moment afegir els views al browserwindow. Ara ho fa el setLayout, pero aixo no esta be
-
-    // By default all tabcontainers visibility is false
-    // Create a method win window to show only the active tabcontainer
+    window.addToTabContainerLayout(tabContainer.layout);
+    window.refreshVisibleTabView();
 
     return { window, desktop, tabContainer, tab };
   }

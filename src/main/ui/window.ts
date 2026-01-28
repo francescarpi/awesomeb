@@ -2,7 +2,7 @@ import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
-import { loadPage, openDevTools } from './helpers';
+import { getOnlyViews, loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import { registerUIWindowEvents } from './events';
 import EventEmitter from 'events';
@@ -10,11 +10,14 @@ import { UILayout } from './layout';
 import log from 'electron-log';
 import { UIPageView, UIView } from './view';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
+import { TViewId } from './types';
 
 const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
-  private rootLayout?: UILayout;
+  private _rootLayout?: UILayout;
+  private _tabContainerLayout?: UILayout;
+
   public readonly bw: BrowserWindow;
 
   private readonly _notificationsManager: UINotificationsManager;
@@ -86,19 +89,21 @@ export class UIWindow {
       margins: '5 5 5 0',
     });
 
-    const urlbarWebviewLayout = new UILayout('urlbar-and-tab', 'horizontal');
+    this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');
 
-    urlbarWebviewLayout.addChild(urlbar);
-    urlbarWebviewLayout.addChild(noTab);
+    this._tabContainerLayout.addChild(urlbar);
+    this._tabContainerLayout.addChild(noTab);
 
     mainLayout.addChild(sidebar);
-    mainLayout.addChild(urlbarWebviewLayout);
+    mainLayout.addChild(this._tabContainerLayout);
+
+    // TODO add notifications view with a fixed position over the main layout
 
     this.render();
   }
 
-  getChild<T>(id: string | number, initialLayout?: UILayout): T | null {
-    const layout = initialLayout || this.rootLayout!;
+  getChild<T>(id: TViewId, initialLayout?: UILayout): T | null {
+    const layout = initialLayout || this._rootLayout!;
 
     if (layout.id === id) {
       return layout as T;
@@ -131,7 +136,7 @@ export class UIWindow {
   }
 
   setRootLayout(layout: UILayout) {
-    this.rootLayout = layout;
+    this._rootLayout = layout;
   }
 
   toggleViewVisibility(id: string) {
@@ -201,7 +206,7 @@ export class UIWindow {
     let parentBounds = initialParentBounds;
 
     if (!layout) {
-      layout = this.rootLayout!;
+      layout = this._rootLayout!;
     }
 
     if (!parentBounds) {
@@ -209,6 +214,8 @@ export class UIWindow {
       parentBounds = { x: 0, y: 0, width, height };
     }
 
+    // If layout type is string, it means it's a standard layout (horizontal or vertical)
+    // It doesn't have custom bounds, so we set its bounds to the parent bounds
     if (typeof layout.type === 'string') {
       layout.setBounds(parentBounds);
     }
@@ -221,8 +228,8 @@ export class UIWindow {
         const childBounds = {
           x,
           y,
-          width: layout.bounds.width - x,
-          height: layout.bounds.height - y,
+          width: layout.bounds.width - x + parentBounds.x,
+          height: layout.bounds.height - y + parentBounds.y,
         };
         return this.render(child, childBounds);
       }
@@ -236,10 +243,9 @@ export class UIWindow {
         x: x + child.margins.l,
         y: y + child.margins.t,
         width: (child.width || layout.bounds.width) - child.margins.l - child.margins.r,
-        height: (child.height || layout.bounds.height) - child.margins.t - child.margins.b - y,
+        height: (child.height || layout.bounds.height) - child.margins.t - child.margins.b,
       });
 
-      // TODO evaluate if set a falg in view as "added"
       if (!this.isViewChildOfContentView(child)) {
         this.bw.contentView.addChildView(child.webContentsView, 0);
       }
@@ -275,7 +281,7 @@ export class UIWindow {
   toggleMaximizeArea() {
     const urlbar = this.getChild<UIPageView>('urlbar')!;
     const sidebar = this.getChild<UIPageView>('sidebar')!;
-    const noTabView = this.getChild<UIPageView>('no-tab')!;
+    const noTabView = this.getChild<UIPageView>('no-tab', this._tabContainerLayout)!;
 
     if (urlbar.isVisible) {
       urlbar.hide();
@@ -295,12 +301,21 @@ export class UIWindow {
     return !urlbar.isVisible;
   }
 
-  addToMainView(_layout: UILayout) {
-    // const mainView = this.getChild<UIPageView>('main-view')!;
-    // mainView.hide();
-    // const rightContainer = this.getChild<UILayout>('urlbar-webview')!;
-    // rightContainer.add(layout);
-    //
-    // this.render();
+  addToTabContainerLayout(layout: UILayout) {
+    this._tabContainerLayout!.addChild(layout);
+  }
+
+  refreshTabContainerLayoutView(visible: TViewId[]) {
+    const views = getOnlyViews(this._tabContainerLayout!, ['urlbar']);
+
+    for (const view of views) {
+      if (visible.includes(view.id)) {
+        view.show();
+      } else {
+        view.hide();
+      }
+    }
+
+    this.render();
   }
 }

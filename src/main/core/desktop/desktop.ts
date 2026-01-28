@@ -7,7 +7,9 @@ export class Desktop {
   private _name: string | null = null;
   private _requireAttention: boolean = false;
   private _theme: Theme;
+
   private readonly _tabContainers: Map<TTabContainerId, TabContainer> = new Map();
+  private _selectedTabContainerId: TTabContainerId | null = null;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -68,7 +70,22 @@ export class Desktop {
     return Array.from(this._tabContainers.values());
   }
 
-  setTabContainer(tabContainer: TabContainer) {
+  addTabContainer(tabContainer: TabContainer) {
     this._tabContainers.set(tabContainer.id, tabContainer);
+  }
+
+  selectTabContainer(id: TTabContainerId) {
+    if (!this._tabContainers.has(id)) {
+      return;
+    }
+
+    this._selectedTabContainerId = id;
+  }
+
+  get selectedTabContainer(): TabContainer | null {
+    if (this._selectedTabContainerId === null) {
+      return null;
+    }
+    return this._tabContainers.get(this._selectedTabContainerId) || null;
   }
 }

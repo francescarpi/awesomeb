@@ -23,8 +23,12 @@ export class Tab {
     this._customTitle = props.customTitle ?? null;
     this._url = props.url ?? null;
 
-    this._view = new UIView();
+    // The view is not visible initially until method to refresh visible tabs is called.
+    this._view = new UIView({ visible: false });
+
+    // The tab layout will be used to show, for instance, the find in page view below the webview.
     this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');
+    this._layout.addChild(this._view);
   }
 
   get id(): number {
@@ -69,6 +73,10 @@ export class Tab {
 
   get layout(): UILayout {
     return this._layout;
+  }
+
+  get view(): UIView {
+    return this._view;
   }
 
   activate() {

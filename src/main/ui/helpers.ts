@@ -2,6 +2,9 @@ import { WebContents } from 'electron';
 import path from 'path';
 import { RENDERER_FOLDER } from '@/paths';
 import { IMargins } from '~/types';
+import { UILayout } from './layout';
+import { UIView } from './view';
+import { TViewId } from './types';
 
 export async function loadPage(wc: WebContents, page: string, query: Record<string, string> = {}) {
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -58,4 +61,18 @@ export function transformMargin(margin: string): IMargins {
         b: 0,
       };
   }
+}
+
+export function getOnlyViews(layout: UILayout, ignore: TViewId[]): UIView[] {
+  const views: UIView[] = [];
+
+  for (const child of layout.children) {
+    if (child instanceof UIView && !ignore.includes(child.id)) {
+      views.push(child);
+    } else if (child instanceof UILayout) {
+      views.push(...getOnlyViews(child, ignore));
+    }
+  }
+
+  return views;
 }

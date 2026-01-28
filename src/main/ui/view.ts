@@ -2,7 +2,7 @@ import path from 'path';
 import { IMargins, TPage } from '~/types';
 import { WebContentsView, Rectangle, WebContents } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
-import { IViewProps, IPageViewProps } from './types';
+import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools, transformMargin } from './helpers';
 
 export class UIView {
@@ -26,9 +26,15 @@ export class UIView {
     this._margins = props?.margins ? transformMargin(props.margins) : this._margins;
     this._width = props?.width || null;
     this._height = props?.height || null;
+
+    if (props?.visible || props?.visible === undefined) {
+      this.show();
+    } else {
+      this.hide();
+    }
   }
 
-  get id(): number | string {
+  get id(): TViewId {
     return this.webContents.id;
   }
 

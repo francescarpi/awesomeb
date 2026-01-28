@@ -5,9 +5,11 @@ import { ITabContainerProps, ITabProps } from './types';
 import { UILayout } from '@/ui';
 
 export class TabContainer {
-  private readonly _tabs: Map<TTabId, Tab> = new Map();
   private _divider: boolean;
   private _layout: UILayout;
+
+  private readonly _tabs: Map<TTabId, Tab> = new Map();
+  private _selectedTabId: TTabId | null = null;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -27,6 +29,9 @@ export class TabContainer {
 
     this._layout.addChild(tab.layout);
     this._tabs.set(tab.id, tab);
+
+    this._selectedTabId = tab.id;
+
     return tab;
   }
 
@@ -36,5 +41,12 @@ export class TabContainer {
 
   get layout(): UILayout {
     return this._layout;
+  }
+
+  get selectedTab(): Tab | null {
+    if (this._selectedTabId === null) {
+      return null;
+    }
+    return this._tabs.get(this._selectedTabId) || null;
   }
 }
