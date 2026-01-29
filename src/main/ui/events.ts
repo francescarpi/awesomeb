@@ -3,11 +3,11 @@ import { UIWindow } from './window';
 export function registerUIWindowEvents(win: UIWindow) {
   //--------------------------------------------------------------------------------------
   win.bw.on('resize', () => {
-    win.render();
+    win.renderLayout();
   });
 
   //--------------------------------------------------------------------------------------
   win.bw.on('move', () => {
-    win.render();
+    win.renderLayout();
   });
 }

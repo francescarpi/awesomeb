@@ -10,7 +10,7 @@ import { UILayout } from './layout';
 import log from 'electron-log';
 import { UIPageView, UIView } from './view';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
-import { TViewId } from './types';
+import { TLayoutChildren, TViewId } from './types';
 import { internalPartition } from '@/core';
 
 const scopeLog = log.scope('UIWindow');
@@ -101,10 +101,76 @@ export class UIWindow {
 
     // TODO add notifications view with a fixed position over the main layout
 
-    this.render();
+    this.renderLayout();
   }
 
-  render(initialLayout?: UILayout, initialParentBounds?: Rectangle) {
+  renderLayout(parentLayout?: UILayout, parentBounds?: Rectangle) {
+    const layout = parentLayout || this._rootLayout!;
+
+    // If layout type is string, it means it's a standard layout (horizontal or vertical)
+    // It doesn't have custom bounds, so we set its bounds to the parent bounds
+    if (typeof layout.type === 'string') {
+      const [width, height] = this.bw.getSize();
+      const bounds = parentBounds || { x: 0, y: 0, width, height };
+      layout.setBounds(bounds);
+    }
+
+    // Iterate over children and set their bounds
+    let previousChild: TLayoutChildren | null = null;
+    for (const child of layout.children) {
+      // If child is a layout, calculate its bounds based on the layout type
+      // and the previous child's bounds (if any) and render it recursively
+      if (child instanceof UILayout) {
+        let bounds = layout.bounds;
+        if (layout.type === 'vertical') {
+          const x = previousChild
+            ? previousChild.bounds.x + previousChild.bounds.width
+            : layout.bounds.x;
+          const y = layout.bounds.y;
+          bounds = {
+            x,
+            y,
+            width: layout.bounds.width - x,
+            height: layout.bounds.height,
+          };
+        } else if (layout.type === 'horizontal') {
+          const x = layout.bounds.x;
+          const y = previousChild
+            ? previousChild.bounds.y + previousChild.bounds.height
+            : layout.bounds.y;
+          bounds = {
+            x,
+            y,
+            width: layout.bounds.width,
+            height: layout.bounds.height - y,
+          };
+        }
+        this.renderLayout(child, bounds);
+        continue;
+      }
+
+      // child is a view
+      let bounds = { x: 0, y: 0, width: 100, height: 100 };
+      if (layout.type === 'vertical') {
+        // bounds without margin
+        bounds = {
+          x: layout.bounds.x,
+          y: layout.bounds.y,
+        };
+      } else if (layout.type === 'horizontal') {
+      }
+
+      child.setBounds(bounds);
+
+      if (!this.isViewChildOfContentView(child)) {
+        this.bw.contentView.addChildView(child.webContentsView, 0);
+      }
+
+      previousChild = child;
+    }
+  }
+
+  render2(initialLayout?: UILayout, initialParentBounds?: Rectangle) {
     let layout = initialLayout;
     let parentBounds = initialParentBounds;
 
@@ -136,7 +202,7 @@ export class UIWindow {
           width: layout.bounds.width - x + parentBounds.x,
           height: layout.bounds.height - y + parentBounds.y,
         };
-        this.render(child, childBounds);
+        this.renderLayout(child, childBounds);
         continue;
       }
 
@@ -220,7 +286,7 @@ export class UIWindow {
       } else {
         view.show();
       }
-      this.render();
+      this.renderLayout();
     }
   }
 
@@ -228,7 +294,7 @@ export class UIWindow {
     const view = this.getChild<UIView>(id);
     if (view) {
       view.setMargins(margins);
-      this.render();
+      this.renderLayout();
     }
   }
 
@@ -236,7 +302,7 @@ export class UIWindow {
     const view = this.getChild<UIView>(id);
     if (view) {
       view.setWidth(width);
-      this.render();
+      this.renderLayout();
     }
   }
 
@@ -244,7 +310,7 @@ export class UIWindow {
     const view = this.getChild<UIView>(id);
     if (view) {
       view.setHeight(height);
-      this.render();
+      this.renderLayout();
     }
   }
 
@@ -284,7 +350,7 @@ export class UIWindow {
       sidebar.setWidth(SIDEBAR_DEFAULT_WIDTH);
     }
 
-    this.render();
+    this.renderLayout();
   }
 
   get isSidebarCollapsed(): boolean {
@@ -307,7 +373,7 @@ export class UIWindow {
       noTabView.setMargins('5 5 5 0');
     }
 
-    this.render();
+    this.renderLayout();
   }
 
   get isAreaMaximized(): boolean {
@@ -332,6 +398,6 @@ export class UIWindow {
       }
     }
 
-    this.render();
+    this.renderLayout();
   }
 }
