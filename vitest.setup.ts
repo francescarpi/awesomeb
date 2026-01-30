@@ -60,6 +60,9 @@ vi.mock('electron', () => {
       isMinimized() {
         return false;
       }
+      getSize() {
+        return [800, 600];
+      }
     },
     WebContentsView: class {
       webContents = webContents;
