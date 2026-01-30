@@ -75,22 +75,20 @@ export class UIWindow {
     const mainLayout = new UILayout('main-layout', 'vertical');
     this.setRootLayout(mainLayout);
 
-    // TODO rename margins to margin
-
     const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       query: { winId: this.id.toString() },
-      margins: '5',
+      margin: '5',
     });
 
     const urlbar = new UIPageView('urlbar', {
       height: 32,
       query: { winId: this.id.toString() },
-      margins: '5',
+      margin: '5',
     });
 
     const noTab = new UIPageView('no-tab', {
-      margins: '5',
+      margin: '5',
     });
 
     this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');
@@ -245,10 +243,10 @@ export class UIWindow {
     }
   }
 
-  setMargins(id: string, margins: string) {
+  setMargin(id: string, margin: string) {
     const view = this.getChild<UIView>(id);
     if (view) {
-      view.setMargins(margins);
+      view.setMargin(margin);
       this.renderLayout();
     }
   }
@@ -316,16 +314,13 @@ export class UIWindow {
   toggleMaximizeArea() {
     const urlbar = this.getChild<UIPageView>('urlbar')!;
     const sidebar = this.getChild<UIPageView>('sidebar')!;
-    const noTabView = this.getChild<UIPageView>('no-tab', this._tabContainerLayout)!;
 
     if (urlbar.isVisible) {
       urlbar.hide();
       sidebar.hide();
-      noTabView.setMargins('5');
     } else {
       urlbar.show();
       sidebar.show();
-      noTabView.setMargins('5 5 5 0');
     }
 
     this.renderLayout();

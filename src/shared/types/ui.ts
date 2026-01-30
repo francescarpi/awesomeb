@@ -1,4 +1,4 @@
-export interface IMargins {
+export interface IMargin {
   l: number;
   r: number;
   t: number;

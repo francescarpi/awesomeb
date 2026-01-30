@@ -1,5 +1,5 @@
 import path from 'path';
-import { IMargins, TPage } from '~/types';
+import { IMargin, TPage } from '~/types';
 import { WebContentsView, Rectangle, WebContents, session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
@@ -8,7 +8,7 @@ import { internalPartition } from '@/core';
 
 export class UIView {
   protected readonly _webContentsView: WebContentsView;
-  protected _margins: IMargins = { t: 0, r: 0, b: 0, l: 0 };
+  protected _margin: IMargin = { t: 0, r: 0, b: 0, l: 0 };
   protected _width: number | null = null;
   protected _height: number | null = null;
 
@@ -27,7 +27,7 @@ export class UIView {
 
     this._webContentsView.setBorderRadius(props?.borderRadius || 0);
 
-    this._margins = props?.margins ? transformMargin(props.margins) : this._margins;
+    this._margin = props?.margin ? transformMargin(props.margin) : this._margin;
     this._width = props?.width || null;
     this._height = props?.height || null;
 
@@ -67,8 +67,8 @@ export class UIView {
     return this._webContentsView.getBounds();
   }
 
-  get margins(): IMargins {
-    return this._margins;
+  get margin(): IMargin {
+    return this._margin;
   }
 
   get isVisible(): boolean {
@@ -91,8 +91,8 @@ export class UIView {
     this.webContentsView.setVisible(true);
   }
 
-  setMargins(margins: string) {
-    this._margins = transformMargin(margins);
+  setMargin(margin: string) {
+    this._margin = transformMargin(margin);
   }
 
   setWidth(width: number) {

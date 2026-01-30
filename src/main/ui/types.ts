@@ -9,7 +9,7 @@ export interface ILayoutNode {
 export interface IViewProps {
   width?: number;
   height?: number;
-  margins?: string;
+  margin?: string;
   visible?: boolean;
   borderRadius?: number;
 }

@@ -1,7 +1,7 @@
 import { WebContents } from 'electron';
 import path from 'path';
 import { RENDERER_FOLDER } from '@/paths';
-import { IMargins } from '~/types';
+import { IMargin } from '~/types';
 import { UILayout } from './layout';
 import { UIView } from './view';
 import { TViewId } from './types';
@@ -22,36 +22,36 @@ export function openDevTools(wc: WebContents, expectedTarget: string) {
   }
 }
 
-export function transformMargin(margin: string): IMargins {
-  const margins = margin.split(' ').map((v) => parseInt(v, 10));
-  switch (margins.length) {
+export function transformMargin(marginStr: string): IMargin {
+  const margin = marginStr.split(' ').map((v) => parseInt(v, 10));
+  switch (margin.length) {
     case 1:
       return {
-        l: margins[0],
-        r: margins[0],
-        t: margins[0],
-        b: margins[0],
+        l: margin[0],
+        r: margin[0],
+        t: margin[0],
+        b: margin[0],
       };
     case 2:
       return {
-        t: margins[0],
-        b: margins[0],
-        l: margins[1],
-        r: margins[1],
+        t: margin[0],
+        b: margin[0],
+        l: margin[1],
+        r: margin[1],
       };
     case 3:
       return {
-        t: margins[0],
-        r: margins[1],
-        l: margins[1],
-        b: margins[2],
+        t: margin[0],
+        r: margin[1],
+        l: margin[1],
+        b: margin[2],
       };
     case 4:
       return {
-        t: margins[0],
-        r: margins[1],
-        b: margins[2],
-        l: margins[3],
+        t: margin[0],
+        r: margin[1],
+        b: margin[2],
+        l: margin[3],
       };
     default:
       return {
