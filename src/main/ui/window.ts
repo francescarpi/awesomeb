@@ -75,6 +75,8 @@ export class UIWindow {
     const mainLayout = new UILayout('main-layout', 'vertical');
     this.setRootLayout(mainLayout);
 
+    // TODO rename margins to margin
+
     const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       query: { winId: this.id.toString() },
@@ -84,11 +86,11 @@ export class UIWindow {
     const urlbar = new UIPageView('urlbar', {
       height: 32,
       query: { winId: this.id.toString() },
-      margins: '5 5 0 0',
+      margins: '5',
     });
 
     const noTab = new UIPageView('no-tab', {
-      margins: '5 5 5 0',
+      margins: '5',
     });
 
     this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');
@@ -115,9 +117,13 @@ export class UIWindow {
       layout.setBounds(bounds);
     }
 
+    scopeLog.info('LAYOUT', layout.id, layout.bounds, layout.type);
+
     // Iterate over children and set their bounds
     let previousChild: TLayoutChildren | null = null;
     for (const child of layout.children) {
+      scopeLog.info('PREVIOUS CHILS', previousChild ? previousChild.id : 'none');
+
       // If child is a layout, calculate its bounds based on the layout type
       // and the previous child's bounds (if any) and render it recursively
       if (child instanceof UILayout) {
@@ -150,17 +156,37 @@ export class UIWindow {
       }
 
       // child is a view
+
+      if (!child.isVisible) {
+        continue;
+      }
+
       let bounds = { x: 0, y: 0, width: 100, height: 100 };
       if (layout.type === 'vertical') {
         // bounds without margin
         bounds = {
           x: layout.bounds.x,
           y: layout.bounds.y,
+          width: child.width || layout.bounds.width,
+          height: child.height || layout.bounds.height,
         };
+
+        // TODO with margins
       } else if (layout.type === 'horizontal') {
+        // bounds without margin
+        const y = previousChild
+          ? previousChild.bounds.y + previousChild.bounds.height
+          : layout.bounds.y;
+        bounds = {
+          x: layout.bounds.x,
+          y: y,
+          width: child.width || layout.bounds.width,
+          height: child.height || layout.bounds.height - y,
+        };
       }
 
       child.setBounds(bounds);
+      scopeLog.info('VIEW', child.id, child.bounds);
 
       if (!this.isViewChildOfContentView(child)) {
         this.bw.contentView.addChildView(child.webContentsView, 0);
@@ -168,77 +194,6 @@ export class UIWindow {
 
       previousChild = child;
     }
-  }
-
-  render2(initialLayout?: UILayout, initialParentBounds?: Rectangle) {
-    let layout = initialLayout;
-    let parentBounds = initialParentBounds;
-
-    if (!layout) {
-      layout = this._rootLayout!;
-    }
-
-    if (!parentBounds) {
-      const { width, height } = this.bw.getBounds();
-      parentBounds = { x: 0, y: 0, width, height };
-    }
-
-    // If layout type is string, it means it's a standard layout (horizontal or vertical)
-    // It doesn't have custom bounds, so we set its bounds to the parent bounds
-    if (typeof layout.type === 'string') {
-      layout.setBounds(parentBounds);
-    }
-
-    let x = layout.bounds.x;
-    let y = layout.bounds.y;
-
-    console.log(layout.id, layout.bounds, 'x', x, 'y', y);
-
-    for (const child of layout.children) {
-      if (child instanceof UILayout) {
-        const childBounds = {
-          x,
-          y,
-          width: layout.bounds.width - x + parentBounds.x,
-          height: layout.bounds.height - y + parentBounds.y,
-        };
-        this.renderLayout(child, childBounds);
-        continue;
-      }
-
-      // child is a view
-      if (!child.isVisible) {
-        continue;
-      }
-
-      const childWidth = child.width || layout.bounds.width;
-      const childHeight = child.height || layout.bounds.height;
-
-      console.log(child.id, 'w:', childWidth, 'h:', childHeight, child.margins);
-
-      child.setBounds({
-        x: x + child.margins.l,
-        y: y + child.margins.t,
-        width: childWidth - child.margins.l - child.margins.r,
-        height: childHeight - child.margins.t - child.margins.b,
-      });
-
-      console.log(child.id, child.bounds);
-
-      if (!this.isViewChildOfContentView(child)) {
-        this.bw.contentView.addChildView(child.webContentsView, 0);
-      }
-
-      if (layout.type === 'horizontal') {
-        y += child.bounds.y + child.bounds.height;
-      } else if (layout.type === 'vertical') {
-        x += child.bounds.x + child.bounds.width + child.margins.r;
-      }
-
-      console.log('Next pos x:', x, 'y:', y);
-    }
-
-    scopeLog.info('Rendered layout', layout.id, 'with', layout.children.length, 'children');
   }
 
   getChild<T>(id: TViewId, initialLayout?: UILayout): T | null {
