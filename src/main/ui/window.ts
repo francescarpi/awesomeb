@@ -120,7 +120,7 @@ export class UIWindow {
     // Iterate over children and set their bounds
     let previousChild: TLayoutChildren | null = null;
     for (const child of layout.children) {
-      scopeLog.info('PREVIOUS CHILS', previousChild ? previousChild.id : 'none');
+      // scopeLog.info('PREVIOUS CHILS', previousChild ? previousChild.id : 'none');
 
       // If child is a layout, calculate its bounds based on the layout type
       // and the previous child's bounds (if any) and render it recursively
@@ -131,10 +131,11 @@ export class UIWindow {
             ? previousChild.bounds.x + previousChild.bounds.width
             : layout.bounds.x;
           const y = layout.bounds.y;
+          const remainingWidth = layout.bounds.width - (x - layout.bounds.x);
           bounds = {
             x,
             y,
-            width: layout.bounds.width - x,
+            width: remainingWidth,
             height: layout.bounds.height,
           };
         } else if (layout.type === 'horizontal') {
@@ -142,11 +143,12 @@ export class UIWindow {
           const y = previousChild
             ? previousChild.bounds.y + previousChild.bounds.height
             : layout.bounds.y;
+          const remainingHeight = layout.bounds.height - (y - layout.bounds.y);
           bounds = {
             x,
             y,
             width: layout.bounds.width,
-            height: layout.bounds.height - y,
+            height: remainingHeight,
           };
         }
         this.renderLayout(child, bounds);
@@ -162,10 +164,14 @@ export class UIWindow {
       let bounds = { x: 0, y: 0, width: 100, height: 100 };
       if (layout.type === 'vertical') {
         // bounds without margin
+        const x = previousChild
+          ? previousChild.bounds.x + previousChild.bounds.width
+          : layout.bounds.x;
+        const remainingWidth = layout.bounds.width - (x - layout.bounds.x);
         bounds = {
-          x: layout.bounds.x,
+          x,
           y: layout.bounds.y,
-          width: child.width || layout.bounds.width,
+          width: child.width || remainingWidth,
           height: child.height || layout.bounds.height,
         };
 
@@ -175,11 +181,12 @@ export class UIWindow {
         const y = previousChild
           ? previousChild.bounds.y + previousChild.bounds.height
           : layout.bounds.y;
+        const remainingHeight = layout.bounds.height - (y - layout.bounds.y);
         bounds = {
           x: layout.bounds.x,
           y: y,
           width: child.width || layout.bounds.width,
-          height: child.height || layout.bounds.height - y,
+          height: child.height || remainingHeight,
         };
       }
 
