@@ -91,6 +91,8 @@ export class Tab {
   }
 
   async loadURL(url: string) {
+    this._url = url;
+
     if (this._suspended) {
       this.activate();
     }

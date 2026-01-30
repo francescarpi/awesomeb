@@ -8,13 +8,13 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
 
 <Layout borderRadius="10px 0 0 10px">
   <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;">
-    <section class="p-1">
+    <section class="pl-2 pt-2 hidden sidebar:block">
       <WindowActions />
     </section>
-    <section class="p-2">
+    <section class="px-2 mt-2 sidebar:mt-0">
       <ButtonIcon icon="sidebar" />
     </section>
-    <section class="p-2">
+    <section class="py-1 flex justify-center sidebar:block sidebar:px-2">
       <Desktops />
     </section>
     <TabContainers />
