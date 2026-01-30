@@ -23,7 +23,34 @@ export function openDevTools(wc: WebContents, expectedTarget: string) {
 }
 
 export function transformMargin(marginStr: string): IMargin {
-  const margin = marginStr.split(' ').map((v) => parseInt(v, 10));
+  // Handle empty or whitespace-only strings
+  if (!marginStr || !marginStr.trim()) {
+    return {
+      l: 0,
+      r: 0,
+      t: 0,
+      b: 0,
+    };
+  }
+
+  const margin = marginStr
+    .trim()
+    .split(/\s+/)
+    .map((v) => {
+      const parsed = parseInt(v, 10);
+      return isNaN(parsed) ? 0 : parsed;
+    });
+
+  // If no valid numbers found, return default
+  if (margin.length === 0) {
+    return {
+      l: 0,
+      r: 0,
+      t: 0,
+      b: 0,
+    };
+  }
+
   switch (margin.length) {
     case 1:
       return {
@@ -47,18 +74,12 @@ export function transformMargin(marginStr: string): IMargin {
         b: margin[2],
       };
     case 4:
-      return {
-        t: margin[0],
-        r: margin[1],
-        b: margin[2],
-        l: margin[3],
-      };
     default:
       return {
-        l: 0,
-        r: 0,
-        t: 0,
-        b: 0,
+        t: margin[0],
+        r: margin[1] || margin[0],
+        b: margin[2] || margin[0],
+        l: margin[3] || margin[1] || margin[0],
       };
   }
 }

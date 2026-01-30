@@ -1,22 +1,30 @@
 import { vi } from 'vitest';
 
-import log from 'electron-log';
-
-log.transports.file.level = false;
-log.transports.console.level = false;
+// Mock electron-log first to avoid import issues
+vi.mock('electron-log', () => ({
+  default: {
+    scope: vi.fn(() => ({
+      info: vi.fn(),
+    })),
+    transports: {
+      file: { level: false },
+      console: { level: false },
+    },
+  },
+}));
 
 vi.mock('electron', () => {
   const webContents = {
-    openDevTools: () => {},
+    openDevTools: vi.fn(),
     id: 1,
-    loadFile: () => {},
-    loadURL: () => {},
-    send: () => {},
+    loadFile: vi.fn().mockResolvedValue(undefined),
+    loadURL: vi.fn().mockResolvedValue(undefined),
+    send: vi.fn(),
   };
 
   return {
     session: {
-      fromPartition: () => ({}),
+      fromPartition: vi.fn(() => ({})),
     },
     app: {
       name: 'TestApp',
@@ -24,8 +32,8 @@ vi.mock('electron', () => {
     },
     BrowserWindow: class {
       constructor() {}
-      loadFile() {}
-      loadURL() {}
+      loadFile = vi.fn().mockResolvedValue(undefined);
+      loadURL = vi.fn().mockResolvedValue(undefined);
       get webContents() {
         return webContents;
       }
@@ -33,21 +41,30 @@ vi.mock('electron', () => {
         return 1;
       }
       contentView = {
-        addChildView: () => {},
+        addChildView: vi.fn(),
         children: [],
       };
       getBounds() {
         return { x: 0, y: 0, width: 800, height: 600 };
       }
-      on() {}
-      once() {}
+      getSize() {
+        return [800, 600];
+      }
       getContentSize() {
         return [800, 600];
       }
-      hide() {}
-      close() {}
+      isDestroyed = vi.fn(() => false);
+      focus = vi.fn();
+      show = vi.fn();
+      hide = vi.fn();
+      close = vi.fn();
+      on = vi.fn();
+      once = vi.fn();
       isVisible() {
         return true;
+      }
+      isMinimized() {
+        return false;
       }
       static getAllWindows() {
         return [];
@@ -57,28 +74,22 @@ vi.mock('electron', () => {
           id: 1,
         };
       }
-      isMinimized() {
-        return false;
-      }
-      getSize() {
-        return [800, 600];
-      }
     },
     WebContentsView: class {
       webContents = webContents;
-      setBounds() {}
+      setBounds = vi.fn();
       getBounds() {
         return { x: 0, y: 0, width: 400, height: 400 };
       }
-      setBorderRadius() {}
-      setVisible() {}
+      setBorderRadius = vi.fn();
+      setVisible = vi.fn();
       getVisible() {
         return true;
       }
     },
     WebContents: class {
-      loadFile() {}
-      loadURL() {}
+      loadFile = vi.fn().mockResolvedValue(undefined);
+      loadURL = vi.fn().mockResolvedValue(undefined);
     },
   };
 });
