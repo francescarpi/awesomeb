@@ -162,7 +162,7 @@ describe('transformMargin', () => {
 });
 
 describe('Layout Bounds Calculation Logic', () => {
-  // Tests que verifican la lógica de cálculo sin depender de componentes complejos
+  // Tests that verify the calculation logic without relying on complex components
 
   test('should calculate margin application correctly', () => {
     const applyMarginToBounds = (bounds: Rectangle, margin: IMargin): Rectangle => ({
@@ -186,7 +186,7 @@ describe('Layout Bounds Calculation Logic', () => {
   });
 
   test('should calculate vertical layout positioning with margins', () => {
-    // Simula el cálculo de posición en layout vertical
+    // Simulates the calculation of position in vertical layout
     const calculateNextX = (previousBounds: Rectangle, previousMargin: IMargin) => {
       return previousBounds.x + previousBounds.width + previousMargin.r;
     };
@@ -199,7 +199,7 @@ describe('Layout Bounds Calculation Logic', () => {
   });
 
   test('should calculate horizontal layout positioning with margins', () => {
-    // Simula el cálculo de posición en layout horizontal
+    // Simulates position calculation in horizontal layout
     const calculateNextY = (previousBounds: Rectangle, previousMargin: IMargin) => {
       return previousBounds.y + previousBounds.height + previousMargin.b;
     };
@@ -243,7 +243,7 @@ describe('Complex Layout Scenarios', () => {
       const layout = new UILayout(`test-${scenario.type}`, scenario.type);
       expect(layout.type).toBe(scenario.type);
 
-      // Los layouts verticales posicionan children en X, horizontales en Y
+      // Vertical layouts position children along the X-axis, horizontal layouts along the Y-axis
       if (scenario.type === 'vertical') {
         expect(layout.type).toBe('vertical');
       } else {
@@ -256,14 +256,14 @@ describe('Complex Layout Scenarios', () => {
     let currentLayout = new UILayout('root', 'vertical');
     const rootLayout = currentLayout;
 
-    // Crea una estructura anidada profunda
+    // Create a deeply nested structure
     for (let i = 0; i < 5; i++) {
       const childLayout = new UILayout(`level-${i}`, i % 2 === 0 ? 'vertical' : 'horizontal');
       currentLayout.addChild(childLayout);
       currentLayout = childLayout;
     }
 
-    // Verifica que la estructura se creó correctamente
+    // Verify that the structure was created correctly
     expect(rootLayout.children.length).toBe(1);
     expect(rootLayout.children[0]).toBeInstanceOf(UILayout);
 
@@ -295,7 +295,7 @@ describe('Complex Layout Scenarios', () => {
   });
 
   test('should handle edge cases in bounds calculations', () => {
-    // Test con bounds mínimos
+    // Test with minimum bounds
     const minBounds = { x: 0, y: 0, width: 1, height: 1 };
     const margin = { t: 0, r: 0, b: 0, l: 0 };
 
@@ -330,7 +330,7 @@ describe('Layout System Integration', () => {
     mainLayout.addChild(sidebarLayout);
     mainLayout.addChild(contentLayout);
 
-    // Verifica que la jerarquía se mantenga
+    // Verify that the hierarchy is maintained
     expect(mainLayout.children).toContain(sidebarLayout);
     expect(mainLayout.children).toContain(contentLayout);
     expect(mainLayout.children.length).toBe(2);
@@ -340,16 +340,169 @@ describe('Layout System Integration', () => {
     const parentBounds = { x: 0, y: 0, width: 1000, height: 600 };
     const layout = new UILayout('test', 'vertical');
 
-    // Simula el proceso de configuración de bounds
+    // Simulates the process of setting up bounds
     layout.setBounds(parentBounds);
     expect(layout.bounds).toEqual(parentBounds);
 
-    // Los bounds del layout padre deben estar disponibles para los children
+    // The bounds of the parent layout must be available to the children
     const childLayout = new UILayout('child', 'horizontal');
     layout.addChild(childLayout);
 
-    // En un sistema real, el child heredaría o calcularía sus bounds basado en el padre
-    // Aquí verificamos que la estructura permite esta propagación
+    // In a real system, the child would inherit or calculate its bounds based on the parent
+    // Here we verify that the structure allows this propagation
     expect(layout.children[0]).toBe(childLayout);
+  });
+});
+
+describe('View Visibility and Dragging Control', () => {
+  // Tests to verify that hidden views do not interfere with dragging
+
+  test('should properly handle view visibility state', () => {
+    // Simulates a view with drag region
+    const mockWebContentsView = {
+      webContents: { id: 1, send: vi.fn() },
+      setBounds: vi.fn(),
+      getBounds: vi.fn(() => ({ x: 0, y: 0, width: 100, height: 100 })),
+      setVisible: vi.fn(),
+      getVisible: vi.fn(() => true),
+      setBorderRadius: vi.fn(),
+    };
+
+    // We simulate the methods we need
+    const simulateViewBehavior = (isVisible: boolean) => {
+      mockWebContentsView.getVisible = vi.fn(() => isVisible);
+      mockWebContentsView.setVisible = vi.fn();
+
+      return {
+        isVisible,
+        hide: () => mockWebContentsView.setVisible(false),
+        show: () => mockWebContentsView.setVisible(true),
+      };
+    };
+
+    const visibleView = simulateViewBehavior(true);
+    const hiddenView = simulateViewBehavior(false);
+
+    expect(visibleView.isVisible).toBe(true);
+    expect(hiddenView.isVisible).toBe(false);
+
+    // Simulate hide/show
+    visibleView.hide();
+    expect(mockWebContentsView.setVisible).toHaveBeenCalledWith(false);
+
+    hiddenView.show();
+    expect(mockWebContentsView.setVisible).toHaveBeenCalledWith(true);
+  });
+
+  test('should manage contentView children based on visibility', () => {
+    const mockContentView = {
+      addChildView: vi.fn(),
+      removeChildView: vi.fn(),
+      children: [],
+    };
+
+    const mockWebContentsView = {
+      webContents: { id: 1 },
+      setBounds: vi.fn(),
+      setVisible: vi.fn(),
+      getVisible: vi.fn(() => true),
+    };
+
+    // Simulate the behavior of adding/removing views from the contentView
+    const simulateContentViewManagement = (isVisible: boolean, isChildPresent: boolean) => {
+      if (isVisible && !isChildPresent) {
+        mockContentView.addChildView(mockWebContentsView, 0);
+      } else if (!isVisible && isChildPresent) {
+        mockContentView.removeChildView(mockWebContentsView);
+      }
+    };
+
+    // Test: visible view not in contentView -> should be added
+    simulateContentViewManagement(true, false);
+    expect(mockContentView.addChildView).toHaveBeenCalledWith(mockWebContentsView, 0);
+
+    // Reset mocks
+    mockContentView.addChildView.mockClear();
+    mockContentView.removeChildView.mockClear();
+
+    // Test: hidden view in contentView -> should be removed
+    simulateContentViewManagement(false, true);
+    expect(mockContentView.removeChildView).toHaveBeenCalledWith(mockWebContentsView);
+  });
+
+  test('should handle refresh tab container layout with visibility changes', () => {
+    // Simulates the behavior of refreshTabContainerLayoutView
+    const mockViews = [
+      { id: 'no-tab', show: vi.fn(), hide: vi.fn(), isVisible: true },
+      { id: 'tab-1', show: vi.fn(), hide: vi.fn(), isVisible: false },
+      { id: 'tab-2', show: vi.fn(), hide: vi.fn(), isVisible: true },
+    ];
+
+    const mockContentView = {
+      addChildView: vi.fn(),
+      removeChildView: vi.fn(),
+      children: [],
+    };
+
+    const simulateRefreshTabContainer = (visibleIds: string[]) => {
+      for (const view of mockViews) {
+        if (visibleIds.includes(view.id)) {
+          view.show();
+          // Simulate addChildView if not present
+          // @ts-expect-error ingore any type issues
+          if (!mockContentView.children.includes(view as any)) {
+            mockContentView.addChildView(view, 0);
+          }
+        } else {
+          view.hide();
+          // Simulate removeChildView if present
+          // @ts-expect-error ingore any type issues
+          if (mockContentView.children.includes(view as any)) {
+            mockContentView.removeChildView(view);
+          }
+        }
+      }
+    };
+
+    // Test: show only tab-2, hide no-tab and tab-1
+    simulateRefreshTabContainer(['tab-2']);
+
+    expect(mockViews[0].hide).toHaveBeenCalled(); // no-tab hidden
+    expect(mockViews[1].hide).toHaveBeenCalled(); // tab-1 hidden
+    expect(mockViews[2].show).toHaveBeenCalled(); // tab-2 shown
+
+    // Verify that contentView methods were called appropriately
+    expect(mockContentView.addChildView).toHaveBeenCalledWith(mockViews[2], 0);
+  });
+
+  test('should prevent drag interaction when view is hidden', () => {
+    // Conceptual test to verify that a hidden view should not allow dragging
+    const mockDragRegionView = {
+      id: 'no-tab',
+      hasDragRegion: true, // CSS app-region: drag
+      isVisible: true,
+      isInContentView: true,
+    };
+
+    // Function that simulates the desired behavior
+    const canPerformDrag = (view: typeof mockDragRegionView) => {
+      // It should only allow drag if the view is visible AND is in the contentView
+      return view.isVisible && view.isInContentView && view.hasDragRegion;
+    };
+
+    // Case 1: View is visible and in contentView -> allows drag
+    expect(canPerformDrag(mockDragRegionView)).toBe(true);
+
+    // Case 2: View is hidden but still in contentView -> should NOT allow drag
+    mockDragRegionView.isVisible = false;
+    expect(canPerformDrag(mockDragRegionView)).toBe(false);
+
+    // Case 3: View is hidden and removed from contentView -> should NOT allow drag
+    mockDragRegionView.isInContentView = false;
+    expect(canPerformDrag(mockDragRegionView)).toBe(false);
+
+    // Case 4: View is visible but not in contentView -> should NOT allow drag
+    mockDragRegionView.isVisible = true;
+    expect(canPerformDrag(mockDragRegionView)).toBe(false);
   });
 });

@@ -83,7 +83,7 @@ export class UIWindow {
     });
 
     const urlbar = new UIPageView('urlbar', {
-      height: 32,
+      height: 40,
       query: { winId: this.id.toString() },
       margin: '5 5 0 5',
     });
@@ -158,8 +158,12 @@ export class UIWindow {
     view.setBounds(boundsWithMargin);
     // scopeLog.info('VIEW', view.id, view.bounds);
 
-    if (!this.isViewChildOfContentView(view)) {
+    // Only add to contentView if the view is visible
+    if (view.isVisible && !this.isViewChildOfContentView(view)) {
       this.bw.contentView.addChildView(view.webContentsView, 0);
+    } else if (!view.isVisible && this.isViewChildOfContentView(view)) {
+      // Remove from contentView if hidden to prevent interactions like dragging
+      this.bw.contentView.removeChildView(view.webContentsView);
     }
   }
 
@@ -427,13 +431,19 @@ export class UIWindow {
   refreshTabContainerLayoutView(visible: TViewId[]) {
     const views = getOnlyViews(this._tabContainerLayout!, ['urlbar']);
 
-    // TODO remove no-tab.
-
     for (const view of views) {
       if (visible.includes(view.id)) {
         view.show();
+        // Ensure the view is added to contentView when showing
+        if (!this.isViewChildOfContentView(view)) {
+          this.bw.contentView.addChildView(view.webContentsView, 0);
+        }
       } else {
         view.hide();
+        // Remove the view from contentView to completely disable dragging and interactions
+        if (this.isViewChildOfContentView(view)) {
+          this.bw.contentView.removeChildView(view.webContentsView);
+        }
       }
     }
 
