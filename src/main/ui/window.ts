@@ -7,13 +7,14 @@ import { UINotificationsManager } from './notifications';
 import { registerUIWindowEvents } from './events';
 import EventEmitter from 'events';
 import { UILayout } from './layout';
-import log from 'electron-log';
+// import log from 'electron-log';
 import { UIPageView, UIView } from './view';
 import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from './constants';
 import { TLayoutChildren, TViewId } from './types';
 import { internalPartition } from '@/core';
+import { IMargin } from '~/types';
 
-const scopeLog = log.scope('UIWindow');
+// const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
   private _rootLayout?: UILayout;
@@ -78,13 +79,13 @@ export class UIWindow {
     const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       query: { winId: this.id.toString() },
-      margin: '5',
+      margin: '5 0 5 5',
     });
 
     const urlbar = new UIPageView('urlbar', {
       height: 32,
       query: { winId: this.id.toString() },
-      margin: '5',
+      margin: '5 5 0 5',
     });
 
     const noTab = new UIPageView('no-tab', {
@@ -108,7 +109,7 @@ export class UIWindow {
     const layout = parentLayout || this._rootLayout!;
 
     this._setupLayoutBounds(layout, parentBounds);
-    scopeLog.info('LAYOUT', layout.id, layout.bounds, layout.type);
+    // scopeLog.info('LAYOUT', layout.id, layout.bounds, layout.type);
 
     this._renderLayoutChildren(layout);
   }
@@ -129,6 +130,8 @@ export class UIWindow {
     for (const child of layout.children) {
       if (child instanceof UILayout) {
         this._renderChildLayout(layout, child, previousChild);
+        // Layouts should also be considered as previousChild
+        previousChild = child;
       } else if (child.isVisible) {
         this._renderChildView(layout, child, previousChild);
         previousChild = child;
@@ -151,8 +154,9 @@ export class UIWindow {
     previousChild: TLayoutChildren | null,
   ) {
     const bounds = this._calculateViewBounds(parentLayout, view, previousChild);
-    view.setBounds(bounds);
-    scopeLog.info('VIEW', view.id, view.bounds);
+    const boundsWithMargin = this._applyMarginToBounds(bounds, view.margin);
+    view.setBounds(boundsWithMargin);
+    // scopeLog.info('VIEW', view.id, view.bounds);
 
     if (!this.isViewChildOfContentView(view)) {
       this.bw.contentView.addChildView(view.webContentsView, 0);
@@ -189,7 +193,9 @@ export class UIWindow {
     previousChild: TLayoutChildren | null,
   ): Rectangle {
     const x = previousChild
-      ? previousChild.bounds.x + previousChild.bounds.width
+      ? previousChild.bounds.x +
+        previousChild.bounds.width +
+        this._getPreviousChildRightMargin(previousChild)
       : parentLayout.bounds.x;
     const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
 
@@ -206,7 +212,9 @@ export class UIWindow {
     previousChild: TLayoutChildren | null,
   ): Rectangle {
     const y = previousChild
-      ? previousChild.bounds.y + previousChild.bounds.height
+      ? previousChild.bounds.y +
+        previousChild.bounds.height +
+        this._getPreviousChildBottomMargin(previousChild)
       : parentLayout.bounds.y;
     const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
 
@@ -224,7 +232,9 @@ export class UIWindow {
     previousChild: TLayoutChildren | null,
   ): Rectangle {
     const x = previousChild
-      ? previousChild.bounds.x + previousChild.bounds.width
+      ? previousChild.bounds.x +
+        previousChild.bounds.width +
+        this._getPreviousChildRightMargin(previousChild)
       : parentLayout.bounds.x;
     const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
 
@@ -242,7 +252,9 @@ export class UIWindow {
     previousChild: TLayoutChildren | null,
   ): Rectangle {
     const y = previousChild
-      ? previousChild.bounds.y + previousChild.bounds.height
+      ? previousChild.bounds.y +
+        previousChild.bounds.height +
+        this._getPreviousChildBottomMargin(previousChild)
       : parentLayout.bounds.y;
     const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
 
@@ -252,6 +264,23 @@ export class UIWindow {
       width: view.width || parentLayout.bounds.width,
       height: view.height || remainingHeight,
     };
+  }
+
+  private _applyMarginToBounds(bounds: Rectangle, margin: IMargin): Rectangle {
+    return {
+      x: bounds.x + margin.l,
+      y: bounds.y + margin.t,
+      width: bounds.width - margin.l - margin.r,
+      height: bounds.height - margin.t - margin.b,
+    };
+  }
+
+  private _getPreviousChildRightMargin(child: TLayoutChildren): number {
+    return child instanceof UIView ? child.margin.r : 0;
+  }
+
+  private _getPreviousChildBottomMargin(child: TLayoutChildren): number {
+    return child instanceof UIView ? child.margin.b : 0;
   }
 
   getChild<T>(id: TViewId, initialLayout?: UILayout): T | null {
