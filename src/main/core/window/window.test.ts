@@ -34,3 +34,27 @@ test('go to next and previous desktop should work correctly', () => {
   w.selectDesktop('next');
   expect(w.selectedDesktop.id).toBe(1);
 });
+
+test('select tab should work correctly', () => {
+  const browser = new Browser();
+  const w = browser.createWindow();
+  w.createDefaultDesktops();
+
+  expect(w.selectedDesktop.id).toBe(1);
+  const desktop = w.selectDesktop(3);
+  expect(w.selectedDesktop.id).toBe(3);
+  expect(desktop).not.toBeNull();
+  expect(desktop?.selectedTabContainer).toBeNull();
+
+  const result = browser.openURL('http://example.com');
+  expect(result).not.toBeNull();
+
+  const { tab, window, tabContainer } = result!;
+
+  window.selectTab(tab.id);
+
+  expect(desktop!.selectedTabContainer).not.toBeNull();
+  expect(desktop!.selectedTabContainer?.id).toBe(tabContainer.id);
+  expect(desktop!.selectedTabContainer!.selectedTab).not.toBeNull();
+  expect(desktop!.selectedTabContainer!.selectedTab!.id).toBe(tab.id);
+});

@@ -1,4 +1,12 @@
-import { TWindowId, INotification, TEntityType, IDesktopEntity, TMenuType } from '~/types';
+import {
+  TWindowId,
+  INotification,
+  TEntityType,
+  IDesktopEntity,
+  TMenuType,
+  TTabId,
+  ITabContainer,
+} from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 //--------------------------------------------------------------------------------------
@@ -68,6 +76,12 @@ const abMenu = {
 const abTabs = {
   getTabContainers: (winId: TWindowId) => {
     return ipcRenderer.invoke('tabs:get-tab-containers', winId);
+  },
+  selectTab: (winId: TWindowId, tabId: TTabId) => {
+    return ipcRenderer.invoke('tabs:select', winId, tabId);
+  },
+  onRefresh: (callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void) => {
+    ipcRenderer.on('tabs:refresh', callback);
   },
 };
 

@@ -11,7 +11,7 @@
 </template>
 
 <template id="tab-template">
-  <li class="p-2 cursor-pointer hover:bg-white/20 overflow-hidden text-ellipsis"></li>
+  <li class="p-2 cursor-pointer hover:bg-white/10 overflow-hidden text-ellipsis"></li>
 </template>
 
 <script>
@@ -29,9 +29,16 @@
 
   fetchTabContainers();
 
+  abTabs.onRefresh((_event, tabContainers) => {
+    refreshTabContainers(tabContainers);
+  });
+
   //----------------------------------------------------------------
   function refreshTabContainers(tabContainers: ITabContainer[]) {
-    console.log(tabContainers);
+    // Clear existing tab containers
+    const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
+    tabContainersList.innerHTML = '';
+
     for (const tabContainer of tabContainers) {
       const tabContainerClone = tplTabContainers.content.cloneNode(true) as DocumentFragment;
 
@@ -55,12 +62,16 @@
         tabLi.dataset.tabId = tab.id.toString();
 
         if (tab.selected) {
-          tabLi.classList.add('bg-white');
+          tabLi.classList.add('bg-white/20');
         }
 
         if (tab.suspended) {
           tabLi.classList.add('opacity-50');
         }
+
+        tabLi.onclick = () => {
+          abTabs.selectTab(winId, tab.id);
+        };
 
         tabsListElement.appendChild(tabLi);
       }

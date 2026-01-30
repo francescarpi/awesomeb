@@ -3,7 +3,7 @@ import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
-import { TDesktopId } from '~/types';
+import { TDesktopId, TTabId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
 import { TViewId } from '@/ui/types';
@@ -85,5 +85,27 @@ export class Window extends UIWindow {
     }
 
     this.refreshTabContainerLayoutView(visible);
+  }
+
+  selectTab(tabId: TTabId) {
+    for (const desktop of this._desktops.values()) {
+      for (const tabContainer of desktop.tabContainers) {
+        const tab = tabContainer.getTab(tabId);
+        if (tab) {
+          // TODO if tab is suspended, needs to activated
+          this._selectedDesktopId = desktop.id;
+          desktop.selectTabContainer(tabContainer.id);
+          tabContainer.selectTab(tabId);
+          this.eventsChannel.emit(
+            'window:selected-tab-did-change',
+            this,
+            this.selectedDesktop,
+            tabContainer,
+            tab,
+          );
+          return;
+        }
+      }
+    }
   }
 }

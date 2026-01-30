@@ -168,7 +168,6 @@ export class Browser {
     tab.loadURL(url);
 
     desktop.addTabContainer(tabContainer);
-    desktop.selectTabContainer(tabContainer.id);
 
     window.addToTabContainerLayout(tabContainer.layout);
     window.refreshVisibleTabView();

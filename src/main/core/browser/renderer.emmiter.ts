@@ -23,4 +23,10 @@ export class BrowserRendererEmmiter {
     };
     window.wc.send('desktop:theme-refresh', result);
   }
+
+  refreshTabContainers(window: Window) {
+    const sidebar = window.getChild<UIPageView>('sidebar')!;
+    const tabContainers = this._browser.renderer.tabContainers(window);
+    sidebar.send('tabs:refresh', tabContainers);
+  }
 }

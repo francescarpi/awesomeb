@@ -49,4 +49,21 @@ export class TabContainer {
     }
     return this._tabs.get(this._selectedTabId) || null;
   }
+
+  getTab(id: TTabId): Tab | null {
+    return this._tabs.get(id) || null;
+  }
+
+  selectTab(id: TTabId): Tab | null {
+    if (this._selectedTabId === id) {
+      return this._tabs.get(id) || null;
+    }
+
+    const tab = this._tabs.get(id) || null;
+    if (tab) {
+      this._selectedTabId = id;
+    }
+
+    return tab;
+  }
 }

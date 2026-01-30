@@ -16,10 +16,15 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Open a new tab in specified target',
   visibility: ({ focusedWindow }) => !!focusedWindow,
   async handler(browser, _window, params) {
-    browser.openURL(params.query, {
+    const result = browser.openURL(params.query, {
       partitionId: params.partitionId,
       searchEngineCode: params.searchEngineCode,
       targetId: params.targetId,
     });
+
+    if (result) {
+      const { tab, window } = result;
+      window.selectTab(tab.id);
+    }
   },
 };
