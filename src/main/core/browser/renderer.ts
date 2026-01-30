@@ -105,9 +105,11 @@ export class BrowserRenderer {
 
   tabContainers(window: Window): ITabContainer[] {
     const desktop = window.selectedDesktop;
+    const selectedTabContainer = desktop.selectedTabContainer;
+
     return desktop.tabContainers.map((tc) => ({
       id: tc.id,
-      selected: false, // TODO
+      selected: selectedTabContainer?.id === tc.id,
       divider: tc.divider,
       tabs: tc.tabs.map((tab) => ({
         id: tab.id,
@@ -115,7 +117,7 @@ export class BrowserRenderer {
         windowId: window.id,
         title: tab.title,
         url: tab.url,
-        selected: false, // TODO
+        selected: selectedTabContainer?.selectedTab?.id === tab.id,
         partition: {
           name: tab.partition.name,
           color: tab.partition.color,

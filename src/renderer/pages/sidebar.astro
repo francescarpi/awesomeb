@@ -7,12 +7,16 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
-  <div class="h-full flex flex-col gap-4 px-1 pt-0.5" style="app-region:drag;">
-    <WindowActions />
-    <section>
+  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;">
+    <section class="p-1">
+      <WindowActions />
+    </section>
+    <section class="p-2">
       <ButtonIcon icon="sidebar" />
     </section>
-    <Desktops />
+    <section class="p-2">
+      <Desktops />
+    </section>
     <TabContainers />
   </div>
 </Layout>

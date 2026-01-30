@@ -79,17 +79,16 @@ export class UIWindow {
     const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
       query: { winId: this.id.toString() },
-      margin: '5 0 5 5',
     });
 
     const urlbar = new UIPageView('urlbar', {
       height: 40,
       query: { winId: this.id.toString() },
-      margin: '5 5 0 5',
+      margin: '5 5 0 0',
     });
 
     const noTab = new UIPageView('no-tab', {
-      margin: '5',
+      margin: '5 5 5 0',
     });
 
     this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');

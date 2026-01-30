@@ -26,6 +26,7 @@ export class UIView {
     });
 
     this._webContentsView.setBorderRadius(props?.borderRadius || 0);
+    this._webContentsView.setBackgroundColor(props?.backgroundColor || '#00000000');
 
     this._margin = props?.margin ? transformMargin(props.margin) : this._margin;
     this._width = props?.width || null;

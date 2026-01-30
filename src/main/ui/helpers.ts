@@ -77,9 +77,9 @@ export function transformMargin(marginStr: string): IMargin {
     default:
       return {
         t: margin[0],
-        r: margin[1] || margin[0],
-        b: margin[2] || margin[0],
-        l: margin[3] || margin[1] || margin[0],
+        r: margin[1],
+        b: margin[2],
+        l: margin[3],
       };
   }
 }

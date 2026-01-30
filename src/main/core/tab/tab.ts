@@ -26,8 +26,9 @@ export class Tab {
     // The view is not visible initially until method to refresh visible tabs is called.
     this._view = new UIView({
       visible: false,
-      margin: '5',
+      margin: '5 5 5 0',
       borderRadius: 8,
+      backgroundColor: '#ffffff',
     });
 
     // The tab layout will be used to show, for instance, the find in page view below the webview.

@@ -45,8 +45,7 @@ export class Browser {
 
     for (const winStore of session.windows) {
       const newWindow = this.createWindow({
-        // bounds: winStore.bounds,
-        bounds: { x: 0, y: 0, width: 1000, height: 1000 },
+        bounds: winStore.bounds,
       });
 
       const partitions = getPartitions();

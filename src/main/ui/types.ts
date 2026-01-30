@@ -12,6 +12,7 @@ export interface IViewProps {
   margin?: string;
   visible?: boolean;
   borderRadius?: number;
+  backgroundColor?: string;
 }
 
 export interface IPageViewProps extends IViewProps {

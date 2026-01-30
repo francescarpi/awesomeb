@@ -2,7 +2,7 @@
 
 ---
 
-<ul id="tabContainers">TabContainer</ul>
+<ul id="tabContainers" style="app-region: no-drag;"></ul>
 
 <template id="tab-container-template">
   <li class="">
@@ -11,7 +11,7 @@
 </template>
 
 <template id="tab-template">
-  <li class=""></li>
+  <li class="p-2 cursor-pointer hover:bg-white/20"></li>
 </template>
 
 <script>
@@ -19,17 +19,54 @@
   import { getSearchParams } from '../../scripts/url';
 
   const { winId } = getSearchParams();
-  let tabContainers: ITabContainer[] = [];
+  const tplTabContainers = document.getElementById('tab-container-template') as HTMLTemplateElement;
+  const tplTab = document.getElementById('tab-template') as HTMLTemplateElement;
 
   async function fetchTabContainers() {
-    tabContainers = await abTabs.getTabContainers(winId);
-    refreshTabContainers();
+    const tabContainers = await abTabs.getTabContainers(winId);
+    refreshTabContainers(tabContainers);
   }
 
   fetchTabContainers();
 
   //----------------------------------------------------------------
-  function refreshTabContainers() {
+  function refreshTabContainers(tabContainers: ITabContainer[]) {
     console.log(tabContainers);
+    for (const tabContainer of tabContainers) {
+      const tabContainerClone = tplTabContainers.content.cloneNode(true) as DocumentFragment;
+
+      const tabContainerLi = tabContainerClone
+        .querySelector('li')!
+        .cloneNode(true) as HTMLLIElement;
+
+      tabContainerLi.dataset.containerId = tabContainer.id.toString();
+
+      // if (tabContainer.selected) {
+      //   tabContainerLi.classList.add('bg-white');
+      // }
+
+      const tabsListElement = tabContainerLi.querySelector('ul') as HTMLUListElement;
+
+      for (const tab of tabContainer.tabs) {
+        const tabClone = tplTab.content.cloneNode(true) as DocumentFragment;
+
+        const tabLi = tabClone.querySelector('li')!.cloneNode(true) as HTMLLIElement;
+        tabLi.textContent = tab.title;
+        tabLi.dataset.tabId = tab.id.toString();
+
+        if (tab.selected) {
+          tabLi.classList.add('bg-white');
+        }
+
+        if (tab.suspended) {
+          tabLi.classList.add('opacity-50');
+        }
+
+        tabsListElement.appendChild(tabLi);
+      }
+
+      const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
+      tabContainersList.appendChild(tabContainerLi);
+    }
   }
 </script>

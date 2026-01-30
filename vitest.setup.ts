@@ -87,6 +87,7 @@ vi.mock('electron', () => {
       getVisible() {
         return true;
       }
+      setBackgroundColor = vi.fn();
     },
     WebContents: class {
       loadFile = vi.fn().mockResolvedValue(undefined);

@@ -123,6 +123,9 @@ describe('transformMargin', () => {
   test('should transform four value margin correctly', () => {
     const result = transformMargin('10 20 30 40');
     expect(result).toEqual({ l: 40, t: 10, r: 20, b: 30 });
+
+    const result2 = transformMargin('5 5 5 0');
+    expect(result2).toEqual({ l: 0, t: 5, r: 5, b: 5 });
   });
 
   test('should handle zero margins', () => {
