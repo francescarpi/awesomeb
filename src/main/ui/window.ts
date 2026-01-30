@@ -107,6 +107,13 @@ export class UIWindow {
   renderLayout(parentLayout?: UILayout, parentBounds?: Rectangle) {
     const layout = parentLayout || this._rootLayout!;
 
+    this._setupLayoutBounds(layout, parentBounds);
+    scopeLog.info('LAYOUT', layout.id, layout.bounds, layout.type);
+
+    this._renderLayoutChildren(layout);
+  }
+
+  private _setupLayoutBounds(layout: UILayout, parentBounds?: Rectangle) {
     // If layout type is string, it means it's a standard layout (horizontal or vertical)
     // It doesn't have custom bounds, so we set its bounds to the parent bounds
     if (typeof layout.type === 'string') {
@@ -114,91 +121,137 @@ export class UIWindow {
       const bounds = parentBounds || { x: 0, y: 0, width, height };
       layout.setBounds(bounds);
     }
+  }
 
-    scopeLog.info('LAYOUT', layout.id, layout.bounds, layout.type);
-
-    // Iterate over children and set their bounds
+  private _renderLayoutChildren(layout: UILayout) {
     let previousChild: TLayoutChildren | null = null;
+
     for (const child of layout.children) {
-      // scopeLog.info('PREVIOUS CHILS', previousChild ? previousChild.id : 'none');
-
-      // If child is a layout, calculate its bounds based on the layout type
-      // and the previous child's bounds (if any) and render it recursively
       if (child instanceof UILayout) {
-        let bounds = layout.bounds;
-        if (layout.type === 'vertical') {
-          const x = previousChild
-            ? previousChild.bounds.x + previousChild.bounds.width
-            : layout.bounds.x;
-          const y = layout.bounds.y;
-          const remainingWidth = layout.bounds.width - (x - layout.bounds.x);
-          bounds = {
-            x,
-            y,
-            width: remainingWidth,
-            height: layout.bounds.height,
-          };
-        } else if (layout.type === 'horizontal') {
-          const x = layout.bounds.x;
-          const y = previousChild
-            ? previousChild.bounds.y + previousChild.bounds.height
-            : layout.bounds.y;
-          const remainingHeight = layout.bounds.height - (y - layout.bounds.y);
-          bounds = {
-            x,
-            y,
-            width: layout.bounds.width,
-            height: remainingHeight,
-          };
-        }
-        this.renderLayout(child, bounds);
-        continue;
+        this._renderChildLayout(layout, child, previousChild);
+      } else if (child.isVisible) {
+        this._renderChildView(layout, child, previousChild);
+        previousChild = child;
       }
-
-      // child is a view
-
-      if (!child.isVisible) {
-        continue;
-      }
-
-      let bounds = { x: 0, y: 0, width: 100, height: 100 };
-      if (layout.type === 'vertical') {
-        // bounds without margin
-        const x = previousChild
-          ? previousChild.bounds.x + previousChild.bounds.width
-          : layout.bounds.x;
-        const remainingWidth = layout.bounds.width - (x - layout.bounds.x);
-        bounds = {
-          x,
-          y: layout.bounds.y,
-          width: child.width || remainingWidth,
-          height: child.height || layout.bounds.height,
-        };
-
-        // TODO with margins
-      } else if (layout.type === 'horizontal') {
-        // bounds without margin
-        const y = previousChild
-          ? previousChild.bounds.y + previousChild.bounds.height
-          : layout.bounds.y;
-        const remainingHeight = layout.bounds.height - (y - layout.bounds.y);
-        bounds = {
-          x: layout.bounds.x,
-          y: y,
-          width: child.width || layout.bounds.width,
-          height: child.height || remainingHeight,
-        };
-      }
-
-      child.setBounds(bounds);
-      scopeLog.info('VIEW', child.id, child.bounds);
-
-      if (!this.isViewChildOfContentView(child)) {
-        this.bw.contentView.addChildView(child.webContentsView, 0);
-      }
-
-      previousChild = child;
     }
+  }
+
+  private _renderChildLayout(
+    parentLayout: UILayout,
+    childLayout: UILayout,
+    previousChild: TLayoutChildren | null,
+  ) {
+    const bounds = this._calculateLayoutBounds(parentLayout, previousChild);
+    this.renderLayout(childLayout, bounds);
+  }
+
+  private _renderChildView(
+    parentLayout: UILayout,
+    view: UIView,
+    previousChild: TLayoutChildren | null,
+  ) {
+    const bounds = this._calculateViewBounds(parentLayout, view, previousChild);
+    view.setBounds(bounds);
+    scopeLog.info('VIEW', view.id, view.bounds);
+
+    if (!this.isViewChildOfContentView(view)) {
+      this.bw.contentView.addChildView(view.webContentsView, 0);
+    }
+  }
+
+  private _calculateLayoutBounds(
+    parentLayout: UILayout,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    if (parentLayout.type === 'vertical') {
+      return this._calculateVerticalLayoutBounds(parentLayout, previousChild);
+    } else if (parentLayout.type === 'horizontal') {
+      return this._calculateHorizontalLayoutBounds(parentLayout, previousChild);
+    }
+    return parentLayout.bounds;
+  }
+
+  private _calculateViewBounds(
+    parentLayout: UILayout,
+    view: UIView,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    if (parentLayout.type === 'vertical') {
+      return this._calculateVerticalViewBounds(parentLayout, view, previousChild);
+    } else if (parentLayout.type === 'horizontal') {
+      return this._calculateHorizontalViewBounds(parentLayout, view, previousChild);
+    }
+    return { x: 0, y: 0, width: 100, height: 100 };
+  }
+
+  private _calculateVerticalLayoutBounds(
+    parentLayout: UILayout,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    const x = previousChild
+      ? previousChild.bounds.x + previousChild.bounds.width
+      : parentLayout.bounds.x;
+    const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
+
+    return {
+      x,
+      y: parentLayout.bounds.y,
+      width: remainingWidth,
+      height: parentLayout.bounds.height,
+    };
+  }
+
+  private _calculateHorizontalLayoutBounds(
+    parentLayout: UILayout,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    const y = previousChild
+      ? previousChild.bounds.y + previousChild.bounds.height
+      : parentLayout.bounds.y;
+    const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
+
+    return {
+      x: parentLayout.bounds.x,
+      y,
+      width: parentLayout.bounds.width,
+      height: remainingHeight,
+    };
+  }
+
+  private _calculateVerticalViewBounds(
+    parentLayout: UILayout,
+    view: UIView,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    const x = previousChild
+      ? previousChild.bounds.x + previousChild.bounds.width
+      : parentLayout.bounds.x;
+    const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
+
+    return {
+      x,
+      y: parentLayout.bounds.y,
+      width: view.width || remainingWidth,
+      height: view.height || parentLayout.bounds.height,
+    };
+  }
+
+  private _calculateHorizontalViewBounds(
+    parentLayout: UILayout,
+    view: UIView,
+    previousChild: TLayoutChildren | null,
+  ): Rectangle {
+    const y = previousChild
+      ? previousChild.bounds.y + previousChild.bounds.height
+      : parentLayout.bounds.y;
+    const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
+
+    return {
+      x: parentLayout.bounds.x,
+      y,
+      width: view.width || parentLayout.bounds.width,
+      height: view.height || remainingHeight,
+    };
   }
 
   getChild<T>(id: TViewId, initialLayout?: UILayout): T | null {
