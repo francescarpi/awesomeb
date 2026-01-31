@@ -8,7 +8,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Previous Tab',
   description: 'Switch to the previous tab in the current window',
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ window }) {
     window.selectTab('prev');
   },

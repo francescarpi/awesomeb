@@ -16,6 +16,7 @@ import * as desktopTheme from './desktop-theme';
 import * as tabNew from './tab-new';
 import * as tabNext from './tab-next';
 import * as tabPrev from './tab-prev';
+import * as tabSuspend from './tab-suspend';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -31,15 +32,21 @@ const COMMANDS = {
   [tabNew.TRIGGER]: tabNew.Command,
   [tabNext.TRIGGER]: tabNext.Command,
   [tabPrev.TRIGGER]: tabPrev.Command,
+  [tabSuspend.TRIGGER]: tabSuspend.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
 
 export function getCommands(browser: Browser): ICommand<any>[] {
-  const focusedWindow = browser.activeWindow;
+  const window = browser.activeWindow;
+  const desktop = window?.selectedDesktop || null;
+  const tabContainer = desktop?.selectedTabContainer || null;
+  const tab = tabContainer?.selectedTab || null;
 
   return Object.values(COMMANDS)
-    .filter((c) => c.visibility === undefined || c.visibility({ focusedWindow }))
+    .filter(
+      (c) => c.visibility === undefined || c.visibility({ window, desktop, tabContainer, tab }),
+    )
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

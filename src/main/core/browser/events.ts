@@ -25,6 +25,7 @@ export function registerBrowserEvents(browser: Browser) {
     async (window: Window, desktop: Desktop) => {
       browser.rendererEmmiter.refreshDesktops(window);
       browser.rendererEmmiter.refreshThemes(window, desktop);
+      browser.refreshMainMenu();
     },
   );
 
@@ -43,6 +44,13 @@ export function registerBrowserEvents(browser: Browser) {
     'window:selected-tab-did-change',
     async (window: Window, _desktop: Desktop, _tabContainer: TabContainer, _tab: Tab) => {
       browser.rendererEmmiter.refreshTabContainers(window);
+      browser.refreshMainMenu();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.refreshMainMenu();
+  });
 }

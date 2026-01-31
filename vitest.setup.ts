@@ -20,6 +20,7 @@ vi.mock('electron', () => {
     loadFile: vi.fn().mockResolvedValue(undefined),
     loadURL: vi.fn().mockResolvedValue(undefined),
     send: vi.fn(),
+    isDestroyed: vi.fn(() => false),
   };
 
   return {
@@ -92,6 +93,10 @@ vi.mock('electron', () => {
     WebContents: class {
       loadFile = vi.fn().mockResolvedValue(undefined);
       loadURL = vi.fn().mockResolvedValue(undefined);
+    },
+    Menu: {
+      buildFromTemplate: vi.fn(),
+      setApplicationMenu: vi.fn(),
     },
   };
 });

@@ -1,32 +1,27 @@
 import path from 'path';
 import { IMargin, TPage } from '~/types';
-import { WebContentsView, Rectangle, WebContents, session } from 'electron';
+import { WebContentsView, Rectangle, WebContents, session, Session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools, transformMargin } from './helpers';
 import { internalPartition } from '@/core';
 
 export class UIView {
-  protected readonly _webContentsView: WebContentsView;
+  protected _webContentsView: WebContentsView;
   protected _margin: IMargin = { t: 0, r: 0, b: 0, l: 0 };
   protected _width: number | null = null;
   protected _height: number | null = null;
 
-  constructor(props?: IViewProps) {
-    this._webContentsView = new WebContentsView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        sandbox: true,
-        preload: this.getPreloadScript(),
-        webSecurity: true,
-        transparent: true,
-        session: session.fromPartition(internalPartition.id), // TODO session should pass as a prop. Is optional. If not provided use internalPartition
-      },
-    });
+  private readonly _borderRadius: number;
+  private readonly _backgroundColor: string;
 
-    this._webContentsView.setBorderRadius(props?.borderRadius || 0);
-    this._webContentsView.setBackgroundColor(props?.backgroundColor || '#00000000');
+  private _session: Session = session.fromPartition(internalPartition.id);
+
+  constructor(props?: IViewProps) {
+    this._borderRadius = props?.borderRadius || 0;
+    this._backgroundColor = props?.backgroundColor || '#00000000';
+
+    this._webContentsView = this._createWebContentsView();
 
     this._margin = props?.margin ? transformMargin(props.margin) : this._margin;
     this._width = props?.width || null;
@@ -39,6 +34,29 @@ export class UIView {
     }
   }
 
+  private _createWebContentsView(): WebContentsView {
+    const wcv = new WebContentsView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
+        preload: this.getPreloadScript(),
+        webSecurity: true,
+        transparent: true,
+        session: this._session, // TODO session should pass as a prop. Is optional. If not provided use internalPartition
+      },
+    });
+
+    wcv.setBorderRadius(this._borderRadius);
+    wcv.setBackgroundColor(this._backgroundColor);
+
+    return wcv;
+  }
+
+  refreshWebContentsView() {
+    this._webContentsView = this._createWebContentsView();
+  }
+
   get id(): TViewId {
     return this.webContents.id;
   }
@@ -46,6 +64,10 @@ export class UIView {
   get webContentsId(): number {
     // Dont delete - used in some places
     return this.webContents.id;
+  }
+
+  get isDestroyed(): boolean {
+    return this.webContents === undefined || this.webContents.isDestroyed();
   }
 
   protected getPreloadScript(): string {

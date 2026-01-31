@@ -22,7 +22,7 @@ export const Command: ICommand<ICommandParams> = {
       height: 500,
     },
   },
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ window, params }) {
     const desktop = window.getDesktop(params.desktopId);
     if (!desktop) {

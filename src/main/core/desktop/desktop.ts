@@ -74,7 +74,12 @@ export class Desktop {
     this._tabContainers.set(tabContainer.id, tabContainer);
   }
 
-  selectTabContainer(id: TTabContainerId) {
+  selectTabContainer(id: TTabContainerId | null) {
+    if (id === null) {
+      this._selectedTabContainerId = null;
+      return;
+    }
+
     if (!this._tabContainers.has(id)) {
       return;
     }

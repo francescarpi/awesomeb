@@ -54,7 +54,12 @@ export class TabContainer {
     return this._tabs.get(id) || null;
   }
 
-  selectTab(id: TTabId): Tab | null {
+  selectTab(id: TTabId | null): Tab | null {
+    if (id === null) {
+      this._selectedTabId = null;
+      return null;
+    }
+
     if (this._selectedTabId === id) {
       return this._tabs.get(id) || null;
     }

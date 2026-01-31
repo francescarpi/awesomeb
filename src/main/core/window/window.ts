@@ -166,14 +166,6 @@ export class Window extends UIWindow {
 
     tabContainer.selectTab(tab.id);
 
-    if (tab.suspended) {
-      // TODO caution, this is an async operation. What if it takes too long and the browser is closed?
-      tab.resume();
-    }
-
-    this.addInTabContainerLayout(tabContainer.layout);
-    this.refreshVisibleTabView();
-
     this.eventsChannel.emit(
       'window:selected-tab-did-change',
       this,
@@ -181,6 +173,13 @@ export class Window extends UIWindow {
       tabContainer,
       tab,
     );
+
+    if (tab.suspended) {
+      await tab.resume();
+    }
+
+    this.addInTabContainerLayout(tabContainer.layout);
+    this.refreshVisibleTabView();
   }
 
   getAllTabs(): IDesConTab[] {
@@ -193,5 +192,35 @@ export class Window extends UIWindow {
       }
     }
     return allTabs;
+  }
+
+  async suspendTab(id: TTabId): Promise<boolean> {
+    const result = this.getTab(id);
+    if (!result) {
+      return false;
+    }
+
+    const { tabContainer, desktop } = result;
+
+    for (const tab of tabContainer.tabs) {
+      tab.suspend();
+    }
+
+    tabContainer.selectTab(null);
+
+    if (desktop.selectedTabContainer?.id === tabContainer.id) {
+      desktop.selectTabContainer(null);
+    }
+
+    this.removeFromTabContainerLayout(tabContainer.layout);
+    this.refreshVisibleTabView();
+
+    scopeLog.debug(
+      `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
+    );
+
+    this.eventsChannel.emit('window:tab-did-suspend', this);
+
+    return true;
   }
 }

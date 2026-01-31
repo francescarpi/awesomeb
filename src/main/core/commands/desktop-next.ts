@@ -8,7 +8,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Next Desktop',
   description: 'Switch to the next desktop',
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ window }) {
     window.selectDesktop('next');
   },

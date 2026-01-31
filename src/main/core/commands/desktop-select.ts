@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
       height: 450,
     },
   },
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ window, params }) {
     // TODO if desktopId is the selected one, back to previous desktop
 

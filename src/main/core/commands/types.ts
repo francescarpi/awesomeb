@@ -1,4 +1,4 @@
-import { Browser, Window } from '@/core';
+import { Browser, Desktop, Tab, TabContainer, Window } from '@/core';
 import { IModalProps } from '@/ui';
 import { TPage } from '~/types';
 
@@ -7,8 +7,20 @@ export interface ICommand<T> {
   name: string;
   description: string;
   modal?: ICommandModal;
-  visibility?: (params: { focusedWindow: Window | null }) => boolean;
-  handler: (params: { browser: Browser; window: Window; params: T }) => Promise<void>;
+  visibility?: (params: {
+    window: Window | null;
+    desktop: Desktop | null;
+    tabContainer: TabContainer | null;
+    tab: Tab | null;
+  }) => boolean;
+  handler: (params: {
+    browser: Browser;
+    window: Window;
+    desktop: Desktop | null;
+    tabContainer: TabContainer | null;
+    tab: Tab | null;
+    params: T;
+  }) => Promise<void>;
 }
 
 interface ICommandModal {

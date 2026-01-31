@@ -41,7 +41,6 @@ export class Session extends Store<ISessionStore> {
             tabs: tabContainer.tabs
               .filter((tab) => !tab.partition.private)
               .map((tab) => ({
-                id: tab.id,
                 partitionId: tab.partition.id,
                 title: tab.title,
                 customTitle: tab.customTitle,

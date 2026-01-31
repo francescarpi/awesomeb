@@ -9,6 +9,7 @@ export enum EIcon {
   Next = 'next.png',
   Previous = 'previous.png',
   Sidebar = 'sidebar.png',
+  Suspend = 'suspend.png',
   Tab = 'tab.png',
   Theme = 'theme.png',
   Windows = 'windows.png',

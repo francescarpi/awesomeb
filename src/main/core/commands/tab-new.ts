@@ -14,7 +14,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'New Tab',
   description: 'Open a new tab in specified target',
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ browser, params }) {
     const result = browser.openURL(params.query, {
       partitionId: params.partitionId,

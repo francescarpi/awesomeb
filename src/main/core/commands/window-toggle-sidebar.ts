@@ -8,7 +8,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Toggle Sidebar',
   description: 'Toggles the visibility of the sidebar in the focused window.',
-  visibility: ({ focusedWindow }) => !!focusedWindow,
+  visibility: ({ window }) => !!window,
   async handler({ window }) {
     window.toggleSidebar();
   },

@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import { Partition } from '@/core';
 import { ITabProps } from './types';
 import { UIView, UILayout } from '@/ui';
+import { TTabId } from '~/types';
 
 export class Tab {
   private readonly _partition: Partition;
@@ -13,6 +14,7 @@ export class Tab {
   private _favicon: string | null = null;
   private _view: UIView;
   private _layout: UILayout;
+  private _viewId: TTabId = -1;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -31,13 +33,15 @@ export class Tab {
       backgroundColor: '#ffffff',
     });
 
+    this._viewId = this._view.id as TTabId;
+
     // The tab layout will be used to show, for instance, the find in page view below the webview.
     this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');
     this._layout.addChild(this._view);
   }
 
-  get id(): number {
-    return this._view.id as number;
+  get id(): TTabId {
+    return this._viewId;
   }
 
   get partition(): Partition {
@@ -100,6 +104,10 @@ export class Tab {
       return;
     }
 
+    if (this.view.isDestroyed) {
+      this._view.refreshWebContentsView();
+    }
+
     this._suspended = false;
 
     // TODO if exist navigation history, restore it
@@ -112,5 +120,17 @@ export class Tab {
     }
 
     throw new Error('Cannot resume tab without URL');
+  }
+
+  suspend() {
+    if (this._suspended) {
+      return;
+    }
+
+    // TODO save navigation history
+
+    this._view.webContents.close();
+
+    this._suspended = true;
   }
 }

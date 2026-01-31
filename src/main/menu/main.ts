@@ -1,4 +1,4 @@
-import { Browser, Window } from '@/core';
+import { Browser, Tab, Window } from '@/core';
 import { MenuItemConstructorOptions, Menu } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -8,15 +8,18 @@ const scopeLog = log.scope('MainMenu');
 export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   scopeLog.info('Setting up main menu');
 
-  const focusedWindow = browser.activeWindow;
+  const window = browser.activeWindow;
+  const desktop = window?.selectedDesktop || null;
+  const tabContainer = desktop?.selectedTabContainer || null;
+  const tab = tabContainer?.selectedTab || null;
 
   const menu = Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
-    fileMenu(browser, showRootIcon, focusedWindow),
-    editMenu(browser, showRootIcon, focusedWindow),
-    windowMenu(browser, showRootIcon, focusedWindow),
-    desktopsMenu(browser, showRootIcon, focusedWindow),
-    tabsMenu(browser, showRootIcon, focusedWindow),
+    fileMenu(browser, showRootIcon, window),
+    editMenu(browser, showRootIcon, window),
+    windowMenu(browser, showRootIcon, window),
+    desktopsMenu(browser, showRootIcon, window),
+    tabsMenu(browser, showRootIcon, window, tab),
   ]);
 
   return menu;
@@ -33,10 +36,10 @@ function appMenu(_browser: Browser, _showRootIcon: boolean): MenuItemConstructor
         label: 'Preferences',
         accelerator: 'CmdOrCtrl+,',
         // icon: getIcon(EIcon.Command),
-        // enabled: !!focusedWindow,
+        // enabled: !!window,
         click: () => {
-          // if (focusedWindow) {
-          //   focusedWindow.openInternalPage(PAGE_PREFERENCES);
+          // if (window) {
+          //   window.openInternalPage(PAGE_PREFERENCES);
           // }
         },
       },
@@ -55,7 +58,7 @@ function appMenu(_browser: Browser, _showRootIcon: boolean): MenuItemConstructor
 function fileMenu(
   _browser: Browser,
   showRootIcon: boolean,
-  focusedWindow: Window | null,
+  window: Window | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'File',
@@ -64,11 +67,11 @@ function fileMenu(
       {
         label: 'Perform command',
         accelerator: 'CmdOrCtrl+P',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Command),
         click: () => {
-          if (focusedWindow) {
-            focusedWindow.modal.open('perform-command', {
+          if (window) {
+            window.modal.open('perform-command', {
               width: 500,
               height: 500,
             });
@@ -81,8 +84,8 @@ function fileMenu(
         accelerator: 'CmdOrCtrl+T',
         icon: getIcon(EIcon.Tab),
         click: () => {
-          if (focusedWindow) {
-            focusedWindow.modal.open('new-tab', { height: 450 });
+          if (window) {
+            window.modal.open('new-tab', { height: 450 });
           }
         },
       },
@@ -92,8 +95,8 @@ function fileMenu(
       //   accelerator: 'CmdOrCtrl+D',
       //   icon: getIcon(EIcon.Desktop),
       //   click: () =>
-      //     focusedWindow
-      //       ? browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'select-desktop' })
+      //     window
+      //       ? browser.showPerformCommandDialog(window.id, { trigger: 'select-desktop' })
       //       : null,
       // },
       // {
@@ -101,8 +104,8 @@ function fileMenu(
       //   accelerator: 'CmdOrCtrl+.',
       //   icon: getIcon(EIcon.Tab),
       //   click: () =>
-      //     focusedWindow
-      //       ? browser.showPerformCommandDialog(focusedWindow.id, {
+      //     window
+      //       ? browser.showPerformCommandDialog(window.id, {
       //           trigger: 'select-tab-container',
       //         })
       //       : null,
@@ -114,7 +117,7 @@ function fileMenu(
 function editMenu(
   _browser: Browser,
   showRootIcon: boolean,
-  _focusedWindow: Window | null,
+  _window: Window | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'Edit',
@@ -135,14 +138,14 @@ function editMenu(
       //   accelerator: 'CmdOrCtrl+Shift+C',
       //   icon: getIcon(EIcon.Copy),
       //   enabled: Boolean(selectedTab),
-      //   click: () => browser.performCommand({ trigger: 'copy-url', params: { windowId: focusedWindow.id } }),
+      //   click: () => browser.performCommand({ trigger: 'copy-url', params: { windowId: window.id } }),
       // },
       // {
       //   label: 'Edit URL',
       //   accelerator: 'CmdOrCtrl+E',
       //   icon: getIcon(EIcon.Edit),
       //   enabled: Boolean(selectedTab),
-      //   click: () => browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'edit-url' }),
+      //   click: () => browser.showPerformCommandDialog(window.id, { trigger: 'edit-url' }),
       // },
       // { type: 'separator' },
       // {
@@ -153,7 +156,7 @@ function editMenu(
       //   click: () =>
       //     browser.performCommand({
       //       trigger: 'find-in-page',
-      //       params: { windowId: focusedWindow.id, tabId: selectedTab!.id },
+      //       params: { windowId: window.id, tabId: selectedTab!.id },
       //     }),
       // },
     ],
@@ -163,7 +166,7 @@ function editMenu(
 function windowMenu(
   browser: Browser,
   showRootIcon: boolean,
-  focusedWindow: Window | null,
+  window: Window | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'Window',
@@ -172,22 +175,22 @@ function windowMenu(
       {
         label: 'Toggle sidebar',
         accelerator: 'CmdOrCtrl+S',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Sidebar),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'toggle-sidebar');
+          if (window) {
+            browser.performCommand(window, 'toggle-sidebar');
           }
         },
       },
       {
         label: 'Toggle maximize area',
         accelerator: 'CmdOrCtrl+I',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Maximize),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'toggle-maximize-area');
+          if (window) {
+            browser.performCommand(window, 'toggle-maximize-area');
           }
         },
       },
@@ -198,10 +201,10 @@ function windowMenu(
 function desktopsMenu(
   browser: Browser,
   showRootIcon: boolean,
-  focusedWindow: Window | null,
+  window: Window | null,
 ): MenuItemConstructorOptions {
-  const desktops = focusedWindow?.desktops || [];
-  const selectedDesktop = focusedWindow?.selectedDesktop;
+  const desktops = window?.desktops || [];
+  const selectedDesktop = window?.selectedDesktop;
 
   return {
     label: 'Desktops',
@@ -210,11 +213,11 @@ function desktopsMenu(
       {
         label: 'Select...',
         accelerator: 'CmdOrCtrl+D',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Desktop),
         click: () => {
-          if (focusedWindow) {
-            focusedWindow.modal.open('select-desktop', { height: 450 });
+          if (window) {
+            window.modal.open('select-desktop', { height: 450 });
           }
         },
       },
@@ -224,8 +227,8 @@ function desktopsMenu(
         accelerator: `Shift+CmdOrCtrl+${desktop.id}`,
         enabled: !selectedDesktop || selectedDesktop.id !== desktop.id,
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'select-desktop', { desktopId: desktop.id });
+          if (window) {
+            browser.performCommand(window, 'select-desktop', { desktopId: desktop.id });
           }
         },
       })),
@@ -233,22 +236,22 @@ function desktopsMenu(
       {
         label: 'Previous',
         accelerator: 'Shift+CmdOrCtrl+[',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Previous),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'previous-desktop');
+          if (window) {
+            browser.performCommand(window, 'previous-desktop');
           }
         },
       },
       {
         label: 'Next',
         accelerator: 'Shift+CmdOrCtrl+]',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Next),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'next-desktop');
+          if (window) {
+            browser.performCommand(window, 'next-desktop');
           }
         },
       },
@@ -259,7 +262,8 @@ function desktopsMenu(
 function tabsMenu(
   browser: Browser,
   showRootIcon: boolean,
-  focusedWindow: Window | null,
+  window: Window | null,
+  tab: Tab | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'Tabs',
@@ -268,22 +272,34 @@ function tabsMenu(
       {
         label: 'Previous',
         accelerator: 'CmdOrCtrl+]',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Previous),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'previous-tab');
+          if (window) {
+            browser.performCommand(window, 'previous-tab');
           }
         },
       },
       {
         label: 'Next',
         accelerator: 'CmdOrCtrl+[',
-        enabled: !!focusedWindow,
+        enabled: !!window,
         icon: getIcon(EIcon.Next),
         click: () => {
-          if (focusedWindow) {
-            browser.performCommand(focusedWindow, 'next-tab');
+          if (window) {
+            browser.performCommand(window, 'next-tab');
+          }
+        },
+      },
+      { type: 'separator' },
+      {
+        label: 'Suspend',
+        accelerator: 'CmdOrCtrl+Shift+S',
+        enabled: tab !== null && !tab?.suspended,
+        icon: getIcon(EIcon.Suspend),
+        click: () => {
+          if (window) {
+            browser.performCommand(window, 'suspend-tab');
           }
         },
       },

@@ -127,8 +127,15 @@ export class Browser {
       scopeLog.error(`Command not found for trigger: ${trigger}`);
       return false;
     }
-    command.handler({ browser: this, window, params });
+
+    const desktop = window.selectedDesktop || null;
+    const tabContainer = desktop?.selectedTabContainer || null;
+    const tab = tabContainer?.selectedTab || null;
+
+    command.handler({ browser: this, window, desktop, tabContainer, tab, params });
+
     this.refreshMainMenu();
+
     return true;
   }
 
