@@ -3,7 +3,7 @@ import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
-import { TDesktopId, TTabId } from '~/types';
+import { IDesConTab, TDesktopId, TTabId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
 import { TViewId } from '@/ui/types';
@@ -87,25 +87,54 @@ export class Window extends UIWindow {
     this.refreshTabContainerLayoutView(visible);
   }
 
-  selectTab(tabId: TTabId) {
+  getTab(id: TTabId): IDesConTab | null {
     for (const desktop of this._desktops.values()) {
-      for (const tabContainer of desktop.tabContainers) {
-        const tab = tabContainer.getTab(tabId);
-        if (tab) {
-          // TODO if tab is suspended, needs to activated
-          this._selectedDesktopId = desktop.id;
-          desktop.selectTabContainer(tabContainer.id);
-          tabContainer.selectTab(tabId);
-          this.eventsChannel.emit(
-            'window:selected-tab-did-change',
-            this,
-            this.selectedDesktop,
-            tabContainer,
-            tab,
-          );
-          return;
-        }
+      const conTab = desktop.getTab(id);
+      if (conTab) {
+        return {
+          desktop,
+          tabContainer: conTab.tabContainer,
+          tab: conTab.tab,
+        };
       }
     }
+    return null;
+  }
+
+  async selectTab(tabId: TTabId) {
+    const result = this.getTab(tabId);
+    if (!result) {
+      return;
+    }
+
+    // If exist previous selected tab, we have to remove it from the browser window
+    const selectedTabContainer = this.selectedDesktop.selectedTabContainer;
+    if (selectedTabContainer) {
+      this.removeFromTabContainerLayout(selectedTabContainer.layout);
+    }
+
+    const { desktop, tabContainer, tab } = result;
+
+    this._selectedDesktopId = desktop.id;
+
+    desktop.selectTabContainer(tabContainer.id);
+
+    tabContainer.selectTab(tabId);
+
+    if (tab.suspended) {
+      // TODO caution, this is an async operation. What if it takes too long and the browser is closed?
+      tab.resume();
+    }
+
+    this.addInTabContainerLayout(tabContainer.layout);
+    this.refreshVisibleTabView();
+
+    this.eventsChannel.emit(
+      'window:selected-tab-did-change',
+      this,
+      this.selectedDesktop,
+      tabContainer,
+      tab,
+    );
   }
 }

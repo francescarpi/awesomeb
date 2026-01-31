@@ -13,3 +13,14 @@ export interface IWinDesConTab {
   tabContainer: TabContainer;
   tab: Tab;
 }
+
+export interface IDesConTab {
+  desktop: Desktop;
+  tabContainer: TabContainer;
+  tab: Tab;
+}
+
+export interface IConTab {
+  tabContainer: TabContainer;
+  tab: Tab;
+}

@@ -24,7 +24,7 @@ export const Command: ICommand<ICommandParams> = {
 
     if (result) {
       const { tab, window } = result;
-      window.selectTab(tab.id);
+      await window.selectTab(tab.id);
     }
   },
 };

@@ -92,11 +92,25 @@ export class Tab {
 
   async loadURL(url: string) {
     this._url = url;
+    await this._view.webContents.loadURL(url);
+  }
 
-    if (this._suspended) {
-      this.activate();
+  async resume() {
+    if (!this._suspended) {
+      return;
     }
 
-    await this._view.webContents.loadURL(url);
+    this._suspended = false;
+
+    // TODO if exist navigation history, restore it
+    // else load the URL
+    // else raise an error
+
+    if (this._url) {
+      await this.loadURL(this._url);
+      return;
+    }
+
+    throw new Error('Cannot resume tab without URL');
   }
 }

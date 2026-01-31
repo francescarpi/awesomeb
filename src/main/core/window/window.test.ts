@@ -35,7 +35,7 @@ test('go to next and previous desktop should work correctly', () => {
   expect(w.selectedDesktop.id).toBe(1);
 });
 
-test('select tab should work correctly', () => {
+test('select tab should work correctly', async () => {
   const browser = new Browser();
   const w = browser.createWindow();
   w.createDefaultDesktops();
@@ -51,7 +51,7 @@ test('select tab should work correctly', () => {
 
   const { tab, window, tabContainer } = result!;
 
-  window.selectTab(tab.id);
+  await window.selectTab(tab.id);
 
   expect(desktop!.selectedTabContainer).not.toBeNull();
   expect(desktop!.selectedTabContainer?.id).toBe(tabContainer.id);

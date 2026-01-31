@@ -19,7 +19,7 @@ export function setupTabIPC(browser: Browser) {
   ipcMain.handle('tabs:select', async (event, winId: TWindowId, tabId: TTabId) => {
     scopeLog.info(`IPC tabs:select received for window ${winId}, tab ${tabId}`);
     return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-      return window.selectTab(tabId);
+      return await window.selectTab(tabId);
     });
   });
 }

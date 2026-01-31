@@ -9,7 +9,7 @@ import {
   getPartitions,
   defaultPartition,
 } from '@/core';
-import { IWinDesConTab, TTabContainerId, TWindowId } from '~/types';
+import { IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
@@ -97,7 +97,7 @@ export class Browser {
     return Array.from(this._windows.values());
   }
 
-  getWindowById(id: TWindowId): Window | null {
+  getWindow(id: TWindowId): Window | null {
     return this._windows.get(id) || null;
   }
 
@@ -114,7 +114,7 @@ export class Browser {
     if (this._activeWindowId === null) {
       return null;
     }
-    return this.getWindowById(this._activeWindowId);
+    return this.getWindow(this._activeWindowId);
   }
 
   performCommand(
@@ -169,9 +169,24 @@ export class Browser {
 
     desktop.addTabContainer(tabContainer);
 
-    window.addToTabContainerLayout(tabContainer.layout);
+    window.addInTabContainerLayout(tabContainer.layout);
     window.refreshVisibleTabView();
 
     return { window, desktop, tabContainer, tab };
+  }
+
+  getTab(id: TTabId): IWinDesConTab | null {
+    for (const window of this._windows.values()) {
+      const desConTab = window.getTab(id);
+      if (desConTab) {
+        return {
+          window,
+          desktop: desConTab.desktop,
+          tabContainer: desConTab.tabContainer,
+          tab: desConTab.tab,
+        };
+      }
+    }
+    return null;
   }
 }

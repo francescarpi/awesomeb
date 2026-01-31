@@ -19,6 +19,7 @@ import { IMargin } from '~/types';
 export class UIWindow {
   private _rootLayout?: UILayout;
   private _tabContainerLayout?: UILayout;
+  private _noTabView?: UIPageView;
 
   public readonly bw: BrowserWindow;
 
@@ -87,19 +88,22 @@ export class UIWindow {
       margin: '5 5 0 0',
     });
 
-    const noTab = new UIPageView('no-tab', {
-      margin: '5 5 5 0',
-    });
+    this._noTabView = new UIPageView('no-tab', { margin: '5 5 5 0' });
 
     this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');
 
     this._tabContainerLayout.addChild(urlbar);
-    this._tabContainerLayout.addChild(noTab);
+    this._tabContainerLayout.addChild(this._noTabView);
 
     mainLayout.addChild(sidebar);
     mainLayout.addChild(this._tabContainerLayout);
 
     // TODO add notifications view with a fixed position over the main layout
+
+    const views = getOnlyViews(mainLayout);
+    for (const view of views) {
+      this.addViewToBrowserWindow(view);
+    }
 
     this.renderLayout();
   }
@@ -156,14 +160,6 @@ export class UIWindow {
     const boundsWithMargin = this._applyMarginToBounds(bounds, view.margin);
     view.setBounds(boundsWithMargin);
     // scopeLog.info('VIEW', view.id, view.bounds);
-
-    // Only add to contentView if the view is visible
-    if (view.isVisible && !this.isViewChildOfContentView(view)) {
-      this.bw.contentView.addChildView(view.webContentsView, 0);
-    } else if (!view.isVisible && this.isViewChildOfContentView(view)) {
-      // Remove from contentView if hidden to prevent interactions like dragging
-      this.bw.contentView.removeChildView(view.webContentsView);
-    }
   }
 
   private _calculateLayoutBounds(
@@ -423,26 +419,46 @@ export class UIWindow {
     return !urlbar.isVisible;
   }
 
-  addToTabContainerLayout(layout: UILayout) {
+  addInTabContainerLayout(layout: UILayout) {
+    const views = getOnlyViews(layout);
+    for (const view of views) {
+      this.addViewToBrowserWindow(view);
+    }
+
     this._tabContainerLayout!.addChild(layout);
   }
 
+  removeFromTabContainerLayout(layout: UILayout) {
+    const views = getOnlyViews(layout);
+    for (const view of views) {
+      this.removeViewFromBrowserWindow(view);
+    }
+
+    this._tabContainerLayout!.removeChild(layout);
+  }
+
+  addViewToBrowserWindow(view: UIView) {
+    this.bw.contentView.addChildView(view.webContentsView, 0);
+  }
+
+  removeViewFromBrowserWindow(view: UIView) {
+    this.bw.contentView.removeChildView(view.webContentsView);
+  }
+
   refreshTabContainerLayoutView(visible: TViewId[]) {
-    const views = getOnlyViews(this._tabContainerLayout!, ['urlbar']);
+    const views = getOnlyViews(this._tabContainerLayout!, ['urlbar', 'no-tab']);
+
+    if (visible.length === 0) {
+      this._noTabView!.show();
+    } else {
+      this._noTabView!.hide();
+    }
 
     for (const view of views) {
       if (visible.includes(view.id)) {
         view.show();
-        // Ensure the view is added to contentView when showing
-        if (!this.isViewChildOfContentView(view)) {
-          this.bw.contentView.addChildView(view.webContentsView, 0);
-        }
       } else {
         view.hide();
-        // Remove the view from contentView to completely disable dragging and interactions
-        if (this.isViewChildOfContentView(view)) {
-          this.bw.contentView.removeChildView(view.webContentsView);
-        }
       }
     }
 

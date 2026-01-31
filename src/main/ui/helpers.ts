@@ -84,8 +84,9 @@ export function transformMargin(marginStr: string): IMargin {
   }
 }
 
-export function getOnlyViews(layout: UILayout, ignore: TViewId[]): UIView[] {
+export function getOnlyViews(layout: UILayout, ignore?: TViewId[]): UIView[] {
   const views: UIView[] = [];
+  ignore = ignore || [];
 
   for (const child of layout.children) {
     if (child instanceof UIView && !ignore.includes(child.id)) {

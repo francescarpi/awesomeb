@@ -21,7 +21,7 @@ export class UIView {
         preload: this.getPreloadScript(),
         webSecurity: true,
         transparent: true,
-        session: session.fromPartition(internalPartition.id),
+        session: session.fromPartition(internalPartition.id), // TODO session should pass as a prop. Is optional. If not provided use internalPartition
       },
     });
 

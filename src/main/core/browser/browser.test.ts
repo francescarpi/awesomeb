@@ -6,7 +6,7 @@ test('should create a browser window successfully', () => {
   const w1 = browser.createWindow();
   expect(browser.windows.length).toBe(1);
   expect(w1).toBeDefined();
-  expect(browser.getWindowById(w1.id)).toBe(w1);
+  expect(browser.getWindow(w1.id)).toBe(w1);
 });
 
 test('openURL in active window/desktop should create a new tabcontainer and tab', () => {

@@ -1,4 +1,4 @@
-import { TDesktopId, TTabContainerId } from '~/types';
+import { IConTab, TDesktopId, TTabContainerId, TTabId } from '~/types';
 import { defaultTheme, Theme, Window, TabContainer } from '@/core';
 import { IProps } from './types';
 import EventEmitter from 'events';
@@ -87,5 +87,18 @@ export class Desktop {
       return null;
     }
     return this._tabContainers.get(this._selectedTabContainerId) || null;
+  }
+
+  getTab(id: TTabId): IConTab | null {
+    for (const tabContainer of this._tabContainers.values()) {
+      const tab = tabContainer.getTab(id);
+      if (tab) {
+        return {
+          tabContainer,
+          tab,
+        };
+      }
+    }
+    return null;
   }
 }

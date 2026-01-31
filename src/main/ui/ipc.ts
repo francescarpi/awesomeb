@@ -20,7 +20,7 @@ export function setupUIIPC(browser: Browser) {
   ipcMain.on('notifications:next', async (event, winId: TWindowId) => {
     scopeLog.info(`IPC Received: notifications:next for window ID ${winId}`);
 
-    const win = browser.getWindowById(winId);
+    const win = browser.getWindow(winId);
     if (!win) {
       scopeLog.error(`No window found with ID ${winId}`);
       return;
