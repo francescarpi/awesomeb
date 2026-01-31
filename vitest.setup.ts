@@ -5,6 +5,9 @@ vi.mock('electron-log', () => ({
   default: {
     scope: vi.fn(() => ({
       info: vi.fn(),
+      debug: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
     })),
     transports: {
       file: { level: false },
@@ -21,6 +24,8 @@ vi.mock('electron', () => {
     loadURL: vi.fn().mockResolvedValue(undefined),
     send: vi.fn(),
     isDestroyed: vi.fn(() => false),
+    stop: vi.fn(),
+    close: vi.fn(),
   };
 
   return {
