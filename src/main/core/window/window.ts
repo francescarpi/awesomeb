@@ -166,17 +166,17 @@ export class Window extends UIWindow {
 
     tabContainer.selectTab(tab.id);
 
-    this.eventsChannel.emit(
-      'window:selected-tab-did-change',
-      this,
-      this.selectedDesktop,
-      tabContainer,
-      tab,
-    );
-
     if (tab.suspended) {
-      await tab.resume();
+      tab.resume();
+
+      this.eventsChannel.emit('window:selected-tab-did-change', this);
+
+      await tab.loadHistoryOrURL();
+    } else {
+      this.eventsChannel.emit('window:selected-tab-did-change', this);
     }
+
+    tab.updateLastAccessed();
 
     this.addInTabContainerLayout(tabContainer.layout);
     this.refreshVisibleTabView();
@@ -222,5 +222,24 @@ export class Window extends UIWindow {
     this.eventsChannel.emit('window:tab-did-suspend', this);
 
     return true;
+  }
+
+  getLastAccessedTab(desktop?: Desktop): IDesConTab | null {
+    const allTabs = this.getAllTabs();
+    if (allTabs.length === 0) {
+      return null;
+    }
+
+    const filteredTabs = desktop
+      ? allTabs.filter((conTab) => conTab.desktop.id === desktop.id)
+      : allTabs;
+
+    if (filteredTabs.length === 0) {
+      return null;
+    }
+
+    filteredTabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
+
+    return filteredTabs[0];
   }
 }

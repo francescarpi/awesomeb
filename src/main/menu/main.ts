@@ -177,9 +177,9 @@ function windowMenu(
         accelerator: 'CmdOrCtrl+S',
         enabled: !!window,
         icon: getIcon(EIcon.Sidebar),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'toggle-sidebar');
+            await browser.performCommand(window, 'toggle-sidebar');
           }
         },
       },
@@ -188,9 +188,9 @@ function windowMenu(
         accelerator: 'CmdOrCtrl+I',
         enabled: !!window,
         icon: getIcon(EIcon.Maximize),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'toggle-maximize-area');
+            await browser.performCommand(window, 'toggle-maximize-area');
           }
         },
       },
@@ -226,9 +226,9 @@ function desktopsMenu(
         label: `Desktop ${desktop.id}`,
         accelerator: `Shift+CmdOrCtrl+${desktop.id}`,
         enabled: !selectedDesktop || selectedDesktop.id !== desktop.id,
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'select-desktop', { desktopId: desktop.id });
+            await browser.performCommand(window, 'select-desktop', { desktopId: desktop.id });
           }
         },
       })),
@@ -238,9 +238,9 @@ function desktopsMenu(
         accelerator: 'Shift+CmdOrCtrl+[',
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'previous-desktop');
+            await browser.performCommand(window, 'previous-desktop');
           }
         },
       },
@@ -249,9 +249,9 @@ function desktopsMenu(
         accelerator: 'Shift+CmdOrCtrl+]',
         enabled: !!window,
         icon: getIcon(EIcon.Next),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'next-desktop');
+            await browser.performCommand(window, 'next-desktop');
           }
         },
       },
@@ -274,9 +274,9 @@ function tabsMenu(
         accelerator: 'CmdOrCtrl+]',
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'previous-tab');
+            await browser.performCommand(window, 'previous-tab');
           }
         },
       },
@@ -285,9 +285,9 @@ function tabsMenu(
         accelerator: 'CmdOrCtrl+[',
         enabled: !!window,
         icon: getIcon(EIcon.Next),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'next-tab');
+            await browser.performCommand(window, 'next-tab');
           }
         },
       },
@@ -297,9 +297,9 @@ function tabsMenu(
         accelerator: 'CmdOrCtrl+Shift+S',
         enabled: tab !== null && !tab?.suspended,
         icon: getIcon(EIcon.Suspend),
-        click: () => {
+        click: async () => {
           if (window) {
-            browser.performCommand(window, 'suspend-tab');
+            await browser.performCommand(window, 'suspend-tab');
           }
         },
       },

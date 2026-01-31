@@ -15,6 +15,7 @@ export class Tab {
   private _view: UIView;
   private _layout: UILayout;
   private _viewId: TTabId = -1;
+  private _lastAccessed: number = Date.now();
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -99,7 +100,7 @@ export class Tab {
     await this._view.webContents.loadURL(url);
   }
 
-  async resume() {
+  resume() {
     if (!this._suspended) {
       return;
     }
@@ -109,7 +110,9 @@ export class Tab {
     }
 
     this._suspended = false;
+  }
 
+  async loadHistoryOrURL() {
     // TODO if exist navigation history, restore it
     // else load the URL
     // else raise an error
@@ -132,5 +135,13 @@ export class Tab {
     this._view.webContents.close();
 
     this._suspended = true;
+  }
+
+  updateLastAccessed() {
+    this._lastAccessed = Date.now();
+  }
+
+  get lastAccessed(): number {
+    return this._lastAccessed;
   }
 }

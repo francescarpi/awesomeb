@@ -117,11 +117,11 @@ export class Browser {
     return this.getWindow(this._activeWindowId);
   }
 
-  performCommand(
+  async performCommand(
     window: Window,
     trigger: TCommandTrigger,
     params?: Record<string, unknown>,
-  ): boolean {
+  ): Promise<boolean> {
     const command = getCommand(trigger);
     if (!command) {
       scopeLog.error(`Command not found for trigger: ${trigger}`);
@@ -132,9 +132,9 @@ export class Browser {
     const tabContainer = desktop?.selectedTabContainer || null;
     const tab = tabContainer?.selectedTab || null;
 
-    command.handler({ browser: this, window, desktop, tabContainer, tab, params });
+    await command.handler({ browser: this, window, desktop, tabContainer, tab, params });
 
-    this.refreshMainMenu();
+    await this.refreshMainMenu();
 
     return true;
   }

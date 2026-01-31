@@ -35,7 +35,7 @@ export function setupCommandsIPC(browser: Browser) {
           }
 
           // Perform command action...
-          const success = browser.performCommand(window, trigger, params);
+          const success = await browser.performCommand(window, trigger, params);
           if (!success) {
             scopeLog.error(`Failed to perform command for trigger: ${trigger}`);
             return;

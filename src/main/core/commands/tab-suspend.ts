@@ -14,6 +14,12 @@ export const Command: ICommand<ICommandParams> = {
       throw new Error('No active tab to suspend.');
     }
 
-    window.suspendTab(tab.id);
+    const success = await window.suspendTab(tab.id);
+    if (success) {
+      const lastAccessed = window.getLastAccessedTab();
+      if (lastAccessed) {
+        window.selectTab(lastAccessed.tab.id);
+      }
+    }
   },
 };

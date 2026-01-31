@@ -1,5 +1,5 @@
 import { TWindowId } from '~/types';
-import { Browser, Window, Desktop, TabContainer, Tab } from '@/core';
+import { Browser, Window, Desktop } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserEvents');
@@ -40,13 +40,10 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on(
-    'window:selected-tab-did-change',
-    async (window: Window, _desktop: Desktop, _tabContainer: TabContainer, _tab: Tab) => {
-      browser.rendererEmmiter.refreshTabContainers(window);
-      browser.refreshMainMenu();
-    },
-  );
+  browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.refreshMainMenu();
+  });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
