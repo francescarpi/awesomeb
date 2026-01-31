@@ -5,8 +5,9 @@
 <ul id="tabContainers" style="app-region: no-drag;"></ul>
 
 <template id="tab-container-template">
-  <li class="">
-    <ul></ul>
+  <li class="flex items-center gap-1">
+    <small class="text-xs pl-1 text-white/20 hidden sidebar:block"></small>
+    <ul class="w-full"></ul>
   </li>
 </template>
 
@@ -39,12 +40,20 @@
     const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
     tabContainersList.innerHTML = '';
 
-    for (const tabContainer of tabContainers) {
+    for (const [idx, tabContainer] of tabContainers.entries()) {
       const tabContainerClone = tplTabContainers.content.cloneNode(true) as DocumentFragment;
 
       const tabContainerLi = tabContainerClone
         .querySelector('li')!
         .cloneNode(true) as HTMLLIElement;
+
+      const tabContainerNumber = tabContainerLi.querySelector('small') as HTMLDivElement;
+
+      if (idx <= 8) {
+        tabContainerNumber.textContent = `${idx + 1}`;
+      } else {
+        tabContainerNumber.textContent = '';
+      }
 
       tabContainerLi.dataset.containerId = tabContainer.id.toString();
 

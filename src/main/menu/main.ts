@@ -265,10 +265,28 @@ function tabsMenu(
   window: Window | null,
   tab: Tab | null,
 ): MenuItemConstructorOptions {
+  const tabs: MenuItemConstructorOptions[] = [];
+  const totalContainers = window?.selectedDesktop?.tabContainers.length || 0;
+
+  for (let i = 1; i <= 9; i++) {
+    tabs.push({
+      label: `Tab ${i}`,
+      enabled: i <= totalContainers,
+      accelerator: `CmdOrCtrl+${i}`,
+      click: () => {
+        if (window) {
+          browser.performCommand(window, 'select-tabcontainer-by-index', { index: i });
+        }
+      },
+    });
+  }
+
   return {
     label: 'Tabs',
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
+      ...tabs,
+      { type: 'separator' },
       {
         label: 'Previous',
         accelerator: 'CmdOrCtrl+]',

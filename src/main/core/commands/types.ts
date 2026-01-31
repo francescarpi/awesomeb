@@ -16,7 +16,7 @@ export interface ICommand<T> {
   handler: (params: {
     browser: Browser;
     window: Window;
-    desktop: Desktop | null;
+    desktop: Desktop;
     tabContainer: TabContainer | null;
     tab: Tab | null;
     params: T;

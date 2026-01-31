@@ -64,4 +64,9 @@ declare global {
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abView: {
+    onChangeVisible: (callback: (event: IpcRendererEvent, visible: boolean) => void) => void;
+  };
 }

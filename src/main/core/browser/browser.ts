@@ -128,7 +128,7 @@ export class Browser {
       return false;
     }
 
-    const desktop = window.selectedDesktop || null;
+    const desktop = window.selectedDesktop;
     const tabContainer = desktop?.selectedTabContainer || null;
     const tab = tabContainer?.selectedTab || null;
 

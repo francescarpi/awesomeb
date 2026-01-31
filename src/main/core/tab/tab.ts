@@ -4,6 +4,7 @@ import { ITabProps } from './types';
 import { UIView, UILayout } from '@/ui';
 import { TTabId } from '~/types';
 import log from 'electron-log';
+import { session } from 'electron';
 
 const scopeLog = log.scope('Tab');
 
@@ -35,6 +36,7 @@ export class Tab {
       margin: '5 5 5 0',
       borderRadius: 8,
       backgroundColor: '#ffffff',
+      session: session.fromPartition(this._partition.id),
     });
 
     this._viewId = this._view.id as TTabId;

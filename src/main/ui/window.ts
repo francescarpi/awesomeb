@@ -321,14 +321,17 @@ export class UIWindow {
 
   toggleViewVisibility(id: string) {
     const view = this.getChild<UIView>(id);
-    if (view) {
-      if (view.isVisible) {
-        view.hide();
-      } else {
-        view.show();
-      }
-      this.renderLayout();
+    if (!view) {
+      return;
     }
+
+    if (view.isVisible) {
+      view.hide();
+    } else {
+      view.show();
+    }
+
+    this.renderLayout();
   }
 
   setMargin(id: string, margin: string) {

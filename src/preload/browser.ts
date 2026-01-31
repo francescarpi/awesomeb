@@ -86,6 +86,13 @@ const abTabs = {
 };
 
 //--------------------------------------------------------------------------------------
+const abView = {
+  onChangeVisible: (callback: (event: IpcRendererEvent, visible: boolean) => void) => {
+    ipcRenderer.on('view:visible', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
@@ -94,3 +101,4 @@ contextBridge.exposeInMainWorld('abDesktops', abDesktops);
 contextBridge.exposeInMainWorld('abWindow', abWindow);
 contextBridge.exposeInMainWorld('abMenu', abMenu);
 contextBridge.exposeInMainWorld('abTabs', abTabs);
+contextBridge.exposeInMainWorld('abView', abView);

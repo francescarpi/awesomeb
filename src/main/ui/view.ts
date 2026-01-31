@@ -15,11 +15,12 @@ export class UIView {
   private readonly _borderRadius: number;
   private readonly _backgroundColor: string;
 
-  private _session: Session = session.fromPartition(internalPartition.id);
+  private _session: Session;
 
   constructor(props?: IViewProps) {
     this._borderRadius = props?.borderRadius || 0;
     this._backgroundColor = props?.backgroundColor || '#00000000';
+    this._session = props?.session || session.fromPartition(internalPartition.id);
 
     this._webContentsView = this._createWebContentsView();
 
@@ -43,11 +44,13 @@ export class UIView {
         preload: this.getPreloadScript(),
         webSecurity: true,
         transparent: true,
-        session: this._session, // TODO session should pass as a prop. Is optional. If not provided use internalPartition
+        session: this._session,
       },
     });
 
     wcv.setBorderRadius(this._borderRadius);
+
+    // TODO setBackgroundColor is not working as expected
     wcv.setBackgroundColor(this._backgroundColor);
 
     return wcv;
@@ -107,10 +110,12 @@ export class UIView {
   }
 
   hide() {
+    this.send('view:visible', false);
     this.webContentsView.setVisible(false);
   }
 
   show() {
+    this.send('view:visible', true);
     this.webContentsView.setVisible(true);
   }
 

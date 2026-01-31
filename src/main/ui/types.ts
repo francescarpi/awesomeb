@@ -1,4 +1,4 @@
-import { Rectangle } from 'electron';
+import { Rectangle, Session } from 'electron';
 import { UILayout } from './layout';
 import { UIView } from './view';
 
@@ -13,6 +13,7 @@ export interface IViewProps {
   visible?: boolean;
   borderRadius?: number;
   backgroundColor?: string;
+  session?: Session;
 }
 
 export interface IPageViewProps extends IViewProps {

@@ -3,7 +3,7 @@ import Layout from '../layouts/Base.astro';
 ---
 
 <Layout borderRadius="10px" backgroundColor="rgba(255, 255, 255, 0.1)">
-  <div class="text-white opacity-50 h-full flex justify-center items-center">
+  <div class="text-white opacity-50 h-full flex justify-center items-center" id="no-tab-view">
     <p>Press Cmd/Ctrl + P to open the commands tool</p>
   </div>
 </Layout>
@@ -13,3 +13,11 @@ import Layout from '../layouts/Base.astro';
     app-region: drag;
   }
 </style>
+
+<script>
+  const noTabView = document.getElementById('no-tab-view')!;
+
+  abView.onChangeVisible((_event, visible) => {
+    noTabView.style.appRegion = visible ? 'drag' : 'no-drag';
+  });
+</script>
