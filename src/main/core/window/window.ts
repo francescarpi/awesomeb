@@ -176,6 +176,12 @@ export class Window extends UIWindow {
       this.eventsChannel.emit('window:selected-tab-did-change', this);
     }
 
+    // If tab wasn't suspended, we don't have to add the layout into the window
+    if (tab.view.isDestroyed) {
+      this.eventsChannel.emit('window:selected-tab-did-change', this);
+      return;
+    }
+
     tab.updateLastAccessed();
 
     this.addInTabContainerLayout(tabContainer.layout);
@@ -230,9 +236,10 @@ export class Window extends UIWindow {
       return null;
     }
 
-    const filteredTabs = desktop
-      ? allTabs.filter((conTab) => conTab.desktop.id === desktop.id)
-      : allTabs;
+    let filteredTabs = allTabs.filter((t) => !t.tab.suspended);
+    if (desktop) {
+      filteredTabs = filteredTabs.filter((conTab) => conTab.desktop.id === desktop.id);
+    }
 
     if (filteredTabs.length === 0) {
       return null;

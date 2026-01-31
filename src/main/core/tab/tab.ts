@@ -3,6 +3,9 @@ import { Partition } from '@/core';
 import { ITabProps } from './types';
 import { UIView, UILayout } from '@/ui';
 import { TTabId } from '~/types';
+import log from 'electron-log';
+
+const scopeLog = log.scope('Tab');
 
 export class Tab {
   private readonly _partition: Partition;
@@ -97,7 +100,11 @@ export class Tab {
 
   async loadURL(url: string) {
     this._url = url;
-    await this._view.webContents.loadURL(url);
+    try {
+      await this._view.webContents.loadURL(url);
+    } catch (error) {
+      scopeLog.error(`Failed to load URL ${url} in tab`);
+    }
   }
 
   resume() {
@@ -132,6 +139,7 @@ export class Tab {
 
     // TODO save navigation history
 
+    this._view.webContents.stop();
     this._view.webContents.close();
 
     this._suspended = true;

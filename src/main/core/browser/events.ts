@@ -25,6 +25,8 @@ export function registerBrowserEvents(browser: Browser) {
     async (window: Window, desktop: Desktop) => {
       browser.rendererEmmiter.refreshDesktops(window);
       browser.rendererEmmiter.refreshThemes(window, desktop);
+      browser.rendererEmmiter.refreshTabContainers(window);
+      window.refreshVisibleTabView();
       browser.refreshMainMenu();
     },
   );
