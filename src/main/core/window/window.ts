@@ -101,8 +101,53 @@ export class Window extends UIWindow {
     return null;
   }
 
-  async selectTab(tabId: TTabId) {
-    const result = this.getTab(tabId);
+  getNextOrPreviousTabOfActiveDesktop(direction: 'next' | 'prev'): IDesConTab | null {
+    const desktop = this.selectedDesktop;
+    const tabContainer = desktop.selectedTabContainer;
+
+    if (!tabContainer) {
+      if (direction === 'next') {
+        const firstTab = desktop.tabContainers[0]?.tabs[0];
+        return firstTab ? { desktop, tabContainer: desktop.tabContainers[0], tab: firstTab } : null;
+      } else {
+        const lastTabContainer = desktop.tabContainers[desktop.tabContainers.length - 1];
+        const lastTab = lastTabContainer?.tabs[lastTabContainer.tabs.length - 1];
+        return lastTab ? { desktop, tabContainer: lastTabContainer, tab: lastTab } : null;
+      }
+    }
+
+    const selectedTab = tabContainer.selectedTab!;
+    const allTabs = this.getAllTabs();
+    const currentIndex = allTabs.findIndex(
+      (conTab) => conTab.tab.id === selectedTab.id && conTab.tabContainer.id === tabContainer.id,
+    );
+
+    let newIndex: number;
+
+    if (direction === 'next') {
+      newIndex = (currentIndex + 1) % allTabs.length;
+    } else {
+      newIndex = (currentIndex - 1 + allTabs.length) % allTabs.length;
+    }
+
+    const result = allTabs[newIndex];
+    if (result) {
+      return result;
+    }
+
+    return null;
+  }
+
+  async selectTab(target: 'next' | 'prev' | TTabId) {
+    if (target === 'next' || target === 'prev') {
+      const conTab = this.getNextOrPreviousTabOfActiveDesktop(target);
+      if (conTab) {
+        await this.selectTab(conTab.tab.id);
+      }
+      return;
+    }
+
+    const result = this.getTab(target);
     if (!result) {
       return;
     }
@@ -119,7 +164,7 @@ export class Window extends UIWindow {
 
     desktop.selectTabContainer(tabContainer.id);
 
-    tabContainer.selectTab(tabId);
+    tabContainer.selectTab(tab.id);
 
     if (tab.suspended) {
       // TODO caution, this is an async operation. What if it takes too long and the browser is closed?
@@ -136,5 +181,17 @@ export class Window extends UIWindow {
       tabContainer,
       tab,
     );
+  }
+
+  getAllTabs(): IDesConTab[] {
+    const allTabs: IDesConTab[] = [];
+    for (const desktop of this._desktops.values()) {
+      for (const tabContainer of desktop.tabContainers) {
+        for (const tab of tabContainer.tabs) {
+          allTabs.push({ desktop, tabContainer, tab });
+        }
+      }
+    }
+    return allTabs;
   }
 }

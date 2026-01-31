@@ -8,7 +8,7 @@ export interface ICommand<T> {
   description: string;
   modal?: ICommandModal;
   visibility?: (params: { focusedWindow: Window | null }) => boolean;
-  handler: (browser: Browser, window: Window, params: T) => Promise<void>;
+  handler: (params: { browser: Browser; window: Window; params: T }) => Promise<void>;
 }
 
 interface ICommandModal {

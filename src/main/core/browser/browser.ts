@@ -127,7 +127,7 @@ export class Browser {
       scopeLog.error(`Command not found for trigger: ${trigger}`);
       return false;
     }
-    command.handler(this, window, params);
+    command.handler({ browser: this, window, params });
     this.refreshMainMenu();
     return true;
   }

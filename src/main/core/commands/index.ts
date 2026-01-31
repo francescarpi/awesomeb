@@ -14,6 +14,8 @@ import * as windowToggleMaximizeArea from './window-toggle-maximize-area';
 import * as desktopRename from './desktop-rename';
 import * as desktopTheme from './desktop-theme';
 import * as tabNew from './tab-new';
+import * as tabNext from './tab-next';
+import * as tabPrev from './tab-prev';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -27,6 +29,8 @@ const COMMANDS = {
   [desktopRename.TRIGGER]: desktopRename.Command,
   [desktopTheme.TRIGGER]: desktopTheme.Command,
   [tabNew.TRIGGER]: tabNew.Command,
+  [tabNext.TRIGGER]: tabNext.Command,
+  [tabPrev.TRIGGER]: tabPrev.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

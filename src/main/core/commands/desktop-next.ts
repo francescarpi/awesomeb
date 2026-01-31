@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Next Desktop',
   description: 'Switch to the next desktop',
   visibility: ({ focusedWindow }) => !!focusedWindow,
-  async handler(_browser, window, _params) {
+  async handler({ window }) {
     window.selectDesktop('next');
   },
 };

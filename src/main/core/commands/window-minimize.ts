@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Minimize Window',
   description: 'Minimizes the specified window',
   visibility: ({ focusedWindow }) => !!focusedWindow && !focusedWindow.bw.isMinimized(),
-  async handler(_browser, window, _params) {
+  async handler({ window }) {
     window.bw.minimize();
   },
 };

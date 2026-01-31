@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Close Window',
   description: 'Close the specified window',
   visibility: ({ focusedWindow }) => !!focusedWindow,
-  async handler(_browser, window, _params) {
+  async handler({ window }) {
     window.bw.close();
   },
 };

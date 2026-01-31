@@ -2,18 +2,14 @@ import { ICommand } from './types';
 
 export interface ICommandParams {}
 
-export const TRIGGER = 'maximize-window';
+export const TRIGGER = 'next-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Maximize Window',
-  description: 'Maximize the specified window',
+  name: 'Next Tab',
+  description: 'Switch to the next tab in the current window',
   visibility: ({ focusedWindow }) => !!focusedWindow,
   async handler({ window }) {
-    if (window.bw.isMaximized()) {
-      window.bw.unmaximize();
-    } else {
-      window.bw.maximize();
-    }
+    window.selectTab('next');
   },
 };

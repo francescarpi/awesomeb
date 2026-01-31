@@ -16,6 +16,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
     editMenu(browser, showRootIcon, focusedWindow),
     windowMenu(browser, showRootIcon, focusedWindow),
     desktopsMenu(browser, showRootIcon, focusedWindow),
+    tabsMenu(browser, showRootIcon, focusedWindow),
   ]);
 
   return menu;
@@ -248,6 +249,41 @@ function desktopsMenu(
         click: () => {
           if (focusedWindow) {
             browser.performCommand(focusedWindow, 'next-desktop');
+          }
+        },
+      },
+    ],
+  };
+}
+
+function tabsMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  focusedWindow: Window | null,
+): MenuItemConstructorOptions {
+  return {
+    label: 'Tabs',
+    icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
+    submenu: [
+      {
+        label: 'Previous',
+        accelerator: 'CmdOrCtrl+]',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Previous),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'previous-tab');
+          }
+        },
+      },
+      {
+        label: 'Next',
+        accelerator: 'CmdOrCtrl+[',
+        enabled: !!focusedWindow,
+        icon: getIcon(EIcon.Next),
+        click: () => {
+          if (focusedWindow) {
+            browser.performCommand(focusedWindow, 'next-tab');
           }
         },
       },

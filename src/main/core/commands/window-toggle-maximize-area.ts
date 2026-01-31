@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   description:
     'Toggle the maximization of the main content area by hiding or showing the sidebar and urlbar.',
   visibility: ({ focusedWindow }) => !!focusedWindow,
-  async handler(_browser, window, _params) {
+  async handler({ window }) {
     window.toggleMaximizeArea();
   },
 };
