@@ -6,6 +6,7 @@ import {
   TMenuType,
   TTabId,
   ITabContainer,
+  IURLTabData,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -86,6 +87,13 @@ const abTabs = {
 };
 
 //--------------------------------------------------------------------------------------
+const abUrlBar = {
+  onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => {
+    ipcRenderer.on('urlbar:refresh', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
@@ -94,3 +102,4 @@ contextBridge.exposeInMainWorld('abDesktops', abDesktops);
 contextBridge.exposeInMainWorld('abWindow', abWindow);
 contextBridge.exposeInMainWorld('abMenu', abMenu);
 contextBridge.exposeInMainWorld('abTabs', abTabs);
+contextBridge.exposeInMainWorld('abUrlBar', abUrlBar);

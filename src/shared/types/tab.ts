@@ -31,3 +31,10 @@ export interface ITabPartition {
   color: string;
   private: boolean;
 }
+
+export interface IURLTabData {
+  safe: boolean;
+  url: string;
+  loading: boolean;
+  tabId: TTabId;
+}

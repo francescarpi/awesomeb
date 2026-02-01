@@ -70,6 +70,19 @@ export class Tab {
     return this._loading;
   }
 
+  setLoading(loading: boolean) {
+    if (this._loading === loading) {
+      return;
+    }
+
+    this._loading = loading;
+    this.eventsChannel.emit('tab:loading-did-change', this);
+
+    // TODO in the browser:
+    //  - if tab is the active => update the url bar
+    //  - if not update tabs container list only the window
+  }
+
   get favicon(): string | null {
     return this._favicon;
   }

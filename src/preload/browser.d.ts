@@ -64,4 +64,9 @@ declare global {
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abUrlBar: {
+    onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => void;
+  };
 }

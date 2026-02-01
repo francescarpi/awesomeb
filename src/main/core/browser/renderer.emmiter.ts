@@ -1,7 +1,7 @@
 import { Browser, Window, Desktop } from '@/core';
 import { UIPageView } from '@/ui';
 import log from 'electron-log';
-import { ITheme } from '~/types';
+import { ITheme, IURLTabData } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -28,5 +28,35 @@ export class BrowserRendererEmmiter {
     const sidebar = window.getChild<UIPageView>('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
     sidebar.send('tabs:refresh', tabContainers);
+  }
+
+  refreshURLBar(window: Window) {
+    const urlbar = window.getChild<UIPageView>('urlbar')!;
+    const data: IURLTabData = {
+      safe: true,
+      url: '',
+      loading: false,
+      tabId: -1,
+    };
+
+    const desktop = window.selectedDesktop;
+    const tabContainer = desktop.selectedTabContainer;
+    if (!tabContainer) {
+      urlbar.send('urlbar:refresh', data);
+      return;
+    }
+
+    const tab = tabContainer.selectedTab;
+    if (!tab) {
+      urlbar.send('urlbar:refresh', data);
+      return;
+    }
+
+    data.safe = true; // TODO implement safe check
+    data.url = tab.url || '';
+    data.loading = tab.loading;
+    data.tabId = tab.id;
+
+    urlbar.send('urlbar:refresh', data);
   }
 }
