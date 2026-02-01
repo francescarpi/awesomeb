@@ -16,6 +16,11 @@ import { buildScopeLog } from '@/utils';
 
 const scopeLog = buildScopeLog('UIWindow', true);
 
+interface IFlexibleChildrenInfo {
+  flexibleCount: number;
+  availableSize: number;
+}
+
 export class UIWindow {
   private _rootLayout?: UILayout;
 
@@ -131,12 +136,78 @@ export class UIWindow {
     }
   }
 
+  /**
+   * Calculate how many flexible children (layouts or views without explicit size)
+   * exist in a parent layout and how much space they should share.
+   *
+   * For vertical layouts: flexible children are those without explicit width
+   * For horizontal layouts: flexible children are those without explicit height
+   *
+   * @example
+   * // Vertical layout with width=1000px containing:
+   * // - UIView with width=200px (fixed)
+   * // - UILayout (flexible)
+   * // - UILayout (flexible)
+   * // Result: 2 flexible children sharing 800px (400px each)
+   *
+   * @example
+   * // Horizontal layout with height=600px containing:
+   * // - UIView with height=50px (fixed)
+   * // - UIView without height (flexible)
+   * // - UILayout (flexible)
+   * // - UILayout (flexible)
+   * // Result: 3 flexible children sharing 550px (~183.33px each)
+   */
+  private _calculateFlexibleChildren(parentLayout: UILayout): IFlexibleChildrenInfo {
+    if (typeof parentLayout.type !== 'string') {
+      return { flexibleCount: 0, availableSize: 0 };
+    }
+
+    const isVertical = parentLayout.type === 'vertical';
+    let flexibleCount = 0;
+    let usedSpace = 0;
+
+    for (const child of parentLayout.children) {
+      if (child instanceof UILayout) {
+        // Layouts are always flexible (they don't have explicit width/height)
+        flexibleCount++;
+      } else if (child instanceof UIView && child.visible) {
+        // For vertical layout, check if view has explicit width
+        // For horizontal layout, check if view has explicit height
+        const hasExplicitSize = isVertical ? child.width !== null : child.height !== null;
+
+        if (hasExplicitSize) {
+          // Sum up the used space by fixed-size children
+          const childSize = isVertical ? child.width! : child.height!;
+          const childMargin = isVertical
+            ? child.margin.l + child.margin.r
+            : child.margin.t + child.margin.b;
+          usedSpace += childSize + childMargin;
+        } else {
+          // This child is flexible
+          flexibleCount++;
+        }
+      }
+    }
+
+    const totalAvailableSpace = isVertical ? parentLayout.bounds.width : parentLayout.bounds.height;
+    const availableSize = totalAvailableSpace - usedSpace;
+
+    return {
+      flexibleCount,
+      availableSize: Math.max(0, availableSize),
+    };
+  }
+
   private _renderLayoutChildren(layout: UILayout) {
     let previousChild: TLayoutChildren | null = null;
+    const flexibleChildrenInfo = this._calculateFlexibleChildren(layout);
 
-    for (const child of layout.children) {
+    for (let i = 0; i < layout.children.length; i++) {
+      const child = layout.children[i];
+
       if (child instanceof UILayout) {
-        this._renderChildLayout(layout, child, previousChild);
+        this._renderChildLayout(layout, child, previousChild, flexibleChildrenInfo);
         // Layouts should also be considered as previousChild
         previousChild = child;
         continue;
@@ -157,7 +228,7 @@ export class UIWindow {
           scopeLog.debug('Added view to contentView:', child.id);
         }
 
-        this._renderChildView(layout, child, previousChild);
+        this._renderChildView(layout, child, previousChild, flexibleChildrenInfo);
         previousChild = child;
       } else {
         if (existsInContentView) {
@@ -172,8 +243,9 @@ export class UIWindow {
     parentLayout: UILayout,
     childLayout: UILayout,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ) {
-    const bounds = this._calculateLayoutBounds(parentLayout, previousChild);
+    const bounds = this._calculateLayoutBounds(parentLayout, previousChild, flexibleChildrenInfo);
     this.renderLayout(childLayout, bounds);
   }
 
@@ -181,8 +253,14 @@ export class UIWindow {
     parentLayout: UILayout,
     view: UIView,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ) {
-    const bounds = this._calculateViewBounds(parentLayout, view, previousChild);
+    const bounds = this._calculateViewBounds(
+      parentLayout,
+      view,
+      previousChild,
+      flexibleChildrenInfo,
+    );
     const boundsWithMargin = this._applyMarginToBounds(bounds, view.margin);
     view.setBounds(boundsWithMargin);
     // scopeLog.info('VIEW', view.id, view.bounds);
@@ -191,11 +269,16 @@ export class UIWindow {
   private _calculateLayoutBounds(
     parentLayout: UILayout,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     if (parentLayout.type === 'vertical') {
-      return this._calculateVerticalLayoutBounds(parentLayout, previousChild);
+      return this._calculateVerticalLayoutBounds(parentLayout, previousChild, flexibleChildrenInfo);
     } else if (parentLayout.type === 'horizontal') {
-      return this._calculateHorizontalLayoutBounds(parentLayout, previousChild);
+      return this._calculateHorizontalLayoutBounds(
+        parentLayout,
+        previousChild,
+        flexibleChildrenInfo,
+      );
     }
     return parentLayout.bounds;
   }
@@ -204,11 +287,22 @@ export class UIWindow {
     parentLayout: UILayout,
     view: UIView,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     if (parentLayout.type === 'vertical') {
-      return this._calculateVerticalViewBounds(parentLayout, view, previousChild);
+      return this._calculateVerticalViewBounds(
+        parentLayout,
+        view,
+        previousChild,
+        flexibleChildrenInfo,
+      );
     } else if (parentLayout.type === 'horizontal') {
-      return this._calculateHorizontalViewBounds(parentLayout, view, previousChild);
+      return this._calculateHorizontalViewBounds(
+        parentLayout,
+        view,
+        previousChild,
+        flexibleChildrenInfo,
+      );
     }
     return { x: 0, y: 0, width: 100, height: 100 };
   }
@@ -216,6 +310,7 @@ export class UIWindow {
   private _calculateVerticalLayoutBounds(
     parentLayout: UILayout,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     const x = previousChild
       ? previousChild.bounds.x +
@@ -224,10 +319,16 @@ export class UIWindow {
       : parentLayout.bounds.x;
     const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
 
+    // Calculate width based on flexible children count
+    const width =
+      flexibleChildrenInfo.flexibleCount > 0
+        ? flexibleChildrenInfo.availableSize / flexibleChildrenInfo.flexibleCount
+        : remainingWidth;
+
     return {
       x,
       y: parentLayout.bounds.y,
-      width: remainingWidth,
+      width,
       height: parentLayout.bounds.height,
     };
   }
@@ -235,6 +336,7 @@ export class UIWindow {
   private _calculateHorizontalLayoutBounds(
     parentLayout: UILayout,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     const y = previousChild
       ? previousChild.bounds.y +
@@ -243,11 +345,17 @@ export class UIWindow {
       : parentLayout.bounds.y;
     const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
 
+    // Calculate height based on flexible children count
+    const height =
+      flexibleChildrenInfo.flexibleCount > 0
+        ? flexibleChildrenInfo.availableSize / flexibleChildrenInfo.flexibleCount
+        : remainingHeight;
+
     return {
       x: parentLayout.bounds.x,
       y,
       width: parentLayout.bounds.width,
-      height: remainingHeight,
+      height,
     };
   }
 
@@ -255,6 +363,7 @@ export class UIWindow {
     parentLayout: UILayout,
     view: UIView,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     const x = previousChild
       ? previousChild.bounds.x +
@@ -263,10 +372,18 @@ export class UIWindow {
       : parentLayout.bounds.x;
     const remainingWidth = parentLayout.bounds.width - (x - parentLayout.bounds.x);
 
+    // If view has explicit width, use it; otherwise use shared width from flexible children
+    let width = view.width;
+    if (!width && flexibleChildrenInfo.flexibleCount > 0) {
+      width = flexibleChildrenInfo.availableSize / flexibleChildrenInfo.flexibleCount;
+    } else if (!width) {
+      width = remainingWidth;
+    }
+
     return {
       x,
       y: parentLayout.bounds.y,
-      width: view.width || remainingWidth,
+      width,
       height: view.height || parentLayout.bounds.height,
     };
   }
@@ -275,6 +392,7 @@ export class UIWindow {
     parentLayout: UILayout,
     view: UIView,
     previousChild: TLayoutChildren | null,
+    flexibleChildrenInfo: IFlexibleChildrenInfo,
   ): Rectangle {
     const y = previousChild
       ? previousChild.bounds.y +
@@ -283,11 +401,19 @@ export class UIWindow {
       : parentLayout.bounds.y;
     const remainingHeight = parentLayout.bounds.height - (y - parentLayout.bounds.y);
 
+    // If view has explicit height, use it; otherwise use shared height from flexible children
+    let height = view.height;
+    if (!height && flexibleChildrenInfo.flexibleCount > 0) {
+      height = flexibleChildrenInfo.availableSize / flexibleChildrenInfo.flexibleCount;
+    } else if (!height) {
+      height = remainingHeight;
+    }
+
     return {
       x: parentLayout.bounds.x,
       y,
       width: view.width || parentLayout.bounds.width,
-      height: view.height || remainingHeight,
+      height,
     };
   }
 

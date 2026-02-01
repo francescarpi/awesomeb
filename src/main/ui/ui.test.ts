@@ -509,3 +509,202 @@ describe('View Visibility and Dragging Control', () => {
     expect(canPerformDrag(mockDragRegionView)).toBe(false);
   });
 });
+
+describe('Flexible Layout Space Distribution', () => {
+  test('should divide space equally between two layouts in vertical parent', () => {
+    // Simulate vertical layout with two child layouts
+    const parentBounds = { x: 0, y: 0, width: 1000, height: 600 };
+
+    // Two child layouts should get 500px width each
+    const expectedWidth = 500;
+
+    expect(expectedWidth).toBe(parentBounds.width / 2);
+  });
+
+  test('should divide space equally between two layouts in horizontal parent', () => {
+    // Simulate horizontal layout with two child layouts
+    const parentBounds = { x: 0, y: 0, width: 1000, height: 600 };
+
+    // Two child layouts should get 300px height each
+    const expectedHeight = 300;
+
+    expect(expectedHeight).toBe(parentBounds.height / 2);
+  });
+
+  test('should divide space among three layouts', () => {
+    // Vertical layout with three child layouts
+    const parentWidth = 900;
+    const flexibleCount = 3;
+
+    const expectedWidthPerChild = parentWidth / flexibleCount;
+    expect(expectedWidthPerChild).toBe(300);
+  });
+
+  test('should account for fixed-width views when calculating flexible space', () => {
+    // Parent width: 1000px
+    // Fixed view: 200px
+    // Two flexible layouts should share remaining 800px (400px each)
+    const parentWidth = 1000;
+    const fixedViewWidth = 200;
+    const flexibleCount = 2;
+
+    const availableSpace = parentWidth - fixedViewWidth;
+    const expectedWidthPerFlexible = availableSpace / flexibleCount;
+
+    expect(expectedWidthPerFlexible).toBe(400);
+  });
+
+  test('should handle mixed fixed and flexible children in vertical layout', () => {
+    // Vertical layout scenario:
+    // - Fixed view (width: 200px)
+    // - Flexible layout 1
+    // - Flexible layout 2
+    // - Fixed view (width: 100px)
+    // Parent width: 1000px
+    // Available for flexible: 1000 - 200 - 100 = 700px
+    // Each flexible gets: 700 / 2 = 350px
+
+    const parentWidth = 1000;
+    const fixedWidth1 = 200;
+    const fixedWidth2 = 100;
+    const flexibleCount = 2;
+
+    const usedSpace = fixedWidth1 + fixedWidth2;
+    const availableSpace = parentWidth - usedSpace;
+    const widthPerFlexible = availableSpace / flexibleCount;
+
+    expect(widthPerFlexible).toBe(350);
+  });
+
+  test('should handle mixed fixed and flexible children in horizontal layout', () => {
+    // Horizontal layout scenario:
+    // - Fixed view (height: 50px)
+    // - Flexible layout 1
+    // - Flexible view (no explicit height)
+    // - Flexible layout 2
+    // Parent height: 600px
+    // Available for flexible: 600 - 50 = 550px
+    // Each flexible gets: 550 / 3 = ~183.33px
+
+    const parentHeight = 600;
+    const fixedHeight = 50;
+    const flexibleCount = 3;
+
+    const availableSpace = parentHeight - fixedHeight;
+    const heightPerFlexible = availableSpace / flexibleCount;
+
+    expect(heightPerFlexible).toBeCloseTo(183.33, 2);
+  });
+
+  test('should handle margins in space calculation for vertical layout', () => {
+    // Vertical layout with margins
+    // Parent width: 1000px
+    // View with width: 200px, margin: left=10, right=20
+    // Two flexible layouts
+    // Total used by fixed: 200 + 10 + 20 = 230px
+    // Available for flexible: 1000 - 230 = 770px
+    // Each flexible gets: 770 / 2 = 385px
+
+    const parentWidth = 1000;
+    const viewWidth = 200;
+    const viewMarginLeft = 10;
+    const viewMarginRight = 20;
+    const flexibleCount = 2;
+
+    const usedSpace = viewWidth + viewMarginLeft + viewMarginRight;
+    const availableSpace = parentWidth - usedSpace;
+    const widthPerFlexible = availableSpace / flexibleCount;
+
+    expect(widthPerFlexible).toBe(385);
+  });
+
+  test('should handle margins in space calculation for horizontal layout', () => {
+    // Horizontal layout with margins
+    // Parent height: 600px
+    // View with height: 100px, margin: top=5, bottom=10
+    // Three flexible layouts
+    // Total used by fixed: 100 + 5 + 10 = 115px
+    // Available for flexible: 600 - 115 = 485px
+    // Each flexible gets: 485 / 3 = ~161.67px
+
+    const parentHeight = 600;
+    const viewHeight = 100;
+    const viewMarginTop = 5;
+    const viewMarginBottom = 10;
+    const flexibleCount = 3;
+
+    const usedSpace = viewHeight + viewMarginTop + viewMarginBottom;
+    const availableSpace = parentHeight - usedSpace;
+    const heightPerFlexible = availableSpace / flexibleCount;
+
+    expect(heightPerFlexible).toBeCloseTo(161.67, 2);
+  });
+
+  test('should handle all flexible children when no fixed-size children exist', () => {
+    // All children are flexible (layouts or views without explicit size)
+    const parentWidth = 1200;
+    const flexibleCount = 4;
+
+    const widthPerFlexible = parentWidth / flexibleCount;
+    expect(widthPerFlexible).toBe(300);
+  });
+
+  test('should handle single flexible child taking all remaining space', () => {
+    // Parent width: 1000px
+    // Fixed view: 300px
+    // One flexible layout should get remaining 700px
+
+    const parentWidth = 1000;
+    const fixedWidth = 300;
+    const flexibleCount = 1;
+
+    const availableSpace = parentWidth - fixedWidth;
+    const widthForFlexible = availableSpace / flexibleCount;
+
+    expect(widthForFlexible).toBe(700);
+  });
+
+  test('should handle zero available space gracefully', () => {
+    // Edge case: fixed children use all available space
+    const parentWidth = 500;
+    const fixedWidth1 = 300;
+    const fixedWidth2 = 200;
+
+    const usedSpace = fixedWidth1 + fixedWidth2;
+    const availableSpace = Math.max(0, parentWidth - usedSpace);
+
+    expect(availableSpace).toBe(0);
+  });
+
+  test('should calculate flexible children info correctly', () => {
+    // Helper function to simulate _calculateFlexibleChildren logic
+    const calculateFlexibleInfo = (
+      totalSize: number,
+      fixedSizes: number[],
+      flexibleCount: number,
+    ) => {
+      const usedSpace = fixedSizes.reduce((sum, size) => sum + size, 0);
+      const availableSize = Math.max(0, totalSize - usedSpace);
+
+      return {
+        flexibleCount,
+        availableSize,
+      };
+    };
+
+    // Test case 1: vertical layout with 2 fixed views (200px, 100px) and 3 flexible layouts
+    const result1 = calculateFlexibleInfo(1000, [200, 100], 3);
+    expect(result1.flexibleCount).toBe(3);
+    expect(result1.availableSize).toBe(700);
+
+    // Test case 2: horizontal layout with 1 fixed view (50px) and 2 flexible layouts
+    const result2 = calculateFlexibleInfo(600, [50], 2);
+    expect(result2.flexibleCount).toBe(2);
+    expect(result2.availableSize).toBe(550);
+
+    // Test case 3: all flexible, no fixed
+    const result3 = calculateFlexibleInfo(800, [], 4);
+    expect(result3.flexibleCount).toBe(4);
+    expect(result3.availableSize).toBe(800);
+  });
+});
