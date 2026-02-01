@@ -123,6 +123,11 @@ export class UIWindow {
 
     this._renderLayoutChildren(layout);
 
+    // Only clean up orphaned views when rendering from root
+    if (!parentLayout) {
+      this._cleanupOrphanedViews();
+    }
+
     scopeLog.debug('BW: Total content views', this.bw.contentView.children.length);
   }
 
@@ -133,6 +138,52 @@ export class UIWindow {
       const [width, height] = this.bw.getSize();
       const bounds = parentBounds || { x: 0, y: 0, width, height };
       layout.setBounds(bounds);
+    }
+  }
+
+  /**
+   * Collect all views that should be in the layout tree
+   */
+  private _collectAllViewsInTree(layout?: UILayout): Set<UIView> {
+    const views = new Set<UIView>();
+    const currentLayout = layout || this._rootLayout!;
+
+    for (const child of currentLayout.children) {
+      if (child instanceof UILayout) {
+        // Recursively collect views from child layouts
+        const childViews = this._collectAllViewsInTree(child);
+        childViews.forEach((view) => views.add(view));
+      } else if (child instanceof UIView) {
+        views.add(child);
+      }
+    }
+
+    return views;
+  }
+
+  /**
+   * Remove views from contentView that are no longer in the layout tree.
+   * This is necessary when layouts are removed from the tree.
+   */
+  private _cleanupOrphanedViews() {
+    const viewsInTree = this._collectAllViewsInTree();
+    const viewsInContentView = this.bw.contentView.children;
+
+    for (const webContentsView of viewsInContentView) {
+      // Check if this webContentsView belongs to a view in our tree
+      let foundInTree = false;
+      for (const view of viewsInTree) {
+        if (view.webContentsView === webContentsView) {
+          foundInTree = true;
+          break;
+        }
+      }
+
+      // If not found in tree, remove it from contentView
+      if (!foundInTree) {
+        this.bw.contentView.removeChildView(webContentsView);
+        scopeLog.debug('Cleaned up orphaned view from contentView');
+      }
     }
   }
 
@@ -585,6 +636,7 @@ export class UIWindow {
     const mainLayout = this.getChild<UILayout>('main-layout')!;
     mainLayout.removeChild(layout);
     scopeLog.debug('Removed layout from main layout:', layout.id);
+    this.renderLayout();
   }
 
   setNoTabVisibility(visible: boolean) {

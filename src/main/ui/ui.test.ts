@@ -708,3 +708,160 @@ describe('Flexible Layout Space Distribution', () => {
     expect(result3.availableSize).toBe(800);
   });
 });
+
+describe('Layout Cleanup and View Management', () => {
+  test('should remove orphaned views when layout is removed', () => {
+    // Simulate the scenario where a layout is removed from the tree
+    const mockContentView = {
+      children: [] as any[],
+      addChildView: vi.fn((view: any) => {
+        mockContentView.children.push(view);
+      }),
+      removeChildView: vi.fn((view: any) => {
+        const index = mockContentView.children.indexOf(view);
+        if (index !== -1) {
+          mockContentView.children.splice(index, 1);
+        }
+      }),
+    };
+
+    const mockView1 = { id: 'view1', webContentsView: { id: 'wcv1' } };
+    const mockView2 = { id: 'view2', webContentsView: { id: 'wcv2' } };
+    const mockView3 = { id: 'view3', webContentsView: { id: 'wcv3' } };
+
+    // Add all views to contentView
+    mockContentView.addChildView(mockView1.webContentsView);
+    mockContentView.addChildView(mockView2.webContentsView);
+    mockContentView.addChildView(mockView3.webContentsView);
+
+    expect(mockContentView.children.length).toBe(3);
+
+    // Simulate removing view2 (orphaned view)
+    const viewsInTree = new Set([mockView1.webContentsView, mockView3.webContentsView]);
+
+    for (const webContentsView of mockContentView.children) {
+      if (!viewsInTree.has(webContentsView)) {
+        mockContentView.removeChildView(webContentsView);
+      }
+    }
+
+    // After cleanup, only 2 views should remain
+    expect(mockContentView.children.length).toBe(2);
+    expect(mockContentView.children).toContain(mockView1.webContentsView);
+    expect(mockContentView.children).toContain(mockView3.webContentsView);
+    expect(mockContentView.children).not.toContain(mockView2.webContentsView);
+  });
+
+  test('should collect all views in layout tree recursively', () => {
+    // Simulate collecting views from a nested layout structure
+    const collectViews = (layoutTree: any): Set<any> => {
+      const views = new Set<any>();
+
+      for (const child of layoutTree.children) {
+        if (child.type === 'layout') {
+          const childViews = collectViews(child);
+          childViews.forEach((v) => views.add(v));
+        } else if (child.type === 'view') {
+          views.add(child);
+        }
+      }
+
+      return views;
+    };
+
+    const layoutTree = {
+      type: 'layout',
+      id: 'root',
+      children: [
+        { type: 'view', id: 'view1' },
+        {
+          type: 'layout',
+          id: 'child-layout',
+          children: [
+            { type: 'view', id: 'view2' },
+            { type: 'view', id: 'view3' },
+          ],
+        },
+        { type: 'view', id: 'view4' },
+      ],
+    };
+
+    const views = collectViews(layoutTree);
+    expect(views.size).toBe(4);
+
+    const viewIds = Array.from(views).map((v: any) => v.id);
+    expect(viewIds).toContain('view1');
+    expect(viewIds).toContain('view2');
+    expect(viewIds).toContain('view3');
+    expect(viewIds).toContain('view4');
+  });
+
+  test('should handle layout removal and addition sequence', () => {
+    // Simulate the selectTab scenario where one layout is removed and another added
+    const mockMainLayout = {
+      children: [] as any[],
+      addChild: vi.fn((child: any) => {
+        mockMainLayout.children.push(child);
+      }),
+      removeChild: vi.fn((child: any) => {
+        const index = mockMainLayout.children.indexOf(child);
+        if (index !== -1) {
+          mockMainLayout.children.splice(index, 1);
+        }
+      }),
+    };
+
+    const layout1 = { id: 'tab-container-1', type: 'layout' };
+    const layout2 = { id: 'tab-container-2', type: 'layout' };
+
+    // Initial state: layout1 is active
+    mockMainLayout.addChild(layout1);
+    expect(mockMainLayout.children.length).toBe(1);
+    expect(mockMainLayout.children[0]).toBe(layout1);
+
+    // Switch to layout2: remove layout1, add layout2
+    mockMainLayout.removeChild(layout1);
+    mockMainLayout.addChild(layout2);
+
+    expect(mockMainLayout.children.length).toBe(1);
+    expect(mockMainLayout.children[0]).toBe(layout2);
+    expect(mockMainLayout.children).not.toContain(layout1);
+  });
+
+  test('should maintain correct view count after multiple layout switches', () => {
+    const mockContentView = {
+      children: [] as any[],
+      addChildView: vi.fn((view: any) => {
+        if (!mockContentView.children.includes(view)) {
+          mockContentView.children.push(view);
+        }
+      }),
+      removeChildView: vi.fn((view: any) => {
+        const index = mockContentView.children.indexOf(view);
+        if (index !== -1) {
+          mockContentView.children.splice(index, 1);
+        }
+      }),
+    };
+
+    const view1 = { id: 'view1' };
+    const view2 = { id: 'view2' };
+    const view3 = { id: 'view3' };
+
+    // Scenario 1: Add view1
+    mockContentView.addChildView(view1);
+    expect(mockContentView.children.length).toBe(1);
+
+    // Scenario 2: Switch to view2 (remove view1, add view2)
+    mockContentView.removeChildView(view1);
+    mockContentView.addChildView(view2);
+    expect(mockContentView.children.length).toBe(1);
+    expect(mockContentView.children[0]).toBe(view2);
+
+    // Scenario 3: Switch to view3 (remove view2, add view3)
+    mockContentView.removeChildView(view2);
+    mockContentView.addChildView(view3);
+    expect(mockContentView.children.length).toBe(1);
+    expect(mockContentView.children[0]).toBe(view3);
+  });
+});
