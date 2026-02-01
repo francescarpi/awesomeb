@@ -19,7 +19,7 @@ import { IMargin } from '~/types';
 export class UIWindow {
   private _rootLayout?: UILayout;
   private _tabContainerLayout?: UILayout;
-  private _noTabView?: UIPageView;
+  // private _noTabView?: UIPageView;
 
   public readonly bw: BrowserWindow;
 
@@ -88,15 +88,18 @@ export class UIWindow {
       margin: '5 5 0 0',
     });
 
-    this._noTabView = new UIPageView('no-tab', { margin: '5 5 5 0' });
+    // this._noTabView = new UIPageView('no-tab', { margin: '5 5 5 0' });
 
-    this._tabContainerLayout = new UILayout('urlbar-and-tab', 'horizontal');
+    const urlbarAndTabLayout = new UILayout('urlbar-and-tab', 'horizontal');
+    this._tabContainerLayout = new UILayout('tab-container-layout', 'horizontal');
 
-    this._tabContainerLayout.addChild(urlbar);
-    this._tabContainerLayout.addChild(this._noTabView);
+    urlbarAndTabLayout.addChild(urlbar);
+    urlbarAndTabLayout.addChild(this._tabContainerLayout);
+
+    // this.setNoTabViewVisibility(true);
 
     mainLayout.addChild(sidebar);
-    mainLayout.addChild(this._tabContainerLayout);
+    mainLayout.addChild(urlbarAndTabLayout);
 
     // TODO add notifications view with a fixed position over the main layout
 
@@ -107,6 +110,16 @@ export class UIWindow {
 
     this.renderLayout();
   }
+
+  // setNoTabViewVisibility(visible: boolean) {
+  //   if (visible) {
+  //     const noTab = new UIPageView('no-tab', { margin: '5 5 5 0' });
+  //     this._tabContainerLayout!.addChild(noTab);
+  //   } else {
+  //     const noTab = this.getChild<UIPageView>('no-tab', this._tabContainerLayout!)!;
+  //     // this._tabContainerLayout!.removeChild(noTab);
+  //   }
+  // }
 
   renderLayout(parentLayout?: UILayout, parentBounds?: Rectangle) {
     const layout = parentLayout || this._rootLayout!;
@@ -451,11 +464,11 @@ export class UIWindow {
   refreshTabContainerLayoutView(visible: TViewId[]) {
     const views = getOnlyViews(this._tabContainerLayout!, ['urlbar', 'no-tab']);
 
-    if (visible.length === 0) {
-      this._noTabView!.show();
-    } else {
-      this._noTabView!.hide();
-    }
+    // if (visible.length === 0) {
+    //   this.setNoTabViewVisibility(true);
+    // } else {
+    //   this.setNoTabViewVisibility(false);
+    // }
 
     for (const view of views) {
       if (visible.includes(view.id)) {

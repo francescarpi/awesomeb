@@ -110,12 +110,10 @@ export class UIView {
   }
 
   hide() {
-    this.send('view:visible', false);
     this.webContentsView.setVisible(false);
   }
 
   show() {
-    this.send('view:visible', true);
     this.webContentsView.setVisible(true);
   }
 

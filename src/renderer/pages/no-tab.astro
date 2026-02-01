@@ -13,11 +13,3 @@ import Layout from '../layouts/Base.astro';
     app-region: drag;
   }
 </style>
-
-<script>
-  const noTabView = document.getElementById('no-tab-view')!;
-
-  abView.onChangeVisible((_event, visible) => {
-    noTabView.style.appRegion = visible ? 'drag' : 'no-drag';
-  });
-</script>

@@ -208,6 +208,7 @@ export class Window extends UIWindow {
 
     const { tabContainer, desktop } = result;
 
+    // TODO to think about suspend/or not, all tabs in the container
     for (const tab of tabContainer.tabs) {
       tab.suspend();
     }
