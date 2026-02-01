@@ -32,7 +32,7 @@ export class Tab {
 
     // The view is not visible initially until method to refresh visible tabs is called.
     this._view = new UIView({
-      visible: false,
+      visible: true,
       margin: '5 5 5 0',
       borderRadius: 8,
       backgroundColor: '#ffffff',

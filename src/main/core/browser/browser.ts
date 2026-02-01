@@ -176,7 +176,7 @@ export class Browser {
 
     desktop.addTabContainer(tabContainer);
 
-    window.addInTabContainerLayout(tabContainer.layout);
+    window.addIntoMainLayout(tabContainer.layout);
     window.refreshVisibleTabView();
 
     return { window, desktop, tabContainer, tab };

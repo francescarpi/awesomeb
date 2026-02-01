@@ -6,7 +6,7 @@ import { MIN_DESKTOPS } from './constants';
 import { IDesConTab, TDesktopId, TTabId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
-import { TViewId } from '@/ui/types';
+// import { TViewId } from '@/ui/types';
 
 const scopeLog = log.scope('Window');
 
@@ -74,17 +74,23 @@ export class Window extends UIWindow {
   }
 
   refreshVisibleTabView() {
-    const visible: TViewId[] = [];
+    // const visible: TViewId[] = [];
     const desktop = this.selectedDesktop;
     const tabContainer = desktop.selectedTabContainer;
 
     if (tabContainer) {
-      for (const tab of tabContainer.tabs) {
-        visible.push(tab.view.id);
-      }
+      this.setNoTabVisibility(false);
+      // this.addIntoMainLayout(tabContainer.layout);
+      // for (const tab of tabContainer.tabs) {
+      //   visible.push(tab.view.id);
+      // }
+    } else {
+      this.setNoTabVisibility(true);
     }
 
-    this.refreshTabContainerLayoutView(visible);
+    this.renderLayout();
+
+    // this.refreshTabContainerLayoutView(visible);
   }
 
   getTab(id: TTabId): IDesConTab | null {
@@ -155,16 +161,17 @@ export class Window extends UIWindow {
     // If exist previous selected tab, we have to remove it from the browser window
     const selectedTabContainer = this.selectedDesktop.selectedTabContainer;
     if (selectedTabContainer) {
-      this.removeFromTabContainerLayout(selectedTabContainer.layout);
+      this.removeFromMainLayout(selectedTabContainer.layout);
     }
 
     const { desktop, tabContainer, tab } = result;
 
     this._selectedDesktopId = desktop.id;
 
+    tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
 
-    tabContainer.selectTab(tab.id);
+    this.refreshVisibleTabView();
 
     if (tab.suspended) {
       tab.resume();
@@ -184,7 +191,7 @@ export class Window extends UIWindow {
 
     tab.updateLastAccessed();
 
-    this.addInTabContainerLayout(tabContainer.layout);
+    this.addIntoMainLayout(tabContainer.layout);
     this.refreshVisibleTabView();
   }
 
@@ -219,7 +226,7 @@ export class Window extends UIWindow {
       desktop.selectTabContainer(null);
     }
 
-    this.removeFromTabContainerLayout(tabContainer.layout);
+    this.removeFromMainLayout(tabContainer.layout);
     this.refreshVisibleTabView();
 
     scopeLog.debug(

@@ -11,6 +11,7 @@ export class UIView {
   protected _margin: IMargin = { t: 0, r: 0, b: 0, l: 0 };
   protected _width: number | null = null;
   protected _height: number | null = null;
+  private _visible: boolean = true;
 
   private readonly _borderRadius: number;
   private readonly _backgroundColor: string;
@@ -27,12 +28,7 @@ export class UIView {
     this._margin = props?.margin ? transformMargin(props.margin) : this._margin;
     this._width = props?.width || null;
     this._height = props?.height || null;
-
-    if (props?.visible || props?.visible === undefined) {
-      this.show();
-    } else {
-      this.hide();
-    }
+    this._visible = props?.visible !== undefined ? props.visible : this._visible;
   }
 
   private _createWebContentsView(): WebContentsView {
@@ -97,8 +93,12 @@ export class UIView {
     return this._margin;
   }
 
-  get isVisible(): boolean {
-    return this.webContentsView.getVisible();
+  get visible(): boolean {
+    return this._visible;
+  }
+
+  setVisible(visible: boolean) {
+    this._visible = visible;
   }
 
   get width(): number | null {
@@ -107,14 +107,6 @@ export class UIView {
 
   get height(): number | null {
     return this._height;
-  }
-
-  hide() {
-    this.webContentsView.setVisible(false);
-  }
-
-  show() {
-    this.webContentsView.setVisible(true);
   }
 
   setMargin(margin: string) {
