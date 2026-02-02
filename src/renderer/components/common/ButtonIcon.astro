@@ -3,14 +3,15 @@ import { Icon } from 'astro-icon/components';
 
 interface Props {
   icon: string;
+  className: string;
 }
 
-const { icon } = Astro.props;
+const { icon, className } = Astro.props;
 ---
 
 <Icon
   name={icon}
   id={icon}
-  class="text-2xl hover:bg-white/30 rounded cursor-pointer"
+  class={`text-2xl hover:bg-white/30 rounded cursor-pointer ${className}`}
   style="app-region:no-drag;"
 />
