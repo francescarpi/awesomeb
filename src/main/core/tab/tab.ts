@@ -168,13 +168,13 @@ export class Tab {
     if (this._suspended) {
       return;
     }
+    this.close();
+    this._suspended = true;
+  }
 
-    // TODO save navigation history
-
+  close() {
     this._view.webContents.stop();
     this._view.webContents.close();
-
-    this._suspended = true;
   }
 
   updateLastAccessed() {

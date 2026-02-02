@@ -4,7 +4,6 @@ import {
   TEntityType,
   IDesktopEntity,
   TMenuType,
-  TTabId,
   ITabContainer,
   IURLTabData,
   ITab,
@@ -78,9 +77,6 @@ const abMenu = {
 const abTabs = {
   getTabContainers: (winId: TWindowId) => {
     return ipcRenderer.invoke('tabs:get-tab-containers', winId);
-  },
-  selectTab: (winId: TWindowId, tabId: TTabId) => {
-    return ipcRenderer.invoke('tabs:select', winId, tabId);
   },
   onRefreshTabContainers: (
     callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,

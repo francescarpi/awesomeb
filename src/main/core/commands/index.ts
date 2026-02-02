@@ -18,6 +18,8 @@ import * as tabNext from './tab-next';
 import * as tabPrev from './tab-prev';
 import * as tabSuspend from './tab-suspend';
 import * as tabContainerSelectByIndex from './tabcontainer-select-by-index';
+import * as tabSelect from './tab-select';
+import * as tabClose from './tab-close';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -35,6 +37,8 @@ const COMMANDS = {
   [tabPrev.TRIGGER]: tabPrev.Command,
   [tabSuspend.TRIGGER]: tabSuspend.Command,
   [tabContainerSelectByIndex.TRIGGER]: tabContainerSelectByIndex.Command,
+  [tabSelect.TRIGGER]: tabSelect.Command,
+  [tabClose.TRIGGER]: tabClose.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

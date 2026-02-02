@@ -60,7 +60,6 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abTabs: {
     getTabContainers: (winId: TWindowId) => Promise<ITabContainer[]>;
-    selectTab: (winId: TWindowId, tabId: TTabId) => void;
     onRefreshTabContainers: (
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;

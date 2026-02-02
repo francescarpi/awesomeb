@@ -2,21 +2,21 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 
-const scopeLog = log.scope('SuspendTabCommand');
+const scopeLog = log.scope('CloseTabCommand');
 
 export interface ICommandParams {
   tabId?: TTabId;
 }
 
-export const TRIGGER = 'suspend-tab';
+export const TRIGGER = 'close-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Suspend Tab',
-  description: 'Suspends the currently active tab in the focused window.',
+  name: 'Close Tab',
+  description: 'Closes the currently active tab or a specified tab in the focused window.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
-    let tabToSuspend = tab;
+    let tabToClose = tab;
     if (params.tabId) {
       const targetTab = browser.getTab(params.tabId);
       if (!targetTab) {
@@ -24,15 +24,15 @@ export const Command: ICommand<ICommandParams> = {
         return;
       }
 
-      tabToSuspend = targetTab.tab;
+      tabToClose = targetTab.tab;
     }
 
-    if (!tabToSuspend) {
-      scopeLog.warn('No tab available to suspend.');
+    if (!tabToClose) {
+      scopeLog.warn('No tab available to close.');
       return;
     }
 
-    const success = await window.suspendTab(tabToSuspend.id);
+    const success = await window.closeTab(tabToClose.id);
     if (success) {
       const lastAccessed = window.getLastAccessedTab();
       if (lastAccessed) {

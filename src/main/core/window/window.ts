@@ -216,6 +216,8 @@ export class Window extends UIWindow {
 
     const { tabContainer, desktop } = result;
 
+    // TODO we have to save the history on disk before suspending
+
     // TODO to think about suspend/or not, all tabs in the container
     for (const tab of tabContainer.tabs) {
       tab.suspend();
@@ -235,6 +237,31 @@ export class Window extends UIWindow {
     );
 
     this.eventsChannel.emit('window:tab-did-suspend', this);
+
+    return true;
+  }
+
+  async closeTab(id: TTabId): Promise<boolean> {
+    const result = this.getTab(id);
+    if (!result) {
+      return false;
+    }
+
+    const { tabContainer, desktop, tab } = result;
+
+    tabContainer.closeTab(tab.id);
+
+    if (tabContainer.tabs.length === 0) {
+      desktop.closeTabContainer(tabContainer.id);
+      if (desktop.selectedTabContainer?.id === tabContainer.id) {
+        desktop.selectTabContainer(null);
+      }
+      this.removeFromMainLayout(tabContainer.layout);
+    }
+
+    this.refreshVisibleTabView();
+
+    this.eventsChannel.emit('window:tab-did-close', this);
 
     return true;
   }

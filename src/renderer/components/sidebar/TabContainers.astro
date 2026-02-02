@@ -14,16 +14,20 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 
 <template id="tab-template">
   <li
-    class="cursor-pointer hover:bg-white/10 gap-1 items-center rounded-tl-full rounded-bl-full grid grid-cols-[24px_auto_3px] tab-row"
+    class="cursor-pointer hover:bg-white/10 gap-1 items-center rounded-tl-full rounded-bl-full grid grid-cols-[24px_auto_25px] group"
   >
     <div class="justify-center items-center ml-2 hidden sidebar:flex">
       <span class="loading loading-spinner loading-xs hidden"></span>
       <Icon name="image" id="favicon" />
     </div>
     <span class="overflow-hidden text-ellipsis text-sm text-nowrap py-2"></span>
-    <div class="hidden sidebar:flex">
-      <span class="w-full h-9 partition"></span>
-      <ButtonIcon icon="sidebar" className="hidden suspend" />
+    <div class="hidden sidebar:flex justify-end mr-1">
+      <span class="w-0.5 h-5 partition group-hover:hidden"></span>
+      <ButtonIcon
+        icon="minus"
+        className="suspend hidden group-hover:block group-[.suspended]:hidden"
+      />
+      <ButtonIcon icon="close" className="close hidden group-hover:block group-[.active]:hidden" />
     </div>
   </li>
 </template>
@@ -101,6 +105,8 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         const tabLi = tabClone.querySelector('li')!.cloneNode(true) as HTMLLIElement;
         const tabTitle = tabLi.querySelector('span:nth-child(2)') as HTMLSpanElement;
         const tabProfile = tabLi.querySelector('span.partition') as HTMLSpanElement;
+        const btnSuspend = tabLi.querySelector('svg.suspend') as HTMLSpanElement;
+        const btnClose = tabLi.querySelector('svg.close') as HTMLSpanElement;
 
         tabLi.dataset.tabId = tab.id.toString();
         tabTitle.textContent = tab.title;
@@ -112,10 +118,23 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 
         if (tab.suspended) {
           tabLi.classList.add('opacity-50');
+          tabLi.classList.add('suspended');
+        } else {
+          tabLi.classList.add('active');
         }
 
-        tabLi.onclick = () => {
-          abTabs.selectTab(winId, tab.id);
+        tabTitle.onclick = () => {
+          abCommands.perform(winId, 'select-tab', { tabId: tab.id });
+        };
+
+        btnSuspend.onclick = (e) => {
+          e.stopPropagation();
+          abCommands.perform(winId, 'suspend-tab', { tabId: tab.id });
+        };
+
+        btnClose.onclick = (e) => {
+          e.stopPropagation();
+          abCommands.perform(winId, 'close-tab', { tabId: tab.id });
         };
 
         tabsListElement.appendChild(tabLi);
@@ -126,15 +145,3 @@ import ButtonIcon from '../common/ButtonIcon.astro';
     }
   }
 </script>
-
-<style>
-  @reference "../../assets/app.css";
-
-  .tab-row:hover span.partition {
-    display: none;
-  }
-
-  .tab-row:hover svg.suspend {
-    display: block;
-  }
-</style>

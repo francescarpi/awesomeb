@@ -72,4 +72,11 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('tab:title-did-change', async (tab: Tab) => {
     refreshUrlBarOrTab(browser, tab);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:tab-did-close', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.rendererEmmiter.refreshURLBar(window, null);
+    browser.refreshMainMenu();
+  });
 }

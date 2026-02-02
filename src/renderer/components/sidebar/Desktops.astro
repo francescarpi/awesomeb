@@ -9,7 +9,7 @@
 
 <template id="desktop-template">
   <li
-    class="border rounded-full cursor-pointer select-none flex flex-col items-center justify-center hover:bg-white/20"
+    class="desktop border rounded-full cursor-pointer select-none flex flex-col items-center justify-center hover:bg-white/20"
   >
     <span class="flex justify-center items-center w-full" id="id"></span>
     <div class="justify-center items-center gap-0.5 -mt-0.5 hidden" id="indicators">
@@ -244,11 +244,11 @@
 <style>
   @reference "../../assets/app.css";
 
-  li {
+  li.desktop {
     @apply hidden sidebar:flex w-5 h-5 text-xs sidebar:w-8.75 sidebar:h-8.75 sidebar:text-base relative;
   }
 
-  li.active {
+  li.desktop.active {
     @apply bg-white/20 flex;
   }
 </style>

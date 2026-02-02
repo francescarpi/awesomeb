@@ -121,4 +121,19 @@ export class Desktop {
     }
     return null;
   }
+
+  closeTabContainer(id: TTabContainerId): boolean {
+    const tabContainer = this._tabContainers.get(id);
+    if (!tabContainer) {
+      return false;
+    }
+
+    this._tabContainers.delete(id);
+
+    if (this._selectedTabContainerId === id) {
+      this._selectedTabContainerId = null;
+    }
+
+    return true;
+  }
 }
