@@ -1,7 +1,7 @@
-import { Browser, Window, Desktop } from '@/core';
+import { Browser, Window, Desktop, Tab } from '@/core';
 import { UIPageView } from '@/ui';
 import log from 'electron-log';
-import { ITheme, IURLTabData } from '~/types';
+import { ITheme } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -30,33 +30,17 @@ export class BrowserRendererEmmiter {
     sidebar.send('tabs:refresh', tabContainers);
   }
 
-  refreshURLBar(window: Window) {
+  refreshURLBar(window: Window, tab: Tab | null) {
     const urlbar = window.getChild<UIPageView>('urlbar')!;
-    const data: IURLTabData = {
-      safe: true,
-      url: '',
-      loading: false,
-      tabId: -1,
-    };
+    urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));
+  }
 
-    const desktop = window.selectedDesktop;
-    const tabContainer = desktop.selectedTabContainer;
-    if (!tabContainer) {
-      urlbar.send('urlbar:refresh', data);
-      return;
-    }
-
-    const tab = tabContainer.selectedTab;
-    if (!tab) {
-      urlbar.send('urlbar:refresh', data);
-      return;
-    }
-
-    data.safe = true; // TODO implement safe check
-    data.url = tab.url || '';
-    data.loading = tab.loading;
-    data.tabId = tab.id;
-
-    urlbar.send('urlbar:refresh', data);
+  refreshTab(window: Window, desktop: Desktop, tab: Tab) {
+    const sidebar = window.getChild<UIPageView>('sidebar')!;
+    const selectedTabContainer = desktop.selectedTabContainer;
+    sidebar.send(
+      'tabs:refresh-one',
+      this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
+    );
   }
 }

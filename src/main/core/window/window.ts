@@ -176,16 +176,16 @@ export class Window extends UIWindow {
     if (tab.suspended) {
       tab.resume();
 
-      this.eventsChannel.emit('window:selected-tab-did-change', this);
+      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
       await tab.loadHistoryOrURL();
     } else {
-      this.eventsChannel.emit('window:selected-tab-did-change', this);
+      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
     }
 
     // If tab wasn't suspended, we don't have to add the layout into the window
     if (tab.view.isDestroyed) {
-      this.eventsChannel.emit('window:selected-tab-did-change', this);
+      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
       return;
     }
 

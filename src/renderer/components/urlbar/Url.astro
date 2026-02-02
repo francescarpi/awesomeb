@@ -2,19 +2,25 @@
 // TODO It should be an input with preprend
 ---
 
-<div class="border border-white/50 w-full h-screen rounded-lg flex gap-2 pl-2 items-center">
-  <span class="loading loading-spinner loading-sm hidden" id="tab-loading"></span>
-  <input class="outline-0 w-full h-full rounded-lg" readonly />
+<div
+  class="border border-white/50 w-full h-screen rounded-lg flex gap-2 pl-2 items-center"
+  id="url"
+>
+  <span class="loading loading-spinner loading-xs hidden"></span>
+  <input class="outline-0 w-full h-full rounded-lg text-sm" readonly />
 </div>
 
 <script>
-  const loadingIndicator = document.getElementById('tab-loading')!;
-  // loadingIndicator.classList.remove('hidden');
-  // setTimeout(() => {
-  //   loadingIndicator.classList.add('hidden');
-  // }, 1000);
+  const url = document.getElementById('url')!;
+  const loading = url.querySelector('span')!;
+  const input = url.querySelector('input')!;
 
-  abUrlBar.onRefresh((event, data) => {
-    console.log(data);
+  abUrlBar.onRefresh((_event, data) => {
+    if (data.loading) {
+      loading.classList.remove('hidden');
+    } else {
+      loading.classList.add('hidden');
+    }
+    input.value = data.url;
   });
 </script>

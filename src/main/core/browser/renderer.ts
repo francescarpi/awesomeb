@@ -1,5 +1,23 @@
-import { IEntity, IDesktopEntity, IThemeEntity, IPartitionEntity, ITabContainer } from '~/types';
-import { Browser, config, getCommands, getPartitions, getThemes, Window } from '@/core';
+import {
+  IEntity,
+  IDesktopEntity,
+  IThemeEntity,
+  IPartitionEntity,
+  ITabContainer,
+  IURLTabData,
+  ITab,
+} from '~/types';
+import {
+  Browser,
+  config,
+  Desktop,
+  getCommands,
+  getPartitions,
+  getThemes,
+  Tab,
+  TabContainer,
+  Window,
+} from '@/core';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -111,24 +129,48 @@ export class BrowserRenderer {
       id: tc.id,
       selected: selectedTabContainer?.id === tc.id,
       divider: tc.divider,
-      tabs: tc.tabs.map((tab) => ({
-        id: tab.id,
-        desktopId: desktop.id,
-        windowId: window.id,
-        title: tab.title,
-        url: tab.url,
-        selected: selectedTabContainer?.selectedTab?.id === tab.id,
-        partition: {
-          name: tab.partition.name,
-          color: tab.partition.color,
-          private: tab.partition.private,
-        },
-        suspended: tab.suspended,
-        loading: tab.loading,
-        favicon: tab.favicon,
-        hasTabPreview: tab.hasTabPreview,
-        requireAttention: tab.requireAttention,
-      })),
+      tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
     }));
+  }
+
+  tab(window: Window, desktop: Desktop, selectedTabContainer: TabContainer | null, tab: Tab): ITab {
+    return {
+      id: tab.id,
+      desktopId: desktop.id,
+      windowId: window.id,
+      title: tab.title,
+      url: tab.url,
+      selected: selectedTabContainer?.selectedTab?.id === tab.id,
+      partition: {
+        name: tab.partition.name,
+        color: tab.partition.color,
+        private: tab.partition.private,
+      },
+      suspended: tab.suspended,
+      loading: tab.loading,
+      favicon: tab.favicon,
+      hasTabPreview: tab.hasTabPreview,
+      requireAttention: tab.requireAttention,
+    };
+  }
+
+  urlBarData(tab: Tab | null): IURLTabData {
+    const data: IURLTabData = {
+      safe: true,
+      url: '',
+      loading: false,
+      tabId: -1,
+    };
+
+    if (!tab) {
+      return data;
+    }
+
+    data.safe = true; // TODO implement safe check
+    data.url = tab.url || '';
+    data.loading = tab.loading;
+    data.tabId = tab.id;
+
+    return data;
   }
 }

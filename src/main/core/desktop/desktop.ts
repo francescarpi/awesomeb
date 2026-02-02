@@ -94,6 +94,21 @@ export class Desktop {
     return this._tabContainers.get(this._selectedTabContainerId) || null;
   }
 
+  get selectedTab(): IConTab | null {
+    const tabContainer = this.selectedTabContainer;
+    if (!tabContainer) {
+      return null;
+    }
+    const tab = tabContainer.selectedTab;
+    if (!tab) {
+      return null;
+    }
+    return {
+      tabContainer,
+      tab,
+    };
+  }
+
   getTab(id: TTabId): IConTab | null {
     for (const tabContainer of this._tabContainers.values()) {
       const tab = tabContainer.getTab(id);

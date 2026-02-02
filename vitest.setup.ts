@@ -26,6 +26,7 @@ vi.mock('electron', () => {
     isDestroyed: vi.fn(() => false),
     stop: vi.fn(),
     close: vi.fn(),
+    on: vi.fn(),
   };
 
   return {

@@ -14,7 +14,7 @@ import { internalPartition } from '@/core';
 import { IMargin } from '~/types';
 import { buildScopeLog } from '@/utils';
 
-const scopeLog = buildScopeLog('UIWindow', true);
+const scopeLog = buildScopeLog('UIWindow', process.env.AB_LOG_UI === 'true');
 
 interface IFlexibleChildrenInfo {
   flexibleCount: number;
@@ -94,7 +94,7 @@ export class UIWindow {
 
     // URL BAR ------------------------------------------------------------
     const urlbar = new UIPageView('urlbar', {
-      height: 40,
+      height: 32,
       query: { winId: this.id.toString() },
       margin: '5 5 0 0',
     });

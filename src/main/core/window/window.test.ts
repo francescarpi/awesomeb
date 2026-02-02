@@ -568,7 +568,7 @@ describe('selectTab', () => {
 
     await w.selectTab(tab.id);
 
-    expect(eventSpy).toHaveBeenCalledWith(w);
+    expect(eventSpy).toHaveBeenCalledWith(w, tab);
   });
 
   test('should do nothing when selecting non-existent tab', async () => {

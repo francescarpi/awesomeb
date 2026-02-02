@@ -5,6 +5,7 @@ import { UIView, UILayout } from '@/ui';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { session } from 'electron';
+import { registerTabEvents } from './events';
 
 const scopeLog = log.scope('Tab');
 
@@ -44,6 +45,8 @@ export class Tab {
     // The tab layout will be used to show, for instance, the find in page view below the webview.
     this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');
     this._layout.addChild(this._view);
+
+    registerTabEvents(this);
   }
 
   get id(): TTabId {
