@@ -1,5 +1,5 @@
 ---
-// TODO It should be an input with preprend
+import { Icon } from 'astro-icon/components';
 ---
 
 <div
@@ -7,6 +7,8 @@
   id="url"
 >
   <span class="loading loading-spinner loading-xs hidden"></span>
+  <Icon name="safe" id="safe-site" class="hidden" />
+  <Icon name="unsafe" id="unsafe-site" class="hidden" />
   <input class="outline-0 w-full h-full rounded-lg text-sm" readonly />
 </div>
 
@@ -14,6 +16,8 @@
   const url = document.getElementById('url')!;
   const loading = url.querySelector('span')!;
   const input = url.querySelector('input')!;
+  const safeIcon = url.querySelector('#safe-site')!;
+  const unsafeIcon = url.querySelector('#unsafe-site')!;
 
   abUrlBar.onRefresh((_event, data) => {
     if (data.loading) {
@@ -21,6 +25,20 @@
     } else {
       loading.classList.add('hidden');
     }
+
     input.value = data.url;
+
+    if (data.url.trim().length > 0 && !data.loading) {
+      if (data.safe) {
+        safeIcon.classList.remove('hidden');
+        unsafeIcon.classList.add('hidden');
+      } else {
+        safeIcon.classList.add('hidden');
+        unsafeIcon.classList.remove('hidden');
+      }
+    } else {
+      safeIcon.classList.add('hidden');
+      unsafeIcon.classList.add('hidden');
+    }
   });
 </script>
