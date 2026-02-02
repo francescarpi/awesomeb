@@ -41,7 +41,7 @@ export function setupCommandsIPC(browser: Browser) {
             return;
           }
 
-          if (modalManager) {
+          if (modalManager && modalManager.isOpen) {
             modalManager.close();
           }
         },

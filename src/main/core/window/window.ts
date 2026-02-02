@@ -166,6 +166,8 @@ export class Window extends UIWindow {
 
     const { desktop, tabContainer, tab } = result;
 
+    this.addIntoMainLayout(tabContainer.layout);
+
     this._selectedDesktopId = desktop.id;
 
     tabContainer.selectTab(tab.id);
@@ -191,7 +193,6 @@ export class Window extends UIWindow {
 
     tab.updateLastAccessed();
 
-    this.addIntoMainLayout(tabContainer.layout);
     this.refreshVisibleTabView();
   }
 

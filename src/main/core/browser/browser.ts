@@ -153,7 +153,7 @@ export class Browser {
     return (maxId + 1) as TTabContainerId;
   }
 
-  openURL(query: string, props?: IOpenUrlProps): IWinDesConTab | null {
+  async openURL(query: string, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
     scopeLog.info(`Opening URL with query: ${query}`);
 
     const url = parseQuery(query, props?.searchEngineCode);
@@ -163,7 +163,6 @@ export class Browser {
     }
 
     const result = parseTarget(this, props?.targetId);
-
     if (!result) {
       scopeLog.error('Invalid target for opening URL');
       return null;
@@ -171,13 +170,11 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
     const tab = tabContainer.createTab({ partition });
-
-    tab.loadURL(url);
-
     desktop.addTabContainer(tabContainer);
 
-    window.addIntoMainLayout(tabContainer.layout);
     window.refreshVisibleTabView();
+
+    await tab.loadURL(url);
 
     return { window, desktop, tabContainer, tab };
   }

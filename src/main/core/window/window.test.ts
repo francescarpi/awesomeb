@@ -46,7 +46,7 @@ test('select tab should work correctly', async () => {
   expect(desktop).not.toBeNull();
   expect(desktop?.selectedTabContainer).toBeNull();
 
-  const result = browser.openURL('http://example.com');
+  const result = await browser.openURL('http://example.com');
   expect(result).not.toBeNull();
 
   const { tab, window, tabContainer } = result!;
@@ -71,15 +71,15 @@ describe('getAllTabs', () => {
     expect(allTabs.length).toBe(0);
   });
 
-  test('should return all tabs from a single desktop', () => {
+  test('should return all tabs from a single desktop', async () => {
     const browser = new Browser();
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
     // Open multiple tabs on desktop 1
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
-    const result3 = browser.openURL('http://example3.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
 
     const allTabs = w.getAllTabs();
 
@@ -89,22 +89,22 @@ describe('getAllTabs', () => {
     expect(allTabs[2].tab.id).toBe(result3!.tab.id);
   });
 
-  test('should return all tabs from multiple desktops', () => {
+  test('should return all tabs from multiple desktops', async () => {
     const browser = new Browser();
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
     // Open tabs on desktop 1 (default)
-    const result1 = browser.openURL('http://example1.com');
+    const result1 = await browser.openURL('http://example1.com');
 
     // Switch to desktop 2 and open tabs
     w.selectDesktop(2);
-    const result2 = browser.openURL('http://example2.com');
-    const result3 = browser.openURL('http://example3.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
 
     // Switch to desktop 3 and open a tab
     w.selectDesktop(3);
-    const result4 = browser.openURL('http://example4.com');
+    const result4 = await browser.openURL('http://example4.com');
 
     const allTabs = w.getAllTabs();
 
@@ -118,12 +118,12 @@ describe('getAllTabs', () => {
     expect(tabIds).toContain(result4!.tab.id);
   });
 
-  test('should return tabs with correct desktop and tabContainer references', () => {
+  test('should return tabs with correct desktop and tabContainer references', async () => {
     const browser = new Browser();
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     const allTabs = w.getAllTabs();
 
     expect(allTabs.length).toBe(1);
@@ -139,7 +139,7 @@ describe('suspendTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     expect(result).not.toBeNull();
     const { tab } = result!;
 
@@ -168,7 +168,7 @@ describe('suspendTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     expect(result).not.toBeNull();
     const { tab, desktop, tabContainer } = result!;
 
@@ -188,7 +188,7 @@ describe('suspendTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     expect(result).not.toBeNull();
     const { tab, desktop, tabContainer } = result!;
 
@@ -207,7 +207,7 @@ describe('suspendTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     const { tab } = result!;
 
     await w.selectTab(tab.id);
@@ -226,7 +226,7 @@ describe('suspendTab', () => {
     w.createDefaultDesktops();
 
     // Open first tab which creates a tab container
-    const result1 = browser.openURL('http://example1.com');
+    const result1 = await browser.openURL('http://example1.com');
     expect(result1).not.toBeNull();
 
     const { tab: tab1 } = result1!;
@@ -263,9 +263,9 @@ describe('getLastAccessedTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
-    const result3 = browser.openURL('http://example3.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
 
     expect(result1).not.toBeNull();
     expect(result2).not.toBeNull();
@@ -292,8 +292,8 @@ describe('getLastAccessedTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
 
     expect(result1).not.toBeNull();
     expect(result2).not.toBeNull();
@@ -337,11 +337,11 @@ describe('getLastAccessedTab', () => {
     const desktop2 = w.getDesktop(2)!;
 
     // Open tab on desktop 1
-    const result1 = browser.openURL('http://example1.com');
+    const result1 = await browser.openURL('http://example1.com');
 
     // Switch to desktop 2 and open tab
     w.selectDesktop(2);
-    const result2 = browser.openURL('http://example2.com');
+    const result2 = await browser.openURL('http://example2.com');
 
     // Manually activate both tabs
     result1!.tab.activate();
@@ -371,8 +371,8 @@ describe('getLastAccessedTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
 
     await w.selectTab(result1!.tab.id);
     await w.selectTab(result2!.tab.id);
@@ -391,7 +391,7 @@ describe('getLastAccessedTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     await w.selectTab(result!.tab.id);
 
     const desktop = w.getDesktop(1)!;
@@ -411,7 +411,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     expect(result).not.toBeNull();
     const { tab, tabContainer, desktop } = result!;
 
@@ -426,9 +426,9 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
-    const result3 = browser.openURL('http://example3.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
 
     // Select first tab
     await w.selectTab(result1!.tab.id);
@@ -448,8 +448,8 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
 
     // Select last tab
     await w.selectTab(result2!.tab.id);
@@ -465,9 +465,9 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
-    const result3 = browser.openURL('http://example3.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
 
     // Select third tab
     await w.selectTab(result3!.tab.id);
@@ -487,8 +487,8 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result1 = browser.openURL('http://example1.com');
-    const result2 = browser.openURL('http://example2.com');
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
 
     // Select first tab
     await w.selectTab(result1!.tab.id);
@@ -505,7 +505,7 @@ describe('selectTab', () => {
     w.createDefaultDesktops();
 
     // Open tab on desktop 1
-    const result1 = browser.openURL('http://example1.com');
+    const result1 = await browser.openURL('http://example1.com');
 
     // Switch to desktop 2 and open tab
     w.selectDesktop(2);
@@ -525,7 +525,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     const { tab } = result!;
 
     // Select and then suspend the tab
@@ -544,7 +544,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     const { tab } = result!;
 
     const initialLastAccessed = tab.lastAccessed;
@@ -560,7 +560,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     const { tab } = result!;
 
     const eventSpy = vi.fn();
@@ -576,7 +576,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
     await w.selectTab(result!.tab.id);
 
     const initialSelectedDesktop = w.selectedDesktop.id;
@@ -593,7 +593,7 @@ describe('selectTab', () => {
     const w = browser.createWindow();
     w.createDefaultDesktops();
 
-    const result = browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com');
 
     // Don't select any tab initially
     expect(w.selectedDesktop.selectedTabContainer).toBeNull();
