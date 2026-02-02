@@ -7,6 +7,7 @@ import {
   TTabId,
   ITabContainer,
   IURLTabData,
+  ITab,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -81,8 +82,13 @@ const abTabs = {
   selectTab: (winId: TWindowId, tabId: TTabId) => {
     return ipcRenderer.invoke('tabs:select', winId, tabId);
   },
-  onRefresh: (callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void) => {
+  onRefreshTabContainers: (
+    callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
+  ) => {
     ipcRenderer.on('tabs:refresh', callback);
+  },
+  onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => {
+    ipcRenderer.on('tabs:refresh-one', callback);
   },
 };
 

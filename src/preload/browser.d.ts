@@ -9,6 +9,7 @@ import {
   TMenuType,
   ITabContainer,
   TTabId,
+  ITab,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -60,9 +61,10 @@ declare global {
   const abTabs: {
     getTabContainers: (winId: TWindowId) => Promise<ITabContainer[]>;
     selectTab: (winId: TWindowId, tabId: TTabId) => void;
-    onRefresh: (
+    onRefreshTabContainers: (
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;
+    onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => void;
   };
 
   //--------------------------------------------------------------------------------------

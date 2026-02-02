@@ -2,7 +2,7 @@
 
 ---
 
-<ul id="tabContainers" style="app-region: no-drag;"></ul>
+<ul id="tabContainers" style="app-region: no-drag;" class="flex flex-col gap-1"></ul>
 
 <template id="tab-container-template">
   <li class="flex items-center gap-1">
@@ -13,8 +13,10 @@
 
 <template id="tab-template">
   <li
-    class="p-2 cursor-pointer hover:bg-white/10 overflow-hidden text-ellipsis text-sm text-nowrap"
+    class="p-2 cursor-pointer hover:bg-white/10 flex gap-2 items-center rounded-tl-full rounded-bl-full"
   >
+    <span class="loading loading-spinner loading-xs hidden"></span>
+    <span class="overflow-hidden text-ellipsis text-sm text-nowrap"></span>
   </li>
 </template>
 
@@ -33,8 +35,24 @@
 
   fetchTabContainers();
 
-  abTabs.onRefresh((_event, tabContainers) => {
+  abTabs.onRefreshTabContainers((_event, tabContainers) => {
     refreshTabContainers(tabContainers);
+  });
+
+  abTabs.onRefreshOne((_event, tab) => {
+    const tabLi = document.querySelector(`li[data-tab-id="${tab.id}"]`) as HTMLLIElement;
+    if (tabLi) {
+      const loading = tabLi.querySelector('span:nth-child(1)') as HTMLSpanElement;
+      const tabTitle = tabLi.querySelector('span:nth-child(2)') as HTMLSpanElement;
+
+      tabTitle.textContent = tab.title;
+
+      if (tab.loading) {
+        loading.classList.remove('hidden');
+      } else {
+        loading.classList.add('hidden');
+      }
+    }
   });
 
   //----------------------------------------------------------------
@@ -70,8 +88,10 @@
         const tabClone = tplTab.content.cloneNode(true) as DocumentFragment;
 
         const tabLi = tabClone.querySelector('li')!.cloneNode(true) as HTMLLIElement;
-        tabLi.textContent = tab.title;
+        const tabTitle = tabLi.querySelector('span:nth-child(2)') as HTMLSpanElement;
+
         tabLi.dataset.tabId = tab.id.toString();
+        tabTitle.textContent = tab.title;
 
         if (tab.selected) {
           tabLi.classList.add('bg-white/20');

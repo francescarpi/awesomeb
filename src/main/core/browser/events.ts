@@ -1,6 +1,7 @@
 import { TWindowId } from '~/types';
 import { Browser, Window, Desktop, Tab } from '@/core';
 import log from 'electron-log';
+import { refreshUrlBarOrTab } from './events.herlpers';
 
 const scopeLog = log.scope('BrowserEvents');
 
@@ -59,30 +60,16 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:loading-did-change', async (tab: Tab) => {
-    const result = browser.getTab(tab.id);
-    if (!result) {
-      return;
-    }
+    refreshUrlBarOrTab(browser, tab);
+  });
 
-    const { window, desktop } = result;
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:url-did-change', async (tab: Tab) => {
+    refreshUrlBarOrTab(browser, tab);
+  });
 
-    const selectedDesktop = window.selectedDesktop;
-    const selectedTab = selectedDesktop.selectedTab;
-
-    let someChanged = false;
-
-    if (selectedTab?.tab.id === tab.id) {
-      browser.rendererEmmiter.refreshURLBar(window, tab);
-      someChanged = true;
-    }
-
-    if (desktop.id === selectedDesktop.id) {
-      browser.rendererEmmiter.refreshTab(window, desktop, tab);
-      someChanged = true;
-    }
-
-    if (someChanged) {
-      browser.refreshMainMenu();
-    }
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:title-did-change', async (tab: Tab) => {
+    refreshUrlBarOrTab(browser, tab);
   });
 }

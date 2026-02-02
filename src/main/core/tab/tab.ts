@@ -61,8 +61,26 @@ export class Tab {
     return this._customTitle || this._title || this._url || 'Untitled';
   }
 
+  setTitle(title: string) {
+    if (this._title === title) {
+      return;
+    }
+
+    this._title = title;
+    this.eventsChannel.emit('tab:title-did-change', this);
+  }
+
   get url(): string | null {
     return this._url;
+  }
+
+  setUrl(url: string) {
+    if (this._url === url) {
+      return;
+    }
+
+    this._url = url;
+    this.eventsChannel.emit('tab:url-did-change', this);
   }
 
   get suspended(): boolean {
@@ -80,10 +98,6 @@ export class Tab {
 
     this._loading = loading;
     this.eventsChannel.emit('tab:loading-did-change', this);
-
-    // TODO in the browser:
-    //  - if tab is the active => update the url bar
-    //  - if not update tabs container list only the window
   }
 
   get favicon(): string | null {
