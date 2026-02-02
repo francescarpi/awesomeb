@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     let tabToSuspend = tab;
-    if (params.tabId) {
+    if (params?.tabId) {
       const targetTab = browser.getTab(params.tabId);
       if (!targetTab) {
         scopeLog.warn(`Tab with ID ${params.tabId} not found.`);
