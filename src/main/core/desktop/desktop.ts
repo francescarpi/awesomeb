@@ -44,12 +44,17 @@ export class Desktop {
   }
 
   get hasTabs(): boolean {
-    // TODO implement
-    return false;
+    return this._tabContainers.size > 0;
   }
 
   get hasActiveTabs(): boolean {
-    // TODO implement
+    for (const tabContainer of this._tabContainers.values()) {
+      for (const tab of tabContainer.tabs) {
+        if (!tab.suspended) {
+          return true;
+        }
+      }
+    }
     return false;
   }
 

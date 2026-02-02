@@ -17,9 +17,11 @@ vi.mock('electron-log', () => ({
 }));
 
 vi.mock('electron', () => {
-  const webContents = {
+  let webContentsIdCounter = 1;
+
+  const createWebContents = () => ({
     openDevTools: vi.fn(),
-    id: 1,
+    id: webContentsIdCounter++,
     loadFile: vi.fn().mockResolvedValue(undefined),
     loadURL: vi.fn().mockResolvedValue(undefined),
     send: vi.fn(),
@@ -27,7 +29,9 @@ vi.mock('electron', () => {
     stop: vi.fn(),
     close: vi.fn(),
     on: vi.fn(),
-  };
+  });
+
+  const webContents = createWebContents();
 
   return {
     session: {
@@ -84,7 +88,7 @@ vi.mock('electron', () => {
       }
     },
     WebContentsView: class {
-      webContents = webContents;
+      webContents = createWebContents();
       setBounds = vi.fn();
       getBounds() {
         return { x: 0, y: 0, width: 400, height: 400 };

@@ -173,8 +173,10 @@ export class Tab {
   }
 
   close() {
-    this._view.webContents.stop();
-    this._view.webContents.close();
+    if (this._view.webContents !== undefined) {
+      this._view.webContents.stop();
+      this._view.webContents.close();
+    }
   }
 
   updateLastAccessed() {

@@ -1,5 +1,5 @@
 import { expect, test, describe, vi } from 'vitest';
-import { Browser } from '@/core';
+import { Browser, defaultPartition, TabContainer } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 
 test('recent created window should have MIN_DESKTOPS', () => {
@@ -602,5 +602,266 @@ describe('selectTab', () => {
     await w.selectTab('next');
 
     expect(w.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(result!.tab.id);
+  });
+});
+
+describe('closeTab', () => {
+  test('should close a tab and return true', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    const { tab, tabContainer } = result!;
+
+    expect(tabContainer.tabs.length).toBe(1);
+
+    const closed = await w.closeTab(tab.id);
+
+    expect(closed).toBe(true);
+    expect(tabContainer.tabs.length).toBe(0);
+  });
+
+  test('should return false when tab does not exist', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const closed = await w.closeTab(999 as any);
+
+    expect(closed).toBe(false);
+  });
+
+  test('should emit window:tab-did-close event', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+
+    const eventSpy = vi.fn();
+    w.eventsChannel.on('window:tab-did-close', eventSpy);
+
+    await w.closeTab(tab.id);
+
+    expect(eventSpy).toHaveBeenCalledWith(w);
+  });
+
+  test('should close tab container when it becomes empty', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    const { tab, tabContainer, desktop } = result!;
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(desktop.tabContainers[0].id).toBe(tabContainer.id);
+
+    await w.closeTab(tab.id);
+
+    expect(desktop.tabContainers.length).toBe(0);
+  });
+
+  test('should deselect tab container when closed tab container was selected', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    const { tab, desktop, tabContainer } = result!;
+
+    // Select the tab
+    await w.selectTab(tab.id);
+    expect(desktop.selectedTabContainer?.id).toBe(tabContainer.id);
+
+    // Close the tab
+    await w.closeTab(tab.id);
+
+    expect(desktop.selectedTabContainer).toBeNull();
+  });
+
+  test('should not close tab container when it has remaining tabs', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const desktop = w.selectedDesktop;
+
+    // Create a tab container with multiple tabs
+    const tabContainer = new TabContainer(browser.eventsChannel, 1 as any);
+
+    const tab1 = tabContainer.createTab({
+      partition: defaultPartition,
+      url: 'http://example1.com',
+    });
+
+    const tab2 = tabContainer.createTab({
+      partition: defaultPartition,
+      url: 'http://example2.com',
+    });
+
+    desktop.addTabContainer(tabContainer);
+
+    expect(tabContainer.tabs.length).toBe(2);
+    expect(desktop.tabContainers.length).toBe(1);
+
+    // Close the first tab
+    await w.closeTab(tab1.id);
+
+    // Tab container should still exist with one tab
+    expect(tabContainer.tabs.length).toBe(1);
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(tabContainer.getTab(tab2.id)).toBe(tab2);
+  });
+
+  test('should handle closing tab from different desktop', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const desktop1 = w.getDesktop(1)!;
+
+    // Open tab on desktop 1
+    const result1 = await browser.openURL('http://example1.com');
+    expect(result1).not.toBeNull();
+    expect(result1!.desktop.id).toBe(1);
+
+    // Switch to desktop 2 and open tab
+    w.selectDesktop(2);
+    const result2 = await browser.openURL('http://example2.com');
+    expect(result2).not.toBeNull();
+    expect(result2!.desktop.id).toBe(2);
+
+    expect(w.selectedDesktop.id).toBe(2);
+
+    // Verify result1 tab exists on desktop 1
+    const tabBeforeClose = desktop1.getTab(result1!.tab.id);
+    expect(tabBeforeClose).not.toBeNull();
+
+    // Close tab from desktop 1 while on desktop 2
+    const closed = await w.closeTab(result1!.tab.id);
+
+    expect(closed).toBe(true);
+    expect(w.selectedDesktop.id).toBe(2); // Should remain on desktop 2
+
+    // Verify tab is removed from desktop 1
+    const tabAfterClose = desktop1.getTab(result1!.tab.id);
+    expect(tabAfterClose).toBeNull();
+
+    // Verify result2 tab still exists
+    expect(w.getTab(result2!.tab.id)).not.toBeNull();
+  });
+
+  test('should handle closing multiple tabs sequentially', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result1 = await browser.openURL('http://example1.com');
+    const result2 = await browser.openURL('http://example2.com');
+    const result3 = await browser.openURL('http://example3.com');
+
+    expect(w.getAllTabs().length).toBe(3);
+
+    await w.closeTab(result1!.tab.id);
+    expect(w.getAllTabs().length).toBe(2);
+
+    await w.closeTab(result2!.tab.id);
+    expect(w.getAllTabs().length).toBe(1);
+
+    await w.closeTab(result3!.tab.id);
+    expect(w.getAllTabs().length).toBe(0);
+  });
+
+  test('should handle closing currently selected tab', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    const { tab, tabContainer, desktop } = result!;
+
+    // Select the tab
+    await w.selectTab(tab.id);
+    expect(desktop.selectedTabContainer?.selectedTab?.id).toBe(tab.id);
+
+    // Close the selected tab
+    await w.closeTab(tab.id);
+
+    // Tab should be gone
+    expect(tabContainer.selectedTab).toBeNull();
+    expect(desktop.selectedTabContainer).toBeNull();
+  });
+
+  test('should refresh visible tab view after closing tab', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result1 = await browser.openURL('http://example1.com');
+    await browser.openURL('http://example2.com');
+
+    // Select first tab
+    await w.selectTab(result1!.tab.id);
+
+    const refreshSpy = vi.spyOn(w, 'refreshVisibleTabView');
+
+    // Close the tab
+    await w.closeTab(result1!.tab.id);
+
+    expect(refreshSpy).toHaveBeenCalled();
+
+    refreshSpy.mockRestore();
+  });
+
+  test('should handle closing tab when container has no selected tab', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    const { tab, tabContainer } = result!;
+
+    // Manually deselect the tab in the container
+    tabContainer.selectTab(null);
+    expect(tabContainer.selectedTab).toBeNull();
+
+    // Close the tab
+    const closed = await w.closeTab(tab.id);
+
+    expect(closed).toBe(true);
+    expect(tabContainer.tabs.length).toBe(0);
+  });
+
+  test('should handle closing all tabs across all desktops', async () => {
+    const browser = new Browser();
+    const w = browser.createWindow();
+    w.createDefaultDesktops();
+
+    // Open tabs on multiple desktops
+    const result1 = await browser.openURL('http://example1.com');
+    w.selectDesktop(2);
+    const result2 = await browser.openURL('http://example2.com');
+    w.selectDesktop(3);
+    const result3 = await browser.openURL('http://example3.com');
+
+    expect(w.getAllTabs().length).toBe(3);
+
+    // Close all tabs
+    await w.closeTab(result1!.tab.id);
+    await w.closeTab(result2!.tab.id);
+    await w.closeTab(result3!.tab.id);
+
+    expect(w.getAllTabs().length).toBe(0);
+    expect(w.getDesktop(1)!.tabContainers.length).toBe(0);
+    expect(w.getDesktop(2)!.tabContainers.length).toBe(0);
+    expect(w.getDesktop(3)!.tabContainers.length).toBe(0);
   });
 });

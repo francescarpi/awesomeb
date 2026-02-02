@@ -241,6 +241,22 @@ export class Window extends UIWindow {
     return true;
   }
 
+  /**
+   * Closes a tab by its ID
+   *
+   * This method:
+   * 1. Finds and closes the specified tab
+   * 2. If the tab container becomes empty, it also closes the container
+   * 3. Deselects the container if it was selected
+   * 4. Refreshes the visible tab view
+   * 5. Emits 'window:tab-did-close' event
+   *
+   * Note: This method does not automatically select another tab.
+   * The caller is responsible for selecting a new tab if needed.
+   *
+   * @param id - The ID of the tab to close
+   * @returns true if the tab was found and closed, false otherwise
+   */
   async closeTab(id: TTabId): Promise<boolean> {
     const result = this.getTab(id);
     if (!result) {

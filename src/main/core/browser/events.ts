@@ -48,6 +48,7 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, tab);
+    browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
 
@@ -55,6 +56,7 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
+    browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
 
@@ -77,6 +79,7 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:tab-did-close', async (window: Window) => {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
+    browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
 }
