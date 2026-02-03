@@ -19,7 +19,6 @@ export class UIModalManager {
   close() {
     if (this._modal) {
       this._modal.bw.hide();
-      this._modal.bw.close();
       this._modal = null;
     }
   }

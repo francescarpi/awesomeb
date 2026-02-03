@@ -321,6 +321,17 @@ function tabsMenu(
           }
         },
       },
+      {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        enabled: tab !== null,
+        icon: getIcon(EIcon.Close),
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'close-tab');
+          }
+        },
+      },
     ],
   };
 }

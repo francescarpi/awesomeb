@@ -1,6 +1,7 @@
 import path from 'path';
 
 export enum EIcon {
+  Close = 'close.png',
   Command = 'command.png',
   Desktop = 'desktop.png',
   Edit = 'edit.png',
