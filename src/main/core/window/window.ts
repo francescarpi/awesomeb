@@ -122,10 +122,10 @@ export class Window extends UIWindow {
       }
     }
 
-    const selectedTab = tabContainer.selectedTab!;
+    const selectedTab = tabContainer.selectedTab;
     const allTabs = this.getAllTabs();
     const currentIndex = allTabs.findIndex(
-      (conTab) => conTab.tab.id === selectedTab.id && conTab.tabContainer.id === tabContainer.id,
+      (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
     );
 
     let newIndex: number;

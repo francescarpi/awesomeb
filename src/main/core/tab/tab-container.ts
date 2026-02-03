@@ -30,8 +30,6 @@ export class TabContainer {
     this._layout.addChild(tab.layout);
     this._tabs.set(tab.id, tab);
 
-    this._selectedTabId = tab.id;
-
     return tab;
   }
 

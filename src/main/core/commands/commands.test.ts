@@ -344,14 +344,15 @@ describe('Commands', () => {
       browser.openURL('https://example2.com');
       const desktop = window.selectedDesktop!;
       const tabContainer = desktop.tabContainers[0];
-      const tab = tabContainer.selectedTab!;
+      tabContainer.selectTab(tabContainer.tabs[0].id);
+      const tab = tabContainer.selectedTab;
       const selectTabSpy = vi.spyOn(window, 'selectTab');
 
       await browser.performCommand(window, tabContainerSelectByIndex.TRIGGER, {
         index: 1,
       });
 
-      expect(selectTabSpy).toHaveBeenCalledWith(tab.id);
+      expect(selectTabSpy).toHaveBeenCalledWith(tab?.id);
     });
 
     test('tabcontainer-select-by-index: should handle invalid index gracefully', async () => {

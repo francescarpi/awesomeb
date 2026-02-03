@@ -1,4 +1,7 @@
 import { ICommand } from './types';
+import log from 'electron-log';
+
+const scopeLog = log.scope('SelectTabContainerByIndexCommand');
 
 export interface ICommandParams {
   index: number;
@@ -13,9 +16,22 @@ export const Command: ICommand<ICommandParams> = {
   visibility: ({ window }) => !!window,
   async handler({ window, desktop, params }) {
     const tabContainers = desktop.tabContainers;
+    if (tabContainers.length === 0) {
+      scopeLog.warn('No tab containers available to select.');
+      return;
+    }
+
     const result = tabContainers[params.index - 1];
-    if (result && result.selectedTab) {
-      await window.selectTab(result.selectedTab.id);
+    if (result) {
+      if (result.selectedTab) {
+        await window.selectTab(result.selectedTab.id);
+      } else {
+        await window.selectTab(result.tabs[0].id);
+      }
+    } else {
+      scopeLog.warn(
+        `No tab container found at index ${params.index - 1}. Total containers: ${tabContainers.length}`,
+      );
     }
   },
 };
