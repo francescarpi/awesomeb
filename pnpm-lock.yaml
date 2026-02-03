@@ -43,8 +43,8 @@ importers:
         specifier: 9.2.1
         version: 9.2.1
       daisyui:
-        specifier: 5.5.16
-        version: 5.5.16
+        specifier: 5.5.17
+        version: 5.5.17
       electron:
         specifier: 40.1.0
         version: 40.1.0
@@ -1683,8 +1683,8 @@ packages:
     resolution: {integrity: sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0, npm: '>=7.0.0'}
 
-  daisyui@5.5.16:
-    resolution: {integrity: sha512-EPGcgduRIwXoQPuIl+r2BXRQsOutvf7UEB/mBfRiD2fdOYYnUqDU5PNp2eONnRqo1DxSsnD01gCRPccH65FWtQ==}
+  daisyui@5.5.17:
+    resolution: {integrity: sha512-Y8QWps/990Epp0Gn+7ReeALSXgwrd3W36waokJvHgqUdYx6t2sj0e1krW3+YqviBa57XTJqHJNTt8HMvcODL2Q==}
 
   debounce-fn@6.0.0:
     resolution: {integrity: sha512-rBMW+F2TXryBwB54Q0d8drNEI+TfoS9JpNTAoVpukbWEhjXQq4rySFYLaqXMFXwdv61Zb2OHtj5bviSoimqxRQ==}
@@ -5878,7 +5878,7 @@ snapshots:
     dependencies:
       css-tree: 2.2.1
 
-  daisyui@5.5.16: {}
+  daisyui@5.5.17: {}
 
   debounce-fn@6.0.0:
     dependencies:
