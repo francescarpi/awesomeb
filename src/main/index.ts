@@ -8,7 +8,7 @@ import {
   setupTabIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
-import { setupLogs, setupAbout } from './boot';
+import { setupLogs, setupAbout, setupFeatures } from './boot';
 import { registerAppEvents } from './events';
 import { setupMenuIPC } from '@/menu';
 
@@ -16,6 +16,7 @@ export type { IModalProps } from './ui';
 
 setupLogs();
 setupAbout();
+setupFeatures();
 
 app.whenReady().then(() => {
   const browser = new Browser();

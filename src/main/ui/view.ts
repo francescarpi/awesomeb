@@ -124,6 +124,30 @@ export class UIView {
   send(channel: string, ...args: any[]) {
     this.webContents.send(channel, ...args);
   }
+
+  reload() {
+    this.webContents.reload();
+  }
+
+  get canGoBack(): boolean {
+    return this.webContents.navigationHistory.canGoBack();
+  }
+
+  get canGoForward(): boolean {
+    return this.webContents.navigationHistory.canGoForward();
+  }
+
+  goBack() {
+    if (this.canGoBack) {
+      this.webContents.navigationHistory.goBack();
+    }
+  }
+
+  goForward() {
+    if (this.canGoForward) {
+      this.webContents.navigationHistory.goForward();
+    }
+  }
 }
 
 export class UIPageView extends UIView {

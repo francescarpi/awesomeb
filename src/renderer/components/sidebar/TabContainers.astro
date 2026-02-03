@@ -14,7 +14,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 
 <template id="tab-template">
   <li
-    class="cursor-pointer hover:bg-white/10 gap-1 items-center rounded-tl-full rounded-bl-full grid grid-cols-[24px_auto_25px] group"
+    class="cursor-pointer hover:bg-white/10 gap-1 items-center rounded-tl-full rounded-bl-full grid grid-cols-[24px_auto_25px] group select-none"
   >
     <div class="justify-center items-center ml-2 hidden sidebar:flex">
       <span class="loading loading-spinner loading-xs hidden"></span>
@@ -107,6 +107,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         const tabProfile = tabLi.querySelector('span.partition') as HTMLSpanElement;
         const btnSuspend = tabLi.querySelector('svg.suspend') as HTMLSpanElement;
         const btnClose = tabLi.querySelector('svg.close') as HTMLSpanElement;
+        const favicon = tabLi.querySelector('#favicon') as HTMLElement;
 
         tabLi.dataset.tabId = tab.id.toString();
         tabTitle.textContent = tab.title;
@@ -125,6 +126,18 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 
         tabTitle.onclick = () => {
           abCommands.perform(winId, 'select-tab', { tabId: tab.id });
+        };
+
+        favicon.onclick = () => {
+          abCommands.perform(winId, 'select-tab', { tabId: tab.id });
+        };
+
+        tabTitle.oncontextmenu = () => {
+          abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
+        };
+
+        favicon.oncontextmenu = () => {
+          abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
         };
 
         btnSuspend.onclick = (e) => {

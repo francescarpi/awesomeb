@@ -1,10 +1,11 @@
 import { Browser } from '@/core';
 import { checkModalAndPagesSender } from '@/utils';
 import { ipcMain } from 'electron';
-import { TWindowId, TMenuType, TDesktopId } from '~/types';
+import { TWindowId, TMenuType, TDesktopId, TTabId } from '~/types';
 import log from 'electron-log';
 import { desktopMenu } from './desktop';
 import { mainMenu } from './main';
+import { tabMenu } from './tab';
 
 const scopeLog = log.scope('MenuIPC');
 
@@ -40,6 +41,16 @@ export function setupMenuIPC(browser: Browser) {
             }
             case 'main': {
               const menu = await mainMenu(browser, true);
+              menu.popup({ window: window.bw });
+              break;
+            }
+            case 'tab': {
+              const tab = browser.getTab(params?.tabId as TTabId);
+              if (!tab) {
+                scopeLog.warn(`Tab with ID ${params?.tabId} not found for window ${winId}`);
+                return;
+              }
+              const menu = tabMenu(browser, tab);
               menu.popup({ window: window.bw });
               break;
             }

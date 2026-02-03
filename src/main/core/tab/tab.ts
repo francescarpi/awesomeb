@@ -6,6 +6,7 @@ import { TTabId } from '~/types';
 import log from 'electron-log';
 import { session } from 'electron';
 import { registerTabEvents } from './events';
+import { sanitizeUserAgent } from '@/utils';
 
 const scopeLog = log.scope('Tab');
 
@@ -30,6 +31,7 @@ export class Tab {
     this._title = props.title ?? null;
     this._customTitle = props.customTitle ?? null;
     this._url = props.url ?? null;
+    this._suspended = props.suspended ?? true;
 
     // The view is not visible initially until method to refresh visible tabs is called.
     this._view = new UIView({
@@ -132,8 +134,9 @@ export class Tab {
 
   async loadURL(url: string) {
     this._url = url;
+    const userAgent = sanitizeUserAgent(this._view.webContents.getUserAgent(), new URL(url));
     try {
-      await this._view.webContents.loadURL(url);
+      await this._view.webContents.loadURL(url, { userAgent });
     } catch (error) {
       scopeLog.error(`Failed to load URL ${url} in tab`);
     }

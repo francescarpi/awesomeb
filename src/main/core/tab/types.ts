@@ -9,4 +9,5 @@ export interface ITabProps {
   title?: string | null;
   customTitle?: string | null;
   url?: string | null;
+  suspended?: boolean;
 }

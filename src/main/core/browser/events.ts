@@ -82,4 +82,12 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('browser:url-opened', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.rendererEmmiter.refreshURLBar(window, null);
+    browser.rendererEmmiter.refreshDesktops(window);
+    browser.refreshMainMenu();
+  });
 }

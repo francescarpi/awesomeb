@@ -1,6 +1,7 @@
 import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { getTab } from './helpers';
 
 const scopeLog = log.scope('CloseTabCommand');
 
@@ -16,17 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Closes the currently active tab or a specified tab in the focused window.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
-    let tabToClose = tab;
-    if (params?.tabId) {
-      const targetTab = browser.getTab(params.tabId);
-      if (!targetTab) {
-        scopeLog.warn(`Tab with ID ${params.tabId} not found.`);
-        return;
-      }
-
-      tabToClose = targetTab.tab;
-    }
-
+    const tabToClose = getTab(browser, tab!, params?.tabId);
     if (!tabToClose) {
       scopeLog.warn('No tab available to close.');
       return;

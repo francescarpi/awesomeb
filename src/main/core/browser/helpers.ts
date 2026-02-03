@@ -1,5 +1,5 @@
-import { TSearchEngineCode, ITarget } from '~/types';
-import { config, Browser, TabContainer, defaultPartition } from '@/core';
+import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
+import { config, Browser, TabContainer, defaultPartition, getPartitions } from '@/core';
 
 export function parseQuery(query: string, searchEngineCode?: TSearchEngineCode): string | null {
   const { valid, url } = isValidUrl(query);
@@ -44,7 +44,13 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
   }
 }
 
-export function parseTarget(browser: Browser, targetId?: string): ITarget | null {
+export function parseTarget(
+  browser: Browser,
+  props?: { targetId?: string; partitionId?: TPartitionId },
+): ITarget | null {
+  const targetId = props?.targetId;
+  const partitionId = props?.partitionId;
+
   if (targetId === undefined || targetId === 'current-desktop-window') {
     const window = browser.activeWindow;
     if (!window) {
@@ -53,9 +59,14 @@ export function parseTarget(browser: Browser, targetId?: string): ITarget | null
 
     const desktop = window.selectedDesktop;
     const tabContainer = new TabContainer(window.eventsChannel, browser.nextTabContainerId);
+    const selectedTab = desktop.selectedTab;
 
-    // TODO if desktop has a selected tab, use its partition, if not, use defaultPartition
-    const partition = defaultPartition;
+    let partition = defaultPartition;
+    if (partitionId) {
+      partition = getPartitions().get(partitionId) || defaultPartition;
+    } else if (selectedTab) {
+      partition = selectedTab.tab.partition;
+    }
 
     return { window, desktop, tabContainer, partition };
   }

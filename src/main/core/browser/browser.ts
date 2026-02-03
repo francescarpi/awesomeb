@@ -162,16 +162,24 @@ export class Browser {
       return null;
     }
 
-    const result = parseTarget(this, props?.targetId);
+    const result = parseTarget(this, {
+      targetId: props?.targetId,
+      partitionId: props?.partitionId,
+    });
     if (!result) {
       scopeLog.error('Invalid target for opening URL');
       return null;
     }
 
     const { window, desktop, tabContainer, partition } = result;
-    const tab = tabContainer.createTab({ partition });
-    desktop.addTabContainer(tabContainer);
 
+    const tab = tabContainer.createTab({ partition, suspended: false });
+    desktop.addTabContainer(tabContainer);
+    desktop.selectTabContainer(tabContainer.id);
+
+    this.eventsChannel.emit('browser:url-opened', window);
+
+    window.addIntoMainLayout(tabContainer.layout);
     window.refreshVisibleTabView();
 
     await tab.loadURL(url);

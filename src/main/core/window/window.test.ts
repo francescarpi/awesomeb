@@ -595,8 +595,8 @@ describe('selectTab', () => {
 
     const result = await browser.openURL('http://example.com');
 
-    // Don't select any tab initially
-    expect(w.selectedDesktop.selectedTabContainer).toBeNull();
+    // Select any tab initially
+    expect(w.selectedDesktop.selectedTabContainer).not.toBeNull();
 
     // Select next should select first tab
     await w.selectTab('next');

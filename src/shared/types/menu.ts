@@ -1,1 +1,1 @@
-export type TMenuType = 'desktop' | 'main';
+export type TMenuType = 'desktop' | 'main' | 'tab';

@@ -1,6 +1,7 @@
 import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { getTab } from './helpers';
 
 const scopeLog = log.scope('SuspendTabCommand');
 
@@ -16,17 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Suspends the currently active tab in the focused window.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
-    let tabToSuspend = tab;
-    if (params?.tabId) {
-      const targetTab = browser.getTab(params.tabId);
-      if (!targetTab) {
-        scopeLog.warn(`Tab with ID ${params.tabId} not found.`);
-        return;
-      }
-
-      tabToSuspend = targetTab.tab;
-    }
-
+    const tabToSuspend = getTab(browser, tab!, params?.tabId);
     if (!tabToSuspend) {
       scopeLog.warn('No tab available to suspend.');
       return;

@@ -18,15 +18,10 @@ export const Command: ICommand<ICommandParams> = {
   async handler({ browser, params, window }) {
     window.modal.close();
 
-    const result = await browser.openURL(params.query, {
+    await browser.openURL(params.query, {
       partitionId: params.partitionId,
       searchEngineCode: params.searchEngineCode,
       targetId: params.targetId,
     });
-
-    if (result) {
-      const { tab, window } = result;
-      await window.selectTab(tab.id);
-    }
   },
 };
