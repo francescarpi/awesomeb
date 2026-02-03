@@ -332,6 +332,40 @@ function tabsMenu(
           }
         },
       },
+      { type: 'separator' },
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        enabled: !!tab && !tab?.suspended,
+        icon: getIcon(EIcon.Reload),
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'reload-tab');
+          }
+        },
+      },
+      {
+        label: 'Go back',
+        enabled: !!tab && !tab.loading && !tab.suspended && tab.view.canGoBack,
+        accelerator: 'CmdOrCtrl+Left',
+        icon: getIcon(EIcon.Back),
+        click: () => {
+          if (window && tab) {
+            browser.performCommand(window, 'go-back', { tabId: tab.id });
+          }
+        },
+      },
+      {
+        label: 'Go forward',
+        enabled: !!tab && !tab.loading && !tab.suspended && tab.view.canGoForward,
+        accelerator: 'CmdOrCtrl+Right',
+        icon: getIcon(EIcon.Forward),
+        click: () => {
+          if (window && tab) {
+            browser.performCommand(window, 'go-forward', { tabId: tab.id });
+          }
+        },
+      },
     ],
   };
 }
