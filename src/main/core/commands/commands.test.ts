@@ -132,7 +132,7 @@ describe('Commands', () => {
 
       await browser.performCommand(window, desktopRename.TRIGGER, {
         desktopId: desktop.id,
-        newName,
+        name: newName,
       });
 
       expect(setNameSpy).toHaveBeenCalledWith(newName);
@@ -143,7 +143,7 @@ describe('Commands', () => {
 
       await browser.performCommand(window, desktopRename.TRIGGER, {
         desktopId: 999,
-        newName: 'Test',
+        name: 'Test',
       });
 
       // Should not throw an error

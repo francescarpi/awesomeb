@@ -13,6 +13,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 <script>
   import { IDesktopEntity } from '~/types';
   import { getSearchParams } from '../scripts/url';
+  import { inputManager } from '../scripts/inputs';
   const { winId, searchParams } = getSearchParams();
   const desktopId = searchParams.get('desktopId');
 
@@ -27,30 +28,16 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)!
       : desktopEntities.find((d) => d.selected)!;
 
-    // Pre-fill input with current desktop name
-    inputEl.defaultValue = selectedDesktop.name || '';
-    if (inputEl.defaultValue.length > 0) {
-      inputEl.select();
-    }
-
-    // Handle input events
-    inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const newName = inputEl.value.trim();
-        if (selectedDesktop && newName.length > 0) {
-          abCommands
-            .perform(winId, 'rename-desktop', {
-              desktopId: parseInt(selectedDesktop.id, 10),
-              newName,
-            })
-            .then(() => {
-              abModal.close(winId);
-            });
-        }
-      } else if (e.key === 'Escape') {
-        abModal.close(winId);
-      }
-    });
+    const { setDefaultValue } = inputManager(
+      inputEl,
+      (newValue: string) =>
+        abCommands.perform(winId, 'rename-desktop', {
+          desktopId: parseInt(selectedDesktop.id, 10),
+          name: newValue,
+        }),
+      () => abModal.close(winId),
+    );
+    setDefaultValue(selectedDesktop.name || '');
   }
 
   setup();

@@ -201,4 +201,18 @@ export class Browser {
     }
     return null;
   }
+
+  getAllTabs(): IWinDesConTab[] {
+    const result: IWinDesConTab[] = [];
+    for (const window of this._windows.values()) {
+      for (const desktop of window.desktops) {
+        for (const tabContainer of desktop.tabContainers) {
+          for (const tab of tabContainer.tabs) {
+            result.push({ window, desktop, tabContainer, tab });
+          }
+        }
+      }
+    }
+    return result;
+  }
 }

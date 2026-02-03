@@ -30,6 +30,17 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         browser.performCommand(window, 'go-forward', { tabId: tab.id });
       },
     },
+    { type: 'separator' },
+    {
+      label: 'Rename',
+      icon: getIcon(EIcon.Edit),
+      click: () => {
+        window.modal.open('rename-tab', {
+          height: 150,
+          query: { tabId: tab.id.toString() },
+        });
+      },
+    },
   ]);
 
   return menu;

@@ -24,6 +24,8 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.partitions();
         case 'targets':
           return browser.renderer.targets(browser, window);
+        case 'tabs':
+          return browser.renderer.tabs(browser, window);
       }
     });
   });

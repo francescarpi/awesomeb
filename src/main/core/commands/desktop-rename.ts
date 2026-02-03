@@ -6,7 +6,7 @@ const scopeLog = log.scope('RenameDesktopCommand');
 
 export interface ICommandParams {
   desktopId: TDesktopId;
-  newName: string;
+  name: string;
 }
 
 export const TRIGGER = 'rename-desktop';
@@ -29,6 +29,6 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    desktop.setName(params.newName);
+    desktop.setName(params.name);
   },
 };

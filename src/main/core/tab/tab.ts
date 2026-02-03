@@ -118,6 +118,15 @@ export class Tab {
     return this._customTitle;
   }
 
+  setCustomTitle(customTitle: string | null) {
+    if (this._customTitle === customTitle) {
+      return;
+    }
+
+    this._customTitle = customTitle;
+    this.eventsChannel.emit('tab:title-did-change', this);
+  }
+
   get layout(): UILayout {
     return this._layout;
   }

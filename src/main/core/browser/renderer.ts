@@ -6,6 +6,7 @@ import {
   ITabContainer,
   IURLTabData,
   ITab,
+  ITabEntity,
 } from '~/types';
 import {
   Browser,
@@ -172,5 +173,16 @@ export class BrowserRenderer {
     data.tabId = tab.id;
 
     return data;
+  }
+  tabs(browser: Browser, window: Window): ITabEntity[] {
+    const tabs = browser.getAllTabs();
+    const selectedDesktop = window.selectedDesktop;
+    const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
+
+    return tabs.map((item) => ({
+      id: item.tab.id.toString(),
+      label: item.tab.title,
+      selected: selectedTab?.id === item.tab.id,
+    }));
   }
 }

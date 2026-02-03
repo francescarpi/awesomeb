@@ -23,6 +23,7 @@ import * as tabClose from './tab-close';
 import * as tabReload from './tab-reload';
 import * as tabHistoryBack from './tab-history-back';
 import * as tabHistoryForward from './tab-history-forward';
+import * as tabRename from './tab-rename';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -45,6 +46,7 @@ const COMMANDS = {
   [tabReload.TRIGGER]: tabReload.Command,
   [tabHistoryBack.TRIGGER]: tabHistoryBack.Command,
   [tabHistoryForward.TRIGGER]: tabHistoryForward.Command,
+  [tabRename.TRIGGER]: tabRename.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
