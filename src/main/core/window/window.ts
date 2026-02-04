@@ -1,4 +1,4 @@
-import { UILayout, UIWindow } from '@/ui';
+import { UIWindow } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';

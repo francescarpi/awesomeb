@@ -134,7 +134,7 @@ export class UIWindow {
   private _setupLayoutBounds(layout: UILayout, parentBounds?: Rectangle) {
     // If layout type is string, it means it's a standard layout (horizontal or vertical)
     // It doesn't have custom bounds, so we set its bounds to the parent bounds
-    if (typeof layout.type === 'string' && layout.visible) {
+    if (typeof layout.type === 'string') {
       const [width, height] = this.bw.getSize();
       const bounds = parentBounds || { x: 0, y: 0, width, height };
       layout.setBounds(bounds);
@@ -219,14 +219,10 @@ export class UIWindow {
     let usedSpace = 0;
 
     for (const child of parentLayout.children) {
-      if (!child.visible) {
-        continue;
-      }
-
       if (child instanceof UILayout) {
         // Layouts are always flexible (they don't have explicit width/height)
         flexibleCount++;
-      } else if (child instanceof UIView && child.visible) {
+      } else if (child instanceof UIView) {
         // For vertical layout, check if view has explicit width
         // For horizontal layout, check if view has explicit height
         const hasExplicitSize = isVertical ? child.width !== null : child.height !== null;

@@ -42,6 +42,10 @@ export class UILayout {
     this._visible = visible;
 
     for (const child of this._children) {
+      if (child instanceof UILayout) {
+        child.setVisible(visible);
+        continue;
+      }
       child.setVisible(visible);
     }
   }
