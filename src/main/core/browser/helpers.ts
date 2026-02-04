@@ -1,5 +1,5 @@
 import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
-import { config, Browser, TabContainer, defaultPartition, getPartitions } from '@/core';
+import { config, Browser, defaultPartition, getPartitions } from '@/core';
 
 export function parseQuery(query: string, searchEngineCode?: TSearchEngineCode): string | null {
   const { valid, url } = isValidUrl(query);
@@ -58,7 +58,7 @@ export function parseTarget(
     }
 
     const desktop = window.selectedDesktop;
-    const tabContainer = new TabContainer(window.eventsChannel, browser.nextTabContainerId);
+    const tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
     const selectedTab = desktop.selectedTab;
 
     let partition = defaultPartition;

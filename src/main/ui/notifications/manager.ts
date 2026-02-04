@@ -17,7 +17,7 @@ export class UINotificationsManager {
 
     refreshNotifications(
       this._notificationsContainer.webContents,
-      this._win.id,
+      this._win.browserWindowId,
       this._notifications,
     );
 

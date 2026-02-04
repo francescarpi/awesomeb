@@ -20,11 +20,11 @@ export class Tab {
   private _favicon: string | null = null;
   private _view: UIView;
   private _layout: UILayout;
-  private _viewId: TTabId = -1;
   private _lastAccessed: number = Date.now();
 
   constructor(
     public readonly eventsChannel: EventEmitter,
+    public readonly id: TTabId,
     props: ITabProps,
   ) {
     this._partition = props.partition;
@@ -42,17 +42,11 @@ export class Tab {
       session: session.fromPartition(this._partition.id),
     });
 
-    this._viewId = this._view.id as TTabId;
-
     // The tab layout will be used to show, for instance, the find in page view below the webview.
     this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');
     this._layout.addChild(this._view);
 
     registerTabEvents(this);
-  }
-
-  get id(): TTabId {
-    return this._viewId;
   }
 
   get partition(): Partition {
@@ -157,6 +151,7 @@ export class Tab {
     }
 
     if (this.view.isDestroyed) {
+      scopeLog.debug('Cannot resume tab because its view is destroyed');
       this._view.refreshWebContentsView();
     }
 

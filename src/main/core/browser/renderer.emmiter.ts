@@ -21,7 +21,7 @@ export class BrowserRendererEmmiter {
       secondary: desktop.theme.secondary,
       degrees: desktop.theme.degrees,
     };
-    window.wc.send('desktop:theme-refresh', result);
+    window.webContents.send('desktop:theme-refresh', result);
   }
 
   refreshTabContainers(window: Window) {

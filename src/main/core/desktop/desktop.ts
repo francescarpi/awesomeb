@@ -1,5 +1,5 @@
 import { IConTab, TDesktopId, TTabContainerId, TTabId } from '~/types';
-import { defaultTheme, Theme, Window, TabContainer } from '@/core';
+import { defaultTheme, Theme, Window, TabContainer, ITabContainerProps } from '@/core';
 import { IProps } from './types';
 import EventEmitter from 'events';
 
@@ -140,5 +140,11 @@ export class Desktop {
     }
 
     return true;
+  }
+
+  createTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {
+    const tabContainer = new TabContainer(this.eventsChannel, id, props);
+    this.addTabContainer(tabContainer);
+    return tabContainer;
   }
 }

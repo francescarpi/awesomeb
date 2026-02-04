@@ -24,7 +24,7 @@ export class UINotificationsContainer extends WebContentsView {
 
     this.setVisible(false);
 
-    loadPage(this.webContents, 'notifications', { winId: this._parent.id.toString() });
+    loadPage(this.webContents, 'notifications', { winId: this._parent.browserWindowId.toString() });
 
     // this.webContents.openDevTools();
   }

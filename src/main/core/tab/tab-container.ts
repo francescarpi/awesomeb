@@ -24,8 +24,8 @@ export class TabContainer {
     return Array.from(this._tabs.values());
   }
 
-  createTab(props: ITabProps): Tab {
-    const tab = new Tab(this.eventsChannel, props);
+  createTab(id: TTabId, props: ITabProps): Tab {
+    const tab = new Tab(this.eventsChannel, id, props);
 
     this._layout.addChild(tab.layout);
     this._tabs.set(tab.id, tab);

@@ -102,9 +102,9 @@ export async function checkWindowSender(
     return;
   }
 
-  if (win.wcId !== event.sender.id) {
+  if (win.webContentsId !== event.sender.id) {
     scopeLog.error(
-      `WebContents ID mismatch: window WC ID ${win.wcId} does not match sender WC ID ${event.sender.id}`,
+      `WebContents ID mismatch: window WC ID ${win.webContentsId} does not match sender WC ID ${event.sender.id}`,
     );
     return;
   }

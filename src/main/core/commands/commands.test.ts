@@ -23,7 +23,7 @@ describe('Commands', () => {
 
   beforeEach(() => {
     browser = new Browser();
-    const window = browser.createWindow();
+    const window = browser.createWindow(1);
     window.createDefaultDesktops();
   });
 

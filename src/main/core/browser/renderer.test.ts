@@ -3,14 +3,14 @@ import { Browser } from './browser';
 
 test("commands renderer shouldn' return any command becaise there is no focused window", () => {
   const browser = new Browser();
-  browser.createWindow();
+  browser.createWindow(1);
 
   expect(browser.renderer.commands().length).toBeGreaterThan(0);
 });
 
 test('desktops renderer sould return expected data', () => {
   const browser = new Browser();
-  const w = browser.createWindow();
+  const w = browser.createWindow(1);
   w.createDefaultDesktops();
 
   expect(browser.renderer.desktops(w)).toEqual([

@@ -4,7 +4,7 @@ import { MIN_DESKTOPS } from './constants';
 
 test('recent created window should have MIN_DESKTOPS', () => {
   const browser = new Browser();
-  const w = browser.createWindow();
+  const w = browser.createWindow(1);
   w.createDefaultDesktops();
 
   expect(w.desktops.length).toBe(MIN_DESKTOPS);
@@ -17,7 +17,7 @@ test('recent created window should have MIN_DESKTOPS', () => {
 
 test('go to next and previous desktop should work correctly', () => {
   const browser = new Browser();
-  const w = browser.createWindow();
+  const w = browser.createWindow(1);
   w.createDefaultDesktops();
 
   expect(w.selectedDesktop.id).toBe(1);
@@ -37,7 +37,7 @@ test('go to next and previous desktop should work correctly', () => {
 
 test('select tab should work correctly', async () => {
   const browser = new Browser();
-  const w = browser.createWindow();
+  const w = browser.createWindow(1);
   w.createDefaultDesktops();
 
   expect(w.selectedDesktop.id).toBe(1);
@@ -62,7 +62,7 @@ test('select tab should work correctly', async () => {
 describe('getAllTabs', () => {
   test('should return empty array when no tabs exist', () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const allTabs = w.getAllTabs();
@@ -73,7 +73,7 @@ describe('getAllTabs', () => {
 
   test('should return all tabs from a single desktop', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     // Open multiple tabs on desktop 1
@@ -91,7 +91,7 @@ describe('getAllTabs', () => {
 
   test('should return all tabs from multiple desktops', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     // Open tabs on desktop 1 (default)
@@ -120,7 +120,7 @@ describe('getAllTabs', () => {
 
   test('should return tabs with correct desktop and tabContainer references', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -136,7 +136,7 @@ describe('getAllTabs', () => {
 describe('suspendTab', () => {
   test('should suspend a tab and return true', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -155,7 +155,7 @@ describe('suspendTab', () => {
 
   test('should return false when tab does not exist', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const suspended = await w.suspendTab(999 as any);
@@ -165,7 +165,7 @@ describe('suspendTab', () => {
 
   test('should deselect tab container when suspending selected tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -185,7 +185,7 @@ describe('suspendTab', () => {
 
   test('should deselect desktop tab container if suspended tab is selected', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -204,7 +204,7 @@ describe('suspendTab', () => {
 
   test('should emit window:tab-did-suspend event', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -222,7 +222,7 @@ describe('suspendTab', () => {
 
   test('should suspend all tabs in the tab container', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     // Open first tab which creates a tab container
@@ -250,7 +250,7 @@ describe('suspendTab', () => {
 describe('getLastAccessedTab', () => {
   test('should return null when no tabs exist', () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const lastTab = w.getLastAccessedTab();
@@ -260,7 +260,7 @@ describe('getLastAccessedTab', () => {
 
   test('should return the most recently accessed tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -289,7 +289,7 @@ describe('getLastAccessedTab', () => {
 
   test('should exclude suspended tabs', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -330,7 +330,7 @@ describe('getLastAccessedTab', () => {
 
   test('should filter by desktop when provided', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const desktop1 = w.getDesktop(1)!;
@@ -368,7 +368,7 @@ describe('getLastAccessedTab', () => {
 
   test('should return null when all tabs are suspended', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -388,7 +388,7 @@ describe('getLastAccessedTab', () => {
 
   test('should return null when filtering by desktop with no non-suspended tabs', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -408,7 +408,7 @@ describe('getLastAccessedTab', () => {
 describe('selectTab', () => {
   test('should select a tab by id', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -423,7 +423,7 @@ describe('selectTab', () => {
 
   test('should select next tab when target is "next"', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -445,7 +445,7 @@ describe('selectTab', () => {
 
   test('should wrap around when selecting next tab at the end', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -462,7 +462,7 @@ describe('selectTab', () => {
 
   test('should select previous tab when target is "prev"', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -484,7 +484,7 @@ describe('selectTab', () => {
 
   test('should wrap around when selecting previous tab at the start', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -501,7 +501,7 @@ describe('selectTab', () => {
 
   test('should switch desktops when selecting a tab from different desktop', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     // Open tab on desktop 1
@@ -522,7 +522,7 @@ describe('selectTab', () => {
 
   test('should resume suspended tab when selected', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -541,7 +541,7 @@ describe('selectTab', () => {
 
   test('should update lastAccessed timestamp when selecting tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -557,7 +557,7 @@ describe('selectTab', () => {
 
   test('should emit window:selected-tab-did-change event', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -573,7 +573,7 @@ describe('selectTab', () => {
 
   test('should do nothing when selecting non-existent tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -590,7 +590,7 @@ describe('selectTab', () => {
 
   test('should handle selecting next/prev when no tab container is selected', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -608,7 +608,7 @@ describe('selectTab', () => {
 describe('closeTab', () => {
   test('should close a tab and return true', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -625,7 +625,7 @@ describe('closeTab', () => {
 
   test('should return false when tab does not exist', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const closed = await w.closeTab(999 as any);
@@ -635,7 +635,7 @@ describe('closeTab', () => {
 
   test('should emit window:tab-did-close event', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -651,7 +651,7 @@ describe('closeTab', () => {
 
   test('should close tab container when it becomes empty', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -668,7 +668,7 @@ describe('closeTab', () => {
 
   test('should deselect tab container when closed tab container was selected', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -687,7 +687,7 @@ describe('closeTab', () => {
 
   test('should not close tab container when it has remaining tabs', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const desktop = w.selectedDesktop;
@@ -695,12 +695,12 @@ describe('closeTab', () => {
     // Create a tab container with multiple tabs
     const tabContainer = new TabContainer(browser.eventsChannel, 1 as any);
 
-    const tab1 = tabContainer.createTab({
+    const tab1 = tabContainer.createTab(1, {
       partition: defaultPartition,
       url: 'http://example1.com',
     });
 
-    const tab2 = tabContainer.createTab({
+    const tab2 = tabContainer.createTab(2, {
       partition: defaultPartition,
       url: 'http://example2.com',
     });
@@ -721,7 +721,7 @@ describe('closeTab', () => {
 
   test('should handle closing tab from different desktop', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const desktop1 = w.getDesktop(1)!;
@@ -759,7 +759,7 @@ describe('closeTab', () => {
 
   test('should handle closing multiple tabs sequentially', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -780,7 +780,7 @@ describe('closeTab', () => {
 
   test('should handle closing currently selected tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -801,7 +801,7 @@ describe('closeTab', () => {
 
   test('should refresh visible tab view after closing tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result1 = await browser.openURL('http://example1.com');
@@ -822,7 +822,7 @@ describe('closeTab', () => {
 
   test('should handle closing tab when container has no selected tab', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
@@ -842,7 +842,7 @@ describe('closeTab', () => {
 
   test('should handle closing all tabs across all desktops', async () => {
     const browser = new Browser();
-    const w = browser.createWindow();
+    const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
     // Open tabs on multiple desktops

@@ -63,7 +63,7 @@ export class UIWindow {
     });
 
     loadPage(this.bw.webContents, 'window', {
-      winId: this.id.toString(),
+      winId: this.browserWindowId.toString(),
     });
 
     registerUIWindowEvents(this);
@@ -71,7 +71,7 @@ export class UIWindow {
     this._modalManager = new UIModalManager(this);
     this._notificationsManager = new UINotificationsManager(this);
 
-    openDevTools(this.wc, 'window');
+    openDevTools(this.webContents, 'window');
 
     this.buildLayout();
   }
@@ -84,7 +84,7 @@ export class UIWindow {
     // SIDEBAR ------------------------------------------------------------
     const sidebar = new UIPageView('sidebar', {
       width: SIDEBAR_DEFAULT_WIDTH,
-      query: { winId: this.id.toString() },
+      query: { winId: this.browserWindowId.toString() },
     });
 
     // TODO add sidebar as a layout, later
@@ -95,7 +95,7 @@ export class UIWindow {
     // URL BAR ------------------------------------------------------------
     const urlbar = new UIPageView('urlbar', {
       height: 32,
-      query: { winId: this.id.toString() },
+      query: { winId: this.browserWindowId.toString() },
       margin: '5 5 0 0',
     });
 
@@ -506,15 +506,15 @@ export class UIWindow {
     return null;
   }
 
-  get id(): number {
+  get browserWindowId(): number {
     return this.bw.id;
   }
 
-  get wcId(): number {
-    return this.wc.id;
+  get webContentsId(): number {
+    return this.webContents.id;
   }
 
-  get wc(): WebContents {
+  get webContents(): WebContents {
     return this.bw.webContents;
   }
 
@@ -625,11 +625,13 @@ export class UIWindow {
     return !urlbar.visible;
   }
 
-  addIntoMainLayout(layout: UILayout) {
+  addIntoMainLayout(layout: UILayout, withRender = true) {
     const mainLayout = this.getChild<UILayout>('main-layout')!;
     mainLayout.addChild(layout);
     scopeLog.debug('Added layout into main layout:', layout.id);
-    this.renderLayout();
+    if (withRender) {
+      this.renderLayout();
+    }
   }
 
   removeFromMainLayout(layout: UILayout) {

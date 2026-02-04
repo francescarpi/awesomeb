@@ -1,4 +1,4 @@
-import { TDesktopId, TPartitionId } from '~/types';
+import { TDesktopId, TPartitionId, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { Rectangle } from 'electron';
 
 export interface ISessionStore {
@@ -6,6 +6,7 @@ export interface ISessionStore {
 }
 
 export interface ISessionWindow {
+  id: TWindowId;
   bounds: Rectangle;
   selectedDesktopId: TDesktopId;
   sidebarCollapsed: boolean;
@@ -15,9 +16,11 @@ export interface ISessionWindow {
     name: string | null;
     theme: string;
     tabContainers: {
+      id: TTabContainerId;
       divider: boolean;
       // layout: ETabContainerLayout;
       tabs: {
+        id: TTabId;
         partitionId: TPartitionId;
         title: string | null;
         customTitle: string | null;

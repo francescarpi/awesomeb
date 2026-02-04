@@ -5,11 +5,10 @@ import {
   Session,
   IWindowProps,
   getTheme,
-  TabContainer,
   getPartitions,
   defaultPartition,
 } from '@/core';
-import { IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
+import { IWinDesConTab, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
@@ -19,6 +18,7 @@ import { BrowserRenderer } from './renderer';
 import { BrowserRendererEmmiter } from './renderer.emmiter';
 import { IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
+import { IdGenerator } from './idgenerator';
 
 const scopeLog = log.scope('Browser');
 
@@ -28,6 +28,7 @@ export class Browser {
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
   public readonly rendererEmmiter = new BrowserRendererEmmiter(this);
+  public readonly idGenerator = new IdGenerator(this);
 
   constructor() {
     registerBrowserEvents(this);
@@ -37,35 +38,33 @@ export class Browser {
     const session = new Session(this);
 
     if (session.windows.length === 0) {
-      const newWindow = this.createWindow();
+      const newWindow = this.createWindow(1);
       newWindow.createDefaultDesktops();
       await this.refreshMainMenu();
       return;
     }
 
     for (const winStore of session.windows) {
-      const newWindow = this.createWindow({
+      const newWindow = this.createWindow(winStore.id, {
         bounds: winStore.bounds,
       });
 
       const partitions = getPartitions();
 
-      for (const [deskIdx, deskStore] of winStore.desktops.entries()) {
+      for (const deskStore of winStore.desktops) {
         const theme = getTheme(deskStore.theme);
         const { name } = deskStore;
 
-        const desktop = newWindow.createDesktop(deskIdx + 1, { theme, name });
+        const desktop = newWindow.createDesktop(deskStore.id, { theme, name });
 
         for (const tabConStore of deskStore.tabContainers) {
-          const tabContainer = new TabContainer(this.eventsChannel, this.nextTabContainerId, {
+          const tabContainer = desktop.createTabContainer(tabConStore.id, {
             divider: tabConStore.divider,
           });
 
-          desktop.addTabContainer(tabContainer);
-
           for (const tabStore of tabConStore.tabs) {
             const partition = partitions.get(tabStore.partitionId) || defaultPartition;
-            tabContainer.createTab({
+            tabContainer.createTab(tabStore.id, {
               partition,
               title: tabStore.title,
               customTitle: tabStore.customTitle,
@@ -79,8 +78,8 @@ export class Browser {
     await this.refreshMainMenu();
   }
 
-  createWindow(props?: IWindowProps): Window {
-    const w = new Window(this.eventsChannel, props);
+  createWindow(id: TWindowId, props?: IWindowProps): Window {
+    const w = new Window(this.eventsChannel, id, props);
     this._windows.set(w.id, w);
 
     scopeLog.info(
@@ -139,20 +138,6 @@ export class Browser {
     return true;
   }
 
-  get nextTabContainerId(): TTabContainerId {
-    let maxId = 0;
-    for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          if (tabContainer.id > maxId) {
-            maxId = tabContainer.id;
-          }
-        }
-      }
-    }
-    return (maxId + 1) as TTabContainerId;
-  }
-
   async openURL(query: string, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
     scopeLog.info(`Opening URL with query: ${query}`);
 
@@ -173,8 +158,9 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
-    const tab = tabContainer.createTab({ partition, suspended: false });
-    desktop.addTabContainer(tabContainer);
+    const tab = tabContainer.createTab(this.idGenerator.nextTabId, { partition, suspended: false });
+
+    tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
 
     this.eventsChannel.emit('browser:url-opened', window);

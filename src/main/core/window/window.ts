@@ -3,7 +3,7 @@ import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
-import { IDesConTab, TDesktopId, TTabId } from '~/types';
+import { IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
 // import { TViewId } from '@/ui/types';
@@ -16,6 +16,7 @@ export class Window extends UIWindow {
 
   constructor(
     public readonly eventsChannel: EventEmitter,
+    public readonly id: TWindowId,
     props?: IProps,
   ) {
     super(eventsChannel, props?.bounds);
@@ -166,23 +167,23 @@ export class Window extends UIWindow {
 
     const { desktop, tabContainer, tab } = result;
 
-    this.addIntoMainLayout(tabContainer.layout);
+    this.addIntoMainLayout(tabContainer.layout, false);
 
     this._selectedDesktopId = desktop.id;
 
     tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
 
-    this.refreshVisibleTabView();
-
     if (tab.suspended) {
       tab.resume();
 
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
+      this.refreshVisibleTabView();
       await tab.loadHistoryOrURL();
     } else {
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+      this.refreshVisibleTabView();
     }
 
     // If tab wasn't suspended, we don't have to add the layout into the window
