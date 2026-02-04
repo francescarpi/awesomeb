@@ -1,9 +1,9 @@
-import { UIWindow } from '@/ui';
+import { UILayout, UIWindow } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
-import { IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
+import { IDesCon, IDesConTab, ITabContainer, TDesktopId, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
 // import { TViewId } from '@/ui/types';
@@ -75,23 +75,23 @@ export class Window extends UIWindow {
   }
 
   refreshVisibleTabView() {
-    // const visible: TViewId[] = [];
     const desktop = this.selectedDesktop;
-    const tabContainer = desktop.selectedTabContainer;
+    const selectedTabContainer = desktop.selectedTabContainer;
 
-    if (tabContainer) {
+    for (const result of this.getAllTabContainers()) {
+      if (result.tabContainer.id === selectedTabContainer?.id) {
+        result.tabContainer.setVisible(true);
+      } else {
+        result.tabContainer.setVisible(false);
+      }
+    }
+    if (selectedTabContainer) {
       this.setNoTabVisibility(false);
-      // this.addIntoMainLayout(tabContainer.layout);
-      // for (const tab of tabContainer.tabs) {
-      //   visible.push(tab.view.id);
-      // }
     } else {
       this.setNoTabVisibility(true);
     }
 
     this.renderLayout();
-
-    // this.refreshTabContainerLayoutView(visible);
   }
 
   getTab(id: TTabId): IDesConTab | null {
@@ -159,42 +159,26 @@ export class Window extends UIWindow {
       return;
     }
 
-    // If exist previous selected tab, we have to remove it from the browser window
-    const selectedTabContainer = this.selectedDesktop.selectedTabContainer;
-    if (selectedTabContainer) {
-      this.removeFromMainLayout(selectedTabContainer.layout);
-    }
-
     const { desktop, tabContainer, tab } = result;
-
-    this.addIntoMainLayout(tabContainer.layout, false);
 
     this._selectedDesktopId = desktop.id;
 
     tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
+    tab.updateLastAccessed();
 
     if (tab.suspended) {
       tab.resume();
 
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
+      this.addIntoMainLayout(tabContainer.layout, false);
       this.refreshVisibleTabView();
       await tab.loadHistoryOrURL();
     } else {
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
       this.refreshVisibleTabView();
     }
-
-    // If tab wasn't suspended, we don't have to add the layout into the window
-    if (tab.view.isDestroyed) {
-      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-      return;
-    }
-
-    tab.updateLastAccessed();
-
-    this.refreshVisibleTabView();
   }
 
   getAllTabs(): IDesConTab[] {
@@ -209,22 +193,31 @@ export class Window extends UIWindow {
     return allTabs;
   }
 
+  getAllTabContainers(): IDesCon[] {
+    const allContainers: IDesCon[] = [];
+    for (const desktop of this._desktops.values()) {
+      for (const tabContainer of desktop.tabContainers) {
+        allContainers.push({ desktop, tabContainer });
+      }
+    }
+    return allContainers;
+  }
+
   async suspendTab(id: TTabId): Promise<boolean> {
     const result = this.getTab(id);
     if (!result) {
       return false;
     }
 
-    const { tabContainer, desktop } = result;
+    const { tabContainer, desktop, tab } = result;
 
     // TODO we have to save the history on disk before suspending
 
-    // TODO to think about suspend/or not, all tabs in the container
-    for (const tab of tabContainer.tabs) {
-      tab.suspend();
-    }
+    tab.suspend();
 
-    tabContainer.selectTab(null);
+    if (tabContainer.selectedTab?.id === tab.id) {
+      tabContainer.selectTab(null);
+    }
 
     if (desktop.selectedTabContainer?.id === tabContainer.id) {
       desktop.selectTabContainer(null);

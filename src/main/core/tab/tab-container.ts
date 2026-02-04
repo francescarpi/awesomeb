@@ -87,4 +87,8 @@ export class TabContainer {
 
     return true;
   }
+
+  setVisible(visible: boolean) {
+    this._layout.setVisible(visible);
+  }
 }

@@ -24,3 +24,8 @@ export interface IConTab {
   tabContainer: TabContainer;
   tab: Tab;
 }
+
+export interface IDesCon {
+  desktop: Desktop;
+  tabContainer: TabContainer;
+}
