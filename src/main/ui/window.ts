@@ -119,7 +119,7 @@ export class UIWindow {
     const layout = parentLayout || this._rootLayout!;
 
     this._setupLayoutBounds(layout, parentBounds);
-    scopeLog.debug('LAYOUT', layout.id, layout.bounds, layout.type);
+    scopeLog.debug('LAYOUT', layout.id, layout.bounds, layout.type, 'visible', layout.visible);
 
     this._renderLayoutChildren(layout);
 
@@ -275,6 +275,8 @@ export class UIWindow {
         child.visible,
         'existsInContentView:',
         existsInContentView,
+        'visible',
+        child.visible,
       );
 
       if (child.visible) {
