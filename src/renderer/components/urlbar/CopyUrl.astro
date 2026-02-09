@@ -1,0 +1,25 @@
+---
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
+---
+
+<ButtonIcon icon="copy" className="disabled" />
+
+<script>
+  import { getSearchParams } from '../../scripts/url';
+  const { winId } = getSearchParams();
+  const iconEl = document.querySelector('svg#copy')!;
+
+  function handleCopy() {
+    abCommands.perform(winId, 'copy-url');
+  }
+
+  abUrlBar.onRefresh((_event, data) => {
+    if (data.url.trim().length === 0) {
+      iconEl.classList.add('disabled');
+      iconEl.removeEventListener('click', handleCopy);
+    } else {
+      iconEl.classList.remove('disabled');
+      iconEl.addEventListener('click', handleCopy);
+    }
+  });
+</script>

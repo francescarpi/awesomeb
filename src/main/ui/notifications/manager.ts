@@ -1,28 +1,24 @@
 import { TNotificationSeverity } from '~/types';
 import { UIWindow } from '../window';
-import { UINotificationsContainer, UINotification } from './models';
+import { UINotificationsView, UINotification } from './models';
 import { refreshNotifications } from '../ipc';
 
 export class UINotificationsManager {
-  private _notificationsContainer: UINotificationsContainer;
+  private _view: UINotificationsView;
   private _notifications: UINotification[] = [];
 
   constructor(private readonly _win: UIWindow) {
-    this._notificationsContainer = new UINotificationsContainer(_win);
+    this._view = new UINotificationsView(_win.browserWindowId);
   }
 
   show(message: string, type: TNotificationSeverity = 'info') {
     const notification = new UINotification(message, type);
     this._notifications.push(notification);
 
-    refreshNotifications(
-      this._notificationsContainer.webContents,
-      this._win.browserWindowId,
-      this._notifications,
-    );
+    refreshNotifications(this._view.webContents, this._win.browserWindowId, this._notifications);
 
-    if (!this._notificationsContainer.getVisible()) {
-      this._notificationsContainer.setVisible(true);
+    if (!this._view.visible) {
+      this._view.setVisible(true);
     }
   }
 
@@ -38,23 +34,19 @@ export class UINotificationsManager {
     this._notifications.shift();
   }
 
-  get notificationContainer(): UINotificationsContainer {
-    return this._notificationsContainer;
+  get view(): UINotificationsView {
+    return this._view;
   }
 
-  get containerId(): number {
-    return this._notificationsContainer.wcId;
+  get webContentsId(): number {
+    return this._view.webContentsId;
   }
 
-  hideContainer() {
-    this._notificationsContainer.setVisible(false);
+  hide() {
+    this._view.setVisible(false);
   }
 
   get isVisible(): boolean {
-    return this._notificationsContainer.getVisible();
-  }
-
-  refreshContainerBounds() {
-    this._notificationsContainer.refreshBounds();
+    return this._view.visible;
   }
 }

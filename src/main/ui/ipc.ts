@@ -26,9 +26,9 @@ export function setupUIIPC(browser: Browser) {
       return;
     }
 
-    if (win.notifications.containerId !== event.sender.id) {
+    if (win.notifications.webContentsId !== event.sender.id) {
       scopeLog.error(
-        `WebContents ID mismatch: notification container WC ID ${win.notifications.containerId} ` +
+        `WebContents ID mismatch: notification container WC ID ${win.notifications.webContentsId} ` +
           `does not match sender WC ID ${event.sender.id}`,
       );
       return;
@@ -39,7 +39,7 @@ export function setupUIIPC(browser: Browser) {
     refreshNotifications(event.sender, winId, win.notifications.all);
 
     if (win.notifications.all.length === 0) {
-      win.notifications.hideContainer();
+      win.notifications.hide();
     }
   });
 }

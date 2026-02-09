@@ -4,6 +4,7 @@ export enum EIcon {
   Back = 'back.png',
   Close = 'close.png',
   Command = 'command.png',
+  Copy = 'copy.png',
   Desktop = 'desktop.png',
   Edit = 'edit.png',
   File = 'file.png',

@@ -16,7 +16,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   const menu = Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
     fileMenu(browser, showRootIcon, window),
-    editMenu(browser, showRootIcon, window),
+    editMenu(browser, showRootIcon, window, tab),
     windowMenu(browser, showRootIcon, window),
     desktopsMenu(browser, showRootIcon, window),
     tabsMenu(browser, showRootIcon, window, tab),
@@ -115,9 +115,10 @@ function fileMenu(
 }
 
 function editMenu(
-  _browser: Browser,
+  browser: Browser,
   showRootIcon: boolean,
-  _window: Window | null,
+  window: Window | null,
+  tab: Tab | null,
 ): MenuItemConstructorOptions {
   return {
     label: 'Edit',
@@ -133,13 +134,17 @@ function editMenu(
       { role: 'delete' },
       { role: 'selectAll' },
       { type: 'separator' },
-      // {
-      //   label: 'Copy URL',
-      //   accelerator: 'CmdOrCtrl+Shift+C',
-      //   icon: getIcon(EIcon.Copy),
-      //   enabled: Boolean(selectedTab),
-      //   click: () => browser.performCommand({ trigger: 'copy-url', params: { windowId: window.id } }),
-      // },
+      {
+        label: 'Copy URL',
+        accelerator: 'CmdOrCtrl+Shift+C',
+        icon: getIcon(EIcon.Copy),
+        enabled: Boolean(tab),
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'copy-url');
+          }
+        },
+      },
       // {
       //   label: 'Edit URL',
       //   accelerator: 'CmdOrCtrl+E',

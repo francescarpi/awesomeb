@@ -1,2 +1,2 @@
-export { UINotificationsContainer, UINotification } from './models';
+export { UINotification } from './models';
 export { UINotificationsManager } from './manager';

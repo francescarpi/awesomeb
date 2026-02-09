@@ -73,6 +73,8 @@ export class UIWindow {
 
     const noTabs = new NoTabs();
     this.addView(noTabs, 'bottom');
+
+    this.addView(this.notifications.view, 'top');
   }
 
   /**
