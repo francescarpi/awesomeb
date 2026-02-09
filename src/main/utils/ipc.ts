@@ -2,7 +2,7 @@ import { IpcMainInvokeEvent } from 'electron';
 import { Browser, Window } from '@/core';
 import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { UIModalManager, UIPageView, UIView } from '@/ui';
+import { UIModalManager, UIPageView } from '@/ui';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -26,30 +26,6 @@ export async function checkModalSender(
   }
 
   return callback(win, win.modal);
-}
-
-export async function checkWindowViewSender(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  winId: TWindowId,
-  page: string,
-  callback: (window: Window, view: UIView) => void,
-) {
-  const win = browser.getWindow(winId);
-  if (!win) {
-    scopeLog.warn(`Window with id ${winId} not found`);
-    return;
-  }
-
-  const view = win.getView<UIPageView>(page);
-  if (!view || view.webContentsId !== event.sender.id) {
-    scopeLog.warn(
-      `Sender webContents id ${event.sender.id} does not match window id ${winId} and page ${page}`,
-    );
-    return;
-  }
-
-  callback(win, view);
 }
 
 export async function checkModalAndPagesSender<T>(

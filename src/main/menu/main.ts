@@ -71,10 +71,7 @@ function fileMenu(
         icon: getIcon(EIcon.Command),
         click: () => {
           if (window) {
-            window.modal.open('perform-command', {
-              width: 500,
-              height: 500,
-            });
+            window.modal.open('perform-command');
           }
         },
       },
@@ -85,7 +82,7 @@ function fileMenu(
         icon: getIcon(EIcon.Tab),
         click: () => {
           if (window) {
-            window.modal.open('new-tab', { height: 600 });
+            window.modal.open('new-tab');
           }
         },
       },
@@ -140,18 +137,22 @@ function editMenu(
         icon: getIcon(EIcon.Copy),
         enabled: Boolean(tab),
         click: async () => {
-          if (window) {
+          if (window && tab) {
             await browser.performCommand(window, 'copy-url');
           }
         },
       },
-      // {
-      //   label: 'Edit URL',
-      //   accelerator: 'CmdOrCtrl+E',
-      //   icon: getIcon(EIcon.Edit),
-      //   enabled: Boolean(selectedTab),
-      //   click: () => browser.showPerformCommandDialog(window.id, { trigger: 'edit-url' }),
-      // },
+      {
+        label: 'Edit URL',
+        accelerator: 'CmdOrCtrl+E',
+        icon: getIcon(EIcon.Edit),
+        enabled: Boolean(tab),
+        click: () => {
+          if (window && tab) {
+            window.modal.open('edit-url');
+          }
+        },
+      },
       // { type: 'separator' },
       // {
       //   label: 'Find in page...',
@@ -222,7 +223,7 @@ function desktopsMenu(
         icon: getIcon(EIcon.Desktop),
         click: () => {
           if (window) {
-            window.modal.open('select-desktop', { height: 450 });
+            window.modal.open('select-desktop');
           }
         },
       },

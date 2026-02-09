@@ -2,8 +2,8 @@ import { Browser } from '@/core';
 import { ipcMain, WebContents } from 'electron';
 import log from 'electron-log';
 import { UINotification } from './notifications';
-import { INotification, TWindowId } from '~/types';
-import { checkModalSender } from '@/utils';
+import { INotification, TPage, TWindowId } from '~/types';
+import { checkModalAndPagesSender, checkModalSender } from '@/utils';
 
 const scopeLog = log.scope('IPCUI');
 
@@ -13,6 +13,16 @@ export function setupUIIPC(browser: Browser) {
     scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
     return await checkModalSender(event, browser, winId, (_win, modalManager) => {
       modalManager.close();
+    });
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('modal:open', async (event, winId: TWindowId, page: TPage) => {
+    scopeLog.info(
+      `IPC Received: layout-system:open-modal for window ID ${winId} with page ${page}`,
+    );
+    return await checkModalAndPagesSender(event, browser, winId, ['urlbar'], async (window) => {
+      window.modal.open(page);
     });
   });
 

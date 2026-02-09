@@ -13,9 +13,6 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Switch to a specific desktop',
   modal: {
     page: 'select-desktop',
-    props: {
-      height: 450,
-    },
   },
   visibility: ({ window }) => !!window,
   async handler({ window, params }) {

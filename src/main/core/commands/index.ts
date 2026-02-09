@@ -25,6 +25,7 @@ import * as tabHistoryBack from './tab-history-back';
 import * as tabHistoryForward from './tab-history-forward';
 import * as tabRename from './tab-rename';
 import * as urlCopy from './url-copy';
+import * as urlEdit from './url-edit';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -49,6 +50,7 @@ const COMMANDS = {
   [tabHistoryForward.TRIGGER]: tabHistoryForward.Command,
   [tabRename.TRIGGER]: tabRename.Command,
   [urlCopy.TRIGGER]: urlCopy.Command,
+  [urlEdit.TRIGGER]: urlEdit.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

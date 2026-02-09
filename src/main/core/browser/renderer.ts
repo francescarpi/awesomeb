@@ -183,6 +183,7 @@ export class BrowserRenderer {
       id: item.tab.id.toString(),
       label: item.tab.title,
       selected: selectedTab?.id === item.tab.id,
+      url: item.tab.url,
     }));
   }
 }

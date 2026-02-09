@@ -5,6 +5,22 @@ import { IProps } from './types';
 
 export class UIModalManager {
   private _modal: UIModal | null = null;
+  private _defaultModalProps = {
+    'edit-url': {
+      width: 700,
+      height: 200,
+    },
+    'perform-command': {
+      width: 500,
+      height: 500,
+    },
+    'new-tab': {
+      height: 600,
+    },
+    'select-desktop': {
+      height: 450,
+    },
+  };
 
   constructor(private readonly _win: UIWindow) {}
 
@@ -13,7 +29,16 @@ export class UIModalManager {
       this.close();
     }
 
-    this._modal = new UIModal(this._win, page, props);
+    let modalProps = props || {};
+
+    if (this._defaultModalProps[page]) {
+      modalProps = {
+        ...this._defaultModalProps[page],
+        ...modalProps,
+      };
+    }
+
+    this._modal = new UIModal(this._win, page, modalProps);
   }
 
   close() {

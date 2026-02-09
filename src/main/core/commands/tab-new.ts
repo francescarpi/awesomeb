@@ -16,9 +16,6 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Open a new tab in specified target',
   modal: {
     page: 'new-tab',
-    props: {
-      height: 600,
-    },
   },
   visibility: ({ window }) => !!window,
   async handler({ browser, params, window }) {

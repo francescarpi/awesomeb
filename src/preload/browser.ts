@@ -7,6 +7,7 @@ import {
   ITabContainer,
   IURLTabData,
   ITab,
+  TPage,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -14,6 +15,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 const abModal = {
   close: (winId: TWindowId) => {
     ipcRenderer.send('modal:close', winId);
+  },
+  open: (winId: TWindowId, page: TPage) => {
+    ipcRenderer.send('modal:open', winId, page);
   },
 };
 

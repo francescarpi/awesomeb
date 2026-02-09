@@ -31,4 +31,6 @@ export interface IPartitionEntity extends IEntity {
   color: string;
 }
 
-export interface ITabEntity extends IEntity {}
+export interface ITabEntity extends IEntity {
+  url: string | null;
+}

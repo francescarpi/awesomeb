@@ -1,19 +1,25 @@
 ---
 import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import Option1 from '../components/edit-url/Option1.astro';
+import Option2 from '../components/edit-url/Option2.astro';
 ---
 
-<BlackBgWithTitle title="Rename Tab">
-  <input class="input w-full text-black rounded-full" placeholder="Set new tab name..." autofocus />
+<BlackBgWithTitle title="Edit URL">
+  <div class="h-full">
+    <Option1 />
+    <Option2 />
+  </div>
 </BlackBgWithTitle>
 
 <script>
   import { ITabEntity } from '~/types';
   import { getSearchParams } from '../scripts/url';
   import { inputManager } from '../scripts/inputs';
+
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId');
 
-  const inputEl = document.querySelector('input')! as HTMLInputElement;
+  const fullURLEl = document.querySelector('#input-full-url')! as HTMLInputElement;
 
   async function setup() {
     // Fetch tabs
@@ -25,16 +31,17 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       : tabsEntitites.find((d) => d.selected)!;
 
     const { setDefaultValue } = inputManager(
-      inputEl,
+      fullURLEl,
       (newValue: string) => {
-        abCommands.perform(winId, 'rename-tab', {
+        abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
-          name: newValue,
+          url: newValue,
         });
       },
       () => abModal.close(winId),
     );
-    setDefaultValue(selectedTab.label || '');
+
+    setDefaultValue(selectedTab.url || '');
   }
 
   setup();

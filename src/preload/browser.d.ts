@@ -10,6 +10,7 @@ import {
   ITabContainer,
   TTabId,
   ITab,
+  TPage,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -19,6 +20,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abModal: {
     close: (winId: TWindowId) => void;
+    open: (winId: TWindowId, page: TPage) => void;
   };
 
   //--------------------------------------------------------------------------------------
