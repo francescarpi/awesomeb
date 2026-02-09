@@ -86,12 +86,15 @@ export class Window extends UIWindow {
         result.tabContainer.setTabsVisibility(false);
       }
     }
-
-    if (selectedTabContainer && this.hasView('notabs')) {
-      this.removeView('notabs');
-    } else if (!selectedTabContainer && !this.hasView('notabs')) {
-      const noTabs = new NoTabs();
-      this.addView(noTabs, 'bottom');
+    if (selectedTabContainer) {
+      if (this.hasView('notabs')) {
+        this.removeView('notabs');
+      }
+    } else {
+      if (!this.hasView('notabs')) {
+        const noTabs = new NoTabs();
+        this.addView(noTabs, 'bottom');
+      }
     }
 
     this.refreshViewsBounds();

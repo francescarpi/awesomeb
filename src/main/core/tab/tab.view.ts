@@ -8,7 +8,7 @@ export class TabView extends UIView {
   constructor(_id: TTabId, partitionId: TPartitionId) {
     super(`tab-${_id}`, {
       visible: false,
-      borderRadius: 8,
+      borderRadius: 12,
       backgroundColor: '#ffffff',
       session: session.fromPartition(partitionId),
     });
@@ -20,13 +20,19 @@ export class TabView extends UIView {
     const urlbar = window.getView<URLBar>('urlbar')!;
     const bounds = window.bounds;
 
-    const x = sidebar.left + sidebar.width;
+    let x = sidebar.left + sidebar.width;
     const y = urlbar.top + urlbar.height + MARGIN;
+    let width = bounds.width - x - MARGIN;
+
+    if (window.areaMaximized) {
+      x = MARGIN;
+      width = bounds.width - MARGIN * 2;
+    }
 
     this.webContentsView.setBounds({
       x,
       y,
-      width: bounds.width - x - MARGIN,
+      width,
       height: bounds.height - y - MARGIN,
     });
   }

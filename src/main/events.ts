@@ -18,7 +18,7 @@ export function registerAppEvents(browser: Browser) {
 
     for (const result of browser.getAllTabs()) {
       if (!result.tab.suspended) {
-        result.window.suspendTab(result.tab.id);
+        await result.window.suspendTab(result.tab.id);
       }
     }
 
