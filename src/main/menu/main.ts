@@ -85,7 +85,7 @@ function fileMenu(
         icon: getIcon(EIcon.Tab),
         click: () => {
           if (window) {
-            window.modal.open('new-tab', { height: 450 });
+            window.modal.open('new-tab', { height: 600 });
           }
         },
       },
