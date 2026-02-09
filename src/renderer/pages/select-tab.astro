@@ -1,0 +1,25 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '../components/common/ListWithSearch.astro';
+---
+
+<BlackBgWithTitle title="Select Tab">
+  <ListWithSearch placeholder="Filter and select a tab..." id="list" />
+</BlackBgWithTitle>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  import { listWithSearchManager } from '../scripts/list-with-search';
+
+  const { winId } = getSearchParams();
+  const listEl = document.getElementById('list')!;
+  listWithSearchManager(listEl, {
+    entity: 'tabs',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'select-tab', { tabId: parseInt(item.id, 10) });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

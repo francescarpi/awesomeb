@@ -20,6 +20,9 @@ export class UIModalManager {
     'select-desktop': {
       height: 450,
     },
+    'select-tab': {
+      height: 500,
+    },
   };
 
   constructor(private readonly _win: UIWindow) {}

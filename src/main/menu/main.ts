@@ -217,7 +217,7 @@ function desktopsMenu(
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
-        label: 'Select...',
+        label: 'Find...',
         accelerator: 'CmdOrCtrl+D',
         enabled: !!window,
         icon: getIcon(EIcon.Desktop),
@@ -291,6 +291,18 @@ function tabsMenu(
     label: 'Tabs',
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
+      {
+        label: 'Find...',
+        accelerator: 'CmdOrCtrl+.',
+        enabled: !!window,
+        icon: getIcon(EIcon.Tab),
+        click: () => {
+          if (window) {
+            window.modal.open('select-tab');
+          }
+        },
+      },
+      { type: 'separator' },
       ...tabs,
       { type: 'separator' },
       {
