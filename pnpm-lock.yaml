@@ -15,7 +15,7 @@ importers:
         specifier: 4.1.1
         version: 4.1.1
       electron-dl:
-        specifier: ^4.0.0
+        specifier: 4.0.0
         version: 4.0.0
       electron-log:
         specifier: 5.4.3

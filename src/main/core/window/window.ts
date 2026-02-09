@@ -180,11 +180,12 @@ export class Window extends UIWindow {
 
       this.addView(tab.view, 'bottom');
       this.refreshTabsVisibility();
-      await tab.loadHistoryOrURL();
-    } else {
-      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-      this.refreshTabsVisibility();
+      this.eventsChannel.emit('window:tab-did-resume', this, tab);
+      return;
     }
+
+    this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+    this.refreshTabsVisibility();
   }
 
   getAllTabs(): IDesConTab[] {
