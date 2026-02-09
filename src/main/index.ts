@@ -11,12 +11,14 @@ import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
 import { registerAppEvents } from './events';
 import { setupMenuIPC } from '@/menu';
+import electronDl from 'electron-dl';
 
 export type { IModalProps } from './ui';
 
 setupLogs();
 setupAbout();
 setupFeatures();
+electronDl();
 
 app.whenReady().then(() => {
   const browser = new Browser();

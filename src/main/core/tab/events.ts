@@ -1,4 +1,6 @@
+import { tabWebContentsMenu } from '@/menu';
 import { Tab } from './tab';
+import contextMenu from 'electron-context-menu';
 
 export function registerTabEvents(tab: Tab) {
   //--------------------------------------------------------------------------------------
@@ -25,8 +27,23 @@ export function registerTabEvents(tab: Tab) {
       }
     },
   );
+
   //--------------------------------------------------------------------------------------
   tab.view.webContents.on('page-title-updated', (_event, title, _explicitSet) => {
     tab.setTitle(title);
+  });
+
+  //--------------------------------------------------------------------------------------
+  const window = tab.view.webContents;
+  // This patch is needed because "electron-dl" accesses session via webContents
+  // of the window => window_.webContents.session
+  // @ts-expect-error As we are patching the window object, we can ignore the type error here
+  window.webContents = tab.view.webContents;
+
+  contextMenu({
+    window,
+    menu: (actions, params, _browserWindow, dictionarySuggestions) => {
+      return tabWebContentsMenu(actions, params, dictionarySuggestions);
+    },
   });
 }

@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
 
+vi.mock('electron-context-menu', () => ({
+  default: vi.fn(),
+}));
+
 // Mock electron-log first to avoid import issues
 vi.mock('electron-log', () => ({
   default: {
