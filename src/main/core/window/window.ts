@@ -76,7 +76,6 @@ export class Window extends UIWindow {
   }
 
   refreshTabsVisibility() {
-    const noTabsView = this.getView<NoTabs>('notabs')!;
     const desktop = this.selectedDesktop;
     const selectedTabContainer = desktop.selectedTabContainer;
 
@@ -88,9 +87,10 @@ export class Window extends UIWindow {
       }
     }
     if (selectedTabContainer) {
-      noTabsView.setVisible(false);
-    } else {
-      noTabsView.setVisible(true);
+      this.removeView('notabs');
+    } else if (!this.hasView('notabs')) {
+      const noTabs = new NoTabs();
+      this.addView(noTabs, 'bottom');
     }
 
     this.refreshViewsBounds();

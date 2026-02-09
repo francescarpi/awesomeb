@@ -97,6 +97,10 @@ export class UIWindow {
     this._views.delete(id);
   }
 
+  hasView(id: TViewId): boolean {
+    return this._views.has(id);
+  }
+
   getView<T>(id: TViewId): T | null {
     return (this._views.get(id) as T) || null;
   }
