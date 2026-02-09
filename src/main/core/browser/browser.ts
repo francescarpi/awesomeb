@@ -165,7 +165,7 @@ export class Browser {
 
     this.eventsChannel.emit('browser:url-opened', window);
 
-    window.addIntoMainLayout(tabContainer.layout);
+    // window.addIntoMainLayout(tabContainer.layout);
     window.refreshVisibleTabView();
 
     await tab.loadURL(url);

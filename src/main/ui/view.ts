@@ -1,34 +1,33 @@
 import path from 'path';
-import { IMargin, TPage } from '~/types';
 import { WebContentsView, Rectangle, WebContents, session, Session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
-import { loadPage, openDevTools, transformMargin } from './helpers';
-import { internalPartition } from '@/core';
+import { loadPage, openDevTools } from './helpers';
+import { internalPartition, Window } from '@/core';
+import { buildScopeLog } from '@/utils';
+
+const scopeLog = buildScopeLog('UIView', process.env.AB_LOG_UI === 'true');
 
 export class UIView {
   protected _webContentsView: WebContentsView;
-  protected _margin: IMargin = { t: 0, r: 0, b: 0, l: 0 };
-  protected _width: number | null = null;
-  protected _height: number | null = null;
-  private _visible: boolean = true;
 
   private readonly _borderRadius: number;
   private readonly _backgroundColor: string;
 
   private _session: Session;
 
-  constructor(props?: IViewProps) {
+  constructor(
+    public readonly id: TViewId,
+    props?: IViewProps,
+  ) {
     this._borderRadius = props?.borderRadius || 0;
     this._backgroundColor = props?.backgroundColor || '#00000000';
     this._session = props?.session || session.fromPartition(internalPartition.id);
 
     this._webContentsView = this._createWebContentsView();
 
-    this._margin = props?.margin ? transformMargin(props.margin) : this._margin;
-    this._width = props?.width || null;
-    this._height = props?.height || null;
-    this._visible = props?.visible !== undefined ? props.visible : this._visible;
+    const visible = props?.visible ?? true;
+    this.setVisible(visible);
   }
 
   private _createWebContentsView(): WebContentsView {
@@ -56,10 +55,6 @@ export class UIView {
     this._webContentsView = this._createWebContentsView();
   }
 
-  get id(): TViewId {
-    return this.webContents.id;
-  }
-
   get webContentsId(): number {
     // Dont delete - used in some places
     return this.webContents.id;
@@ -81,44 +76,36 @@ export class UIView {
     return this._webContentsView.webContents;
   }
 
-  setBounds(bounds: Rectangle) {
-    this._webContentsView.setBounds(bounds);
-  }
-
   get bounds(): Rectangle {
     return this._webContentsView.getBounds();
   }
 
-  get margin(): IMargin {
-    return this._margin;
+  get width(): number {
+    return this.bounds.width;
   }
 
-  get visible(): boolean {
-    return this._visible;
+  get height(): number {
+    return this.bounds.height;
   }
 
-  setVisible(visible: boolean) {
-    this._visible = visible;
+  get top(): number {
+    return this.bounds.y;
   }
 
-  get width(): number | null {
-    return this._width;
-  }
-
-  get height(): number | null {
-    return this._height;
-  }
-
-  setMargin(margin: string) {
-    this._margin = transformMargin(margin);
+  get left(): number {
+    return this.bounds.x;
   }
 
   setWidth(width: number) {
-    this._width = width;
+    this._webContentsView.setBounds({ ...this.bounds, width });
   }
 
-  setHeight(height: number) {
-    this._height = height;
+  get visible(): boolean {
+    return this._webContentsView.getVisible();
+  }
+
+  setVisible(visible: boolean) {
+    this._webContentsView.setVisible(visible);
   }
 
   send(channel: string, ...args: any[]) {
@@ -148,23 +135,20 @@ export class UIView {
       this.webContents.navigationHistory.goForward();
     }
   }
+
+  refreshBounds(window: Window) {
+    scopeLog.error('Not implemented refreshBounds for UIView', window.id);
+  }
 }
 
 export class UIPageView extends UIView {
-  constructor(
-    public readonly page: TPage,
-    props?: IPageViewProps,
-  ) {
-    super(props);
-    loadPage(this.webContents, page, props?.query);
-    openDevTools(this.webContents, page);
+  constructor(id: TViewId, props?: IPageViewProps) {
+    super(id, props);
+    loadPage(this.webContents, id, props?.query);
+    openDevTools(this.webContents, id);
   }
 
   protected getPreloadScript(): string {
     return path.join(PRELOAD_FOLDER, 'browser.js');
-  }
-
-  get id(): string {
-    return this.page;
   }
 }

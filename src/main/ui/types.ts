@@ -1,19 +1,14 @@
 import { Rectangle, Session } from 'electron';
-import { UILayout } from './layout';
-import { UIView } from './view';
 
 export interface ILayoutNode {
   layout(rect: Rectangle): void;
 }
 
 export interface IViewProps {
-  width?: number;
-  height?: number;
-  margin?: string;
-  visible?: boolean;
   borderRadius?: number;
   backgroundColor?: string;
   session?: Session;
+  visible?: boolean;
 }
 
 export interface IPageViewProps extends IViewProps {
@@ -22,6 +17,4 @@ export interface IPageViewProps extends IViewProps {
 
 export type TLayoutType = 'vertical' | 'horizontal' | Rectangle;
 
-export type TLayoutChildren = UILayout | UIView;
-
-export type TViewId = number | string;
+export type TViewId = string;

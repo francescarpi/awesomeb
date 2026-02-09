@@ -1,5 +1,4 @@
 import { Browser, Window, Desktop, Tab } from '@/core';
-import { UIPageView } from '@/ui';
 import log from 'electron-log';
 import { ITheme } from '~/types';
 
@@ -9,7 +8,7 @@ export class BrowserRendererEmmiter {
   constructor(private readonly _browser: Browser) {}
 
   refreshDesktops(window: Window) {
-    const sidebar = window.getChild<UIPageView>('sidebar')!;
+    const sidebar = window.getView('sidebar')!;
     const desktops = this._browser.renderer.desktops(window);
     sidebar.send('desktops:refresh', desktops);
     scopeLog.info('Desktops refreshed in renderer');
@@ -25,18 +24,18 @@ export class BrowserRendererEmmiter {
   }
 
   refreshTabContainers(window: Window) {
-    const sidebar = window.getChild<UIPageView>('sidebar')!;
+    const sidebar = window.getView('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
     sidebar.send('tabs:refresh', tabContainers);
   }
 
   refreshURLBar(window: Window, tab: Tab | null) {
-    const urlbar = window.getChild<UIPageView>('urlbar')!;
+    const urlbar = window.getView('urlbar')!;
     urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));
   }
 
   refreshTab(window: Window, desktop: Desktop, tab: Tab) {
-    const sidebar = window.getChild<UIPageView>('sidebar')!;
+    const sidebar = window.getView('sidebar')!;
     const selectedTabContainer = desktop.selectedTabContainer;
     sidebar.send(
       'tabs:refresh-one',

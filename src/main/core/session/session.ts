@@ -31,8 +31,8 @@ export class Session extends Store<ISessionStore> {
       id: window.id,
       bounds: window.bounds,
       selectedDesktopId: window.selectedDesktop.id,
-      sidebarCollapsed: window.isSidebarCollapsed,
-      areaMaximized: window.isAreaMaximized,
+      sidebarCollapsed: window.sidebarCollapsed,
+      areaMaximized: window.areaMaximized,
       desktops: window.desktops.map((desktop) => {
         const tabContainers = desktop.tabContainers
           .map((tabContainer) => ({

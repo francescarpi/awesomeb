@@ -2,11 +2,9 @@ import { TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
 import EventEmitter from 'events';
 import { ITabContainerProps, ITabProps } from './types';
-import { UILayout } from '@/ui';
 
 export class TabContainer {
   private _divider: boolean;
-  private _layout: UILayout;
 
   private readonly _tabs: Map<TTabId, Tab> = new Map();
   private _selectedTabId: TTabId | null = null;
@@ -17,7 +15,6 @@ export class TabContainer {
     props?: ITabContainerProps,
   ) {
     this._divider = props?.divider ?? false;
-    this._layout = new UILayout(`tab-container-${this.id}`, 'vertical');
   }
 
   get tabs(): Tab[] {
@@ -27,7 +24,6 @@ export class TabContainer {
   createTab(id: TTabId, props: ITabProps): Tab {
     const tab = new Tab(this.eventsChannel, id, props);
 
-    this._layout.addChild(tab.layout);
     this._tabs.set(tab.id, tab);
 
     return tab;
@@ -35,10 +31,6 @@ export class TabContainer {
 
   get divider(): boolean {
     return this._divider;
-  }
-
-  get layout(): UILayout {
-    return this._layout;
   }
 
   get selectedTab(): Tab | null {
@@ -76,7 +68,6 @@ export class TabContainer {
       return false;
     }
 
-    this._layout.removeChild(tab.layout);
     this._tabs.delete(id);
 
     if (this._selectedTabId === id) {
@@ -86,9 +77,5 @@ export class TabContainer {
     tab.close();
 
     return true;
-  }
-
-  setVisible(visible: boolean) {
-    this._layout.setVisible(visible);
   }
 }

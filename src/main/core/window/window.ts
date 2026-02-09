@@ -3,10 +3,9 @@ import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
-import { IDesCon, IDesConTab, ITabContainer, TDesktopId, TTabId, TWindowId } from '~/types';
+import { IDesCon, IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
-// import { TViewId } from '@/ui/types';
 
 const scopeLog = log.scope('Window');
 
@@ -24,6 +23,8 @@ export class Window extends UIWindow {
     registerWindowEvents(this);
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
+
+    this.refreshViewsBounds();
   }
 
   get desktops(): Desktop[] {
@@ -75,23 +76,22 @@ export class Window extends UIWindow {
   }
 
   refreshVisibleTabView() {
-    const desktop = this.selectedDesktop;
-    const selectedTabContainer = desktop.selectedTabContainer;
-
-    for (const result of this.getAllTabContainers()) {
-      if (result.tabContainer.id === selectedTabContainer?.id) {
-        result.tabContainer.setVisible(true);
-      } else {
-        result.tabContainer.setVisible(false);
-      }
-    }
-    if (selectedTabContainer) {
-      this.setNoTabVisibility(false);
-    } else {
-      this.setNoTabVisibility(true);
-    }
-
-    this.renderLayout();
+    // const desktop = this.selectedDesktop;
+    // const selectedTabContainer = desktop.selectedTabContainer;
+    // for (const result of this.getAllTabContainers()) {
+    //   if (result.tabContainer.id === selectedTabContainer?.id) {
+    //     result.tabContainer.setVisible(true);
+    //   } else {
+    //     result.tabContainer.setVisible(false);
+    //   }
+    // }
+    // if (selectedTabContainer) {
+    //   this.setNoTabVisibility(false);
+    // } else {
+    //   this.setNoTabVisibility(true);
+    // }
+    //
+    // this.renderLayout();
   }
 
   getTab(id: TTabId): IDesConTab | null {
@@ -172,7 +172,7 @@ export class Window extends UIWindow {
 
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
-      this.addIntoMainLayout(tabContainer.layout, false);
+      // this.addIntoMainLayout(tabContainer.layout, false);
       this.refreshVisibleTabView();
       await tab.loadHistoryOrURL();
     } else {
@@ -223,7 +223,7 @@ export class Window extends UIWindow {
       desktop.selectTabContainer(null);
     }
 
-    this.removeFromMainLayout(tabContainer.layout);
+    // this.removeFromMainLayout(tabContainer.layout);
     this.refreshVisibleTabView();
 
     scopeLog.debug(
@@ -266,7 +266,7 @@ export class Window extends UIWindow {
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
       }
-      this.removeFromMainLayout(tabContainer.layout);
+      // this.removeFromMainLayout(tabContainer.layout);
     }
 
     this.refreshVisibleTabView();
@@ -294,5 +294,21 @@ export class Window extends UIWindow {
     filteredTabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
 
     return filteredTabs[0];
+  }
+
+  refreshViewsBounds() {
+    for (const view of this.views) {
+      view.refreshBounds(this);
+    }
+  }
+
+  toggleSidebar() {
+    super.toggleSidebar();
+    this.refreshViewsBounds();
+  }
+
+  toggleMaximizeArea() {
+    super.toggleMaximizeArea();
+    this.refreshViewsBounds();
   }
 }

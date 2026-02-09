@@ -15,4 +15,14 @@ export function registerWindowEvents(window: Window) {
     scopeLog.info(`Window blurred: ${window.id}`);
     window.eventsChannel.emit('window:window-blur', window.id);
   });
+
+  //--------------------------------------------------------------------------------------
+  window.bw.on('resize', () => {
+    window.refreshViewsBounds();
+  });
+
+  //--------------------------------------------------------------------------------------
+  window.bw.on('move', () => {
+    window.refreshViewsBounds();
+  });
 }

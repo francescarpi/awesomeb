@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { Partition } from '@/core';
 import { ITabProps } from './types';
-import { UIView, UILayout } from '@/ui';
+import { UIView } from '@/ui';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { session } from 'electron';
@@ -19,7 +19,6 @@ export class Tab {
   private _loading: boolean = false;
   private _favicon: string | null = null;
   private _view: UIView;
-  private _layout: UILayout;
   private _lastAccessed: number = Date.now();
 
   constructor(
@@ -34,17 +33,12 @@ export class Tab {
     this._suspended = props.suspended ?? true;
 
     // The view is not visible initially until method to refresh visible tabs is called.
-    this._view = new UIView({
+    this._view = new UIView(`tab-${this.id}`, {
       visible: true,
-      margin: '5 5 5 0',
       borderRadius: 8,
       backgroundColor: '#ffffff',
       session: session.fromPartition(this._partition.id),
     });
-
-    // The tab layout will be used to show, for instance, the find in page view below the webview.
-    this._layout = new UILayout(`tab-${this._view.id}`, 'horizontal');
-    this._layout.addChild(this._view);
 
     registerTabEvents(this);
   }
@@ -119,10 +113,6 @@ export class Tab {
 
     this._customTitle = customTitle;
     this.eventsChannel.emit('tab:title-did-change', this);
-  }
-
-  get layout(): UILayout {
-    return this._layout;
   }
 
   get view(): UIView {
