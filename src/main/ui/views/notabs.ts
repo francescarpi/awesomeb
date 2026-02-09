@@ -1,6 +1,8 @@
 import { Window } from '@/core';
 import { UIPageView } from '../view';
 import { MARGIN } from '../constants';
+import { Sidebar } from './sidebar';
+import { URLBar } from './urlbar';
 
 export class NoTabs extends UIPageView {
   constructor() {
@@ -8,8 +10,8 @@ export class NoTabs extends UIPageView {
   }
 
   refreshBounds(window: Window) {
-    const sidebar = window.getView('sidebar')!;
-    const urlbar = window.getView('urlbar')!;
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    const urlbar = window.getView<URLBar>('urlbar')!;
     const bounds = window.bounds;
     const y = urlbar.top + urlbar.height + MARGIN;
 

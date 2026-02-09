@@ -302,13 +302,13 @@ export class Window extends UIWindow {
     }
   }
 
-  toggleSidebar() {
-    super.toggleSidebar();
+  toggleSidebar(window: Window) {
+    super.toggleSidebar(window);
     this.refreshViewsBounds();
   }
 
-  toggleMaximizeArea() {
-    super.toggleMaximizeArea();
+  toggleMaximizeArea(window: Window) {
+    super.toggleMaximizeArea(window);
     this.refreshViewsBounds();
   }
 }

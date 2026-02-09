@@ -2,6 +2,7 @@ import { TWindowId } from '~/types';
 import { Window } from '@/core';
 import { UIPageView } from '../view';
 import { URLBAR_HEIGHT, MARGIN } from '../constants';
+import { Sidebar } from './sidebar';
 
 export class URLBar extends UIPageView {
   constructor(winId: TWindowId) {
@@ -11,21 +12,21 @@ export class URLBar extends UIPageView {
   }
 
   refreshBounds(window: Window) {
-    const sidebar = window.getView('sidebar')!;
+    const sidebar = window.getView<Sidebar>('sidebar')!;
     const bounds = window.bounds;
 
-    let width = bounds.width - sidebar.width - MARGIN;
-    let x = sidebar.width;
+    let height = URLBAR_HEIGHT - MARGIN * 2;
+    let y = MARGIN;
     if (window.areaMaximized) {
-      x = MARGIN;
-      width = bounds.width - MARGIN * 2;
+      height = 0;
+      y = 0;
     }
 
     this.webContentsView.setBounds({
-      x,
-      y: MARGIN,
-      width,
-      height: URLBAR_HEIGHT - MARGIN * 2,
+      x: sidebar.width,
+      y,
+      width: bounds.width - sidebar.width - MARGIN,
+      height,
     });
   }
 }

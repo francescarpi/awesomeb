@@ -5,7 +5,7 @@ import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import EventEmitter from 'events';
-import { internalPartition } from '@/core';
+import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
 import { Z_INDEX } from './constants';
@@ -97,8 +97,8 @@ export class UIWindow {
     this._views.delete(id);
   }
 
-  getView(id: TViewId): UIView | null {
-    return this._views.get(id) || null;
+  getView<T>(id: TViewId): T | null {
+    return (this._views.get(id) as T) || null;
   }
 
   get views(): UIView[] {
@@ -139,17 +139,21 @@ export class UIWindow {
     return this.bw.getBounds();
   }
 
-  toggleSidebar() {
+  toggleSidebar(window: Window) {
     this._sidebarCollapsed = !this._sidebarCollapsed;
+    const sidebar = this.getView<Sidebar>('sidebar')!;
+    sidebar.loadPage(window);
   }
 
   get sidebarCollapsed(): boolean {
     return this._sidebarCollapsed;
   }
 
-  toggleMaximizeArea() {
+  toggleMaximizeArea(window: Window) {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
+    const sidebar = this.getView<Sidebar>('sidebar')!;
+    sidebar.loadPage(window);
   }
 
   get areaMaximized(): boolean {

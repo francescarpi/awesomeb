@@ -7,7 +7,7 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
-  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;">
+  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;" id="sidebar">
     <section class="pl-2 pt-2 hidden sidebar:block">
       <WindowActions />
     </section>
@@ -25,7 +25,20 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
   import { onClick } from '../scripts/buttons';
 
   import { getSearchParams } from '../scripts/url';
-  const { winId } = getSearchParams();
+  const { winId, searchParams } = getSearchParams();
+
+  const colorPrimary = searchParams.get('colorPrimary');
+  const colorSecondary = searchParams.get('colorSecondary');
+  const degrees = searchParams.get('degrees');
+
+  if (colorPrimary && colorSecondary && degrees) {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      const backgroundImage = `linear-gradient(${parseInt(degrees, 10)}deg, ${colorPrimary}, ${colorSecondary})`;
+      sidebar.style.backgroundImage = backgroundImage;
+      sidebar.style.borderRight = `1px solid rgba(255, 255, 255, 0.4)`;
+    }
+  }
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
 </script>
