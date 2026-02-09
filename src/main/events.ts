@@ -16,7 +16,12 @@ export function registerAppEvents(browser: Browser) {
     const session = new Session(browser);
     session.save();
 
-    // browser.history.save(browser)
+    for (const result of browser.getAllTabs()) {
+      if (!result.tab.suspended) {
+        result.window.suspendTab(result.tab.id);
+      }
+    }
+
     app.exit(0);
   });
 }

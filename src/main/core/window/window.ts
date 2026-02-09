@@ -1,6 +1,6 @@
 import { NoTabs, UIWindow } from '@/ui';
 import type { IProps } from './types';
-import { Desktop, IDesktopProps } from '@/core';
+import { Desktop, IDesktopProps, history } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
 import { IDesCon, IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
@@ -86,9 +86,10 @@ export class Window extends UIWindow {
         result.tabContainer.setTabsVisibility(false);
       }
     }
-    if (selectedTabContainer) {
+
+    if (selectedTabContainer && this.hasView('notabs')) {
       this.removeView('notabs');
-    } else if (!this.hasView('notabs')) {
+    } else if (!selectedTabContainer && !this.hasView('notabs')) {
       const noTabs = new NoTabs();
       this.addView(noTabs, 'bottom');
     }
@@ -213,8 +214,7 @@ export class Window extends UIWindow {
 
     const { tabContainer, desktop, tab } = result;
 
-    // TODO we have to save the history on disk before suspending
-
+    history.save(tab);
     tab.suspend();
 
     if (tabContainer.selectedTab?.id === tab.id) {

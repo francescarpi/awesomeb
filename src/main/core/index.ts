@@ -7,3 +7,4 @@ export * from './session';
 export * from './config';
 export * from './partitions';
 export * from './tab';
+export * from './history/';

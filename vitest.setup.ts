@@ -36,6 +36,9 @@ vi.mock('electron', () => {
     navigationHistory: {
       canGoBack: vi.fn(() => false),
       canGoForward: vi.fn(() => false),
+      getAllEntries: vi.fn(() => []),
+      getActiveIndex: vi.fn(() => 0),
+      restore: vi.fn().mockResolvedValue(undefined),
     },
   });
 

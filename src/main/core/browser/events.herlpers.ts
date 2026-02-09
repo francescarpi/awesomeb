@@ -1,4 +1,7 @@
 import { Browser, Tab } from '@/core';
+import log from 'electron-log';
+
+const scopeLog = log.scope('BrowserEventsHelpers');
 
 export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   const result = browser.getTab(tab.id);
@@ -25,5 +28,6 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
 
   if (someChanged) {
     browser.refreshMainMenu();
+    scopeLog.info('Refreshed URL bar or tab for tab with id', tab.id);
   }
 }

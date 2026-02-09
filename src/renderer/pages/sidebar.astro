@@ -7,7 +7,7 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
-  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;" id="sidebar">
+  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;" id="sidebarContainer">
     <section class="pl-2 pt-2 hidden sidebar:block">
       <WindowActions />
     </section>
@@ -32,7 +32,7 @@ import TabContainers from '../components/sidebar/TabContainers.astro';
   const degrees = searchParams.get('degrees');
 
   if (colorPrimary && colorSecondary && degrees) {
-    const sidebar = document.getElementById('sidebar');
+    const sidebar = document.getElementById('sidebarContainer');
     if (sidebar) {
       const backgroundImage = `linear-gradient(${parseInt(degrees, 10)}deg, ${colorPrimary}, ${colorSecondary})`;
       sidebar.style.backgroundImage = backgroundImage;

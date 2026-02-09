@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { Partition } from '@/core';
+import { Partition, history } from '@/core';
 import { ITabProps } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
@@ -143,9 +143,16 @@ export class Tab {
   }
 
   async loadHistoryOrURL() {
-    // TODO if exist navigation history, restore it
-    // else load the URL
-    // else raise an error
+    const tabHistory = history.get(this.id);
+    if (tabHistory) {
+      await this.view.webContents.navigationHistory.restore(tabHistory).catch((error) => {
+        scopeLog.error(
+          `Failed to restore navigation history for Tab ${this.id} with WebContents ID ${this.view.webContentsId}. ` +
+            `Error: ${error.message}`,
+        );
+      });
+      return;
+    }
 
     if (this._url) {
       await this.loadURL(this._url);
