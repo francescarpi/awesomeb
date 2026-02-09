@@ -29,7 +29,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshTabContainers(window);
       browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
 
-      window.refreshVisibleTabView();
+      window.refreshTabsVisibility();
       browser.refreshMainMenu();
     },
   );

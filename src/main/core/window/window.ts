@@ -1,4 +1,4 @@
-import { UIWindow } from '@/ui';
+import { NoTabs, UIWindow } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
@@ -75,23 +75,25 @@ export class Window extends UIWindow {
     }
   }
 
-  refreshVisibleTabView() {
-    // const desktop = this.selectedDesktop;
-    // const selectedTabContainer = desktop.selectedTabContainer;
-    // for (const result of this.getAllTabContainers()) {
-    //   if (result.tabContainer.id === selectedTabContainer?.id) {
-    //     result.tabContainer.setVisible(true);
-    //   } else {
-    //     result.tabContainer.setVisible(false);
-    //   }
-    // }
-    // if (selectedTabContainer) {
-    //   this.setNoTabVisibility(false);
-    // } else {
-    //   this.setNoTabVisibility(true);
-    // }
-    //
-    // this.renderLayout();
+  refreshTabsVisibility() {
+    const noTabsView = this.getView<NoTabs>('notabs')!;
+    const desktop = this.selectedDesktop;
+    const selectedTabContainer = desktop.selectedTabContainer;
+
+    for (const result of this.getAllTabContainers()) {
+      if (result.tabContainer.id === selectedTabContainer?.id) {
+        result.tabContainer.setTabsVisibility(true);
+      } else {
+        result.tabContainer.setTabsVisibility(false);
+      }
+    }
+    if (selectedTabContainer) {
+      noTabsView.setVisible(false);
+    } else {
+      noTabsView.setVisible(true);
+    }
+
+    this.refreshViewsBounds();
   }
 
   getTab(id: TTabId): IDesConTab | null {
@@ -172,12 +174,12 @@ export class Window extends UIWindow {
 
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
-      // this.addIntoMainLayout(tabContainer.layout, false);
-      this.refreshVisibleTabView();
+      this.addView(tab.view, 'bottom');
+      this.refreshTabsVisibility();
       await tab.loadHistoryOrURL();
     } else {
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-      this.refreshVisibleTabView();
+      this.refreshTabsVisibility();
     }
   }
 
@@ -223,8 +225,8 @@ export class Window extends UIWindow {
       desktop.selectTabContainer(null);
     }
 
-    // this.removeFromMainLayout(tabContainer.layout);
-    this.refreshVisibleTabView();
+    this.removeView(tab.view.id);
+    this.refreshTabsVisibility();
 
     scopeLog.debug(
       `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
@@ -266,10 +268,10 @@ export class Window extends UIWindow {
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
       }
-      // this.removeFromMainLayout(tabContainer.layout);
     }
 
-    this.refreshVisibleTabView();
+    this.removeView(tab.view.id);
+    this.refreshTabsVisibility();
 
     this.eventsChannel.emit('window:tab-did-close', this);
 

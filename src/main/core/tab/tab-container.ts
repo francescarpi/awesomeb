@@ -78,4 +78,10 @@ export class TabContainer {
 
     return true;
   }
+
+  setTabsVisibility(visible: boolean) {
+    for (const tab of this._tabs.values()) {
+      tab.view.setVisible(visible);
+    }
+  }
 }

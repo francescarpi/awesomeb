@@ -810,7 +810,7 @@ describe('closeTab', () => {
     // Select first tab
     await w.selectTab(result1!.tab.id);
 
-    const refreshSpy = vi.spyOn(w, 'refreshVisibleTabView');
+    const refreshSpy = vi.spyOn(w, 'refreshTabsVisibility');
 
     // Close the tab
     await w.closeTab(result1!.tab.id);

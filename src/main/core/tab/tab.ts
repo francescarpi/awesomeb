@@ -1,12 +1,11 @@
 import EventEmitter from 'events';
 import { Partition } from '@/core';
 import { ITabProps } from './types';
-import { UIView } from '@/ui';
 import { TTabId } from '~/types';
 import log from 'electron-log';
-import { session } from 'electron';
 import { registerTabEvents } from './events';
 import { sanitizeUserAgent } from '@/utils';
+import { TabView } from './tab.view';
 
 const scopeLog = log.scope('Tab');
 
@@ -18,7 +17,7 @@ export class Tab {
   private _suspended: boolean = true;
   private _loading: boolean = false;
   private _favicon: string | null = null;
-  private _view: UIView;
+  private _view: TabView;
   private _lastAccessed: number = Date.now();
 
   constructor(
@@ -33,12 +32,7 @@ export class Tab {
     this._suspended = props.suspended ?? true;
 
     // The view is not visible initially until method to refresh visible tabs is called.
-    this._view = new UIView(`tab-${this.id}`, {
-      visible: true,
-      borderRadius: 8,
-      backgroundColor: '#ffffff',
-      session: session.fromPartition(this._partition.id),
-    });
+    this._view = new TabView(id, this._partition.id);
 
     registerTabEvents(this);
   }
@@ -115,7 +109,7 @@ export class Tab {
     this.eventsChannel.emit('tab:title-did-change', this);
   }
 
-  get view(): UIView {
+  get view(): TabView {
     return this._view;
   }
 
