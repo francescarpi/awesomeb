@@ -6,6 +6,7 @@ import log from 'electron-log';
 import { registerTabEvents } from './events';
 import { sanitizeUserAgent } from '@/utils';
 import { TabView } from './tab.view';
+import { FindInPage } from './find-in-page';
 
 const scopeLog = log.scope('Tab');
 
@@ -17,8 +18,9 @@ export class Tab {
   private _suspended: boolean = true;
   private _loading: boolean = false;
   private _favicon: string | null = null;
-  private _view: TabView;
+  readonly view: TabView;
   private _lastAccessed: number = Date.now();
+  private _findInPage: FindInPage | null = null;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -32,7 +34,7 @@ export class Tab {
     this._suspended = props.suspended ?? true;
 
     // The view is not visible initially until method to refresh visible tabs is called.
-    this._view = new TabView(id, this._partition.id);
+    this.view = new TabView(id, this._partition.id);
 
     registerTabEvents(this);
   }
@@ -109,10 +111,6 @@ export class Tab {
     this.eventsChannel.emit('tab:title-did-change', this);
   }
 
-  get view(): TabView {
-    return this._view;
-  }
-
   activate() {
     if (this._suspended) {
       this._suspended = false;
@@ -121,9 +119,9 @@ export class Tab {
 
   async loadURL(url: string) {
     this._url = url;
-    const userAgent = sanitizeUserAgent(this._view.webContents.getUserAgent(), new URL(url));
+    const userAgent = sanitizeUserAgent(this.view.webContents.getUserAgent(), new URL(url));
     try {
-      await this._view.webContents.loadURL(url, { userAgent });
+      await this.view.webContents.loadURL(url, { userAgent });
     } catch (error) {
       scopeLog.error(`Failed to load URL ${url} in tab`);
     }
@@ -136,7 +134,7 @@ export class Tab {
 
     if (this.view.isDestroyed) {
       scopeLog.debug('Cannot resume tab because its view is destroyed');
-      this._view.refreshWebContentsView();
+      this.view.refreshWebContentsView();
     }
 
     this._suspended = false;
@@ -171,10 +169,7 @@ export class Tab {
   }
 
   close() {
-    if (this._view.webContents !== undefined) {
-      this._view.webContents.stop();
-      this._view.webContents.close();
-    }
+    this.view.close();
   }
 
   updateLastAccessed() {
@@ -183,5 +178,35 @@ export class Tab {
 
   get lastAccessed(): number {
     return this._lastAccessed;
+  }
+
+  get findInPage(): FindInPage | null {
+    return this._findInPage;
+  }
+
+  startFindInPage() {
+    if (this._findInPage) {
+      this._findInPage.view.focus();
+      return;
+    }
+
+    this._findInPage = new FindInPage(this.eventsChannel, this.id);
+    this.eventsChannel.emit(
+      'tab:find-in-page-visibility-did-change',
+      this,
+      true,
+      this._findInPage.view,
+    );
+  }
+
+  stopFindInPage() {
+    if (!this._findInPage) {
+      return;
+    }
+
+    const view = this._findInPage.view;
+    this._findInPage.close();
+    this._findInPage = null;
+    this.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
   }
 }

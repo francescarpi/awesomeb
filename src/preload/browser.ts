@@ -8,6 +8,9 @@ import {
   IURLTabData,
   ITab,
   TPage,
+  TTabId,
+  TFindInPageAction,
+  IFindInPageResult,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -89,6 +92,17 @@ const abTabs = {
   },
   onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => {
     ipcRenderer.on('tabs:refresh-one', callback);
+  },
+  closeFindInTab: (tabId: TTabId) => {
+    ipcRenderer.send('tabs:close-find-in-tab', tabId);
+  },
+  findInPageAction: (tabId: TTabId, action: TFindInPageAction, query: string) => {
+    return ipcRenderer.invoke('tabs:find-in-page-action', tabId, action, query);
+  },
+  onRefreshFindInPage: (
+    callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
+  ) => {
+    ipcRenderer.on('tabs:refresh-find-in-page', callback);
   },
 };
 

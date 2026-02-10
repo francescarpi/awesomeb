@@ -26,6 +26,7 @@ import * as tabHistoryForward from './tab-history-forward';
 import * as tabRename from './tab-rename';
 import * as urlCopy from './url-copy';
 import * as urlEdit from './url-edit';
+import * as findInPage from './find-in-page';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -51,6 +52,7 @@ const COMMANDS = {
   [tabRename.TRIGGER]: tabRename.Command,
   [urlCopy.TRIGGER]: urlCopy.Command,
   [urlEdit.TRIGGER]: urlEdit.Command,
+  [findInPage.TRIGGER]: findInPage.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

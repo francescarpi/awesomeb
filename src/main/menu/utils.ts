@@ -13,6 +13,7 @@ export enum EIcon {
   Next = 'next.png',
   Previous = 'previous.png',
   Reload = 'reload.png',
+  Search = 'search.png',
   Sidebar = 'sidebar.png',
   Suspend = 'suspend.png',
   Tab = 'tab.png',

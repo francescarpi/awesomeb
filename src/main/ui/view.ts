@@ -139,13 +139,28 @@ export class UIView {
   refreshBounds(window: Window) {
     scopeLog.error('Not implemented refreshBounds for UIView', window.id);
   }
+
+  close() {
+    if (this.webContents !== undefined) {
+      this.webContents.stop();
+      this.webContents.close();
+    }
+  }
+
+  focus() {
+    if (this.webContents !== undefined) {
+      this.webContents.focus();
+    }
+  }
 }
 
 export class UIPageView extends UIView {
   constructor(id: TViewId, props?: IPageViewProps) {
     super(id, props);
-    loadPage(this.webContents, id, props?.query);
-    openDevTools(this.webContents, id);
+
+    loadPage(this.webContents, props?.page || id, props?.query);
+
+    openDevTools(this.webContents, props?.page || id);
   }
 
   protected getPreloadScript(): string {

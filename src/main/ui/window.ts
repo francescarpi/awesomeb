@@ -82,7 +82,7 @@ export class UIWindow {
    * @param view The view to add.
    * @param props Optional properties for the view, such as zIndex. 0 by default, higher values will be rendered on top of lower values.
    */
-  addView(view: UIView, zIndex?: 'top' | 'middle' | 'bottom') {
+  addView(view: UIView, zIndex?: keyof typeof Z_INDEX) {
     this._views.set(view.id, view);
 
     const index = Z_INDEX[zIndex || 'bottom'];

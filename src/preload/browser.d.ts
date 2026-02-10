@@ -66,6 +66,11 @@ declare global {
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;
     onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => void;
+    closeFindInTab: (tabId: TTabId) => void;
+    findInPageAction: (tabId: TTabId, action: TFindInPageAction, query: string) => void;
+    onRefreshFindInPage: (
+      callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------

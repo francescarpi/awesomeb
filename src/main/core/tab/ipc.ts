@@ -1,7 +1,7 @@
 import { Browser } from '@/core';
-import { checkModalAndPagesSender } from '@/utils';
-import { ipcMain } from 'electron';
-import { TWindowId } from '~/types';
+import { checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
+import { FindInPageOptions, ipcMain } from 'electron';
+import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 
 const scopeLog = log.scope('TabIPC');
@@ -14,4 +14,44 @@ export function setupTabIPC(browser: Browser) {
       return browser.renderer.tabContainers(window);
     });
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabs:close-find-in-tab', async (event, tabId: TTabId) => {
+    scopeLog.info(`IPC tabs:close-find-in-tab received for tab ${tabId}`);
+    return await checkFindInPageSender(event, browser, tabId, async (tab, _findInPage) => {
+      tab.view.webContents.stopFindInPage('clearSelection');
+      tab.stopFindInPage();
+    });
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.handle(
+    'tabs:find-in-page-action',
+    async (event, tabId: TTabId, action: TFindInPageAction, query: string) => {
+      scopeLog.info(
+        `IPC tabs:find-in-page-action received for tab ${tabId} with action ${action} and query "${query}"`,
+      );
+      return await checkFindInPageSender(event, browser, tabId, async (tab, findInPage) => {
+        const wc = tab.view.webContents;
+
+        if (query.trim() === '') {
+          wc.stopFindInPage('clearSelection');
+          return null;
+        }
+
+        const options: FindInPageOptions = {};
+        if (action === 'next') {
+          options.findNext = true;
+        } else if (action === 'previous') {
+          options.forward = false;
+        } else {
+          options.forward = true;
+        }
+
+        const requestId = wc.findInPage(query, options);
+        findInPage.addSearch(requestId, query, action);
+        return requestId;
+      });
+    },
+  );
 }

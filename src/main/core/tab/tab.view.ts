@@ -5,8 +5,8 @@ import { Window } from '@/core';
 import { MARGIN } from '@/ui/constants';
 
 export class TabView extends UIView {
-  constructor(_id: TTabId, partitionId: TPartitionId) {
-    super(`tab-${_id}`, {
+  constructor(tabId: TTabId, partitionId: TPartitionId) {
+    super(`tab-${tabId}`, {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',

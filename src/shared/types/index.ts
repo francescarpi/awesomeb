@@ -8,3 +8,4 @@ export * from './config';
 export * from './partitions';
 export * from './browser';
 export * from './tab';
+export * from './find-in-page';

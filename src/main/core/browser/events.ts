@@ -1,7 +1,8 @@
-import { TWindowId } from '~/types';
+import { TFindInPageId, TTabId, TWindowId } from '~/types';
 import { Browser, Window, Desktop, Tab } from '@/core';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
+import { UIPageView } from '@/ui';
 
 const scopeLog = log.scope('BrowserEvents');
 
@@ -95,4 +96,36 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tab:find-in-page-visibility-did-change',
+    async (tab: Tab, visible: boolean, view: UIPageView) => {
+      const result = browser.getTab(tab.id);
+      if (!result) {
+        return;
+      }
+
+      if (visible) {
+        result.window.addView(view, 'bottomPlus');
+      } else {
+        result.window.removeView(view.id);
+      }
+
+      result.window.refreshTabsVisibility();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tab:find-in-page-result-did-change',
+    async (tabId: TTabId, requestId: TFindInPageId) => {
+      const result = browser.getTab(tabId);
+      if (!result) {
+        return;
+      }
+
+      browser.rendererEmmiter.refreshTabFindInPageResult(result.tab, requestId);
+    },
+  );
 }

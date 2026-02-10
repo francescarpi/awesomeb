@@ -1,0 +1,63 @@
+---
+import Layout from '../layouts/Base.astro';
+import ButtonIcon from '../components/common/ButtonIcon.astro';
+---
+
+<Layout backgroundColor="#000" borderRadius="0 0 12px 12px">
+  <div class="flex items-center gap-2 p-2">
+    <ButtonIcon icon="close" />
+    <input class="input text-black rounded-full input-xs" placeholder="Find in page..." autofocus />
+    <ButtonIcon icon="previous" />
+    <ButtonIcon icon="next" />
+    <div id="result" class="text-sm hidden">
+      <span>0</span> of <span>0</span>
+      <span>matches</span>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { inputManager } from '../scripts/inputs';
+  import { getSearchParams } from '../scripts/url';
+  const { searchParams } = getSearchParams();
+  const tabId = searchParams.get('tabId')!;
+
+  const inputEl = document.querySelector('input')! as HTMLInputElement;
+  const resultEl = document.getElementById('result')!;
+  const currentMatchEl = resultEl.querySelector('span:nth-child(1)')!;
+  const totalMatchesEl = resultEl.querySelector('span:nth-child(2)')!;
+  const wordEl = resultEl.querySelector('span:nth-child(3)')!;
+  const closeBtn = document.querySelector('svg#close')!;
+  const prevBtn = document.querySelector('svg#previous')!;
+  const nextBtn = document.querySelector('svg#next')!;
+
+  const {} = inputManager(
+    inputEl,
+    (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'next', value),
+    () => abTabs.closeFindInTab(parseInt(tabId, 10)),
+    (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'start', value),
+  );
+
+  abTabs.onRefreshFindInPage((_event, result) => {
+    if (result) {
+      currentMatchEl.textContent = result.activeMatch.toString();
+      totalMatchesEl.textContent = result.matches.toString();
+      wordEl.textContent = result.matches === 1 ? 'match' : 'matches';
+      resultEl.classList.remove('hidden');
+    } else {
+      resultEl.classList.add('hidden');
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    abTabs.closeFindInTab(parseInt(tabId, 10));
+  });
+
+  prevBtn.addEventListener('click', () => {
+    abTabs.findInPageAction(parseInt(tabId, 10), 'previous', inputEl.value);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    abTabs.findInPageAction(parseInt(tabId, 10), 'next', inputEl.value);
+  });
+</script>

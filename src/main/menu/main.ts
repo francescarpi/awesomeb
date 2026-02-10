@@ -86,27 +86,6 @@ function fileMenu(
           }
         },
       },
-      // { type: 'separator' },
-      // {
-      //   label: 'Select desktop',
-      //   accelerator: 'CmdOrCtrl+D',
-      //   icon: getIcon(EIcon.Desktop),
-      //   click: () =>
-      //     window
-      //       ? browser.showPerformCommandDialog(window.id, { trigger: 'select-desktop' })
-      //       : null,
-      // },
-      // {
-      //   label: 'Select tab',
-      //   accelerator: 'CmdOrCtrl+.',
-      //   icon: getIcon(EIcon.Tab),
-      //   click: () =>
-      //     window
-      //       ? browser.showPerformCommandDialog(window.id, {
-      //           trigger: 'select-tab-container',
-      //         })
-      //       : null,
-      // },
     ],
   };
 }
@@ -153,18 +132,18 @@ function editMenu(
           }
         },
       },
-      // { type: 'separator' },
-      // {
-      //   label: 'Find in page...',
-      //   accelerator: 'CmdOrCtrl+F',
-      //   icon: getIcon(EIcon.Search),
-      //   enabled: Boolean(selectedTab) && selectedTab?.hasTabPreview === false,
-      //   click: () =>
-      //     browser.performCommand({
-      //       trigger: 'find-in-page',
-      //       params: { windowId: window.id, tabId: selectedTab!.id },
-      //     }),
-      // },
+      { type: 'separator' },
+      {
+        label: 'Find in page...',
+        accelerator: 'CmdOrCtrl+F',
+        icon: getIcon(EIcon.Search),
+        enabled: Boolean(tab),
+        click: async () => {
+          if (window && tab) {
+            await browser.performCommand(window, 'find-in-page');
+          }
+        },
+      },
     ],
   };
 }

@@ -1,7 +1,7 @@
 import { Browser, Window, Desktop, Tab } from '@/core';
 import { Sidebar, URLBar } from '@/ui';
 import log from 'electron-log';
-import { ITheme } from '~/types';
+import { ITheme, TFindInPageId } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -42,5 +42,15 @@ export class BrowserRendererEmmiter {
       'tabs:refresh-one',
       this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
     );
+  }
+
+  refreshTabFindInPageResult(tab: Tab, requestId: TFindInPageId) {
+    if (!tab.findInPage) {
+      scopeLog.error('Trying to refresh find in page result for a tab that does not have it');
+      return;
+    }
+
+    const view = tab.findInPage.view;
+    view.send('tabs:refresh-find-in-page', this._browser.renderer.findInPageResult(tab, requestId));
   }
 }

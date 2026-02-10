@@ -1,6 +1,9 @@
 import { tabWebContentsMenu } from '@/menu';
 import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
+import log from 'electron-log';
+
+const scopeLog = log.scope('TabEvents');
 
 export function registerTabEvents(tab: Tab) {
   //--------------------------------------------------------------------------------------
@@ -31,6 +34,17 @@ export function registerTabEvents(tab: Tab) {
   //--------------------------------------------------------------------------------------
   tab.view.webContents.on('page-title-updated', (_event, title, _explicitSet) => {
     tab.setTitle(title);
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on('found-in-page', async (_event, result) => {
+    if (!tab.findInPage) {
+      scopeLog.warn(`Received found-in-page event for Tab ${tab.id} but no search in progress.`);
+      return;
+    }
+
+    const { requestId } = result;
+    tab.findInPage.setResult(requestId, result);
   });
 
   //--------------------------------------------------------------------------------------

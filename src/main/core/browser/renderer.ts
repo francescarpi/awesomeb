@@ -7,6 +7,8 @@ import {
   IURLTabData,
   ITab,
   ITabEntity,
+  TFindInPageId,
+  IFindInPageResult,
 } from '~/types';
 import {
   Browser,
@@ -174,6 +176,7 @@ export class BrowserRenderer {
 
     return data;
   }
+
   tabs(browser: Browser, window: Window): ITabEntity[] {
     const tabs = browser.getAllTabs();
     const selectedDesktop = window.selectedDesktop;
@@ -185,5 +188,24 @@ export class BrowserRenderer {
       selected: selectedTab?.id === item.tab.id,
       url: item.tab.url,
     }));
+  }
+
+  findInPageResult(tab: Tab, requestId: TFindInPageId): IFindInPageResult | null {
+    const findInPage = tab.findInPage;
+    if (!findInPage) {
+      return null;
+    }
+
+    const search = findInPage.getSearch(requestId);
+    if (!search || !search.result) {
+      return null;
+    }
+
+    return {
+      requestId: search.requestId,
+      query: search.query,
+      activeMatch: search.result.activeMatchOrdinal,
+      matches: search.result.matches,
+    };
   }
 }

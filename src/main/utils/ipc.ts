@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { Browser, Window } from '@/core';
-import { TWindowId } from '~/types';
+import { Browser, Window, Tab, FindInPage } from '@/core';
+import { TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
 
@@ -86,4 +86,32 @@ export async function checkWindowSender(
   }
 
   return callback(win);
+}
+
+export async function checkFindInPageSender(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  tabId: TTabId,
+  callback: (tab: Tab, findInPage: FindInPage) => void,
+): Promise<void> {
+  const result = browser.getTab(tabId);
+  if (!result) {
+    scopeLog.error(`No tab found with ID ${tabId}`);
+    return;
+  }
+
+  const { tab } = result;
+  if (!tab.findInPage) {
+    scopeLog.error(`Tab with ID ${tabId} does not have a findInPage view`);
+    return;
+  }
+
+  if (tab.findInPage.view.webContentsId !== event.sender.id) {
+    scopeLog.error(
+      `WebContents ID mismatch: findInPage WC ID ${tab.findInPage.view.webContentsId} does not match sender WC ID ${event.sender.id}`,
+    );
+    return;
+  }
+
+  return callback(tab, tab.findInPage);
 }
