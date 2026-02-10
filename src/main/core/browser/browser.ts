@@ -165,7 +165,7 @@ export class Browser {
 
     this.eventsChannel.emit('browser:url-opened', window);
 
-    window.addView(tab.view, 'bottom');
+    window.addView(tab.view);
     window.refreshTabsVisibility();
 
     await tab.loadURL(url);

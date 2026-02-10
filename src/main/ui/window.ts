@@ -8,7 +8,6 @@ import EventEmitter from 'events';
 import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Z_INDEX } from './constants';
 import { Sidebar, URLBar, NoTabs } from './views';
 
 export class UIWindow {
@@ -66,15 +65,15 @@ export class UIWindow {
 
   private buildLayout() {
     const sidebar = new Sidebar(this.browserWindowId);
-    this.addView(sidebar, 'middle');
+    this.addView(sidebar);
 
     const urlbar = new URLBar(this.browserWindowId);
-    this.addView(urlbar, 'bottom');
+    this.addView(urlbar);
 
     const noTabs = new NoTabs();
-    this.addView(noTabs, 'bottom');
+    this.addView(noTabs);
 
-    this.addView(this.notifications.view, 'top');
+    this.addView(this.notifications.view);
   }
 
   /**
@@ -82,11 +81,19 @@ export class UIWindow {
    * @param view The view to add.
    * @param props Optional properties for the view, such as zIndex. 0 by default, higher values will be rendered on top of lower values.
    */
-  addView(view: UIView, zIndex?: keyof typeof Z_INDEX) {
+  addView(view: UIView) {
     this._views.set(view.id, view);
+    this.bw.contentView.addChildView(view.webContentsView);
+  }
 
-    const index = Z_INDEX[zIndex || 'bottom'];
-    this.bw.contentView.addChildView(view.webContentsView, index);
+  moveViewToTop(id: TViewId) {
+    const view = this._views.get(id);
+    if (!view) {
+      return;
+    }
+
+    this.bw.contentView.removeChildView(view.webContentsView);
+    this.bw.contentView.addChildView(view.webContentsView);
   }
 
   removeView(id: TViewId) {

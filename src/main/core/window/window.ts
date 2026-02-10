@@ -93,7 +93,7 @@ export class Window extends UIWindow {
     } else {
       if (!this.hasView('notabs')) {
         const noTabs = new NoTabs();
-        this.addView(noTabs, 'bottom');
+        this.addView(noTabs);
       }
     }
 
@@ -178,7 +178,7 @@ export class Window extends UIWindow {
 
       this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
-      this.addView(tab.view, 'bottom');
+      this.addView(tab.view);
       this.refreshTabsVisibility();
       this.eventsChannel.emit('window:tab-did-resume', this, tab);
       return;
@@ -310,6 +310,7 @@ export class Window extends UIWindow {
 
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
+    this.moveViewToTop('sidebar');
     this.refreshViewsBounds();
   }
 

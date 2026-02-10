@@ -3,6 +3,7 @@ import { TTabId } from '~/types';
 import { Window } from '@/core';
 import log from 'electron-log';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
+import { MARGIN } from '@/ui/constants';
 
 const scopeLog = log.scope('FindInPageView');
 
@@ -26,7 +27,7 @@ export class FindInPageView extends UIPageView {
 
     this.webContentsView.setBounds({
       x: tab.left,
-      y: tab.top + tab.height - FIND_IN_PAGE_VIEW_HEIGHT,
+      y: window.bounds.height - FIND_IN_PAGE_VIEW_HEIGHT - MARGIN,
       width: tab.width,
       height: FIND_IN_PAGE_VIEW_HEIGHT,
     });

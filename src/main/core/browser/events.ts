@@ -107,7 +107,7 @@ export function registerBrowserEvents(browser: Browser) {
       }
 
       if (visible) {
-        result.window.addView(view, 'bottomPlus');
+        result.window.addView(view);
       } else {
         result.window.removeView(view.id);
       }
