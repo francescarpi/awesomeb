@@ -5,7 +5,7 @@ import Option2 from '../components/edit-url/Option2.astro';
 ---
 
 <BlackBgWithTitle title="Edit URL">
-  <div class="h-full">
+  <div class="h-full flex flex-col gap-4">
     <Option1 />
     <Option2 />
   </div>
@@ -14,12 +14,54 @@ import Option2 from '../components/edit-url/Option2.astro';
 <script>
   import { ITabEntity } from '~/types';
   import { getSearchParams } from '../scripts/url';
-  import { inputManager } from '../scripts/inputs';
+  import { inputManager, type TSetValue, type TSetDefault } from '../scripts/inputs';
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId');
 
   const fullURLEl = document.querySelector('#input-full-url')! as HTMLInputElement;
+  const protocolEl = document.querySelector('#input-protocol')! as HTMLInputElement;
+  const hostnameEl = document.querySelector('#input-hostname')! as HTMLInputElement;
+  const portEl = document.querySelector('#input-port')! as HTMLInputElement;
+  const pathnameEl = document.querySelector('#input-pathname')! as HTMLInputElement;
+  const hashEl = document.querySelector('#input-hash')! as HTMLInputElement;
+
+  function fillOption2(
+    url: string,
+    setProtocol: TSetValue | TSetDefault,
+    setHostname: TSetValue | TSetDefault,
+    setPort: TSetValue | TSetDefault,
+    setPathname: TSetValue | TSetDefault,
+    setHash: TSetValue | TSetDefault,
+  ) {
+    try {
+      const urlObj = new URL(url);
+      setProtocol(urlObj.protocol.replace(':', ''));
+      setHostname(urlObj.hostname);
+      setPort(urlObj.port);
+      setPathname(urlObj.pathname);
+      setHash(urlObj.hash);
+    } catch (error) {
+      return;
+    }
+  }
+
+  function fillOption1(setFullURL: TSetValue) {
+    const protocol = protocolEl.value;
+    const hostname = hostnameEl.value;
+    const port = portEl.value;
+    const pathname = pathnameEl.value;
+    const hash = hashEl.value;
+    let url = `${protocol}://${hostname}`;
+    if (port) {
+      url += `:${port}`;
+    }
+    url += pathname;
+    if (hash) {
+      url += `#${hash}`;
+    }
+    setFullURL(url);
+  }
 
   async function setup() {
     // Fetch tabs
@@ -30,7 +72,9 @@ import Option2 from '../components/edit-url/Option2.astro';
       ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
       : tabsEntitites.find((d) => d.selected)!;
 
-    const { setDefaultValue } = inputManager(
+    // -----------------------------------------------------------------
+    // OPTION 1
+    const { setDefaultValue: setDefaultFullURL, setValue: setFullURL } = inputManager(
       fullURLEl,
       (newValue: string) => {
         abCommands.perform(winId, 'edit-url', {
@@ -39,9 +83,93 @@ import Option2 from '../components/edit-url/Option2.astro';
         });
       },
       () => abModal.close(winId),
+      (newValue: string) => {
+        fillOption2(newValue, setProtocol, setHostname, setPort, setPathname, setHash);
+      },
     );
 
-    setDefaultValue(selectedTab.url || '');
+    setDefaultFullURL(selectedTab.url || '', { select: true });
+
+    // -----------------------------------------------------------------
+    // OPTION 2
+    // -----------------------------------------------------------------
+    // Protocol
+    const { setDefaultValue: setDefaultProtocol, setValue: setProtocol } = inputManager(
+      protocolEl,
+      () => {
+        abCommands.perform(winId, 'edit-url', {
+          tabId: parseInt(selectedTab.id, 10),
+          url: fullURLEl.value,
+        });
+      },
+      () => abModal.close(winId),
+      () => fillOption1(setFullURL),
+    );
+
+    // -----------------------------------------------------------------
+    // Hostname
+    const { setDefaultValue: setDefaultHostname, setValue: setHostname } = inputManager(
+      hostnameEl,
+      () => {
+        abCommands.perform(winId, 'edit-url', {
+          tabId: parseInt(selectedTab.id, 10),
+          url: fullURLEl.value,
+        });
+      },
+      () => abModal.close(winId),
+      () => fillOption1(setFullURL),
+    );
+
+    // -----------------------------------------------------------------
+    // Port
+    const { setDefaultValue: setDefaultPort, setValue: setPort } = inputManager(
+      portEl,
+      () => {
+        abCommands.perform(winId, 'edit-url', {
+          tabId: parseInt(selectedTab.id, 10),
+          url: fullURLEl.value,
+        });
+      },
+      () => abModal.close(winId),
+      () => fillOption1(setFullURL),
+    );
+
+    // -----------------------------------------------------------------
+    // Pathname
+    const { setDefaultValue: setDefaultPathname, setValue: setPathname } = inputManager(
+      pathnameEl,
+      () => {
+        abCommands.perform(winId, 'edit-url', {
+          tabId: parseInt(selectedTab.id, 10),
+          url: fullURLEl.value,
+        });
+      },
+      () => abModal.close(winId),
+      () => fillOption1(setFullURL),
+    );
+
+    // -----------------------------------------------------------------
+    // Hash
+    const { setDefaultValue: setDefaultHash, setValue: setHash } = inputManager(
+      hashEl,
+      () => {
+        abCommands.perform(winId, 'edit-url', {
+          tabId: parseInt(selectedTab.id, 10),
+          url: fullURLEl.value,
+        });
+      },
+      () => abModal.close(winId),
+      () => fillOption1(setFullURL),
+    );
+
+    fillOption2(
+      selectedTab.url || '',
+      setDefaultProtocol,
+      setDefaultHostname,
+      setDefaultPort,
+      setDefaultPathname,
+      setDefaultHash,
+    );
   }
 
   setup();

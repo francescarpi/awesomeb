@@ -8,7 +8,7 @@ export class UIModalManager {
   private _defaultModalProps = {
     'edit-url': {
       width: 700,
-      height: 200,
+      height: 460,
     },
     'perform-command': {
       width: 500,

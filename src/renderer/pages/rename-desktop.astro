@@ -37,7 +37,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
         }),
       () => abModal.close(winId),
     );
-    setDefaultValue(selectedDesktop.name || '');
+    setDefaultValue(selectedDesktop.name || '', { select: true });
   }
 
   setup();

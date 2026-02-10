@@ -34,7 +34,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       },
       () => abModal.close(winId),
     );
-    setDefaultValue(selectedTab.label || '');
+    setDefaultValue(selectedTab.label || '', { select: true });
   }
 
   setup();
