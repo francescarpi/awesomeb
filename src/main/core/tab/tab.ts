@@ -209,4 +209,8 @@ export class Tab {
     this._findInPage = null;
     this.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
   }
+
+  saveHistory() {
+    history.save(this);
+  }
 }

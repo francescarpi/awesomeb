@@ -1,6 +1,6 @@
 import { NoTabs, UIWindow } from '@/ui';
 import type { IProps } from './types';
-import { Desktop, IDesktopProps, history } from '@/core';
+import { Desktop, IDesktopProps } from '@/core';
 import EventEmitter from 'events';
 import { MIN_DESKTOPS } from './constants';
 import { IDesCon, IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
@@ -218,7 +218,7 @@ export class Window extends UIWindow {
 
     const { tabContainer, desktop, tab } = result;
 
-    history.save(tab);
+    tab.saveHistory();
     tab.suspend();
 
     if (tabContainer.selectedTab?.id === tab.id) {
