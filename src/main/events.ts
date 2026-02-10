@@ -1,7 +1,12 @@
 import { app } from 'electron';
 import { Session, Browser } from '@/core';
+import log from 'electron-log';
+
+const scopeLog = log.scope('AppEvents');
 
 export function registerAppEvents(browser: Browser) {
+  scopeLog.debug('Registering app events');
+
   //--------------------------------------------------------------------------------------
   app.on('window-all-closed', () => {
     if (process.platform === 'darwin') {

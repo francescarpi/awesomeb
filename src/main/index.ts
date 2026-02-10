@@ -20,7 +20,7 @@ setupAbout();
 setupFeatures();
 electronDl();
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   const browser = new Browser();
 
   setupUIIPC(browser);
@@ -31,7 +31,8 @@ app.whenReady().then(() => {
   setupMenuIPC(browser);
   setupTabIPC(browser);
 
-  browser.loadSession();
+  await browser.loadProfiles();
+  await browser.loadSession();
 
   registerAppEvents(browser);
 });
