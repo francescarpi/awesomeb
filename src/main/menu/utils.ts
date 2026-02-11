@@ -12,6 +12,7 @@ export enum EIcon {
   Forward = 'forward.png',
   Maximize = 'maximize.png',
   Next = 'next.png',
+  Notification = 'notification.png',
   Previous = 'previous.png',
   Reload = 'reload.png',
   Search = 'search.png',

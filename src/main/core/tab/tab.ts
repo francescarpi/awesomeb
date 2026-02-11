@@ -20,6 +20,7 @@ export class Tab {
   readonly view: TabView;
   private _lastAccessed: number = Date.now();
   private _findInPage: FindInPage | null = null;
+  private _requireAttention: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -46,13 +47,15 @@ export class Tab {
     return this._customTitle || this._title || this._url || 'Untitled';
   }
 
-  setTitle(title: string) {
+  setTitle(title: string): boolean {
     if (this._title === title) {
-      return;
+      return false;
     }
 
     this._title = title;
     this.browser.eventsChannel.emit('tab:title-did-change', this);
+
+    return true;
   }
 
   get url(): string | null {
@@ -94,7 +97,16 @@ export class Tab {
   }
 
   get requireAttention(): boolean {
-    return false;
+    return this._requireAttention;
+  }
+
+  setRequireAttention(requireAttention: boolean) {
+    if (this._requireAttention === requireAttention) {
+      return;
+    }
+
+    this._requireAttention = requireAttention;
+    this.browser.eventsChannel.emit('tab:require-attention-did-change', this);
   }
 
   get customTitle(): string | null {

@@ -7,6 +7,12 @@ import { windowOpenHadler, Browser } from '@/core';
 
 const scopeLog = log.scope('TabEvents');
 
+function checkIfRequireAttention(browser: Browser, tab: Tab) {
+  const selectedDesktopResult = browser.selectedDesktop;
+  const tabResult = browser.getTab(tab.id)!;
+  tab.setRequireAttention(selectedDesktopResult?.desktop.id !== tabResult.desktop.id);
+}
+
 export function registerTabEvents(browser: Browser, tab: Tab) {
   //--------------------------------------------------------------------------------------
   tab.view.webContents.on('did-start-loading', () => {
@@ -35,7 +41,10 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
   //--------------------------------------------------------------------------------------
   tab.view.webContents.on('page-title-updated', (_event, title, _explicitSet) => {
-    tab.setTitle(title);
+    const changed = tab.setTitle(title);
+    if (changed) {
+      checkIfRequireAttention(browser, tab);
+    }
   });
 
   // ----------------------------------------------------------------------------------------------- //
@@ -47,6 +56,24 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
     const { requestId } = result;
     tab.findInPage.setResult(requestId, result);
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on('page-favicon-updated', async (_event, favicons) => {
+    if (favicons && favicons.length > 0) {
+      // TODO Only if favicon changed
+      checkIfRequireAttention(browser, tab);
+    }
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on('media-started-playing', async () => {
+    checkIfRequireAttention(browser, tab);
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on('focus', async () => {
+    tab.setRequireAttention(false);
   });
 
   // ----------------------------------------------------------------------------------------------- //

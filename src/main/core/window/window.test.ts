@@ -59,13 +59,13 @@ test('select tab should work correctly', async () => {
   expect(desktop!.selectedTabContainer!.selectedTab!.id).toBe(tab.id);
 });
 
-describe('getAllTabs', () => {
+describe('tabs', () => {
   test('should return empty array when no tabs exist', () => {
     const browser = new Browser();
     const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
-    const allTabs = w.getAllTabs();
+    const allTabs = w.tabs;
 
     expect(allTabs).toEqual([]);
     expect(allTabs.length).toBe(0);
@@ -81,7 +81,7 @@ describe('getAllTabs', () => {
     const result2 = await browser.openURL('http://example2.com');
     const result3 = await browser.openURL('http://example3.com');
 
-    const allTabs = w.getAllTabs();
+    const allTabs = w.tabs;
 
     expect(allTabs.length).toBe(3);
     expect(allTabs[0].tab.id).toBe(result1!.tab.id);
@@ -106,7 +106,7 @@ describe('getAllTabs', () => {
     w.selectDesktop(3);
     const result4 = await browser.openURL('http://example4.com');
 
-    const allTabs = w.getAllTabs();
+    const allTabs = w.tabs;
 
     expect(allTabs.length).toBe(4);
 
@@ -124,7 +124,7 @@ describe('getAllTabs', () => {
     w.createDefaultDesktops();
 
     const result = await browser.openURL('http://example.com');
-    const allTabs = w.getAllTabs();
+    const allTabs = w.tabs;
 
     expect(allTabs.length).toBe(1);
     expect(allTabs[0].desktop.id).toBe(result!.desktop.id);
@@ -766,16 +766,16 @@ describe('closeTab', () => {
     const result2 = await browser.openURL('http://example2.com');
     const result3 = await browser.openURL('http://example3.com');
 
-    expect(w.getAllTabs().length).toBe(3);
+    expect(w.tabs.length).toBe(3);
 
     await w.closeTab(result1!.tab.id);
-    expect(w.getAllTabs().length).toBe(2);
+    expect(w.tabs.length).toBe(2);
 
     await w.closeTab(result2!.tab.id);
-    expect(w.getAllTabs().length).toBe(1);
+    expect(w.tabs.length).toBe(1);
 
     await w.closeTab(result3!.tab.id);
-    expect(w.getAllTabs().length).toBe(0);
+    expect(w.tabs.length).toBe(0);
   });
 
   test('should handle closing currently selected tab', async () => {
@@ -852,14 +852,14 @@ describe('closeTab', () => {
     w.selectDesktop(3);
     const result3 = await browser.openURL('http://example3.com');
 
-    expect(w.getAllTabs().length).toBe(3);
+    expect(w.tabs.length).toBe(3);
 
     // Close all tabs
     await w.closeTab(result1!.tab.id);
     await w.closeTab(result2!.tab.id);
     await w.closeTab(result3!.tab.id);
 
-    expect(w.getAllTabs().length).toBe(0);
+    expect(w.tabs.length).toBe(0);
     expect(w.getDesktop(1)!.tabContainers.length).toBe(0);
     expect(w.getDesktop(2)!.tabContainers.length).toBe(0);
     expect(w.getDesktop(3)!.tabContainers.length).toBe(0);

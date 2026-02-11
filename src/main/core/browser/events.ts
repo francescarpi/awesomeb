@@ -140,4 +140,15 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshTabContainers(tabContainerResult.window);
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:require-attention-did-change', async (tab: Tab) => {
+    const tabResult = browser.getTab(tab.id);
+    if (!tabResult) {
+      return;
+    }
+    browser.rendererEmmiter.refreshDesktops(tabResult.window);
+    browser.rendererEmmiter.refreshTabContainers(tabResult.window);
+    await browser.refreshMainMenu();
+  });
 }

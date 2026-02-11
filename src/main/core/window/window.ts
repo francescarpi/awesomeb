@@ -82,7 +82,7 @@ export class Window extends UIWindow {
     const desktop = this.selectedDesktop;
     const selectedTabContainer = desktop.selectedTabContainer;
 
-    for (const result of this.getAllTabContainers()) {
+    for (const result of this.tabContainers) {
       if (result.tabContainer.id === selectedTabContainer?.id) {
         result.tabContainer.setTabsVisibility(true);
       } else {
@@ -133,20 +133,20 @@ export class Window extends UIWindow {
     }
 
     const selectedTab = tabContainer.selectedTab;
-    const allTabs = this.getAllTabs();
-    const currentIndex = allTabs.findIndex(
+    const tabs = this.tabs;
+    const currentIndex = tabs.findIndex(
       (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
     );
 
     let newIndex: number;
 
     if (direction === 'next') {
-      newIndex = (currentIndex + 1) % allTabs.length;
+      newIndex = (currentIndex + 1) % tabs.length;
     } else {
-      newIndex = (currentIndex - 1 + allTabs.length) % allTabs.length;
+      newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
     }
 
-    const result = allTabs[newIndex];
+    const result = tabs[newIndex];
     if (result) {
       return result;
     }
@@ -175,6 +175,7 @@ export class Window extends UIWindow {
     tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
     tab.updateLastAccessed();
+    tab.setRequireAttention(false);
 
     if (tab.suspended) {
       tab.resume();
@@ -191,7 +192,7 @@ export class Window extends UIWindow {
     this.refreshTabsVisibility();
   }
 
-  getAllTabs(): IDesConTab[] {
+  get tabs(): IDesConTab[] {
     const allTabs: IDesConTab[] = [];
     for (const desktop of this._desktops.values()) {
       for (const tabContainer of desktop.tabContainers) {
@@ -203,7 +204,7 @@ export class Window extends UIWindow {
     return allTabs;
   }
 
-  getAllTabContainers(): IDesCon[] {
+  get tabContainers(): IDesCon[] {
     const allContainers: IDesCon[] = [];
     for (const desktop of this._desktops.values()) {
       for (const tabContainer of desktop.tabContainers) {
@@ -286,12 +287,12 @@ export class Window extends UIWindow {
   }
 
   getLastAccessedTab(desktop?: Desktop): IDesConTab | null {
-    const allTabs = this.getAllTabs();
-    if (allTabs.length === 0) {
+    const tabs = this.tabs;
+    if (tabs.length === 0) {
       return null;
     }
 
-    let filteredTabs = allTabs.filter((t) => !t.tab.suspended);
+    let filteredTabs = tabs.filter((t) => !t.tab.suspended);
     if (desktop) {
       filteredTabs = filteredTabs.filter((conTab) => conTab.desktop.id === desktop.id);
     }
@@ -320,5 +321,10 @@ export class Window extends UIWindow {
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
     this.refreshViewsBounds();
+  }
+
+  get tabsRequireAttention(): IDesConTab[] {
+    const tabs = this.tabs.filter((conTab) => conTab.tab.requireAttention);
+    return tabs;
   }
 }

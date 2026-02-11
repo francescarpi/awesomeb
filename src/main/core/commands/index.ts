@@ -30,6 +30,7 @@ import * as findInPage from './find-in-page';
 import * as tabContainerAddDivider from './tabcontainer-add-divider';
 import * as tabContainerRemoveDivider from './tabcontainer-remove-divider';
 import * as desktopRemoveAllDividers from './desktop-remove-all-dividers';
+import * as tabSelectRequireAttention from './tab-select-require-attention';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -59,6 +60,7 @@ const COMMANDS = {
   [tabContainerAddDivider.TRIGGER]: tabContainerAddDivider.Command,
   [tabContainerRemoveDivider.TRIGGER]: tabContainerRemoveDivider.Command,
   [desktopRemoveAllDividers.TRIGGER]: desktopRemoveAllDividers.Command,
+  [tabSelectRequireAttention.TRIGGER]: tabSelectRequireAttention.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

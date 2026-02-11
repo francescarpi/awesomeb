@@ -8,7 +8,7 @@ import {
   getPartitions,
   defaultPartition,
 } from '@/core';
-import { IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
+import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
@@ -214,6 +214,14 @@ export class Browser {
     return null;
   }
 
+  get selectedDesktop(): IWinDes | null {
+    const activeWindow = this.activeWindow;
+    if (!activeWindow) {
+      return null;
+    }
+    return { window: activeWindow, desktop: activeWindow.selectedDesktop };
+  }
+
   getTabContainer(id: TTabContainerId): IWinDesCon | null {
     for (const window of this._windows.values()) {
       for (const desktop of window.desktops) {
@@ -227,7 +235,7 @@ export class Browser {
     return null;
   }
 
-  getAllTabs(): IWinDesConTab[] {
+  get tabs(): IWinDesConTab[] {
     const result: IWinDesConTab[] = [];
     for (const window of this._windows.values()) {
       for (const desktop of window.desktops) {

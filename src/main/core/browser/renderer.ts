@@ -181,7 +181,7 @@ export class BrowserRenderer {
   }
 
   tabsEntities(browser: Browser, window: Window): ITabEntity[] {
-    const tabs = browser.getAllTabs();
+    const tabs = browser.tabs;
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 

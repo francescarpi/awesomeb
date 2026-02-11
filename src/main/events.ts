@@ -21,7 +21,7 @@ export function registerAppEvents(browser: Browser) {
     const session = new Session(browser);
     session.save();
 
-    for (const result of browser.getAllTabs()) {
+    for (const result of browser.tabs) {
       if (!result.tab.suspended) {
         result.tab.saveHistory();
       }

@@ -4,7 +4,6 @@ import { IProps } from './types';
 
 export class Desktop {
   private _name: string | null = null;
-  private _requireAttention: boolean = false;
   private _theme: Theme;
 
   private readonly _tabContainers: Map<TTabContainerId, TabContainer> = new Map();
@@ -39,7 +38,14 @@ export class Desktop {
   }
 
   get requireAttention(): boolean {
-    return this._requireAttention;
+    for (const tabContainer of this._tabContainers.values()) {
+      for (const tab of tabContainer.tabs) {
+        if (tab.requireAttention) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   get hasTabs(): boolean {
