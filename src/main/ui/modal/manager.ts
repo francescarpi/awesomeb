@@ -23,6 +23,10 @@ export class UIModalManager {
     'select-tab': {
       height: 500,
     },
+    'open-bookmark': {
+      width: 600,
+      height: 500,
+    },
   };
 
   constructor(private readonly _win: UIWindow) {}

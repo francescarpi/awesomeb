@@ -28,6 +28,8 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.tabsEntities(browser, window);
         case 'tabContainers':
           return browser.renderer.tabContainersEntities(window);
+        case 'bookmarks':
+          return browser.renderer.bookmarksEntities();
       }
     });
   });

@@ -10,6 +10,7 @@ import {
   TFindInPageId,
   IFindInPageResult,
   ITabContainerEntity,
+  IBookmarkEntity,
 } from '~/types';
 import {
   Browser,
@@ -21,6 +22,7 @@ import {
   Tab,
   TabContainer,
   Window,
+  bookmarks,
 } from '@/core';
 
 export class BrowserRenderer {
@@ -219,6 +221,14 @@ export class BrowserRenderer {
       id: tc.id.toString(),
       label: tc.tabs.map((t) => t.title).join(' | '),
       selected: selectedTabContainer?.id === tc.id,
+    }));
+  }
+
+  bookmarksEntities(): IBookmarkEntity[] {
+    return bookmarks.plainList.map((bm) => ({
+      id: bm.url,
+      label: bm.name,
+      extra: bm.path.join('/'),
     }));
   }
 }

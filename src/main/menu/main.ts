@@ -390,24 +390,24 @@ async function bookmarksMenu(
     label: 'Bookmarks',
     icon: showRootIcon ? getIcon(EIcon.Bookmarks) : undefined,
     submenu: [
-      // {
-      //   label: 'Manage bookmarks',
-      //   icon: getIcon(EIcon.Bookmarks),
-      //   enabled: !!focusedWindow,
-      //   click: () => {
-      //     if (focusedWindow) {
-      //       focusedWindow.openInternalPage(PAGE_BOOKMARKS)
-      //     }
-      //   },
-      // },
+      {
+        label: 'Manage bookmarks',
+        icon: getIcon(EIcon.Bookmarks),
+        enabled: !!window,
+        click: () => {
+          // if (window
+          //   focusedWindow.openInternalPage(PAGE_BOOKMARKS)
+          // }
+        },
+      },
       {
         label: 'Open bookmark',
         accelerator: 'CmdOrCtrl+B',
         icon: getIcon(EIcon.Open),
         click: () => {
-          // if (focusedWindow) {
-          //   browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'open-bookmark' })
-          // }
+          if (window) {
+            window.modal.open('open-bookmark');
+          }
         },
       },
       { type: 'separator' },

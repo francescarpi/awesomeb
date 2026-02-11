@@ -6,7 +6,8 @@ export type TEntityType =
   | 'partitions'
   | 'targets'
   | 'tabs'
-  | 'tabContainers';
+  | 'tabContainers'
+  | 'bookmarks';
 
 export interface IEntity {
   id: string;
@@ -37,3 +38,5 @@ export interface ITabEntity extends IEntity {
 }
 
 export interface ITabContainerEntity extends IEntity {}
+
+export interface IBookmarkEntity extends IEntity {}
