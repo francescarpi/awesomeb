@@ -152,4 +152,17 @@ export class Desktop {
     this.addTabContainer(tabContainer);
     return tabContainer;
   }
+
+  get tabs(): IConTab[] {
+    const tabs: IConTab[] = [];
+    for (const tabContainer of this._tabContainers.values()) {
+      for (const tab of tabContainer.tabs) {
+        tabs.push({
+          tabContainer,
+          tab,
+        });
+      }
+    }
+    return tabs;
+  }
 }

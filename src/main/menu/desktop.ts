@@ -2,18 +2,15 @@ import { Browser, Window, Desktop } from '@/core';
 import { Menu } from 'electron';
 import { EIcon, getIcon } from './utils';
 
-export function desktopMenu(_browser: Browser, window: Window, desktop: Desktop): Menu {
+export function desktopMenu(browser: Browser, window: Window, desktop: Desktop): Menu {
   const menu = Menu.buildFromTemplate([
     {
       label: 'Suspend all tabs',
       enabled: desktop.hasActiveTabs,
-      // icon: getIcon(EIcon.Suspend),
-      // click: () => {
-      //   browser.performCommand({
-      //     trigger: 'suspend-desktop-tabs',
-      //     params: { windowId: window.id, desktopId: desktop.id },
-      //   });
-      // },
+      icon: getIcon(EIcon.Suspend),
+      click: () => {
+        browser.performCommand(window, 'suspend-desktop', { desktopId: desktop.id });
+      },
     },
     { type: 'separator' },
     {

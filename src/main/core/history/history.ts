@@ -18,7 +18,7 @@ export class History {
   }
 
   save(tab: Tab) {
-    if (tab.partition.private) {
+    if (tab.partition.private || tab.view.webContents === undefined) {
       return;
     }
 

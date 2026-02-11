@@ -1,0 +1,32 @@
+import { TDesktopId } from '~/types';
+import { ICommand } from './types';
+import log from 'electron-log';
+
+const scopeLog = log.scope('SuspendDesktopCommand');
+
+export interface ICommandParams {
+  desktopId: TDesktopId;
+}
+
+export const TRIGGER = 'suspend-desktop';
+
+export const Command: ICommand<ICommandParams> = {
+  trigger: TRIGGER,
+  name: 'Suspend Desktop',
+  description: 'Suspend all tabs in the selected desktop',
+  modal: {
+    page: TRIGGER,
+  },
+  visibility: ({ window }) => !!window,
+  async handler({ params, window }) {
+    const desktop = window.getDesktop(params.desktopId);
+    if (!desktop) {
+      scopeLog.error(`Desktop with id ${params.desktopId} not found`);
+      return;
+    }
+
+    for (const tabResult of desktop.tabs) {
+      window.suspendTab(tabResult.tab.id);
+    }
+  },
+};
