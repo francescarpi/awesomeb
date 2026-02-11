@@ -18,6 +18,7 @@ export class UINotificationsManager {
     refreshNotifications(this._view.webContents, this._win.browserWindowId, this._notifications);
 
     if (!this._view.visible) {
+      this._win.moveViewToTop(this._view.id);
       this._view.setVisible(true);
     }
   }

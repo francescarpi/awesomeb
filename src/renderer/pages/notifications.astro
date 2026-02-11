@@ -3,7 +3,7 @@ import Layout from '../layouts/Base.astro';
 ---
 
 <Layout>
-  <div class="h-full rounded-lg bg-black/95 text-white text-sm p-2 relative">
+  <div class="h-full rounded-lg bg-black/95 text-white text-sm p-2 relative" id="container">
     <p id="message">No message provided</p>
     <div id="count" class="fixed bottom-2 right-2 text-xs"></div>
     <div id="countdown" class="fixed bottom-2 left-2 text-xs"></div>
@@ -17,20 +17,26 @@ import Layout from '../layouts/Base.astro';
 </style>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
+  import { getSearchParams } from '../scripts/url';
+  const { winId } = getSearchParams();
   const DEFAULT_COUNTER = 5;
 
   let intervalRef: NodeJS.Timeout | null = null;
   let countdown = DEFAULT_COUNTER;
 
-  abNotifications.onRefreshNotifications((_e, winId, notifications) => {
-    if (winId.toString() !== params.get('winId')) {
+  const messageEl: HTMLParagraphElement = document.querySelector('#message')!;
+  const countEl: HTMLDivElement = document.querySelector('#count')!;
+  const countdownEl: HTMLDivElement = document.querySelector('#countdown')!;
+  const containerEl: HTMLDivElement = document.querySelector('#container')!;
+
+  containerEl.addEventListener('click', () => {
+    abNotifications.nextNotification(winId);
+  });
+
+  abNotifications.onRefreshNotifications((_e, wId, notifications) => {
+    if (wId !== winId) {
       return;
     }
-
-    const messageEl: HTMLParagraphElement = document.querySelector('#message')!;
-    const countEl: HTMLDivElement = document.querySelector('#count')!;
-    const countdownEl: HTMLDivElement = document.querySelector('#countdown')!;
 
     countEl.textContent = notifications.length > 1 ? notifications.length.toString() : '';
     countEl.style.display = notifications.length > 1 ? 'flex' : 'none';
