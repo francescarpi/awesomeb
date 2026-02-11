@@ -1,7 +1,8 @@
-import { Browser, Tab, Window } from '@/core';
+import { Browser, Tab, Window, bookmarks } from '@/core';
 import { MenuItemConstructorOptions, Menu } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
+import { EBookmarkType, IBookmark } from '~/types';
 
 const scopeLog = log.scope('MainMenu');
 
@@ -20,6 +21,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
     windowMenu(browser, showRootIcon, window),
     desktopsMenu(browser, showRootIcon, window),
     tabsMenu(browser, showRootIcon, window, tab),
+    await bookmarksMenu(browser, showRootIcon, window),
   ]);
 
   return menu;
@@ -377,4 +379,66 @@ function tabsMenu(
       },
     ],
   };
+}
+
+async function bookmarksMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  window: Window | null,
+): Promise<MenuItemConstructorOptions> {
+  return {
+    label: 'Bookmarks',
+    icon: showRootIcon ? getIcon(EIcon.Bookmarks) : undefined,
+    submenu: [
+      // {
+      //   label: 'Manage bookmarks',
+      //   icon: getIcon(EIcon.Bookmarks),
+      //   enabled: !!focusedWindow,
+      //   click: () => {
+      //     if (focusedWindow) {
+      //       focusedWindow.openInternalPage(PAGE_BOOKMARKS)
+      //     }
+      //   },
+      // },
+      {
+        label: 'Open bookmark',
+        accelerator: 'CmdOrCtrl+B',
+        icon: getIcon(EIcon.Open),
+        click: () => {
+          // if (focusedWindow) {
+          //   browser.showPerformCommandDialog(focusedWindow.id, { trigger: 'open-bookmark' })
+          // }
+        },
+      },
+      { type: 'separator' },
+      ...(await bookmarkSubMenu(browser, window, bookmarks.all)),
+    ],
+  };
+}
+
+async function bookmarkSubMenu(
+  browser: Browser,
+  window: Window | null,
+  bookmarks: IBookmark[],
+): Promise<MenuItemConstructorOptions[]> {
+  return await Promise.all(
+    bookmarks.map(async (bookmark) => {
+      if (bookmark.type === EBookmarkType.Url) {
+        // const icon = await getCachedFavicon(bookmark.url, { format: 'native16' });
+        return {
+          label: bookmark.title,
+          // icon: icon ? (icon as NativeImage) : undefined,
+          click: () => {
+            browser.openURL(bookmark.url, { selectTab: true });
+          },
+        };
+      }
+
+      return {
+        label: bookmark.title,
+        submenu: await bookmarkSubMenu(browser, window, bookmark.children),
+        icon: getIcon(EIcon.Folder),
+      };
+    }),
+  );
 }

@@ -2,6 +2,7 @@ import path from 'path';
 
 export enum EIcon {
   Back = 'back.png',
+  Bookmarks = 'bookmarks.png',
   Close = 'close.png',
   Command = 'command.png',
   Copy = 'copy.png',
@@ -9,10 +10,12 @@ export enum EIcon {
   Divider = 'divider.png',
   Edit = 'edit.png',
   File = 'file.png',
+  Folder = 'folder.png',
   Forward = 'forward.png',
   Maximize = 'maximize.png',
   Next = 'next.png',
   Notification = 'notification.png',
+  Open = 'open.png',
   Previous = 'previous.png',
   Reload = 'reload.png',
   Search = 'search.png',
