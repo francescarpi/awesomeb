@@ -27,6 +27,9 @@ import * as tabRename from './tab-rename';
 import * as urlCopy from './url-copy';
 import * as urlEdit from './url-edit';
 import * as findInPage from './find-in-page';
+import * as tabContainerAddDivider from './tabcontainer-add-divider';
+import * as tabContainerRemoveDivider from './tabcontainer-remove-divider';
+import * as desktopRemoveAllDividers from './desktop-remove-all-dividers';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -53,6 +56,9 @@ const COMMANDS = {
   [urlCopy.TRIGGER]: urlCopy.Command,
   [urlEdit.TRIGGER]: urlEdit.Command,
   [findInPage.TRIGGER]: findInPage.Command,
+  [tabContainerAddDivider.TRIGGER]: tabContainerAddDivider.Command,
+  [tabContainerRemoveDivider.TRIGGER]: tabContainerRemoveDivider.Command,
+  [desktopRemoveAllDividers.TRIGGER]: desktopRemoveAllDividers.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

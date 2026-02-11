@@ -33,6 +33,14 @@ export class TabContainer {
     return this._divider;
   }
 
+  setDivider(divider: boolean) {
+    if (this._divider === divider) {
+      return;
+    }
+    this._divider = divider;
+    this.eventsChannel.emit('tabcontainer:divider-did-change', this);
+  }
+
   get selectedTab(): Tab | null {
     if (this._selectedTabId === null) {
       return null;

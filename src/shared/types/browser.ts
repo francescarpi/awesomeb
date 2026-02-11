@@ -29,3 +29,9 @@ export interface IDesCon {
   desktop: Desktop;
   tabContainer: TabContainer;
 }
+
+export interface IWinDesCon {
+  window: Window;
+  desktop: Desktop;
+  tabContainer: TabContainer;
+}

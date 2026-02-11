@@ -4,7 +4,7 @@ import { EIcon, getIcon } from './utils';
 import { IWinDesConTab } from '~/types';
 
 export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
-  const { tab, window } = tabInfo;
+  const { tab, window, tabContainer, desktop } = tabInfo;
   const menu = Menu.buildFromTemplate([
     {
       label: 'Reload',
@@ -39,6 +39,26 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
           height: 150,
           query: { tabId: tab.id.toString() },
         });
+      },
+    },
+    { type: 'separator' },
+    {
+      label: 'Add divider',
+      icon: getIcon(EIcon.Divider),
+      click: () => {
+        browser.performCommand(window, 'add-divider', { tabContainerId: tabContainer.id });
+      },
+    },
+    {
+      label: 'Remove divider',
+      click: () => {
+        browser.performCommand(window, 'remove-divider', { tabContainerId: tabContainer.id });
+      },
+    },
+    {
+      label: 'Remove all dividers',
+      click: () => {
+        browser.performCommand(window, 'remove-all-dividers', { desktopId: desktop.id });
       },
     },
   ]);

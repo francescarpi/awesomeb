@@ -5,7 +5,7 @@ test("commands renderer shouldn' return any command becaise there is no focused 
   const browser = new Browser();
   browser.createWindow(1);
 
-  expect(browser.renderer.commands().length).toBeGreaterThan(0);
+  expect(browser.renderer.commandsEntities().length).toBeGreaterThan(0);
 });
 
 test('desktops renderer sould return expected data', () => {
@@ -13,7 +13,7 @@ test('desktops renderer sould return expected data', () => {
   const w = browser.createWindow(1);
   w.createDefaultDesktops();
 
-  expect(browser.renderer.desktops(w)).toEqual([
+  expect(browser.renderer.desktopsEntities(w)).toEqual([
     {
       id: '1',
       label: '1: Unnamed',

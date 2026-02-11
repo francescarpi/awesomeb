@@ -13,19 +13,21 @@ export function setupBrowserIPC(browser: Browser) {
     return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
       switch (entity) {
         case 'commands':
-          return browser.renderer.commands();
+          return browser.renderer.commandsEntities();
         case 'desktops':
-          return browser.renderer.desktops(window);
+          return browser.renderer.desktopsEntities(window);
         case 'themes':
-          return browser.renderer.themes(window);
+          return browser.renderer.themesEntities(window);
         case 'searchEngines':
-          return browser.renderer.searchEngines();
+          return browser.renderer.searchEnginesEntities();
         case 'partitions':
-          return browser.renderer.partitions();
+          return browser.renderer.partitionsEntities();
         case 'targets':
-          return browser.renderer.targets(browser, window);
+          return browser.renderer.targetsEntities(browser, window);
         case 'tabs':
-          return browser.renderer.tabs(browser, window);
+          return browser.renderer.tabsEntities(browser, window);
+        case 'tabContainers':
+          return browser.renderer.tabContainersEntities(window);
       }
     });
   });

@@ -1,5 +1,5 @@
 import { TFindInPageId, TTabId, TWindowId } from '~/types';
-import { Browser, Window, Desktop, Tab } from '@/core';
+import { Browser, Window, Desktop, Tab, TabContainer } from '@/core';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
 import { UIPageView } from '@/ui';
@@ -126,6 +126,18 @@ export function registerBrowserEvents(browser: Browser) {
       }
 
       browser.rendererEmmiter.refreshTabFindInPageResult(result.tab, requestId);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tabcontainer:divider-did-change',
+    async (tabContainer: TabContainer) => {
+      const tabContainerResult = browser.getTabContainer(tabContainer.id);
+      if (!tabContainerResult) {
+        return;
+      }
+      browser.rendererEmmiter.refreshTabContainers(tabContainerResult.window);
     },
   );
 }

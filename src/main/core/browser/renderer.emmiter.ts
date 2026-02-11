@@ -10,7 +10,7 @@ export class BrowserRendererEmmiter {
 
   refreshDesktops(window: Window) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
-    const desktops = this._browser.renderer.desktops(window);
+    const desktops = this._browser.renderer.desktopsEntities(window);
     sidebar.send('desktops:refresh', desktops);
     scopeLog.info('Desktops refreshed in renderer');
   }

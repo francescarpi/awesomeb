@@ -98,6 +98,13 @@ import ButtonIcon from '../common/ButtonIcon.astro';
       //   tabContainerLi.classList.add('bg-white');
       // }
 
+      if (tabContainer.divider) {
+        tabContainerLi.classList.add('border-b');
+        tabContainerLi.classList.add('border-white/20');
+        tabContainerLi.classList.add('border-dashed');
+        tabContainerLi.classList.add('pb-1.5');
+      }
+
       const tabsListElement = tabContainerLi.querySelector('ul') as HTMLUListElement;
 
       for (const tab of tabContainer.tabs) {

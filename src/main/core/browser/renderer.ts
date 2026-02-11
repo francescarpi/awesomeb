@@ -9,6 +9,7 @@ import {
   ITabEntity,
   TFindInPageId,
   IFindInPageResult,
+  ITabContainerEntity,
 } from '~/types';
 import {
   Browser,
@@ -25,7 +26,7 @@ import {
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
 
-  commands(): IEntity[] {
+  commandsEntities(): IEntity[] {
     return getCommands(this._browser).map((cmd) => ({
       id: cmd.trigger,
       label: cmd.name,
@@ -33,7 +34,7 @@ export class BrowserRenderer {
     }));
   }
 
-  desktops(window: Window): IDesktopEntity[] {
+  desktopsEntities(window: Window): IDesktopEntity[] {
     return window.desktops.map((desk) => ({
       id: desk.id.toString(),
       label: desk.label,
@@ -45,7 +46,7 @@ export class BrowserRenderer {
     }));
   }
 
-  themes(window: Window): IThemeEntity[] {
+  themesEntities(window: Window): IThemeEntity[] {
     const themes = getThemes();
 
     const selectedDesktop = window.selectedDesktop;
@@ -65,7 +66,7 @@ export class BrowserRenderer {
     return result;
   }
 
-  searchEngines(): IEntity[] {
+  searchEnginesEntities(): IEntity[] {
     const searchEngines = config.getProperty('searchEngines');
 
     return searchEngines.map((engine) => ({
@@ -74,7 +75,7 @@ export class BrowserRenderer {
     }));
   }
 
-  partitions(): IPartitionEntity[] {
+  partitionsEntities(): IPartitionEntity[] {
     const partitions = getPartitions();
     return Array.from(partitions.values()).map((partition) => ({
       id: partition.id,
@@ -83,7 +84,7 @@ export class BrowserRenderer {
     }));
   }
 
-  targets(browser: Browser, window: Window): IEntity[] {
+  targetsEntities(browser: Browser, window: Window): IEntity[] {
     const result = [
       {
         id: 'current-desktop-window',
@@ -177,7 +178,7 @@ export class BrowserRenderer {
     return data;
   }
 
-  tabs(browser: Browser, window: Window): ITabEntity[] {
+  tabsEntities(browser: Browser, window: Window): ITabEntity[] {
     const tabs = browser.getAllTabs();
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
@@ -207,5 +208,15 @@ export class BrowserRenderer {
       activeMatch: search.result.activeMatchOrdinal,
       matches: search.result.matches,
     };
+  }
+
+  tabContainersEntities(window: Window): ITabContainerEntity[] {
+    const desktop = window.selectedDesktop;
+    const selectedTabContainer = desktop.selectedTabContainer;
+    return desktop.tabContainers.map((tc) => ({
+      id: tc.id.toString(),
+      label: tc.tabs.map((t) => t.title).join(' | '),
+      selected: selectedTabContainer?.id === tc.id,
+    }));
   }
 }

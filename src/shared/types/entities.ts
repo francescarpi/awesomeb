@@ -5,7 +5,8 @@ export type TEntityType =
   | 'searchEngines'
   | 'partitions'
   | 'targets'
-  | 'tabs';
+  | 'tabs'
+  | 'tabContainers';
 
 export interface IEntity {
   id: string;
@@ -34,3 +35,5 @@ export interface IPartitionEntity extends IEntity {
 export interface ITabEntity extends IEntity {
   url: string | null;
 }
+
+export interface ITabContainerEntity extends IEntity {}
