@@ -12,7 +12,6 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { getSearchParams } from '../scripts/url';
   import { listWithSearchManager } from '../scripts/list-with-search';
 
-  const listEl = document.getElementById('list')!;
   const { winId, searchParams } = getSearchParams();
   const desktopId = searchParams.get('desktopId');
 
@@ -26,7 +25,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       : desktopEntities.find((d) => d.selected)!;
 
     // Load themes for the selected desktop
-    listWithSearchManager(listEl, {
+    listWithSearchManager('list', {
       entity: 'themes',
       onAccept: (item) => {
         abCommands.perform(winId, 'desktop-theme', {

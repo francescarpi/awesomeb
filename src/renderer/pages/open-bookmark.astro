@@ -4,22 +4,89 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 ---
 
 <BlackBgWithTitle title="Open Bookmark">
-  <ListWithSearch placeholder="Filter and select a bookmark..." id="list" />
+  <div class="h-full">
+    <div id="pagesIndicator" class="fixed top-4 right-3"></div>
+    <ListWithSearch placeholder="Filter and select a bookmark..." id="list" />
+    <ListWithSearch placeholder="Select a profile..." id="partition" />
+    <ListWithSearch placeholder="Select a target" id="target" />
+  </div>
 </BlackBgWithTitle>
 
 <script>
   import { getSearchParams } from '../scripts/url';
   import { listWithSearchManager } from '../scripts/list-with-search';
+  import { paginatorManager } from '../scripts/paginator';
+  import { IEntity, IPartitionEntity, IBookmarkEntity } from '~/types';
 
   const { winId } = getSearchParams();
-  const listEl = document.getElementById('list')!;
-  listWithSearchManager(listEl, {
+
+  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
+    'pagesIndicator',
+    ['list', 'partition', 'target'],
+  );
+
+  refreshPageVisibility();
+  refreshPageIndicator();
+
+  let partition: IPartitionEntity | null = null;
+  let target: IEntity | null = null;
+  let bookmark: IBookmarkEntity | null = null;
+
+  listWithSearchManager('list', {
     entity: 'bookmarks',
-    onAccept: (item) => {
-      // abCommands.perform(winId, 'select-desktop', { desktopId: parseInt(item.id, 10) });
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onChange: (_inputValue, entity) => {
+      bookmark = entity as IBookmarkEntity;
+    },
+    onAccept: (selectedPartition) => {
+      bookmark = selectedPartition as IBookmarkEntity;
+      handleSelect();
     },
     onEscape: () => {
       abModal.close(winId);
     },
   });
+
+  listWithSearchManager('partition', {
+    entity: 'partitions',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    renderExtra: (item, rowEl) => {
+      const entity = item as IPartitionEntity;
+      const style = `background-color: ${entity.color}`;
+      rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
+    },
+    onChange: (_inputValue, entity) => {
+      partition = entity as IPartitionEntity;
+    },
+    onAccept: (selectedPartition) => {
+      partition = selectedPartition as IPartitionEntity;
+      handleSelect();
+    },
+  });
+
+  listWithSearchManager('target', {
+    entity: 'targets',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onChange: (_inputValue, entity) => {
+      target = entity;
+    },
+    onAccept: (selectedTarget) => {
+      target = selectedTarget;
+      handleSelect();
+    },
+  });
+
+  // ------------------------------------------------------
+  function handleSelect() {
+    abCommands.perform(winId, 'new-tab', {
+      query: bookmark!.id,
+      partitionId: partition!.id,
+      targetId: target!.id,
+    });
+  }
 </script>

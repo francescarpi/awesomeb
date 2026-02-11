@@ -12,8 +12,8 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { listWithSearchManager } from '../scripts/list-with-search';
 
   const { winId } = getSearchParams();
-  const commandsEl = document.getElementById('list')!;
-  listWithSearchManager(commandsEl, {
+
+  listWithSearchManager('list', {
     entity: 'commands',
     onAccept: (item) => {
       abCommands.perform(winId, item.id, {});

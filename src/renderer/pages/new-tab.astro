@@ -16,26 +16,26 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { listWithSearchManager } from '../scripts/list-with-search';
   import { getSearchParams } from '../scripts/url';
   import { IEntity, IPartitionEntity } from '~/types';
+  import { paginatorManager } from '../scripts/paginator';
 
-  const queryEl = document.getElementById('query')!;
-  const partitionEl = document.getElementById('partition')!;
-  const targetEl = document.getElementById('target')!;
-
-  let activePage = queryEl;
-  const pages = [queryEl, partitionEl, targetEl];
   const { winId } = getSearchParams();
 
   let query = '';
+
   let searchEngine: IEntity | null = null;
   let partition: IPartitionEntity | null = null;
   let target: IEntity | null = null;
 
-  // ------------------------------------------------------
-  refreshPageVisible();
+  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
+    'pagesIndicator',
+    ['query', 'partition', 'target'],
+  );
+
+  refreshPageVisibility();
   refreshPageIndicator();
 
   // ------------------------------------------------------
-  listWithSearchManager(queryEl, {
+  listWithSearchManager('query', {
     entity: 'searchEngines',
     filtering: false,
     onEscape: () => abModal.close(winId),
@@ -51,7 +51,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
     },
   });
 
-  listWithSearchManager(partitionEl, {
+  listWithSearchManager('partition', {
     entity: 'partitions',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
@@ -70,7 +70,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
     },
   });
 
-  listWithSearchManager(targetEl, {
+  listWithSearchManager('target', {
     entity: 'targets',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
@@ -83,49 +83,6 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       handleSelect();
     },
   });
-
-  // ------------------------------------------------------
-  function refreshPageVisible() {
-    for (const page of pages) {
-      if (page === activePage) {
-        page.style.display = 'grid';
-        page.querySelector('input')!.focus();
-      } else {
-        page.style.display = 'none';
-      }
-    }
-  }
-
-  // ------------------------------------------------------
-  function refreshPageIndicator() {
-    const pagesIndicatorEl = document.getElementById('pagesIndicator')!;
-    pagesIndicatorEl.innerHTML = '';
-
-    pages.forEach((page) => {
-      const dot = document.createElement('span');
-      dot.className = 'mx-1 text-white select-none';
-      dot.innerText = page === activePage ? '●' : '○';
-      pagesIndicatorEl.appendChild(dot);
-    });
-  }
-
-  // ------------------------------------------------------
-  function nextPage() {
-    const currentIndex = pages.indexOf(activePage);
-    const nextIndex = (currentIndex + 1) % pages.length;
-    activePage = pages[nextIndex];
-    refreshPageVisible();
-    refreshPageIndicator();
-  }
-
-  // ------------------------------------------------------
-  function previousPage() {
-    const currentIndex = pages.indexOf(activePage);
-    const previousIndex = (currentIndex - 1 + pages.length) % pages.length;
-    activePage = pages[previousIndex];
-    refreshPageVisible();
-    refreshPageIndicator();
-  }
 
   // ------------------------------------------------------
   function handleSelect() {

@@ -12,8 +12,8 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { listWithSearchManager } from '../scripts/list-with-search';
 
   const { winId } = getSearchParams();
-  const listEl = document.getElementById('list')!;
-  listWithSearchManager(listEl, {
+
+  listWithSearchManager('list', {
     entity: 'desktops',
     onAccept: (item) => {
       abCommands.perform(winId, 'suspend-desktop', { desktopId: parseInt(item.id, 10) });

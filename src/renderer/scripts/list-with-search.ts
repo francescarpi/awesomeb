@@ -2,7 +2,7 @@ import { TEntityType, IEntity } from '~/types';
 import { getSearchParams } from './url';
 
 export async function listWithSearchManager(
-  listEl: HTMLElement,
+  listElId: string,
   props: {
     entity: TEntityType;
     onAccept?: (item: IEntity) => void;
@@ -14,6 +14,8 @@ export async function listWithSearchManager(
     onChange?: (inputValue: string, entity: IEntity) => void;
   },
 ) {
+  const listEl = document.getElementById(listElId)!;
+
   // Validate elements
   const tpl = listEl.querySelector('#row-template') as HTMLTemplateElement;
   const ul = listEl.querySelector('ul');

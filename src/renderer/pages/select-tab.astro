@@ -12,8 +12,8 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { listWithSearchManager } from '../scripts/list-with-search';
 
   const { winId } = getSearchParams();
-  const listEl = document.getElementById('list')!;
-  listWithSearchManager(listEl, {
+
+  listWithSearchManager('list', {
     entity: 'tabs',
     onAccept: (item) => {
       abCommands.perform(winId, 'select-tab', { tabId: parseInt(item.id, 10) });
