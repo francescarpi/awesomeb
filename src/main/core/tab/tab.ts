@@ -35,6 +35,7 @@ export class Tab {
 
     // The view is not visible initially until method to refresh visible tabs is called.
     this.view = new TabView(id, this._partition.id);
+    this.view.webContents.loadURL('about:blank');
 
     registerTabEvents(browser, this);
   }
@@ -181,6 +182,7 @@ export class Tab {
 
   close() {
     this.view.close();
+    history.delete(this.id);
   }
 
   updateLastAccessed() {
