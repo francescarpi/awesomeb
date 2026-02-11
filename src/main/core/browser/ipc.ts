@@ -21,7 +21,7 @@ export function setupBrowserIPC(browser: Browser) {
         case 'searchEngines':
           return browser.renderer.searchEnginesEntities();
         case 'partitions':
-          return browser.renderer.partitionsEntities();
+          return browser.renderer.partitionsEntities(browser);
         case 'targets':
           return browser.renderer.targetsEntities(browser, window);
         case 'tabs':

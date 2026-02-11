@@ -593,7 +593,7 @@ describe('selectTab', () => {
     const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
-    const result = await browser.openURL('http://example.com');
+    const result = await browser.openURL('http://example.com', { selectTab: true });
 
     // Select any tab initially
     expect(w.selectedDesktop.selectedTabContainer).not.toBeNull();
@@ -693,7 +693,7 @@ describe('closeTab', () => {
     const desktop = w.selectedDesktop;
 
     // Create a tab container with multiple tabs
-    const tabContainer = new TabContainer(browser.eventsChannel, 1 as any);
+    const tabContainer = new TabContainer(browser, 1 as any);
 
     const tab1 = tabContainer.createTab(1, {
       partition: defaultPartition,

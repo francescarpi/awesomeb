@@ -44,6 +44,7 @@ vi.mock('electron', () => {
       getActiveIndex: vi.fn(() => 0),
       restore: vi.fn().mockResolvedValue(undefined),
     },
+    setWindowOpenHandler: vi.fn(),
   });
 
   const webContents = createWebContents();

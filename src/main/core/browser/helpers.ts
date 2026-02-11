@@ -1,5 +1,9 @@
 import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
 import { config, Browser, defaultPartition, getPartitions } from '@/core';
+import { HandlerDetails, WindowOpenHandlerResponse } from 'electron';
+import log from 'electron-log';
+
+const scopeLog = log.scope('BrowserHelper');
 
 export function parseQuery(query: string, searchEngineCode?: TSearchEngineCode): string | null {
   const { valid, url } = isValidUrl(query);
@@ -72,4 +76,40 @@ export function parseTarget(
   }
 
   return null;
+}
+
+export function windowOpenHadler(
+  browser: Browser,
+  details: HandlerDetails,
+): WindowOpenHandlerResponse {
+  const { url, disposition, features } = details;
+
+  scopeLog.info(`Url open handler for tab. URL: "${url}", Disposition: "${disposition}"`);
+
+  const isPopup =
+    disposition === 'new-window' && (features.includes('width=') || features.includes('height='));
+
+  scopeLog.info(`Is popup: ${isPopup}`);
+
+  if (isPopup) {
+    scopeLog.info('Opening URL in a popup window');
+    return { action: 'allow' };
+  }
+
+  if (disposition === 'foreground-tab') {
+    browser.openURL(url, { targetId: 'current-desktop-window', selectTab: true });
+    return { action: 'deny' };
+  }
+
+  if (disposition === 'background-tab') {
+    browser.openURL(url, { targetId: 'current-desktop-window' });
+    return { action: 'deny' };
+  }
+
+  if (disposition === 'new-window') {
+    browser.openURL(url, { targetId: 'new-window' });
+    return { action: 'deny' };
+  }
+
+  return { action: 'deny' };
 }

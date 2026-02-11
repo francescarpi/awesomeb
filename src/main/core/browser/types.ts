@@ -4,4 +4,5 @@ export interface IOpenUrlProps {
   partitionId?: TPartitionId;
   searchEngineCode?: TSearchEngineCode;
   targetId?: string;
+  selectTab?: boolean;
 }

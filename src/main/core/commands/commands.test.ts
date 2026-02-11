@@ -194,6 +194,7 @@ describe('Commands', () => {
         partitionId: 'default',
         searchEngineCode: 'google',
         targetId: 'active-desktop',
+        selectTab: true,
       });
     });
 

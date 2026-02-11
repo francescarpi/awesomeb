@@ -2,10 +2,12 @@ import { tabWebContentsMenu } from '@/menu';
 import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
+import { HandlerDetails } from 'electron';
+import { windowOpenHadler, Browser } from '@/core';
 
 const scopeLog = log.scope('TabEvents');
 
-export function registerTabEvents(tab: Tab) {
+export function registerTabEvents(browser: Browser, tab: Tab) {
   //--------------------------------------------------------------------------------------
   tab.view.webContents.on('did-start-loading', () => {
     tab.setLoading(true);
@@ -46,6 +48,11 @@ export function registerTabEvents(tab: Tab) {
     const { requestId } = result;
     tab.findInPage.setResult(requestId, result);
   });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.setWindowOpenHandler((details: HandlerDetails) =>
+    windowOpenHadler(browser, details),
+  );
 
   //--------------------------------------------------------------------------------------
   const window = tab.view.webContents;

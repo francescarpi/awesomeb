@@ -1,7 +1,6 @@
 import { IConTab, TDesktopId, TTabContainerId, TTabId } from '~/types';
-import { defaultTheme, Theme, Window, TabContainer, ITabContainerProps } from '@/core';
+import { defaultTheme, Theme, Window, TabContainer, ITabContainerProps, Browser } from '@/core';
 import { IProps } from './types';
-import EventEmitter from 'events';
 
 export class Desktop {
   private _name: string | null = null;
@@ -12,7 +11,7 @@ export class Desktop {
   private _selectedTabContainerId: TTabContainerId | null = null;
 
   constructor(
-    public readonly eventsChannel: EventEmitter,
+    public readonly browser: Browser,
     public readonly window: Window,
     public readonly id: TDesktopId,
     props?: IProps,
@@ -28,7 +27,7 @@ export class Desktop {
 
     this._name = name;
 
-    this.eventsChannel.emit('desktop:name-did-change', this.window, this);
+    this.browser.eventsChannel.emit('desktop:name-did-change', this.window, this);
   }
 
   get name(): string | null {
@@ -68,7 +67,7 @@ export class Desktop {
     }
 
     this._theme = theme;
-    this.eventsChannel.emit('desktop:theme-did-change', this.window, this);
+    this.browser.eventsChannel.emit('desktop:theme-did-change', this.window, this);
   }
 
   get tabContainers(): TabContainer[] {
@@ -143,7 +142,7 @@ export class Desktop {
   }
 
   createTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {
-    const tabContainer = new TabContainer(this.eventsChannel, id, props);
+    const tabContainer = new TabContainer(this.browser, id, props);
     this.addTabContainer(tabContainer);
     return tabContainer;
   }

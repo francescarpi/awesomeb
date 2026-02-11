@@ -87,7 +87,7 @@ export class Browser {
   }
 
   createWindow(id: TWindowId, props?: IWindowProps): Window {
-    const w = new Window(this.eventsChannel, id, props);
+    const w = new Window(this, id, props);
     this._windows.set(w.id, w);
 
     scopeLog.info(
@@ -159,6 +159,7 @@ export class Browser {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
     });
+
     if (!result) {
       scopeLog.error('Invalid target for opening URL');
       return null;
@@ -168,8 +169,10 @@ export class Browser {
 
     const tab = tabContainer.createTab(this.idGenerator.nextTabId, { partition, suspended: false });
 
-    tabContainer.selectTab(tab.id);
-    desktop.selectTabContainer(tabContainer.id);
+    if (props?.selectTab) {
+      tabContainer.selectTab(tab.id);
+      desktop.selectTabContainer(tabContainer.id);
+    }
 
     this.eventsChannel.emit('browser:url-opened', window);
 
@@ -191,6 +194,21 @@ export class Browser {
           tabContainer: desConTab.tabContainer,
           tab: desConTab.tab,
         };
+      }
+    }
+    return null;
+  }
+
+  get selectedTab(): IWinDesConTab | null {
+    for (const window of this._windows.values()) {
+      for (const desktop of window.desktops) {
+        const selectedTabContainer = desktop.selectedTabContainer;
+        if (selectedTabContainer) {
+          const selectedTab = selectedTabContainer.selectedTab;
+          if (selectedTab) {
+            return { window, desktop, tabContainer: selectedTabContainer, tab: selectedTab };
+          }
+        }
       }
     }
     return null;

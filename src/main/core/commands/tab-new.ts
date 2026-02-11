@@ -25,6 +25,7 @@ export const Command: ICommand<ICommandParams> = {
       partitionId: params.partitionId,
       searchEngineCode: params.searchEngineCode,
       targetId: params.targetId,
+      selectTab: true,
     });
   },
 };

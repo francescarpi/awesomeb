@@ -1,7 +1,6 @@
 import { NoTabs, UIWindow } from '@/ui';
 import type { IProps } from './types';
-import { Desktop, IDesktopProps } from '@/core';
-import EventEmitter from 'events';
+import { Desktop, IDesktopProps, Browser } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 import { IDesCon, IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
@@ -14,11 +13,11 @@ export class Window extends UIWindow {
   private _selectedDesktopId: number;
 
   constructor(
-    public readonly eventsChannel: EventEmitter,
+    public readonly browser: Browser,
     public readonly id: TWindowId,
     props?: IProps,
   ) {
-    super(eventsChannel, props?.bounds);
+    super(browser.eventsChannel, props?.bounds);
 
     registerWindowEvents(this);
 
@@ -58,13 +57,17 @@ export class Window extends UIWindow {
     }
 
     this._selectedDesktopId = deskIds[newIndex];
-    this.eventsChannel.emit('window:selected-desktop-did-change', this, this.selectedDesktop);
+    this.browser.eventsChannel.emit(
+      'window:selected-desktop-did-change',
+      this,
+      this.selectedDesktop,
+    );
 
     return this.selectedDesktop;
   }
 
   createDesktop(id: TDesktopId, props?: IDesktopProps): Desktop {
-    const newDesktop = new Desktop(this.eventsChannel, this, id, props);
+    const newDesktop = new Desktop(this.browser, this, id, props);
     this._desktops.set(id, newDesktop);
     return newDesktop;
   }
@@ -176,15 +179,15 @@ export class Window extends UIWindow {
     if (tab.suspended) {
       tab.resume();
 
-      this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
       this.addView(tab.view);
       this.refreshTabsVisibility();
-      this.eventsChannel.emit('window:tab-did-resume', this, tab);
+      this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
       return;
     }
 
-    this.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
     this.refreshTabsVisibility();
   }
 
@@ -236,7 +239,7 @@ export class Window extends UIWindow {
       `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
     );
 
-    this.eventsChannel.emit('window:tab-did-suspend', this);
+    this.browser.eventsChannel.emit('window:tab-did-suspend', this);
 
     return true;
   }
@@ -277,7 +280,7 @@ export class Window extends UIWindow {
     this.removeView(tab.view.id);
     this.refreshTabsVisibility();
 
-    this.eventsChannel.emit('window:tab-did-close', this);
+    this.browser.eventsChannel.emit('window:tab-did-close', this);
 
     return true;
   }

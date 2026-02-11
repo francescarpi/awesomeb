@@ -75,12 +75,14 @@ export class BrowserRenderer {
     }));
   }
 
-  partitionsEntities(): IPartitionEntity[] {
+  partitionsEntities(browser: Browser): IPartitionEntity[] {
     const partitions = getPartitions();
+    const selectedTabResult = browser.selectedTab;
     return Array.from(partitions.values()).map((partition) => ({
       id: partition.id,
       label: partition.name,
       color: partition.color,
+      selected: selectedTabResult?.tab.partition.id === partition.id,
     }));
   }
 

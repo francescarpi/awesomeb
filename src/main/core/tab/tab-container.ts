@@ -1,7 +1,7 @@
 import { TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
-import EventEmitter from 'events';
 import { ITabContainerProps, ITabProps } from './types';
+import { Browser } from '@/core';
 
 export class TabContainer {
   private _divider: boolean;
@@ -10,7 +10,7 @@ export class TabContainer {
   private _selectedTabId: TTabId | null = null;
 
   constructor(
-    public readonly eventsChannel: EventEmitter,
+    public readonly browser: Browser,
     public readonly id: TTabContainerId,
     props?: ITabContainerProps,
   ) {
@@ -22,7 +22,7 @@ export class TabContainer {
   }
 
   createTab(id: TTabId, props: ITabProps): Tab {
-    const tab = new Tab(this.eventsChannel, id, props);
+    const tab = new Tab(this.browser, id, props);
 
     this._tabs.set(tab.id, tab);
 
@@ -38,7 +38,7 @@ export class TabContainer {
       return;
     }
     this._divider = divider;
-    this.eventsChannel.emit('tabcontainer:divider-did-change', this);
+    this.browser.eventsChannel.emit('tabcontainer:divider-did-change', this);
   }
 
   get selectedTab(): Tab | null {

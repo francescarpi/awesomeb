@@ -1,5 +1,4 @@
-import EventEmitter from 'events';
-import { Partition, history } from '@/core';
+import { Partition, history, Browser } from '@/core';
 import { ITabProps } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
@@ -23,7 +22,7 @@ export class Tab {
   private _findInPage: FindInPage | null = null;
 
   constructor(
-    public readonly eventsChannel: EventEmitter,
+    public readonly browser: Browser,
     public readonly id: TTabId,
     props: ITabProps,
   ) {
@@ -36,7 +35,7 @@ export class Tab {
     // The view is not visible initially until method to refresh visible tabs is called.
     this.view = new TabView(id, this._partition.id);
 
-    registerTabEvents(this);
+    registerTabEvents(browser, this);
   }
 
   get partition(): Partition {
@@ -53,7 +52,7 @@ export class Tab {
     }
 
     this._title = title;
-    this.eventsChannel.emit('tab:title-did-change', this);
+    this.browser.eventsChannel.emit('tab:title-did-change', this);
   }
 
   get url(): string | null {
@@ -66,7 +65,7 @@ export class Tab {
     }
 
     this._url = url;
-    this.eventsChannel.emit('tab:url-did-change', this);
+    this.browser.eventsChannel.emit('tab:url-did-change', this);
   }
 
   get suspended(): boolean {
@@ -83,7 +82,7 @@ export class Tab {
     }
 
     this._loading = loading;
-    this.eventsChannel.emit('tab:loading-did-change', this);
+    this.browser.eventsChannel.emit('tab:loading-did-change', this);
   }
 
   get favicon(): string | null {
@@ -108,7 +107,7 @@ export class Tab {
     }
 
     this._customTitle = customTitle;
-    this.eventsChannel.emit('tab:title-did-change', this);
+    this.browser.eventsChannel.emit('tab:title-did-change', this);
   }
 
   activate() {
@@ -190,8 +189,8 @@ export class Tab {
       return;
     }
 
-    this._findInPage = new FindInPage(this.eventsChannel, this.id);
-    this.eventsChannel.emit(
+    this._findInPage = new FindInPage(this.browser.eventsChannel, this.id);
+    this.browser.eventsChannel.emit(
       'tab:find-in-page-visibility-did-change',
       this,
       true,
@@ -207,7 +206,7 @@ export class Tab {
     const view = this._findInPage.view;
     this._findInPage.close();
     this._findInPage = null;
-    this.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
+    this.browser.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
   }
 
   saveHistory() {
