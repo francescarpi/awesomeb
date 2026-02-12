@@ -1,7 +1,7 @@
-import { Browser } from '@/core';
-import { Menu } from 'electron';
+import { Browser, bookmarks, Window } from '@/core';
+import { Menu, MenuItemConstructorOptions } from 'electron';
 import { EIcon, getIcon } from './utils';
-import { IWinDesConTab } from '~/types';
+import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
 
 export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   const { tab, window, tabContainer, desktop } = tabInfo;
@@ -36,10 +36,18 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       icon: getIcon(EIcon.Edit),
       click: () => {
         window.modal.open('rename-tab', {
-          height: 150,
           query: { tabId: tab.id.toString() },
         });
       },
+    },
+    { type: 'separator' },
+    {
+      label: 'Add bookmark',
+      icon: getIcon(EIcon.Bookmarks),
+      enabled: !!tab.url && !tab.suspended,
+      submenu: tab.url
+        ? bookmarkFolderOptions(browser, window, tab.title, tab.url, 'root', 'Root', bookmarks.all)
+        : [],
     },
     { type: 'separator' },
     {
@@ -64,4 +72,49 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   ]);
 
   return menu;
+}
+
+function bookmarkFolderOptions(
+  browser: Browser,
+  window: Window,
+  tabTitle: string,
+  tabUrl: string,
+  folderId: string,
+  folderName: string,
+  bookmarks: IBookmark[],
+): MenuItemConstructorOptions[] {
+  const folders = bookmarks.filter((b) => b.type === EBookmarkType.Folder);
+  const foldersOptions: MenuItemConstructorOptions[] = folders.map((folder) => ({
+    label: folder.title,
+    icon: getIcon(EIcon.Folder),
+    submenu: bookmarkFolderOptions(
+      browser,
+      window,
+      tabTitle,
+      tabUrl,
+      folder.id,
+      folder.title,
+      folder.children,
+    ),
+  }));
+  return [
+    ...foldersOptions,
+    { type: 'separator' },
+    {
+      label: 'Add here...',
+      click: () => {
+        window.modal.open('add-bookmark', {
+          query: { title: tabTitle, url: tabUrl, folderId, folderName },
+        });
+      },
+    },
+    {
+      label: 'Create folder here and add...',
+      click: () => {
+        window.modal.open('add-bookmark', {
+          query: { title: tabTitle, url: tabUrl, folderId, folderName, createFolder: 'true' },
+        });
+      },
+    },
+  ];
 }

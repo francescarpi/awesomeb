@@ -2,32 +2,10 @@ import { UIModal } from './models';
 import { UIWindow } from '../window';
 import { TPage } from '~/types';
 import { IProps } from './types';
+import { DEFAULT_MODALS_PROPS } from './constants';
 
 export class UIModalManager {
   private _modal: UIModal | null = null;
-  private _defaultModalProps = {
-    'edit-url': {
-      width: 700,
-      height: 460,
-    },
-    'perform-command': {
-      width: 500,
-      height: 500,
-    },
-    'new-tab': {
-      height: 600,
-    },
-    'select-desktop': {
-      height: 450,
-    },
-    'select-tab': {
-      height: 500,
-    },
-    'open-bookmark': {
-      width: 600,
-      height: 500,
-    },
-  };
 
   constructor(private readonly _win: UIWindow) {}
 
@@ -38,9 +16,9 @@ export class UIModalManager {
 
     let modalProps = props || {};
 
-    if (this._defaultModalProps[page]) {
+    if (DEFAULT_MODALS_PROPS[page]) {
       modalProps = {
-        ...this._defaultModalProps[page],
+        ...DEFAULT_MODALS_PROPS[page],
         ...modalProps,
       };
     }

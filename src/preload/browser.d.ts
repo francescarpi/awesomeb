@@ -77,4 +77,15 @@ declare global {
   const abUrlBar: {
     onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abBookmarks: {
+    add: (
+      winId: TWindowId,
+      parentFolderId: string,
+      title: string,
+      url: string,
+      newFolderName: string,
+    ) => void;
+  };
 }

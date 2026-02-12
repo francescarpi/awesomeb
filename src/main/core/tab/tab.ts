@@ -35,7 +35,6 @@ export class Tab {
 
     // The view is not visible initially until method to refresh visible tabs is called.
     this.view = new TabView(id, this._partition.id);
-    this.view.webContents.loadURL('about:blank');
 
     registerTabEvents(browser, this);
   }
@@ -64,10 +63,11 @@ export class Tab {
   }
 
   setUrl(url: string) {
-    if (this._url === url) {
+    if (this._url === url || url === 'about:blank') {
       return;
     }
 
+    scopeLog.debug(`Tab ${this.id} URL changed to ${url}`);
     this._url = url;
     this.browser.eventsChannel.emit('tab:url-did-change', this);
   }
@@ -153,6 +153,10 @@ export class Tab {
   }
 
   async loadHistoryOrURL() {
+    scopeLog.info(
+      `Attempting to restore navigation history for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+    );
+
     const tabHistory = history.get(this.id);
     if (tabHistory) {
       await this.view.webContents.navigationHistory.restore(tabHistory).catch((error) => {
@@ -164,7 +168,14 @@ export class Tab {
       return;
     }
 
+    scopeLog.debug(
+      `No navigation history found for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+    );
+
     if (this._url) {
+      scopeLog.debug(
+        `Loading URL ${this._url} for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+      );
       await this.loadURL(this._url);
       return;
     }

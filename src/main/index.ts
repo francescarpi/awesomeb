@@ -6,6 +6,7 @@ import {
   setupDesktopIPC,
   setupWindowIPC,
   setupTabIPC,
+  setupBookmarksIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -30,6 +31,7 @@ app.whenReady().then(async () => {
   setupWindowIPC(browser);
   setupMenuIPC(browser);
   setupTabIPC(browser);
+  setupBookmarksIPC(browser);
 
   await browser.loadProfiles();
   await browser.loadSession();

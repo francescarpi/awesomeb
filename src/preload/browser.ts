@@ -114,6 +114,19 @@ const abUrlBar = {
 };
 
 //--------------------------------------------------------------------------------------
+const abBookmarks = {
+  add: (
+    winId: TWindowId,
+    parentFolderId: string,
+    title: string,
+    url: string,
+    newFolderName: string,
+  ) => {
+    ipcRenderer.send('bookmarks:add', winId, parentFolderId, title, url, newFolderName);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
@@ -123,3 +136,4 @@ contextBridge.exposeInMainWorld('abWindow', abWindow);
 contextBridge.exposeInMainWorld('abMenu', abMenu);
 contextBridge.exposeInMainWorld('abTabs', abTabs);
 contextBridge.exposeInMainWorld('abUrlBar', abUrlBar);
+contextBridge.exposeInMainWorld('abBookmarks', abBookmarks);

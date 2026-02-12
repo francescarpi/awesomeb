@@ -1,0 +1,75 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle>
+  <div class="flex flex-col gap-4">
+    <input
+      class="input w-full text-black rounded-full"
+      placeholder="Folder name..."
+      id="folder-name"
+    />
+    <input class="input w-full text-black rounded-full" placeholder="Title..." id="title" />
+    <input class="input w-full text-black rounded-full" placeholder="Url..." id="url" />
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  import { inputManager } from '../scripts/inputs';
+
+  const { winId, searchParams } = getSearchParams();
+
+  const title = searchParams.get('title')!;
+  const url = searchParams.get('url')!;
+  const folderId = searchParams.get('folderId')!;
+  const folderName = searchParams.get('folderName')!;
+  const createFolder = searchParams.get('createFolder');
+  const h1 = document.querySelector('h1')!;
+
+  const {
+    setVisible: setFolderNameVisible,
+    focus: focusFolderName,
+    getValue: getFolderName,
+  } = inputManager(
+    'folder-name',
+    () => handleSubmit(),
+    () => abModal.close(winId),
+  );
+
+  const {
+    focus: focusTitle,
+    setDefaultValue: setDefaultTitle,
+    getValue: getTitle,
+  } = inputManager(
+    'title',
+    () => handleSubmit(),
+    () => abModal.close(winId),
+  );
+
+  const { setDefaultValue: setDefaultURL, getValue: getURL } = inputManager(
+    'url',
+    () => handleSubmit(),
+    () => abModal.close(winId),
+  );
+
+  setDefaultTitle(title);
+  setDefaultURL(url);
+
+  if (createFolder) {
+    h1.textContent = `Create folder and add bookmark to: ${folderName}`;
+    setFolderNameVisible(true);
+    focusFolderName();
+  } else {
+    h1.textContent = `Add bookmark to: ${folderName}`;
+    setFolderNameVisible(false);
+    focusTitle(true);
+  }
+
+  function handleSubmit() {
+    const folderName = getFolderName();
+    const title = getTitle();
+    const url = getURL();
+    abBookmarks.add(winId, folderId, title, url, folderName);
+  }
+</script>
