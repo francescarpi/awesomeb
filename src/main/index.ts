@@ -7,6 +7,8 @@ import {
   setupWindowIPC,
   setupTabIPC,
   setupBookmarksIPC,
+  setupProtocols,
+  registerProtocols,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -20,9 +22,12 @@ setupLogs();
 setupAbout();
 setupFeatures();
 electronDl();
+setupProtocols();
 
 app.whenReady().then(async () => {
   const browser = new Browser();
+
+  registerProtocols();
 
   setupUIIPC(browser);
   setupCommandsIPC(browser);

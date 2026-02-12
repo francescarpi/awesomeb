@@ -7,6 +7,7 @@ import {
   getTheme,
   getPartitions,
   defaultPartition,
+  internalPartition,
 } from '@/core';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
@@ -20,6 +21,7 @@ import { IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
 import { registerSessionEvents } from './events.session';
+import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('Browser');
 
@@ -71,7 +73,11 @@ export class Browser {
           });
 
           for (const tabStore of tabConStore.tabs) {
-            const partition = partitions.get(tabStore.partitionId) || defaultPartition;
+            const partition =
+              tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
+                ? internalPartition
+                : partitions.get(tabStore.partitionId) || defaultPartition;
+
             tabContainer.createTab(tabStore.id, {
               partition,
               title: tabStore.title,
@@ -167,7 +173,12 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
-    const tab = tabContainer.createTab(this.idGenerator.nextTabId, { partition, suspended: false });
+    const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? internalPartition : null;
+
+    const tab = tabContainer.createTab(this.idGenerator.nextTabId, {
+      partition: intPartition || partition,
+      suspended: false,
+    });
 
     if (props?.selectTab) {
       tabContainer.selectTab(tab.id);

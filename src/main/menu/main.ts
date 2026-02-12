@@ -3,6 +3,7 @@ import { MenuItemConstructorOptions, Menu } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark } from '~/types';
+import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('MainMenu');
 
@@ -395,9 +396,9 @@ async function bookmarksMenu(
         icon: getIcon(EIcon.Bookmarks),
         enabled: !!window,
         click: () => {
-          // if (window
-          //   focusedWindow.openInternalPage(PAGE_BOOKMARKS)
-          // }
+          browser.openURL(`${INTERNAL_PROTOCOL}://bookmarks`, {
+            selectTab: true,
+          });
         },
       },
       {
