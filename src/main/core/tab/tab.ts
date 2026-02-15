@@ -189,6 +189,8 @@ export class Tab {
     if (this._suspended) {
       return;
     }
+
+    this.clearFailLoad();
     this.close();
     this._suspended = true;
   }
