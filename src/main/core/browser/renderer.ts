@@ -238,7 +238,17 @@ export class BrowserRenderer {
     return bookmarks.all;
   }
 
-  tabNavigation(tab: Tab): ITabNavigation {
+  tabNavigation(tab?: Tab): ITabNavigation {
+    if (!tab) {
+      return {
+        canGoBack: false,
+        canGoForward: false,
+        loading: false,
+        hasURL: false,
+        tabId: -1,
+      };
+    }
+
     return {
       canGoBack: tab.view.canGoBack,
       canGoForward: tab.view.canGoForward,

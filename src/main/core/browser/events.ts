@@ -69,6 +69,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
+    browser.rendererEmmiter.refreshTabNavigation(window);
     browser.refreshMainMenu();
   });
 
@@ -92,6 +93,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
+    browser.rendererEmmiter.refreshTabNavigation(window);
     browser.refreshMainMenu();
   });
 

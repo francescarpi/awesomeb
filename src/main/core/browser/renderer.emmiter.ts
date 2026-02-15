@@ -56,7 +56,7 @@ export class BrowserRendererEmmiter {
     );
   }
 
-  refreshTabNavigation(window: Window, tab: Tab) {
+  refreshTabNavigation(window: Window, tab?: Tab) {
     const data = this._browser.renderer.tabNavigation(tab);
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('urlbar:refresh-tab-navigation', data);
