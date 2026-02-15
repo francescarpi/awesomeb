@@ -6,7 +6,7 @@ import { loadPage } from '../helpers';
 
 export class Sidebar extends UIPageView {
   constructor(windowId: TWindowId) {
-    super('sidebar', {
+    super('sidebar', 'browser', {
       query: { winId: windowId.toString() },
     });
   }

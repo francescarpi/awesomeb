@@ -18,6 +18,7 @@ export class UIView {
 
   constructor(
     public readonly id: TViewId,
+    private readonly preload: 'browser' | 'tab' = 'tab',
     props?: IViewProps,
   ) {
     this._borderRadius = props?.borderRadius || 0;
@@ -36,7 +37,7 @@ export class UIView {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        preload: this.getPreloadScript(),
+        preload: path.join(PRELOAD_FOLDER, `${this.preload}.js`),
         webSecurity: true,
         transparent: true,
         session: this._session,
@@ -62,10 +63,6 @@ export class UIView {
 
   get isDestroyed(): boolean {
     return this.webContents === undefined || this.webContents.isDestroyed();
-  }
-
-  protected getPreloadScript(): string {
-    return path.join(PRELOAD_FOLDER, 'tab.js');
   }
 
   get webContentsView(): WebContentsView {
@@ -155,15 +152,11 @@ export class UIView {
 }
 
 export class UIPageView extends UIView {
-  constructor(id: TViewId, props?: IPageViewProps) {
-    super(id, props);
+  constructor(id: TViewId, preload: 'browser' | 'tab', props?: IPageViewProps) {
+    super(id, preload, props);
 
     loadPage(this.webContents, props?.page || id, props?.query);
 
     openDevTools(this.webContents, props?.page || id);
-  }
-
-  protected getPreloadScript(): string {
-    return path.join(PRELOAD_FOLDER, 'browser.js');
   }
 }

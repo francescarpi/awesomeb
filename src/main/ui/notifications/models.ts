@@ -5,7 +5,7 @@ import { UIPageView } from '../view';
 
 export class UINotificationsView extends UIPageView {
   constructor(windowId: TWindowId) {
-    super('notifications', {
+    super('notifications', 'browser', {
       query: { winId: windowId.toString() },
       visible: false,
     });

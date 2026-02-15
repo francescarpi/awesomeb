@@ -6,7 +6,7 @@ import { URLBar } from './urlbar';
 
 export class NoTabs extends UIPageView {
   constructor() {
-    super('notabs');
+    super('notabs', 'browser');
   }
 
   refreshBounds(window: Window) {

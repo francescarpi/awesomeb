@@ -6,7 +6,7 @@ import { Sidebar } from './sidebar';
 
 export class URLBar extends UIPageView {
   constructor(winId: TWindowId) {
-    super('urlbar', {
+    super('urlbar', 'browser', {
       query: { winId: winId.toString() },
     });
   }

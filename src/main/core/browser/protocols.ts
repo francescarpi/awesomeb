@@ -34,13 +34,12 @@ export function registerProtocols() {
     }
 
     if (process.env.VITE_DEV_SERVER_URL) {
-      let devServer = '';
+      let devServer: string;
       if (url.pathname === '/') {
         devServer = `${process.env.VITE_DEV_SERVER_URL}${page}`;
       } else {
-        devServer = `${process.env.VITE_DEV_SERVER_URL}${url.pathname.substring(1)}`;
+        devServer = `${process.env.VITE_DEV_SERVER_URL}${url.pathname.substring(1)}${url.search}`;
       }
-      console.log(devServer);
       return fetch(devServer);
     }
 

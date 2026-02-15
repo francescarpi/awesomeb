@@ -11,6 +11,7 @@ import {
   TTabId,
   TFindInPageAction,
   IFindInPageResult,
+  IBookmark,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -123,6 +124,12 @@ const abBookmarks = {
     newFolderName: string,
   ) => {
     ipcRenderer.send('bookmarks:add', winId, parentFolderId, title, url, newFolderName);
+  },
+  get: async (): Promise<IBookmark[]> => {
+    return await ipcRenderer.invoke('bookmarks:get');
+  },
+  update: async (bookmarks: IBookmark[]) => {
+    await ipcRenderer.invoke('bookmarks:update', bookmarks);
   },
 };
 

@@ -11,6 +11,7 @@ import {
   IFindInPageResult,
   ITabContainerEntity,
   IBookmarkEntity,
+  IBookmark,
 } from '~/types';
 import {
   Browser,
@@ -230,5 +231,9 @@ export class BrowserRenderer {
       label: bm.name,
       extra: bm.path.join('/'),
     }));
+  }
+
+  bookmarks(): IBookmark[] {
+    return bookmarks.all;
   }
 }

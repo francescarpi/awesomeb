@@ -9,7 +9,7 @@ const scopeLog = log.scope('FindInPageView');
 
 export class FindInPageView extends UIPageView {
   constructor(private readonly tabId: TTabId) {
-    super(`find-in-page-${tabId}`, {
+    super(`find-in-page-${tabId}`, 'browser', {
       visible: false,
       query: {
         tabId: tabId.toString(),

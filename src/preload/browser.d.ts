@@ -87,5 +87,7 @@ declare global {
       url: string,
       newFolderName: string,
     ) => void;
+    get: () => Promise<IBookmark[]>;
+    update: (bookmarks: IBookmark[]) => Promise<void>;
   };
 }

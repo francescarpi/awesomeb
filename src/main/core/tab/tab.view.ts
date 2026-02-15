@@ -1,16 +1,18 @@
 import { Sidebar, UIView, URLBar } from '@/ui';
 import { TPartitionId, TTabId } from '~/types';
 import { session } from 'electron';
-import { Window } from '@/core';
+import { internalPartition, Window } from '@/core';
 import { MARGIN } from '@/ui/constants';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
+import path from 'path';
+import { PRELOAD_FOLDER } from '@/paths';
 
 export class TabView extends UIView {
   constructor(
     private readonly tabId: TTabId,
-    partitionId: TPartitionId,
+    private readonly partitionId: TPartitionId,
   ) {
-    super(`tab-${tabId}`, {
+    super(`tab-${tabId}`, partitionId === internalPartition.id ? 'browser' : 'tab', {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',
@@ -49,5 +51,10 @@ export class TabView extends UIView {
       width,
       height,
     });
+  }
+
+  protected getPreloadScript(): string {
+    console.log('cesc', this.partitionId);
+    return path.join(PRELOAD_FOLDER, 'tab.js');
   }
 }

@@ -1,8 +1,9 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { Browser, Window, Tab, FindInPage } from '@/core';
+import { Browser, Window, Tab, FindInPage, Desktop, TabContainer } from '@/core';
 import { TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
+import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -114,4 +115,23 @@ export async function checkFindInPageSender(
   }
 
   return callback(tab, tab.findInPage);
+}
+
+export async function checkInternalPage(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  page: string,
+  callback: (window: Window, desktop: Desktop, tabContainer: TabContainer, tab: Tab) => void,
+): Promise<void> {
+  for (const tabResult of browser.tabs) {
+    if (tabResult.tab.url && tabResult.tab.url === `${INTERNAL_PROTOCOL}://${page}/`) {
+      if (tabResult.tab.view.webContentsId === event.sender.id) {
+        return callback(tabResult.window, tabResult.desktop, tabResult.tabContainer, tabResult.tab);
+      }
+    }
+  }
+
+  scopeLog.error(
+    `No internal page found with name ${page} matching sender WC ID ${event.sender.id}`,
+  );
 }
