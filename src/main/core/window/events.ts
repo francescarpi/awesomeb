@@ -12,6 +12,9 @@ export function registerWindowEvents(window: Window) {
 
   //--------------------------------------------------------------------------------------
   window.bw.on('blur', () => {
+    if (window.modal) {
+      return;
+    }
     scopeLog.info(`Window blurred: ${window.id}`);
     window.browser.eventsChannel.emit('window:window-blur', window.id);
   });

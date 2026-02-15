@@ -93,14 +93,14 @@ export class TabContainer {
 
       if (visible) {
         if (tab.findInPage) {
-          tab.findInPage.view.setVisible(true);
+          tab.findInPage.setVisible(true);
         }
         if (tab.failLoad) {
           tab.failLoad.setVisible(true);
         }
       } else {
         if (tab.findInPage) {
-          tab.findInPage.view.setVisible(false);
+          tab.findInPage.setVisible(false);
         }
         if (tab.failLoad) {
           tab.failLoad.setVisible(false);

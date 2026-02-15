@@ -6,7 +6,12 @@ import ButtonIcon from '../components/common/ButtonIcon.astro';
 <Layout backgroundColor="#000" borderRadius="12px">
   <div class="flex items-center gap-2 p-2">
     <ButtonIcon icon="close" />
-    <input class="input text-black rounded-full input-xs" placeholder="Find in page..." autofocus />
+    <input
+      class="input text-black rounded-full input-xs"
+      placeholder="Find in page..."
+      autofocus
+      id="search"
+    />
     <ButtonIcon icon="previous" />
     <ButtonIcon icon="next" />
     <div id="result" class="text-sm hidden">
@@ -32,7 +37,7 @@ import ButtonIcon from '../components/common/ButtonIcon.astro';
   const nextBtn = document.querySelector('svg#next')!;
 
   const {} = inputManager(
-    inputEl,
+    'search',
     (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'next', value),
     () => abTabs.closeFindInTab(parseInt(tabId, 10)),
     (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'start', value),

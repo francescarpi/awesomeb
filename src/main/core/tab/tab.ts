@@ -214,7 +214,7 @@ export class Tab {
 
   startFindInPage() {
     if (this._findInPage) {
-      this._findInPage.view.focus();
+      this._findInPage.focus();
       return;
     }
 
@@ -223,7 +223,7 @@ export class Tab {
       'tab:find-in-page-visibility-did-change',
       this,
       true,
-      this._findInPage.view,
+      this._findInPage,
     );
   }
 
@@ -232,7 +232,7 @@ export class Tab {
       return;
     }
 
-    const view = this._findInPage.view;
+    const view = this._findInPage;
     this._findInPage.close();
     this._findInPage = null;
     this.browser.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
@@ -257,6 +257,10 @@ export class Tab {
   }
 
   clearFailLoad() {
+    if (!this._failLoad) {
+      return;
+    }
+
     const view = this._failLoad;
     this._failLoad = null;
     this.browser.eventsChannel.emit('tab:fail-load-did-change', this, false, view);

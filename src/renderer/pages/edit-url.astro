@@ -75,7 +75,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // OPTION 1
     const { setDefaultValue: setDefaultFullURL, setValue: setFullURL } = inputManager(
-      fullURLEl,
+      'input-full-url',
       (newValue: string) => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
@@ -95,7 +95,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // Protocol
     const { setDefaultValue: setDefaultProtocol, setValue: setProtocol } = inputManager(
-      protocolEl,
+      'input-protocol',
       () => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
@@ -109,7 +109,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // Hostname
     const { setDefaultValue: setDefaultHostname, setValue: setHostname } = inputManager(
-      hostnameEl,
+      'input-hostname',
       () => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
@@ -123,7 +123,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // Port
     const { setDefaultValue: setDefaultPort, setValue: setPort } = inputManager(
-      portEl,
+      'input-port',
       () => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
@@ -137,7 +137,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // Pathname
     const { setDefaultValue: setDefaultPathname, setValue: setPathname } = inputManager(
-      pathnameEl,
+      'input-pathname',
       () => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
@@ -151,7 +151,7 @@ import Option2 from '../components/edit-url/Option2.astro';
     // -----------------------------------------------------------------
     // Hash
     const { setDefaultValue: setDefaultHash, setValue: setHash } = inputManager(
-      hashEl,
+      'input-hash',
       () => {
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),

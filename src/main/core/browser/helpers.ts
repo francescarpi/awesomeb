@@ -58,6 +58,7 @@ export function parseTarget(
   if (targetId === undefined || targetId === 'current-desktop-window') {
     const window = browser.activeWindow;
     if (!window) {
+      scopeLog.error('No active window found for targetId "current-desktop-window"');
       return null;
     }
 

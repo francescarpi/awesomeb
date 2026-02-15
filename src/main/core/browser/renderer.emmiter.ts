@@ -50,7 +50,9 @@ export class BrowserRendererEmmiter {
       return;
     }
 
-    const view = tab.findInPage.view;
-    view.send('tabs:refresh-find-in-page', this._browser.renderer.findInPageResult(tab, requestId));
+    tab.findInPage.send(
+      'tabs:refresh-find-in-page',
+      this._browser.renderer.findInPageResult(tab, requestId),
+    );
   }
 }

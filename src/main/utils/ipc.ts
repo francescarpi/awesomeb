@@ -107,9 +107,9 @@ export async function checkFindInPageSender(
     return;
   }
 
-  if (tab.findInPage.view.webContentsId !== event.sender.id) {
+  if (tab.findInPage.webContentsId !== event.sender.id) {
     scopeLog.error(
-      `WebContents ID mismatch: findInPage WC ID ${tab.findInPage.view.webContentsId} does not match sender WC ID ${event.sender.id}`,
+      `WebContents ID mismatch: findInPage WC ID ${tab.findInPage.webContentsId} does not match sender WC ID ${event.sender.id}`,
     );
     return;
   }
