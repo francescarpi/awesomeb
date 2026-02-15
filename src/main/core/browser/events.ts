@@ -8,14 +8,20 @@ const scopeLog = log.scope('BrowserEvents');
 
 export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:focus', async (winId: TWindowId) => {
+  browser.eventsChannel.on('window:window-focus', async (winId: TWindowId) => {
     scopeLog.info('Window focused event received');
     browser.setActiveWindowId(winId);
+
+    const selectedTabResult = browser.selectedTab;
+    if (selectedTabResult && selectedTabResult.window.id === winId) {
+      selectedTabResult.tab.view.focus();
+    }
+
     await browser.refreshMainMenu();
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:blur', async (_winId: TWindowId) => {
+  browser.eventsChannel.on('window:window-blur', async (_winId: TWindowId) => {
     scopeLog.info('Window blur event received');
     browser.setActiveWindowId(null);
     await browser.refreshMainMenu();
