@@ -105,6 +105,9 @@ const abTabs = {
   ) => {
     ipcRenderer.on('tabs:refresh-find-in-page', callback);
   },
+  retryFailed: (tabId: TTabId) => {
+    ipcRenderer.send('tabs:retry-failed', tabId);
+  },
 };
 
 //--------------------------------------------------------------------------------------

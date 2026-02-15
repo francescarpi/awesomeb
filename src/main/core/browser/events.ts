@@ -106,6 +106,27 @@ export function registerBrowserEvents(browser: Browser) {
         return;
       }
 
+      // TODO maybe 'visible' and 'view' is not necessary. Check findInpage tab's property
+
+      if (visible) {
+        result.window.addView(view);
+      } else {
+        result.window.removeView(view.id);
+      }
+
+      result.window.refreshTabsVisibility();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tab:fail-load-did-change',
+    async (tab: Tab, visible: boolean, view: UIPageView) => {
+      const result = browser.getTab(tab.id);
+      if (!result) {
+        return;
+      }
+
       if (visible) {
         result.window.addView(view);
       } else {

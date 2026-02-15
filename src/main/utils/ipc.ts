@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { Browser, Window, Tab, FindInPage, Desktop, TabContainer } from '@/core';
+import { Browser, Window, Tab, FindInPage, Desktop, TabContainer, FailLoad } from '@/core';
 import { TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
@@ -134,4 +134,32 @@ export async function checkInternalPage(
   scopeLog.error(
     `No internal page found with name ${page} matching sender WC ID ${event.sender.id}`,
   );
+}
+
+export async function checkFailLoadSender(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  tabId: TTabId,
+  callback: (tab: Tab, failLoad: FailLoad) => void,
+): Promise<void> {
+  const result = browser.getTab(tabId);
+  if (!result) {
+    scopeLog.error(`No tab found with ID ${tabId}`);
+    return;
+  }
+
+  const { tab } = result;
+  if (!tab.failLoad) {
+    scopeLog.error(`Tab with ID ${tabId} does not have a fail load view`);
+    return;
+  }
+
+  if (tab.failLoad.webContentsId !== event.sender.id) {
+    scopeLog.error(
+      `WebContents ID mismatch: fail load WC ID ${tab.failLoad.webContentsId} does not match sender WC ID ${event.sender.id}`,
+    );
+    return;
+  }
+
+  return callback(tab, tab.failLoad);
 }

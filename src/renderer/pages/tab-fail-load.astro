@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Base.astro';
+import { Icon } from 'astro-icon/components';
+---
+
+<Layout borderRadius="10px">
+  <div class="text-black flex flex-col items-center justify-center h-full gap-4">
+    <Icon name="alert" class="text-6xl text-red-700" />
+    <h6 class="font-bold">Cannot Connect to the Website</h6>
+    <p>
+      The page at <strong class="url"></strong> cannot be reached.
+    </p>
+    <div class="bg-gray-100 p-4 rounded w-full max-w-md">
+      <p>Error code: <span class="code"></span></p>
+      <p>Error: <span class="description"></span></p>
+      <p>URL: <span class="url"></span></p>
+    </div>
+    <button class="btn btn-primary">Retry</button>
+  </div>
+</Layout>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  const { searchParams } = getSearchParams();
+
+  document.querySelectorAll('.url').forEach((el) => {
+    el.textContent = searchParams.get('url');
+  });
+
+  document.querySelector('.code')!.textContent = searchParams.get('code');
+  document.querySelector('.description')!.textContent = searchParams.get('description');
+
+  document.querySelector('button')!.addEventListener('click', () => {
+    abTabs.retryFailed(parseInt(searchParams.get('tabId')!, 10));
+  });
+</script>

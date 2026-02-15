@@ -23,6 +23,7 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
+    tabToReload.clearFailLoad();
     tabToReload.view.reload();
   },
 };

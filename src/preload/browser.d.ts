@@ -71,6 +71,7 @@ declare global {
     onRefreshFindInPage: (
       callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
     ) => void;
+    retryFailed: (tabId: TTabId) => void;
   };
 
   //--------------------------------------------------------------------------------------

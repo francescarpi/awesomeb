@@ -7,6 +7,7 @@ import { MARGIN } from '@/ui/constants';
 
 const scopeLog = log.scope('FindInPageView');
 
+// TODO check fail-load. Maybe with only one findinpage class it's gonna be enough
 export class FindInPageView extends UIPageView {
   constructor(private readonly tabId: TTabId) {
     super(`find-in-page-${tabId}`, 'browser', {

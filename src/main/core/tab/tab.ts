@@ -6,6 +6,7 @@ import { registerTabEvents } from './events';
 import { sanitizeUserAgent } from '@/utils';
 import { TabView } from './tab.view';
 import { FindInPage } from './find-in-page';
+import { FailLoad } from './fail-load';
 
 const scopeLog = log.scope('Tab');
 
@@ -21,6 +22,7 @@ export class Tab {
   private _lastAccessed: number = Date.now();
   private _findInPage: FindInPage | null = null;
   private _requireAttention: boolean = false;
+  private _failLoad: FailLoad | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -158,7 +160,7 @@ export class Tab {
     );
 
     const tabHistory = history.get(this.id);
-    if (tabHistory) {
+    if (tabHistory && tabHistory.entries.length > 0) {
       await this.view.webContents.navigationHistory.restore(tabHistory).catch((error) => {
         scopeLog.error(
           `Failed to restore navigation history for Tab ${this.id} with WebContents ID ${this.view.webContentsId}. ` +
@@ -236,5 +238,25 @@ export class Tab {
 
   saveHistory() {
     history.save(this);
+  }
+
+  setFailLoad(code: number, description: string, url: string) {
+    if (this._failLoad) {
+      return;
+    }
+
+    this._failLoad = new FailLoad(this.id, code, description, url);
+
+    this.browser.eventsChannel.emit('tab:fail-load-did-change', this, true, this._failLoad);
+  }
+
+  get failLoad(): FailLoad | null {
+    return this._failLoad;
+  }
+
+  clearFailLoad() {
+    const view = this._failLoad;
+    this._failLoad = null;
+    this.browser.eventsChannel.emit('tab:fail-load-did-change', this, false, view);
   }
 }

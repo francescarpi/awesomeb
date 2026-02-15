@@ -1,5 +1,5 @@
 import { Browser } from '@/core';
-import { checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
+import { checkFailLoadSender, checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
 import { FindInPageOptions, ipcMain } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
@@ -54,4 +54,13 @@ export function setupTabIPC(browser: Browser) {
       });
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabs:retry-failed', async (event, tabId: TTabId) => {
+    scopeLog.info(`IPC tabs:retry-failed received for tab ${tabId}`);
+    return await checkFailLoadSender(event, browser, tabId, async (tab, _failLoad) => {
+      tab.clearFailLoad();
+      tab.view.webContents.reload();
+    });
+  });
 }

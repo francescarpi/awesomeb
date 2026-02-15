@@ -77,6 +77,26 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   });
 
   // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on(
+    'did-fail-load',
+    async (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      event.preventDefault();
+      if (!isMainFrame || errorCode === -3) {
+        return;
+      }
+
+      if (errorCode === -310) {
+        scopeLog.info('Ignoring ERR_TOO_MANY_REDIRECTS (-310) error');
+        tab.view.webContents.reload();
+        return;
+      }
+
+      tab.setUrl(validatedURL);
+      tab.setFailLoad(errorCode, errorDescription, validatedURL);
+    },
+  );
+
+  // ----------------------------------------------------------------------------------------------- //
   tab.view.webContents.setWindowOpenHandler((details: HandlerDetails) =>
     windowOpenHadler(browser, details),
   );
