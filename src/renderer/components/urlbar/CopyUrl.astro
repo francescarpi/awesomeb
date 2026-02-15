@@ -2,24 +2,26 @@
 import ButtonIcon from '../../components/common/ButtonIcon.astro';
 ---
 
-<ButtonIcon icon="copy" className="disabled" />
+<ButtonIcon icon="copy" />
 
 <script>
+  import { buttonManager } from '../../scripts/button-manager';
   import { getSearchParams } from '../../scripts/url';
   const { winId } = getSearchParams();
-  const iconEl = document.querySelector('svg#copy')!;
 
-  function handleCopy() {
-    abCommands.perform(winId, 'copy-url');
-  }
+  const { disable, enable } = buttonManager('copy', {
+    handleClick: () => {
+      abCommands.perform(winId, 'copy-url');
+    },
+  });
+
+  disable();
 
   abUrlBar.onRefresh((_event, data) => {
     if (data.url.trim().length === 0) {
-      iconEl.classList.add('disabled');
-      iconEl.removeEventListener('click', handleCopy);
+      disable();
     } else {
-      iconEl.classList.remove('disabled');
-      iconEl.addEventListener('click', handleCopy);
+      enable();
     }
   });
 </script>

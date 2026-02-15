@@ -12,6 +12,7 @@ import {
   ITabContainerEntity,
   IBookmarkEntity,
   IBookmark,
+  ITabNavigation,
 } from '~/types';
 import {
   Browser,
@@ -235,5 +236,15 @@ export class BrowserRenderer {
 
   bookmarks(): IBookmark[] {
     return bookmarks.all;
+  }
+
+  tabNavigation(tab: Tab): ITabNavigation {
+    return {
+      canGoBack: tab.view.canGoBack,
+      canGoForward: tab.view.canGoForward,
+      loading: tab.loading,
+      hasURL: !!tab.url,
+      tabId: tab.id,
+    };
   }
 }

@@ -32,6 +32,7 @@ import * as tabContainerRemoveDivider from './tabcontainer-remove-divider';
 import * as desktopRemoveAllDividers from './desktop-remove-all-dividers';
 import * as tabSelectRequireAttention from './tab-select-require-attention';
 import * as desktopSuspend from './desktop-suspend';
+import * as tabStop from './tab-stop';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -63,6 +64,7 @@ const COMMANDS = {
   [desktopRemoveAllDividers.TRIGGER]: desktopRemoveAllDividers.Command,
   [tabSelectRequireAttention.TRIGGER]: tabSelectRequireAttention.Command,
   [desktopSuspend.TRIGGER]: desktopSuspend.Command,
+  [tabStop.TRIGGER]: tabStop.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

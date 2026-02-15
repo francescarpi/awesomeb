@@ -38,3 +38,11 @@ export interface IURLTabData {
   loading: boolean;
   tabId: TTabId;
 }
+
+export interface ITabNavigation {
+  canGoBack: boolean;
+  canGoForward: boolean;
+  loading: boolean;
+  hasURL: boolean;
+  tabId: TTabId;
+}

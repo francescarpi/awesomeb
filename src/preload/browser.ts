@@ -12,6 +12,7 @@ import {
   TFindInPageAction,
   IFindInPageResult,
   IBookmark,
+  ITabNavigation,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -114,6 +115,9 @@ const abTabs = {
 const abUrlBar = {
   onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => {
     ipcRenderer.on('urlbar:refresh', callback);
+  },
+  onTabNavigationRefresh: (callback: (event: IpcRendererEvent, data: ITabNavigation) => void) => {
+    ipcRenderer.on('urlbar:refresh-tab-navigation', callback);
   },
 };
 

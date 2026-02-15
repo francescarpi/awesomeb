@@ -55,4 +55,10 @@ export class BrowserRendererEmmiter {
       this._browser.renderer.findInPageResult(tab, requestId),
     );
   }
+
+  refreshTabNavigation(window: Window, tab: Tab) {
+    const data = this._browser.renderer.tabNavigation(tab);
+    const urlbar = window.getView<URLBar>('urlbar')!;
+    urlbar.send('urlbar:refresh-tab-navigation', data);
+  }
 }

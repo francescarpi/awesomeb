@@ -18,6 +18,7 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
 
   if (selectedTab?.tab.id === tab.id) {
     browser.rendererEmmiter.refreshURLBar(window, tab);
+    browser.rendererEmmiter.refreshTabNavigation(window, tab);
     someChanged = true;
   }
 

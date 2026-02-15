@@ -2,24 +2,30 @@
 import ButtonIcon from '../../components/common/ButtonIcon.astro';
 ---
 
-<ButtonIcon icon="edit" className="disabled" />
+<ButtonIcon icon="edit" />
 
 <script>
+  import { buttonManager } from '../../scripts/button-manager';
   import { getSearchParams } from '../../scripts/url';
   const { winId } = getSearchParams();
-  const iconEl = document.querySelector('svg#edit')!;
 
   function handleEdit() {
     abModal.open(winId, 'edit-url');
   }
 
+  const { disable, enable } = buttonManager('edit', {
+    handleClick: () => {
+      abModal.open(winId, 'edit-url');
+    },
+  });
+
+  disable();
+
   abUrlBar.onRefresh((_event, data) => {
     if (data.url.trim().length === 0) {
-      iconEl.classList.add('disabled');
-      iconEl.removeEventListener('click', handleEdit);
+      disable();
     } else {
-      iconEl.classList.remove('disabled');
-      iconEl.addEventListener('click', handleEdit);
+      enable();
     }
   });
 </script>

@@ -77,6 +77,9 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abUrlBar: {
     onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => void;
+    onTabNavigationRefresh: (
+      callback: (event: IpcRendererEvent, data: ITabNavigation) => void,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------
