@@ -8,6 +8,7 @@ import {
   getPartitions,
   defaultPartition,
   internalPartition,
+  openURLHistory,
 } from '@/core';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
@@ -190,6 +191,7 @@ export class Browser {
     window.addView(tab.view);
     window.refreshTabsVisibility();
 
+    openURLHistory.add(url);
     await tab.loadURL(url);
 
     return { window, desktop, tabContainer, tab };

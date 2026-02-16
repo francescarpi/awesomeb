@@ -9,6 +9,7 @@ import {
   setupBookmarksIPC,
   setupProtocols,
   registerProtocols,
+  setupOpenURLHistoryIpc,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -37,6 +38,7 @@ app.whenReady().then(async () => {
   setupMenuIPC(browser);
   setupTabIPC(browser);
   setupBookmarksIPC(browser);
+  setupOpenURLHistoryIpc(browser);
 
   await browser.loadProfiles();
   await browser.loadSession();

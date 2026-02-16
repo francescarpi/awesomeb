@@ -94,4 +94,9 @@ declare global {
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abOpenURLHistory: {
+    find: (winId: TWindowId, query: string) => Promise<string[]>;
+  };
 }

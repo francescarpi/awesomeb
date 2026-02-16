@@ -132,6 +132,7 @@ export function registerBrowserEvents(browser: Browser) {
     async (tab: Tab, visible: boolean, view: UIPageView) => {
       const result = browser.getTab(tab.id);
       if (!result) {
+        scopeLog.warn(`Tab with id ${tab.id} not found for fail load event`);
         return;
       }
 

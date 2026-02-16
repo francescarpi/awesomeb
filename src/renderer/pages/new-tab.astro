@@ -41,9 +41,10 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: (inputValue, entity) => {
+    onChange: (inputValue, entity, inputEl) => {
       searchEngine = entity;
       query = inputValue;
+      searchInHistory(inputValue, inputEl);
     },
     onAccept: (searchEngine) => {
       searchEngine = searchEngine;
@@ -94,5 +95,35 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
         targetId: target!.id,
       });
     }
+  }
+
+  // ------------------------------------------------------
+  function searchInHistory(query: string, inputEl: HTMLInputElement) {
+    if (query.trim().length === 0) {
+      inputEl.setSelectionRange(0, 0);
+      return;
+    }
+
+    abOpenURLHistory.find(winId, query).then((results: string[]) => {
+      if (results.length === 0) {
+        inputEl.setSelectionRange(0, 0);
+        return;
+      }
+
+      const selectedResult = results[0];
+      inputEl.value = selectedResult;
+
+      const scheme = getScheme(selectedResult);
+      const startIdx = scheme.length + (query.length - 1);
+      const endIdx = selectedResult.length;
+
+      const safeStart = Math.max(0, startIdx);
+      inputEl.setSelectionRange(safeStart, endIdx);
+    });
+  }
+
+  function getScheme(url: string) {
+    const idx = url.indexOf('://');
+    return idx !== -1 ? url.slice(0, idx + 3) : '';
   }
 </script>

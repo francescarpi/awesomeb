@@ -76,6 +76,8 @@ export class TabContainer {
       return false;
     }
 
+    tab.clearFailLoad();
+
     this._tabs.delete(id);
 
     if (this._selectedTabId === id) {

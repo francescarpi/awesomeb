@@ -141,6 +141,13 @@ const abBookmarks = {
 };
 
 //--------------------------------------------------------------------------------------
+const abOpenURLHistory = {
+  find: async (winId: TWindowId, query: string) => {
+    return await ipcRenderer.invoke('open-url-history:find', winId, query);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
@@ -151,3 +158,4 @@ contextBridge.exposeInMainWorld('abMenu', abMenu);
 contextBridge.exposeInMainWorld('abTabs', abTabs);
 contextBridge.exposeInMainWorld('abUrlBar', abUrlBar);
 contextBridge.exposeInMainWorld('abBookmarks', abBookmarks);
+contextBridge.exposeInMainWorld('abOpenURLHistory', abOpenURLHistory);
