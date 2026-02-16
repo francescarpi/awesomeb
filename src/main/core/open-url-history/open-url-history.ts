@@ -1,7 +1,8 @@
 import Store from 'electron-store';
-import { IOpenUrlHistory } from './types';
+import { IOpenUrlHistory, TFindUrlResult } from './types';
 import { userDataPath } from '@/paths';
 import { TOTAL_URLS_TO_KEEP } from './constants';
+import { bestMatchWithRange } from './helpers';
 
 export class OpenURLHistory {
   private readonly _store: Store<IOpenUrlHistory>;
@@ -22,12 +23,12 @@ export class OpenURLHistory {
     this._store.set('urls', newUrls);
   }
 
-  find(query: string): string[] {
+  find(query: string): TFindUrlResult {
     if (query.trim() === '') {
-      return [];
+      return null;
     }
 
     const urls = this._store.get('urls');
-    return urls.filter((url) => url.toLowerCase().includes(query.toLowerCase()));
+    return bestMatchWithRange(urls, query);
   }
 }

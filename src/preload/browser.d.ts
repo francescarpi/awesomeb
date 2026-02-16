@@ -97,6 +97,6 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abOpenURLHistory: {
-    find: (winId: TWindowId, query: string) => Promise<string[]>;
+    find: (winId: TWindowId, query: string) => Promise<TFindUrlResult>;
   };
 }

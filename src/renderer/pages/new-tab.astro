@@ -17,6 +17,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   import { getSearchParams } from '../scripts/url';
   import { IEntity, IPartitionEntity } from '~/types';
   import { paginatorManager } from '../scripts/paginator';
+  import { TFindUrlResult } from '@/core';
 
   const { winId } = getSearchParams();
 
@@ -41,10 +42,9 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: (inputValue, entity, inputEl) => {
+    onChange: async (inputValue, entity, inputEl) => {
       searchEngine = entity;
-      query = inputValue;
-      searchInHistory(inputValue, inputEl);
+      query = await searchInHistory(inputValue, inputEl);
     },
     onAccept: (searchEngine) => {
       searchEngine = searchEngine;
@@ -98,32 +98,21 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   }
 
   // ------------------------------------------------------
-  function searchInHistory(query: string, inputEl: HTMLInputElement) {
+  async function searchInHistory(query: string, inputEl: HTMLInputElement): Promise<string> {
     if (query.trim().length === 0) {
       inputEl.setSelectionRange(0, 0);
-      return;
+      return query;
     }
 
-    abOpenURLHistory.find(winId, query).then((results: string[]) => {
-      if (results.length === 0) {
-        inputEl.setSelectionRange(0, 0);
-        return;
-      }
+    const result: TFindUrlResult = await abOpenURLHistory.find(winId, query);
+    if (!result) {
+      inputEl.setSelectionRange(0, 0);
+      return query;
+    }
 
-      const selectedResult = results[0];
-      inputEl.value = selectedResult;
+    inputEl.value = result.value;
+    inputEl.setSelectionRange(result.range[1] + 1, result.value.length);
 
-      const scheme = getScheme(selectedResult);
-      const startIdx = scheme.length + (query.length - 1);
-      const endIdx = selectedResult.length;
-
-      const safeStart = Math.max(0, startIdx);
-      inputEl.setSelectionRange(safeStart, endIdx);
-    });
-  }
-
-  function getScheme(url: string) {
-    const idx = url.indexOf('://');
-    return idx !== -1 ? url.slice(0, idx + 3) : '';
+    return result.value;
   }
 </script>
