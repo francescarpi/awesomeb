@@ -191,7 +191,10 @@ export class Browser {
     window.addView(tab.view);
     window.refreshTabsVisibility();
 
-    openURLHistory.add(url);
+    if (!partition.private) {
+      openURLHistory.add(url);
+    }
+
     await tab.loadURL(url);
 
     return { window, desktop, tabContainer, tab };
