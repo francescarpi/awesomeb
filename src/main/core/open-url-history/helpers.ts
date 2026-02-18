@@ -75,5 +75,9 @@ export function bestMatchWithRange(list: string[], query: string): TFindUrlResul
     return null; // no match found
   }
 
+  if (bestItem.indexOf(query) === -1) {
+    return null;
+  }
+
   return { value: bestItem, range: [bestStart, bestEnd] };
 }

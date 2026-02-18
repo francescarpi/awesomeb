@@ -31,4 +31,8 @@ export class OpenURLHistory {
     const urls = this._store.get('urls');
     return bestMatchWithRange(urls, query);
   }
+
+  clear() {
+    this._store.set('urls', []);
+  }
 }

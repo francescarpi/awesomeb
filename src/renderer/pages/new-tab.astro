@@ -99,14 +99,14 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 
   // ------------------------------------------------------
   async function searchInHistory(query: string, inputEl: HTMLInputElement): Promise<string> {
-    if (query.trim().length === 0) {
-      inputEl.setSelectionRange(0, 0);
+    if (query.trim().length === 0 || query.length < 3) {
+      inputEl.setSelectionRange(query.length, query.length);
       return query;
     }
 
     const result: TFindUrlResult = await abOpenURLHistory.find(winId, query);
     if (!result) {
-      inputEl.setSelectionRange(0, 0);
+      inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
       return query;
     }
 
