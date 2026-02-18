@@ -12,19 +12,12 @@ export class URLBar extends UIPageView {
   }
 
   refreshBounds(window: Window) {
-    if (window.fullScreen && this.webContentsView.getVisible()) {
-      this.webContentsView.setVisible(false);
-      return;
-    } else if (!window.fullScreen && !this.webContentsView.getVisible()) {
-      this.webContentsView.setVisible(true);
-    }
-
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const bounds = window.bounds;
 
     let height = URLBAR_HEIGHT - MARGIN * 2;
     let y = MARGIN;
-    if (window.areaMaximized) {
+    if (window.areaMaximized || window.fullScreen) {
       height = 0;
       y = 0;
     }
