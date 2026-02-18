@@ -4,13 +4,11 @@ import { session } from 'electron';
 import { internalPartition, Window } from '@/core';
 import { MARGIN } from '@/ui/constants';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
-import path from 'path';
-import { PRELOAD_FOLDER } from '@/paths';
 
 export class TabView extends UIView {
   constructor(
     private readonly tabId: TTabId,
-    private readonly partitionId: TPartitionId,
+    partitionId: TPartitionId,
   ) {
     super(`tab-${tabId}`, partitionId === internalPartition.id ? 'browser' : 'tab', {
       visible: false,
@@ -21,6 +19,20 @@ export class TabView extends UIView {
   }
 
   refreshBounds(window: Window) {
+    const bounds = window.bounds;
+    if (window.fullScreen) {
+      this.webContentsView.setBounds({
+        x: 0,
+        y: 0,
+        width: bounds.width,
+        height: bounds.height,
+      });
+      this.webContentsView.setBorderRadius(0);
+      return;
+    }
+
+    this.webContentsView.setBorderRadius(12);
+
     // TODO calculate bounds based on number of tab container's tabs
     const tabResult = window.getTab(this.tabId);
     if (!tabResult) {
@@ -29,7 +41,6 @@ export class TabView extends UIView {
 
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const urlbar = window.getView<URLBar>('urlbar')!;
-    const bounds = window.bounds;
 
     let x = sidebar.left + sidebar.width;
     const y = urlbar.top + urlbar.height + MARGIN;
@@ -51,10 +62,5 @@ export class TabView extends UIView {
       width,
       height,
     });
-  }
-
-  protected getPreloadScript(): string {
-    console.log('cesc', this.partitionId);
-    return path.join(PRELOAD_FOLDER, 'tab.js');
   }
 }

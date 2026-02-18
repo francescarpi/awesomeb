@@ -11,6 +11,7 @@ const scopeLog = log.scope('Window');
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
   private _selectedDesktopId: number;
+  private _fullScreen: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -326,5 +327,18 @@ export class Window extends UIWindow {
   get tabsRequireAttention(): IDesConTab[] {
     const tabs = this.tabs.filter((conTab) => conTab.tab.requireAttention);
     return tabs;
+  }
+
+  setFullScreen(fullScreen: boolean) {
+    if (this._fullScreen === fullScreen) {
+      return;
+    }
+
+    this._fullScreen = fullScreen;
+    this.refreshViewsBounds();
+  }
+
+  get fullScreen(): boolean {
+    return this._fullScreen;
   }
 }

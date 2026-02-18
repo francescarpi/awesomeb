@@ -28,4 +28,14 @@ export function registerWindowEvents(window: Window) {
   window.bw.on('move', () => {
     window.refreshViewsBounds();
   });
+
+  //--------------------------------------------------------------------------------------
+  window.bw.on('enter-html-full-screen', () => {
+    window.setFullScreen(true);
+  });
+
+  //--------------------------------------------------------------------------------------
+  window.bw.on('leave-html-full-screen', () => {
+    window.setFullScreen(false);
+  });
 }

@@ -12,9 +12,16 @@ export class Sidebar extends UIPageView {
   }
 
   refreshBounds(window: Window) {
+    if (window.fullScreen && this.webContentsView.getVisible()) {
+      this.webContentsView.setVisible(false);
+      return;
+    } else if (!window.fullScreen && !this.webContentsView.getVisible()) {
+      this.webContentsView.setVisible(true);
+    }
+
     const bounds = window.bounds;
 
-    let width;
+    let width: number;
     if (window.areaMaximized) {
       width = window.sidebarCollapsed ? 0 : SIDEBAR_DEFAULT_WIDTH;
     } else {
