@@ -152,21 +152,17 @@ export class UIWindow {
     return this.bw.getBounds();
   }
 
-  toggleSidebar(window: Window) {
+  toggleSidebar(_window: Window) {
     this._sidebarCollapsed = !this._sidebarCollapsed;
-    const sidebar = this.getView<Sidebar>('sidebar')!;
-    sidebar.loadPage(window);
   }
 
   get sidebarCollapsed(): boolean {
     return this._sidebarCollapsed;
   }
 
-  toggleMaximizeArea(window: Window) {
+  toggleMaximizeArea(_window: Window) {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
-    const sidebar = this.getView<Sidebar>('sidebar')!;
-    sidebar.loadPage(window);
   }
 
   get areaMaximized(): boolean {
