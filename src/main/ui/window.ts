@@ -5,7 +5,7 @@ import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import EventEmitter from 'events';
-import { internalPartition, Window } from '@/core';
+import { internalPartition } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
 import { Sidebar, URLBar, NoTabs } from './views';
@@ -17,6 +17,7 @@ export class UIWindow {
   private readonly _views: Map<TViewId, UIView> = new Map();
   private _sidebarCollapsed = false;
   private _areaMaximized = false;
+  private _fullScreen = false;
 
   constructor(
     public readonly eventsChannel: EventEmitter,
@@ -152,7 +153,7 @@ export class UIWindow {
     return this.bw.getBounds();
   }
 
-  toggleSidebar(_window: Window) {
+  toggleSidebar() {
     this._sidebarCollapsed = !this._sidebarCollapsed;
   }
 
@@ -160,12 +161,23 @@ export class UIWindow {
     return this._sidebarCollapsed;
   }
 
-  toggleMaximizeArea(_window: Window) {
+  toggleMaximizeArea() {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
   }
 
   get areaMaximized(): boolean {
     return this._areaMaximized;
+  }
+
+  setFullScreen(fullScreen: boolean) {
+    if (this._fullScreen === fullScreen) {
+      return;
+    }
+    this._fullScreen = fullScreen;
+  }
+
+  get fullScreen(): boolean {
+    return this._fullScreen;
   }
 }

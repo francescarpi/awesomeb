@@ -11,6 +11,6 @@ export const Command: ICommand<ICommandParams> = {
     'Toggle the maximization of the main content area by hiding or showing the sidebar and urlbar.',
   visibility: ({ window }) => !!window,
   async handler({ window }) {
-    window.toggleMaximizeArea(window);
+    window.toggleMaximizeArea();
   },
 };

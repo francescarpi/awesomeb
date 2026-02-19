@@ -11,7 +11,6 @@ const scopeLog = log.scope('Window');
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
   private _selectedDesktopId: number;
-  private _fullScreen: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -313,14 +312,14 @@ export class Window extends UIWindow {
     }
   }
 
-  toggleSidebar(window: Window) {
-    super.toggleSidebar(window);
+  toggleSidebar() {
+    super.toggleSidebar();
     this.moveViewToTop('sidebar');
     this.refreshViewsBounds();
   }
 
-  toggleMaximizeArea(window: Window) {
-    super.toggleMaximizeArea(window);
+  toggleMaximizeArea() {
+    super.toggleMaximizeArea();
     this.refreshViewsBounds();
   }
 
@@ -330,15 +329,7 @@ export class Window extends UIWindow {
   }
 
   setFullScreen(fullScreen: boolean) {
-    if (this._fullScreen === fullScreen) {
-      return;
-    }
-
-    this._fullScreen = fullScreen;
+    super.setFullScreen(fullScreen);
     this.refreshViewsBounds();
-  }
-
-  get fullScreen(): boolean {
-    return this._fullScreen;
   }
 }
