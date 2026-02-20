@@ -7,6 +7,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
     class="input w-full text-black rounded-full"
     placeholder="Set new desktop name..."
     autofocus
+    id="input"
   />
 </BlackBgWithTitle>
 
@@ -16,8 +17,6 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
   import { inputManager } from '../scripts/inputs';
   const { winId, searchParams } = getSearchParams();
   const desktopId = searchParams.get('desktopId');
-
-  const inputEl = document.querySelector('input')! as HTMLInputElement;
 
   async function setup() {
     // Fetch desktops
@@ -29,7 +28,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       : desktopEntities.find((d) => d.selected)!;
 
     const { setDefaultValue } = inputManager(
-      inputEl,
+      'input',
       (newValue: string) =>
         abCommands.perform(winId, 'rename-desktop', {
           desktopId: parseInt(selectedDesktop.id, 10),
