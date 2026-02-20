@@ -10,6 +10,6 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Toggles the visibility of the sidebar in the focused window.',
   visibility: ({ window }) => !!window,
   async handler({ window }) {
-    window.toggleSidebar();
+    window.toggleSidebar(window);
   },
 };

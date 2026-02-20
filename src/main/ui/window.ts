@@ -5,7 +5,7 @@ import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import { UINotificationsManager } from './notifications';
 import EventEmitter from 'events';
-import { internalPartition } from '@/core';
+import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
 import { Sidebar, URLBar, NoTabs } from './views';
@@ -153,17 +153,25 @@ export class UIWindow {
     return this.bw.getBounds();
   }
 
-  toggleSidebar() {
+  toggleSidebar(window: Window) {
     this._sidebarCollapsed = !this._sidebarCollapsed;
+
+    // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
+    const sidebar = this.getView<Sidebar>('sidebar')!;
+    sidebar.loadPage(window);
   }
 
   get sidebarCollapsed(): boolean {
     return this._sidebarCollapsed;
   }
 
-  toggleMaximizeArea() {
+  toggleMaximizeArea(window: Window) {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
+
+    // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
+    const sidebar = this.getView<Sidebar>('sidebar')!;
+    sidebar.loadPage(window);
   }
 
   get areaMaximized(): boolean {
