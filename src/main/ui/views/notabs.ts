@@ -10,6 +10,16 @@ export class NoTabs extends UIPageView {
   }
 
   refreshBounds(window: Window) {
+    if (window.activeTabs.length > 0) {
+      this.webContentsView.setBounds({
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+      return;
+    }
+
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const urlbar = window.getView<URLBar>('urlbar')!;
     const bounds = window.bounds;

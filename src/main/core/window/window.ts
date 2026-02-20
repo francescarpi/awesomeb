@@ -1,4 +1,4 @@
-import { NoTabs, UIWindow } from '@/ui';
+import { UIWindow } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps, Browser } from '@/core';
 import { MIN_DESKTOPS } from './constants';
@@ -87,16 +87,6 @@ export class Window extends UIWindow {
         result.tabContainer.setTabsVisibility(true);
       } else {
         result.tabContainer.setTabsVisibility(false);
-      }
-    }
-    if (selectedTabContainer) {
-      if (this.hasView('notabs')) {
-        this.removeView('notabs');
-      }
-    } else {
-      if (!this.hasView('notabs')) {
-        const noTabs = new NoTabs();
-        this.addView(noTabs);
       }
     }
 
@@ -202,6 +192,10 @@ export class Window extends UIWindow {
       }
     }
     return allTabs;
+  }
+
+  get activeTabs(): IDesConTab[] {
+    return this.tabs.filter((conTab) => !conTab.tab.suspended);
   }
 
   get tabContainers(): IDesCon[] {
