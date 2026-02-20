@@ -14,29 +14,29 @@ export class NoTabs extends UIPageView {
       this.webContentsView.setBounds({
         x: 0,
         y: 0,
-        width: 0,
-        height: 0,
+        width: 1,
+        height: 1,
       });
       return;
     }
 
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const urlbar = window.getView<URLBar>('urlbar')!;
-    const bounds = window.bounds;
+    const windowBounds = window.bounds;
     const y = urlbar.top + urlbar.height + MARGIN;
 
-    let width = bounds.width - sidebar.width - MARGIN;
+    let width = windowBounds.width - sidebar.width - MARGIN;
     let x = sidebar.width;
     if (window.areaMaximized) {
       x = MARGIN;
-      width = bounds.width - MARGIN * 2;
+      width = windowBounds.width - MARGIN * 2;
     }
 
     this.webContentsView.setBounds({
       x,
       y,
       width,
-      height: bounds.height - y - MARGIN,
+      height: windowBounds.height - y - MARGIN,
     });
   }
 }

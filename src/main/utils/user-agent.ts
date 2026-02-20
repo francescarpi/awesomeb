@@ -9,5 +9,7 @@ export function sanitizeUserAgent(userAgent: string, _url: URL): string {
   // const appNameVersion = `${appName}/${appVersion} `;
   // sanitizedUserAgent = sanitizedUserAgent.replace(appNameVersion, '').trim();
 
+  // console.log(sanitizedUserAgent);
+
   return sanitizedUserAgent;
 }
