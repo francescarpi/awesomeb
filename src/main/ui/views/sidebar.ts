@@ -22,7 +22,7 @@ export class Sidebar extends UIPageView {
     }
 
     if (window.fullScreen) {
-      width = 0;
+      width = 1;
     }
 
     this.webContentsView.setBounds({

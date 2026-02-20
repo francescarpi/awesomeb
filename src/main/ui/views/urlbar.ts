@@ -18,7 +18,7 @@ export class URLBar extends UIPageView {
     let height = URLBAR_HEIGHT - MARGIN * 2;
     let y = MARGIN;
     if (window.areaMaximized || window.fullScreen) {
-      height = 0;
+      height = 1;
       y = 0;
     }
 
