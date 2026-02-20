@@ -6,7 +6,7 @@ export const PRELOAD_FOLDER = path.join(__dirname, '..', 'preload');
 
 export const RENDERER_FOLDER = path.join(__dirname, '..', 'renderer');
 
-const APP_CONFIG_FOLDER = '.awesomeb.astro';
+const APP_CONFIG_FOLDER = '.awesomeb';
 
 export function userDataPath(): string {
   const userDataPath =
