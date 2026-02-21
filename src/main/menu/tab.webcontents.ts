@@ -6,8 +6,12 @@ import {
 } from 'electron';
 import { Actions } from 'electron-context-menu';
 import { EIcon, getIcon } from './utils';
+import { Browser, Window, Partition } from '@/core';
 
 export function tabWebContentsMenu(
+  browser: Browser,
+  window: Window,
+  partition: Partition,
   actions: Actions,
   params: ContextMenuParams,
   wc: WebContents,
@@ -15,6 +19,8 @@ export function tabWebContentsMenu(
 ): MenuItemConstructorOptions[] {
   const res: MenuItemConstructorOptions[] = [
     ...navigationOptions(wc),
+    { type: 'separator' },
+    ...openOptions(browser, window, partition, params.linkURL),
     { type: 'separator' },
     actions.copy({}),
     actions.copyLink({}),
@@ -56,6 +62,28 @@ function navigationOptions(wc: WebContents): MenuItemConstructorOptions[] {
       icon: getIcon(EIcon.Reload),
       enabled: true,
       click: () => wc.reload(),
+    },
+  ];
+}
+
+function openOptions(
+  browser: Browser,
+  window: Window,
+  partition: Partition,
+  url: string,
+): MenuItemConstructorOptions[] {
+  if (url === '') {
+    return [];
+  }
+
+  return [
+    {
+      label: 'Open link...',
+      icon: getIcon(EIcon.Open),
+      submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
+        label: target.label,
+        click: () => browser.openURL(url, { targetId: target.id, partitionId: partition.id }),
+      })),
     },
   ];
 }

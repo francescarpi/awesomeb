@@ -111,7 +111,11 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   contextMenu({
     window,
     menu: (actions, params, browserWindow, dictionarySuggestions) => {
+      const tabData = browser.getTab(tab.id)!;
       return tabWebContentsMenu(
+        browser,
+        tabData.window,
+        tabData.tab.partition,
         actions,
         params,
         browserWindow as WebContents,
