@@ -2,7 +2,7 @@ import { tabWebContentsMenu } from '@/menu';
 import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
-import { HandlerDetails } from 'electron';
+import { HandlerDetails, WebContents } from 'electron';
 import { windowOpenHadler, Browser } from '@/core';
 
 const scopeLog = log.scope('TabEvents');
@@ -110,8 +110,13 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
   contextMenu({
     window,
-    menu: (actions, params, _browserWindow, dictionarySuggestions) => {
-      return tabWebContentsMenu(actions, params, dictionarySuggestions);
+    menu: (actions, params, browserWindow, dictionarySuggestions) => {
+      return tabWebContentsMenu(
+        actions,
+        params,
+        browserWindow as WebContents,
+        dictionarySuggestions,
+      );
     },
   });
 }
