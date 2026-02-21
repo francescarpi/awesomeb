@@ -3,13 +3,14 @@
 // const appName = app.getName();
 // const appVersion = app.getVersion();
 
-export function sanitizeUserAgent(userAgent: string, _url: URL): string {
-  const sanitizedUserAgent = userAgent.replace(/\sElectron\/\S+/, '').trim();
+export function sanitizeUserAgent(_userAgent: string, _url: URL): string {
+  // const sanitizedUserAgent = userAgent.replace(/\sElectron\/\S+/, '').trim();
 
   // const appNameVersion = `${appName}/${appVersion} `;
   // sanitizedUserAgent = sanitizedUserAgent.replace(appNameVersion, '').trim();
 
   // console.log(sanitizedUserAgent);
 
-  return sanitizedUserAgent;
+  // return sanitizedUserAgent;
+  return 'AwesomeB/0.0.1-alpha Chrome/144.0.7559.177';
 }

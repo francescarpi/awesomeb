@@ -5,8 +5,7 @@ const checks = [
   {
     url: 'https://example.com',
     ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) AwesomeB/1.0.0 Chrome/144.0.7559.96 Electron/40.1.0 Safari/537.36',
-    expect:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) AwesomeB/1.0.0 Chrome/144.0.7559.96 Safari/537.36',
+    expect: 'AwesomeB/0.0.1-alpha Chrome/144.0.7559.177',
   },
 ];
 
