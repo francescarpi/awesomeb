@@ -32,4 +32,7 @@ export const DEFAULT_MODALS_PROPS = {
   'add-bookmark': {
     height: 260,
   },
+  'move-tab': {
+    height: 600,
+  },
 };

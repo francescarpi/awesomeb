@@ -194,6 +194,7 @@ export class BrowserRenderer {
       label: item.tab.title,
       selected: selectedTab?.id === item.tab.id,
       url: item.tab.url,
+      partitionId: item.tab.partition.id,
     }));
   }
 

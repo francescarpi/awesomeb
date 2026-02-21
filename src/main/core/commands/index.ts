@@ -34,6 +34,7 @@ import * as tabSelectRequireAttention from './tab-select-require-attention';
 import * as desktopSuspend from './desktop-suspend';
 import * as tabStop from './tab-stop';
 import * as urlHistoryClear from './url-history-clear';
+import * as tabMove from './tab-move';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -67,6 +68,7 @@ const COMMANDS = {
   [desktopSuspend.TRIGGER]: desktopSuspend.Command,
   [tabStop.TRIGGER]: tabStop.Command,
   [urlHistoryClear.TRIGGER]: urlHistoryClear.Command,
+  [tabMove.TRIGGER]: tabMove.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
