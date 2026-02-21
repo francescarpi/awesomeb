@@ -88,6 +88,8 @@ export class Browser {
           }
         }
       }
+
+      newWindow.selectDesktop(winStore.selectedDesktopId);
     }
 
     await this.refreshMainMenu();
