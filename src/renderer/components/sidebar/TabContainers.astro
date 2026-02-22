@@ -16,7 +16,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
   <li
     class="cursor-pointer hover:bg-white/10 gap-1 items-center rounded-tl-full rounded-bl-full grid grid-cols-1 sidebar:grid-cols-[24px_auto_25px] group select-none"
   >
-    <div class="justify-center items-center sidebar:ml-2 flex py-2 sidebar:py-0">
+    <div class="justify-center items-center sidebar:ml-2 flex py-2 sidebar:py-0 favicon-container">
       <span class="loading loading-spinner loading-xs hidden"></span>
       <Icon name="image" id="favicon" />
     </div>
@@ -34,7 +34,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 </template>
 
 <script>
-  import { ITabContainer } from '~/types';
+  import { ITabContainer, TTabId } from '~/types';
   import { getSearchParams } from '../../scripts/url';
 
   const { winId } = getSearchParams();
@@ -68,6 +68,8 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         loading.classList.add('hidden');
         favicon.classList.remove('hidden');
       }
+
+      refreshFavicon(tab.id);
     }
   });
 
@@ -159,10 +161,37 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         };
 
         tabsListElement.appendChild(tabLi);
+
+        refreshFavicon(tab.id);
       }
 
       const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
       tabContainersList.appendChild(tabContainerLi);
     }
+  }
+
+  //----------------------------------------------------------------
+  async function refreshFavicon(tabId: TTabId) {
+    const favicon = await abTabs.favicon(winId, tabId);
+    if (!favicon) {
+      return;
+    }
+
+    const tabEl = document.querySelector(`li[data-tab-id="${tabId}"]`) as HTMLLIElement;
+    if (!tabEl) {
+      return;
+    }
+
+    const faviconContainer = tabEl.querySelector('.favicon-container') as HTMLDivElement;
+    faviconContainer.querySelector('#favicon')!.remove();
+
+    const img = document.createElement('img');
+    img.src = favicon;
+    img.id = 'favicon';
+    img.classList.add('w-3');
+    img.classList.add('h-3');
+    img.classList.add('object-contain');
+    img.classList.add('block');
+    faviconContainer.appendChild(img);
   }
 </script>

@@ -109,6 +109,9 @@ const abTabs = {
   retryFailed: (tabId: TTabId) => {
     ipcRenderer.send('tabs:retry-failed', tabId);
   },
+  favicon: async (winId: TWindowId, tabId: TTabId) => {
+    return await ipcRenderer.invoke('tabs:favicon', winId, tabId);
+  },
 };
 
 //--------------------------------------------------------------------------------------

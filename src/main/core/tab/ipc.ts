@@ -1,4 +1,4 @@
-import { Browser } from '@/core';
+import { Browser, getCachedFavicon } from '@/core';
 import { checkFailLoadSender, checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
 import { FindInPageOptions, ipcMain } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
@@ -61,6 +61,23 @@ export function setupTabIPC(browser: Browser) {
     return await checkFailLoadSender(event, browser, tabId, async (tab, _failLoad) => {
       tab.clearFailLoad();
       tab.view.webContents.reload();
+    });
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.handle('tabs:favicon', async (event, winId: TWindowId, tabId: TTabId) => {
+    scopeLog.info(`IPC tabs:favicon received for tab ${tabId}`);
+    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
+      const tabResult = window.getTab(tabId);
+      if (!tabResult) {
+        scopeLog.warn(`Tab with ID ${tabId} not found in window ${winId}`);
+        return null;
+      }
+
+      if (!tabResult.tab.favicon && tabResult.tab.url) {
+        return await getCachedFavicon(tabResult.tab.url);
+      }
+      return tabResult.tab.favicon;
     });
   });
 }
