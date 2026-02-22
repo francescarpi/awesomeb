@@ -205,4 +205,9 @@ export function registerBrowserEvents(browser: Browser) {
       await browser.refreshMainMenu();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:favicon-did-change', async (tab: Tab) => {
+    refreshUrlBarOrTab(browser, tab);
+  });
 }

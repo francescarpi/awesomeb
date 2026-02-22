@@ -60,6 +60,16 @@ export class Tab {
     return true;
   }
 
+  setFavicon(favicon: string | null): boolean {
+    if (this._favicon === favicon) {
+      return false;
+    }
+
+    this._favicon = favicon;
+    this.browser.eventsChannel.emit('tab:favicon-did-change', this);
+    return true;
+  }
+
   get url(): string | null {
     return this._url;
   }

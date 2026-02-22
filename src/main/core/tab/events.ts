@@ -4,6 +4,7 @@ import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { HandlerDetails, WebContents } from 'electron';
 import { windowOpenHadler, Browser } from '@/core';
+import { parseFavicon } from './favicons';
 
 const scopeLog = log.scope('TabEvents');
 
@@ -61,8 +62,12 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.view.webContents.on('page-favicon-updated', async (_event, favicons) => {
     if (favicons && favicons.length > 0) {
-      // TODO Only if favicon changed
-      checkIfRequireAttention(browser, tab);
+      await parseFavicon(tab.view.webContents, favicons[0], (dataImage: string) => {
+        const hasChanged = tab.setFavicon(dataImage);
+        if (hasChanged) {
+          checkIfRequireAttention(browser, tab);
+        }
+      });
     }
   });
 
