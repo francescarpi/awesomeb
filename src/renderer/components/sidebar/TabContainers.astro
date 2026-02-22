@@ -1,5 +1,4 @@
 ---
-import { Icon } from 'astro-icon/components';
 import ButtonIcon from '../common/ButtonIcon.astro';
 ---
 
@@ -18,7 +17,10 @@ import ButtonIcon from '../common/ButtonIcon.astro';
   >
     <div class="justify-center items-center sidebar:ml-2 flex py-2 sidebar:py-0 favicon-container">
       <span class="loading loading-spinner loading-xs hidden"></span>
-      <Icon name="image" id="favicon" />
+      <img
+        id="favicon"
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+oCFhEkNc4GJaUAAADUSURBVCjPlZI9TkJREEbPvJDgAqSmsLKwM3bSEAoKChNXYbATFqGhMdZsgAWQQGigMrGnYgXSEBorjwWPH58JXL/uu5lz78x3J9Qr4AU4J02fQDfUIVAD5ongJTAL9QMgIq5TqG19VjhsqSP14tQFWcG3gQbQPAWWCv4hh/r/AiNiAbylzJolhPGqVo+C6pn6rt7l/gl4BAZq+U+824jVnhut1Xv1y716h/W7fwTqwPhI+9954pNf4UTECrhJmHmX6hK4PXg5ZeWmkS/5M1BJBJdA5wft93xQaqW6gwAAAABJRU5ErkJggg=="
+      />
     </div>
     <span class="overflow-hidden text-ellipsis text-sm text-nowrap py-2 hidden sidebar:block"
     ></span>
@@ -183,15 +185,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
     }
 
     const faviconContainer = tabEl.querySelector('.favicon-container') as HTMLDivElement;
-    faviconContainer.querySelector('#favicon')!.remove();
-
-    const img = document.createElement('img');
-    img.src = favicon;
-    img.id = 'favicon';
-    img.classList.add('w-3');
-    img.classList.add('h-3');
-    img.classList.add('object-contain');
-    img.classList.add('block');
-    faviconContainer.appendChild(img);
+    const faviconEl = faviconContainer.querySelector('#favicon') as HTMLImageElement;
+    faviconEl.src = favicon;
   }
 </script>

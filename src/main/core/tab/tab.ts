@@ -200,6 +200,7 @@ export class Tab {
       return;
     }
 
+    this._favicon = null;
     this.clearFailLoad();
     this.close();
     this._suspended = true;
