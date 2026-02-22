@@ -1,5 +1,13 @@
 import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
-import { config, Browser, defaultPartition, getPartitions, TabContainer, Partition } from '@/core';
+import {
+  config,
+  Browser,
+  defaultPartition,
+  getPartitions,
+  TabContainer,
+  Partition,
+  getNextPreviousBounds,
+} from '@/core';
 import { HandlerDetails, WindowOpenHandlerResponse } from 'electron';
 import log from 'electron-log';
 
@@ -76,11 +84,11 @@ export function parseTarget(
       `Created new window with id ${window.id}, default desktop is ${window.selectedDesktop.id}`,
     );
   } else if (targetId === 'new-window-left') {
-    // const bounds = getDisplayBounds(browser, 'previous') || undefined;
-    // window = browser.createWindow({ bounds });
+    const bounds = getNextPreviousBounds(browser, 'previous') || undefined;
+    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds });
   } else if (targetId === 'new-window-right') {
-    // const bounds = getDisplayBounds(browser, 'next') || undefined;
-    // window = browser.createWindow({ bounds });
+    const bounds = getNextPreviousBounds(browser, 'next') || undefined;
+    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds });
   }
 
   let desktop = window.selectedDesktop;
