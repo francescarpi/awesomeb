@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
     page: 'move-tab',
   },
   visibility: ({ window }) => !!window,
-  async handler({ params }) {
-    console.log(params);
+  async handler({ params, browser }) {
+    await browser.moveTab(params.tabId, params.targetId, { selectTab: true });
   },
 };

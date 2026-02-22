@@ -18,7 +18,7 @@ import { registerBrowserEvents } from './events';
 import log from 'electron-log';
 import { BrowserRenderer } from './renderer';
 import { BrowserRendererEmmiter } from './renderer.emmiter';
-import { IOpenUrlProps } from './types';
+import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
 import { registerSessionEvents } from './events.session';
@@ -200,6 +200,57 @@ export class Browser {
     await tab.loadURL(url);
 
     return { window, desktop, tabContainer, tab };
+  }
+
+  async moveTab(tabId: TTabId, targetId: string, props?: IMoveTabProps) {
+    const tabResult = this.getTab(tabId);
+    if (!tabResult) {
+      scopeLog.error(`Tab with id ${tabId} not found`);
+      return;
+    }
+
+    const targetResult = parseTarget(this, {
+      targetId: targetId,
+      partitionId: tabResult.tab.partition.id,
+      tabContainer: tabResult.tabContainer,
+    });
+
+    if (!targetResult) {
+      scopeLog.error(`Invalid targetId provided for moving tab: ${targetId}`);
+      return;
+    }
+
+    if (
+      tabResult.window.id == targetResult.window.id &&
+      tabResult.desktop.id == targetResult.desktop.id
+    ) {
+      scopeLog.warn('Tab is already in the target desktop/window');
+      return;
+    }
+
+    tabResult.desktop.closeTabContainer(tabResult.tabContainer.id);
+    targetResult.desktop.addTabContainer(tabResult.tabContainer);
+
+    if (tabResult.window.id !== targetResult.window.id) {
+      tabResult.window.removeView(tabResult.tab.view.id);
+      targetResult.window.addView(tabResult.tab.view);
+    }
+
+    tabResult.window.refreshTabsVisibility();
+    targetResult.window.refreshTabsVisibility();
+
+    if (props?.selectTab) {
+      targetResult.window.selectTab(tabResult.tab.id);
+    }
+
+    this.eventsChannel.emit(
+      'browser:tab-did-move',
+      tabResult.tab.id,
+      tabResult.window,
+      tabResult.desktop,
+      targetResult.window,
+      targetResult.desktop,
+    );
   }
 
   getTab(id: TTabId): IWinDesConTab | null {

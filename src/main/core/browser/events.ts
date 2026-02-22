@@ -181,4 +181,28 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshTabContainers(tabResult.window);
     await browser.refreshMainMenu();
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'browser:tab-did-move',
+    async (
+      _tabId: TTabId,
+      sourceWindow: Window,
+      _sourceDesktop: Desktop,
+      targetWindow: Window,
+      _targetDesktop: Desktop,
+    ) => {
+      browser.rendererEmmiter.refreshDesktops(targetWindow);
+      browser.rendererEmmiter.refreshTabContainers(targetWindow);
+      browser.rendererEmmiter.refreshURLBar(targetWindow, null);
+
+      if (targetWindow.id !== sourceWindow.id) {
+        browser.rendererEmmiter.refreshDesktops(sourceWindow);
+        browser.rendererEmmiter.refreshTabContainers(sourceWindow);
+        browser.rendererEmmiter.refreshURLBar(sourceWindow, null);
+      }
+
+      await browser.refreshMainMenu();
+    },
+  );
 }

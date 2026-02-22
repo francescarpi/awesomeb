@@ -94,7 +94,7 @@ export class BrowserRenderer {
     const result = [
       {
         id: 'current-desktop-window',
-        label: 'Current desktop & window',
+        label: 'Current window/desktop',
       },
       {
         id: 'into-selected-tab-container',
@@ -124,7 +124,7 @@ export class BrowserRenderer {
     for (const desk of window.desktops) {
       result.push({
         id: `desktop-${desk.id}`,
-        label: desk.label,
+        label: `Desktop: "${desk.label}"`,
       });
     }
 

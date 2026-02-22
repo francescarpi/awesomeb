@@ -1,5 +1,5 @@
 import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
-import { config, Browser, defaultPartition, getPartitions } from '@/core';
+import { config, Browser, defaultPartition, getPartitions, TabContainer, Partition } from '@/core';
 import { HandlerDetails, WindowOpenHandlerResponse } from 'electron';
 import log from 'electron-log';
 
@@ -50,33 +50,73 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
 
 export function parseTarget(
   browser: Browser,
-  props?: { targetId?: string; partitionId?: TPartitionId },
+  props?: { targetId?: string; partitionId?: TPartitionId; tabContainer?: TabContainer },
 ): ITarget | null {
-  const targetId = props?.targetId;
+  const targetId = props?.targetId || 'current-desktop-window';
   const partitionId = props?.partitionId;
 
-  if (targetId === undefined || targetId === 'current-desktop-window') {
-    const window = browser.activeWindow;
-    if (!window) {
-      scopeLog.error('No active window found for targetId "current-desktop-window"');
-      return null;
-    }
-
-    const desktop = window.selectedDesktop;
-    const tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
-    const selectedTab = desktop.selectedTab;
-
-    let partition = defaultPartition;
-    if (partitionId) {
-      partition = getPartitions().get(partitionId) || defaultPartition;
-    } else if (selectedTab) {
-      partition = selectedTab.tab.partition;
-    }
-
-    return { window, desktop, tabContainer, partition };
+  let window = browser.activeWindow;
+  if (!window) {
+    scopeLog.error('No active window found for targetId "current-desktop-window"');
+    return null;
   }
 
-  return null;
+  if (targetId.startsWith('window-')) {
+    const targetWindowId = Number(targetId.replace('window-', ''));
+    const targetWindow = browser.getWindow(targetWindowId);
+    if (!targetWindow) {
+      return null;
+    }
+    window = targetWindow;
+  }
+
+  if (targetId === 'new-window') {
+    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds: window.bounds });
+    scopeLog.info(
+      `Created new window with id ${window.id}, default desktop is ${window.selectedDesktop.id}`,
+    );
+  } else if (targetId === 'new-window-left') {
+    // const bounds = getDisplayBounds(browser, 'previous') || undefined;
+    // window = browser.createWindow({ bounds });
+  } else if (targetId === 'new-window-right') {
+    // const bounds = getDisplayBounds(browser, 'next') || undefined;
+    // window = browser.createWindow({ bounds });
+  }
+
+  let desktop = window.selectedDesktop;
+  if (targetId.startsWith('desktop-')) {
+    const desktopId = Number(targetId.replace('desktop-', ''));
+    const targetDesktop = window.getDesktop(desktopId);
+    if (!targetDesktop) {
+      scopeLog.error(
+        `No desktop found with id ${desktopId} in window ${window.id} for targetId "${targetId}"`,
+      );
+      return null;
+    }
+    desktop = targetDesktop;
+  }
+
+  const { selectedTab } = desktop;
+  let tabContainer: TabContainer;
+  if (targetId === 'selected-tab-container' && selectedTab) {
+    tabContainer = selectedTab.tabContainer;
+  } else if (props?.tabContainer) {
+    tabContainer = props.tabContainer;
+  } else {
+    tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  }
+
+  let partition: Partition;
+  if (selectedTab) {
+    partition = selectedTab.tab.partition;
+  } else if (partitionId) {
+    const partitions = getPartitions();
+    partition = partitions.get(partitionId) || defaultPartition;
+  } else {
+    partition = defaultPartition;
+  }
+
+  return { window, desktop, tabContainer, partition };
 }
 
 export function windowOpenHadler(

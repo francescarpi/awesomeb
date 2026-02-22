@@ -6,3 +6,7 @@ export interface IOpenUrlProps {
   targetId?: string;
   selectTab?: boolean;
 }
+
+export interface IMoveTabProps {
+  selectTab?: boolean;
+}
