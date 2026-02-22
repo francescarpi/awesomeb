@@ -20,3 +20,13 @@ export function userDataPath(): string {
 
   return userDataPath;
 }
+
+export function faviconsPath(): string {
+  const extPath = path.join(userDataPath(), 'favicons');
+
+  if (!fs.existsSync(extPath)) {
+    fs.mkdirSync(extPath, { recursive: true });
+  }
+
+  return extPath;
+}

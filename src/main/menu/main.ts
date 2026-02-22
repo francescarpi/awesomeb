@@ -1,5 +1,5 @@
-import { Browser, Tab, Window, bookmarks } from '@/core';
-import { MenuItemConstructorOptions, Menu } from 'electron';
+import { Browser, Tab, Window, bookmarks, getCachedFavicon } from '@/core';
+import { MenuItemConstructorOptions, Menu, NativeImage } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark } from '~/types';
@@ -425,10 +425,10 @@ async function bookmarkSubMenu(
   return await Promise.all(
     bookmarks.map(async (bookmark) => {
       if (bookmark.type === EBookmarkType.Url) {
-        // const icon = await getCachedFavicon(bookmark.url, { format: 'native16' });
+        const icon = await getCachedFavicon(bookmark.url, { format: 'native16' });
         return {
           label: bookmark.title,
-          // icon: icon ? (icon as NativeImage) : undefined,
+          icon: icon ? (icon as NativeImage) : undefined,
           click: () => {
             browser.openURL(bookmark.url, { selectTab: true });
           },
