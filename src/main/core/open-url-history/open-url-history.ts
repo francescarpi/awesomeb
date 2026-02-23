@@ -18,8 +18,9 @@ export class OpenURLHistory {
   }
 
   add(url: string) {
+    const sanitizedUrl = url.replace(/(^\w+:|^)\/\//, '');
     const urls = this._store.get('urls');
-    const newUrls = [url, ...urls.filter((u) => u !== url)].slice(0, TOTAL_URLS_TO_KEEP);
+    const newUrls = [sanitizedUrl, ...urls.filter((u) => u !== url)].slice(0, TOTAL_URLS_TO_KEEP);
     this._store.set('urls', newUrls);
   }
 
