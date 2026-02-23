@@ -33,7 +33,7 @@ export function registerBrowserEvents(browser: Browser) {
     async (window: Window, desktop: Desktop) => {
       browser.rendererEmmiter.refreshDesktops(window);
       browser.rendererEmmiter.refreshThemes(window, desktop);
-      browser.rendererEmmiter.refreshTabContainers(window);
+      await browser.rendererEmmiter.refreshTabContainers(window);
       browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
 
       window.refreshTabsVisibility();
@@ -53,7 +53,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
+    await browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, tab);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
@@ -66,7 +66,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
+    await browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.rendererEmmiter.refreshTabNavigation(window);
@@ -75,22 +75,22 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:loading-did-change', async (tab: Tab) => {
-    refreshUrlBarOrTab(browser, tab);
+    await refreshUrlBarOrTab(browser, tab);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:url-did-change', async (tab: Tab) => {
-    refreshUrlBarOrTab(browser, tab);
+    await refreshUrlBarOrTab(browser, tab);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:title-did-change', async (tab: Tab) => {
-    refreshUrlBarOrTab(browser, tab);
+    await refreshUrlBarOrTab(browser, tab);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-close', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
+    await browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.rendererEmmiter.refreshTabNavigation(window);
@@ -99,7 +99,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('browser:url-opened', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
+    await browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
@@ -167,7 +167,7 @@ export function registerBrowserEvents(browser: Browser) {
       if (!tabContainerResult) {
         return;
       }
-      browser.rendererEmmiter.refreshTabContainers(tabContainerResult.window);
+      await browser.rendererEmmiter.refreshTabContainers(tabContainerResult.window);
     },
   );
 
@@ -178,7 +178,7 @@ export function registerBrowserEvents(browser: Browser) {
       return;
     }
     browser.rendererEmmiter.refreshDesktops(tabResult.window);
-    browser.rendererEmmiter.refreshTabContainers(tabResult.window);
+    await browser.rendererEmmiter.refreshTabContainers(tabResult.window);
     await browser.refreshMainMenu();
   });
 
@@ -193,12 +193,12 @@ export function registerBrowserEvents(browser: Browser) {
       _targetDesktop: Desktop,
     ) => {
       browser.rendererEmmiter.refreshDesktops(targetWindow);
-      browser.rendererEmmiter.refreshTabContainers(targetWindow);
+      await browser.rendererEmmiter.refreshTabContainers(targetWindow);
       browser.rendererEmmiter.refreshURLBar(targetWindow, null);
 
       if (targetWindow.id !== sourceWindow.id) {
         browser.rendererEmmiter.refreshDesktops(sourceWindow);
-        browser.rendererEmmiter.refreshTabContainers(sourceWindow);
+        await browser.rendererEmmiter.refreshTabContainers(sourceWindow);
         browser.rendererEmmiter.refreshURLBar(sourceWindow, null);
       }
 
@@ -208,6 +208,6 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:favicon-did-change', async (tab: Tab) => {
-    refreshUrlBarOrTab(browser, tab);
+    await refreshUrlBarOrTab(browser, tab);
   });
 }

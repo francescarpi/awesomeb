@@ -131,19 +131,28 @@ export class BrowserRenderer {
     return result;
   }
 
-  tabContainers(window: Window): ITabContainer[] {
+  async tabContainers(window: Window): Promise<ITabContainer[]> {
     const desktop = window.selectedDesktop;
     const selectedTabContainer = desktop.selectedTabContainer;
 
-    return desktop.tabContainers.map((tc) => ({
-      id: tc.id,
-      selected: selectedTabContainer?.id === tc.id,
-      divider: tc.divider,
-      tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
-    }));
+    return Promise.all(
+      desktop.tabContainers.map(async (tc) => ({
+        id: tc.id,
+        selected: selectedTabContainer?.id === tc.id,
+        divider: tc.divider,
+        tabs: await Promise.all(
+          tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+        ),
+      })),
+    );
   }
 
-  tab(window: Window, desktop: Desktop, selectedTabContainer: TabContainer | null, tab: Tab): ITab {
+  async tab(
+    window: Window,
+    desktop: Desktop,
+    selectedTabContainer: TabContainer | null,
+    tab: Tab,
+  ): Promise<ITab> {
     return {
       id: tab.id,
       desktopId: desktop.id,
@@ -158,7 +167,7 @@ export class BrowserRenderer {
       },
       suspended: tab.suspended,
       loading: tab.loading,
-      favicon: tab.favicon,
+      favicon: await tab.getFavicon(),
       hasTabPreview: tab.hasTabPreview,
       requireAttention: tab.requireAttention,
     };

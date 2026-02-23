@@ -59,7 +59,9 @@ import ButtonIcon from '../common/ButtonIcon.astro';
     if (tabLi) {
       const loading = tabLi.querySelector('span:nth-child(1)') as HTMLSpanElement;
       const tabTitle = tabLi.querySelector('span:nth-child(2)') as HTMLSpanElement;
-      const favicon = tabLi.querySelector('#favicon') as HTMLElement;
+      const favicon = tabLi.querySelector('#favicon') as HTMLImageElement;
+
+      favicon.src = tab.favicon || '';
 
       tabTitle.textContent = tab.title;
 
@@ -70,8 +72,6 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         loading.classList.add('hidden');
         favicon.classList.remove('hidden');
       }
-
-      refreshFavicon(tab.id);
     }
   });
 
@@ -119,11 +119,13 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         const tabProfile = tabLi.querySelector('span.partition') as HTMLSpanElement;
         const btnSuspend = tabLi.querySelector('svg.suspend') as HTMLSpanElement;
         const btnClose = tabLi.querySelector('svg.close') as HTMLSpanElement;
-        const favicon = tabLi.querySelector('#favicon') as HTMLElement;
+        const favicon = tabLi.querySelector('#favicon') as HTMLImageElement;
 
         tabLi.dataset.tabId = tab.id.toString();
         tabTitle.textContent = tab.title;
         tabProfile.style.backgroundColor = tab.partition.color;
+
+        favicon.src = tab.favicon || '';
 
         if (tab.selected) {
           tabLi.classList.add('bg-white/20');
@@ -163,29 +165,10 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         };
 
         tabsListElement.appendChild(tabLi);
-
-        refreshFavicon(tab.id);
       }
 
       const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
       tabContainersList.appendChild(tabContainerLi);
     }
-  }
-
-  //----------------------------------------------------------------
-  async function refreshFavicon(tabId: TTabId) {
-    const favicon = await abTabs.favicon(winId, tabId);
-    if (!favicon) {
-      return;
-    }
-
-    const tabEl = document.querySelector(`li[data-tab-id="${tabId}"]`) as HTMLLIElement;
-    if (!tabEl) {
-      return;
-    }
-
-    const faviconContainer = tabEl.querySelector('.favicon-container') as HTMLDivElement;
-    const faviconEl = faviconContainer.querySelector('#favicon') as HTMLImageElement;
-    faviconEl.src = favicon;
   }
 </script>

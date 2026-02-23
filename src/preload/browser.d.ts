@@ -72,7 +72,6 @@ declare global {
       callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
     ) => void;
     retryFailed: (tabId: TTabId) => void;
-    favicon: (winId: TWindowId, tabId: TTabId) => Promise<string | null>;
   };
 
   //--------------------------------------------------------------------------------------
