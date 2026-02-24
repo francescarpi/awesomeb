@@ -38,4 +38,7 @@ export const DEFAULT_MODALS_PROPS = {
   login: {
     height: 350,
   },
+  'client-certificate': {
+    height: 300,
+  },
 };

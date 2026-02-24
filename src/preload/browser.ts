@@ -112,6 +112,9 @@ const abTabs = {
   login: (winId: TWindowId, tabId: TTabId, data: { username: string; password: string } | null) => {
     ipcRenderer.send('tabs:login', winId, tabId, data);
   },
+  clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => {
+    ipcRenderer.send('tabs:client-certificate', winId, tabId, fingeprint);
+  },
 };
 
 //--------------------------------------------------------------------------------------

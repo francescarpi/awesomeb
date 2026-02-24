@@ -1,0 +1,50 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Choose a client certficiate">
+  <div class="flex flex-col gap-4">
+    <p>
+      Site <i></i> is requesting a client certificate for authentication. Please choose a certificate
+      to proceed.
+    </p>
+    <select class="select w-full autofocus text-black"></select>
+    <div class="flex justify-end gap-2">
+      <button class="btn btn-ghost" id="cancel">Cancel</button>
+      <button class="btn btn-primary" id="accept">Accept</button>
+    </div>
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  const { winId, searchParams } = getSearchParams();
+
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+  const rawCertificates = searchParams.get('certificates')!;
+  const url = searchParams.get('url')!;
+  document.querySelector('i')!.textContent = url;
+
+  const certificates = rawCertificates.split(',').map((cert) => {
+    const [fingerprint, subject] = cert.split('|');
+    return { fingerprint, subject };
+  });
+
+  const options = certificates.map((cert) => {
+    const option = document.createElement('option');
+    option.value = cert.fingerprint;
+    option.textContent = cert.subject;
+    return option;
+  });
+
+  const select = document.querySelector('select')!;
+  options.forEach((option) => select.appendChild(option));
+
+  document.getElementById('cancel')!.addEventListener('click', () => {
+    abTabs.clientCertificate(winId, tabId, null);
+  });
+
+  document.getElementById('accept')!.addEventListener('click', () => {
+    abTabs.clientCertificate(winId, tabId, select.value);
+  });
+</script>

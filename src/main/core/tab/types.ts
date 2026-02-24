@@ -1,4 +1,5 @@
 import { Partition } from '../partitions';
+import { Certificate } from 'electron';
 
 export interface ITabContainerProps {
   divider?: boolean;
@@ -13,3 +14,5 @@ export interface ITabProps {
 }
 
 export type TBasicAuthCallback = (username?: string, password?: string) => void;
+
+export type TCertificateCallback = (certificate: Certificate) => void;

@@ -77,6 +77,7 @@ declare global {
       tabId: TTabId,
       data: { username: string; password: string } | null,
     ) => void;
+    clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => void;
   };
 
   //--------------------------------------------------------------------------------------

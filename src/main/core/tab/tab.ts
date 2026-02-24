@@ -1,5 +1,5 @@
 import { Partition, history, Browser, getCachedFavicon } from '@/core';
-import { ITabProps, TBasicAuthCallback } from './types';
+import { ITabProps, TBasicAuthCallback, TCertificateCallback } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
@@ -8,6 +8,7 @@ import { TabView } from './tab.view';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
 import { DEFAULT_FAVICON } from './constants';
+import { Certificate } from 'electron';
 
 const scopeLog = log.scope('Tab');
 
@@ -25,6 +26,7 @@ export class Tab {
   private _requireAttention: boolean = false;
   private _failLoad: FailLoad | null = null;
   private _basicAuthCallback: TBasicAuthCallback | null = null;
+  private _clientCertificatesAndCallback: [Certificate[], TCertificateCallback] | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -295,5 +297,13 @@ export class Tab {
 
   get basicAuthCallback(): TBasicAuthCallback | null {
     return this._basicAuthCallback;
+  }
+
+  setClientCertificates(data: [Certificate[], TCertificateCallback] | null) {
+    this._clientCertificatesAndCallback = data;
+  }
+
+  get clientCertificates(): [Certificate[], TCertificateCallback] | null {
+    return this._clientCertificatesAndCallback;
   }
 }

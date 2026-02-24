@@ -1,6 +1,6 @@
 import { Browser } from '@/core';
 import { checkFailLoadSender, checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
-import { FindInPageOptions, ipcMain } from 'electron';
+import { FindInPageOptions, ipcMain, Certificate } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 
@@ -89,13 +89,60 @@ export function setupTabIPC(browser: Browser) {
           return;
         }
 
+        window.modal.close();
+
         if (data) {
           tab.basicAuthCallback(data.username, data.password);
         } else {
           tab.basicAuthCallback();
         }
 
+        tab.setBasicAuthCallback(null);
+      });
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'tabs:client-certificate',
+    async (event, winId: TWindowId, tabId: TTabId, fingerprint: string | null) => {
+      scopeLog.info(
+        `IPC tabs:client-certificate received for window ${winId} and tab ${tabId} with fingerprint ${fingerprint}`,
+      );
+      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
+        const tabData = window.getTab(tabId);
+        if (!tabData) {
+          scopeLog.warn(`Login IPC: Tab ${tabId} not found in window ${winId}`);
+          return;
+        }
+
+        const tab = tabData.tab;
+        if (!tab.clientCertificates) {
+          scopeLog.warn(
+            `Client Certificate IPC: Tab ${tabId} in window ${winId} does not have clientCertificates set`,
+          );
+          return;
+        }
+
+        const [certificates, callback] = tab.clientCertificates;
+
         window.modal.close();
+
+        if (fingerprint) {
+          const certificate = certificates.find((cert) => cert.fingerprint === fingerprint);
+          if (certificate) {
+            callback(certificate);
+          } else {
+            scopeLog.warn(
+              `Client Certificate IPC: Certificate with fingerprint ${fingerprint} not found for tab ${tabId} in window ${winId}`,
+            );
+            callback(null as unknown as Certificate);
+          }
+        } else {
+          callback(null as unknown as Certificate);
+        }
+
+        tab.setClientCertificates(null);
       });
     },
   );
