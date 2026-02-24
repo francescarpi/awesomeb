@@ -35,4 +35,7 @@ export const DEFAULT_MODALS_PROPS = {
   'move-tab': {
     height: 600,
   },
+  login: {
+    height: 350,
+  },
 };

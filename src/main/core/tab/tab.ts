@@ -1,5 +1,5 @@
 import { Partition, history, Browser, getCachedFavicon } from '@/core';
-import { ITabProps } from './types';
+import { ITabProps, TBasicAuthCallback } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
@@ -24,6 +24,7 @@ export class Tab {
   private _findInPage: FindInPage | null = null;
   private _requireAttention: boolean = false;
   private _failLoad: FailLoad | null = null;
+  private _basicAuthCallback: TBasicAuthCallback | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -286,5 +287,13 @@ export class Tab {
     const view = this._failLoad;
     this._failLoad = null;
     this.browser.eventsChannel.emit('tab:fail-load-did-change', this, false, view);
+  }
+
+  setBasicAuthCallback(callback: TBasicAuthCallback | null) {
+    this._basicAuthCallback = callback;
+  }
+
+  get basicAuthCallback(): TBasicAuthCallback | null {
+    return this._basicAuthCallback;
   }
 }

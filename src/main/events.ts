@@ -29,4 +29,30 @@ export function registerAppEvents(browser: Browser) {
 
     app.exit(0);
   });
+
+  // ----------------------------------------------------------------------------------------------- //
+  app.on('login', (event, webContents, _request, authInfo, callback) => {
+    event.preventDefault();
+
+    const result = browser.getTabByWebContentsId(webContents.id);
+    if (!result) {
+      scopeLog.warn(`Login event for unknown webContents id: ${webContents.id}`);
+      return;
+    }
+
+    result.tab.setBasicAuthCallback(callback);
+    result.window.modal.open('login', {
+      query: {
+        host: authInfo.host,
+        realm: authInfo.realm,
+        winId: result.window.id.toString(),
+        tabId: result.tab.id.toString(),
+      },
+    });
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  app.on('open-url', async (_event, url) => {
+    browser.openURL(url);
+  });
 }

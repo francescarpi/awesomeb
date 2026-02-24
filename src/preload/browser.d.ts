@@ -72,6 +72,11 @@ declare global {
       callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
     ) => void;
     retryFailed: (tabId: TTabId) => void;
+    login: (
+      winId: TWindowId,
+      tabId: TTabId,
+      data: { username: string; password: string } | null,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------

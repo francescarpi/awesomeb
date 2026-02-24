@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Suspend Tab',
   description: 'Suspends the currently active tab in the focused window.',
   visibility: ({ tab }) => !!tab,
-  async handler({ browser, window, tab, params }) {
+  async handler({ browser, window, tab, params, desktop }) {
     const tabToSuspend = getTab(browser, tab!, params?.tabId);
     if (!tabToSuspend) {
       scopeLog.warn('No tab available to suspend.');
@@ -28,6 +28,9 @@ export const Command: ICommand<ICommandParams> = {
       const lastAccessed = window.getLastAccessedTab();
       if (lastAccessed) {
         window.selectTab(lastAccessed.tab.id);
+        if (lastAccessed.desktop.id !== desktop.id) {
+          window.selectDesktop(lastAccessed.desktop.id);
+        }
       }
     }
   },

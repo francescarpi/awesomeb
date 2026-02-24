@@ -1,0 +1,61 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Login">
+  <div class="flex flex-col gap-4">
+    <p>
+      This site (<i>XXX</i>) requires a username and password to continue.
+    </p>
+    <p id="realm"></p>
+    <input
+      class="input w-full text-black rounded-full"
+      placeholder="Username"
+      autofocus
+      id="username"
+    />
+    <input
+      class="input w-full text-black rounded-full"
+      placeholder="Password"
+      type="password"
+      id="password"
+    />
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { inputManager } from '../scripts/inputs';
+  import { getSearchParams } from '../scripts/url';
+  const { winId, searchParams } = getSearchParams();
+
+  const host = searchParams.get('host')!;
+  const realm = searchParams.get('realm')!;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  document.querySelector('i')!.textContent = host;
+  if (realm.trim() !== '') {
+    document.getElementById('realm')!.textContent = realm;
+  }
+
+  inputManager(
+    'username',
+    () => performLogin(),
+    () => performCancel(),
+  );
+
+  inputManager(
+    'password',
+    () => performLogin(),
+    () => performCancel(),
+  );
+
+  function performLogin() {
+    const username = (document.getElementById('username') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    abTabs.login(winId, tabId, { username, password });
+  }
+
+  function performCancel() {
+    abTabs.login(winId, tabId, null);
+  }
+</script>

@@ -268,6 +268,15 @@ export class Browser {
     return null;
   }
 
+  getTabByWebContentsId(webContentsId: number): IWinDesConTab | null {
+    for (const tabInfo of this.tabs) {
+      if (tabInfo.tab.view.webContentsId === webContentsId) {
+        return tabInfo;
+      }
+    }
+    return null;
+  }
+
   get selectedTab(): IWinDesConTab | null {
     for (const window of this._windows.values()) {
       for (const desktop of window.desktops) {

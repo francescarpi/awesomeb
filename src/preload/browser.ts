@@ -109,6 +109,9 @@ const abTabs = {
   retryFailed: (tabId: TTabId) => {
     ipcRenderer.send('tabs:retry-failed', tabId);
   },
+  login: (winId: TWindowId, tabId: TTabId, data: { username: string; password: string } | null) => {
+    ipcRenderer.send('tabs:login', winId, tabId, data);
+  },
 };
 
 //--------------------------------------------------------------------------------------

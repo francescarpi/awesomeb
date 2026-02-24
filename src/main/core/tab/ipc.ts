@@ -63,4 +63,40 @@ export function setupTabIPC(browser: Browser) {
       tab.view.webContents.reload();
     });
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'tabs:login',
+    async (
+      event,
+      winId: TWindowId,
+      tabId: TTabId,
+      data: { username: string; password: string } | null,
+    ) => {
+      scopeLog.info(`IPC tabs:login received for window ${winId} and tab ${tabId}`);
+      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
+        const tabData = window.getTab(tabId);
+        if (!tabData) {
+          scopeLog.warn(`Login IPC: Tab ${tabId} not found in window ${winId}`);
+          return;
+        }
+
+        const tab = tabData.tab;
+        if (!tab.basicAuthCallback) {
+          scopeLog.warn(
+            `Login IPC: Tab ${tabId} in window ${winId} does not have a basicAuthCallback set`,
+          );
+          return;
+        }
+
+        if (data) {
+          tab.basicAuthCallback(data.username, data.password);
+        } else {
+          tab.basicAuthCallback();
+        }
+
+        window.modal.close();
+      });
+    },
+  );
 }
