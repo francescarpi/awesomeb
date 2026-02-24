@@ -10,7 +10,7 @@ export class NoTabs extends UIPageView {
   }
 
   refreshBounds(window: Window) {
-    if (window.activeTabs.length > 0) {
+    if (window.hasTabsVisible) {
       this.webContentsView.setBounds({
         x: 0,
         y: 0,

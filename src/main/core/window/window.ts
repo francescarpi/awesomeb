@@ -194,8 +194,13 @@ export class Window extends UIWindow {
     return allTabs;
   }
 
-  get activeTabs(): IDesConTab[] {
-    return this.tabs.filter((conTab) => !conTab.tab.suspended);
+  get hasTabsVisible(): boolean {
+    const desktop = this.selectedDesktop;
+    return (
+      desktop &&
+      desktop.selectedTabContainer !== null &&
+      desktop.selectedTabContainer.selectedTab !== null
+    );
   }
 
   get tabContainers(): IDesCon[] {
