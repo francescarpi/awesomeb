@@ -268,6 +268,7 @@ export class Tab {
       return;
     }
 
+    this._loading = false;
     this._failLoad = new FailLoad(this.id, code, description, url);
 
     this.browser.eventsChannel.emit('tab:fail-load-did-change', this, true, this._failLoad);

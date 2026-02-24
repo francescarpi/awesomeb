@@ -210,4 +210,12 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('tab:favicon-did-change', async (tab: Tab) => {
     await refreshUrlBarOrTab(browser, tab);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'desktop:tabcontainers-order-did-change',
+    async (window: Window, _desktop: Desktop) => {
+      await browser.rendererEmmiter.refreshTabContainers(window);
+    },
+  );
 }

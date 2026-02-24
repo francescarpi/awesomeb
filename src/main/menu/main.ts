@@ -323,6 +323,29 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
+        label: 'Move up',
+        accelerator: 'CmdOrCtrl+Alt+]',
+        icon: getIcon(EIcon.Up),
+        click: async () => {
+          if (window && tab) {
+            await browser.performCommand(window, 'move-tab-container-up');
+          }
+        },
+        enabled: !!tab,
+      },
+      {
+        label: 'Move down',
+        accelerator: 'CmdOrCtrl+Alt+[',
+        icon: getIcon(EIcon.Down),
+        click: async () => {
+          if (window && tab) {
+            await browser.performCommand(window, 'move-tab-container-down');
+          }
+        },
+        enabled: !!tab,
+      },
+      { type: 'separator' },
+      {
         label: 'Suspend',
         accelerator: 'CmdOrCtrl+Shift+S',
         enabled: tab !== null && !tab?.suspended,

@@ -36,6 +36,8 @@ import * as tabStop from './tab-stop';
 import * as urlHistoryClear from './url-history-clear';
 import * as tabMove from './tab-move';
 import * as tabDevtools from './tab-devtools';
+import * as tabContainerMoveUp from './tabcontainer-move-up';
+import * as tabContainerMoveDown from './tabcontainer-move-down';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -71,6 +73,8 @@ const COMMANDS = {
   [urlHistoryClear.TRIGGER]: urlHistoryClear.Command,
   [tabMove.TRIGGER]: tabMove.Command,
   [tabDevtools.TRIGGER]: tabDevtools.Command,
+  [tabContainerMoveUp.TRIGGER]: tabContainerMoveUp.Command,
+  [tabContainerMoveDown.TRIGGER]: tabContainerMoveDown.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

@@ -8,6 +8,7 @@ export enum EIcon {
   Copy = 'copy.png',
   Desktop = 'desktop.png',
   Divider = 'divider.png',
+  Down = 'down.png',
   Edit = 'edit.png',
   File = 'file.png',
   Folder = 'folder.png',
@@ -25,6 +26,7 @@ export enum EIcon {
   Suspend = 'suspend.png',
   Tab = 'tab.png',
   Theme = 'theme.png',
+  Up = 'up.png',
   Windows = 'windows.png',
 }
 

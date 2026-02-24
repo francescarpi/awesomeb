@@ -165,4 +165,28 @@ export class Desktop {
     }
     return tabs;
   }
+
+  moveTabContainer(id: TTabContainerId, direction: 'up' | 'down') {
+    const tabContainers = this.tabContainers;
+    const index = tabContainers.findIndex((tc) => tc.id === id);
+    if (index === -1) {
+      return;
+    }
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= tabContainers.length) {
+      return;
+    }
+
+    const [movedTabContainer] = tabContainers.splice(index, 1);
+    tabContainers.splice(newIndex, 0, movedTabContainer);
+
+    // Update the internal map to reflect the new order
+    this._tabContainers.clear();
+    for (const tc of tabContainers) {
+      this._tabContainers.set(tc.id, tc);
+    }
+
+    this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
+  }
 }
