@@ -9,6 +9,7 @@ import {
   defaultPartition,
   internalPartition,
   openURLHistory,
+  Downloads,
 } from '@/core';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
@@ -33,6 +34,7 @@ export class Browser {
   public readonly renderer = new BrowserRenderer(this);
   public readonly rendererEmmiter = new BrowserRendererEmmiter(this);
   public readonly idGenerator = new IdGenerator(this);
+  public readonly downloads = new Downloads(this);
 
   constructor() {
     registerBrowserEvents(this);

@@ -1,12 +1,14 @@
-import { Browser } from '@/core';
+import { Browser, config, EDownloadStatus } from '@/core';
 import { TPartitionId } from '~/types';
 import { session, desktopCapturer } from 'electron';
 import { sanitizeUserAgent } from '@/utils';
 import log from 'electron-log';
+import path from 'path';
+import fs from 'fs';
 
 const scopeLog = log.scope('SessionEvents');
 
-export function registerSessionEvents(_browser: Browser, partitionId: TPartitionId) {
+export function registerSessionEvents(browser: Browser, partitionId: TPartitionId) {
   const ses = session.fromPartition(partitionId);
 
   scopeLog.info(`Registering session events for partition: ${partitionId}`);
@@ -42,5 +44,84 @@ export function registerSessionEvents(_browser: Browser, partitionId: TPartition
     newHeaders[uaKey] = sanitizeUserAgent(userAgent, new URL(details.url));
 
     callback({ requestHeaders: newHeaders });
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  ses.on('will-download', async (_event, item, wc) => {
+    const tabData = browser.getTabByWebContentsId(wc.id);
+    if (!tabData) {
+      scopeLog.error(`Tab not found for WebContents ID ${wc.id} during will-download.`);
+      return;
+    }
+
+    scopeLog.info(`Download: ${item.getFilename()} from tab: ${tabData.tab.id}`);
+
+    const downloadsFolder = config.getProperty('downloadsFolder');
+    const filePath = path.join(downloadsFolder, item.getFilename());
+
+    // Check if file already exists and modify the filename if necessary adding a number suffix
+    let savePath = filePath;
+    let fileIndex = 1;
+    const fileExtension = path.extname(item.getFilename());
+    const fileNameWithoutExt = path.basename(item.getFilename(), fileExtension);
+
+    while (fs.existsSync(savePath)) {
+      savePath = path.join(downloadsFolder, `${fileNameWithoutExt} (${fileIndex})${fileExtension}`);
+      fileIndex++;
+    }
+
+    item.setSavePath(savePath);
+
+    browser.downloads.add(item);
+
+    item.on('updated', (_event, state) => {
+      const download = browser.downloads.get(savePath);
+      if (!download) {
+        scopeLog.error(
+          `FromSessionEvents: Download not found in browser for path ${savePath} during update.`,
+        );
+        return;
+      }
+
+      if (download.status === EDownloadStatus.Idle) {
+        download.setStatus(EDownloadStatus.InProgress);
+      }
+
+      if (state === 'interrupted') {
+        scopeLog.warn(`Download interrupted: ${item.getFilename()}`);
+        download.setStatus(EDownloadStatus.Interrupted);
+        return;
+      }
+
+      if (item.isPaused()) {
+        scopeLog.info(`Download paused: ${item.getFilename()}`);
+        download.setStatus(EDownloadStatus.Paused);
+        return;
+      }
+
+      download.setReceivedBytes(item.getReceivedBytes());
+    });
+
+    item.on('done', (_event, state) => {
+      const download = browser.downloads.get(savePath);
+      if (!download) {
+        scopeLog.error(
+          `FromSessionEvents: Download not found in browser for path ${savePath} during update.`,
+        );
+        return;
+      }
+
+      switch (state) {
+        case 'completed':
+          download.setStatus(EDownloadStatus.Completed);
+          return;
+        case 'interrupted':
+          download.setStatus(EDownloadStatus.Interrupted);
+          return;
+        case 'cancelled':
+          download.setStatus(EDownloadStatus.Cancelled);
+          return;
+      }
+    });
   });
 }
