@@ -39,6 +39,7 @@ export interface ITabEntity extends IEntity {
   lastAccessed: number;
   favicon: string | null;
   partitionColor: string;
+  suspended: boolean;
 }
 
 export interface ITabContainerEntity extends IEntity {}

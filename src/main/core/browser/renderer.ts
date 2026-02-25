@@ -210,6 +210,7 @@ export class BrowserRenderer {
         partitionColor: item.tab.partition.color,
         lastAccessed: item.tab.lastAccessed,
         favicon: await item.tab.getFavicon(),
+        suspended: item.tab.suspended,
       })),
     );
   }

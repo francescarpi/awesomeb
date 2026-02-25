@@ -49,6 +49,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
   abEntities.fetch(winId, 'tabs').then((tabs) => {
     const sortedTabs = (tabs as ITabEntity[])
+      .filter((tab) => !tab.suspended)
       .sort((a, b) => a.lastAccessed - b.lastAccessed)
       .reverse();
 
