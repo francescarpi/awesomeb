@@ -133,28 +133,19 @@ export class BrowserRenderer {
     return result;
   }
 
-  async tabContainers(window: Window): Promise<ITabContainer[]> {
+  tabContainers(window: Window): ITabContainer[] {
     const desktop = window.selectedDesktop;
     const selectedTabContainer = desktop.selectedTabContainer;
 
-    return Promise.all(
-      desktop.tabContainers.map(async (tc) => ({
-        id: tc.id,
-        selected: selectedTabContainer?.id === tc.id,
-        divider: tc.divider,
-        tabs: await Promise.all(
-          tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
-        ),
-      })),
-    );
+    return desktop.tabContainers.map((tc) => ({
+      id: tc.id,
+      selected: selectedTabContainer?.id === tc.id,
+      divider: tc.divider,
+      tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+    }));
   }
 
-  async tab(
-    window: Window,
-    desktop: Desktop,
-    selectedTabContainer: TabContainer | null,
-    tab: Tab,
-  ): Promise<ITab> {
+  tab(window: Window, desktop: Desktop, selectedTabContainer: TabContainer | null, tab: Tab): ITab {
     return {
       id: tab.id,
       desktopId: desktop.id,
@@ -169,7 +160,6 @@ export class BrowserRenderer {
       },
       suspended: tab.suspended,
       loading: tab.loading,
-      favicon: await tab.getFavicon(),
       hasTabPreview: tab.hasTabPreview,
       requireAttention: tab.requireAttention,
     };
@@ -195,24 +185,21 @@ export class BrowserRenderer {
     return data;
   }
 
-  async tabsEntities(browser: Browser, window: Window): Promise<ITabEntity[]> {
+  tabsEntities(browser: Browser, window: Window): ITabEntity[] {
     const tabs = browser.tabs;
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 
-    return Promise.all(
-      tabs.map(async (item) => ({
-        id: item.tab.id.toString(),
-        label: item.tab.title,
-        selected: selectedTab?.id === item.tab.id,
-        url: item.tab.url,
-        partitionId: item.tab.partition.id,
-        partitionColor: item.tab.partition.color,
-        lastAccessed: item.tab.lastAccessed,
-        favicon: await item.tab.getFavicon(),
-        suspended: item.tab.suspended,
-      })),
-    );
+    return tabs.map((item) => ({
+      id: item.tab.id.toString(),
+      label: item.tab.title,
+      selected: selectedTab?.id === item.tab.id,
+      url: item.tab.url,
+      partitionId: item.tab.partition.id,
+      partitionColor: item.tab.partition.color,
+      lastAccessed: item.tab.lastAccessed,
+      suspended: item.tab.suspended,
+    }));
   }
 
   findInPageResult(tab: Tab, requestId: TFindInPageId): IFindInPageResult | null {

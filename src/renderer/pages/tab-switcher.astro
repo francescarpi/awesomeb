@@ -76,9 +76,9 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       li.appendChild(div);
       ul.appendChild(li);
 
-      const favicon = document.createElement('img');
-      favicon.src = tab.favicon || '';
-      favicon.classList.add('w-5', 'h-5');
+      // const favicon = document.createElement('img');
+      // favicon.src = tab.favicon || '';
+      // favicon.classList.add('w-5', 'h-5');
 
       const title = document.createElement('span');
       title.classList.add('truncate', 'w-full');
@@ -88,7 +88,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       partitionColor.classList.add('w-3', 'h-3');
       partitionColor.style.backgroundColor = tab.partitionColor || '#000';
 
-      div.appendChild(favicon);
+      // div.appendChild(favicon);
       div.appendChild(title);
       div.appendChild(partitionColor);
     });
@@ -98,9 +98,9 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
     const items = document.querySelectorAll('ul li div');
     items.forEach((item, idx) => {
       if (idx === selectedIndex) {
-        item.classList.add('bg-white/10');
+        item.classList.add('bg-white/20');
       } else {
-        item.classList.remove('bg-white/10');
+        item.classList.remove('bg-white/20');
       }
     });
   }

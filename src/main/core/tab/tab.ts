@@ -1,4 +1,4 @@
-import { Partition, history, Browser, getCachedFavicon } from '@/core';
+import { Partition, history, Browser } from '@/core';
 import { ITabProps, TBasicAuthCallback, TCertificateCallback } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
@@ -7,7 +7,6 @@ import { sanitizeUserAgent } from '@/utils';
 import { TabView } from './tab.view';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
-import { DEFAULT_FAVICON } from './constants';
 import { Certificate } from 'electron';
 
 const scopeLog = log.scope('Tab');
@@ -105,17 +104,8 @@ export class Tab {
     this.browser.eventsChannel.emit('tab:loading-did-change', this);
   }
 
-  async getFavicon(): Promise<string | null> {
-    if (this._favicon) {
-      return this._favicon;
-    }
-
-    if (this._url) {
-      const favicon = await getCachedFavicon(this._url);
-      return favicon ? (favicon as string) : DEFAULT_FAVICON;
-    }
-
-    return null;
+  get favicon(): string | null {
+    return this._favicon;
   }
 
   get hasTabPreview(): boolean {

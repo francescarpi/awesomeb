@@ -3,7 +3,7 @@ import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserEventsHelpers');
 
-export async function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
+export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   const result = browser.getTab(tab.id);
   if (!result) {
     return;
@@ -23,7 +23,7 @@ export async function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   }
 
   if (desktop.id === selectedDesktop.id) {
-    await browser.rendererEmmiter.refreshTab(window, desktop, tab);
+    browser.rendererEmmiter.refreshTab(window, desktop, tab);
     someChanged = true;
   }
 

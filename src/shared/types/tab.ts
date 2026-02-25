@@ -21,7 +21,6 @@ export interface ITab {
   partition: ITabPartition;
   suspended: boolean;
   loading: boolean;
-  favicon: string | null;
   hasTabPreview: boolean;
   requireAttention: boolean;
 }

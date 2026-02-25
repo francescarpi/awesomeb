@@ -37,7 +37,6 @@ export interface ITabEntity extends IEntity {
   url: string | null;
   partitionId: string;
   lastAccessed: number;
-  favicon: string | null;
   partitionColor: string;
   suspended: boolean;
 }
