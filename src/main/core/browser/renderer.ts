@@ -13,6 +13,7 @@ import {
   IBookmarkEntity,
   IBookmark,
   ITabNavigation,
+  IDownloads,
 } from '~/types';
 import {
   Browser,
@@ -25,6 +26,7 @@ import {
   TabContainer,
   Window,
   bookmarks,
+  EDownloadStatus,
 } from '@/core';
 
 export class BrowserRenderer {
@@ -265,6 +267,28 @@ export class BrowserRenderer {
       loading: tab.loading,
       hasURL: !!tab.url,
       tabId: tab.id,
+    };
+  }
+
+  downloads(): IDownloads {
+    const downloads = this._browser.downloads.all;
+    const downloadsLength = downloads.length;
+
+    const progress =
+      downloadsLength === 0
+        ? 0
+        : Math.ceil((downloads.reduce((sum, d) => sum + d.progress, 0) / downloadsLength) * 100);
+
+    return {
+      progress,
+      downloading: downloads.some((download) => download.status === EDownloadStatus.InProgress),
+      items: downloads.map((download) => ({
+        savePath: download.savePath,
+        fileName: download.fileName,
+        progress: download.progress,
+        status: download.status,
+        visited: download.visited,
+      })),
     };
   }
 }

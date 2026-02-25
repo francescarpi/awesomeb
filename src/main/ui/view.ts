@@ -58,6 +58,11 @@ export class UIView {
 
   get webContentsId(): number {
     // Dont delete - used in some places
+    if (this.webContents === undefined) {
+      scopeLog.error('WebContents is undefined for view:', this.id);
+      return -1;
+    }
+
     return this.webContents.id;
   }
 

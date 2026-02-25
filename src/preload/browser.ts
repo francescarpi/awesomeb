@@ -13,6 +13,7 @@ import {
   IFindInPageResult,
   IBookmark,
   ITabNavigation,
+  IDownloads,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -154,6 +155,13 @@ const abOpenURLHistory = {
 };
 
 //--------------------------------------------------------------------------------------
+const abDownloads = {
+  onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => {
+    ipcRenderer.on('downloads:refresh', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
@@ -165,3 +173,4 @@ contextBridge.exposeInMainWorld('abTabs', abTabs);
 contextBridge.exposeInMainWorld('abUrlBar', abUrlBar);
 contextBridge.exposeInMainWorld('abBookmarks', abBookmarks);
 contextBridge.exposeInMainWorld('abOpenURLHistory', abOpenURLHistory);
+contextBridge.exposeInMainWorld('abDownloads', abDownloads);

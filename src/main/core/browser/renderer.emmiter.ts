@@ -61,4 +61,12 @@ export class BrowserRendererEmmiter {
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('urlbar:refresh-tab-navigation', data);
   }
+
+  refreshDownloads() {
+    const data = this._browser.renderer.downloads();
+    for (const window of this._browser.windows) {
+      const sidebar = window.getView<Sidebar>('sidebar')!;
+      sidebar.send('downloads:refresh', data);
+    }
+  }
 }

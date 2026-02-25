@@ -11,6 +11,7 @@ import {
   TTabId,
   ITab,
   TPage,
+  IDownloads,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -104,5 +105,10 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abOpenURLHistory: {
     find: (winId: TWindowId, query: string) => Promise<TFindUrlResult>;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abDownloads: {
+    onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => void;
   };
 }

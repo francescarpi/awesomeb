@@ -38,6 +38,8 @@ import * as tabMove from './tab-move';
 import * as tabDevtools from './tab-devtools';
 import * as tabContainerMoveUp from './tabcontainer-move-up';
 import * as tabContainerMoveDown from './tabcontainer-move-down';
+import * as devtoolsSidebar from './devtools-sidebar';
+import * as devtoolsUrlbar from './devtools-urlbar';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -75,6 +77,8 @@ const COMMANDS = {
   [tabDevtools.TRIGGER]: tabDevtools.Command,
   [tabContainerMoveUp.TRIGGER]: tabContainerMoveUp.Command,
   [tabContainerMoveDown.TRIGGER]: tabContainerMoveDown.Command,
+  [devtoolsSidebar.TRIGGER]: devtoolsSidebar.Command,
+  [devtoolsUrlbar.TRIGGER]: devtoolsUrlbar.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

@@ -218,4 +218,9 @@ export function registerBrowserEvents(browser: Browser) {
       await browser.rendererEmmiter.refreshTabContainers(window);
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('downloads:updated', async () => {
+    browser.rendererEmmiter.refreshDownloads();
+  });
 }
