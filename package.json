@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "astro-electron": "0.5.0",
+    "dayjs": "1.11.19",
     "electron-context-menu": "4.1.1",
     "electron-dl": "4.0.0",
     "electron-log": "5.4.3",

@@ -1,2 +1,2 @@
-export { EDownloadStatus } from './types';
 export { Downloads } from './downloads';
+export { setupDownloadsIPC } from './ipc';

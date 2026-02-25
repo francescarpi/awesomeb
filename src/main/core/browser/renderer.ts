@@ -14,6 +14,7 @@ import {
   IBookmark,
   ITabNavigation,
   IDownloads,
+  EDownloadStatus,
 } from '~/types';
 import {
   Browser,
@@ -26,7 +27,6 @@ import {
   TabContainer,
   Window,
   bookmarks,
-  EDownloadStatus,
 } from '@/core';
 
 export class BrowserRenderer {
@@ -285,9 +285,10 @@ export class BrowserRenderer {
       items: downloads.map((download) => ({
         savePath: download.savePath,
         fileName: download.fileName,
-        progress: download.progress,
+        progress: Math.ceil(download.progress * 100),
         status: download.status,
         visited: download.visited,
+        created: download.created,
       })),
     };
   }

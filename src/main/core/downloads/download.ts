@@ -1,12 +1,13 @@
-import { EDownloadStatus } from './types';
-import { DownloadItem } from 'electron';
+import { DownloadItem, shell } from 'electron';
 import { Browser } from '@/core';
 import path from 'path';
+import { EDownloadStatus } from '~/types';
 
 export class Download {
   private _status: EDownloadStatus = EDownloadStatus.Idle;
   private _receivedBytes: number = 0;
   private _visited: boolean = false;
+  private _createdAt: number = Date.now();
 
   constructor(
     private readonly _browser: Browser,
@@ -20,6 +21,7 @@ export class Download {
 
     this._status = status;
     this._browser.eventsChannel.emit('downloads:updated');
+    this._browser.eventsChannel.emit('downloads:completed', this.fileName);
   }
 
   get status(): EDownloadStatus {
@@ -65,5 +67,28 @@ export class Download {
 
   get fileName(): string {
     return path.basename(this.savePath);
+  }
+
+  get created(): number {
+    return this._createdAt;
+  }
+
+  cancel() {
+    this._item.cancel();
+    this._browser.eventsChannel.emit('downloads:updated');
+  }
+
+  pause() {
+    this._item.pause();
+    this._browser.eventsChannel.emit('downloads:updated');
+  }
+
+  resume() {
+    this._item.resume();
+    this._browser.eventsChannel.emit('downloads:updated');
+  }
+
+  open() {
+    shell.showItemInFolder(this.savePath);
   }
 }

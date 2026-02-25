@@ -1,3 +1,3 @@
 export const INTERNAL_PROTOCOL = 'awesomeb';
 
-export const ALLOWED_PAGES: string[] = ['bookmarks'];
+export const ALLOWED_PAGES: string[] = ['bookmarks', 'downloads'];

@@ -4,17 +4,20 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 
 <ButtonIcon icon="downloads" />
 
-<!-- <div -->
-<!--   class="radial-progress text-[10px] bg-white text-black" -->
-<!--   style="--value:70; --size:30px; --thickness: 2px;" -->
-<!--   aria-valuenow="70" -->
-<!--   role="progressbar" -->
-<!-- > -->
-<!--   70% -->
-<!-- </div> -->
-
 <script>
+  import { getSearchParams } from '../../scripts/url';
+  import { onClick } from '../../scripts/buttons';
+
+  const { winId } = getSearchParams();
+  const downloads = document.getElementById('downloads')!;
+
   abDownloads.onRefresh((_event, data) => {
-    console.log(data);
+    if (data.downloading) {
+      downloads.classList.add('animate-pulse', 'text-red-500');
+    } else {
+      downloads.classList.remove('animate-pulse', 'text-red-500');
+    }
   });
+
+  onClick('downloads', () => abDownloads.openPage(winId));
 </script>

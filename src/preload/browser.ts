@@ -159,6 +159,15 @@ const abDownloads = {
   onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => {
     ipcRenderer.on('downloads:refresh', callback);
   },
+  openPage: (winId: TWindowId) => {
+    ipcRenderer.send('downloads:open-page', winId);
+  },
+  action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => {
+    ipcRenderer.send('downloads:action', savePath, action);
+  },
+  get: async () => {
+    return await ipcRenderer.invoke('downloads:get');
+  },
 };
 
 //--------------------------------------------------------------------------------------

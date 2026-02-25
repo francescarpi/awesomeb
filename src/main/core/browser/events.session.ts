@@ -1,5 +1,5 @@
-import { Browser, config, EDownloadStatus } from '@/core';
-import { TPartitionId } from '~/types';
+import { Browser, config } from '@/core';
+import { EDownloadStatus, TPartitionId } from '~/types';
 import { session, desktopCapturer } from 'electron';
 import { sanitizeUserAgent } from '@/utils';
 import log from 'electron-log';
@@ -81,6 +81,11 @@ export function registerSessionEvents(browser: Browser, partitionId: TPartitionI
           `FromSessionEvents: Download not found in browser for path ${savePath} during update.`,
         );
         return;
+      }
+
+      if (download.status === EDownloadStatus.Paused && !item.isPaused()) {
+        scopeLog.info(`Download resumed: ${item.getFilename()}`);
+        download.setStatus(EDownloadStatus.InProgress);
       }
 
       if (download.status === EDownloadStatus.Idle) {

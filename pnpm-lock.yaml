@@ -11,6 +11,9 @@ importers:
       astro-electron:
         specifier: 0.5.0
         version: 0.5.0(astro@5.17.3(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2))(electron@40.6.1)(vite-plugin-electron-renderer@0.14.6)
+      dayjs:
+        specifier: 1.11.19
+        version: 1.11.19
       electron-context-menu:
         specifier: 4.1.1
         version: 4.1.1
@@ -1876,6 +1879,9 @@ packages:
 
   daisyui@5.5.19:
     resolution: {integrity: sha512-pbFAkl1VCEh/MPCeclKL61I/MqRIFFhNU7yiXoDDRapXN4/qNCoMxeCCswyxEEhqL5eiTTfwHvucFtOE71C9sA==}
+
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debounce-fn@6.0.0:
     resolution: {integrity: sha512-rBMW+F2TXryBwB54Q0d8drNEI+TfoS9JpNTAoVpukbWEhjXQq4rySFYLaqXMFXwdv61Zb2OHtj5bviSoimqxRQ==}
@@ -6210,6 +6216,8 @@ snapshots:
       css-tree: 2.2.1
 
   daisyui@5.5.19: {}
+
+  dayjs@1.11.19: {}
 
   debounce-fn@6.0.0:
     dependencies:

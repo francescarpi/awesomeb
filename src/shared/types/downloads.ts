@@ -1,5 +1,3 @@
-import { EDownloadStatus } from '@/core';
-
 export interface IDownloads {
   downloading: boolean;
   progress: number;
@@ -12,4 +10,14 @@ export interface IDownloadItem {
   progress: number;
   status: EDownloadStatus;
   visited: boolean;
+  created: number;
+}
+
+export enum EDownloadStatus {
+  Idle = 'idle',
+  InProgress = 'in_progress',
+  Interrupted = 'interrupted',
+  Completed = 'completed',
+  Cancelled = 'cancelled',
+  Paused = 'paused',
 }

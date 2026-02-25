@@ -223,4 +223,11 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('downloads:updated', async () => {
     browser.rendererEmmiter.refreshDownloads();
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('downloads:completed', async (fileName: string) => {
+    for (const window of browser.windows) {
+      window.notifications.show(`Download completed: ${fileName}`);
+    }
+  });
 }

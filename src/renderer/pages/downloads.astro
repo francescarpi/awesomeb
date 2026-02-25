@@ -1,0 +1,127 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Downloads">
+  <div>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Datetime</th>
+            <th>Progress</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="text-black"> </tbody>
+      </table>
+    </div>
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { IDownloads, EDownloadStatus } from '~/types';
+
+  document.title = 'Downloads';
+
+  abDownloads.onRefresh((_event, data) => renderRows(data));
+  abDownloads.get().then((data) => renderRows(data));
+
+  function renderRows(data: IDownloads) {
+    const body = document.querySelector('tbody')!;
+
+    for (const item of data.items) {
+      const existingRow = document.getElementById(item.savePath);
+
+      if (existingRow) {
+        existingRow.querySelector('td:nth-child(3)')!.textContent = `${item.progress}%`;
+
+        if (item.status !== existingRow.dataset.status) {
+          const actionTD = existingRow.querySelector('td:nth-child(4)') as HTMLTableCellElement;
+          existingRow.dataset.status = item.status;
+          updateActionColum(actionTD, item.status);
+        }
+
+        continue;
+      }
+
+      const row = document.createElement('tr');
+
+      row.id = item.savePath;
+      row.dataset.status = item.status;
+
+      row.appendChild(createTD(item.fileName));
+      row.appendChild(createTD(new Date(item.created).toISOString()));
+      row.appendChild(createTD(`${item.progress}%`));
+
+      const tdAction = createTD('', '180px');
+      updateActionColum(tdAction, item.status);
+
+      row.appendChild(tdAction);
+
+      body.appendChild(row);
+    }
+  }
+
+  function createTD(content: string | HTMLElement, width?: string) {
+    const td = document.createElement('td');
+
+    if (width) {
+      td.style.width = width;
+    }
+
+    if (typeof content === 'string') {
+      td.innerHTML = content;
+    } else {
+      td.appendChild(content);
+    }
+    return td;
+  }
+
+  function updateActionColum(td: HTMLTableCellElement, status: EDownloadStatus) {
+    td.innerHTML = '';
+
+    const div = document.createElement('div');
+    div.classList.add('flex', 'gap-2', 'justify-end');
+    td.appendChild(div);
+
+    switch (status) {
+      case EDownloadStatus.InProgress: {
+        const btn1 = document.createElement('button');
+        btn1.classList.add('btn', 'btn-sm', 'btn-error');
+        btn1.textContent = 'Cancel';
+        btn1.onclick = () => abDownloads.action(td.parentElement!.id, 'cancel');
+        div.appendChild(btn1);
+
+        const btn2 = document.createElement('button');
+        btn2.classList.add('btn', 'btn-sm');
+        btn2.textContent = 'Pause';
+        btn2.onclick = () => abDownloads.action(td.parentElement!.id, 'pause');
+        div.appendChild(btn2);
+
+        break;
+      }
+      case EDownloadStatus.Completed: {
+        const btn1 = document.createElement('button');
+        btn1.classList.add('btn', 'btn-sm');
+        btn1.textContent = 'Open';
+        btn1.onclick = () => abDownloads.action(td.parentElement!.id, 'open');
+        div.appendChild(btn1);
+        break;
+      }
+      case EDownloadStatus.Paused: {
+        const btn1 = document.createElement('button');
+        btn1.classList.add('btn', 'btn-sm');
+        btn1.textContent = 'Resume';
+        btn1.onclick = () => abDownloads.action(td.parentElement!.id, 'resume');
+        div.appendChild(btn1);
+        break;
+      }
+      case EDownloadStatus.Cancelled: {
+        div.innerHTML = 'Cancelled';
+        break;
+      }
+    }
+  }
+</script>
