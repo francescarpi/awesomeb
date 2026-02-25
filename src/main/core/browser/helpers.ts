@@ -8,7 +8,7 @@ import {
   Partition,
   getNextPreviousBounds,
 } from '@/core';
-import { HandlerDetails, WindowOpenHandlerResponse } from 'electron';
+import { HandlerDetails, WindowOpenHandlerResponse, Notification } from 'electron';
 import log from 'electron-log';
 
 const scopeLog = log.scope('BrowserHelper');
@@ -161,4 +161,8 @@ export function windowOpenHadler(
   }
 
   return { action: 'deny' };
+}
+
+export function notification(title: string, body: string) {
+  new Notification({ title, body }).show();
 }

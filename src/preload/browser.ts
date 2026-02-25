@@ -1,6 +1,5 @@
 import {
   TWindowId,
-  INotification,
   TEntityType,
   IDesktopEntity,
   TMenuType,
@@ -24,18 +23,6 @@ const abModal = {
   },
   open: (winId: TWindowId, page: TPage) => {
     ipcRenderer.send('modal:open', winId, page);
-  },
-};
-
-//--------------------------------------------------------------------------------------
-const abNotifications = {
-  onRefreshNotifications: (
-    callback: (e: IpcRendererEvent, winId: TWindowId, notifications: INotification[]) => void,
-  ) => {
-    ipcRenderer.on('notifications:on-refresh', callback);
-  },
-  nextNotification: (winId: TWindowId) => {
-    ipcRenderer.send('notifications:next', winId);
   },
 };
 
@@ -172,7 +159,6 @@ const abDownloads = {
 
 //--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
-contextBridge.exposeInMainWorld('abNotifications', abNotifications);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
 contextBridge.exposeInMainWorld('abDesktops', abDesktops);

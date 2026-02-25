@@ -3,7 +3,6 @@ import { BrowserWindow, WebContents, app, Rectangle, session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
-import { UINotificationsManager } from './notifications';
 import EventEmitter from 'events';
 import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
@@ -12,7 +11,6 @@ import { Sidebar, URLBar, NoTabs } from './views';
 
 export class UIWindow {
   public readonly bw: BrowserWindow;
-  private readonly _notificationsManager: UINotificationsManager;
   private readonly _modalManager: UIModalManager;
   private readonly _views: Map<TViewId, UIView> = new Map();
   private _sidebarCollapsed = false;
@@ -57,7 +55,6 @@ export class UIWindow {
     });
 
     this._modalManager = new UIModalManager(this);
-    this._notificationsManager = new UINotificationsManager(this);
 
     openDevTools(this.webContents, 'window');
 
@@ -73,8 +70,6 @@ export class UIWindow {
 
     const noTabs = new NoTabs();
     this.addView(noTabs);
-
-    this.addView(this.notifications.view);
   }
 
   /**
@@ -139,10 +134,6 @@ export class UIWindow {
 
   show() {
     this.bw.show();
-  }
-
-  get notifications(): UINotificationsManager {
-    return this._notificationsManager;
   }
 
   get modal(): UIModalManager {

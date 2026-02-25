@@ -1,3 +1,4 @@
+import { notification } from '@/core';
 import { ICommand } from './types';
 import { clipboard } from 'electron';
 
@@ -13,7 +14,7 @@ export const Command: ICommand<ICommandParams> = {
   async handler({ tab, window }) {
     if (tab && tab.url && window) {
       clipboard.writeText(tab.url);
-      window.notifications.show('URL of the active tab copied to clipboard');
+      notification('URL Copied', 'URL of the active tab copied to clipboard');
     }
   },
 };

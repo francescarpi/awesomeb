@@ -1,8 +1,7 @@
 import { Browser } from '@/core';
-import { ipcMain, WebContents } from 'electron';
+import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { UINotification } from './notifications';
-import { INotification, TPage, TWindowId } from '~/types';
+import { TPage, TWindowId } from '~/types';
 import { checkModalAndPagesSender, checkModalSender } from '@/utils';
 
 const scopeLog = log.scope('IPCUI');
@@ -25,48 +24,4 @@ export function setupUIIPC(browser: Browser) {
       window.modal.open(page);
     });
   });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('notifications:next', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC Received: notifications:next for window ID ${winId}`);
-
-    const win = browser.getWindow(winId);
-    if (!win) {
-      scopeLog.error(`No window found with ID ${winId}`);
-      return;
-    }
-
-    if (win.notifications.webContentsId !== event.sender.id) {
-      scopeLog.error(
-        `WebContents ID mismatch: notification container WC ID ${win.notifications.webContentsId} ` +
-          `does not match sender WC ID ${event.sender.id}`,
-      );
-      return;
-    }
-
-    win.notifications.deleteFirstNotification();
-
-    refreshNotifications(event.sender, winId, win.notifications.all);
-
-    if (win.notifications.all.length === 0) {
-      win.notifications.hide();
-    }
-  });
-}
-
-//--------------------------------------------------------------------------------------
-export function refreshNotifications(
-  wc: WebContents,
-  winId: TWindowId,
-  notifications: UINotification[],
-) {
-  scopeLog.info(`Refreshing notifications for WebContents ID ${wc.id}`);
-
-  const data: INotification[] = notifications.map((n) => ({
-    id: n.id,
-    message: n.message,
-    severity: n.severity,
-  }));
-
-  wc.send('notifications:on-refresh', winId, data);
 }

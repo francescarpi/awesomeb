@@ -1,5 +1,5 @@
 import { ICommand } from './types';
-import { openURLHistory } from '@/core';
+import { notification, openURLHistory } from '@/core';
 
 export interface ICommandParams {}
 
@@ -9,8 +9,8 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Clear URL History',
   description: "Clear the browser's URL history",
-  async handler({ window }) {
+  async handler({}) {
     openURLHistory.clear();
-    window.notifications.show('URL history cleaned successfully');
+    notification('URL History Cleared', 'URL history cleaned successfully');
   },
 };

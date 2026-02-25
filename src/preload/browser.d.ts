@@ -1,6 +1,5 @@
 import {
   TWindowId,
-  INotification,
   TEntityType,
   IEntity,
   IDesktopEntity,
@@ -22,14 +21,6 @@ declare global {
   const abModal: {
     close: (winId: TWindowId) => void;
     open: (winId: TWindowId, page: TPage) => void;
-  };
-
-  //--------------------------------------------------------------------------------------
-  const abNotifications: {
-    onRefreshNotifications: (
-      callback: (e: IpcRendererEvent, winId: TWindowId, notifications: INotification[]) => void,
-    ) => void;
-    nextNotification: (winId: TWindowId) => void;
   };
 
   //--------------------------------------------------------------------------------------

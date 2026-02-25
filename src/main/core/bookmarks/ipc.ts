@@ -1,4 +1,4 @@
-import { Browser, bookmarks } from '@/core';
+import { Browser, bookmarks, notification } from '@/core';
 import { checkInternalPage, checkModalAndPagesSender } from '@/utils';
 import { ipcMain } from 'electron';
 import log from 'electron-log';
@@ -27,7 +27,7 @@ export function setupBookmarksIPC(browser: Browser) {
           url,
           newFolderName.trim() === '' ? null : newFolderName,
         );
-        window.notifications.show('Bookmark added successfully');
+        notification('Bookmark Added', 'Bookmark added successfully');
         browser.refreshMainMenu();
       });
     },
@@ -53,9 +53,9 @@ export function setupBookmarksIPC(browser: Browser) {
       event,
       browser,
       'bookmarks',
-      async (window, _desktop, _tabContainer, _tab) => {
+      async (_window, _desktop, _tabContainer, _tab) => {
         bookmarks.update(newList);
-        window.notifications.show('Bookmarks updated');
+        notification('Bookmarks Updated', 'Bookmarks updated successfully');
         browser.refreshMainMenu();
       },
     );
