@@ -14,6 +14,8 @@ export class UIModal {
     private readonly _page: TPage,
     props?: IProps,
   ) {
+    const modal = props?.modal !== undefined ? props.modal : true;
+
     this.bw = new BrowserWindow({
       width: props?.width || 400,
       height: props?.height || 400,
@@ -24,7 +26,7 @@ export class UIModal {
       backgroundColor: process.platform === 'darwin' ? '#00000000' : '#000000',
       roundedCorners: true,
       hasShadow: false,
-      modal: true,
+      modal,
       resizable: false,
       movable: false,
       show: false,
@@ -41,6 +43,14 @@ export class UIModal {
     loadPage(this.bw.webContents, this._page, query);
 
     openDevTools(this.bw.webContents, 'modal');
+
+    if (!modal) {
+      const parentBounds = this._parent.bw.getBounds();
+      const modalBounds = this.bw.getBounds();
+      const x = parentBounds.x + (parentBounds.width - modalBounds.width) / 2;
+      const y = parentBounds.y + (parentBounds.height - modalBounds.height) / 2;
+      this.bw.setBounds({ x, y, width: modalBounds.width, height: modalBounds.height });
+    }
 
     this.bw.once('ready-to-show', () => {
       this.bw.show();

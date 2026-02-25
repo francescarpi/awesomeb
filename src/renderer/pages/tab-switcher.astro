@@ -23,6 +23,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
         abCommands.perform(winId, 'select-tab', {
           tabId,
         });
+        abModal.close(winId);
       } else {
         abModal.close(winId);
       }
