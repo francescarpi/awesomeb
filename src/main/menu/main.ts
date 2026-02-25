@@ -321,6 +321,16 @@ function tabsMenu(
           }
         },
       },
+      {
+        label: 'Tab switcher...',
+        accelerator: 'Control+Tab',
+        icon: getIcon(EIcon.Tab),
+        click: async () => {
+          if (window && !window.modal.isOpen) {
+            window.modal.open('tab-switcher');
+          }
+        },
+      },
       { type: 'separator' },
       {
         label: 'Move up',

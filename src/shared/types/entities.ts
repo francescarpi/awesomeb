@@ -36,6 +36,9 @@ export interface IPartitionEntity extends IEntity {
 export interface ITabEntity extends IEntity {
   url: string | null;
   partitionId: string;
+  lastAccessed: number;
+  favicon: string | null;
+  partitionColor: string;
 }
 
 export interface ITabContainerEntity extends IEntity {}
