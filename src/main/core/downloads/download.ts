@@ -21,7 +21,10 @@ export class Download {
 
     this._status = status;
     this._browser.eventsChannel.emit('downloads:updated');
-    this._browser.eventsChannel.emit('downloads:completed', this.fileName);
+
+    if (status === EDownloadStatus.Completed) {
+      this._browser.eventsChannel.emit('downloads:completed', this.fileName);
+    }
   }
 
   get status(): EDownloadStatus {
