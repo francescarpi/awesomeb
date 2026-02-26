@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <div class="fixed inset-0 flex flex-col justify-end mr-1 mb-1">
+    <div class="text-xs bg-black p-4 rounded-br-xl">
+      Listening for mark. <b class="text-warning">Hold</b> to see more details...
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+
+  const { winId } = getSearchParams();
+
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Meta') {
+      event.preventDefault();
+      abTabMarks.close(winId);
+    }
+  }
+
+  window.addEventListener('keyup', handleKeyUp);
+</script>

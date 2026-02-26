@@ -331,6 +331,16 @@ function tabsMenu(
           }
         },
       },
+      {
+        label: 'Marks',
+        accelerator: 'CmdOrCtrl+;',
+        icon: getIcon(EIcon.Bookmarks),
+        click: async () => {
+          if (window && !window.isTabMarksVisible) {
+            window.showTabMarks();
+          }
+        },
+      },
       { type: 'separator' },
       {
         label: 'Move up',

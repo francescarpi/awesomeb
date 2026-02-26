@@ -116,4 +116,9 @@ declare global {
     close: (winId: TWindowId) => void;
     refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abTabMarks: {
+    close: (winId: TWindowId) => void;
+  };
 }

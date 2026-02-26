@@ -176,6 +176,13 @@ const abTabSwitcher = {
 };
 
 //--------------------------------------------------------------------------------------
+const abTabMarks = {
+  close: (winId: TWindowId) => {
+    ipcRenderer.send('tabmarks:close', winId);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -189,3 +196,4 @@ contextBridge.exposeInMainWorld('abOpenURLHistory', abOpenURLHistory);
 contextBridge.exposeInMainWorld('abDownloads', abDownloads);
 contextBridge.exposeInMainWorld('abFavicons', abFavicons);
 contextBridge.exposeInMainWorld('abTabSwitcher', abTabSwitcher);
+contextBridge.exposeInMainWorld('abTabMarks', abTabMarks);

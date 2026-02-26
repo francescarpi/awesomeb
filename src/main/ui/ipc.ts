@@ -34,8 +34,16 @@ export function setupUIIPC(browser: Browser) {
       winId,
       ['tab-switcher'],
       async (window) => {
-        window.closeTabSwitcher();
+        window.hideTabSwitcher();
       },
     );
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabmarks:close', async (event, winId: TWindowId) => {
+    scopeLog.info(`IPC Received: layout-system:close-tab-marks for window ID ${winId}`);
+    return await checkModalAndPagesSender(event, browser, winId, ['tab-marks'], async (window) => {
+      window.hideTabMarks();
+    });
   });
 }

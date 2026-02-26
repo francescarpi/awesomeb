@@ -7,7 +7,7 @@ import EventEmitter from 'events';
 import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Sidebar, URLBar, TabSwitcher } from './views';
+import { Sidebar, URLBar, TabSwitcher, TabMarks } from './views';
 
 export class UIWindow {
   public readonly bw: BrowserWindow;
@@ -65,6 +65,7 @@ export class UIWindow {
     this.addView(new Sidebar(this.browserWindowId));
     this.addView(new URLBar(this.browserWindowId));
     this.addView(new TabSwitcher(this.browserWindowId));
+    this.addView(new TabMarks(this.browserWindowId));
   }
 
   /**
@@ -191,8 +192,29 @@ export class UIWindow {
     return view.visible;
   }
 
-  closeTabSwitcher() {
+  hideTabSwitcher() {
     const view = this.getView<TabSwitcher>('tab-switcher')!;
     view.setVisible(false);
+  }
+
+  showTabMarks() {
+    const view = this.getView<TabMarks>('tab-marks')!;
+
+    // move to top
+    this.bw.contentView.removeChildView(view.webContentsView);
+    this.bw.contentView.addChildView(view.webContentsView);
+
+    view.setVisible(true);
+    view.focus();
+  }
+
+  hideTabMarks() {
+    const view = this.getView<TabMarks>('tab-marks')!;
+    view.setVisible(false);
+  }
+
+  get isTabMarksVisible(): boolean {
+    const view = this.getView<TabMarks>('tab-marks')!;
+    return view.visible;
   }
 }
