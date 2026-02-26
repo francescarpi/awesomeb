@@ -211,6 +211,7 @@ export class UIWindow {
   hideTabMarks() {
     const view = this.getView<TabMarks>('tab-marks')!;
     view.setVisible(false);
+    view.webContents.reload();
   }
 
   get isTabMarksVisible(): boolean {

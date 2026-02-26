@@ -13,7 +13,7 @@ export class TabMarks extends UIPageView {
   refreshBounds(window: Window) {
     const windowBounds = window.bounds;
 
-    const width = 300;
+    const width = 400;
     const height = 200;
     const x = Math.round(windowBounds.width - width);
     const y = Math.round(windowBounds.height - height);

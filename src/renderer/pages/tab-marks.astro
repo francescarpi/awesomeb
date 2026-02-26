@@ -4,8 +4,24 @@ import Base from '../layouts/Base.astro';
 
 <Base>
   <div class="fixed inset-0 flex flex-col justify-end mr-1 mb-1">
-    <div class="text-xs bg-black p-4 rounded-br-xl">
+    <div class="text-xs bg-black p-4 rounded-br-xl" id="short-version">
       Listening for mark. <b class="text-warning">Hold</b> to see more details...
+    </div>
+    <div class="text-xs bg-black p-4 rounded-br-xl hidden flex-col gap-4" id="full-version">
+      <p class="text-lg">Available tab marks...</p>
+
+      <p id="no-marks">No maks...</p>
+
+      <div class="grid grid-cols-[50px_auto] border-t border-t-warning pt-2 mt-2">
+        <span class="text-warning">m</span>
+        <p>Press "m" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)</p>
+        <span class="text-warning">n</span>
+        <p>Remove the mark from the active tab</p>
+        <span class="text-warning">b</span>
+        <p>Remove all marks</p>
+        <span class="text-warning">&lt;letter&gt;</span>
+        <p>Select the tab marked with that letter (e.g., a, b, c, ...)</p>
+      </div>
     </div>
   </div>
 </Base>
@@ -14,6 +30,8 @@ import Base from '../layouts/Base.astro';
   import { getSearchParams } from '../scripts/url';
 
   const { winId } = getSearchParams();
+  const shortVersion = document.getElementById('short-version')!;
+  const fullVersion = document.getElementById('full-version')!;
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Meta') {
@@ -23,4 +41,10 @@ import Base from '../layouts/Base.astro';
   }
 
   window.addEventListener('keyup', handleKeyUp);
+
+  setTimeout(() => {
+    shortVersion.classList.add('hidden');
+    fullVersion.classList.remove('hidden');
+    fullVersion.classList.add('flex');
+  }, 1500);
 </script>
