@@ -12,6 +12,7 @@ import {
   setupOpenURLHistoryIpc,
   setupDownloadsIPC,
   setupFaviconsIpc,
+  setupTabMarksIpc,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -43,6 +44,7 @@ app.whenReady().then(async () => {
   setupOpenURLHistoryIpc(browser);
   setupDownloadsIPC(browser);
   setupFaviconsIpc(browser);
+  setupTabMarksIpc(browser);
 
   await browser.loadProfiles();
   await browser.loadSession();

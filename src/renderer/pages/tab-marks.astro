@@ -16,9 +16,9 @@ import Base from '../layouts/Base.astro';
         <span class="text-warning">m</span>
         <p>Press "m" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)</p>
         <span class="text-warning">n</span>
-        <p>Remove the mark from the active tab</p>
+        <p>Delete the mark from the active tab</p>
         <span class="text-warning">b</span>
-        <p>Remove all marks</p>
+        <p>Delete all marks</p>
         <span class="text-warning">&lt;letter&gt;</span>
         <p>Select the tab marked with that letter (e.g., a, b, c, ...)</p>
       </div>
@@ -28,10 +28,21 @@ import Base from '../layouts/Base.astro';
 
 <script>
   import { getSearchParams } from '../scripts/url';
+  import { ITabMark } from '~/types';
 
   const { winId } = getSearchParams();
   const shortVersion = document.getElementById('short-version')!;
   const fullVersion = document.getElementById('full-version')!;
+
+  let markMode = false;
+  let marks: ITabMark[] = [];
+
+  async function loadTabMarks() {
+    marks = await abTabMarks.get(winId);
+    // TODO call render marks
+  }
+
+  loadTabMarks();
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Meta') {
@@ -40,7 +51,42 @@ import Base from '../layouts/Base.astro';
     }
   }
 
+  async function handleKeyDown(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.key === 'b') {
+      marks = await abTabMarks.perform(winId, { id: 'deleteAll' });
+      // updateMarks(marksReturned)
+      return;
+    }
+
+    if (event.key === 'n') {
+      marks = await abTabMarks.perform(winId, { id: 'deleteOne' });
+      // updateMarks(marksReturned)
+      return;
+    }
+
+    if (event.key === 'm' && !markMode) {
+      markMode = true;
+      return;
+    }
+
+    if (markMode) {
+      markMode = false;
+      marks = await abTabMarks.perform(winId, { id: 'add', trigger: event.key });
+      // updateMarks(marksReturned)
+      return;
+    }
+
+    const mark = marks.find((m) => m.trigger.toLowerCase() === event.key.toLowerCase());
+    if (mark) {
+      abTabMarks.perform(winId, { id: 'select', trigger: mark.trigger });
+    }
+  }
+
   window.addEventListener('keyup', handleKeyUp);
+  window.addEventListener('keydown', handleKeyDown);
 
   setTimeout(() => {
     shortVersion.classList.add('hidden');

@@ -38,12 +38,4 @@ export function setupUIIPC(browser: Browser) {
       },
     );
   });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('tabmarks:close', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC Received: layout-system:close-tab-marks for window ID ${winId}`);
-    return await checkModalAndPagesSender(event, browser, winId, ['tab-marks'], async (window) => {
-      window.hideTabMarks();
-    });
-  });
 }

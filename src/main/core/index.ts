@@ -12,3 +12,4 @@ export * from './bookmarks';
 export * from './open-url-history';
 export * from './downloads';
 export * from './favicons';
+export * from './tab-marks';

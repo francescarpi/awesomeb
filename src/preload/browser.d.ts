@@ -11,6 +11,8 @@ import {
   ITab,
   TPage,
   IDownloads,
+  ITabMark,
+  TMarksAction,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -120,5 +122,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abTabMarks: {
     close: (winId: TWindowId) => void;
+    get: (winId: TWindowId) => Promise<ITabMark[]>;
+    perform: (winId: TWindowId, action: TMarksAction) => Promise<ITabMark[]>;
   };
 }

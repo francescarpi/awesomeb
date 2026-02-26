@@ -14,6 +14,7 @@ import {
   ITabNavigation,
   IDownloads,
   ITabSwitcherTab,
+  TMarksAction,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -179,6 +180,12 @@ const abTabSwitcher = {
 const abTabMarks = {
   close: (winId: TWindowId) => {
     ipcRenderer.send('tabmarks:close', winId);
+  },
+  get: (winId: TWindowId) => {
+    return ipcRenderer.invoke('tabmarks:get', winId);
+  },
+  perform: (winId: TWindowId, action: TMarksAction) => {
+    return ipcRenderer.invoke('tabmarks:perform', winId, action);
   },
 };
 

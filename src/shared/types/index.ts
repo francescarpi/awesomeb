@@ -10,3 +10,4 @@ export * from './tab';
 export * from './find-in-page';
 export * from './bookmarks';
 export * from './downloads';
+export * from './tab-marks';
