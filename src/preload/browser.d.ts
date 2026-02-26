@@ -105,4 +105,9 @@ declare global {
     action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => void;
     get: () => Promise<IDownloads>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abFavicons: {
+    get: (winId: TWindowId, tabId: TTabId) => Promise<string | null>;
+  };
 }

@@ -11,3 +11,4 @@ export * from './history/';
 export * from './bookmarks';
 export * from './open-url-history';
 export * from './downloads';
+export * from './favicons';

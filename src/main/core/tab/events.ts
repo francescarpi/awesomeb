@@ -3,8 +3,7 @@ import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { HandlerDetails, WebContents, Certificate } from 'electron';
-import { windowOpenHadler, Browser } from '@/core';
-import { parseFavicon } from './favicons';
+import { windowOpenHadler, Browser, parseFavicon } from '@/core';
 
 const scopeLog = log.scope('TabEvents');
 

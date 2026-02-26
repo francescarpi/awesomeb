@@ -158,6 +158,13 @@ const abDownloads = {
 };
 
 //--------------------------------------------------------------------------------------
+const abFavicons = {
+  get: (winId: TWindowId, tabId: TTabId) => {
+    return ipcRenderer.invoke('favicons:get', winId, tabId);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -169,3 +176,4 @@ contextBridge.exposeInMainWorld('abUrlBar', abUrlBar);
 contextBridge.exposeInMainWorld('abBookmarks', abBookmarks);
 contextBridge.exposeInMainWorld('abOpenURLHistory', abOpenURLHistory);
 contextBridge.exposeInMainWorld('abDownloads', abDownloads);
+contextBridge.exposeInMainWorld('abFavicons', abFavicons);

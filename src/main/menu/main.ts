@@ -458,7 +458,7 @@ async function bookmarkSubMenu(
   return await Promise.all(
     bookmarks.map(async (bookmark) => {
       if (bookmark.type === EBookmarkType.Url) {
-        const icon = await getCachedFavicon(bookmark.url, { format: 'native16' });
+        const icon = await getCachedFavicon(bookmark.url, { format: 'native12' });
         return {
           label: bookmark.title,
           icon: icon ? (icon as NativeImage) : undefined,

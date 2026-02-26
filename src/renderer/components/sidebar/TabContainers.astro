@@ -17,11 +17,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
   >
     <div class="justify-center items-center sidebar:ml-2 flex py-2 sidebar:py-0 favicon-container">
       <span class="loading loading-spinner loading-xs hidden"></span>
-      <img
-        id="favicon"
-        class="w-4 h-4"
-        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+oCFhEkNc4GJaUAAADUSURBVCjPlZI9TkJREEbPvJDgAqSmsLKwM3bSEAoKChNXYbATFqGhMdZsgAWQQGigMrGnYgXSEBorjwWPH58JXL/uu5lz78x3J9Qr4AU4J02fQDfUIVAD5ongJTAL9QMgIq5TqG19VjhsqSP14tQFWcG3gQbQPAWWCv4hh/r/AiNiAbylzJolhPGqVo+C6pn6rt7l/gl4BAZq+U+824jVnhut1Xv1y716h/W7fwTqwPhI+9954pNf4UTECrhJmHmX6hK4PXg5ZeWmkS/5M1BJBJdA5wft93xQaqW6gwAAAABJRU5ErkJggg=="
-      />
+      <img id="favicon" class="w-4 h-4" src="" />
     </div>
     <span class="overflow-hidden text-ellipsis text-sm text-nowrap py-2 hidden sidebar:block"
     ></span>
@@ -37,7 +33,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 </template>
 
 <script>
-  import { ITabContainer } from '~/types';
+  import { ITabContainer, TTabId } from '~/types';
   import { getSearchParams } from '../../scripts/url';
 
   const { winId } = getSearchParams();
@@ -62,7 +58,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
       const tabTitle = tabLi.querySelector('span:nth-child(2)') as HTMLSpanElement;
       const favicon = tabLi.querySelector('#favicon') as HTMLImageElement;
 
-      favicon.src = tab.favicon || '';
+      updateFavicon(tab.id);
 
       tabTitle.textContent = tab.title;
 
@@ -126,7 +122,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         tabTitle.textContent = tab.title;
         tabProfile.style.backgroundColor = tab.partition.color;
 
-        favicon.src = tab.favicon || '';
+        // favicon.src = tab.favicon || '';
 
         if (tab.selected) {
           tabLi.classList.add('bg-white/20');
@@ -166,10 +162,23 @@ import ButtonIcon from '../common/ButtonIcon.astro';
         };
 
         tabsListElement.appendChild(tabLi);
+
+        updateFavicon(tab.id);
       }
 
       const tabContainersList = document.getElementById('tabContainers') as HTMLUListElement;
       tabContainersList.appendChild(tabContainerLi);
+    }
+  }
+
+  async function updateFavicon(tabId: TTabId) {
+    const favicon = await abFavicons.get(winId, tabId);
+    if (favicon) {
+      const tabLi = document.querySelector(`li[data-tab-id="${tabId}"]`) as HTMLLIElement;
+      if (tabLi) {
+        const faviconImg = tabLi.querySelector('#favicon') as HTMLImageElement;
+        faviconImg.src = favicon;
+      }
     }
   }
 </script>

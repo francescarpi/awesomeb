@@ -3,6 +3,7 @@ import fs from 'fs';
 import slugify from 'slugify';
 import { faviconsPath } from '@/paths';
 import path from 'path';
+import { DEFAULT_FAVICON } from './constants';
 
 import log from 'electron-log';
 const scopeLog = log.scope('FaviconsHelper');
@@ -58,17 +59,21 @@ async function fetchFromUrlAndCache(
   const source = `https://www.google.com/s2/favicons?domain=${url}&sz=32`;
   try {
     const response = await fetch(source);
-    if (!response.ok) {
-      return null;
-    }
-    const arrayBuffer = await response.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
 
-    const imageBuffer = Buffer.from(bytes);
+    let imageBuffer: Buffer;
+
+    if (response.ok) {
+      const arrayBuffer = await response.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+
+      imageBuffer = Buffer.from(bytes);
+    } else {
+      imageBuffer = DEFAULT_FAVICON;
+    }
 
     // Cache in memory
     const cacheKey = gennerateCacheKey(url);
@@ -95,7 +100,7 @@ async function fetchFromUrlAndCache(
 
 export async function getCachedFavicon(
   url: string,
-  opts?: { format?: 'buffer' | 'data' | 'native' | 'native16'; dontCacheOnDisk?: boolean },
+  opts?: { format?: 'buffer' | 'data' | 'native' | 'native12'; dontCacheOnDisk?: boolean },
 ): Promise<string | Buffer | NativeImage | null> {
   const normalized = normalizeUrl(url);
   const { format, dontCacheOnDisk } = opts || {};
@@ -110,8 +115,8 @@ export async function getCachedFavicon(
       switch (format || 'data') {
         case 'native':
           return nativeImage.createFromBuffer(cachedImage);
-        case 'native16':
-          return nativeImage.createFromBuffer(cachedImage).resize({ width: 16, height: 16 });
+        case 'native12':
+          return nativeImage.createFromBuffer(cachedImage).resize({ width: 12, height: 12 });
         case 'buffer':
           return cachedImage;
         case 'data':
