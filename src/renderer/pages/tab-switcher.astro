@@ -5,7 +5,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 <BlackBgWithTitle title="Tab Switcher"><ul></ul></BlackBgWithTitle>
 
 <script>
-  import { ITabEntity } from '~/types';
+  import { ITabEntity, TTabId } from '~/types';
   import { getSearchParams } from '../scripts/url';
 
   const { winId } = getSearchParams();
@@ -76,9 +76,8 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       li.appendChild(div);
       ul.appendChild(li);
 
-      // const favicon = document.createElement('img');
-      // favicon.src = tab.favicon || '';
-      // favicon.classList.add('w-5', 'h-5');
+      const favicon = document.createElement('img');
+      favicon.classList.add('w-5', 'h-5');
 
       const title = document.createElement('span');
       title.classList.add('truncate', 'w-full');
@@ -88,9 +87,11 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       partitionColor.classList.add('w-3', 'h-3');
       partitionColor.style.backgroundColor = tab.partitionColor || '#000';
 
-      // div.appendChild(favicon);
+      div.appendChild(favicon);
       div.appendChild(title);
       div.appendChild(partitionColor);
+
+      updateFavicon(parseInt(tab.id, 10));
     });
   }
 
@@ -103,5 +104,15 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
         item.classList.remove('bg-white/20');
       }
     });
+  }
+
+  async function updateFavicon(tabId: TTabId) {
+    const favicon = await abFavicons.get(winId, tabId);
+    const img = document.querySelector(`li[data-tab-id="${tabId}"] img`) as HTMLImageElement;
+    if (favicon) {
+      img.src = favicon;
+    } else {
+      img.src = '';
+    }
   }
 </script>
