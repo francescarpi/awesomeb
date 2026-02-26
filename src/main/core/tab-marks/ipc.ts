@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron';
 import log from 'electron-log';
 import { Browser, tabMarks } from '@/core';
-import { TWindowId } from '~/types';
+import { TWindowId, TMarksAction } from '~/types';
 import { checkModalAndPagesSender } from '@/utils';
-import { TMarksAction } from './types';
 
 const scopeLog = log.scope('TabMarksIPC');
 

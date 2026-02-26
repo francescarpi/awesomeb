@@ -35,6 +35,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshThemes(window, desktop);
       browser.rendererEmmiter.refreshTabContainers(window);
       browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
+      browser.rendererEmmiter.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
 
       window.refreshTabsVisibility();
       browser.refreshMainMenu();
