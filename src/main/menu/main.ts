@@ -326,8 +326,8 @@ function tabsMenu(
         accelerator: 'Control+Tab',
         icon: getIcon(EIcon.Tab),
         click: async () => {
-          if (window && !window.modal.isOpen) {
-            window.modal.open('tab-switcher', { modal: false });
+          if (window && !window.isTabSwitcherVisible) {
+            window.showTabSwitcher();
           }
         },
       },

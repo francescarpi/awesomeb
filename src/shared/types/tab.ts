@@ -45,3 +45,9 @@ export interface ITabNavigation {
   hasURL: boolean;
   tabId: TTabId;
 }
+
+export interface ITabSwitcherTab {
+  id: TTabId;
+  title: string;
+  partitionColor: string;
+}

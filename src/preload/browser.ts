@@ -13,6 +13,7 @@ import {
   IBookmark,
   ITabNavigation,
   IDownloads,
+  ITabSwitcherTab,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -165,6 +166,16 @@ const abFavicons = {
 };
 
 //--------------------------------------------------------------------------------------
+const abTabSwitcher = {
+  close: (winId: TWindowId) => {
+    ipcRenderer.send('tabswitcher:close', winId);
+  },
+  refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => {
+    ipcRenderer.on('tabswitcher:refresh', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -177,3 +188,4 @@ contextBridge.exposeInMainWorld('abBookmarks', abBookmarks);
 contextBridge.exposeInMainWorld('abOpenURLHistory', abOpenURLHistory);
 contextBridge.exposeInMainWorld('abDownloads', abDownloads);
 contextBridge.exposeInMainWorld('abFavicons', abFavicons);
+contextBridge.exposeInMainWorld('abTabSwitcher', abTabSwitcher);

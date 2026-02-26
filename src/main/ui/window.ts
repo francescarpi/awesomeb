@@ -7,7 +7,7 @@ import EventEmitter from 'events';
 import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Sidebar, URLBar } from './views';
+import { Sidebar, URLBar, TabSwitcher } from './views';
 
 export class UIWindow {
   public readonly bw: BrowserWindow;
@@ -62,11 +62,9 @@ export class UIWindow {
   }
 
   private buildLayout() {
-    const sidebar = new Sidebar(this.browserWindowId);
-    this.addView(sidebar);
-
-    const urlbar = new URLBar(this.browserWindowId);
-    this.addView(urlbar);
+    this.addView(new Sidebar(this.browserWindowId));
+    this.addView(new URLBar(this.browserWindowId));
+    this.addView(new TabSwitcher(this.browserWindowId));
   }
 
   /**
@@ -175,5 +173,26 @@ export class UIWindow {
 
   get fullScreen(): boolean {
     return this._fullScreen;
+  }
+
+  showTabSwitcher() {
+    const view = this.getView<TabSwitcher>('tab-switcher')!;
+
+    // move to top
+    this.bw.contentView.removeChildView(view.webContentsView);
+    this.bw.contentView.addChildView(view.webContentsView);
+
+    view.setVisible(true);
+    view.focus();
+  }
+
+  get isTabSwitcherVisible(): boolean {
+    const view = this.getView<TabSwitcher>('tab-switcher')!;
+    return view.visible;
+  }
+
+  closeTabSwitcher() {
+    const view = this.getView<TabSwitcher>('tab-switcher')!;
+    view.setVisible(false);
   }
 }

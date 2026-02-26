@@ -24,4 +24,18 @@ export function setupUIIPC(browser: Browser) {
       window.modal.open(page);
     });
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabswitcher:close', async (event, winId: TWindowId) => {
+    scopeLog.info(`IPC Received: layout-system:close-tab-switcher for window ID ${winId}`);
+    return await checkModalAndPagesSender(
+      event,
+      browser,
+      winId,
+      ['tab-switcher'],
+      async (window) => {
+        window.closeTabSwitcher();
+      },
+    );
+  });
 }

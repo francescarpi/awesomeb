@@ -15,6 +15,7 @@ import {
   ITabNavigation,
   IDownloads,
   EDownloadStatus,
+  ITabSwitcherTab,
 } from '~/types';
 import {
   Browser,
@@ -284,5 +285,25 @@ export class BrowserRenderer {
         created: download.created,
       })),
     };
+  }
+
+  tabSwitcherData(window: Window): ITabSwitcherTab[] {
+    const sortedTabs = window.tabs
+      .map((tab) => tab.tab)
+      .filter((tab) => !tab.suspended)
+      .sort((a, b) => a.lastAccessed - b.lastAccessed)
+      .reverse();
+
+    if (sortedTabs.length > 1) {
+      const firstTab = sortedTabs[0];
+      sortedTabs[0] = sortedTabs[1];
+      sortedTabs[1] = firstTab;
+    }
+
+    return sortedTabs.map((tab) => ({
+      id: tab.id,
+      title: tab.title,
+      partitionColor: tab.partition.color,
+    }));
   }
 }

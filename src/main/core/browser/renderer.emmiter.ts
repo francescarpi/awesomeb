@@ -1,5 +1,5 @@
 import { Browser, Window, Desktop, Tab } from '@/core';
-import { Sidebar, URLBar } from '@/ui';
+import { Sidebar, TabSwitcher, URLBar } from '@/ui';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import { ITheme, TFindInPageId } from '~/types';
@@ -77,5 +77,10 @@ export class BrowserRendererEmmiter {
         }
       }
     }
+  }
+
+  refreshTabSwitcher(window: Window) {
+    const urlbar = window.getView<TabSwitcher>('tab-switcher')!;
+    urlbar.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
 }

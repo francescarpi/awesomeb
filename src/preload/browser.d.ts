@@ -110,4 +110,10 @@ declare global {
   const abFavicons: {
     get: (winId: TWindowId, tabId: TTabId) => Promise<string | null>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abTabSwitcher: {
+    close: (winId: TWindowId) => void;
+    refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => void;
+  };
 }

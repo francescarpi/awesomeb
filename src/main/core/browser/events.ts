@@ -53,6 +53,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
+    browser.rendererEmmiter.refreshTabSwitcher(window);
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, tab);
     browser.rendererEmmiter.refreshDesktops(window);

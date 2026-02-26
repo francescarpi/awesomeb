@@ -5,11 +5,13 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 <BlackBgWithTitle title="Tab Switcher"><ul></ul></BlackBgWithTitle>
 
 <script>
-  import { ITabEntity, TTabId } from '~/types';
+  import { TTabId, ITabSwitcherTab } from '~/types';
   import { getSearchParams } from '../scripts/url';
 
   const { winId } = getSearchParams();
   let selectedIndex = 0;
+
+  abTabSwitcher.refresh((_event, tabs) => renderTabs(tabs));
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Control') {
@@ -18,14 +20,15 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       const selectedLi = document.querySelectorAll('ul li')[selectedIndex] as
         | HTMLLIElement
         | undefined;
+
       if (selectedLi) {
         const tabId = parseInt(selectedLi.dataset.tabId!, 10);
+        abTabSwitcher.close(winId);
         abCommands.perform(winId, 'select-tab', {
           tabId,
         });
-        abModal.close(winId);
       } else {
-        abModal.close(winId);
+        abTabSwitcher.close(winId);
       }
     }
   }
@@ -47,28 +50,15 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
 
-  abEntities.fetch(winId, 'tabs').then((tabs) => {
-    const sortedTabs = (tabs as ITabEntity[])
-      .filter((tab) => !tab.suspended)
-      .sort((a, b) => a.lastAccessed - b.lastAccessed)
-      .reverse();
-
-    if (sortedTabs.length > 1) {
-      const firstTab = sortedTabs[0];
-      sortedTabs[0] = sortedTabs[1];
-      sortedTabs[1] = firstTab;
-    }
-
-    renderTabs(sortedTabs);
-    updateSelection();
-  });
-
-  function renderTabs(tabs: ITabEntity[]) {
+  function renderTabs(tabs: ITabSwitcherTab[]) {
     const ul = document.querySelector('ul')!;
+
+    ul.innerHTML = '';
+    selectedIndex = 0;
 
     tabs.forEach((tab) => {
       const li = document.createElement('li');
-      li.dataset.tabId = tab.id;
+      li.dataset.tabId = tab.id.toString();
 
       const div = document.createElement('div');
       div.classList.add('p-2', 'flex', 'gap-2', 'items-center');
@@ -81,7 +71,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
       const title = document.createElement('span');
       title.classList.add('truncate', 'w-full');
-      title.textContent = tab.label;
+      title.textContent = tab.title;
 
       const partitionColor = document.createElement('span');
       partitionColor.classList.add('w-3', 'h-3');
@@ -91,8 +81,10 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
       div.appendChild(title);
       div.appendChild(partitionColor);
 
-      updateFavicon(parseInt(tab.id, 10));
+      updateFavicon(tab.id);
     });
+
+    updateSelection();
   }
 
   function updateSelection() {

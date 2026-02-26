@@ -16,7 +16,7 @@ export function setupCommandsIPC(browser: Browser) {
         event,
         browser,
         winId,
-        ['sidebar', 'urlbar'],
+        ['sidebar', 'urlbar', 'tab-switcher'],
         async (window, modalManager) => {
           const command = getCommand(trigger);
           if (!command) {
