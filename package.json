@@ -27,7 +27,7 @@
     "@eslint/js": "10.0.1",
     "@tailwindcss/vite": "4.2.1",
     "@types/mime-types": "3.0.1",
-    "astro": "5.17.3",
+    "astro": "5.18.0",
     "astro-icon": "1.1.5",
     "concurrently": "9.2.1",
     "daisyui": "5.5.19",
