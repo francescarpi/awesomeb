@@ -7,7 +7,7 @@ import EventEmitter from 'events';
 import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Sidebar, URLBar, NoTabs } from './views';
+import { Sidebar, URLBar } from './views';
 
 export class UIWindow {
   public readonly bw: BrowserWindow;
@@ -67,9 +67,6 @@ export class UIWindow {
 
     const urlbar = new URLBar(this.browserWindowId);
     this.addView(urlbar);
-
-    const noTabs = new NoTabs();
-    this.addView(noTabs);
   }
 
   /**

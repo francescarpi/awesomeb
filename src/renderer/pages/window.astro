@@ -2,7 +2,15 @@
 import Layout from '../layouts/Base.astro';
 ---
 
-<Layout />
+<Layout>
+  <div class="fixed inset-0">
+    <div
+      class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute top-10.5 left-63.5 right-1 bottom-1 select-none"
+    >
+      <p>Cmd/Ctrl + P to open the commands tool</p>
+    </div>
+  </div>
+</Layout>
 
 <script>
   import { getSearchParams } from '../scripts/url';
