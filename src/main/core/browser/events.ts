@@ -67,6 +67,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabSwitcher(window);
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
@@ -100,6 +101,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('browser:url-opened', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabSwitcher(window);
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
