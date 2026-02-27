@@ -41,6 +41,7 @@ import * as tabContainerMoveDown from './tabcontainer-move-down';
 import * as devtoolsSidebar from './devtools-sidebar';
 import * as devtoolsUrlbar from './devtools-urlbar';
 import * as tabCloseBelow from './tab-close-below';
+import * as tabChangeProfile from './tab-change-profile';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -81,6 +82,7 @@ const COMMANDS = {
   [devtoolsSidebar.TRIGGER]: devtoolsSidebar.Command,
   [devtoolsUrlbar.TRIGGER]: devtoolsUrlbar.Command,
   [tabCloseBelow.TRIGGER]: tabCloseBelow.Command,
+  [tabChangeProfile.TRIGGER]: tabChangeProfile.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

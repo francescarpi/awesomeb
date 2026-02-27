@@ -1,0 +1,25 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '../components/common/ListWithSearch.astro';
+---
+
+<BlackBgWithTitle title="Change Tab Profile">
+  <ListWithSearch placeholder="Select new tab's profile..." id="list" />
+</BlackBgWithTitle>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  import { listWithSearchManager } from '../scripts/list-with-search';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'partitions',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'change-tab-profile', { partitionId: item.id });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>
