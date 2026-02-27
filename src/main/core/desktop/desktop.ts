@@ -189,4 +189,24 @@ export class Desktop {
 
     this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
   }
+
+  getTabsBelow(tabId: TTabId): IConTab[] {
+    const tabsBelow: IConTab[] = [];
+    let found = false;
+    for (const tc of this.tabContainers) {
+      for (const t of tc.tabs) {
+        if (t.id === tabId) {
+          found = true;
+          continue;
+        }
+        if (found) {
+          tabsBelow.push({
+            tabContainer: tc,
+            tab: t,
+          });
+        }
+      }
+    }
+    return tabsBelow;
+  }
 }

@@ -57,6 +57,12 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
+      label: 'Change profile...',
+      icon: getIcon(EIcon.Partition),
+      submenu: [],
+    },
+    { type: 'separator' },
+    {
       label: 'Add bookmark',
       icon: getIcon(EIcon.Bookmarks),
       enabled: !!tab.url && !tab.suspended,
