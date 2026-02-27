@@ -46,8 +46,9 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       icon: getIcon(EIcon.Move),
       submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
         label: target.label,
-        click: () =>
-          browser.performCommand(window, 'move-tab', { tabId: tab.id, targetId: target.id }),
+        click: async () => {
+          await browser.performCommand(window, 'move-tab', { tabId: tab.id, targetId: target.id });
+        },
       })),
     },
     {
@@ -57,9 +58,26 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Change profile...',
-      icon: getIcon(EIcon.Partition),
-      submenu: [],
+      label: 'Suspend',
+      icon: getIcon(EIcon.Suspend),
+      enabled: !tab.suspended,
+      click: async () => {
+        await browser.performCommand(window, 'suspend-tab', { tabId: tab.id });
+      },
+    },
+    {
+      label: 'Close',
+      icon: getIcon(EIcon.Close),
+      click: async () => {
+        await browser.performCommand(window, 'close-tab', { tabId: tab.id });
+      },
+    },
+    {
+      label: 'Close below',
+      icon: getIcon(EIcon.Close),
+      click: async () => {
+        await browser.performCommand(window, 'close-tabs-below', { tabId: tab.id });
+      },
     },
     { type: 'separator' },
     {
