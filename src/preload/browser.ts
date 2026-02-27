@@ -187,6 +187,9 @@ const abTabMarks = {
   perform: (winId: TWindowId, action: TMarksAction) => {
     return ipcRenderer.invoke('tabmarks:perform', winId, action);
   },
+  onChangeVisibility: (callback: (event: IpcRendererEvent, visible: boolean) => void) => {
+    ipcRenderer.on('tabmarks:change-visibility', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------

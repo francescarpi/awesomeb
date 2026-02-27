@@ -204,14 +204,15 @@ export class UIWindow {
     this.bw.contentView.removeChildView(view.webContentsView);
     this.bw.contentView.addChildView(view.webContentsView);
 
+    view.send('tabmarks:change-visibility', true);
     view.setVisible(true);
     view.focus();
   }
 
   hideTabMarks() {
     const view = this.getView<TabMarks>('tab-marks')!;
+    view.send('tabmarks:change-visibility', false);
     view.setVisible(false);
-    view.webContents.reload();
   }
 
   get isTabMarksVisible(): boolean {

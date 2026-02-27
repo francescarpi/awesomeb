@@ -11,6 +11,7 @@ import Base from '../layouts/Base.astro';
       <p class="text-lg">Available tab marks...</p>
 
       <p id="no-marks">No maks...</p>
+      <div id="marks-container"></div>
 
       <div class="grid grid-cols-[50px_auto] border-t border-t-warning pt-2 mt-2">
         <span class="text-warning">m</span>
@@ -33,13 +34,24 @@ import Base from '../layouts/Base.astro';
   const { winId } = getSearchParams();
   const shortVersion = document.getElementById('short-version')!;
   const fullVersion = document.getElementById('full-version')!;
+  const noMarks = document.getElementById('no-marks')!;
+  const marksContainer = document.getElementById('marks-container')!;
 
   let markMode = false;
   let marks: ITabMark[] = [];
+  let fullVersionTimeout: NodeJS.Timeout;
+
+  abTabMarks.onChangeVisibility((_event, visible) => {
+    if (visible) {
+      registerTimeout();
+    } else {
+      showShortVersion();
+    }
+  });
 
   async function loadTabMarks() {
     marks = await abTabMarks.get(winId);
-    // TODO call render marks
+    updateMarks();
   }
 
   loadTabMarks();
@@ -57,13 +69,13 @@ import Base from '../layouts/Base.astro';
 
     if (event.key === 'b') {
       marks = await abTabMarks.perform(winId, { id: 'deleteAll' });
-      // updateMarks(marksReturned)
+      updateMarks();
       return;
     }
 
     if (event.key === 'n') {
       marks = await abTabMarks.perform(winId, { id: 'deleteOne' });
-      // updateMarks(marksReturned)
+      updateMarks();
       return;
     }
 
@@ -75,7 +87,7 @@ import Base from '../layouts/Base.astro';
     if (markMode) {
       markMode = false;
       marks = await abTabMarks.perform(winId, { id: 'add', trigger: event.key });
-      // updateMarks(marksReturned)
+      updateMarks();
       return;
     }
 
@@ -88,9 +100,48 @@ import Base from '../layouts/Base.astro';
   window.addEventListener('keyup', handleKeyUp);
   window.addEventListener('keydown', handleKeyDown);
 
-  setTimeout(() => {
+  function updateMarks() {
+    if (marks.length === 0) {
+      noMarks.classList.remove('hidden');
+      marksContainer.classList.add('hidden');
+      return;
+    }
+
+    marksContainer.innerHTML = '';
+    noMarks.classList.add('hidden');
+    marksContainer.classList.remove('hidden');
+
+    for (const mark of marks) {
+      const markElement = document.createElement('div');
+      markElement.className = 'flex items-center gap-2';
+      markElement.innerHTML = `
+        <span class="text-warning">${mark.trigger}</span>
+        <p>${mark.title}</p>
+      `;
+      marksContainer.appendChild(markElement);
+    }
+  }
+
+  function showFullVersion() {
     shortVersion.classList.add('hidden');
     fullVersion.classList.remove('hidden');
     fullVersion.classList.add('flex');
-  }, 1500);
+  }
+
+  function showShortVersion() {
+    shortVersion.classList.remove('hidden');
+    fullVersion.classList.add('hidden');
+    fullVersion.classList.remove('flex');
+
+    if (fullVersionTimeout) {
+      clearTimeout(fullVersionTimeout);
+    }
+  }
+
+  function registerTimeout() {
+    clearTimeout(fullVersionTimeout);
+    fullVersionTimeout = setTimeout(() => {
+      showFullVersion();
+    }, 1500);
+  }
 </script>

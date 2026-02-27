@@ -124,5 +124,6 @@ declare global {
     close: (winId: TWindowId) => void;
     get: (winId: TWindowId) => Promise<ITabMark[]>;
     perform: (winId: TWindowId, action: TMarksAction) => Promise<ITabMark[]>;
+    onChangeVisibility: (callback: (event: IpcRendererEvent, visible: boolean) => void) => void;
   };
 }

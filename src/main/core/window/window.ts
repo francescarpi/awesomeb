@@ -331,4 +331,16 @@ export class Window extends UIWindow {
     super.setFullScreen(fullScreen);
     this.refreshViewsBounds();
   }
+
+  get selectedTab(): IDesConTab | null {
+    const desktop = this.selectedDesktop;
+    const tabContainer = desktop.selectedTabContainer;
+    const selectedTab = tabContainer?.selectedTab;
+
+    if (desktop && tabContainer && selectedTab) {
+      return { desktop, tabContainer, tab: selectedTab };
+    }
+
+    return null;
+  }
 }
