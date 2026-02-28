@@ -37,7 +37,7 @@ export class UIView {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        preload: path.join(PRELOAD_FOLDER, `${this.preload}.js`),
+        preload: path.join(PRELOAD_FOLDER, `${this.preload}.preload.js`),
         webSecurity: true,
         transparent: true,
         session: this._session,

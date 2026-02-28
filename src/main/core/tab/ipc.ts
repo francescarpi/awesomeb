@@ -3,6 +3,7 @@ import { checkFailLoadSender, checkFindInPageSender, checkModalAndPagesSender } 
 import { FindInPageOptions, ipcMain, Certificate } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
+import { URLInfoView } from './url-info';
 
 const scopeLog = log.scope('TabIPC');
 
@@ -11,7 +12,7 @@ export function setupTabIPC(browser: Browser) {
   ipcMain.handle('tabs:get-tab-containers', async (event, winId: TWindowId) => {
     scopeLog.info(`IPC tabs:get-tab-containers received for window ${winId}`);
     return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-      return await browser.renderer.tabContainers(window);
+      return browser.renderer.tabContainers(window);
     });
   });
 
@@ -146,4 +147,29 @@ export function setupTabIPC(browser: Browser) {
       });
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tab:show-url-info', async (event, url: string | null) => {
+    scopeLog.info(`IPC tabs:show-url-info received with url ${url}`);
+    const selectedTab = browser.selectedTab;
+    if (!selectedTab || selectedTab.tab.view.webContentsId !== event.sender.id) {
+      scopeLog.warn(
+        `URL Info IPC: No selected tab or sender does not match selected tab's webContentsId`,
+      );
+      return;
+    }
+
+    if (url) {
+      const view = new URLInfoView(selectedTab.tab, url);
+      selectedTab.window.addView(view);
+      selectedTab.window.refreshViewsBounds();
+    } else {
+      const viewId = `url-info-${selectedTab.tab.id}`;
+      const view = selectedTab.window.getView<URLInfoView>(viewId);
+      if (view) {
+        view.close();
+        selectedTab.window.removeView(view.id);
+      }
+    }
+  });
 }

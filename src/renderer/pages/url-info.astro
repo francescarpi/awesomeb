@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <div class="bg-black fixed inset-0 text-white flex items-center text-sm p-2 rounded-bl-xl">
+    <span class="truncate"></span>
+  </div>
+</Base>
+
+<script>
+  import { getSearchParams } from '../scripts/url';
+  const { searchParams } = getSearchParams();
+  const url = searchParams.get('url')!;
+  document.querySelector('span')!.textContent = url;
+</script>

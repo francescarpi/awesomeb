@@ -52,8 +52,8 @@ const electronPreloadConfig = {
       minify: MINIFY ? 'esbuild' : false,
       rollupOptions: {
         input: {
-          'preload/browser': 'src/preload/browser.ts',
-          'preload/tab': 'src/preload/tab.ts',
+          'preload/browser.preload': 'src/preload/browser.preload.ts',
+          'preload/tab.preload': 'src/preload/tab.preload.ts',
         },
         output: {
           inlineDynamicImports: false
