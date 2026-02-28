@@ -4,7 +4,9 @@ import Base from '../layouts/Base.astro';
 
 <Base>
   <div class="bg-black fixed inset-0 text-white flex items-center text-sm p-2 rounded-bl-xl">
-    <span class="truncate"></span>
+    <div class="overflow-hidden flex-1">
+      <span class="inline-block whitespace-nowrap"></span>
+    </div>
   </div>
 </Base>
 
@@ -12,5 +14,24 @@ import Base from '../layouts/Base.astro';
   import { getSearchParams } from '../scripts/url';
   const { searchParams } = getSearchParams();
   const url = searchParams.get('url')!;
-  document.querySelector('span')!.textContent = url;
+  const span = document.querySelector('span')!;
+  const container = span.parentElement!;
+
+  span.textContent = url;
+
+  // Wait 1 second and then animate if the text is truncated
+  setTimeout(() => {
+    const spanWidth = span.scrollWidth;
+    const containerWidth = container.clientWidth;
+
+    if (spanWidth > containerWidth) {
+      // Calculate the distance that needs to be moved
+      const distance = spanWidth - containerWidth;
+      // Calculate duration based on distance (adjust speed here)
+      const duration = distance * 15; // Nms por pixel
+
+      span.style.transition = `transform ${duration}ms linear`;
+      span.style.transform = `translateX(-${distance}px)`;
+    }
+  }, 1000);
 </script>
