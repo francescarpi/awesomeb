@@ -200,6 +200,8 @@ export class BrowserRenderer {
       partitionColor: item.tab.partition.color,
       lastAccessed: item.tab.lastAccessed,
       suspended: item.tab.suspended,
+      extra: `Desktop: ${item.desktop.label}`,
+      isDimmed: item.tab.suspended,
     }));
   }
 

@@ -14,6 +14,7 @@ export interface IEntity {
   label: string;
   selected?: boolean;
   extra?: string;
+  isDimmed?: boolean;
 }
 
 export interface IDesktopEntity extends IEntity {

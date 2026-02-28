@@ -134,6 +134,10 @@ function renderEntity(
       extra.textContent = `(${item.extra})`;
     }
 
+    if (item.isDimmed) {
+      container.classList.add('opacity-30');
+    }
+
     if (renderExtra) {
       renderExtra(item, extra);
     }
