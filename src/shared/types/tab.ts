@@ -9,6 +9,7 @@ export interface ITabContainer {
   selected: boolean;
   divider: boolean;
   tabs: ITab[];
+  desktopId: TDesktopId;
 }
 
 export interface ITab {

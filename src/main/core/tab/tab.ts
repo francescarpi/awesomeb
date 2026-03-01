@@ -203,6 +203,7 @@ export class Tab {
       return;
     }
 
+    this._loading = false;
     this._favicon = null;
     this.clearFailLoad();
     this.close();

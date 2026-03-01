@@ -10,7 +10,8 @@ const MINIFY = false;
 // Shared aliases between main process and preload
 const electronAliases = {
   "@": path.resolve("src/main"),
-  "~": path.resolve("src/shared")
+  "~": path.resolve("src/shared"),
+  "#": path.resolve("src/renderer")
 }
 
 // Aliases for the renderer (Astro)

@@ -140,6 +140,7 @@ export class BrowserRenderer {
 
     return desktop.tabContainers.map((tc) => ({
       id: tc.id,
+      desktopId: desktop.id,
       selected: selectedTabContainer?.id === tc.id,
       divider: tc.divider,
       tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
