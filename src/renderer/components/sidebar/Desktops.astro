@@ -58,6 +58,8 @@
   function setupEventListeners() {
     DESKTOP_LIST_ELEMENT.addEventListener('click', handleDesktopClick);
     DESKTOP_LIST_ELEMENT.addEventListener('contextmenu', handleContextMenu);
+    DESKTOP_LIST_ELEMENT.addEventListener('mouseenter', handleDesktopMouseEnter, true);
+    DESKTOP_LIST_ELEMENT.addEventListener('mouseleave', handleDesktopMouseLeave, true);
   }
 
   /**
@@ -92,6 +94,54 @@
     abMenu.contextMenu(WINDOW_ID, 'desktop', {
       desktopId: numericDesktopId,
     });
+  }
+
+  /**
+   * Handles mouse enter events on desktop items
+   */
+  function handleDesktopMouseEnter(event: Event) {
+    const target = event.target as HTMLElement;
+    const desktopItem = target.closest('li.desktop');
+
+    if (!desktopItem) return;
+
+    const desktopName = desktopItem.dataset.name;
+    if (desktopName) {
+      updateDesktopNameWithTransition(desktopName);
+    }
+  }
+
+  /**
+   * Handles mouse leave events on desktop items
+   */
+  function handleDesktopMouseLeave(event: Event) {
+    const target = event.target as HTMLElement;
+    const desktopItem = target.closest('li.desktop');
+
+    if (!desktopItem) return;
+
+    // Restore the active desktop name
+    const activeDesktop = DESKTOP_LIST_ELEMENT.querySelector('li.desktop.active');
+    if (activeDesktop) {
+      const activeName = activeDesktop.dataset.name;
+      if (activeName) {
+        updateDesktopNameWithTransition(activeName);
+      }
+    }
+  }
+
+  /**
+   * Updates the desktop name with a smooth fade transition
+   */
+  function updateDesktopNameWithTransition(newName: string) {
+    // Fade out
+    DESKTOP_NAME_ELEMENT.style.opacity = '0';
+
+    // Change text and fade in after a short delay
+    setTimeout(() => {
+      DESKTOP_NAME_ELEMENT.textContent = newName;
+      DESKTOP_NAME_ELEMENT.style.opacity = '1';
+    }, 150);
   }
 
   // ========================================
@@ -180,6 +230,7 @@
   ) {
     // Set basic desktop information
     elements.listItem.dataset.id = desktop.id;
+    elements.listItem.dataset.name = desktop.name;
     elements.desktopId.textContent = desktop.id;
 
     // Handle selection state
@@ -249,5 +300,9 @@
 
   li.desktop.active {
     @apply bg-white/20 flex;
+  }
+
+  #name {
+    transition: opacity 100ms ease-in-out;
   }
 </style>
