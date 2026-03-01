@@ -31,7 +31,7 @@ export class UIModal {
       movable: false,
       show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'browser.js'),
+        preload: path.join(PRELOAD_FOLDER, 'browser.preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,

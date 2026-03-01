@@ -163,6 +163,12 @@ export function windowOpenHadler(
   return { action: 'deny' };
 }
 
-export function notification(title: string, body: string) {
-  new Notification({ title, body }).show();
+export function notification(title: string, body: string, onClick?: () => void) {
+  const notif = new Notification({ title, body });
+
+  if (onClick) {
+    notif.on('click', onClick);
+  }
+
+  notif.show();
 }

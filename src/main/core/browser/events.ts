@@ -3,6 +3,7 @@ import { Browser, Window, Desktop, Tab, TabContainer, notification } from '@/cor
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
 import { UIPageView } from '@/ui';
+import { Download } from '../downloads/download';
 
 const scopeLog = log.scope('BrowserEvents');
 
@@ -229,8 +230,12 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('downloads:completed', async (fileName: string) => {
-    notification('Download Completed', `File "${fileName}" has been downloaded successfully.`);
+  browser.eventsChannel.on('downloads:completed', async (download: Download) => {
+    notification(
+      'Download Completed',
+      `File "${download.fileName}" has been downloaded successfully.`,
+      () => download.open(),
+    );
   });
 
   //--------------------------------------------------------------------------------------
