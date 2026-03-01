@@ -27,5 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
     anchor.addEventListener('mouseout', () => {
       awesomePublicAPI.showLinkInfo(null);
     });
+
+    anchor.addEventListener(
+      'click',
+      () => {
+        awesomePublicAPI.showLinkInfo(null);
+      },
+      { once: true },
+    );
   });
 });
