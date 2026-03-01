@@ -110,6 +110,9 @@ const abTabs = {
   clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => {
     ipcRenderer.send('tabs:client-certificate', winId, tabId, fingeprint);
   },
+  trustCertificateError: (tabId: TTabId) => {
+    ipcRenderer.send('tabs:trust-certificate-error', tabId);
+  },
 };
 
 //--------------------------------------------------------------------------------------

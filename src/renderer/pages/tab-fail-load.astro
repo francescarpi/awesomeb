@@ -4,7 +4,9 @@ import { Icon } from 'astro-icon/components';
 ---
 
 <Layout borderRadius="10px">
-  <div class="text-black flex flex-col items-center justify-center h-full gap-4">
+  <div
+    class="bg-white text-black flex flex-col items-center justify-center h-full gap-4 rounded-xl"
+  >
     <Icon name="alert" class="text-6xl text-red-700" />
     <h6 class="font-bold">Cannot Connect to the Website</h6>
     <p>
@@ -15,12 +17,14 @@ import { Icon } from 'astro-icon/components';
       <p>Error: <span class="description"></span></p>
       <p>URL: <span class="url"></span></p>
     </div>
-    <button class="btn btn-primary">Retry</button>
+    <button class="btn btn-primary" id="retry">Retry</button>
   </div>
 </Layout>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
+  import { getSearchParams } from '#/scripts/url';
+  import { onClick } from '#/scripts/buttons';
+
   const { searchParams } = getSearchParams();
 
   document.querySelectorAll('.url').forEach((el) => {
@@ -30,7 +34,7 @@ import { Icon } from 'astro-icon/components';
   document.querySelector('.code')!.textContent = searchParams.get('code');
   document.querySelector('.description')!.textContent = searchParams.get('description');
 
-  document.querySelector('button')!.addEventListener('click', () => {
+  onClick('retry', () => {
     abTabs.retryFailed(parseInt(searchParams.get('tabId')!, 10));
   });
 </script>

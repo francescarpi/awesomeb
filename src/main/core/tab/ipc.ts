@@ -1,5 +1,10 @@
 import { Browser } from '@/core';
-import { checkFailLoadSender, checkFindInPageSender, checkModalAndPagesSender } from '@/utils';
+import {
+  checkCertificateErrorSender,
+  checkFailLoadSender,
+  checkFindInPageSender,
+  checkModalAndPagesSender,
+} from '@/utils';
 import { FindInPageOptions, ipcMain, Certificate } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
@@ -171,5 +176,19 @@ export function setupTabIPC(browser: Browser) {
         selectedTab.window.removeView(view.id);
       }
     }
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabs:trust-certificate-error', async (event, tabId: TTabId) => {
+    scopeLog.info(`IPC tabs:trust-certificate-error received for tab ${tabId}`);
+    return await checkCertificateErrorSender(
+      event,
+      browser,
+      tabId,
+      async (tab, certificateError) => {
+        certificateError.callback(true);
+        tab.cleanCertificateError();
+      },
+    );
   });
 }

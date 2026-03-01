@@ -5,6 +5,8 @@ import log from 'electron-log';
 
 const scopeLog = log.scope('FailLoad');
 
+// TODO replace tabId by tab instance and use it to get tab.view.bounds isntean to use getView
+// TODO Look how certificate error is implemented. view is not necessary to send to the view
 export class FailLoad extends UIPageView {
   constructor(
     private readonly tabId: TTabId,

@@ -4,6 +4,7 @@ import { TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { CertificateError } from '@/core/tab/certificate-error';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -162,4 +163,32 @@ export async function checkFailLoadSender(
   }
 
   return callback(tab, tab.failLoad);
+}
+
+export async function checkCertificateErrorSender(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  tabId: TTabId,
+  callback: (tab: Tab, certificateError: CertificateError) => void,
+): Promise<void> {
+  const result = browser.getTab(tabId);
+  if (!result) {
+    scopeLog.error(`No tab found with ID ${tabId}`);
+    return;
+  }
+
+  const { tab } = result;
+  if (!tab.certificateError) {
+    scopeLog.error(`Tab with ID ${tabId} does not have a certificate error view`);
+    return;
+  }
+
+  if (tab.certificateError.webContentsId !== event.sender.id) {
+    scopeLog.error(
+      `WebContents ID mismatch: fail load WC ID ${tab.certificateError.webContentsId} does not match sender WC ID ${event.sender.id}`,
+    );
+    return;
+  }
+
+  return callback(tab, tab.certificateError);
 }

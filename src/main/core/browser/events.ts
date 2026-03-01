@@ -242,4 +242,28 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
     browser.rendererEmmiter.refreshNoTabsInfo(window);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tab:certificate-error-did-change',
+    async (tab: Tab, visible: boolean) => {
+      const result = browser.getTab(tab.id);
+      if (!result) {
+        return;
+      }
+
+      if (visible) {
+        const certificateErrorView = result.tab.certificateError;
+        if (!certificateErrorView) {
+          scopeLog.warn(`Certificate error view not found for Tab with id ${tab.id}`);
+          return;
+        }
+        result.window.addView(certificateErrorView);
+      } else {
+        result.window.removeView(`certificate-error-tab-${tab.id}`);
+      }
+
+      result.window.refreshTabsVisibility();
+    },
+  );
 }

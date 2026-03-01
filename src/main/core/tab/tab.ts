@@ -8,6 +8,7 @@ import { TabView } from './tab.view';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
+import { CertificateError } from './certificate-error';
 
 const scopeLog = log.scope('Tab');
 
@@ -27,6 +28,7 @@ export class Tab {
   private _basicAuthCallback: TBasicAuthCallback | null = null;
   private _clientCertificatesAndCallback: [Certificate[], TCertificateCallback] | null = null;
   private _safe: boolean = true;
+  private _certificateError: CertificateError | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -301,5 +303,29 @@ export class Tab {
 
   get safe(): boolean {
     return this._safe;
+  }
+
+  setCertificateError(url: string, error: string, callback: (isTrusted: boolean) => void) {
+    if (this._certificateError) {
+      return;
+    }
+
+    this._safe = false;
+    this._certificateError = new CertificateError(this, url, error, callback);
+    this.browser.eventsChannel.emit('tab:certificate-error-did-change', this, true);
+  }
+
+  get certificateError(): CertificateError | null {
+    return this._certificateError;
+  }
+
+  cleanCertificateError() {
+    if (!this._certificateError) {
+      return;
+    }
+
+    this._safe = true;
+    this._certificateError = null;
+    this.browser.eventsChannel.emit('tab:certificate-error-did-change', this, false);
   }
 }

@@ -133,6 +133,19 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   );
 
   // ----------------------------------------------------------------------------------------------- //
+  tab.view.webContents.on(
+    'certificate-error',
+    async (event, url, error, _certificate, callback, isMainFrame) => {
+      if (!isMainFrame) {
+        return;
+      }
+
+      event.preventDefault();
+      tab.setCertificateError(url, error, callback);
+    },
+  );
+
+  // ----------------------------------------------------------------------------------------------- //
   tab.view.webContents.setWindowOpenHandler((details: HandlerDetails) =>
     windowOpenHadler(browser, details),
   );

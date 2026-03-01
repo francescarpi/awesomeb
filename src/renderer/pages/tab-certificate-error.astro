@@ -1,0 +1,39 @@
+---
+import Layout from '#/layouts/Base.astro';
+import { Icon } from 'astro-icon/components';
+---
+
+<Layout borderRadius="10px">
+  <div
+    class="bg-white text-black flex flex-col items-center justify-center h-full gap-4 rounded-xl"
+  >
+    <Icon name="alert" class="text-6xl text-red-700" />
+    <h6 class="font-bold">Cannot Connect to the Website</h6>
+    <div class="max-w-md flex flex-col items-center gap-4">
+      <p class="bg-gray-100 p-4 rounded w-full">
+        The certificate for url <i id="url"></i> is invalid. As a result, the connection between your
+        browser and the server is not properly encrypted, which could allow an attacker to intercept or
+        steal sensitive data. Error code: <strong class="code"></strong>.
+      </p>
+      <button class="btn btn-error" id="trust"
+        >I understand the risks and choose to proceed anyway.</button
+      >
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getSearchParams } from '#/scripts/url';
+  import { onClick } from '#/scripts/buttons';
+
+  const { searchParams } = getSearchParams();
+
+  const url = searchParams.get('url')!;
+  const error = searchParams.get('error')!;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  document.getElementById('url')!.textContent = url;
+  document.querySelector('.code')!.textContent = error;
+
+  onClick('trust', () => abTabs.trustCertificateError(tabId));
+</script>
