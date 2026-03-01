@@ -26,6 +26,7 @@ export class Tab {
   private _failLoad: FailLoad | null = null;
   private _basicAuthCallback: TBasicAuthCallback | null = null;
   private _clientCertificatesAndCallback: [Certificate[], TCertificateCallback] | null = null;
+  private _safe: boolean = true;
 
   constructor(
     public readonly browser: Browser,
@@ -296,5 +297,9 @@ export class Tab {
 
   get clientCertificates(): [Certificate[], TCertificateCallback] | null {
     return this._clientCertificatesAndCallback;
+  }
+
+  get safe(): boolean {
+    return this._safe;
   }
 }

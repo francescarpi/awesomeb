@@ -11,3 +11,4 @@ export * from './find-in-page';
 export * from './bookmarks';
 export * from './downloads';
 export * from './tab-marks';
+export * from './certificates';

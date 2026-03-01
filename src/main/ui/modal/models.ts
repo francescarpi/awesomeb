@@ -62,6 +62,6 @@ export class UIModal {
   }
 
   get wcId(): number {
-    return this.bw.webContents.id;
+    return this.bw.isDestroyed() ? -1 : this.bw.webContents.id;
   }
 }

@@ -3,22 +3,21 @@ import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
 
-const scopeLog = log.scope('RenameTabCommand');
+const scopeLog = log.scope('CertificateInfoCommand');
 
 export interface ICommandParams {
   tabId?: TTabId;
-  name: string;
 }
 
-export const TRIGGER = 'rename-tab';
+export const TRIGGER = 'certificate-info';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rename Tab',
-  description: 'Renames the specified tab.',
-  visibility: ({ tab }) => !!tab,
+  name: 'Certificate Info',
+  description: 'View SSL/TLS certificate information for the current tab.',
+  visibility: ({ tab }) => !!tab && tab.safe,
   modal: {
-    page: 'rename-tab',
+    page: 'certificate-info',
   },
   async handler({ browser, tab, params }) {
     const tabToRename = getTab(browser, tab!, params?.tabId);
@@ -26,8 +25,5 @@ export const Command: ICommand<ICommandParams> = {
       scopeLog.warn('No tab available');
       return;
     }
-
-    tabToRename.setCustomTitle(params.name);
-    scopeLog.info(`Renamed tab ${tabToRename.id} to "${params.name}"`);
   },
 };

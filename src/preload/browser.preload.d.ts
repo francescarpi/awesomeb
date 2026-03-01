@@ -133,4 +133,9 @@ declare global {
     perform: (winId: TWindowId, action: TMarksAction) => Promise<ITabMark[]>;
     onChangeVisibility: (callback: (event: IpcRendererEvent, visible: boolean) => void) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abCertificates: {
+    info: (winId: TWindowId) => Promise<IPeerCertificate>;
+  };
 }

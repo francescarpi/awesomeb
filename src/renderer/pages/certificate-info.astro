@@ -1,0 +1,52 @@
+---
+import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Certificate Info">
+  <span class="loading loading-dots loading-xs"></span>
+
+  <div id="details" class="hidden grid-cols-2">
+    <span class="font-bold">Common Name</span>
+    <span></span>
+    <span class="font-bold">Issuer Country</span>
+    <span></span>
+    <span class="font-bold">Issuer Organization</span>
+    <span></span>
+    <span class="font-bold">Issuer Common Name</span>
+    <span></span>
+    <span class="font-bold">Valid From</span>
+    <span></span>
+    <span class="font-bold">Valid To</span>
+    <span></span>
+    <div class="col-span-2 mt-6 flex justify-center">
+      <button class="btn btn-sm"> Close </button>
+    </div>
+  </div>
+
+  <script>
+    import { getSearchParams } from '#/scripts/url';
+    import dayjs from 'dayjs';
+
+    const { winId } = getSearchParams();
+    const loading = document.querySelector('.loading')!;
+    const details = document.querySelector('#details')!;
+
+    abCertificates.info(winId).then((info) => {
+      loading.remove();
+
+      details.classList.remove('hidden');
+      details.classList.add('grid');
+
+      details.children[1].textContent = info.subject.CN;
+      details.children[3].textContent = info.issuer.C;
+      details.children[5].textContent = info.issuer.O;
+      details.children[7].textContent = info.issuer.CN;
+      details.children[9].textContent = dayjs(info?.valid_from).format('ddd, D MMM YYYY HH:mm:ss');
+      details.children[11].textContent = dayjs(info?.valid_to).format('ddd, D MMM YYYY HH:mm:ss');
+    });
+
+    document.querySelector('button')!.addEventListener('click', () => {
+      abModal.close(winId);
+    });
+  </script>
+</BlackBgWithTitle>

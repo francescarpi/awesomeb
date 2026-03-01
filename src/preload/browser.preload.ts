@@ -198,6 +198,13 @@ const abTabMarks = {
 };
 
 //--------------------------------------------------------------------------------------
+const abCertificates = {
+  info: (winId: TWindowId) => {
+    return ipcRenderer.invoke('certificates:info', winId);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -212,3 +219,4 @@ contextBridge.exposeInMainWorld('abDownloads', abDownloads);
 contextBridge.exposeInMainWorld('abFavicons', abFavicons);
 contextBridge.exposeInMainWorld('abTabSwitcher', abTabSwitcher);
 contextBridge.exposeInMainWorld('abTabMarks', abTabMarks);
+contextBridge.exposeInMainWorld('abCertificates', abCertificates);

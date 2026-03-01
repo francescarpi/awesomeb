@@ -41,4 +41,8 @@ export const DEFAULT_MODALS_PROPS = {
   'client-certificate': {
     height: 300,
   },
+  'certificate-info': {
+    height: 330,
+    width: 500,
+  },
 };
