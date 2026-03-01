@@ -63,6 +63,11 @@ const abWindow = {
   readyToShow: (winId: TWindowId) => {
     ipcRenderer.send('window:ready-to-show', winId);
   },
+  onRefreshNoTabsInfo: (
+    callback: (event: IpcRendererEvent, sidebarCollapsed: boolean, areaMaximized: boolean) => void,
+  ) => {
+    ipcRenderer.on('window:refresh-no-tabs-info', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------

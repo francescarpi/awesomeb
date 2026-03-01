@@ -83,4 +83,12 @@ export class BrowserRendererEmmiter {
     const urlbar = window.getView<TabSwitcher>('tab-switcher')!;
     urlbar.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
+
+  refreshNoTabsInfo(window: Window) {
+    window.webContents.send(
+      'window:refresh-no-tabs-info',
+      window.sidebarCollapsed,
+      window.areaMaximized,
+    );
+  }
 }

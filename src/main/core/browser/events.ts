@@ -232,4 +232,9 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('downloads:completed', async (fileName: string) => {
     notification('Download Completed', `File "${fileName}" has been downloaded successfully.`);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
+    browser.rendererEmmiter.refreshNoTabsInfo(window);
+  });
 }

@@ -46,6 +46,13 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abWindow: {
     readyToShow: (winId: TWindowId) => void;
+    onRefreshNoTabsInfo: (
+      callback: (
+        event: IpcRendererEvent,
+        sidebarCollapsed: boolean,
+        areaMaximized: boolean,
+      ) => void,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------

@@ -5,7 +5,8 @@ import Layout from '../layouts/Base.astro';
 <Layout>
   <div class="fixed inset-0">
     <div
-      class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute top-10.5 left-63.5 right-1 bottom-1 select-none"
+      id="no-tabs-info"
+      class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute right-1 bottom-1 select-none"
     >
       <p>Cmd/Ctrl + P to open the commands tool</p>
     </div>
@@ -13,8 +14,15 @@ import Layout from '../layouts/Base.astro';
 </Layout>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
-  const { winId } = getSearchParams();
+  import { getSearchParams } from '#/scripts/url';
+
+  const { winId, searchParams } = getSearchParams();
+  const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
+
+  const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
+  const areaMaximized = searchParams.get('areaMaximized') === 'true';
+
+  refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
 
   abDesktops.getTheme(winId).then((theme) => {
     const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
@@ -26,4 +34,21 @@ import Layout from '../layouts/Base.astro';
     const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
   });
+
+  abWindow.onRefreshNoTabsInfo((_e, sidebarCollapsed, areaMaximized) => {
+    refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
+  });
+
+  function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
+    if (areaMaximized) {
+      noTabsInfo.style.left = '5px';
+      noTabsInfo.style.top = '5px';
+    } else if (sidebarCollapsed) {
+      noTabsInfo.style.left = '40px';
+      noTabsInfo.style.top = '42px';
+    } else {
+      noTabsInfo.style.left = '254px';
+      noTabsInfo.style.top = '42px';
+    }
+  }
 </script>

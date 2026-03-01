@@ -42,7 +42,7 @@ export class UIWindow {
       roundedCorners: true,
       show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'browser.js'),
+        preload: path.join(PRELOAD_FOLDER, 'browser.preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -52,6 +52,8 @@ export class UIWindow {
 
     loadPage(this.bw.webContents, 'window', {
       winId: this.browserWindowId.toString(),
+      sidebarCollapsed: this._sidebarCollapsed.toString(),
+      areaMaximized: this._areaMaximized.toString(),
     });
 
     this._modalManager = new UIModalManager(this);
@@ -146,6 +148,8 @@ export class UIWindow {
     // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
     const sidebar = this.getView<Sidebar>('sidebar')!;
     sidebar.loadPage(window);
+
+    this.eventsChannel.emit('window:layout-did-change', window);
   }
 
   get sidebarCollapsed(): boolean {
@@ -159,6 +163,8 @@ export class UIWindow {
     // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
     const sidebar = this.getView<Sidebar>('sidebar')!;
     sidebar.loadPage(window);
+
+    this.eventsChannel.emit('window:layout-did-change', window);
   }
 
   get areaMaximized(): boolean {
