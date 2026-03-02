@@ -171,6 +171,21 @@ export class Browser {
     return true;
   }
 
+  async duplicateTab(tabId: TTabId, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
+    const tabResult = this.getTab(tabId);
+    if (!tabResult) {
+      scopeLog.error(`Tab with id ${tabId} not found for duplication`);
+      return null;
+    }
+
+    if (!tabResult.tab.url) {
+      scopeLog.warn(`Tab with id ${tabId} has no URL to duplicate`);
+      return null;
+    }
+
+    return this.openURL(tabResult.tab.url, props);
+  }
+
   async openURL(query: string, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
     scopeLog.info(`Opening URL with query: ${query}`);
 

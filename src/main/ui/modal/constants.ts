@@ -45,4 +45,7 @@ export const DEFAULT_MODALS_PROPS = {
     height: 330,
     width: 500,
   },
+  'duplicate-tab': {
+    height: 600,
+  },
 };

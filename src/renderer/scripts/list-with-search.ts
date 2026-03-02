@@ -13,7 +13,7 @@ export async function listWithSearchManager(
     filtering?: boolean;
     onChange?: (inputValue: string, entity: IEntity, inputEl: HTMLInputElement) => void;
   },
-) {
+): Promise<{ getSelected: () => IEntity | null }> {
   const listEl = document.getElementById(listElId)!;
 
   // Validate elements
@@ -102,6 +102,13 @@ export async function listWithSearchManager(
     indexSelected = 0;
     selectItemAtIndex(ul, indexSelected);
   });
+
+  return {
+    getSelected: () => {
+      if (filteredEntities.length === 0) return null;
+      return filteredEntities[indexSelected];
+    },
+  };
 }
 
 function selectItemAtIndex(ul: HTMLElement, index: number) {

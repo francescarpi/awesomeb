@@ -55,6 +55,19 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       })),
     },
     {
+      label: 'Duplicate...',
+      icon: getIcon(EIcon.Copy),
+      submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
+        label: target.label,
+        click: async () => {
+          await browser.performCommand(window, 'duplicate-tab', {
+            tabId: tab.id,
+            targetId: target.id,
+          });
+        },
+      })),
+    },
+    {
       label: 'Change profile...',
       icon: getIcon(EIcon.Partition),
       submenu: partitions.map((partition) => ({

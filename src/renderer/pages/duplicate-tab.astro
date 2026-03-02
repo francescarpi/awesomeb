@@ -1,0 +1,69 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+---
+
+<BlackBgWithTitle title="Duplicate Tab">
+  <div class="h-full">
+    <div id="pagesIndicator" class="fixed top-4 right-3"></div>
+    <ListWithSearch placeholder="Select tab..." id="tab" />
+    <ListWithSearch placeholder="Select a profile..." id="partition" />
+    <ListWithSearch placeholder="Select a target" id="target" />
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { listWithSearchManager, paginatorManager, getSearchParams } from '#/scripts';
+  import { IPartitionEntity } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
+    'pagesIndicator',
+    ['tab', 'partition', 'target'],
+  );
+
+  refreshPageVisibility();
+  refreshPageIndicator();
+
+  const { getSelected: getTab } = await listWithSearchManager('tab', {
+    entity: 'tabs',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onAccept: () => handleAccept(),
+  });
+
+  const { getSelected: getPartition } = await listWithSearchManager('partition', {
+    entity: 'partitions',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    renderExtra: (item, rowEl) => {
+      const entity = item as IPartitionEntity;
+      const style = `background-color: ${entity.color}`;
+      rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
+    },
+    onAccept: () => handleAccept(),
+  });
+
+  const { getSelected: getTarget } = await listWithSearchManager('target', {
+    entity: 'targets',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onAccept: () => handleAccept(),
+  });
+
+  function handleAccept() {
+    const tabId = parseInt(getTab()!.id, 10);
+    const partitionId = getPartition()!.id;
+    const targetId = getTarget()!.id;
+
+    abCommands.perform(winId, 'duplicate-tab', {
+      tabId,
+      partitionId,
+      targetId,
+    });
+  }
+</script>

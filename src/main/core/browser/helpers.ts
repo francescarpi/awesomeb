@@ -122,11 +122,11 @@ export function parseTarget(
   }
 
   let partition: Partition;
-  if (selectedTab) {
-    partition = selectedTab.tab.partition;
-  } else if (partitionId) {
+  if (partitionId) {
     const partitions = getPartitions();
     partition = partitions.get(partitionId) || defaultPartition;
+  } else if (selectedTab) {
+    partition = selectedTab.tab.partition;
   } else {
     partition = defaultPartition;
   }

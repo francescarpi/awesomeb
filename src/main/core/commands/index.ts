@@ -43,6 +43,7 @@ import * as devtoolsUrlbar from './devtools-urlbar';
 import * as tabCloseBelow from './tab-close-below';
 import * as tabChangeProfile from './tab-change-profile';
 import * as tabCertificateInfo from './tab-certificate-info';
+import * as tabDuplicate from './tab-duplicate';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -85,6 +86,7 @@ const COMMANDS = {
   [tabCloseBelow.TRIGGER]: tabCloseBelow.Command,
   [tabChangeProfile.TRIGGER]: tabChangeProfile.Command,
   [tabCertificateInfo.TRIGGER]: tabCertificateInfo.Command,
+  [tabDuplicate.TRIGGER]: tabDuplicate.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
