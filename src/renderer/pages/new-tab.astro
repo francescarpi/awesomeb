@@ -1,6 +1,6 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
-import ListWithSearch from '../components/common/ListWithSearch.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
 <BlackBgWithTitle title="New Tab">
@@ -13,19 +13,13 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { listWithSearchManager } from '../scripts/list-with-search';
-  import { getSearchParams } from '../scripts/url';
-  import { IEntity, IPartitionEntity } from '~/types';
-  import { paginatorManager } from '../scripts/paginator';
+  import { listWithSearchManager, getSearchParams, paginatorManager } from '#/scripts';
+  import { IPartitionEntity } from '~/types';
   import { TFindUrlResult } from '@/core';
 
   const { winId } = getSearchParams();
 
   let query = '';
-
-  let searchEngine: IEntity | null = null;
-  let partition: IPartitionEntity | null = null;
-  let target: IEntity | null = null;
 
   const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
     'pagesIndicator',
@@ -36,23 +30,19 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
   refreshPageIndicator();
 
   // ------------------------------------------------------
-  listWithSearchManager('query', {
+  const { getSelected: getSearchEngine } = await listWithSearchManager('query', {
     entity: 'searchEngines',
     filtering: false,
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: async (inputValue, entity, inputEl) => {
-      searchEngine = entity;
+    onChange: async (inputValue, _entity, inputEl) => {
       query = await searchInHistory(inputValue, inputEl);
     },
-    onAccept: (value) => {
-      searchEngine = value;
-      handleSelect();
-    },
+    onAccept: () => handleSelect(),
   });
 
-  listWithSearchManager('partition', {
+  const { getSelected: getPartition } = await listWithSearchManager('partition', {
     entity: 'partitions',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
@@ -62,37 +52,29 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       const style = `background-color: ${entity.color}`;
       rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
     },
-    onChange: (_inputValue, entity) => {
-      partition = entity as IPartitionEntity;
-    },
-    onAccept: (selectedPartition) => {
-      partition = selectedPartition as IPartitionEntity;
-      handleSelect();
-    },
+    onAccept: () => handleSelect(),
   });
 
-  listWithSearchManager('target', {
+  const { getSelected: getTarget } = await listWithSearchManager('target', {
     entity: 'targets',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: (_inputValue, entity) => {
-      target = entity;
-    },
-    onAccept: (selectedTarget) => {
-      target = selectedTarget;
-      handleSelect();
-    },
+    onAccept: () => handleSelect(),
   });
 
   // ------------------------------------------------------
   function handleSelect() {
     if (query.trim().length > 0) {
+      const partitionId = getPartition()!.id;
+      const searchEngineCode = getSearchEngine()!.id;
+      const targetId = getTarget()!.id;
+
       abCommands.perform(winId, 'new-tab', {
         query,
-        partitionId: partition!.id,
-        searchEngineCode: searchEngine!.id,
-        targetId: target!.id,
+        partitionId,
+        searchEngineCode,
+        targetId,
       });
     }
   }

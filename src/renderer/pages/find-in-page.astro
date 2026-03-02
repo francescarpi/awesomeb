@@ -1,6 +1,6 @@
 ---
-import Layout from '../layouts/Base.astro';
-import ButtonIcon from '../components/common/ButtonIcon.astro';
+import Layout from '#/layouts/Base.astro';
+import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
 <Layout backgroundColor="#000" borderRadius="12px">
@@ -22,8 +22,8 @@ import ButtonIcon from '../components/common/ButtonIcon.astro';
 </Layout>
 
 <script>
-  import { inputManager } from '../scripts/inputs';
-  import { getSearchParams } from '../scripts/url';
+  import { inputManager, getSearchParams } from '#/scripts';
+
   const { searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId')!;
 

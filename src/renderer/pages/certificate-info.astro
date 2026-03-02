@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Certificate Info">
@@ -24,7 +24,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
   </div>
 
   <script>
-    import { getSearchParams } from '#/scripts/url';
+    import { getSearchParams } from '#/scripts';
     import dayjs from 'dayjs';
 
     const { winId } = getSearchParams();

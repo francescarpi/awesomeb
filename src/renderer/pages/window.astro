@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Base.astro';
+import Layout from '#/layouts/Base.astro';
 ---
 
 <Layout>
@@ -14,7 +14,7 @@ import Layout from '../layouts/Base.astro';
 </Layout>
 
 <script>
-  import { getSearchParams } from '#/scripts/url';
+  import { getSearchParams } from '#/scripts';
 
   const { winId, searchParams } = getSearchParams();
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;

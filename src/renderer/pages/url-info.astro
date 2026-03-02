@@ -1,5 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import Base from '#/layouts/Base.astro';
 ---
 
 <Base>
@@ -11,7 +11,8 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
+  import { getSearchParams } from '#/scripts';
+
   const { searchParams } = getSearchParams();
   const url = searchParams.get('url')!;
   const span = document.querySelector('span')!;

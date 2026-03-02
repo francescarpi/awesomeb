@@ -32,9 +32,8 @@ import WindowId from '#/components/sidebar/WindowId.astro';
 </Layout>
 
 <script>
-  import { onClick } from '#/scripts/buttons';
+  import { onClick, getSearchParams } from '#/scripts';
 
-  import { getSearchParams } from '#/scripts/url';
   const { winId, searchParams } = getSearchParams();
 
   const colorPrimary = searchParams.get('colorPrimary');

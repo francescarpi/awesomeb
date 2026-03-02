@@ -1,12 +1,12 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Tab Switcher"><ul></ul></BlackBgWithTitle>
 
 <script>
   import { TTabId, ITabSwitcherTab } from '~/types';
-  import { getSearchParams } from '../scripts/url';
+  import { getSearchParams } from '#/scripts';
 
   const { winId } = getSearchParams();
   let selectedIndex = 0;

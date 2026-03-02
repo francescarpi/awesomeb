@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Bookmarks">
@@ -76,8 +76,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
 <script>
   import { IBookmark, IFolderBookmark, IUrlBookmark, EBookmarkType } from '~/types';
-  import { dialogConfirm } from '../scripts/dialog-confirm';
-  import { dialogWithSelect, IOption } from '../scripts/dialog-with-select';
+  import { dialogConfirm, dialogWithSelect, type IOption } from '#/scripts';
 
   // =============================================================================
   // DOM ELEMENTS

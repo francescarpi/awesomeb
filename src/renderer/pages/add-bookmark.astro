@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle>
@@ -15,8 +15,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
-  import { inputManager } from '../scripts/inputs';
+  import { getSearchParams, inputManager } from '#/scripts';
 
   const { winId, searchParams } = getSearchParams();
 

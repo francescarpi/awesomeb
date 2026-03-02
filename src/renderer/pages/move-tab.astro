@@ -1,6 +1,6 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
-import ListWithSearch from '../components/common/ListWithSearch.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
 <BlackBgWithTitle title="Move Tab">
@@ -12,9 +12,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { paginatorManager } from '../scripts/paginator';
-  import { listWithSearchManager } from '../scripts/list-with-search';
-  import { getSearchParams } from '../scripts/url';
+  import { paginatorManager, listWithSearchManager, getSearchParams } from '#/scripts';
   import { IEntity, IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();

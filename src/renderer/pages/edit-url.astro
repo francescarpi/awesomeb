@@ -1,7 +1,7 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
-import Option1 from '../components/edit-url/Option1.astro';
-import Option2 from '../components/edit-url/Option2.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Option1 from '#/components/edit-url/Option1.astro';
+import Option2 from '#/components/edit-url/Option2.astro';
 ---
 
 <BlackBgWithTitle title="Edit URL">
@@ -13,8 +13,7 @@ import Option2 from '../components/edit-url/Option2.astro';
 
 <script>
   import { ITabEntity } from '~/types';
-  import { getSearchParams } from '../scripts/url';
-  import { inputManager, type TSetValue, type TSetDefault } from '../scripts/inputs';
+  import { getSearchParams, inputManager, type TSetValue, type TSetDefault } from '#/scripts';
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId');

@@ -1,6 +1,6 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
-import ListWithSearch from '../components/common/ListWithSearch.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
 <BlackBgWithTitle title="Remove All Desktop Dividers">
@@ -8,8 +8,7 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
-  import { listWithSearchManager } from '../scripts/list-with-search';
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
 
   const { winId } = getSearchParams();
 

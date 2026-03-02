@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Choose a client certficiate">
@@ -17,7 +17,7 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { getSearchParams } from '../scripts/url';
+  import { getSearchParams } from '#/scripts';
   const { winId, searchParams } = getSearchParams();
 
   const tabId = parseInt(searchParams.get('tabId')!, 10);

@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Rename Desktop">
@@ -13,8 +13,8 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 
 <script>
   import { IDesktopEntity } from '~/types';
-  import { getSearchParams } from '../scripts/url';
-  import { inputManager } from '../scripts/inputs';
+  import { getSearchParams, inputManager } from '#/scripts';
+
   const { winId, searchParams } = getSearchParams();
   const desktopId = searchParams.get('desktopId');
 

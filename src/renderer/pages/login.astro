@@ -1,5 +1,5 @@
 ---
-import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Login">
@@ -24,8 +24,8 @@ import BlackBgWithTitle from '../layouts/BlackBgWithTitle.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { inputManager } from '../scripts/inputs';
-  import { getSearchParams } from '../scripts/url';
+  import { inputManager, getSearchParams } from '#/scripts';
+
   const { winId, searchParams } = getSearchParams();
 
   const host = searchParams.get('host')!;
