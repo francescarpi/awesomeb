@@ -285,24 +285,24 @@ export class Window extends UIWindow {
     return true;
   }
 
+  get tabsOrderedByLastAccessed(): IDesConTab[] {
+    const tabs = this.tabs.filter((t) => !t.tab.suspended);
+    tabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
+    return tabs;
+  }
+
   getLastAccessedTab(desktop?: Desktop): IDesConTab | null {
-    const tabs = this.tabs;
+    let tabs = this.tabsOrderedByLastAccessed;
+
+    if (desktop) {
+      tabs = tabs.filter((conTab) => conTab.desktop.id === desktop.id);
+    }
+
     if (tabs.length === 0) {
       return null;
     }
 
-    let filteredTabs = tabs.filter((t) => !t.tab.suspended);
-    if (desktop) {
-      filteredTabs = filteredTabs.filter((conTab) => conTab.desktop.id === desktop.id);
-    }
-
-    if (filteredTabs.length === 0) {
-      return null;
-    }
-
-    filteredTabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
-
-    return filteredTabs[0];
+    return tabs[0];
   }
 
   refreshViewsBounds() {

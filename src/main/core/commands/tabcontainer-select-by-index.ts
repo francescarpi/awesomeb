@@ -14,7 +14,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Select Tab Container by Index',
   description: 'Selects a tab container based on the provided index, being one-based.',
   visibility: ({ window }) => !!window,
-  async handler({ window, desktop, params }) {
+  async handler({ window, desktop, params, tabContainer: selectedTabContainer, tab: selectedTab }) {
     const tabContainers = desktop.tabContainers;
     if (tabContainers.length === 0) {
       scopeLog.warn('No tab containers available to select.');
@@ -22,6 +22,15 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     const result = tabContainers[params.index - 1];
+    if (result && result.id === selectedTabContainer?.id && selectedTab) {
+      const orderedTabs = window.tabsOrderedByLastAccessed;
+      if (orderedTabs.length > 1) {
+        const previous = orderedTabs[1];
+        window.selectTab(previous.tab.id);
+        return;
+      }
+    }
+
     if (result) {
       if (result.selectedTab) {
         await window.selectTab(result.selectedTab.id);
