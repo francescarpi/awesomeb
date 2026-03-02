@@ -12,7 +12,7 @@
     "start": "electron .",
     "format": "prettier --write src",
     "test": "vitest",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint .",
     "tscheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "tscheck:renderer": "tsc --noEmit -p tsconfig.renderer.json --composite false",
     "tscheck": "npm run tscheck:node && npm run tscheck:renderer"
@@ -35,7 +35,8 @@
     "electron-builder": "26.8.1",
     "eslint": "10.0.2",
     "eslint-js": "github:eslint/js",
-    "globals": "17.3.0",
+    "eslint-plugin-astro": "1.6.0",
+    "globals": "17.4.0",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1",
     "tailwindcss": "4.2.1",

@@ -230,11 +230,11 @@
   ) {
     // Set basic desktop information
     elements.listItem.dataset.id = desktop.id;
-    elements.listItem.dataset.name = desktop.name;
+    elements.listItem.dataset.name = desktop.name || ' ';
     elements.desktopId.textContent = desktop.id;
 
     // Handle selection state
-    updateSelectionState(elements.listItem, desktop.selected, desktop.name);
+    updateSelectionState(elements.listItem, desktop.selected || false, desktop.name || ' ');
 
     // Handle tab indicators
     updateTabIndicators(elements, desktop);

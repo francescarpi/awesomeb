@@ -38,4 +38,9 @@ export function registerWindowEvents(window: Window) {
   window.bw.on('leave-html-full-screen', () => {
     window.setFullScreen(false);
   });
+
+  //--------------------------------------------------------------------------------------
+  window.bw.on('close', () => {
+    window.browser.removeWindow(window.id);
+  });
 }

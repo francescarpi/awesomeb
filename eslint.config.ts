@@ -3,19 +3,21 @@ import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
+import eslintPluginAstro from 'eslint-plugin-astro';
 
 export default defineConfig([
   globalIgnores([
     'dist',
     'public/mockServiceWorker.js',
-    '.astro',
     'src/**/*.d.ts',
     'dist-electron',
+    '.astro',
   ]),
   js.configs.recommended,
-  tseslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...eslintPluginAstro.configs.recommended,
   {
-    files: ['**/*.{ts,js}'],
+    files: ['**/*.{ts,js,astro}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

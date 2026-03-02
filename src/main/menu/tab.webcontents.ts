@@ -82,7 +82,8 @@ function openOptions(
       icon: getIcon(EIcon.Open),
       submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
         label: target.label,
-        click: () => browser.openURL(url, { targetId: target.id, partitionId: partition.id }),
+        click: () =>
+          browser.openURL(url, { targetId: target.id, partitionId: partition.id, selectTab: true }),
       })),
     },
   ];

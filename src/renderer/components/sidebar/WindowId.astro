@@ -1,0 +1,11 @@
+---
+
+---
+
+<div id="window-id" class="text-[11px]"></div>
+
+<script>
+  import { getSearchParams } from '#/scripts/url';
+  const { winId } = getSearchParams();
+  document.querySelector('#window-id')!.textContent = `ID: ${winId}`;
+</script>

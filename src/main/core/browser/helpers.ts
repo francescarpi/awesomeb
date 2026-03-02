@@ -79,16 +79,23 @@ export function parseTarget(
   }
 
   if (targetId === 'new-window') {
-    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds: window.bounds });
+    const newBounds = window.bounds;
+    newBounds.x += 30;
+    newBounds.y += 30;
+
+    window = browser.createWindow(browser.idGenerator.nextWindowId, {
+      bounds: newBounds,
+      withDesktops: true,
+    });
     scopeLog.info(
       `Created new window with id ${window.id}, default desktop is ${window.selectedDesktop.id}`,
     );
   } else if (targetId === 'new-window-left') {
     const bounds = getNextPreviousBounds(browser, 'previous') || undefined;
-    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds });
+    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
   } else if (targetId === 'new-window-right') {
     const bounds = getNextPreviousBounds(browser, 'next') || undefined;
-    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds });
+    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
   }
 
   let desktop = window.selectedDesktop;

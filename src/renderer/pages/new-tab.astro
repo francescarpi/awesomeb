@@ -46,8 +46,8 @@ import ListWithSearch from '../components/common/ListWithSearch.astro';
       searchEngine = entity;
       query = await searchInHistory(inputValue, inputEl);
     },
-    onAccept: (searchEngine) => {
-      searchEngine = searchEngine;
+    onAccept: (value) => {
+      searchEngine = value;
       handleSelect();
     },
   });

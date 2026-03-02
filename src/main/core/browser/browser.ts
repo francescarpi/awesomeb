@@ -108,7 +108,21 @@ export class Browser {
 
     this._activeWindowId = w.id;
 
+    if (props?.withDesktops) {
+      w.createDefaultDesktops();
+    }
+
     return w;
+  }
+
+  removeWindow(id: TWindowId) {
+    this._windows.delete(id);
+    scopeLog.info(
+      `Removed window with id ${id} ` + `(Total windows: ${BrowserWindow.getAllWindows().length})`,
+    );
+    if (this._activeWindowId === id) {
+      this._activeWindowId = null;
+    }
   }
 
   get windows(): Window[] {

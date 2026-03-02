@@ -1,10 +1,11 @@
 ---
-import Layout from '../layouts/Base.astro';
-import WindowActions from '../components/sidebar/WindowActions.astro';
-import ButtonIcon from '../components/common/ButtonIcon.astro';
-import Desktops from '../components/sidebar/Desktops.astro';
-import TabContainers from '../components/sidebar/TabContainers.astro';
-import Downloads from '../components/sidebar/Downloads.astro';
+import Layout from '#/layouts/Base.astro';
+import WindowActions from '#/components/sidebar/WindowActions.astro';
+import ButtonIcon from '#/components/common/ButtonIcon.astro';
+import Desktops from '#/components/sidebar/Desktops.astro';
+import TabContainers from '#/components/sidebar/TabContainers.astro';
+import Downloads from '#/components/sidebar/Downloads.astro';
+import WindowId from '#/components/sidebar/WindowId.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
@@ -21,16 +22,19 @@ import Downloads from '../components/sidebar/Downloads.astro';
     <section class="flex-1">
       <TabContainers />
     </section>
-    <section class="p-2">
+    <section
+      class="py-2 flex flex-col gap-1 items-center sidebar:flex-row sidebar:justify-between sidebar:px-2"
+    >
       <Downloads />
+      <WindowId />
     </section>
   </div>
 </Layout>
 
 <script>
-  import { onClick } from '../scripts/buttons';
+  import { onClick } from '#/scripts/buttons';
 
-  import { getSearchParams } from '../scripts/url';
+  import { getSearchParams } from '#/scripts/url';
   const { winId, searchParams } = getSearchParams();
 
   const colorPrimary = searchParams.get('colorPrimary');

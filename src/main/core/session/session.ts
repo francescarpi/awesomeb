@@ -27,7 +27,8 @@ export class Session extends Store<ISessionStore> {
   }
 
   sessionToStore(): ISessionWindow[] {
-    return this._browser.windows.map((window) => ({
+    const windows = this._browser.windows;
+    return windows.map((window) => ({
       id: window.id,
       bounds: window.bounds,
       selectedDesktopId: window.selectedDesktop.id,

@@ -1,12 +1,12 @@
 ---
-import ButtonIcon from '../common/ButtonIcon.astro';
+import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
 <ButtonIcon icon="downloads" />
 
 <script>
-  import { getSearchParams } from '../../scripts/url';
-  import { onClick } from '../../scripts/buttons';
+  import { getSearchParams } from '#/scripts/url';
+  import { onClick } from '#/scripts/buttons';
 
   const { winId } = getSearchParams();
   const downloads = document.getElementById('downloads')!;
