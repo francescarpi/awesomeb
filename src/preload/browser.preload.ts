@@ -113,6 +113,9 @@ const abTabs = {
   trustCertificateError: (tabId: TTabId) => {
     ipcRenderer.send('tabs:trust-certificate-error', tabId);
   },
+  grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => {
+    ipcRenderer.send('tabs:grant-permission', winId, tabId, value);
+  },
 };
 
 //--------------------------------------------------------------------------------------

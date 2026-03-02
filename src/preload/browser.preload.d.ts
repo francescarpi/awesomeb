@@ -80,6 +80,7 @@ declare global {
     ) => void;
     clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => void;
     trustCertificateError: (tabId: TTabId) => void;
+    grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
   };
 
   //--------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { Browser } from '@/core';
+import { Browser, permissions } from '@/core';
 import {
   checkCertificateErrorSender,
   checkFailLoadSender,
@@ -191,4 +191,34 @@ export function setupTabIPC(browser: Browser) {
       },
     );
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'tabs:grant-permission',
+    async (event, winId: TWindowId, tabId: TTabId, value: boolean) => {
+      scopeLog.info(
+        `IPC tabs:grant-permission received for window ${winId}, tab ${tabId} with value ${value}`,
+      );
+      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
+        const tabData = window.getTab(tabId);
+        if (!tabData) {
+          scopeLog.warn(`Grant Permission IPC: Tab ${tabId} not found in window ${winId}`);
+          return;
+        }
+
+        if (!tabData.tab.requestPermission) {
+          scopeLog.warn(
+            `Grant Permission IPC: Tab ${tabId} in window ${winId} does not have requestPermission set`,
+          );
+          return;
+        }
+
+        const [permission, host, callback] = tabData.tab.requestPermission;
+
+        callback(value);
+        permissions.set(host, permission, value);
+        tabData.tab.setRequestPermission(null);
+      });
+    },
+  );
 }

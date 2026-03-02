@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 import slugify from 'slugify';
 import log from 'electron-log';
-import { IConfigSearchEngine, TPartitionId } from '~/types';
+import { EPermissionConfigType, IConfigSearchEngine, TPartitionId } from '~/types';
 
 const scopeLog = log.scope('Config');
 
@@ -50,6 +50,7 @@ export class Config extends Store<IConfigStore> {
         partitions: [],
         downloadsFolder: path.join(os.homedir(), 'Downloads'),
         themes: [],
+        permissionsType: EPermissionConfigType.Standard,
       },
     });
   }
@@ -195,5 +196,9 @@ export class Config extends Store<IConfigStore> {
     themes.splice(index, 1);
     this.setProperty('themes', themes);
     scopeLog.info(`Deleted theme: ${themeName}.`);
+  }
+
+  get isStandardPermissions() {
+    return this.getProperty('permissionsType') === EPermissionConfigType.Standard;
   }
 }

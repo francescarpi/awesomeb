@@ -1,0 +1,38 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Grant permission">
+  <div class="flex flex-col gap-4">
+    <p>
+      The site <strong></strong> is requesting permission for <strong></strong>.
+    </p>
+    <p>Do you want to grant this permission?</p>
+    <div class="flex gap-2 justify-center">
+      <button class="btn btn-error" id="deny">Deny</button>
+      <button class="btn btn-success" id="grant">Grant</button>
+    </div>
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { getSearchParams, onClick } from '#/scripts';
+  const { searchParams, winId } = getSearchParams();
+
+  const host = searchParams.get('host')!;
+  const permission = searchParams.get('permission')!;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  document.querySelector('strong:nth-child(1)')!.textContent = host;
+  document.querySelector('strong:nth-child(2)')!.textContent = permission;
+
+  onClick('deny', () => {
+    abTabs.grantPermission(winId, tabId, false);
+    abModal.close(winId);
+  });
+
+  onClick('grant', () => {
+    abTabs.grantPermission(winId, tabId, true);
+    abModal.close(winId);
+  });
+</script>

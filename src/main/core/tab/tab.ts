@@ -1,5 +1,10 @@
 import { Partition, history, Browser } from '@/core';
-import { ITabProps, TBasicAuthCallback, TCertificateCallback } from './types';
+import {
+  ITabProps,
+  TBasicAuthCallback,
+  TCertificateCallback,
+  TPermissionRequestCallback,
+} from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
@@ -29,6 +34,7 @@ export class Tab {
   private _clientCertificatesAndCallback: [Certificate[], TCertificateCallback] | null = null;
   private _safe: boolean = true;
   private _certificateError: CertificateError | null = null;
+  private _requestPermission: [string, string, TPermissionRequestCallback] | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -327,5 +333,13 @@ export class Tab {
     this._safe = true;
     this._certificateError = null;
     this.browser.eventsChannel.emit('tab:certificate-error-did-change', this, false);
+  }
+
+  setRequestPermission(data: [string, string, TPermissionRequestCallback] | null) {
+    this._requestPermission = data;
+  }
+
+  get requestPermission(): [string, string, TPermissionRequestCallback] | null {
+    return this._requestPermission;
   }
 }

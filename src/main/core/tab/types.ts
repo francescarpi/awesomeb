@@ -16,3 +16,5 @@ export interface ITabProps {
 export type TBasicAuthCallback = (username?: string, password?: string) => void;
 
 export type TCertificateCallback = (certificate: Certificate) => void;
+
+export type TPermissionRequestCallback = (granted: boolean) => void;

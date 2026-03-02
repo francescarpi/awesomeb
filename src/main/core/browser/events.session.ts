@@ -1,4 +1,4 @@
-import { Browser, config } from '@/core';
+import { ALLOWED_PERMISSIONS, Browser, config, permissions } from '@/core';
 import { EDownloadStatus, TPartitionId } from '~/types';
 import { session, desktopCapturer } from 'electron';
 import { sanitizeUserAgent } from '@/utils';
@@ -127,6 +127,63 @@ export function registerSessionEvents(browser: Browser, partitionId: TPartitionI
           download.setStatus(EDownloadStatus.Cancelled);
           return;
       }
+    });
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  ses.setPermissionRequestHandler(async (webContents, permission, callback) => {
+    if (config.isStandardPermissions && ALLOWED_PERMISSIONS.includes(permission)) {
+      scopeLog.info(`Automatically granting standard permission: ${permission}`);
+      callback(true);
+      return;
+    }
+
+    const tabResult = browser.getTabByWebContentsId(webContents.id);
+    if (!tabResult) {
+      scopeLog.error(
+        `Tab not found for WebContents ID ${webContents.id} during permission request.`,
+      );
+      callback(false);
+      return;
+    }
+
+    const url = webContents.getURL();
+    if (!url) {
+      scopeLog.error('URL not found for WebContents during permission request.');
+      callback(false);
+      return;
+    }
+
+    let host: string;
+
+    try {
+      host = new URL(url).host;
+    } catch {
+      scopeLog.error(`Invalid URL "${url}" for permission request.`);
+      callback(false);
+      return;
+    }
+
+    const permissionValue = permissions.get(host, permission);
+
+    scopeLog.info(
+      `Permission request: host=${host}, permission=${permission}, storedValue=${permissionValue}`,
+    );
+
+    if (permissionValue !== null) {
+      callback(permissionValue);
+      return;
+    }
+
+    tabResult.tab.setRequestPermission([permission, host, callback]);
+
+    tabResult.window.modal.open('request-permission', {
+      query: {
+        permission,
+        host,
+        url,
+        tabId: tabResult.tab.id.toString(),
+      },
     });
   });
 }

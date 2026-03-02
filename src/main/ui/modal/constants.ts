@@ -48,4 +48,7 @@ export const DEFAULT_MODALS_PROPS = {
   'duplicate-tab': {
     height: 600,
   },
+  'request-permission': {
+    height: 260,
+  },
 };
