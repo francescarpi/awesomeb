@@ -24,9 +24,13 @@ export class TabContainer {
   createTab(id: TTabId, props: ITabProps): Tab {
     const tab = new Tab(this.browser, id, props);
 
-    this._tabs.set(tab.id, tab);
+    this.addTab(tab);
 
     return tab;
+  }
+
+  addTab(tab: Tab) {
+    this._tabs.set(tab.id, tab);
   }
 
   get divider(): boolean {

@@ -100,7 +100,10 @@ export class UIWindow {
       return;
     }
 
+    view.webContentsView.webContents.close();
+
     this.bw.contentView.removeChildView(view.webContentsView);
+
     this._views.delete(id);
   }
 

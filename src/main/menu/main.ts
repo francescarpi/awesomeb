@@ -421,6 +421,17 @@ function tabsMenu(
           }
         },
       },
+      {
+        label: 'Close tab preview',
+        visible: false,
+        accelerator: 'Escape',
+        enabled: !!tab && !!tab.tabPreview,
+        click: () => {
+          if (window && tab && tab.tabPreview) {
+            browser.performCommand(window, 'close-tab-preview');
+          }
+        },
+      },
     ],
   };
 }

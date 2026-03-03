@@ -49,9 +49,8 @@ export class Tab {
     this._customTitle = props.customTitle ?? null;
     this._url = props.url ?? null;
     this._suspended = props.suspended ?? true;
-
-    // The view is not visible initially until method to refresh visible tabs is called.
-    this.view = new TabView(id, this._partition.id);
+    this.view = new TabView(this);
+    this._parent = props.parent ?? null;
 
     registerTabEvents(browser, this);
   }
@@ -356,14 +355,17 @@ export class Tab {
     }
 
     this._preview = previewTab;
-    this.browser.eventsChannel.emit('tab:preview-did-change', this);
   }
 
   get tabPreview(): TabPreview | null {
     return this._preview;
   }
 
-  isPreview(): boolean {
+  get isPreview(): boolean {
     return this._parent !== null;
+  }
+
+  clearParent() {
+    this._parent = null;
   }
 }

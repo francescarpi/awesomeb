@@ -44,6 +44,8 @@ import * as tabCloseBelow from './tab-close-below';
 import * as tabChangeProfile from './tab-change-profile';
 import * as tabCertificateInfo from './tab-certificate-info';
 import * as tabDuplicate from './tab-duplicate';
+import * as tabpreviewClose from './tabpreview-close';
+import * as tabpreviewAccept from './tabpreview-accept';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -87,6 +89,8 @@ const COMMANDS = {
   [tabChangeProfile.TRIGGER]: tabChangeProfile.Command,
   [tabCertificateInfo.TRIGGER]: tabCertificateInfo.Command,
   [tabDuplicate.TRIGGER]: tabDuplicate.Command,
+  [tabpreviewClose.TRIGGER]: tabpreviewClose.Command,
+  [tabpreviewAccept.TRIGGER]: tabpreviewAccept.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

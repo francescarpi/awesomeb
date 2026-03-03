@@ -4,7 +4,7 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
 <Base>
-  <div class="fixed inset-0 bg-black/50 rounded-xl p-4 flex gap-2">
+  <div class="fixed inset-0 bg-black/70 rounded-xl p-4 flex gap-2">
     <div
       class="w-full border border-white rounded-xl flex justify-center items-center animate-pulse"
     >
@@ -24,5 +24,6 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
   const { searchParams } = getSearchParams();
   const parentTabId = searchParams.get('tabId')!;
 
-  onClick('close', () => abTabs.closeTabPreview(parseInt(parentTabId, 10)));
+  onClick('close', () => abTabs.tabPreviewAction(parseInt(parentTabId, 10), 'close'));
+  onClick('maximize', () => abTabs.tabPreviewAction(parseInt(parentTabId, 10), 'accept'));
 </script>

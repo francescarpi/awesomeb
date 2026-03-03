@@ -9,6 +9,8 @@ import { FindInPageOptions, ipcMain, Certificate } from 'electron';
 import { TFindInPageAction, TTabId, TWindowId } from '~/types';
 import log from 'electron-log';
 import { URLInfoView } from './url-info';
+import { Tab } from './tab';
+import { TabPreview } from './tab-preview';
 
 const scopeLog = log.scope('TabIPC');
 
@@ -231,28 +233,58 @@ export function setupTabIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('tabs:close-preview', async (event, parentTabId: TTabId) => {
-    scopeLog.info(`close-preview received for parent tab ${parentTabId}`);
-    const parentTabData = browser.getTab(parentTabId);
+  ipcMain.on('tabs:open-tab-preview', async (event, url: string) => {
+    const parentTabData = browser.getTabByWebContentsId(event.sender.id);
     if (!parentTabData) {
-      scopeLog.warn(`No tab found for parent tab ID ${parentTabId}`);
+      scopeLog.warn(`No tab found for webContents ID ${event.sender.id}`);
       return;
     }
 
-    const tabPreview = parentTabData.tab.tabPreview;
-    if (!tabPreview) {
-      scopeLog.warn(`No preview tab found for parent tab ID ${parentTabId}`);
-      return;
-    }
+    const tab = new Tab(browser, browser.idGenerator.nextTabId, {
+      partition: parentTabData.tab.partition,
+      suspended: false,
+      parent: parentTabData.tab,
+    });
 
-    if (tabPreview.webContentsId !== event.sender.id) {
-      scopeLog.warn(
-        `Sender webContents ID ${event.sender.id} does not match preview tab's webContentsId ${tabPreview.webContentsId}`,
-      );
-      return;
-    }
+    tab.view.setVisible(true);
+    tab.loadURL(url);
 
-    parentTabData.tab.setTabPreview(null);
-    tabPreview.close();
+    const tabPreview = new TabPreview(parentTabData.tab, tab);
+    parentTabData.tab.setTabPreview(tabPreview);
+
+    parentTabData.window.addView(tabPreview);
+    parentTabData.window.addView(tabPreview.tab.view);
+
+    parentTabData.window.refreshTabsVisibility();
+
+    browser.refreshMainMenu();
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'tabs:tab-preview-action',
+    async (event, parentTabId: TTabId, action: 'close' | 'accept') => {
+      scopeLog.info(`tab previoew action received for parent tab ${parentTabId}`);
+      const parentTabData = browser.getTab(parentTabId);
+      if (!parentTabData) {
+        scopeLog.warn(`No tab found for parent tab ID ${parentTabId}`);
+        return;
+      }
+
+      const tabPreview = parentTabData.tab.tabPreview;
+      if (!tabPreview) {
+        scopeLog.warn(`No preview tab found for parent tab ID ${parentTabId}`);
+        return;
+      }
+
+      if (tabPreview.webContentsId !== event.sender.id) {
+        scopeLog.warn(
+          `Sender webContents ID ${event.sender.id} does not match preview tab's webContentsId ${tabPreview.webContentsId}`,
+        );
+        return;
+      }
+
+      browser.performCommand(parentTabData.window, `${action}-tab-preview`);
+    },
+  );
 }

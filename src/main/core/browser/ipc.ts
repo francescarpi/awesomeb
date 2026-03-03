@@ -1,4 +1,4 @@
-import { Browser, Tab, TabPreview } from '@/core';
+import { Browser } from '@/core';
 import { checkModalAndPagesSender } from '@/utils';
 import { ipcMain } from 'electron';
 import { TWindowId, TEntityType } from '~/types';
@@ -38,24 +38,5 @@ export function setupBrowserIPC(browser: Browser) {
         }
       },
     );
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('browser:open-tab-preview', async (event, url: string) => {
-    const parentTabData = browser.getTabByWebContentsId(event.sender.id);
-    if (!parentTabData) {
-      scopeLog.warn(`No tab found for webContents ID ${event.sender.id}`);
-      return;
-    }
-
-    const tab = new Tab(browser, browser.idGenerator.nextTabId, {
-      partition: parentTabData.tab.partition,
-      url,
-      suspended: false,
-      parent: parentTabData.tab,
-    });
-
-    const tabPreview = new TabPreview(parentTabData.tab, tab);
-    parentTabData.tab.setTabPreview(tabPreview);
   });
 }

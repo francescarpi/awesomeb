@@ -81,7 +81,7 @@ declare global {
     clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => void;
     trustCertificateError: (tabId: TTabId) => void;
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
-    closeTabPreview: (parentTabId: TTabId) => void;
+    tabPreviewAction: (parentTabId: TTabId, action: 'close' | 'accept') => void;
   };
 
   //--------------------------------------------------------------------------------------

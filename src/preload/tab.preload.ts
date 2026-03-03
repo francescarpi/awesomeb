@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 const awesomePublicAPI = {
   showTabPreview: (url: string) => {
-    ipcRenderer.send('browser:open-tab-preview', url);
+    ipcRenderer.send('tabs:open-tab-preview', url);
   },
   showLinkInfo: (url: string | null) => {
     ipcRenderer.send('tab:show-url-info', url);

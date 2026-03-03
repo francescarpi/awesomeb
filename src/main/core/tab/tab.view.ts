@@ -1,20 +1,17 @@
 import { Sidebar, UIView, URLBar } from '@/ui';
-import { TPartitionId, TTabId } from '~/types';
 import { session } from 'electron';
 import { internalPartition, Window } from '@/core';
 import { MARGIN } from '@/ui/constants';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
+import { Tab } from './tab';
 
 export class TabView extends UIView {
-  constructor(
-    private readonly tabId: TTabId,
-    partitionId: TPartitionId,
-  ) {
-    super(`tab-${tabId}#`, partitionId === internalPartition.id ? 'browser' : 'tab', {
+  constructor(private readonly tab: Tab) {
+    super(`tab-${tab.id}#`, tab.partition.id === internalPartition.id ? 'browser' : 'tab', {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',
-      session: session.fromPartition(partitionId),
+      session: session.fromPartition(tab.partition.id),
     });
   }
 
@@ -33,17 +30,11 @@ export class TabView extends UIView {
 
     this.webContentsView.setBorderRadius(12);
 
-    // TODO calculate bounds based on number of tab container's tabs
-    const tabResult = window.getTab(this.tabId);
-    if (!tabResult) {
-      return;
-    }
-
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const urlbar = window.getView<URLBar>('urlbar')!;
 
     let x = sidebar.left + sidebar.width;
-    const y = urlbar.top + urlbar.height + MARGIN;
+    let y = urlbar.top + urlbar.height + MARGIN;
     let width = bounds.width - x - MARGIN;
     let height = bounds.height - y - MARGIN;
 
@@ -52,8 +43,15 @@ export class TabView extends UIView {
       width = bounds.width - MARGIN * 2;
     }
 
-    if (tabResult.tab.findInPage) {
+    if (this.tab.findInPage) {
       height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
+    }
+
+    if (this.tab.isPreview) {
+      x += 16;
+      y += 16;
+      width -= 65;
+      height -= 16 * 2;
     }
 
     this.webContentsView.setBounds({

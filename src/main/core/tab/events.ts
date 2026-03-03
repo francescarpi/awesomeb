@@ -9,8 +9,10 @@ const scopeLog = log.scope('TabEvents');
 
 function checkIfRequireAttention(browser: Browser, tab: Tab) {
   const selectedDesktopResult = browser.selectedDesktop;
-  const tabResult = browser.getTab(tab.id)!;
-  tab.setRequireAttention(selectedDesktopResult?.desktop.id !== tabResult.desktop.id);
+  const tabResult = browser.getTab(tab.id);
+  if (tabResult) {
+    tab.setRequireAttention(selectedDesktopResult?.desktop.id !== tabResult.desktop.id);
+  }
 }
 
 export function registerTabEvents(browser: Browser, tab: Tab) {
