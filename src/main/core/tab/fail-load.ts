@@ -1,22 +1,16 @@
-import { UIPageView, UIView } from '@/ui';
-import { TTabId } from '~/types';
-import { Window } from '@/core';
-import log from 'electron-log';
+import { UIPageView } from '@/ui';
+import { Window, Tab } from '@/core';
 
-const scopeLog = log.scope('FailLoad');
-
-// TODO replace tabId by tab instance and use it to get tab.view.bounds isntean to use getView
-// TODO Look how certificate error is implemented. view is not necessary to send to the view
 export class FailLoad extends UIPageView {
   constructor(
-    private readonly tabId: TTabId,
+    private readonly tab: Tab,
     private readonly _code: number,
     private readonly _description: string,
     private readonly _url: string,
   ) {
-    super(`fail-load-tab-${tabId}`, 'browser', {
+    super(`tab-${tab.id}#fail-load`, 'browser', {
       query: {
-        tabId: tabId.toString(),
+        tabId: tab.id.toString(),
         url: _url,
         code: _code.toString(),
         description: _description,
@@ -37,18 +31,12 @@ export class FailLoad extends UIPageView {
     return this._url;
   }
 
-  refreshBounds(window: Window) {
-    const tab = window.getView<UIView>(`tab-${this.tabId}`);
-    if (!tab) {
-      scopeLog.error(`Tab view not found for tabId: ${this.tabId}`);
-      return;
-    }
-
+  refreshBounds(_window: Window) {
     this.webContentsView.setBounds({
-      x: tab.left,
-      y: tab.top,
-      width: tab.width,
-      height: tab.height,
+      x: this.tab.view.left,
+      y: this.tab.view.top,
+      width: this.tab.view.width,
+      height: this.tab.view.height,
     });
   }
 }

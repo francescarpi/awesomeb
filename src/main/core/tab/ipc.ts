@@ -164,6 +164,14 @@ export function setupTabIPC(browser: Browser) {
       return;
     }
 
+    // Remove previous URL info view if exists
+    for (const view of selectedTab.window.views) {
+      if (view.id.startsWith(`tab-${selectedTab.tab.id}#url-info`)) {
+        view.close();
+        selectedTab.window.removeView(view.id);
+      }
+    }
+
     if (url) {
       const view = new URLInfoView(selectedTab.tab, url);
       selectedTab.window.addView(view);

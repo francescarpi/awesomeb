@@ -8,6 +8,9 @@ import { internalPartition, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
 import { Sidebar, URLBar, TabSwitcher, TabMarks } from './views';
+import log from 'electron-log';
+
+const scopeLog = log.scope('UIWindow');
 
 export class UIWindow {
   public readonly bw: BrowserWindow;
@@ -93,6 +96,7 @@ export class UIWindow {
   removeView(id: TViewId) {
     const view = this._views.get(id);
     if (!view) {
+      scopeLog.error(`View with id ${id} not found in window ${this.browserWindowId}`);
       return;
     }
 

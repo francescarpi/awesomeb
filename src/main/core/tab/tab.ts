@@ -242,7 +242,7 @@ export class Tab {
       return;
     }
 
-    this._findInPage = new FindInPage(this.browser.eventsChannel, this.id);
+    this._findInPage = new FindInPage(this.browser.eventsChannel, this);
     this.browser.eventsChannel.emit(
       'tab:find-in-page-visibility-did-change',
       this,
@@ -272,7 +272,7 @@ export class Tab {
     }
 
     this._loading = false;
-    this._failLoad = new FailLoad(this.id, code, description, url);
+    this._failLoad = new FailLoad(this, code, description, url);
 
     this.browser.eventsChannel.emit('tab:fail-load-did-change', this, true, this._failLoad);
   }

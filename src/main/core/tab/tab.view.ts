@@ -10,7 +10,7 @@ export class TabView extends UIView {
     private readonly tabId: TTabId,
     partitionId: TPartitionId,
   ) {
-    super(`tab-${tabId}`, partitionId === internalPartition.id ? 'browser' : 'tab', {
+    super(`tab-${tabId}#`, partitionId === internalPartition.id ? 'browser' : 'tab', {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',

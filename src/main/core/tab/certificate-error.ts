@@ -9,7 +9,7 @@ export class CertificateError extends UIPageView {
     error: string,
     public readonly callback: (isTrusted: boolean) => void,
   ) {
-    super(`certificate-error-tab-${tab.id}`, 'browser', {
+    super(`tab-${tab.id}#certificate-error`, 'browser', {
       query: {
         tabId: tab.id.toString(),
         url,

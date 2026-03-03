@@ -1,24 +1,21 @@
 import EventEmitter from 'events';
-import { TFindInPageAction, TFindInPageId, IFindInPageSearch, TTabId } from '~/types';
+import { TFindInPageAction, TFindInPageId, IFindInPageSearch } from '~/types';
 import type { Result } from 'electron';
-import { MARGIN, UIPageView, UIView } from '@/ui';
-import { Window } from '@/core';
-import log from 'electron-log';
+import { MARGIN, UIPageView } from '@/ui';
+import { Window, Tab } from '@/core';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
-
-const scopeLog = log.scope('FindInPage');
 
 export class FindInPage extends UIPageView {
   private readonly _searches: Map<TFindInPageId, IFindInPageSearch> = new Map();
 
   constructor(
     public readonly eventsChannel: EventEmitter,
-    private readonly tabId: TTabId,
+    private readonly tab: Tab,
   ) {
-    super(`find-in-page-${tabId}`, 'browser', {
+    super(`tab-${tab.id}#find-in-page`, 'browser', {
       visible: false,
       query: {
-        tabId: tabId.toString(),
+        tabId: tab.id.toString(),
       },
       page: 'find-in-page',
     });
@@ -33,7 +30,7 @@ export class FindInPage extends UIPageView {
     if (search) {
       search.result = result;
       this._searches.set(requestId, search);
-      this.eventsChannel.emit('tab:find-in-page-result-did-change', this.tabId, requestId);
+      this.eventsChannel.emit('tab:find-in-page-result-did-change', this.tab.id, requestId);
     }
   }
 
@@ -46,16 +43,10 @@ export class FindInPage extends UIPageView {
   }
 
   refreshBounds(window: Window) {
-    const tab = window.getView<UIView>(`tab-${this.tabId}`);
-    if (!tab) {
-      scopeLog.error(`Tab view not found for tabId: ${this.tabId}`);
-      return;
-    }
-
     this.webContentsView.setBounds({
-      x: tab.left,
+      x: this.tab.view.left,
       y: window.bounds.height - FIND_IN_PAGE_VIEW_HEIGHT - MARGIN,
-      width: tab.width,
+      width: this.tab.view.width,
       height: FIND_IN_PAGE_VIEW_HEIGHT,
     });
   }

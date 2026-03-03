@@ -277,7 +277,14 @@ export class Window extends UIWindow {
       }
     }
 
-    this.removeView(tab.view.id);
+    // Remove views
+    for (const view of this.views) {
+      if (view.id.startsWith(`tab-${tab.id}#`)) {
+        view.close();
+        this.removeView(view.id);
+      }
+    }
+
     this.refreshTabsVisibility();
 
     this.browser.eventsChannel.emit('window:tab-did-close', this);
