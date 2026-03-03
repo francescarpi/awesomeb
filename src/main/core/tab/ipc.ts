@@ -229,4 +229,30 @@ export function setupTabIPC(browser: Browser) {
       });
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('tabs:close-preview', async (event, parentTabId: TTabId) => {
+    scopeLog.info(`close-preview received for parent tab ${parentTabId}`);
+    const parentTabData = browser.getTab(parentTabId);
+    if (!parentTabData) {
+      scopeLog.warn(`No tab found for parent tab ID ${parentTabId}`);
+      return;
+    }
+
+    const tabPreview = parentTabData.tab.tabPreview;
+    if (!tabPreview) {
+      scopeLog.warn(`No preview tab found for parent tab ID ${parentTabId}`);
+      return;
+    }
+
+    if (tabPreview.webContentsId !== event.sender.id) {
+      scopeLog.warn(
+        `Sender webContents ID ${event.sender.id} does not match preview tab's webContentsId ${tabPreview.webContentsId}`,
+      );
+      return;
+    }
+
+    parentTabData.tab.setTabPreview(null);
+    tabPreview.close();
+  });
 }

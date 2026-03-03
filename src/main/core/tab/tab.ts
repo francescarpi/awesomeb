@@ -14,6 +14,7 @@ import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
 import { CertificateError } from './certificate-error';
+import { TabPreview } from './tab-preview';
 
 const scopeLog = log.scope('Tab');
 
@@ -35,6 +36,8 @@ export class Tab {
   private _safe: boolean = true;
   private _certificateError: CertificateError | null = null;
   private _requestPermission: [string, string, TPermissionRequestCallback] | null = null;
+  private _parent: Tab | null = null;
+  private _preview: TabPreview | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -341,5 +344,26 @@ export class Tab {
 
   get requestPermission(): [string, string, TPermissionRequestCallback] | null {
     return this._requestPermission;
+  }
+
+  get parentTab(): Tab | null {
+    return this._parent;
+  }
+
+  setTabPreview(previewTab: TabPreview | null) {
+    if (this._preview === previewTab) {
+      return;
+    }
+
+    this._preview = previewTab;
+    this.browser.eventsChannel.emit('tab:preview-did-change', this);
+  }
+
+  get tabPreview(): TabPreview | null {
+    return this._preview;
+  }
+
+  isPreview(): boolean {
+    return this._parent !== null;
   }
 }

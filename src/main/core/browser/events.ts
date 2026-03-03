@@ -1,5 +1,5 @@
 import { TFindInPageId, TTabId, TWindowId } from '~/types';
-import { Browser, Window, Desktop, Tab, TabContainer, notification } from '@/core';
+import { Browser, Window, Desktop, Tab, TabContainer, notification, TabPreview } from '@/core';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
 import { UIPageView } from '@/ui';
@@ -266,4 +266,29 @@ export function registerBrowserEvents(browser: Browser) {
       result.window.refreshTabsVisibility();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:preview-did-change', async (tab: Tab) => {
+    scopeLog.info(`Tab preview did change event received for Tab with id ${tab.id}`);
+
+    const tabData = browser.getTab(tab.id);
+    if (!tabData) {
+      scopeLog.warn(`Tab with id ${tab.id} not found for tab preview event`);
+      return;
+    }
+
+    const tabPreview = tabData.tab.tabPreview;
+
+    if (!tabPreview) {
+      scopeLog.info(`No preview set for Tab with id ${tab.id}, skipping preview view update`);
+      const view = tabData.window.getView<TabPreview>(`tab-${tab.id}#preview`);
+      if (view) {
+        tabData.window.removeView(view.id);
+      }
+    } else {
+      tabData.window.addView(tabPreview);
+    }
+
+    tabData.window.refreshTabsVisibility();
+  });
 }

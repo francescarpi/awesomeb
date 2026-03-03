@@ -1,9 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 const awesomePublicAPI = {
-  // showTabPreview: (url: string) => {
-  //   ipcRenderer.send('show-tab-preview', url);
-  // },
+  showTabPreview: (url: string) => {
+    ipcRenderer.send('browser:open-tab-preview', url);
+  },
   showLinkInfo: (url: string | null) => {
     ipcRenderer.send('tab:show-url-info', url);
   },
@@ -12,7 +12,6 @@ const awesomePublicAPI = {
 contextBridge.exposeInMainWorld('awesomePublic', awesomePublicAPI);
 
 // ----------------------------------------------------------------------------------------------- //
-// Show link info on hover
 document.addEventListener('DOMContentLoaded', () => {
   const anchors = document.querySelectorAll('a');
 
@@ -28,12 +27,25 @@ document.addEventListener('DOMContentLoaded', () => {
       awesomePublicAPI.showLinkInfo(null);
     });
 
-    anchor.addEventListener(
-      'click',
-      () => {
-        awesomePublicAPI.showLinkInfo(null);
-      },
-      { once: true },
-    );
+    anchor.addEventListener('click', (event: MouseEvent) => {
+      awesomePublicAPI.showLinkInfo(null);
+
+      if (event.altKey && anchor.href) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+
+        removeFocusActiveElement();
+
+        awesomePublicAPI.showTabPreview(anchor.href);
+      }
+    });
   });
 });
+
+function removeFocusActiveElement() {
+  const activeElement = document.activeElement as HTMLElement | null;
+  if (activeElement) {
+    activeElement.blur();
+  }
+}

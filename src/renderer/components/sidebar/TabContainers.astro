@@ -1,5 +1,5 @@
 ---
-import ButtonIcon from '../common/ButtonIcon.astro';
+import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
 <ul id="tabContainers" style="app-region: no-drag;" class="flex flex-col gap-1.5"></ul>
@@ -13,8 +13,7 @@ import ButtonIcon from '../common/ButtonIcon.astro';
 </template>
 
 <script>
-  import { TabContainersMng } from '#/scripts/tab-containers';
-  import { getSearchParams } from '#/scripts/url';
+  import { getSearchParams, TabContainersMng } from '#/scripts';
 
   const { winId } = getSearchParams();
 
