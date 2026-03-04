@@ -117,7 +117,7 @@ const abTabs = {
     ipcRenderer.send('tabs:grant-permission', winId, tabId, value);
   },
   tabPreviewAction: (parentTabId: TTabId, action: 'close' | 'accept') => {
-    ipcRenderer.send('tabs:close-tab-preview', parentTabId, action);
+    ipcRenderer.send('tabs:tab-preview-action', parentTabId, action);
   },
 };
 

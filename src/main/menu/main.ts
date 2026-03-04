@@ -432,6 +432,17 @@ function tabsMenu(
           }
         },
       },
+      {
+        label: 'Accept tab preview',
+        visible: false,
+        accelerator: 'Enter',
+        enabled: !!tab && !!tab.tabPreview,
+        click: () => {
+          if (window && tab && tab.tabPreview) {
+            browser.performCommand(window, 'accept-tab-preview');
+          }
+        },
+      },
     ],
   };
 }

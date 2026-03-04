@@ -228,7 +228,7 @@ export class Browser {
       openURLHistory.add(url);
     }
 
-    await tab.loadURL(url);
+    tab.loadURL(url);
 
     return { window, desktop, tabContainer, tab };
   }
@@ -356,5 +356,61 @@ export class Browser {
       }
     }
     return result;
+  }
+
+  closeTabPreview(tabId: TTabId) {
+    const tabData = this.getTab(tabId);
+    if (!tabData) {
+      scopeLog.warn(`Tab with id ${tabId} not found for closing preview`);
+      return;
+    }
+
+    const tabPreview = tabData.tab.tabPreview;
+    if (!tabPreview) {
+      scopeLog.warn(`No preview tab found for Tab ID ${tabData.tab.id}`);
+      return;
+    }
+
+    tabData.window.removeView(tabPreview.tab.view.id);
+    tabData.window.removeView(tabPreview.id);
+
+    tabData.tab.setTabPreview(null);
+
+    tabPreview.close();
+
+    tabData.window.refreshTabsVisibility();
+    this.refreshMainMenu();
+  }
+
+  acceptTabPreview(tabId: TTabId) {
+    const tabData = this.getTab(tabId);
+    if (!tabData) {
+      scopeLog.warn(`Tab with id ${tabId} not found for accepting preview`);
+      return;
+    }
+
+    const tabPreview = tabData.tab.tabPreview;
+    if (!tabPreview) {
+      scopeLog.warn(`No preview tab found for Tab ID ${tabData.tab.id}`);
+      return;
+    }
+
+    const tabContainer = tabData.desktop.createTabContainer(this.idGenerator.nextTabContainerId);
+    tabContainer.addTab(tabPreview.tab);
+    tabContainer.selectTab(tabPreview.tab.id);
+
+    tabData.desktop.selectTabContainer(tabContainer.id);
+
+    tabPreview.tab.clearParent();
+
+    tabData.window.removeView(tabPreview.id);
+    tabPreview.close();
+
+    tabData.tab.setTabPreview(null);
+
+    tabData.window.refreshTabsVisibility();
+    this.refreshMainMenu();
+
+    this.eventsChannel.emit('browser:url-opened', tabData.window);
   }
 }
