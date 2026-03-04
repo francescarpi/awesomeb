@@ -10,7 +10,7 @@ importers:
     dependencies:
       astro-electron:
         specifier: 0.5.0
-        version: 0.5.0(astro@5.18.0(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2))(electron@40.6.1)(vite-plugin-electron-renderer@0.14.6)
+        version: 0.5.0(astro@5.18.0(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2))(electron@40.7.0)(vite-plugin-electron-renderer@0.14.6)
       dayjs:
         specifier: 1.11.19
         version: 1.11.19
@@ -61,8 +61,8 @@ importers:
         specifier: 5.5.19
         version: 5.5.19
       electron:
-        specifier: 40.6.1
-        version: 40.6.1
+        specifier: 40.7.0
+        version: 40.7.0
       electron-builder:
         specifier: 26.8.1
         version: 26.8.1(electron-builder-squirrel-windows@26.4.0)
@@ -2071,8 +2071,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@40.6.1:
-    resolution: {integrity: sha512-u9YfoixttdauciHV9Ut9Zf3YipJoU093kR1GSYTTXTAXqhiXI0G1A0NnL/f0O2m2UULCXaXMf2W71PloR6V9pQ==}
+  electron@40.7.0:
+    resolution: {integrity: sha512-oQe76S/3V1rcb0+i45hAxnCH8udkRZSaHUNwglzNAEKbB94LSJ1qwbFo8+uRc2UsYZgCqSIMRcyX40GyOkD+Xw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -5786,10 +5786,10 @@ snapshots:
   astral-regex@2.0.0:
     optional: true
 
-  astro-electron@0.5.0(astro@5.18.0(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2))(electron@40.6.1)(vite-plugin-electron-renderer@0.14.6):
+  astro-electron@0.5.0(astro@5.18.0(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2))(electron@40.7.0)(vite-plugin-electron-renderer@0.14.6):
     dependencies:
       astro: 5.18.0(@types/node@25.0.10)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.56.0)(typescript@5.9.3)(yaml@2.8.2)
-      electron: 40.6.1
+      electron: 40.7.0
       vite-plugin-electron: 0.29.0(vite-plugin-electron-renderer@0.14.6)
     transitivePeerDependencies:
       - vite-plugin-electron-renderer
@@ -6521,7 +6521,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@40.6.1:
+  electron@40.7.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 24.10.9
