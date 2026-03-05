@@ -202,6 +202,8 @@ class Tab extends HTMLLIElement {
     );
     titleElement.onclick = () => abCommands.perform(winId, 'select-tab', { tabId: tab.id });
     titleElement.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
+    titleElement.ondblclick = () => abModal.open(winId, 'rename-tab');
+
     this._titleElement = titleElement;
     this.setTitle(tab.title);
 

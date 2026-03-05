@@ -20,9 +20,15 @@ export function setupUIIPC(browser: Browser) {
     scopeLog.info(
       `IPC Received: layout-system:open-modal for window ID ${winId} with page ${page}`,
     );
-    return await checkModalAndPagesSender(event, browser, winId, ['urlbar'], async (window) => {
-      window.modal.open(page);
-    });
+    return await checkModalAndPagesSender(
+      event,
+      browser,
+      winId,
+      ['urlbar', 'sidebar'],
+      async (window) => {
+        window.modal.open(page);
+      },
+    );
   });
 
   //--------------------------------------------------------------------------------------
