@@ -1,4 +1,4 @@
-import { ITab, ITabContainer, TWindowId } from '~/types';
+import { ITab, ITabContainer, TTabId, TWindowId } from '~/types';
 
 const suspendBtnTpl = document.getElementById('suspend-button-template') as HTMLTemplateElement;
 const closeBtnTpl = document.getElementById('close-button-template') as HTMLTemplateElement;
@@ -11,48 +11,32 @@ export class TabContainersMng {
     this._container = container;
   }
 
-  private id(tabContainer: ITabContainer): string {
-    return `tab-container-${tabContainer.id}`;
-  }
-
   renderTabContainers(winId: TWindowId, tabContainers: ITabContainer[]) {
-    for (const [idx, tabContainer] of tabContainers.entries()) {
-      const tContainerSameIdx = this._container.querySelector(
-        `li:nth-child(${idx + 1})`,
-      ) as TabContainer | null;
-
-      if (!tContainerSameIdx) {
-        const tContainer = this.createTabContainer(tabContainer, idx, winId);
-        this._container.appendChild(tContainer);
-      } else if (tContainerSameIdx.id === this.id(tabContainer)) {
-        tContainerSameIdx.setDivider(tabContainer.divider);
-
-        for (const tab of tabContainer.tabs) {
-          this.refreshTab(winId, tab);
-        }
-      } else if (tContainerSameIdx.id !== this.id(tabContainer)) {
-        this._container.removeChild(tContainerSameIdx);
-        const tContainer = this.createTabContainer(tabContainer, idx, winId);
-        this._container.insertBefore(tContainer, this._container.children[idx]);
+    // To prevent flickering of favicons, we store them in a temporary object and reuse the same image elements when possible
+    const favicons: Record<TTabId, HTMLImageElement> = {};
+    const existingFavicons = this._container.querySelectorAll(
+      'img.favicon',
+    ) as unknown as HTMLImageElement[];
+    for (const favicon of existingFavicons) {
+      const tabId = parseInt(favicon.dataset.tabId as string, 10);
+      if (tabId) {
+        favicons[tabId] = favicon;
       }
     }
 
-    // Remove tab containers that are no longer present
-    const currentTabContainerIds = tabContainers.map((tc) => this.id(tc));
-    const existingTabContainerElements = this._container.querySelectorAll(
-      'li[id^="tab-container-"]',
-    );
-    existingTabContainerElements.forEach((el) => {
-      if (!currentTabContainerIds.includes(el.id)) {
-        this._container.removeChild(el);
-      }
-    });
+    this._container.innerHTML = '';
+
+    for (const [idx, tabContainer] of tabContainers.entries()) {
+      const tContainer = this.createTabContainer(tabContainer, idx, winId, favicons);
+      this._container.insertBefore(tContainer, this._container.children[idx]);
+    }
   }
 
   private createTabContainer(
     tabContainer: ITabContainer,
     idx: number,
     winId: TWindowId,
+    faviconsMap: Record<TTabId, HTMLImageElement>,
   ): TabContainer {
     const tabContainerElement = document.createElement('li', {
       is: 'tab-container-el',
@@ -66,7 +50,7 @@ export class TabContainersMng {
       const tabElement = document.createElement('li', {
         is: 'tab-el',
       }) as Tab;
-      tabElement.init(winId, tab);
+      tabElement.init(winId, tab, faviconsMap[tab.id] || null);
       tabContainerElement.addTabChild(tabElement);
     }
 
@@ -142,7 +126,7 @@ class Tab extends HTMLLIElement {
   private _faviconElement: HTMLImageElement | null = null;
   private _titleElement: HTMLSpanElement | null = null;
 
-  init(winId: TWindowId, tab: ITab) {
+  init(winId: TWindowId, tab: ITab, favicon: HTMLImageElement | null = null) {
     this._tab = tab;
     this.id = `tab-${tab.id}`;
 
@@ -178,8 +162,14 @@ class Tab extends HTMLLIElement {
 
     this._loadingElement = document.createElement('span');
     this._loadingElement.classList.add('loading', 'loading-spinner', 'loading-xs', 'hidden');
-    this._faviconElement = document.createElement('img');
-    this._faviconElement.classList.add('favicon', 'w-4', 'h-4');
+
+    if (favicon) {
+      this._faviconElement = favicon;
+    } else {
+      this._faviconElement = document.createElement('img');
+      this._faviconElement.classList.add('favicon', 'w-4', 'h-4');
+      this._faviconElement.dataset.tabId = tab.id.toString();
+    }
 
     this.loadFavicon(winId);
 

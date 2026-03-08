@@ -33,6 +33,7 @@ vi.mock('electron', () => {
     stop: vi.fn(),
     close: vi.fn(),
     on: vi.fn(),
+    focus: vi.fn(),
     getUserAgent: vi.fn(
       () =>
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) AwesomeB/1.0.0 Chrome/144.0.7559.96 Electron/40.1.0 Safari/537.36',
