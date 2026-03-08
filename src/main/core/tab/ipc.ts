@@ -257,6 +257,7 @@ export function setupTabIPC(browser: Browser) {
 
     parentTabData.window.refreshTabsVisibility();
 
+    // browser.rendererEmmiter.refreshTabContainers(parentTabData.window);
     browser.refreshMainMenu();
   });
 

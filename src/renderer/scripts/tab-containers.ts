@@ -70,6 +70,7 @@ export class TabContainersMng {
     tabElement.setTitle(tab.title);
     tabElement.setSuspended(tab.suspended);
     tabElement.setSelected(tab.selected);
+    tabElement.setHighlight({ hasTabPreview: tab.hasTabPreview });
   }
 }
 
@@ -180,22 +181,41 @@ class Tab extends HTMLLIElement {
     faviconContainer.appendChild(this._faviconElement);
 
     // Title element
-    const titleElement = document.createElement('span');
-    titleElement.classList.add(
+    const titleContainer = document.createElement('div');
+    titleContainer.classList.add(
+      'py-2',
+      'hidden',
+      'sidebar:block',
+      'flex',
+      'flex-col',
       'overflow-hidden',
       'text-ellipsis',
       'text-sm',
       'text-nowrap',
-      'py-2',
-      'hidden',
-      'sidebar:block',
     );
-    titleElement.onclick = () => abCommands.perform(winId, 'select-tab', { tabId: tab.id });
-    titleElement.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
-    titleElement.ondblclick = () => abModal.open(winId, 'rename-tab');
+
+    const titleElement = document.createElement('span');
+    titleContainer.appendChild(titleElement);
+
+    titleContainer.onclick = () => abCommands.perform(winId, 'select-tab', { tabId: tab.id });
+    titleContainer.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
+    titleContainer.ondblclick = () => abModal.open(winId, 'rename-tab');
 
     this._titleElement = titleElement;
     this.setTitle(tab.title);
+
+    // Highlights
+    const highlightsContainer = document.createElement('div');
+    highlightsContainer.classList.add('flex', 'gap-1');
+
+    const tabPreviewHighlight = document.createElement('span');
+    tabPreviewHighlight.textContent = 'P';
+    tabPreviewHighlight.classList.add('hasTabPreview', 'hidden');
+    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
+
+    highlightsContainer.appendChild(tabPreviewHighlight);
+
+    titleContainer.appendChild(highlightsContainer);
 
     // Partition and action buttons container
     const partitionAndActionsContainer = document.createElement('div');
@@ -220,7 +240,7 @@ class Tab extends HTMLLIElement {
     partitionAndActionsContainer.appendChild(closeBtn);
 
     this.appendChild(faviconContainer);
-    this.appendChild(titleElement);
+    this.appendChild(titleContainer);
     this.appendChild(partitionAndActionsContainer);
   }
 
@@ -266,6 +286,18 @@ class Tab extends HTMLLIElement {
       this.classList.add('bg-white/20');
     } else {
       this.classList.remove('bg-white/20');
+    }
+  }
+
+  setHighlight({ hasTabPreview }: { hasTabPreview: boolean }) {
+    const tabPreviewHighlight = this.querySelector('.hasTabPreview') as HTMLSpanElement | null;
+
+    if (tabPreviewHighlight) {
+      if (hasTabPreview) {
+        tabPreviewHighlight.classList.remove('hidden');
+      } else {
+        tabPreviewHighlight.classList.add('hidden');
+      }
     }
   }
 }
