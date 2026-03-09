@@ -1,8 +1,11 @@
 import { ITab, ITabContainer, TTabId, TWindowId } from '~/types';
+import TabPreview from '#/icons/tab-preview.svg';
+import Minus from '#/icons/minus.svg';
+import Close from '#/icons/close.svg';
 
-const suspendBtnTpl = document.getElementById('suspend-button-template') as HTMLTemplateElement;
-const closeBtnTpl = document.getElementById('close-button-template') as HTMLTemplateElement;
-
+/***************************************************************************************************************
+ * MANAGER
+ ***************************************************************************************************************/
 export class TabContainersMng {
   private readonly _container: HTMLUListElement;
 
@@ -74,6 +77,9 @@ export class TabContainersMng {
   }
 }
 
+/***************************************************************************************************************
+ * TAB CONTAINER
+ ***************************************************************************************************************/
 class TabContainer extends HTMLLIElement {
   private _numberElement: HTMLSpanElement | null = null;
 
@@ -81,16 +87,24 @@ class TabContainer extends HTMLLIElement {
     this.id = `tab-container-${tabContainer.id}`;
     this.classList.add('flex', 'items-center', 'gap-1');
 
-    const numberElement = document.createElement('span');
-    numberElement.textContent = '0';
-    numberElement.classList.add('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block');
-    this._numberElement = numberElement;
+    const numberElement = this.createNumberElement(0);
+    this.appendChild(numberElement);
 
+    this.appendChild(this.createTabsContainerElement());
+  }
+
+  private createNumberElement(num: number): HTMLSpanElement {
+    const numberElement = document.createElement('span');
+    this._numberElement = numberElement;
+    numberElement.textContent = num.toString();
+    numberElement.classList.add('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block');
+    return numberElement;
+  }
+
+  private createTabsContainerElement(): HTMLUListElement {
     const tabsContainerElement = document.createElement('ul');
     tabsContainerElement.classList.add('w-full');
-
-    this.appendChild(numberElement);
-    this.appendChild(tabsContainerElement);
+    return tabsContainerElement;
   }
 
   setNumber(num: number) {
@@ -121,6 +135,9 @@ class TabContainer extends HTMLLIElement {
   }
 }
 
+/***************************************************************************************************************
+ * TAB
+ ***************************************************************************************************************/
 class Tab extends HTMLLIElement {
   private _tab: ITab | null = null;
   private _loadingElement: HTMLSpanElement | null = null;
@@ -136,12 +153,15 @@ class Tab extends HTMLLIElement {
 
     // Classes for the tab element
     this.classList.add(
+      'py-1.5',
       'cursor-pointer',
       'hover:bg-white/10',
       'gap-1',
-      'items-center',
-      'rounded-tl-full',
-      'rounded-bl-full',
+      'items-start',
+      'rounded-tl-lg',
+      'rounded-bl-lg',
+      'sidebar:rounded-tl-full',
+      'sidebar:rounded-bl-full',
       'grid',
       'grid-cols-1',
       'sidebar:grid-cols-[24px_auto_25px]',
@@ -150,40 +170,93 @@ class Tab extends HTMLLIElement {
     );
 
     // Favicon and loading spinner container
-    const faviconContainer = document.createElement('div');
-    faviconContainer.classList.add(
-      'justify-center',
-      'items-center',
-      'sidebar:ml-2',
-      'flex',
-      'py-2',
-      'sidebar:py-0',
-      'favicon-container',
-    );
-
-    this._loadingElement = document.createElement('span');
-    this._loadingElement.classList.add('loading', 'loading-spinner', 'loading-xs', 'hidden');
-
-    if (favicon) {
-      this._faviconElement = favicon;
-    } else {
-      this._faviconElement = document.createElement('img');
-      this._faviconElement.classList.add('favicon', 'w-4', 'h-4');
-      this._faviconElement.dataset.tabId = tab.id.toString();
-    }
-
+    const faviconContainer = this.createFaviconContainerElement();
+    const loadingElement = this.createLoadingElement();
+    const faviconElement = this.createFaviconElement(winId, tab.id, favicon);
+    faviconContainer.appendChild(loadingElement);
+    faviconContainer.appendChild(faviconElement);
     this.loadFavicon(winId);
 
-    this._faviconElement.onclick = () => abCommands.perform(winId, 'select-tab', { tabId: tab.id });
-    this._faviconElement.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
-
-    faviconContainer.appendChild(this._loadingElement);
-    faviconContainer.appendChild(this._faviconElement);
-
     // Title element
+    const titleContainer = this.createTitleContainer(winId, tab.id);
+    const titleElement = this.createTitleElement();
+    this.setTitle(tab.title);
+
+    // Highlights
+    const highlights = this.createHighlightsElement();
+    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
+
+    titleContainer.appendChild(titleElement);
+    titleContainer.appendChild(highlights);
+
+    // Partition and action buttons container
+    const partitionAndActionsContainer = this.createPartitionAndButtonsElement();
+    const partitionIndicator = this.createPartitionElement(tab.partition.color);
+
+    const suspendBtn = this.createButton(Minus.src, 'suspended', () =>
+      abCommands.perform(winId, 'suspend-tab', { tabId: tab.id }),
+    );
+    const closeBtn = this.createButton(Close.src, 'active', () =>
+      abCommands.perform(winId, 'close-tab', { tabId: tab.id }),
+    );
+
+    partitionAndActionsContainer.appendChild(partitionIndicator);
+    partitionAndActionsContainer.appendChild(suspendBtn);
+    partitionAndActionsContainer.appendChild(closeBtn);
+
+    this.appendChild(faviconContainer);
+    this.appendChild(titleContainer);
+    this.appendChild(partitionAndActionsContainer);
+  }
+
+  private createButton(svgPath: string, groupHover: string, onClick: () => void): HTMLImageElement {
+    const button = document.createElement('img');
+    button.classList.add(
+      'hover:bg-white/30',
+      'w-5',
+      'h-5',
+      'rounded',
+      'cursor-pointer',
+      'hidden',
+      'group-hover:block',
+      `group-[.${groupHover}]:hidden`,
+    );
+
+    button.src = svgPath;
+    button.onclick = onClick;
+
+    return button;
+  }
+
+  private createPartitionElement(color: string): HTMLSpanElement {
+    const partitionIndicator = document.createElement('span');
+    partitionIndicator.classList.add('w-1', 'h-5', 'group-hover:hidden');
+    partitionIndicator.style.backgroundColor = color;
+    return partitionIndicator;
+  }
+
+  private createHighlightsElement(): HTMLDivElement {
+    const highlightsContainer = document.createElement('div');
+    highlightsContainer.classList.add('flex', 'gap-1');
+
+    const tabPreviewHighlight = document.createElement('img');
+    tabPreviewHighlight.src = TabPreview.src;
+    tabPreviewHighlight.classList.add('hasTabPreview', 'w-3', 'h-3', 'hidden');
+
+    highlightsContainer.appendChild(tabPreviewHighlight);
+
+    return highlightsContainer;
+  }
+
+  private createPartitionAndButtonsElement(): HTMLDivElement {
+    const partitionAndActionsContainer = document.createElement('div');
+    partitionAndActionsContainer.classList.add('hidden', 'sidebar:flex', 'justify-end', 'mr-1');
+    return partitionAndActionsContainer;
+  }
+
+  private createTitleContainer(winId: TWindowId, tabId: TTabId): HTMLDivElement {
     const titleContainer = document.createElement('div');
     titleContainer.classList.add(
-      'py-2',
       'hidden',
       'sidebar:block',
       'flex',
@@ -193,55 +266,56 @@ class Tab extends HTMLLIElement {
       'text-sm',
       'text-nowrap',
     );
-
-    const titleElement = document.createElement('span');
-    titleContainer.appendChild(titleElement);
-
-    titleContainer.onclick = () => abCommands.perform(winId, 'select-tab', { tabId: tab.id });
-    titleContainer.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id });
+    titleContainer.onclick = () => abCommands.perform(winId, 'select-tab', { tabId });
+    titleContainer.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId });
     titleContainer.ondblclick = () => abModal.open(winId, 'rename-tab');
+    return titleContainer;
+  }
 
+  private createTitleElement(): HTMLSpanElement {
+    const titleElement = document.createElement('span');
     this._titleElement = titleElement;
-    this.setTitle(tab.title);
+    return titleElement;
+  }
 
-    // Highlights
-    const highlightsContainer = document.createElement('div');
-    highlightsContainer.classList.add('flex', 'gap-1');
+  private createFaviconContainerElement(): HTMLDivElement {
+    const faviconContainer = document.createElement('div');
+    faviconContainer.classList.add(
+      'justify-center',
+      'items-center',
+      'sidebar:ml-2',
+      'flex',
+      'mt-0.4',
+      'sidebar:mt-0.5',
+      'sidebar:py-0',
+      'favicon-container',
+    );
+    return faviconContainer;
+  }
 
-    const tabPreviewHighlight = document.createElement('span');
-    tabPreviewHighlight.textContent = 'P';
-    tabPreviewHighlight.classList.add('hasTabPreview', 'hidden');
-    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
+  private createLoadingElement(): HTMLSpanElement {
+    this._loadingElement = document.createElement('span');
+    this._loadingElement.classList.add('loading', 'loading-spinner', 'loading-xs', 'hidden');
+    return this._loadingElement;
+  }
 
-    highlightsContainer.appendChild(tabPreviewHighlight);
+  private createFaviconElement(
+    winId: TWindowId,
+    tabId: TTabId,
+    existingFavicon: HTMLImageElement | null,
+  ): HTMLImageElement {
+    if (existingFavicon) {
+      this._faviconElement = existingFavicon;
+    } else {
+      this._faviconElement = document.createElement('img');
+      this._faviconElement.classList.add('favicon', 'w-4', 'h-4');
+      this._faviconElement.dataset.tabId = tabId.toString();
+    }
 
-    titleContainer.appendChild(highlightsContainer);
+    this._faviconElement.onclick = () => abCommands.perform(winId, 'select-tab', { tabId });
+    this._faviconElement.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId });
 
-    // Partition and action buttons container
-    const partitionAndActionsContainer = document.createElement('div');
-    partitionAndActionsContainer.classList.add('hidden', 'sidebar:flex', 'justify-end', 'mr-1');
-
-    const partitionIndicator = document.createElement('span');
-    partitionIndicator.classList.add('w-1', 'h-5', 'group-hover:hidden');
-    partitionIndicator.style.backgroundColor = tab.partition.color;
-
-    const suspendBtn = (suspendBtnTpl.content.cloneNode(true) as DocumentFragment).querySelector(
-      'svg',
-    ) as SVGSVGElement;
-    suspendBtn.onclick = () => abCommands.perform(winId, 'suspend-tab', { tabId: tab.id });
-
-    const closeBtn = (closeBtnTpl.content.cloneNode(true) as DocumentFragment).querySelector(
-      'svg',
-    ) as SVGSVGElement;
-    closeBtn.onclick = () => abCommands.perform(winId, 'close-tab', { tabId: tab.id });
-
-    partitionAndActionsContainer.appendChild(partitionIndicator);
-    partitionAndActionsContainer.appendChild(suspendBtn);
-    partitionAndActionsContainer.appendChild(closeBtn);
-
-    this.appendChild(faviconContainer);
-    this.appendChild(titleContainer);
-    this.appendChild(partitionAndActionsContainer);
+    return this._faviconElement;
   }
 
   showLoading(visible: boolean) {

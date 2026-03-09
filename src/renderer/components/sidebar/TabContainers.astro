@@ -1,16 +1,8 @@
 ---
-import ButtonIcon from '#/components/common/ButtonIcon.astro';
+
 ---
 
 <ul id="tabContainers" style="app-region: no-drag;" class="flex flex-col gap-1.5"></ul>
-
-<template id="suspend-button-template">
-  <ButtonIcon icon="minus" className="suspend hidden group-hover:block group-[.suspended]:hidden" />
-</template>
-
-<template id="close-button-template">
-  <ButtonIcon icon="close" className="close hidden group-hover:block group-[.active]:hidden" />
-</template>
 
 <script>
   import { getSearchParams, TabContainersMng } from '#/scripts';
