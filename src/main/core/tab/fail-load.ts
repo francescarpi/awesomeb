@@ -31,7 +31,7 @@ export class FailLoad extends UIPageView {
     return this._url;
   }
 
-  refreshBounds(_window: Window) {
+  render(_window: Window) {
     this.webContentsView.setBounds({
       x: this.tab.view.left,
       y: this.tab.view.top,

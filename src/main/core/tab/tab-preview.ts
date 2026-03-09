@@ -15,7 +15,18 @@ export class TabPreview extends UIPageView {
     });
   }
 
-  refreshBounds(_window: Window) {
+  render(window: Window) {
+    const selectedTab = window.selectedTab;
+    if (
+      selectedTab?.tab.id === this.tab.id ||
+      selectedTab?.tab.tabPreview?.tab.id === this.tab.id
+    ) {
+      this.setVisible(true);
+    } else {
+      this.setVisible(false);
+      return;
+    }
+
     this.webContentsView.setBounds({
       x: this.parent.view.left,
       y: this.parent.view.top,

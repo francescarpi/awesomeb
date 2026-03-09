@@ -42,7 +42,7 @@ export class FindInPage extends UIPageView {
     return this._searches.get(requestId) || null;
   }
 
-  refreshBounds(window: Window) {
+  render(window: Window) {
     this.webContentsView.setBounds({
       x: this.tab.view.left,
       y: window.bounds.height - FIND_IN_PAGE_VIEW_HEIGHT - MARGIN,

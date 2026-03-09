@@ -21,12 +21,12 @@ export function registerWindowEvents(window: Window) {
 
   //--------------------------------------------------------------------------------------
   window.bw.on('resize', () => {
-    window.refreshViewsBounds();
+    window.renderViews();
   });
 
   //--------------------------------------------------------------------------------------
   window.bw.on('move', () => {
-    window.refreshViewsBounds();
+    window.renderViews();
   });
 
   //--------------------------------------------------------------------------------------

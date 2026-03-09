@@ -138,8 +138,8 @@ export class UIView {
     }
   }
 
-  refreshBounds(window: Window) {
-    scopeLog.error('Not implemented refreshBounds for UIView', window.id);
+  render(window: Window) {
+    scopeLog.error('Not implemented render for UIView', window.id);
   }
 
   close() {

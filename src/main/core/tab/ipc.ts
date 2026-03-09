@@ -177,7 +177,7 @@ export function setupTabIPC(browser: Browser) {
     if (url) {
       const view = new URLInfoView(selectedTab.tab, url);
       selectedTab.window.addView(view);
-      selectedTab.window.refreshViewsBounds();
+      selectedTab.window.renderViews();
     } else {
       const viewId = `url-info-${selectedTab.tab.id}`;
       const view = selectedTab.window.getView<URLInfoView>(viewId);

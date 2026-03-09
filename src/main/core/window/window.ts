@@ -23,7 +23,7 @@ export class Window extends UIWindow {
 
     this._selectedDesktopId = props?.selectedDesktopId || 1;
 
-    this.refreshViewsBounds();
+    this.renderViews();
   }
 
   get desktops(): Desktop[] {
@@ -90,7 +90,7 @@ export class Window extends UIWindow {
       }
     }
 
-    this.refreshViewsBounds();
+    this.renderViews();
   }
 
   getTab(id: TTabId): IDesConTab | null {
@@ -145,6 +145,8 @@ export class Window extends UIWindow {
   }
 
   async selectTab(target: 'next' | 'prev' | TTabId) {
+    this.renderViews();
+
     if (target === 'next' || target === 'prev') {
       const conTab = this.getNextOrPreviousTabOfActiveDesktop(target);
       if (conTab) {
@@ -164,6 +166,7 @@ export class Window extends UIWindow {
 
     tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);
+
     tab.updateLastAccessed();
     tab.setRequireAttention(false);
 
@@ -315,21 +318,21 @@ export class Window extends UIWindow {
     return tabs[0];
   }
 
-  refreshViewsBounds() {
+  renderViews() {
     for (const view of this.views) {
-      view.refreshBounds(this);
+      view.render(this);
     }
   }
 
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
     this.moveViewToTop('sidebar');
-    this.refreshViewsBounds();
+    this.renderViews();
   }
 
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
-    this.refreshViewsBounds();
+    this.renderViews();
   }
 
   get tabsRequireAttention(): IDesConTab[] {
@@ -339,7 +342,7 @@ export class Window extends UIWindow {
 
   setFullScreen(fullScreen: boolean) {
     super.setFullScreen(fullScreen);
-    this.refreshViewsBounds();
+    this.renderViews();
   }
 
   get selectedTab(): IDesConTab | null {

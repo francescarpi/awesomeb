@@ -11,7 +11,7 @@ export class URLBar extends UIPageView {
     });
   }
 
-  refreshBounds(window: Window) {
+  render(window: Window) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const bounds = window.bounds;
 

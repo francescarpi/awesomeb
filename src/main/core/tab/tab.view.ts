@@ -15,7 +15,16 @@ export class TabView extends UIView {
     });
   }
 
-  refreshBounds(window: Window) {
+  render(window: Window) {
+    if (this.tab.isPreview) {
+      const selectedTab = window.selectedTab;
+      if (selectedTab?.tab.id === this.tab.parentTab?.id) {
+        this.setVisible(true);
+      } else {
+        this.setVisible(false);
+      }
+    }
+
     const bounds = window.bounds;
     if (window.fullScreen) {
       this.webContentsView.setBounds({

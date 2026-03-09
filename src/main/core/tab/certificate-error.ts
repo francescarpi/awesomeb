@@ -19,7 +19,7 @@ export class CertificateError extends UIPageView {
     });
   }
 
-  refreshBounds(_window: Window) {
+  render(_window: Window) {
     this.webContentsView.setBounds({
       x: this.tab.view.left,
       y: this.tab.view.top,
