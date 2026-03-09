@@ -165,7 +165,6 @@ class Tab extends HTMLLIElement {
       'grid',
       'grid-cols-1',
       'sidebar:grid-cols-[24px_auto_25px]',
-      'group',
       'select-none',
     );
 
@@ -193,10 +192,10 @@ class Tab extends HTMLLIElement {
     const partitionAndActionsContainer = this.createPartitionAndButtonsElement();
     const partitionIndicator = this.createPartitionElement(tab.partition.color);
 
-    const suspendBtn = this.createButton(Minus.src, 'suspended', () =>
+    const suspendBtn = this.createButton(Minus.src, 'group-hover/active:block', () =>
       abCommands.perform(winId, 'suspend-tab', { tabId: tab.id }),
     );
-    const closeBtn = this.createButton(Close.src, 'active', () =>
+    const closeBtn = this.createButton(Close.src, 'group-hover/suspended:block', () =>
       abCommands.perform(winId, 'close-tab', { tabId: tab.id }),
     );
 
@@ -218,8 +217,7 @@ class Tab extends HTMLLIElement {
       'rounded',
       'cursor-pointer',
       'hidden',
-      'group-hover:block',
-      `group-[.${groupHover}]:hidden`,
+      groupHover,
     );
 
     button.src = svgPath;
@@ -230,7 +228,12 @@ class Tab extends HTMLLIElement {
 
   private createPartitionElement(color: string): HTMLSpanElement {
     const partitionIndicator = document.createElement('span');
-    partitionIndicator.classList.add('w-1', 'h-5', 'group-hover:hidden');
+    partitionIndicator.classList.add(
+      'w-1',
+      'h-5',
+      'group-hover/active:hidden',
+      'group-hover/suspended:hidden',
+    );
     partitionIndicator.style.backgroundColor = color;
     return partitionIndicator;
   }
@@ -347,11 +350,11 @@ class Tab extends HTMLLIElement {
 
   setSuspended(suspended: boolean) {
     if (suspended) {
-      this.classList.add('suspended', 'opacity-50');
-      this.classList.remove('active');
+      this.classList.add('group/suspended', 'opacity-50');
+      this.classList.remove('group/active');
     } else {
-      this.classList.remove('suspended', 'opacity-50');
-      this.classList.add('active');
+      this.classList.remove('group/suspended', 'opacity-50');
+      this.classList.add('group/active');
     }
   }
 
