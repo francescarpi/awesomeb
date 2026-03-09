@@ -120,7 +120,7 @@ export class Tab {
   }
 
   get hasTabPreview(): boolean {
-    return false;
+    return !!this._preview;
   }
 
   get requireAttention(): boolean {
