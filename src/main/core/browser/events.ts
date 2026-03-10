@@ -266,4 +266,19 @@ export function registerBrowserEvents(browser: Browser) {
       result.window.renderViews();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabpreview:closed', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.refreshMainMenu();
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabpreview:accepted', async (window: Window) => {
+    browser.rendererEmmiter.refreshTabSwitcher(window);
+    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.rendererEmmiter.refreshURLBar(window, null);
+    browser.rendererEmmiter.refreshDesktops(window);
+    browser.refreshMainMenu();
+  });
 }

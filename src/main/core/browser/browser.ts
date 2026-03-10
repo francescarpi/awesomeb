@@ -379,7 +379,8 @@ export class Browser {
     tabPreview.close();
 
     tabData.window.renderViews();
-    this.refreshMainMenu();
+
+    this.eventsChannel.emit('tabpreview:closed', tabData.window);
   }
 
   acceptTabPreview(tabId: TTabId) {
@@ -409,8 +410,7 @@ export class Browser {
     tabData.tab.setTabPreview(null);
 
     tabData.window.renderViews();
-    this.refreshMainMenu();
 
-    this.eventsChannel.emit('browser:url-opened', tabData.window);
+    this.eventsChannel.emit('tabpreview:accepted', tabData.window);
   }
 }

@@ -174,17 +174,13 @@ class Tab extends HTMLLIElement {
     const faviconElement = this.createFaviconElement(winId, tab.id, favicon);
     faviconContainer.appendChild(loadingElement);
     faviconContainer.appendChild(faviconElement);
-    this.loadFavicon(winId);
 
     // Title element
     const titleContainer = this.createTitleContainer(winId, tab.id);
     const titleElement = this.createTitleElement();
-    this.setTitle(tab.title);
 
     // Highlights
     const highlights = this.createHighlightsElement();
-    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
-
     titleContainer.appendChild(titleElement);
     titleContainer.appendChild(highlights);
 
@@ -206,6 +202,10 @@ class Tab extends HTMLLIElement {
     this.appendChild(faviconContainer);
     this.appendChild(titleContainer);
     this.appendChild(partitionAndActionsContainer);
+
+    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
+    this.setTitle(tab.title);
+    this.loadFavicon(winId);
   }
 
   private createButton(svgPath: string, groupHover: string, onClick: () => void): HTMLImageElement {
