@@ -171,7 +171,11 @@ class Tab extends HTMLLIElement {
     // Favicon and loading spinner container
     const faviconContainer = this.createFaviconContainerElement();
     const loadingElement = this.createLoadingElement();
-    const faviconElement = this.createFaviconElement(winId, tab.id, favicon);
+    const { element: faviconElement, created: faviconCreated } = this.createFaviconElement(
+      winId,
+      tab.id,
+      favicon,
+    );
     faviconContainer.appendChild(loadingElement);
     faviconContainer.appendChild(faviconElement);
 
@@ -205,7 +209,9 @@ class Tab extends HTMLLIElement {
 
     this.setHighlight({ hasTabPreview: tab.hasTabPreview });
     this.setTitle(tab.title);
-    this.loadFavicon(winId);
+    if (faviconCreated) {
+      this.loadFavicon(winId);
+    }
   }
 
   private createButton(svgPath: string, groupHover: string, onClick: () => void): HTMLImageElement {
@@ -306,19 +312,22 @@ class Tab extends HTMLLIElement {
     winId: TWindowId,
     tabId: TTabId,
     existingFavicon: HTMLImageElement | null,
-  ): HTMLImageElement {
+  ): { element: HTMLImageElement; created: boolean } {
+    let created;
     if (existingFavicon) {
       this._faviconElement = existingFavicon;
+      created = false;
     } else {
       this._faviconElement = document.createElement('img');
       this._faviconElement.classList.add('favicon', 'w-4', 'h-4');
       this._faviconElement.dataset.tabId = tabId.toString();
+      created = true;
     }
 
     this._faviconElement.onclick = () => abCommands.perform(winId, 'select-tab', { tabId });
     this._faviconElement.oncontextmenu = () => abMenu.contextMenu(winId, 'tab', { tabId });
 
-    return this._faviconElement;
+    return { element: this._faviconElement, created };
   }
 
   showLoading(visible: boolean) {
