@@ -16,15 +16,27 @@ export class TabView extends UIView {
   }
 
   render(window: Window) {
-    if (this.tab.isPreview) {
-      const selectedTab = window.selectedTab;
-      if (selectedTab?.tab.id === this.tab.parentTab?.id) {
-        this.setVisible(true);
-      } else {
-        this.setVisible(false);
+    const selectedTab = window.selectedTab;
+    const visibleTabs: number[] = [];
+
+    if (selectedTab) {
+      const tabContainer = selectedTab.tabContainer;
+      for (const tab of tabContainer.tabs) {
+        visibleTabs.push(tab.id);
+        if (tab.tabPreview) {
+          visibleTabs.push(tab.tabPreview.tab.id);
+        }
       }
     }
 
+    if (!visibleTabs.includes(this.tab.id)) {
+      this.setVisible(false);
+      return;
+    }
+
+    this.setVisible(true);
+
+    // Calculate bounds...
     const bounds = window.bounds;
     if (window.fullScreen) {
       this.webContentsView.setBounds({

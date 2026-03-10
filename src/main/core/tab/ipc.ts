@@ -255,7 +255,7 @@ export function setupTabIPC(browser: Browser) {
     parentTabData.window.addView(tabPreview);
     parentTabData.window.addView(tabPreview.tab.view);
 
-    parentTabData.window.refreshTabsVisibility();
+    parentTabData.window.renderViews();
 
     browser.rendererEmmiter.refreshTabContainers(parentTabData.window);
     browser.refreshMainMenu();

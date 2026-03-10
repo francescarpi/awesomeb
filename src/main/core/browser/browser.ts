@@ -222,7 +222,7 @@ export class Browser {
     this.eventsChannel.emit('browser:url-opened', window);
 
     window.addView(tab.view);
-    window.refreshTabsVisibility();
+    window.renderViews();
 
     if (!partition.private) {
       openURLHistory.add(url);
@@ -267,8 +267,8 @@ export class Browser {
       targetResult.window.addView(tabResult.tab.view);
     }
 
-    tabResult.window.refreshTabsVisibility();
-    targetResult.window.refreshTabsVisibility();
+    tabResult.window.renderViews();
+    targetResult.window.renderViews();
 
     if (props?.selectTab) {
       targetResult.window.selectTab(tabResult.tab.id);
@@ -378,7 +378,7 @@ export class Browser {
 
     tabPreview.close();
 
-    tabData.window.refreshTabsVisibility();
+    tabData.window.renderViews();
     this.refreshMainMenu();
   }
 
@@ -408,7 +408,7 @@ export class Browser {
 
     tabData.tab.setTabPreview(null);
 
-    tabData.window.refreshTabsVisibility();
+    tabData.window.renderViews();
     this.refreshMainMenu();
 
     this.eventsChannel.emit('browser:url-opened', tabData.window);

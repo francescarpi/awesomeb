@@ -38,7 +38,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.rendererEmmiter.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
 
-      window.refreshTabsVisibility();
+      window.renderViews();
       browser.refreshMainMenu();
     },
   );
@@ -127,7 +127,7 @@ export function registerBrowserEvents(browser: Browser) {
         result.window.removeView(view.id);
       }
 
-      result.window.refreshTabsVisibility();
+      result.window.renderViews();
     },
   );
 
@@ -147,7 +147,7 @@ export function registerBrowserEvents(browser: Browser) {
         result.window.removeView(view.id);
       }
 
-      result.window.refreshTabsVisibility();
+      result.window.renderViews();
     },
   );
 
@@ -263,7 +263,7 @@ export function registerBrowserEvents(browser: Browser) {
         result.window.removeView(`certificate-error-tab-${tab.id}`);
       }
 
-      result.window.refreshTabsVisibility();
+      result.window.renderViews();
     },
   );
 }

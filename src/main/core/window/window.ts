@@ -78,21 +78,6 @@ export class Window extends UIWindow {
     }
   }
 
-  refreshTabsVisibility() {
-    const desktop = this.selectedDesktop;
-    const selectedTabContainer = desktop.selectedTabContainer;
-
-    for (const result of this.tabContainers) {
-      if (result.tabContainer.id === selectedTabContainer?.id) {
-        result.tabContainer.setTabsVisibility(true);
-      } else {
-        result.tabContainer.setTabsVisibility(false);
-      }
-    }
-
-    this.renderViews();
-  }
-
   getTab(id: TTabId): IDesConTab | null {
     for (const desktop of this._desktops.values()) {
       const conTab = desktop.getTab(id);
@@ -176,14 +161,14 @@ export class Window extends UIWindow {
       this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
       this.addView(tab.view);
-      this.refreshTabsVisibility();
+      this.renderViews();
       this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
       return;
     }
 
     this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
-    this.refreshTabsVisibility();
+    this.renderViews();
 
     tab.view.focus();
   }
@@ -239,7 +224,7 @@ export class Window extends UIWindow {
     }
 
     this.removeView(tab.view.id);
-    this.refreshTabsVisibility();
+    this.renderViews();
 
     scopeLog.debug(
       `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
@@ -291,7 +276,7 @@ export class Window extends UIWindow {
       }
     }
 
-    this.refreshTabsVisibility();
+    this.renderViews();
 
     this.browser.eventsChannel.emit('window:tab-did-close', this);
 
