@@ -19,8 +19,8 @@ export class URLInfoView extends UIPageView {
 
   render(_window: Window) {
     this.webContentsView.setBounds({
-      x: this.tab.view.left,
-      y: this.tab.view.top + this.tab.view.height - HEIGHT,
+      x: this.tab.left,
+      y: this.tab.top + this.tab.height - HEIGHT,
       width: 400,
       height: HEIGHT,
     });

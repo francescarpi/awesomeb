@@ -17,22 +17,22 @@ function checkIfRequireAttention(browser: Browser, tab: Tab) {
 
 export function registerTabEvents(browser: Browser, tab: Tab) {
   //--------------------------------------------------------------------------------------
-  tab.view.webContents.on('did-start-loading', () => {
+  tab.webContents.on('did-start-loading', () => {
     tab.setLoading(true);
   });
 
   //--------------------------------------------------------------------------------------
-  tab.view.webContents.on('did-stop-loading', () => {
+  tab.webContents.on('did-stop-loading', () => {
     tab.setLoading(false);
   });
 
   //--------------------------------------------------------------------------------------
-  tab.view.webContents.on('did-navigate', (_event, url, _httpResponseCode, _httpStatusText) => {
+  tab.webContents.on('did-navigate', (_event, url, _httpResponseCode, _httpStatusText) => {
     tab.setUrl(url);
   });
 
   //--------------------------------------------------------------------------------------
-  tab.view.webContents.on(
+  tab.webContents.on(
     'did-navigate-in-page',
     (_event, url, isMainFrame, _frameProcessId, _frameRoutingId) => {
       if (isMainFrame) {
@@ -42,7 +42,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   );
 
   //--------------------------------------------------------------------------------------
-  tab.view.webContents.on('page-title-updated', (_event, title, _explicitSet) => {
+  tab.webContents.on('page-title-updated', (_event, title, _explicitSet) => {
     const changed = tab.setTitle(title);
     if (changed) {
       checkIfRequireAttention(browser, tab);
@@ -50,7 +50,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on('found-in-page', async (_event, result) => {
+  tab.webContents.on('found-in-page', async (_event, result) => {
     if (!tab.findInPage) {
       scopeLog.warn(`Received found-in-page event for Tab ${tab.id} but no search in progress.`);
       return;
@@ -61,9 +61,9 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on('page-favicon-updated', async (_event, favicons) => {
+  tab.webContents.on('page-favicon-updated', async (_event, favicons) => {
     if (favicons && favicons.length > 0) {
-      await parseFavicon(tab.view.webContents, favicons[0], (dataImage: string) => {
+      await parseFavicon(tab.webContents, favicons[0], (dataImage: string) => {
         const hasChanged = tab.setFavicon(dataImage);
         if (hasChanged) {
           checkIfRequireAttention(browser, tab);
@@ -73,17 +73,17 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on('media-started-playing', async () => {
+  tab.webContents.on('media-started-playing', async () => {
     checkIfRequireAttention(browser, tab);
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on('focus', async () => {
+  tab.webContents.on('focus', async () => {
     tab.setRequireAttention(false);
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on(
+  tab.webContents.on(
     'did-fail-load',
     async (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
       event.preventDefault();
@@ -93,7 +93,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
       if (errorCode === -310) {
         scopeLog.info('Ignoring ERR_TOO_MANY_REDIRECTS (-310) error');
-        tab.view.webContents.reload();
+        tab.webContents.reload();
         return;
       }
 
@@ -103,39 +103,36 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   );
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on(
-    'select-client-certificate',
-    async (event, url, certificateList, callback) => {
-      event.preventDefault();
+  tab.webContents.on('select-client-certificate', async (event, url, certificateList, callback) => {
+    event.preventDefault();
 
-      const tabInfo = browser.getTab(tab.id);
-      if (!tabInfo) {
-        scopeLog.error(
-          `Failed to find Tab with ID ${tab.id} for client certificate selection. Aborting certificate selection.`,
-        );
-        callback(null as unknown as Certificate);
-        return;
-      }
+    const tabInfo = browser.getTab(tab.id);
+    if (!tabInfo) {
+      scopeLog.error(
+        `Failed to find Tab with ID ${tab.id} for client certificate selection. Aborting certificate selection.`,
+      );
+      callback(null as unknown as Certificate);
+      return;
+    }
 
-      tab.setClientCertificates([certificateList, callback]);
+    tab.setClientCertificates([certificateList, callback]);
 
-      const certificates = certificateList
-        .map((cert) => `${cert.fingerprint}|${cert.subjectName}`)
-        .join(',');
+    const certificates = certificateList
+      .map((cert) => `${cert.fingerprint}|${cert.subjectName}`)
+      .join(',');
 
-      tabInfo.window.modal.open('client-certificate', {
-        query: {
-          winId: tabInfo.window.id.toString(),
-          tabId: tab.id.toString(),
-          url,
-          certificates,
-        },
-      });
-    },
-  );
+    tabInfo.window.modal.open('client-certificate', {
+      query: {
+        winId: tabInfo.window.id.toString(),
+        tabId: tab.id.toString(),
+        url,
+        certificates,
+      },
+    });
+  });
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.on(
+  tab.webContents.on(
     'certificate-error',
     async (event, url, error, _certificate, callback, isMainFrame) => {
       if (!isMainFrame) {
@@ -148,16 +145,16 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   );
 
   // ----------------------------------------------------------------------------------------------- //
-  tab.view.webContents.setWindowOpenHandler((details: HandlerDetails) =>
+  tab.webContents.setWindowOpenHandler((details: HandlerDetails) =>
     windowOpenHadler(browser, details),
   );
 
   //--------------------------------------------------------------------------------------
-  const window = tab.view.webContents;
+  const window = tab.webContents;
   // This patch is needed because "electron-dl" accesses session via webContents
   // of the window => window_.webContents.session
   // @ts-expect-error As we are patching the window object, we can ignore the type error here
-  window.webContents = tab.view.webContents;
+  window.webContents = tab.webContents;
 
   contextMenu({
     window,

@@ -221,7 +221,7 @@ export class Browser {
 
     this.eventsChannel.emit('browser:url-opened', window);
 
-    window.addView(tab.view);
+    window.addView(tab);
     window.renderViews();
 
     if (!partition.private) {
@@ -263,8 +263,8 @@ export class Browser {
     targetResult.desktop.addTabContainer(tabResult.tabContainer);
 
     if (tabResult.window.id !== targetResult.window.id) {
-      tabResult.window.removeView(tabResult.tab.view.id);
-      targetResult.window.addView(tabResult.tab.view);
+      tabResult.window.removeView(tabResult.tab.viewId);
+      targetResult.window.addView(tabResult.tab);
     }
 
     tabResult.window.renderViews();
@@ -301,7 +301,7 @@ export class Browser {
 
   getTabByWebContentsId(webContentsId: number): IWinDesConTab | null {
     for (const tabInfo of this.tabs) {
-      if (tabInfo.tab.view.webContentsId === webContentsId) {
+      if (tabInfo.tab.webContentsId === webContentsId) {
         return tabInfo;
       }
     }
@@ -371,8 +371,8 @@ export class Browser {
       return;
     }
 
-    tabData.window.removeView(tabPreview.tab.view.id);
-    tabData.window.removeView(tabPreview.id);
+    tabData.window.removeView(tabPreview.tab.viewId);
+    tabData.window.removeView(tabPreview.viewId);
 
     tabData.tab.setTabPreview(null);
 
@@ -404,7 +404,7 @@ export class Browser {
 
     tabPreview.tab.clearParent();
 
-    tabData.window.removeView(tabPreview.id);
+    tabData.window.removeView(tabPreview.viewId);
     tabPreview.close();
 
     tabData.tab.setTabPreview(null);

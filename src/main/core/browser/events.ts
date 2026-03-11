@@ -15,7 +15,7 @@ export function registerBrowserEvents(browser: Browser) {
 
     const selectedTabResult = browser.selectedTab;
     if (selectedTabResult && selectedTabResult.window.id === winId) {
-      selectedTabResult.tab.view.focus();
+      selectedTabResult.tab.focus();
     }
 
     await browser.refreshMainMenu();
@@ -124,7 +124,7 @@ export function registerBrowserEvents(browser: Browser) {
       if (visible) {
         result.window.addView(view);
       } else {
-        result.window.removeView(view.id);
+        result.window.removeView(view.viewId);
       }
 
       result.window.renderViews();
@@ -144,7 +144,7 @@ export function registerBrowserEvents(browser: Browser) {
       if (visible) {
         result.window.addView(view);
       } else {
-        result.window.removeView(view.id);
+        result.window.removeView(view.viewId);
       }
 
       result.window.renderViews();

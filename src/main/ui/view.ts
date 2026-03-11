@@ -17,7 +17,7 @@ export class UIView {
   private _session: Session;
 
   constructor(
-    public readonly id: TViewId,
+    public readonly viewId: TViewId,
     private readonly preload: 'browser' | 'tab' = 'tab',
     props?: IViewProps,
   ) {
@@ -59,7 +59,7 @@ export class UIView {
   get webContentsId(): number {
     // Dont delete - used in some places
     if (this.webContents === undefined) {
-      scopeLog.error('WebContents is undefined for view:', this.id);
+      scopeLog.error('WebContents is undefined for view:', this.viewId);
       return -1;
     }
 

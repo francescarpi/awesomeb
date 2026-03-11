@@ -11,7 +11,7 @@ export const Command: ICommand<ICommandParams> = {
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {
-      tab.view.webContents.openDevTools();
+      tab.webContents.openDevTools();
     }
   },
 };

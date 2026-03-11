@@ -401,7 +401,7 @@ function tabsMenu(
       },
       {
         label: 'Go back',
-        enabled: !!tab && !tab.loading && !tab.suspended && tab.view.canGoBack,
+        enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoBack,
         accelerator: 'CmdOrCtrl+Left',
         icon: getIcon(EIcon.Back),
         click: () => {
@@ -412,7 +412,7 @@ function tabsMenu(
       },
       {
         label: 'Go forward',
-        enabled: !!tab && !tab.loading && !tab.suspended && tab.view.canGoForward,
+        enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoForward,
         accelerator: 'CmdOrCtrl+Right',
         icon: getIcon(EIcon.Forward),
         click: () => {

@@ -79,7 +79,7 @@ export class UIWindow {
    * @param props Optional properties for the view, such as zIndex. 0 by default, higher values will be rendered on top of lower values.
    */
   addView(view: UIView) {
-    this._views.set(view.id, view);
+    this._views.set(view.viewId, view);
     this.bw.contentView.addChildView(view.webContentsView);
   }
 

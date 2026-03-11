@@ -15,7 +15,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Go Forward',
   description: 'Navigates forward in the browsing history of the specified tab.',
-  visibility: ({ tab }) => !!tab && tab.view.canGoForward,
+  visibility: ({ tab }) => !!tab && tab.canGoForward,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab!, params?.tabId);
     if (!tabToReload) {
@@ -24,6 +24,6 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     tabToReload.clearFailLoad();
-    tabToReload.view.goForward();
+    tabToReload.goForward();
   },
 };

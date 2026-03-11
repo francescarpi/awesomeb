@@ -126,7 +126,7 @@ export async function checkInternalPage(
 ): Promise<void> {
   for (const tabResult of browser.tabs) {
     if (tabResult.tab.url && tabResult.tab.url === `${INTERNAL_PROTOCOL}://${page}/`) {
-      if (tabResult.tab.view.webContentsId === event.sender.id) {
+      if (tabResult.tab.webContentsId === event.sender.id) {
         return callback(tabResult.window, tabResult.desktop, tabResult.tabContainer, tabResult.tab);
       }
     }

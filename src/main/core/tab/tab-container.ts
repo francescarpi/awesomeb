@@ -92,26 +92,4 @@ export class TabContainer {
 
     return true;
   }
-
-  setTabsVisibility(visible: boolean) {
-    for (const tab of this._tabs.values()) {
-      tab.view.setVisible(visible);
-
-      if (visible) {
-        if (tab.findInPage) {
-          tab.findInPage.setVisible(true);
-        }
-        if (tab.failLoad) {
-          tab.failLoad.setVisible(true);
-        }
-      } else {
-        if (tab.findInPage) {
-          tab.findInPage.setVisible(false);
-        }
-        if (tab.failLoad) {
-          tab.failLoad.setVisible(false);
-        }
-      }
-    }
-  }
 }

@@ -19,12 +19,12 @@ export class History {
   }
 
   save(tab: Tab) {
-    if (tab.partition.private || tab.view.webContents === undefined) {
+    if (tab.partition.private || tab.webContents === undefined) {
       return;
     }
 
     const history = this.get(tab.id) || { index: 0, entries: [] };
-    const { index, entries } = this.sanitizeHistory(tab.view.webContents);
+    const { index, entries } = this.sanitizeHistory(tab.webContents);
 
     history.entries = entries;
     history.index = index;

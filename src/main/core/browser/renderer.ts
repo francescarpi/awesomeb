@@ -259,8 +259,8 @@ export class BrowserRenderer {
     }
 
     return {
-      canGoBack: tab.view.canGoBack,
-      canGoForward: tab.view.canGoForward,
+      canGoBack: tab.canGoBack,
+      canGoForward: tab.canGoForward,
       loading: tab.loading,
       hasURL: !!tab.url,
       tabId: tab.id,

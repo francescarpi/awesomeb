@@ -33,10 +33,10 @@ export class FailLoad extends UIPageView {
 
   render(_window: Window) {
     this.webContentsView.setBounds({
-      x: this.tab.view.left,
-      y: this.tab.view.top,
-      width: this.tab.view.width,
-      height: this.tab.view.height,
+      x: this.tab.left,
+      y: this.tab.top,
+      width: this.tab.width,
+      height: this.tab.height,
     });
   }
 }

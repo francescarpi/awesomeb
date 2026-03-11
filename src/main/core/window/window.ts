@@ -160,7 +160,7 @@ export class Window extends UIWindow {
 
       this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
-      this.addView(tab.view);
+      this.addView(tab);
       this.renderViews();
       this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
       return;
@@ -170,7 +170,7 @@ export class Window extends UIWindow {
 
     this.renderViews();
 
-    tab.view.focus();
+    tab.focus();
   }
 
   get tabs(): IDesConTab[] {
@@ -223,7 +223,7 @@ export class Window extends UIWindow {
       desktop.selectTabContainer(null);
     }
 
-    this.removeView(tab.view.id);
+    this.removeView(tab.viewId);
     this.renderViews();
 
     scopeLog.debug(
@@ -270,9 +270,9 @@ export class Window extends UIWindow {
 
     // Remove views
     for (const view of this.views) {
-      if (view.id.startsWith(`tab-${tab.id}#`)) {
+      if (view.viewId.startsWith(`tab-${tab.id}#`)) {
         view.close();
-        this.removeView(view.id);
+        this.removeView(view.viewId);
       }
     }
 

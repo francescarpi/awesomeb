@@ -27,7 +27,7 @@ export function setupTabIPC(browser: Browser) {
   ipcMain.on('tabs:close-find-in-tab', async (event, tabId: TTabId) => {
     scopeLog.info(`IPC tabs:close-find-in-tab received for tab ${tabId}`);
     return await checkFindInPageSender(event, browser, tabId, async (tab, _findInPage) => {
-      tab.view.webContents.stopFindInPage('clearSelection');
+      tab.webContents.stopFindInPage('clearSelection');
       tab.stopFindInPage();
     });
   });
@@ -40,7 +40,7 @@ export function setupTabIPC(browser: Browser) {
         `IPC tabs:find-in-page-action received for tab ${tabId} with action ${action} and query "${query}"`,
       );
       return await checkFindInPageSender(event, browser, tabId, async (tab, findInPage) => {
-        const wc = tab.view.webContents;
+        const wc = tab.webContents;
 
         if (query.trim() === '') {
           wc.stopFindInPage('clearSelection');
@@ -68,7 +68,7 @@ export function setupTabIPC(browser: Browser) {
     scopeLog.info(`IPC tabs:retry-failed received for tab ${tabId}`);
     return await checkFailLoadSender(event, browser, tabId, async (tab, _failLoad) => {
       tab.clearFailLoad();
-      tab.view.webContents.reload();
+      tab.webContents.reload();
     });
   });
 
@@ -159,7 +159,7 @@ export function setupTabIPC(browser: Browser) {
   ipcMain.on('tab:show-url-info', async (event, url: string | null) => {
     scopeLog.info(`IPC tabs:show-url-info received with url ${url}`);
     const selectedTab = browser.selectedTab;
-    if (!selectedTab || selectedTab.tab.view.webContentsId !== event.sender.id) {
+    if (!selectedTab || selectedTab.tab.webContentsId !== event.sender.id) {
       scopeLog.warn(
         `URL Info IPC: No selected tab or sender does not match selected tab's webContentsId`,
       );
@@ -168,9 +168,9 @@ export function setupTabIPC(browser: Browser) {
 
     // Remove previous URL info view if exists
     for (const view of selectedTab.window.views) {
-      if (view.id.startsWith(`tab-${selectedTab.tab.id}#url-info`)) {
+      if (view.viewId.startsWith(`tab-${selectedTab.tab.id}#url-info`)) {
         view.close();
-        selectedTab.window.removeView(view.id);
+        selectedTab.window.removeView(view.viewId);
       }
     }
 
@@ -183,7 +183,7 @@ export function setupTabIPC(browser: Browser) {
       const view = selectedTab.window.getView<URLInfoView>(viewId);
       if (view) {
         view.close();
-        selectedTab.window.removeView(view.id);
+        selectedTab.window.removeView(view.viewId);
       }
     }
   });
@@ -246,14 +246,14 @@ export function setupTabIPC(browser: Browser) {
       parent: parentTabData.tab,
     });
 
-    tab.view.setVisible(true);
+    tab.setVisible(true);
     tab.loadURL(url);
 
     const tabPreview = new TabPreview(parentTabData.tab, tab);
     parentTabData.tab.setTabPreview(tabPreview);
 
     parentTabData.window.addView(tabPreview);
-    parentTabData.window.addView(tabPreview.tab.view);
+    parentTabData.window.addView(tabPreview.tab);
 
     parentTabData.window.renderViews();
 

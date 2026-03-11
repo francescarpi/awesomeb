@@ -19,7 +19,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     {
       label: 'Go back',
-      enabled: !tab.loading && !tab.suspended && tab.view.canGoBack,
+      enabled: !tab.loading && !tab.suspended && tab.canGoBack,
       icon: getIcon(EIcon.Back),
       click: () => {
         browser.performCommand(window, 'go-back', { tabId: tab.id });
@@ -27,7 +27,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     {
       label: 'Go forward',
-      enabled: !tab.loading && !tab.suspended && tab.view.canGoForward,
+      enabled: !tab.loading && !tab.suspended && tab.canGoForward,
       icon: getIcon(EIcon.Forward),
       click: () => {
         browser.performCommand(window, 'go-forward', { tabId: tab.id });

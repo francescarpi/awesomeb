@@ -28,10 +28,10 @@ export class TabPreview extends UIPageView {
     }
 
     this.webContentsView.setBounds({
-      x: this.parent.view.left,
-      y: this.parent.view.top,
-      width: this.parent.view.width,
-      height: this.parent.view.height,
+      x: this.parent.left,
+      y: this.parent.top,
+      width: this.parent.width,
+      height: this.parent.height,
     });
   }
 }

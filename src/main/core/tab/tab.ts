@@ -1,4 +1,4 @@
-import { Partition, history, Browser } from '@/core';
+import { Partition, history, Browser, Window, internalPartition } from '@/core';
 import {
   ITabProps,
   TBasicAuthCallback,
@@ -9,16 +9,17 @@ import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
 import { sanitizeUserAgent } from '@/utils';
-import { TabView } from './tab.view';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
-import { Certificate } from 'electron';
+import { Certificate, session } from 'electron';
 import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
+import { MARGIN, Sidebar, UIView, URLBar } from '@/ui';
+import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
 
 const scopeLog = log.scope('Tab');
 
-export class Tab {
+export class Tab extends UIView {
   private readonly _partition: Partition;
   private _title: string | null = null;
   private _customTitle: string | null = null;
@@ -26,7 +27,6 @@ export class Tab {
   private _suspended: boolean = true;
   private _loading: boolean = false;
   private _favicon: string | null = null;
-  readonly view: TabView;
   private _lastAccessed: number = Date.now();
   private _findInPage: FindInPage | null = null;
   private _requireAttention: boolean = false;
@@ -44,15 +44,89 @@ export class Tab {
     public readonly id: TTabId,
     props: ITabProps,
   ) {
+    super(`tab-${id}#`, props.partition.id === internalPartition.id ? 'browser' : 'tab', {
+      visible: false,
+      borderRadius: 12,
+      backgroundColor: '#ffffff',
+      session: session.fromPartition(props.partition.id),
+    });
+
     this._partition = props.partition;
     this._title = props.title ?? null;
     this._customTitle = props.customTitle ?? null;
     this._url = props.url ?? null;
     this._suspended = props.suspended ?? true;
-    this.view = new TabView(this);
     this._parent = props.parent ?? null;
 
     registerTabEvents(browser, this);
+  }
+
+  render(window: Window) {
+    const selectedTab = window.selectedTab;
+    const visibleTabs: number[] = [];
+
+    if (selectedTab) {
+      const tabContainer = selectedTab.tabContainer;
+      for (const tab of tabContainer.tabs) {
+        visibleTabs.push(tab.id);
+        if (tab.tabPreview) {
+          visibleTabs.push(tab.tabPreview.tab.id);
+        }
+      }
+    }
+
+    if (!visibleTabs.includes(this.id)) {
+      this.setVisible(false);
+      return;
+    }
+
+    this.setVisible(true);
+
+    // Calculate bounds...
+    const bounds = window.bounds;
+    if (window.fullScreen) {
+      this.webContentsView.setBounds({
+        x: 0,
+        y: 0,
+        width: bounds.width,
+        height: bounds.height,
+      });
+      this.webContentsView.setBorderRadius(0);
+      return;
+    }
+
+    this.webContentsView.setBorderRadius(12);
+
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    const urlbar = window.getView<URLBar>('urlbar')!;
+
+    let x = sidebar.left + sidebar.width;
+    let y = urlbar.top + urlbar.height + MARGIN;
+    let width = bounds.width - x - MARGIN;
+    let height = bounds.height - y - MARGIN;
+
+    if (window.areaMaximized) {
+      x = MARGIN;
+      width = bounds.width - MARGIN * 2;
+    }
+
+    if (this.findInPage) {
+      height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
+    }
+
+    if (this.isPreview) {
+      x += 16;
+      y += 16;
+      width -= 65;
+      height -= 16 * 2;
+    }
+
+    this.webContentsView.setBounds({
+      x,
+      y,
+      width,
+      height,
+    });
   }
 
   get partition(): Partition {
@@ -157,9 +231,9 @@ export class Tab {
 
   async loadURL(url: string) {
     this._url = url;
-    const userAgent = sanitizeUserAgent(this.view.webContents.getUserAgent(), new URL(url));
+    const userAgent = sanitizeUserAgent(this.webContents.getUserAgent(), new URL(url));
     try {
-      await this.view.webContents.loadURL(url, { userAgent });
+      await this.webContents.loadURL(url, { userAgent });
     } catch (error) {
       scopeLog.error(`Failed to load URL ${url} in tab`);
     }
@@ -170,9 +244,9 @@ export class Tab {
       return;
     }
 
-    if (this.view.isDestroyed) {
+    if (this.isDestroyed) {
       scopeLog.debug('Cannot resume tab because its view is destroyed');
-      this.view.refreshWebContentsView();
+      this.refreshWebContentsView();
     }
 
     this._suspended = false;
@@ -180,14 +254,14 @@ export class Tab {
 
   async loadHistoryOrURL() {
     scopeLog.info(
-      `Attempting to restore navigation history for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+      `Attempting to restore navigation history for Tab ${this.id} with WebContents ID ${this.webContentsId}`,
     );
 
     const tabHistory = history.get(this.id);
     if (tabHistory && tabHistory.entries.length > 0) {
-      await this.view.webContents.navigationHistory.restore(tabHistory).catch((error) => {
+      await this.webContents.navigationHistory.restore(tabHistory).catch((error) => {
         scopeLog.error(
-          `Failed to restore navigation history for Tab ${this.id} with WebContents ID ${this.view.webContentsId}. ` +
+          `Failed to restore navigation history for Tab ${this.id} with WebContents ID ${this.webContentsId}. ` +
             `Error: ${error.message}`,
         );
       });
@@ -195,12 +269,12 @@ export class Tab {
     }
 
     scopeLog.debug(
-      `No navigation history found for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+      `No navigation history found for Tab ${this.id} with WebContents ID ${this.webContentsId}`,
     );
 
     if (this._url) {
       scopeLog.debug(
-        `Loading URL ${this._url} for Tab ${this.id} with WebContents ID ${this.view.webContentsId}`,
+        `Loading URL ${this._url} for Tab ${this.id} with WebContents ID ${this.webContentsId}`,
       );
       await this.loadURL(this._url);
       return;
@@ -222,7 +296,7 @@ export class Tab {
   }
 
   close() {
-    this.view.close();
+    super.close();
     history.delete(this.id);
   }
 
