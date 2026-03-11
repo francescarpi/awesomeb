@@ -16,7 +16,7 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   const tab = tabContainer?.selectedTab || null;
 
   const menu = Menu.buildFromTemplate([
-    ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon)] : []),
+    ...(process.platform === 'darwin' ? [appMenu(browser, showRootIcon, window)] : []),
     fileMenu(browser, showRootIcon, window),
     editMenu(browser, showRootIcon, window, tab),
     windowMenu(browser, showRootIcon, window),
@@ -28,22 +28,26 @@ export async function mainMenu(browser: Browser, showRootIcon: boolean) {
   return menu;
 }
 
-function appMenu(_browser: Browser, _showRootIcon: boolean): MenuItemConstructorOptions {
+function appMenu(
+  browser: Browser,
+  showRootIcon: boolean,
+  window: Window | null,
+): MenuItemConstructorOptions {
   return {
     role: 'appMenu',
-    // icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
+    icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
     submenu: [
       { role: 'about' },
       { type: 'separator' },
       {
         label: 'Preferences',
         accelerator: 'CmdOrCtrl+,',
-        // icon: getIcon(EIcon.Command),
-        // enabled: !!window,
+        icon: getIcon(EIcon.Command),
+        enabled: !!window,
         click: () => {
-          // if (window) {
-          //   window.openInternalPage(PAGE_PREFERENCES);
-          // }
+          if (window) {
+            browser.openURL(`${INTERNAL_PROTOCOL}://settings/`, { selectTab: true });
+          }
         },
       },
       { type: 'separator' },
