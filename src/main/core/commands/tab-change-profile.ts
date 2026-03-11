@@ -20,7 +20,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'change-tab-profile',
   },
-  async handler({ browser, window, tab, params }) {
+  async handler({ browser, tab, params }) {
     const affectedTab = getTab(browser, tab!, params?.tabId);
     if (!affectedTab) {
       scopeLog.warn('No tab available.');
@@ -33,7 +33,7 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    window.closeTab(affectedTab.id);
+    browser.closeTab(affectedTab.id);
     browser.openURL(url, {
       partitionId: params?.partitionId,
       selectTab: true,

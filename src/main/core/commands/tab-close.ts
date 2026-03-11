@@ -23,7 +23,7 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    const success = await window.closeTab(tabToClose.id);
+    const success = await browser.closeTab(tabToClose.id);
     if (success) {
       const lastAccessed = window.getLastAccessedTab();
       if (lastAccessed) {

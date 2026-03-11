@@ -254,7 +254,7 @@ describe('Commands', () => {
       // Select the tab to make it active
       await window.selectTab(tab.id);
 
-      const closeTabSpy = vi.spyOn(window, 'closeTab');
+      const closeTabSpy = vi.spyOn(browser, 'closeTab');
 
       // Pass empty object as params since command expects it
       await browser.performCommand(window, tabClose.TRIGGER, {});
@@ -268,7 +268,7 @@ describe('Commands', () => {
       browser.openURL('https://example2.com');
       const desktop = window.selectedDesktop!;
       const tab = desktop.tabContainers[0].tabs[0];
-      const closeTabSpy = vi.spyOn(window, 'closeTab');
+      const closeTabSpy = vi.spyOn(browser, 'closeTab');
 
       await browser.performCommand(window, tabClose.TRIGGER, {
         tabId: tab.id,

@@ -28,7 +28,9 @@ import {
   TabContainer,
   Window,
   bookmarks,
+  closedHistory,
 } from '@/core';
+import dayjs from 'dayjs';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -308,6 +310,14 @@ export class BrowserRenderer {
       id: tab.id,
       title: tab.title,
       partitionColor: tab.partition.color,
+    }));
+  }
+
+  closedTabsEntities(): IEntity[] {
+    return closedHistory.tabs.map((tab) => ({
+      id: tab.url,
+      label: tab.title,
+      extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
     }));
   }
 }

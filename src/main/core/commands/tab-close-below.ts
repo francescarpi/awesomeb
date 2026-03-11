@@ -27,7 +27,7 @@ export const Command: ICommand<ICommandParams> = {
     const tabsBelow = tabInfo.desktop.getTabsBelow(tabToClose.id);
 
     for (const tabData of tabsBelow) {
-      await window.closeTab(tabData.tab.id);
+      await browser.closeTab(tabData.tab.id);
     }
   },
 };

@@ -1,4 +1,4 @@
-import { Browser, Tab, Window, bookmarks, getCachedFavicon } from '@/core';
+import { Browser, Tab, Window, bookmarks, getCachedFavicon, closedHistory } from '@/core';
 import { MenuItemConstructorOptions, Menu, NativeImage } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -59,7 +59,7 @@ function appMenu(_browser: Browser, _showRootIcon: boolean): MenuItemConstructor
 }
 
 function fileMenu(
-  _browser: Browser,
+  browser: Browser,
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
@@ -86,6 +86,18 @@ function fileMenu(
         click: () => {
           if (window) {
             window.modal.open('new-tab');
+          }
+        },
+      },
+      {
+        label: 'Open recently closed tab',
+        accelerator: 'Shift+CmdOrCtrl+T',
+        enabled: closedHistory.tabs.length > 0,
+        icon: getIcon(EIcon.Open),
+        click: async () => {
+          const tab = closedHistory.mostRecentTab;
+          if (window && tab) {
+            await browser.performCommand(window, 'open-closed', { url: tab.url });
           }
         },
       },

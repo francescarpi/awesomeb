@@ -10,6 +10,7 @@ import {
   internalPartition,
   openURLHistory,
   Downloads,
+  closedHistory,
 } from '@/core';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
@@ -412,5 +413,57 @@ export class Browser {
     tabData.window.renderViews();
 
     this.eventsChannel.emit('tabpreview:accepted', tabData.window);
+  }
+
+  /**
+   * Closes a tab by its ID
+   *
+   * This method:
+   * 1. Finds and closes the specified tab
+   * 2. If the tab container becomes empty, it also closes the container
+   * 3. Deselects the container if it was selected
+   * 4. Refreshes the visible tab view
+   * 5. Emits 'window:tab-did-close' event
+   *
+   * Note: This method does not automatically select another tab.
+   * The caller is responsible for selecting a new tab if needed.
+   *
+   * @param id - The ID of the tab to close
+   * @returns true if the tab was found and closed, false otherwise
+   */
+  async closeTab(id: TTabId): Promise<boolean> {
+    const result = this.getTab(id);
+    if (!result) {
+      return false;
+    }
+
+    const { tabContainer, desktop, tab, window } = result;
+
+    tabContainer.closeTab(tab.id);
+
+    if (tabContainer.tabs.length === 0) {
+      desktop.closeTabContainer(tabContainer.id);
+      if (desktop.selectedTabContainer?.id === tabContainer.id) {
+        desktop.selectTabContainer(null);
+      }
+    }
+
+    // Remove views
+    for (const view of window.views) {
+      if (view.viewId.startsWith(`tab-${tab.id}#`)) {
+        view.close();
+        window.removeView(view.viewId);
+      }
+    }
+
+    window.renderViews();
+
+    if (!tab.partition.private && tab.url) {
+      closedHistory.addTab(tab.title, tab.url);
+    }
+
+    this.eventsChannel.emit('window:tab-did-close', window);
+
+    return true;
   }
 }

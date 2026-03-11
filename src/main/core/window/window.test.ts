@@ -617,7 +617,7 @@ describe('closeTab', () => {
 
     expect(tabContainer.tabs.length).toBe(1);
 
-    const closed = await w.closeTab(tab.id);
+    const closed = await browser.closeTab(tab.id);
 
     expect(closed).toBe(true);
     expect(tabContainer.tabs.length).toBe(0);
@@ -628,7 +628,7 @@ describe('closeTab', () => {
     const w = browser.createWindow(1);
     w.createDefaultDesktops();
 
-    const closed = await w.closeTab(999 as any);
+    const closed = await browser.closeTab(999 as any);
 
     expect(closed).toBe(false);
   });
@@ -644,7 +644,7 @@ describe('closeTab', () => {
     const eventSpy = vi.fn();
     w.eventsChannel.on('window:tab-did-close', eventSpy);
 
-    await w.closeTab(tab.id);
+    await browser.closeTab(tab.id);
 
     expect(eventSpy).toHaveBeenCalledWith(w);
   });
@@ -661,7 +661,7 @@ describe('closeTab', () => {
     expect(desktop.tabContainers.length).toBe(1);
     expect(desktop.tabContainers[0].id).toBe(tabContainer.id);
 
-    await w.closeTab(tab.id);
+    await browser.closeTab(tab.id);
 
     expect(desktop.tabContainers.length).toBe(0);
   });
@@ -680,7 +680,7 @@ describe('closeTab', () => {
     expect(desktop.selectedTabContainer?.id).toBe(tabContainer.id);
 
     // Close the tab
-    await w.closeTab(tab.id);
+    await browser.closeTab(tab.id);
 
     expect(desktop.selectedTabContainer).toBeNull();
   });
@@ -711,7 +711,7 @@ describe('closeTab', () => {
     expect(desktop.tabContainers.length).toBe(1);
 
     // Close the first tab
-    await w.closeTab(tab1.id);
+    await browser.closeTab(tab1.id);
 
     // Tab container should still exist with one tab
     expect(tabContainer.tabs.length).toBe(1);
@@ -744,7 +744,7 @@ describe('closeTab', () => {
     expect(tabBeforeClose).not.toBeNull();
 
     // Close tab from desktop 1 while on desktop 2
-    const closed = await w.closeTab(result1!.tab.id);
+    const closed = await browser.closeTab(result1!.tab.id);
 
     expect(closed).toBe(true);
     expect(w.selectedDesktop.id).toBe(2); // Should remain on desktop 2
@@ -768,13 +768,13 @@ describe('closeTab', () => {
 
     expect(w.tabs.length).toBe(3);
 
-    await w.closeTab(result1!.tab.id);
+    await browser.closeTab(result1!.tab.id);
     expect(w.tabs.length).toBe(2);
 
-    await w.closeTab(result2!.tab.id);
+    await browser.closeTab(result2!.tab.id);
     expect(w.tabs.length).toBe(1);
 
-    await w.closeTab(result3!.tab.id);
+    await browser.closeTab(result3!.tab.id);
     expect(w.tabs.length).toBe(0);
   });
 
@@ -792,7 +792,7 @@ describe('closeTab', () => {
     expect(desktop.selectedTabContainer?.selectedTab?.id).toBe(tab.id);
 
     // Close the selected tab
-    await w.closeTab(tab.id);
+    await browser.closeTab(tab.id);
 
     // Tab should be gone
     expect(tabContainer.selectedTab).toBeNull();
@@ -813,7 +813,7 @@ describe('closeTab', () => {
     const refreshSpy = vi.spyOn(w, 'renderViews');
 
     // Close the tab
-    await w.closeTab(result1!.tab.id);
+    await browser.closeTab(result1!.tab.id);
 
     expect(refreshSpy).toHaveBeenCalled();
 
@@ -834,7 +834,7 @@ describe('closeTab', () => {
     expect(tabContainer.selectedTab).toBeNull();
 
     // Close the tab
-    const closed = await w.closeTab(tab.id);
+    const closed = await browser.closeTab(tab.id);
 
     expect(closed).toBe(true);
     expect(tabContainer.tabs.length).toBe(0);
@@ -855,9 +855,9 @@ describe('closeTab', () => {
     expect(w.tabs.length).toBe(3);
 
     // Close all tabs
-    await w.closeTab(result1!.tab.id);
-    await w.closeTab(result2!.tab.id);
-    await w.closeTab(result3!.tab.id);
+    await browser.closeTab(result1!.tab.id);
+    await browser.closeTab(result2!.tab.id);
+    await browser.closeTab(result3!.tab.id);
 
     expect(w.tabs.length).toBe(0);
     expect(w.getDesktop(1)!.tabContainers.length).toBe(0);

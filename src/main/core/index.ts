@@ -15,3 +15,4 @@ export * from './favicons';
 export * from './tab-marks';
 export * from './certificates';
 export * from './permissions';
+export * from './closed-history';

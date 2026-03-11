@@ -51,4 +51,7 @@ export const DEFAULT_MODALS_PROPS = {
   'request-permission': {
     height: 260,
   },
+  'open-closed': {
+    height: 600,
+  },
 };
