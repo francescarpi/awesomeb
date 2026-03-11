@@ -78,9 +78,6 @@ importers:
       eslint:
         specifier: 10.0.3
         version: 10.0.3(jiti@2.6.1)
-      eslint-js:
-        specifier: github:eslint/js
-        version: https://codeload.github.com/eslint/js/tar.gz/6473ee3a95c2c52467d53cf6f98b3ee6662a72da
       eslint-plugin-astro:
         specifier: 1.6.0
         version: 1.6.0(eslint@10.0.3(jiti@2.6.1))
@@ -2010,10 +2007,6 @@ packages:
     engines: {node: '>=12'}
     peerDependencies:
       eslint: '>=6.0.0'
-
-  eslint-js@https://codeload.github.com/eslint/js/tar.gz/6473ee3a95c2c52467d53cf6f98b3ee6662a72da:
-    resolution: {tarball: https://codeload.github.com/eslint/js/tar.gz/6473ee3a95c2c52467d53cf6f98b3ee6662a72da}
-    version: 0.0.0
 
   eslint-plugin-astro@1.6.0:
     resolution: {integrity: sha512-yGIbLHuj5MOUXa0s4sZ6cVhv6ehb+WLF80tsrGaxMk6VTUExruMzubQDzhOYt8fbR1c9vILCCRSCsKI7M1whig==}
@@ -6363,8 +6356,6 @@ snapshots:
     dependencies:
       eslint: 10.0.3(jiti@2.6.1)
       semver: 7.7.4
-
-  eslint-js@https://codeload.github.com/eslint/js/tar.gz/6473ee3a95c2c52467d53cf6f98b3ee6662a72da: {}
 
   eslint-plugin-astro@1.6.0(eslint@10.0.3(jiti@2.6.1)):
     dependencies:
