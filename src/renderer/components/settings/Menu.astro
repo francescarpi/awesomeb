@@ -1,13 +1,13 @@
 ---
 const PAGES = [
-  { name: 'General', section: '' },
-  { name: 'Profiles', section: 'profiles' },
-  { name: 'Themes', section: 'themes' },
-  { name: 'Permissions', section: 'permissions' },
+  { id: 'general', name: 'General', section: '' },
+  { id: 'profiles', name: 'Profiles', section: 'profiles' },
+  { id: 'themes', name: 'Themes', section: 'themes' },
+  { id: 'permissions', name: 'Permissions', section: 'permissions' },
 ];
 ---
 
-<div role="tablist" class="tabs tabs-box mt-4">
+<div role="tablist" class="tabs tabs-box my-4">
   {
     PAGES.map((page) => (
       <a role="tab" class="tab [--tab-bg:black]" href={`?${page.section}`}>
@@ -28,6 +28,16 @@ const PAGES = [
       const href = tab.getAttribute('href');
       if (href === `?${section}`) {
         tab.classList.add('tab-active');
+      }
+    });
+
+    const containers = document.querySelectorAll('.tab-content');
+    containers.forEach((container) => {
+      container.classList.add('hidden');
+
+      console.log(container.id, section);
+      if (container.id === `tab-${section}`) {
+        container.classList.remove('hidden');
       }
     });
   }
