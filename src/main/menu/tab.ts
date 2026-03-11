@@ -106,6 +106,14 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
+      label: tab.isMuted ? 'Unmute' : 'Mute',
+      icon: getIcon(tab.isMuted ? EIcon.Unmute : EIcon.Mute),
+      click: async () => {
+        await browser.performCommand(window, 'toggle-mute', { tabId: tab.id });
+      },
+    },
+    { type: 'separator' },
+    {
       label: 'Add bookmark',
       icon: getIcon(EIcon.Bookmarks),
       enabled: !!tab.url && !tab.suspended,

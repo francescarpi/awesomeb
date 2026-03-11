@@ -442,4 +442,14 @@ export class Tab extends UIView {
   clearParent() {
     this._parent = null;
   }
+
+  toggleMute() {
+    const muted = this.isMuted;
+    this.webContents.setAudioMuted(!muted);
+    this.browser.eventsChannel.emit('tab:audio-mute-did-change', this);
+  }
+
+  get isMuted(): boolean {
+    return this.webContents.audioMuted;
+  }
 }

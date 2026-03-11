@@ -15,6 +15,7 @@ export enum EIcon {
   Forward = 'forward.png',
   Maximize = 'maximize.png',
   Move = 'move.png',
+  Mute = 'mute.png',
   Next = 'next.png',
   Notification = 'notification.png',
   Open = 'open.png',
@@ -26,6 +27,7 @@ export enum EIcon {
   Suspend = 'suspend.png',
   Tab = 'tab.png',
   Theme = 'theme.png',
+  Unmute = 'unmute.png',
   Up = 'up.png',
   Windows = 'windows.png',
 }

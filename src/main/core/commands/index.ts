@@ -46,6 +46,7 @@ import * as tabCertificateInfo from './tab-certificate-info';
 import * as tabDuplicate from './tab-duplicate';
 import * as tabpreviewClose from './tabpreview-close';
 import * as tabpreviewAccept from './tabpreview-accept';
+import * as tabToggleMute from './tab-toggle-mute';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -91,6 +92,7 @@ const COMMANDS = {
   [tabDuplicate.TRIGGER]: tabDuplicate.Command,
   [tabpreviewClose.TRIGGER]: tabpreviewClose.Command,
   [tabpreviewAccept.TRIGGER]: tabpreviewAccept.Command,
+  [tabToggleMute.TRIGGER]: tabToggleMute.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

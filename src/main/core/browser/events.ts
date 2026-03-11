@@ -281,4 +281,13 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshDesktops(window);
     browser.refreshMainMenu();
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:audio-mute-did-change', async (tab: Tab) => {
+    const result = browser.getTab(tab.id);
+    if (!result) {
+      return;
+    }
+    browser.rendererEmmiter.refreshTabContainers(result.window);
+  });
 }

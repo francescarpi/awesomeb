@@ -164,6 +164,7 @@ export class BrowserRenderer {
       loading: tab.loading,
       hasTabPreview: tab.hasTabPreview,
       requireAttention: tab.requireAttention,
+      isMuted: tab.isMuted,
     };
   }
 

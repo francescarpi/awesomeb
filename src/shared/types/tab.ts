@@ -24,6 +24,7 @@ export interface ITab {
   loading: boolean;
   hasTabPreview: boolean;
   requireAttention: boolean;
+  isMuted: boolean;
 }
 
 export interface ITabPartition {

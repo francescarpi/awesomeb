@@ -2,6 +2,7 @@ import { ITab, ITabContainer, TTabId, TWindowId } from '~/types';
 import TabPreview from '#/icons/tab-preview.svg';
 import Minus from '#/icons/minus.svg';
 import Close from '#/icons/close.svg';
+import Muted from '#/icons/muted.svg';
 
 /***************************************************************************************************************
  * MANAGER
@@ -73,7 +74,7 @@ export class TabContainersMng {
     tabElement.setTitle(tab.title);
     tabElement.setSuspended(tab.suspended);
     tabElement.setSelected(tab.selected);
-    tabElement.setHighlight({ hasTabPreview: tab.hasTabPreview });
+    tabElement.setHighlight({ hasTabPreview: tab.hasTabPreview, isMuted: tab.isMuted });
   }
 }
 
@@ -207,7 +208,7 @@ class Tab extends HTMLLIElement {
     this.appendChild(titleContainer);
     this.appendChild(partitionAndActionsContainer);
 
-    this.setHighlight({ hasTabPreview: tab.hasTabPreview });
+    this.setHighlight({ hasTabPreview: tab.hasTabPreview, isMuted: tab.isMuted });
     this.setTitle(tab.title);
     if (faviconCreated) {
       this.loadFavicon(winId);
@@ -252,7 +253,12 @@ class Tab extends HTMLLIElement {
     tabPreviewHighlight.src = TabPreview.src;
     tabPreviewHighlight.classList.add('hasTabPreview', 'w-3', 'h-3', 'hidden');
 
+    const tabMuted = document.createElement('img');
+    tabMuted.src = Muted.src;
+    tabMuted.classList.add('tabMuted', 'w-3', 'h-3', 'hidden');
+
     highlightsContainer.appendChild(tabPreviewHighlight);
+    highlightsContainer.appendChild(tabMuted);
 
     return highlightsContainer;
   }
@@ -375,15 +381,20 @@ class Tab extends HTMLLIElement {
     }
   }
 
-  setHighlight({ hasTabPreview }: { hasTabPreview: boolean }) {
-    const tabPreviewHighlight = this.querySelector('.hasTabPreview') as HTMLSpanElement | null;
+  setHighlight({ hasTabPreview, isMuted }: { hasTabPreview: boolean; isMuted: boolean }) {
+    const tabPreviewHighlight = this.querySelector('.hasTabPreview') as HTMLSpanElement;
+    const tabMuted = this.querySelector('.tabMuted') as HTMLSpanElement;
 
-    if (tabPreviewHighlight) {
-      if (hasTabPreview) {
-        tabPreviewHighlight.classList.remove('hidden');
-      } else {
-        tabPreviewHighlight.classList.add('hidden');
-      }
+    if (hasTabPreview) {
+      tabPreviewHighlight.classList.remove('hidden');
+    } else {
+      tabPreviewHighlight.classList.add('hidden');
+    }
+
+    if (isMuted) {
+      tabMuted.classList.remove('hidden');
+    } else {
+      tabMuted.classList.add('hidden');
     }
   }
 }
