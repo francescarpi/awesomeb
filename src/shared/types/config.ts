@@ -1,4 +1,14 @@
+import { EPermissionConfigType } from './permissions';
+
 export type TSearchEngineCode = string;
+
+export interface IConfig {
+  searchEngines: IConfigSearchEngine[];
+  partitions: IConfigPartition[];
+  downloadsFolder: string;
+  themes: IConfigTheme[];
+  permissionsType: EPermissionConfigType;
+}
 
 export interface IConfigPartition {
   name: string;

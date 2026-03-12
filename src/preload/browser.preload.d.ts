@@ -13,6 +13,7 @@ import {
   IDownloads,
   ITabMark,
   TMarksAction,
+  IConfig,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -140,5 +141,10 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abCertificates: {
     info: (winId: TWindowId) => Promise<IPeerCertificate>;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abConfig: {
+    get: (winId: TWindowId) => Promise<IConfig>;
   };
 }

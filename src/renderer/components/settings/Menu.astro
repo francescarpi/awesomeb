@@ -10,17 +10,27 @@ const PAGES = [
 <div role="tablist" class="tabs tabs-box my-4">
   {
     PAGES.map((page) => (
-      <a role="tab" class="tab [--tab-bg:black]" href={`?${page.section}`}>
+      <a role="tab" class="tab [--tab-bg:black]" href={`?${page.section}`} id={page.id}>
         {page.name}
       </a>
     ))
   }
 </div>
 
+<style>
+  @reference "../../assets/app.css";
+  .tab.tab-active:hover {
+    @apply text-white/80;
+  }
+</style>
+
 <script>
   function updateActiveTab() {
     const section = window.location.search.substring(1);
     const tabs = document.querySelectorAll('.tab');
+    const containers = document.querySelectorAll('.tab-content');
+
+    containers.forEach((container) => container.classList.add('hidden'));
 
     tabs.forEach((tab) => {
       tab.classList.remove('tab-active');
@@ -28,16 +38,11 @@ const PAGES = [
       const href = tab.getAttribute('href');
       if (href === `?${section}`) {
         tab.classList.add('tab-active');
-      }
-    });
-
-    const containers = document.querySelectorAll('.tab-content');
-    containers.forEach((container) => {
-      container.classList.add('hidden');
-
-      console.log(container.id, section);
-      if (container.id === `tab-${section}`) {
-        container.classList.remove('hidden');
+        const content = document.querySelector(`#tab-${tab.id}`);
+        if (content) {
+          content.classList.remove('hidden');
+          content.classList.add('flex');
+        }
       }
     });
   }

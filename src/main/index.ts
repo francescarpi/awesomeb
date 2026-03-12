@@ -14,6 +14,7 @@ import {
   setupFaviconsIpc,
   setupTabMarksIpc,
   setupCertificatesIPC,
+  setupConfigIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -47,6 +48,7 @@ app.whenReady().then(async () => {
   setupFaviconsIpc(browser);
   setupTabMarksIpc(browser);
   setupCertificatesIPC(browser);
+  setupConfigIPC(browser);
 
   await browser.loadProfiles();
   await browser.loadSession();
