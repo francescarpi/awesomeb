@@ -15,6 +15,7 @@ import {
   IDownloads,
   ITabSwitcherTab,
   TMarksAction,
+  IConfig,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -217,6 +218,9 @@ const abCertificates = {
 const abConfig = {
   get: (winId: TWindowId) => {
     return ipcRenderer.invoke('config:get', winId);
+  },
+  save: (winId: TWindowId, config: IConfig) => {
+    return ipcRenderer.invoke('config:save', winId, config);
   },
 };
 

@@ -66,4 +66,8 @@ export class Config extends Store<IConfig> {
   get config(): IConfig {
     return this.store;
   }
+
+  save(config: IConfig) {
+    this.store = { ...config };
+  }
 }
