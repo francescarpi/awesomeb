@@ -38,20 +38,28 @@ export class ABButton extends BaseComponent {
       }
     }
 
+    :host ::slotted(img) {
+      width: 20px !important;
+      height: 20px !important;
+    }
+
     button {
-      background-color: rgba(255, 255, 255, 1);
-      border: 0;
-      border-radius: 8px;
-      padding: 4px 10px;
+      background-color: #ffffff;
+      border: 1px solid rgb(209, 213, 219);
+      border-radius: 0.5rem;
+      color: #111827;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Roboto';
+      line-height: 1.25rem;
+      padding: 6px 15px;
+      text-align: center;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       cursor: pointer;
       user-select: none;
-      font-size: 0.875rem;
-      font-family: 'Roboto';
-      box-shadow: 1px 1px 1px 1px #000000;
-      border: 1px solid #000000;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.8);
+        background-color: #f9fafb;
       }
     }
   `;
