@@ -22,29 +22,29 @@
   "license": "MIT",
   "packageManager": "pnpm@10.28.0",
   "devDependencies": {
-    "@astrojs/check": "0.9.7",
+    "@astrojs/check": "0.9.8",
     "@electron-toolkit/tsconfig": "2.0.0",
     "@eslint/js": "10.0.1",
-    "@tailwindcss/vite": "4.2.1",
+    "@tailwindcss/vite": "4.2.2",
     "@types/mime-types": "3.0.1",
     "astro": "5.18.0",
     "astro-icon": "1.1.5",
     "concurrently": "9.2.1",
     "daisyui": "5.5.19",
-    "electron": "41.0.1",
+    "electron": "41.0.3",
     "electron-builder": "26.8.1",
     "eslint": "10.0.3",
     "eslint-plugin-astro": "1.6.0",
     "globals": "17.4.0",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1",
-    "tailwindcss": "4.2.1",
+    "tailwindcss": "4.2.2",
     "tsc-alias": "1.8.16",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.57.0",
-    "vite": "8.0.0",
+    "typescript-eslint": "8.57.1",
+    "vite": "8.0.1",
     "vite-plugin-electron-renderer": "0.14.6",
-    "vite-plugin-static-copy": "3.2.0",
+    "vite-plugin-static-copy": "3.3.0",
     "vitest": "4.1.0"
   },
   "dependencies": {
@@ -55,6 +55,6 @@
     "electron-log": "5.4.3",
     "electron-store": "11.0.2",
     "mime-types": "3.0.2",
-    "slugify": "1.6.6"
+    "slugify": "1.6.8"
   }
 }
