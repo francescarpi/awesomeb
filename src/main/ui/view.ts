@@ -154,6 +154,12 @@ export class UIView {
       this.webContents.focus();
     }
   }
+
+  print() {
+    if (this.webContents !== undefined) {
+      this.webContents.print();
+    }
+  }
 }
 
 export class UIPageView extends UIView {
