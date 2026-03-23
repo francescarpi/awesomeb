@@ -44,7 +44,7 @@
     "typescript-eslint": "8.57.1",
     "vite": "8.0.1",
     "vite-plugin-electron-renderer": "0.14.6",
-    "vite-plugin-static-copy": "3.3.0",
+    "vite-plugin-static-copy": "4.0.0",
     "vitest": "4.1.0"
   },
   "dependencies": {
