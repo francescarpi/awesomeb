@@ -1,7 +1,7 @@
-export function onClick(id: string, callback: () => void) {
+export function onClick(id: string, callback: (btn: HTMLButtonElement) => void) {
   const btn = document.getElementById(id);
   if (btn) {
-    btn.addEventListener('click', callback);
+    btn.addEventListener('click', () => callback(btn as HTMLButtonElement));
   }
 }
 

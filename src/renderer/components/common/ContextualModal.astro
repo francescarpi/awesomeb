@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import { Icon } from 'astro-icon/components';
+---
+
+<Base>
+  <div class="fixed inset-0" id="overlay" style="app-region: no-drag;"></div>
+  <div
+    class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 max-w-80 absolute rounded-lg p-2 hidden"
+    id="wrapper"
+  >
+    <div id="content" class="text-sm" style="app-region: no-drag;"><slot /></div>
+  </div>
+  <Icon name="arrow-down" class="absolute text-4xl text-gray-800 hidden" id="arrow" />
+</Base>
+
+<script>
+  import { getSearchParams, onClick } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+  onClick('overlay', () => {
+    abModal.closeContextual(winId);
+  });
+
+  function placeContent() {
+    const wrapper = document.getElementById('wrapper')!;
+    const arrow = document.getElementById('arrow')!;
+
+    const x = parseFloat(searchParams.get('x')!);
+    const y = parseFloat(searchParams.get('y')!);
+    const anchor = searchParams.get('anchor')!;
+
+    switch (anchor) {
+      case 'bottom-left': {
+        wrapper.style.bottom = `${window.innerHeight - y + 7}px`;
+        wrapper.style.left = `${x}px`;
+        arrow.style.bottom = `${window.innerHeight - y - 13}px`;
+        arrow.style.left = `${x - 5}px`;
+        break;
+      }
+    }
+
+    wrapper.classList.remove('hidden');
+    arrow.classList.remove('hidden');
+  }
+
+  placeContent();
+</script>

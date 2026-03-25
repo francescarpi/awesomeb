@@ -16,6 +16,7 @@ import {
   ITabSwitcherTab,
   TMarksAction,
   IConfig,
+  IContextualModalParams,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -26,6 +27,12 @@ const abModal = {
   },
   open: (winId: TWindowId, page: TPage) => {
     ipcRenderer.send('modal:open', winId, page);
+  },
+  openContextual: (winId: TWindowId, page: TPage, params: IContextualModalParams) => {
+    ipcRenderer.send('modal:open-contextual', winId, page, params);
+  },
+  closeContextual: (winId: TWindowId) => {
+    ipcRenderer.send('modal:close-contextual', winId);
   },
 };
 

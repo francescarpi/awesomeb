@@ -5,6 +5,7 @@ import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import { CertificateError } from '@/core/tab/certificate-error';
+import { UIContextualModal } from '@/ui/modal/models';
 
 const scopeLog = log.scope('UtilsIPC');
 
@@ -191,4 +192,32 @@ export async function checkCertificateErrorSender(
   }
 
   return callback(tab, tab.certificateError);
+}
+
+export async function checkContextualModal<T>(
+  event: IpcMainInvokeEvent,
+  browser: Browser,
+  winId: TWindowId,
+  callback: (window: Window, view: UIContextualModal) => Promise<T>,
+) {
+  const win = browser.getWindow(winId);
+  if (!win) {
+    scopeLog.error(`No window found with ID ${winId}`);
+    return;
+  }
+
+  const view = win.getView<UIContextualModal>('contextual-modal');
+  if (!view) {
+    scopeLog.error(`No contextual modal found for window ID ${winId}`);
+    return;
+  }
+
+  if (view.webContentsId !== event.sender.id) {
+    scopeLog.error(
+      `WebContents ID mismatch: contextual modal WC ID ${view.webContentsId} does not match sender WC ID ${event.sender.id}`,
+    );
+    return;
+  }
+
+  return await callback(win, view);
 }

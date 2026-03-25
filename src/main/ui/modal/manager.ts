@@ -1,6 +1,6 @@
-import { UIModal } from './models';
+import { UIModal, UIContextualModal } from './models';
 import { UIWindow } from '../window';
-import { TPage } from '~/types';
+import { IContextualModalParams, TPage } from '~/types';
 import { IProps } from './types';
 import { DEFAULT_MODALS_PROPS } from './constants';
 
@@ -43,5 +43,19 @@ export class UIModalManager {
 
   get isOpen(): boolean {
     return this._modal !== null;
+  }
+
+  openContextual(page: TPage, props?: IContextualModalParams) {
+    const view = new UIContextualModal(this._win, page, props);
+    this._win.addView(view);
+  }
+
+  closeContextual() {
+    const view = this._win.getView<UIContextualModal>('contextual-modal');
+    if (!view) {
+      return;
+    }
+
+    this._win.removeView('contextual-modal');
   }
 }

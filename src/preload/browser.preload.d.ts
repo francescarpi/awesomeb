@@ -24,6 +24,8 @@ declare global {
   const abModal: {
     close: (winId: TWindowId) => void;
     open: (winId: TWindowId, page: TPage) => void;
+    openContextual: (winId: TWindowId, page: TPage, params: IContextualModalParams) => void;
+    closeContextual: (winId: TWindowId) => void;
   };
 
   //--------------------------------------------------------------------------------------

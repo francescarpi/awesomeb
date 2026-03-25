@@ -2,10 +2,11 @@ import path from 'path';
 import { PRELOAD_FOLDER } from '@/paths';
 import { BrowserWindow, session } from 'electron';
 import { UIWindow } from '../window';
-import { TPage } from '~/types';
+import { IContextualModalParams, TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
-import { internalPartition } from '@/core';
+import { internalPartition, Window } from '@/core';
+import { UIPageView } from '../view';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
@@ -63,5 +64,32 @@ export class UIModal {
 
   get wcId(): number {
     return this.bw.isDestroyed() ? -1 : this.bw.webContents.id;
+  }
+}
+
+export class UIContextualModal extends UIPageView {
+  constructor(win: UIWindow, page: TPage, props: IContextualModalParams) {
+    super('contextual-modal', 'browser', {
+      page,
+      query: {
+        winId: win.browserWindowId.toString(),
+        x: props.bounds.x.toString(),
+        y: props.bounds.y.toString(),
+        width: props.bounds.width.toString(),
+        height: props.bounds.height.toString(),
+        anchor: props.anchor,
+      },
+    });
+  }
+
+  render(window: Window) {
+    const windowBounds = window.bounds;
+
+    this.webContentsView.setBounds({
+      x: 0,
+      y: 0,
+      width: windowBounds.width,
+      height: windowBounds.height,
+    });
   }
 }

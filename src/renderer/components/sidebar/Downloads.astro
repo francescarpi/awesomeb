@@ -5,8 +5,7 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
 <ButtonIcon icon="downloads" />
 
 <script>
-  import { getSearchParams } from '#/scripts/url';
-  import { onClick } from '#/scripts/buttons';
+  import { getSearchParams, onClick } from '#/scripts';
 
   const { winId } = getSearchParams();
   const downloads = document.getElementById('downloads')!;
@@ -19,5 +18,16 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
     }
   });
 
-  onClick('downloads', () => abDownloads.openPage(winId));
+  onClick('downloads', (btn) => {
+    const bounds = btn.getBoundingClientRect();
+    abModal.openContextual(winId, 'contextual-downloads-modal', {
+      bounds: {
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+      },
+      anchor: 'bottom-left',
+    });
+  });
 </script>

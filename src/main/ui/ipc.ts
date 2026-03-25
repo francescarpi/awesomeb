@@ -1,8 +1,8 @@
 import { Browser } from '@/core';
 import { ipcMain } from 'electron';
 import log from 'electron-log';
-import { TPage, TWindowId } from '~/types';
-import { checkModalAndPagesSender, checkModalSender } from '@/utils';
+import { IContextualModalParams, TPage, TWindowId } from '~/types';
+import { checkModalAndPagesSender, checkModalSender, checkContextualModal } from '@/utils';
 
 const scopeLog = log.scope('IPCUI');
 
@@ -43,5 +43,26 @@ export function setupUIIPC(browser: Browser) {
         window.hideTabSwitcher();
       },
     );
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'modal:open-contextual',
+    async (event, winId: TWindowId, page: TPage, params: IContextualModalParams) => {
+      scopeLog.info(`Open contextual modal "${page}" for window ${winId}.`);
+      return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
+        window.modal.openContextual(page, params);
+        window.renderViews();
+      });
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('modal:close-contextual', async (event, winId: TWindowId) => {
+    scopeLog.info(`Close contextual modal for window ${winId}.`);
+    return await checkContextualModal(event, browser, winId, async (window) => {
+      window.modal.closeContextual();
+      window.renderViews();
+    });
   });
 }
