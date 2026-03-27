@@ -11,20 +11,29 @@ export function setupDownloadsIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
   ipcMain.on('downloads:open-page', async (event, winId: TWindowId) => {
     scopeLog.info(`Open-page received for window ${winId}`);
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-      let downloadsFound = false;
-      for (const tabData of window.tabs) {
-        if (tabData.tab.url === `${INTERNAL_PROTOCOL}://downloads/`) {
-          window.selectTab(tabData.tab.id);
-          downloadsFound = true;
-          break;
-        }
-      }
+    return await checkModalAndPagesSender(
+      event,
+      browser,
+      winId,
+      ['sidebar', 'contextual-modal'],
+      async (window) => {
+        window.closeContextualModal();
 
-      if (!downloadsFound) {
-        browser.openURL(`${INTERNAL_PROTOCOL}://downloads/`, { selectTab: true });
-      }
-    });
+        let downloadsFound = false;
+
+        for (const tabData of window.tabs) {
+          if (tabData.tab.url === `${INTERNAL_PROTOCOL}://downloads/`) {
+            window.selectTab(tabData.tab.id);
+            downloadsFound = true;
+            break;
+          }
+        }
+
+        if (!downloadsFound) {
+          browser.openURL(`${INTERNAL_PROTOCOL}://downloads/`, { selectTab: true });
+        }
+      },
+    );
   });
 
   //--------------------------------------------------------------------------------------

@@ -2,7 +2,15 @@ import { UIWindow } from '@/ui';
 import type { IProps } from './types';
 import { Desktop, IDesktopProps, Browser } from '@/core';
 import { MIN_DESKTOPS } from './constants';
-import { IDesCon, IDesConTab, TDesktopId, TTabId, TWindowId } from '~/types';
+import {
+  IContextualModalParams,
+  IDesCon,
+  IDesConTab,
+  TDesktopId,
+  TPage,
+  TTabId,
+  TWindowId,
+} from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
 
@@ -292,5 +300,17 @@ export class Window extends UIWindow {
     }
 
     return null;
+  }
+
+  openContextualModal(page: TPage, params: IContextualModalParams) {
+    this.modal.openContextual(page, params);
+    this.browser.rendererEmmiter.refreshSidebarDrag(this, false);
+    this.renderViews();
+  }
+
+  closeContextualModal() {
+    this.modal.closeContextual();
+    this.browser.rendererEmmiter.refreshSidebarDrag(this, true);
+    this.renderViews();
   }
 }

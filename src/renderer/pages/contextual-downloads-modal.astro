@@ -5,7 +5,16 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 <ContextualModal>
   <div class="w-64">
     <div class="flex justify-end mt-4 border-t pt-2">
-      <button class="btn btn-xs">Show all downloads</button>
+      <button class="btn btn-xs" id="show-all">Show all downloads</button>
     </div>
   </div>
 </ContextualModal>
+
+<script>
+  import { onClick, getSearchParams } from '#/scripts';
+  const { winId } = getSearchParams();
+
+  onClick('show-all', () => {
+    abDownloads.openPage(winId);
+  });
+</script>
