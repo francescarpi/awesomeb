@@ -14,3 +14,7 @@
 :root {
   background: transparent;
 }
+
+#sidebarContainer.dragable {
+  app-region: drag;
+}

@@ -91,4 +91,9 @@ export class BrowserRendererEmmiter {
       window.areaMaximized,
     );
   }
+
+  refreshSidebarDrag(window: Window, dragable: boolean) {
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    sidebar.send('sidebar:change-drag', dragable);
+  }
 }

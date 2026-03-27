@@ -52,6 +52,7 @@ export function setupUIIPC(browser: Browser) {
       scopeLog.info(`Open contextual modal "${page}" for window ${winId}.`);
       return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
         window.modal.openContextual(page, params);
+        browser.rendererEmmiter.refreshSidebarDrag(window, false);
         window.renderViews();
       });
     },
@@ -62,6 +63,7 @@ export function setupUIIPC(browser: Browser) {
     scopeLog.info(`Close contextual modal for window ${winId}.`);
     return await checkContextualModal(event, browser, winId, async (window) => {
       window.modal.closeContextual();
+      browser.rendererEmmiter.refreshSidebarDrag(window, true);
       window.renderViews();
     });
   });

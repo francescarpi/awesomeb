@@ -4,9 +4,10 @@ import '../assets/app.css';
 interface Props {
   backgroundColor?: string;
   borderRadius?: string;
+  noDrag?: boolean;
 }
 
-const { backgroundColor, borderRadius } = Astro.props;
+const { backgroundColor, borderRadius, noDrag } = Astro.props;
 ---
 
 <!doctype html>
@@ -19,7 +20,7 @@ const { backgroundColor, borderRadius } = Astro.props;
     />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
   </head>
-  <body>
+  <body style={noDrag ? 'app-region: no-drag' : ''}>
     <div class="rootContainer fixed inset-0 text-white">
       <slot />
     </div>

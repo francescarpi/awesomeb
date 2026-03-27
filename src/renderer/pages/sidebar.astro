@@ -9,7 +9,7 @@ import WindowId from '#/components/sidebar/WindowId.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
-  <div class="h-full flex flex-col gap-4 pt-0.5" style="app-region:drag;" id="sidebarContainer">
+  <div class="h-full flex flex-col gap-4 pt-0.5 dragable" id="sidebarContainer">
     <section class="pl-2 pt-2 hidden sidebar:block">
       <WindowActions />
     </section>
@@ -50,4 +50,13 @@ import WindowId from '#/components/sidebar/WindowId.astro';
   }
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
+
+  abSidebar.onChangeDrag((_event, isDragable) => {
+    const sidebar = document.getElementById('sidebarContainer')!;
+    if (isDragable) {
+      sidebar.classList.add('dragable');
+    } else {
+      sidebar.classList.remove('dragable');
+    }
+  });
 </script>

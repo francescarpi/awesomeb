@@ -3,13 +3,13 @@ import Base from '../../layouts/Base.astro';
 import { Icon } from 'astro-icon/components';
 ---
 
-<Base>
-  <div class="fixed inset-0" id="overlay" style="app-region: no-drag;"></div>
+<Base noDrag>
+  <div class="fixed inset-0" id="overlay"></div>
   <div
     class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 max-w-80 absolute rounded-lg p-2 hidden"
     id="wrapper"
   >
-    <div id="content" class="text-sm" style="app-region: no-drag;"><slot /></div>
+    <div id="content" class="text-sm"><slot /></div>
   </div>
   <Icon name="arrow-down" class="absolute text-4xl text-gray-800 hidden" id="arrow" />
 </Base>

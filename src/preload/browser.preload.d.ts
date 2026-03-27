@@ -150,4 +150,9 @@ declare global {
     get: (winId: TWindowId) => Promise<IConfig>;
     save: (winId: TWindowId, config: IConfig) => Promise<IConfig>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abSidebar: {
+    onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
+  };
 }

@@ -153,8 +153,7 @@ export class UIWindow {
     this._sidebarCollapsed = !this._sidebarCollapsed;
 
     // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
-    const sidebar = this.getView<Sidebar>('sidebar')!;
-    sidebar.loadPage(window);
+    this.reloadSidebar(window);
 
     this.eventsChannel.emit('window:layout-did-change', window);
   }
@@ -168,10 +167,14 @@ export class UIWindow {
     this._sidebarCollapsed = this._areaMaximized;
 
     // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
-    const sidebar = this.getView<Sidebar>('sidebar')!;
-    sidebar.loadPage(window);
+    this.reloadSidebar(window);
 
     this.eventsChannel.emit('window:layout-did-change', window);
+  }
+
+  reloadSidebar(window: Window) {
+    const sidebar = this.getView<Sidebar>('sidebar')!;
+    sidebar.loadPage(window);
   }
 
   get areaMaximized(): boolean {

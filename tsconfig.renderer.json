@@ -9,11 +9,10 @@
     "composite": true,
     "moduleResolution": "bundler",
     "types": [],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/main/*"],
-      "~/*": ["src/shared/*"],
-      "#/*": ["src/renderer/*"]
+      "@/*": ["./src/main/*"],
+      "~/*": ["./src/shared/*"],
+      "#/*": ["./src/renderer/*"]
     }
   }
 }

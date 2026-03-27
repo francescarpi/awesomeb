@@ -232,6 +232,13 @@ const abConfig = {
 };
 
 //--------------------------------------------------------------------------------------
+const abSidebar = {
+  onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => {
+    ipcRenderer.on('sidebar:change-drag', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -248,3 +255,4 @@ contextBridge.exposeInMainWorld('abTabSwitcher', abTabSwitcher);
 contextBridge.exposeInMainWorld('abTabMarks', abTabMarks);
 contextBridge.exposeInMainWorld('abCertificates', abCertificates);
 contextBridge.exposeInMainWorld('abConfig', abConfig);
+contextBridge.exposeInMainWorld('abSidebar', abSidebar);

@@ -45,7 +45,7 @@ export class UIModalManager {
     return this._modal !== null;
   }
 
-  openContextual(page: TPage, props?: IContextualModalParams) {
+  openContextual(page: TPage, props: IContextualModalParams) {
     const view = new UIContextualModal(this._win, page, props);
     this._win.addView(view);
   }
