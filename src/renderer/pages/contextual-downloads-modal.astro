@@ -3,7 +3,11 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
 <ContextualModal>
-  <div class="w-64">
+  <div>
+    <div id="no-downloads" class="text-center mt-2 hidden">No downloads for this session.</div>
+    <ul id="downloads-list" class="divide-y mt-2">
+      <!-- Downloads will be rendered here -->
+    </ul>
     <div class="flex justify-end mt-4 border-t pt-2">
       <button class="btn btn-xs" id="show-all">Show all downloads</button>
     </div>
@@ -12,9 +16,54 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
 <script>
   import { onClick, getSearchParams } from '#/scripts';
+  import { IDownloads } from '~/types';
+
   const { winId } = getSearchParams();
 
   onClick('show-all', () => {
     abDownloads.openPage(winId);
   });
+
+  abDownloads.onRefresh((_event, data) => renderDownloads(data));
+  abDownloads.get(winId).then((data) => renderDownloads(data));
+
+  function renderDownloads(data: IDownloads) {
+    console.log(data);
+
+    const noDownloadsEl = document.getElementById('no-downloads')!;
+    if (data.items.length === 0) {
+      noDownloadsEl.classList.remove('hidden');
+      return;
+    }
+
+    const downloadsListEl = document.getElementById('downloads-list')!;
+    downloadsListEl.innerHTML = '';
+
+    for (const item of data.items) {
+      const li = document.createElement('li');
+      li.className = 'py-2';
+
+      const name = document.createElement('div');
+      name.textContent = item.fileName;
+
+      const content = document.createElement('div');
+      content.className = 'flex items-center gap-2';
+
+      const progress = document.createElement('progress');
+      progress.className = 'progress progress-primary';
+      progress.value = item.progress;
+      progress.max = 100;
+
+      const progressText = document.createElement('span');
+      progressText.textContent = `${item.progress}%`;
+      progressText.className = 'text-xs';
+
+      content.appendChild(progress);
+      content.appendChild(progressText);
+
+      li.appendChild(name);
+      li.appendChild(content);
+      downloadsListEl.appendChild(li);
+    }
+  }
 </script>

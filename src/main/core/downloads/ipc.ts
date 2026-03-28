@@ -67,8 +67,19 @@ export function setupDownloadsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('downloads:get', async (event) => {
+  ipcMain.handle('downloads:get', async (event, winId?: TWindowId) => {
     scopeLog.info(`Get downloads received`);
+    if (winId) {
+      return await checkModalAndPagesSender(
+        event,
+        browser,
+        winId,
+        ['sidebar', 'contextual-modal'],
+        async (_window) => {
+          return browser.renderer.downloads();
+        },
+      );
+    }
     return await checkInternalPage(event, browser, 'downloads', async (_window) => {
       return browser.renderer.downloads();
     });

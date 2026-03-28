@@ -1,5 +1,6 @@
 import { Browser, Window, Desktop, Tab } from '@/core';
 import { Sidebar, TabSwitcher, URLBar } from '@/ui';
+import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import { ITheme, TFindInPageId } from '~/types';
@@ -68,6 +69,11 @@ export class BrowserRendererEmmiter {
     for (const window of this._browser.windows) {
       const sidebar = window.getView<Sidebar>('sidebar')!;
       sidebar.send('downloads:refresh', data);
+
+      const contextualModal = window.getView<UIContextualModal>('contextual-modal');
+      if (contextualModal) {
+        contextualModal.send('downloads:refresh', data);
+      }
 
       // ...and to all "downloads" pages
       for (const page of window.views) {

@@ -176,8 +176,8 @@ const abDownloads = {
   action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => {
     ipcRenderer.send('downloads:action', savePath, action);
   },
-  get: async () => {
-    return await ipcRenderer.invoke('downloads:get');
+  get: async (winId?: TWindowId) => {
+    return await ipcRenderer.invoke('downloads:get', winId);
   },
 };
 
