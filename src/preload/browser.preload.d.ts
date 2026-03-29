@@ -117,7 +117,11 @@ declare global {
   const abDownloads: {
     onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => void;
     openPage: (winId: TWindowId) => void;
-    action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => void;
+    action: (
+      savePath: string,
+      action: 'cancel' | 'pause' | 'resume' | 'open',
+      winId?: TWindowId,
+    ) => void;
     get: (winId?: TWindowId) => Promise<IDownloads>;
   };
 

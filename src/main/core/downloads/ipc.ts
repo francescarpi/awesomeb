@@ -39,9 +39,15 @@ export function setupDownloadsIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
   ipcMain.on(
     'downloads:action',
-    async (event, savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => {
+    async (
+      event,
+      savePath: string,
+      action: 'cancel' | 'pause' | 'resume' | 'open',
+      winId?: TWindowId,
+    ) => {
       scopeLog.info(`Cancel download received for save path ${savePath}`);
-      return await checkInternalPage(event, browser, 'downloads', async (_window) => {
+
+      const performAction = () => {
         const downloadItem = browser.downloads.get(savePath);
         if (!downloadItem) {
           scopeLog.warn(`No download item found for save path ${savePath}`);
@@ -62,6 +68,22 @@ export function setupDownloadsIPC(browser: Browser) {
             downloadItem.open();
             break;
         }
+      };
+
+      if (winId) {
+        return await checkModalAndPagesSender(
+          event,
+          browser,
+          winId,
+          ['contextual-modal'],
+          async (_window) => {
+            return performAction();
+          },
+        );
+      }
+
+      return await checkInternalPage(event, browser, 'downloads', async (_window) => {
+        return performAction();
       });
     },
   );
@@ -74,7 +96,7 @@ export function setupDownloadsIPC(browser: Browser) {
         event,
         browser,
         winId,
-        ['sidebar', 'contextual-modal'],
+        ['contextual-modal'],
         async (_window) => {
           return browser.renderer.downloads();
         },

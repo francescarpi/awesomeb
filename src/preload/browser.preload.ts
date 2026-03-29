@@ -173,8 +173,8 @@ const abDownloads = {
   openPage: (winId: TWindowId) => {
     ipcRenderer.send('downloads:open-page', winId);
   },
-  action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open') => {
-    ipcRenderer.send('downloads:action', savePath, action);
+  action: (savePath: string, action: 'cancel' | 'pause' | 'resume' | 'open', winId?: TWindowId) => {
+    ipcRenderer.send('downloads:action', savePath, action, winId);
   },
   get: async (winId?: TWindowId) => {
     return await ipcRenderer.invoke('downloads:get', winId);
