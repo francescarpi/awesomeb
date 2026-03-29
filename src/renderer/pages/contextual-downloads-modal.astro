@@ -16,7 +16,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
 <script>
   import { onClick, getSearchParams } from '#/scripts';
-  import { IDownloads } from '~/types';
+  import { EDownloadStatus, IDownloads } from '~/types';
 
   const { winId } = getSearchParams();
 
@@ -41,13 +41,22 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
     for (const item of data.items) {
       const li = document.createElement('li');
-      li.className = 'py-2';
+      li.classList.add('py-2');
+
+      if (item.status === EDownloadStatus.Paused) {
+        li.classList.add('opacity-30');
+      }
 
       const name = document.createElement('div');
       name.textContent = item.fileName;
 
       const content = document.createElement('div');
-      content.className = 'flex items-center gap-2';
+      content.classList.add('flex', 'items-center', 'gap-2');
+
+      if (item.status === EDownloadStatus.Cancelled) {
+        name.classList.add('line-through');
+        content.classList.add('opacity-30');
+      }
 
       const progress = document.createElement('progress');
       progress.className = 'progress progress-primary';
