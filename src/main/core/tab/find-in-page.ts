@@ -13,7 +13,6 @@ export class FindInPage extends UIPageView {
     private readonly tab: Tab,
   ) {
     super(`tab-${tab.id}#find-in-page`, 'browser', {
-      visible: false,
       query: {
         tabId: tab.id.toString(),
       },
@@ -43,6 +42,14 @@ export class FindInPage extends UIPageView {
   }
 
   render(window: Window) {
+    const selectedTab = window.selectedTab;
+    if (!selectedTab || selectedTab.tab.id !== this.tab.id) {
+      this.setVisible(false);
+      return;
+    }
+
+    this.setVisible(true);
+
     this.webContentsView.setBounds({
       x: this.tab.left,
       y: window.bounds.height - FIND_IN_PAGE_VIEW_HEIGHT - MARGIN,

@@ -116,10 +116,9 @@ export function registerBrowserEvents(browser: Browser) {
     async (tab: Tab, visible: boolean, view: UIPageView) => {
       const result = browser.getTab(tab.id);
       if (!result) {
+        scopeLog.warn(`Tab with id ${tab.id} not found for find in page visibility change event`);
         return;
       }
-
-      // TODO maybe 'visible' and 'view' is not necessary. Check findInpage tab's property
 
       if (visible) {
         result.window.addView(view);
