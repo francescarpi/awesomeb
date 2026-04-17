@@ -1,8 +1,12 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Base from '../layouts/Base.astro';
 ---
 
-<BlackBgWithTitle title="Tab Switcher"><ul></ul></BlackBgWithTitle>
+<Base noDrag>
+  <div class="fixed inset-0 bg-white/50 flex items-center justify-center">
+    <ul class="w-80 bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4">No tabs...</ul>
+  </div>
+</Base>
 
 <script>
   import { TTabId, ITabSwitcherTab } from '~/types';

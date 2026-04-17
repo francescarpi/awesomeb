@@ -10,6 +10,7 @@ import { UIPageView } from '../view';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
+
   constructor(
     private readonly _parent: UIWindow,
     private readonly _page: TPage,
