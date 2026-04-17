@@ -102,4 +102,9 @@ export class BrowserRendererEmmiter {
     const sidebar = window.getView<Sidebar>('sidebar')!;
     sidebar.send('sidebar:change-drag', dragable);
   }
+
+  refreshExtensions(window: Window) {
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    sidebar.send('extensions:on-refresh', this._browser.extensions.active);
+  }
 }

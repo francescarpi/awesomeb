@@ -289,4 +289,11 @@ export function registerBrowserEvents(browser: Browser) {
     }
     browser.rendererEmmiter.refreshTabContainers(result.window);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('extensions:enabled-changed', async () => {
+    for (const window of browser.windows) {
+      browser.rendererEmmiter.refreshExtensions(window);
+    }
+  });
 }

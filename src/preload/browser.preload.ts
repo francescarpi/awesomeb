@@ -18,6 +18,7 @@ import {
   IConfig,
   IContextualModalParams,
   TExtensionId,
+  IExtension,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -244,11 +245,17 @@ const abExtensions = {
   get: (winId?: TWindowId) => {
     return ipcRenderer.invoke('extensions:get', winId);
   },
+  active: (winId?: TWindowId) => {
+    return ipcRenderer.invoke('extensions:active', winId);
+  },
   refresh: () => {
     return ipcRenderer.invoke('extensions:refresh');
   },
   toggle: (id: TExtensionId) => {
     return ipcRenderer.invoke('extensions:toggle', id);
+  },
+  onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => {
+    ipcRenderer.on('extensions:on-refresh', callback);
   },
 };
 

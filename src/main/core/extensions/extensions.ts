@@ -61,7 +61,7 @@ export class Extensions {
 
     const enabled = !extension.enabled;
     this._store.set(`extensions.${id}.enabled`, enabled);
-    // this._browser.channel.emit(EEventName.ExtensionEnabledDidChange);
+    this._browser.eventsChannel.emit('extensions:enabled-changed');
 
     return this._store.get(`extensions.${id}`);
   }

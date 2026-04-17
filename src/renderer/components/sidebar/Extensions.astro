@@ -1,0 +1,43 @@
+---
+
+---
+
+<div id="extensions" class="hidden sidebar:flex gap-2"></div>
+
+<script>
+  import { IExtension } from '~/types';
+  import { getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
+  const resp = await abExtensions.active(winId);
+
+  renderExtensions(resp.extensions);
+
+  abExtensions.onRefresh((_event, extensions) => {
+    renderExtensions(extensions);
+  });
+
+  function renderExtensions(extension: IExtension[]) {
+    const container = document.getElementById('extensions')!;
+    container.innerHTML = '';
+
+    for (const ext of extension) {
+      if (!ext.icon) continue;
+
+      const extEl = document.createElement('img');
+      extEl.src = ext.icon;
+      extEl.classList.add(
+        'w-6',
+        'h-6',
+        'rounded',
+        'object-cover',
+        'cursor-pointer',
+        'hover:bg-white/15',
+        'p-0.5',
+      );
+      extEl.style = 'app-region: no-drag;';
+
+      container.appendChild(extEl);
+    }
+  }
+</script>

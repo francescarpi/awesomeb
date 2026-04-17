@@ -11,12 +11,25 @@ export function setupExtensionsIPC(browser: Browser) {
   ipcMain.handle('extensions:get', async (event, winId?: TWindowId) => {
     scopeLog.info('Getting extensions data', { winId });
     if (winId) {
-      return await checkModalAndPagesSender(event, browser, winId, [], async (_window) => {
+      return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (_window) => {
         return browser.renderer.extensions();
       });
     }
     return await checkInternalPage(event, browser, 'extensions', async (_window) => {
       return browser.renderer.extensions();
+    });
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.handle('extensions:active', async (event, winId?: TWindowId) => {
+    scopeLog.info('Getting active extensions data', { winId });
+    if (winId) {
+      return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (_window) => {
+        return browser.renderer.extensions(true);
+      });
+    }
+    return await checkInternalPage(event, browser, 'extensions', async (_window) => {
+      return browser.renderer.extensions(true);
     });
   });
 

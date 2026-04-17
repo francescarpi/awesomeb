@@ -323,10 +323,10 @@ export class BrowserRenderer {
     }));
   }
 
-  extensions(): IExtensions {
+  extensions(active = false): IExtensions {
     return {
       path: extensionsPath(),
-      extensions: this._browser.extensions.all,
+      extensions: active ? this._browser.extensions.active : this._browser.extensions.all,
     };
   }
 }
