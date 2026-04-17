@@ -13,3 +13,4 @@ export * from './downloads';
 export * from './tab-marks';
 export * from './certificates';
 export * from './permissions';
+export * from './extensions';

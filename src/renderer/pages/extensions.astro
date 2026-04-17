@@ -1,0 +1,103 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Extensions">
+  <div class="flex gap-4">
+    <p>
+      AwesomeB offers limited support for Chrome extensions. At this time, installation must be done
+      manually: place your extensions in the following directory (<i id="path" class="bg-white/20"
+      ></i>) and then click the Refresh Extensions button.
+    </p>
+    <button class="btn btn-primary btn-sm" id="refresh">Refresh Extensions</button>
+  </div>
+  <div id="extensions-list" class="mt-4"></div>
+</BlackBgWithTitle>
+
+<script>
+  import { onClick } from '#/scripts';
+  import { IExtension } from '~/types';
+
+  const extensionsList = document.getElementById('extensions-list')!;
+
+  const resp = await abExtensions.get();
+  document.getElementById('path')!.textContent = resp.path;
+
+  onClick('refresh', async () => {
+    const extensions = await abExtensions.refresh();
+    renderExtensions(extensions);
+  });
+
+  renderExtensions(resp.extensions);
+
+  function renderExtensions(extensions: IExtension[]) {
+    extensionsList.innerHTML = '';
+
+    if (extensions.length === 0) {
+      extensionsList.textContent = 'No extensions found.';
+      return;
+    }
+
+    const container = document.createElement('div');
+    container.classList.add('grid', 'grid-cols-2', 'gap-2');
+
+    for (const ext of extensions) {
+      const extEl = document.createElement('div');
+      extEl.classList.add('bg-white/10', 'p-2', 'rounded');
+
+      const header = document.createElement('div');
+      header.classList.add('grid', 'grid-cols-[30px_1fr_40px]');
+
+      if (ext.icon) {
+        const icon = document.createElement('img');
+        icon.src = ext.icon;
+        icon.classList.add('w-6', 'h-6');
+        header.appendChild(icon);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.classList.add('w-6', 'h-6', 'bg-white/20', 'rounded');
+        header.appendChild(placeholder);
+      }
+
+      const name = document.createElement('span');
+      name.textContent = ext.manifest.name;
+      header.appendChild(name);
+
+      const toggle = document.createElement('input');
+      toggle.type = 'checkbox';
+      toggle.checked = ext.enabled;
+      toggle.classList.add('toggle');
+      toggle.onchange = async () => {
+        console.log(`Toggling extension ${ext.id} to ${toggle.checked}`);
+        await abExtensions.toggle(ext.id);
+      };
+      header.appendChild(toggle);
+
+      extEl.appendChild(header);
+
+      const descp = document.createElement('p');
+      descp.textContent = ext.manifest.description || 'No description';
+      descp.classList.add('text-sm', 'text-gray-400', 'mt-1');
+      extEl.appendChild(descp);
+
+      const footer = document.createElement('div');
+      footer.classList.add('flex', 'gap-2', 'mt-3');
+
+      const version = document.createElement('span');
+      version.textContent = `Version: ${ext.manifest.version}`;
+      version.classList.add('text-xs', 'text-gray-500', 'w-full');
+      footer.appendChild(version);
+
+      const id = document.createElement('span');
+      id.textContent = `ID: ${ext.id}`;
+      id.classList.add('text-xs', 'text-gray-500', 'w-full');
+      footer.appendChild(id);
+
+      extEl.appendChild(footer);
+
+      container.appendChild(extEl);
+    }
+
+    extensionsList.appendChild(container);
+  }
+</script>

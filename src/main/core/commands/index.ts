@@ -49,6 +49,7 @@ import * as tabpreviewAccept from './tabpreview-accept';
 import * as tabToggleMute from './tab-toggle-mute';
 import * as tabOpenClosed from './tab-open-closed';
 import * as tabPrint from './tab-print';
+import * as extensionsManage from './extensions-manage';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -97,6 +98,7 @@ const COMMANDS = {
   [tabToggleMute.TRIGGER]: tabToggleMute.Command,
   [tabOpenClosed.TRIGGER]: tabOpenClosed.Command,
   [tabPrint.TRIGGER]: tabPrint.Command,
+  [extensionsManage.TRIGGER]: extensionsManage.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

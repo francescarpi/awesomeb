@@ -17,6 +17,7 @@ import {
   TMarksAction,
   IConfig,
   IContextualModalParams,
+  TExtensionId,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -239,6 +240,19 @@ const abSidebar = {
 };
 
 //--------------------------------------------------------------------------------------
+const abExtensions = {
+  get: (winId?: TWindowId) => {
+    return ipcRenderer.invoke('extensions:get', winId);
+  },
+  refresh: () => {
+    return ipcRenderer.invoke('extensions:refresh');
+  },
+  toggle: (id: TExtensionId) => {
+    return ipcRenderer.invoke('extensions:toggle', id);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -256,3 +270,4 @@ contextBridge.exposeInMainWorld('abTabMarks', abTabMarks);
 contextBridge.exposeInMainWorld('abCertificates', abCertificates);
 contextBridge.exposeInMainWorld('abConfig', abConfig);
 contextBridge.exposeInMainWorld('abSidebar', abSidebar);
+contextBridge.exposeInMainWorld('abExtensions', abExtensions);

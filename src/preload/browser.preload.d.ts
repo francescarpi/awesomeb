@@ -14,6 +14,7 @@ import {
   ITabMark,
   TMarksAction,
   IConfig,
+  IExtension,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -158,5 +159,12 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abSidebar: {
     onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abExtensions: {
+    get: (winId?: TWindowId) => Promise<IExtensions>;
+    refresh: () => Promise<IExtension[]>;
+    toggle: (id: TExtensionId) => Promise<IExtension[]>;
   };
 }

@@ -30,3 +30,13 @@ export function faviconsPath(): string {
 
   return extPath;
 }
+
+export function extensionsPath(): string {
+  const extPath = path.join(userDataPath(), 'extensions');
+
+  if (!fs.existsSync(extPath)) {
+    fs.mkdirSync(extPath, { recursive: true });
+  }
+
+  return extPath;
+}

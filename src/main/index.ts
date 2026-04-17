@@ -15,6 +15,7 @@ import {
   setupTabMarksIpc,
   setupCertificatesIPC,
   setupConfigIPC,
+  setupExtensionsIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -49,6 +50,7 @@ app.whenReady().then(async () => {
   setupTabMarksIpc(browser);
   setupCertificatesIPC(browser);
   setupConfigIPC(browser);
+  setupExtensionsIPC(browser);
 
   await browser.loadProfiles();
   await browser.loadSession();

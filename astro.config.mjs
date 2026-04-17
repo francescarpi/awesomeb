@@ -34,8 +34,9 @@ const electronMainConfig = {
       viteStaticCopy({
         targets: [
           {
-            src: 'src/main/assets/icons/*.png',
-            dest: 'assets/icons',
+            src: './src/main/assets/icons',
+            dest: './assets/icons',
+            rename: { stripBase: true }
           },
         ],
       }),

@@ -16,6 +16,7 @@ import {
   IDownloads,
   EDownloadStatus,
   ITabSwitcherTab,
+  IExtensions,
 } from '~/types';
 import {
   Browser,
@@ -31,6 +32,7 @@ import {
   closedHistory,
 } from '@/core';
 import dayjs from 'dayjs';
+import { extensionsPath } from '@/paths';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -319,5 +321,12 @@ export class BrowserRenderer {
       label: tab.title,
       extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
     }));
+  }
+
+  extensions(): IExtensions {
+    return {
+      path: extensionsPath(),
+      extensions: this._browser.extensions.all,
+    };
   }
 }
