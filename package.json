@@ -40,7 +40,7 @@
     "prettier-plugin-astro": "0.14.1",
     "tailwindcss": "4.2.2",
     "tsc-alias": "1.8.16",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "typescript-eslint": "8.58.2",
     "vite": "8.0.8",
     "vite-plugin-electron-renderer": "0.14.6",

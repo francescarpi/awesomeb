@@ -1,25 +1,25 @@
 import { defineConfig } from 'astro/config';
-import icon from 'astro-icon'
-import tailwindcss from "@tailwindcss/vite";
-import electron from "astro-electron";
-import { viteStaticCopy } from 'vite-plugin-static-copy'
-import path from 'path'
+import icon from 'astro-icon';
+import tailwindcss from '@tailwindcss/vite';
+import electron from 'astro-electron';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import path from 'path';
 
 const MINIFY = false;
 
 // Shared aliases between main process and preload
 const electronAliases = {
-  "@": path.resolve("src/main"),
-  "~": path.resolve("src/shared"),
-  "#": path.resolve("src/renderer")
-}
+  '@': path.resolve('src/main'),
+  '~': path.resolve('src/shared'),
+  '#': path.resolve('src/renderer'),
+};
 
 // Aliases for the renderer (Astro)
 const rendererAliases = {
   ...electronAliases,
-  "@preload": "./src/preload",
-  "@renderer": "./src/renderer",
-}
+  '@preload': './src/preload',
+  '@renderer': './src/renderer',
+};
 
 // Configuration for the main process of Electron
 const electronMainConfig = {
@@ -34,17 +34,17 @@ const electronMainConfig = {
       viteStaticCopy({
         targets: [
           {
-            src: 'src/main/assets/icons',
-            dest: 'assets',
+            src: 'src/main/assets/icons/*.png',
+            dest: 'assets/icons',
           },
         ],
       }),
     ],
     resolve: {
       alias: electronAliases,
-    }
+    },
   },
-}
+};
 
 // Configuration for the Electron preload
 const electronPreloadConfig = {
@@ -57,15 +57,15 @@ const electronPreloadConfig = {
           'preload/tab.preload': 'src/preload/tab.preload.ts',
         },
         output: {
-          inlineDynamicImports: false
-        }
+          inlineDynamicImports: false,
+        },
       },
     },
     resolve: {
       alias: electronAliases,
-    }
-  }
-}
+    },
+  },
+};
 
 export default defineConfig({
   // === INTEGRATIONS ===
@@ -79,8 +79,8 @@ export default defineConfig({
     electron({
       main: electronMainConfig,
       preload: electronPreloadConfig,
-      renderer: {}
-    })
+      renderer: {},
+    }),
   ],
 
   // === ASTRO CONFIG ===
@@ -96,12 +96,12 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      alias: rendererAliases
-    }
+      alias: rendererAliases,
+    },
   },
 
   // === DEV CONFIG ===
   devToolbar: {
-    enabled: false
+    enabled: false,
   },
 });
