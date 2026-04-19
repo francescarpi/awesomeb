@@ -77,15 +77,16 @@ export class ChromeTabs {
     _extensionId: TExtensionId,
     props: { tabData?: TTabId | chrome.tabs.ReloadProperties },
   ): Promise<void> {
-    // const tab =
-    //   props.tabData && typeof props.tabData === 'number'
-    //     ? focusedWindow.getTab(props.tabData)
-    //     : focusedWindow.selectedDesktop.selectedTab;
-    // if (!tab) {
-    //   scopeLog.warn(`No tab found  for updating`);
-    //   return;
-    // }
-    //
-    // tab.tab.reload();
+    const tab =
+      props.tabData && typeof props.tabData === 'number'
+        ? window.getTab(props.tabData)
+        : window.selectedTab;
+
+    if (!tab) {
+      scopeLog.warn(`No tab found  for updating`);
+      return;
+    }
+
+    tab.tab.reload();
   }
 }

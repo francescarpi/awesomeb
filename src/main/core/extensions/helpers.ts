@@ -68,7 +68,7 @@ export function loadLatestExtensionManifests(rootDir: string): IExtension[] {
           id: extId,
           manifest,
           manifestPath: manifestFullPath,
-          icon: loadIcon(manifestFullPath, manifest),
+          icon: loadIcon(manifestFullPath, manifest.action.default_icon),
           enabled: false,
         });
       } catch (err) {
@@ -89,8 +89,11 @@ export function loadLatestExtensionManifests(rootDir: string): IExtension[] {
  * @param manifest The extension manifest object.
  * @returns A base64 data URL of the icon, or null if not found or on error.
  */
-function loadIcon(manifestPath: string, manifest: IExtensionManifest): string | null {
-  let iconPath = manifest.action.default_icon;
+export function loadIcon(
+  manifestPath: string,
+  icon: string | { [index: number]: string } | undefined,
+): string | null {
+  let iconPath = icon;
   if (typeof iconPath === 'object') {
     iconPath = iconPath['48'] || iconPath['32'] || iconPath['16'];
     if (!iconPath) {
@@ -102,7 +105,7 @@ function loadIcon(manifestPath: string, manifest: IExtensionManifest): string | 
     return null;
   }
 
-  const fullPath = path.join(manifestPath, iconPath);
+  const fullPath = path.join(manifestPath, iconPath as string);
   if (!fs.existsSync(fullPath)) {
     scopeLog.warn(`Icon file not found at ${fullPath}`);
     return null;
@@ -160,13 +163,6 @@ export async function loadExtensionToSession(
   });
 }
 
-/**
- * Unloads an extension from the given Electron session.
- * It checks if the extension is currently loaded in the session before attempting to unload it.
- *
- * @param ses The Electron session to unload the extension from.
- * @param extensionId The ID of the extension to unload.
- */
 export function unloadExtensionFromSession(ses: Session, extensionId: TExtensionId) {
   const sessionExtension = ses.extensions.getExtension(extensionId);
   if (sessionExtension) {

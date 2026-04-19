@@ -1,18 +1,33 @@
-import { Browser } from '@/core'
-import { TPartitionId } from '~/types'
+import { Browser, Window } from '@/core';
+import { TPartitionId } from '~/types';
+import log from 'electron-log';
+import { loadIcon } from '../helpers';
+import * as path from 'path';
 
-import log from 'electron-log'
-const scopeLog = log.scope('ChromeAction')
+const scopeLog = log.scope('ChromeAction');
 
 export class ChromeAction {
   constructor(private readonly browser: Browser) {}
 
-  setIcon(partitionId: TPartitionId, extensionId: string, details: chrome.action.TabIconDetails): void {
-    const ext = this.browser.extensions.getExtensionByPartition(partitionId, extensionId)
+  async setIcon(
+    _window: Window,
+    _partitionId: TPartitionId,
+    extensionId: string,
+    details: chrome.action.TabIconDetails,
+  ): Promise<void> {
+    const ext = this.browser.extensions.getExtension(extensionId);
     if (!ext) {
-      scopeLog.warn(`Extension with id ${extensionId} not found`)
-      return
+      scopeLog.warn(`Extension with id ${extensionId} not found`);
+      return;
     }
-    ext.setIcon(details)
+
+    const icon = loadIcon(
+      ext.manifestPath,
+      details.path ? path.join('popup', details.path as string) : undefined,
+    );
+
+    console.log('ICON', icon);
+
+    // ext.setIcon(details);
   }
 }
