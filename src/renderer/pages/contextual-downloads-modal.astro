@@ -28,8 +28,6 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
   abDownloads.get(winId).then((data) => renderDownloads(data));
 
   function renderDownloads(data: IDownloads) {
-    console.log(data);
-
     const noDownloadsEl = document.getElementById('no-downloads')!;
     if (data.items.length === 0) {
       noDownloadsEl.classList.remove('hidden');

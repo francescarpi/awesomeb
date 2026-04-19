@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent } from 'electron';
 import { Browser, Window, Tab, FindInPage, Desktop, TabContainer, FailLoad } from '@/core';
-import { TTabId, TWindowId } from '~/types';
+import { TTabId, TWindowId, TExtensionId, IExtension } from '~/types';
 import log from 'electron-log';
 import { UIModalManager, UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
@@ -220,4 +220,25 @@ export async function checkContextualModal<T>(
   }
 
   return await callback(win, view);
+}
+
+export async function checkExtensionSender<T>(
+  browser: Browser,
+  winId: TWindowId,
+  extensionId: TExtensionId,
+  callback: (window: Window, extension: IExtension) => Promise<T>,
+) {
+  const win = browser.getWindow(winId);
+  if (!win) {
+    scopeLog.error(`No window found with ID ${winId}`);
+    return;
+  }
+
+  const extension = browser.extensions.getExtension(extensionId);
+  if (!extension) {
+    scopeLog.error(`No extension found with ID ${extensionId}`);
+    return;
+  }
+
+  return await callback(win, extension);
 }

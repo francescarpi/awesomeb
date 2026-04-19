@@ -68,7 +68,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       toggle.checked = ext.enabled;
       toggle.classList.add('toggle');
       toggle.onchange = async () => {
-        console.log(`Toggling extension ${ext.id} to ${toggle.checked}`);
         await abExtensions.toggle(ext.id);
       };
       header.appendChild(toggle);

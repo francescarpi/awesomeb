@@ -6,13 +6,16 @@ import { loadLatestExtensionManifests } from './helpers';
 import log from 'electron-log';
 import { Browser, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
+import { Chrome } from './chrome';
 
 const scopeLog = log.scope('Extensions');
 
 export class Extensions {
   private readonly _store: Store<IExtensionsStore>;
+  public readonly chrome: Chrome;
 
   constructor(private readonly _browser: Browser) {
+    this.chrome = new Chrome(_browser);
     this._store = new Store<IExtensionsStore>({
       name: 'extensions',
       cwd: userDataPath(),
@@ -85,6 +88,8 @@ export class Extensions {
     const popupUrl = `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`;
     popup.webContents.loadURL(popupUrl);
     window.addView(popup);
+
+    // popup.webContents.openDevTools({ mode: 'detach' });
 
     window.renderViews();
   }

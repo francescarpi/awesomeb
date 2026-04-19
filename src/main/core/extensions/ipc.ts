@@ -1,8 +1,8 @@
 import { Browser } from '@/core';
 import { ipcMain } from 'electron';
-import { TExtensionId, TWindowId } from '~/types';
+import { TExtensionId, TWindowId, TPartitionId } from '~/types';
 import log from 'electron-log';
-import { checkInternalPage, checkModalAndPagesSender } from '@/utils';
+import { checkInternalPage, checkModalAndPagesSender, checkExtensionSender } from '@/utils';
 
 const scopeLog = log.scope('ExtensionsIPC');
 
@@ -94,6 +94,33 @@ export function setupExtensionsIPC(browser: Browser) {
           browser.extensions.iniPopup(window, width, height);
         },
       );
+    },
+  );
+
+  // ----------------------------------------------------------------------------------------------- //
+  ipcMain.handle(
+    'extension-crx-message',
+    async (
+      _event,
+      winId: TWindowId,
+      partitionId: TPartitionId,
+      extensionId: TExtensionId,
+      action: { method: string; args: Record<string, unknown> },
+    ) => {
+      scopeLog.info(
+        `Received extension-crx-message from extension ${extensionId} and partitionId: ${partitionId}:`,
+        action.method,
+        action.args,
+      );
+      return await checkExtensionSender(browser, winId, extensionId, async (window, extension) => {
+        return await browser.extensions.chrome.dispatch(
+          window,
+          partitionId,
+          extension.id,
+          action.method,
+          action.args,
+        );
+      });
     },
   );
 }

@@ -3,11 +3,11 @@ import { contextBridge, ipcRenderer } from 'electron';
 const extensionId = window.location.href.split('/')[2];
 
 const searchParams = new URLSearchParams(window.location.search);
+const winId = parseInt(searchParams.get('winId')!, 10);
 const partitionId = searchParams.get('partitionId')!;
-const winId = searchParams.get('winId')!;
 
 async function invokeRequest(method: string, ...args: unknown[]) {
-  return await ipcRenderer.invoke('extension-crx-message', partitionId, extensionId, {
+  return await ipcRenderer.invoke('extension-crx-message', winId, partitionId, extensionId, {
     method,
     args,
   });
@@ -90,5 +90,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const clientRect = document.documentElement.getBoundingClientRect();
   const width = Math.ceil(clientRect.width);
   const height = Math.ceil(clientRect.height);
-  ipcRenderer.send('extensions:ini-popup', parseInt(winId, 10), width, height);
+  ipcRenderer.send('extensions:ini-popup', winId, width, height);
 });
