@@ -301,4 +301,11 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshExtensions(window);
     }
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('extensions:icon-updated', async () => {
+    for (const window of browser.windows) {
+      browser.rendererEmmiter.refreshExtensions(window);
+    }
+  });
 }

@@ -2,11 +2,12 @@ import Store from 'electron-store';
 import { IExtensionsStore } from './types';
 import { userDataPath, extensionsPath } from '@/paths';
 import { IExtension, TExtensionId } from '~/types';
-import { loadLatestExtensionManifests } from './helpers';
+import { loadLatestExtensionManifests, loadIcon } from './helpers';
 import log from 'electron-log';
 import { Browser, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
+import path from 'path';
 
 const scopeLog = log.scope('Extensions');
 
@@ -105,6 +106,28 @@ export class Extensions {
       popup.setSize(width || 225, height || 100);
       popup.render(window);
       popup.setVisible(true);
+    }
+  }
+
+  updateIcon(extensionId: TExtensionId, details: chrome.action.TabIconDetails) {
+    const extension = this.getExtension(extensionId);
+    if (!extension) {
+      scopeLog.warn(`Extension with id ${extensionId} not found for updating icon`);
+      return;
+    }
+
+    const icon = loadIcon(
+      extension.manifestPath,
+      details.path ? path.join('popup', details.path as string) : undefined,
+    );
+
+    if (icon) {
+      const newExtension = {
+        ...extension,
+        icon,
+      };
+      this._store.set(`extensions.${extensionId}`, newExtension);
+      this._browser.eventsChannel.emit('extensions:icon-updated', extensionId);
     }
   }
 }
