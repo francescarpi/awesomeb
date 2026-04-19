@@ -104,7 +104,14 @@ export class BrowserRendererEmmiter {
   }
 
   refreshExtensions(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('extensions:on-refresh', this._browser.extensions.active);
+    const urlbar = window.getView<URLBar>('urlbar')!;
+
+    const selectedTab = window.selectedTab;
+    if (!selectedTab) {
+      urlbar.send('extensions:on-refresh', []);
+      return;
+    }
+
+    urlbar.send('extensions:on-refresh', this._browser.extensions.active);
   }
 }

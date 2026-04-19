@@ -65,39 +65,4 @@ export class Extensions {
 
     return this._store.get(`extensions.${id}`);
   }
-
-  // getOrCreateExtensionInstance(
-  //   partitionId: TPartitionId,
-  //   extensionId: TExtensionId,
-  // ): Extension | null {
-  //   let partitionMap = this._extensionsByPartition.get(extensionId);
-  //   if (!partitionMap) {
-  //     partitionMap = new Map();
-  //     this._extensionsByPartition.set(extensionId, partitionMap);
-  //   }
-  //
-  //   let extensionInstance = partitionMap.get(partitionId);
-  //   if (!extensionInstance) {
-  //     const extensionData = this._store.get(`extensions.${extensionId}`);
-  //     if (!extensionData) {
-  //       scopeLog.warn(`Extension with id ${extensionId} not found`);
-  //       return null;
-  //     }
-  //
-  //     extensionInstance = new Extension(this._browser, partitionId, extensionData);
-  //     partitionMap.set(partitionId, extensionInstance);
-  //   }
-  //
-  //   return extensionInstance;
-  // }
-
-  // getExtensionByPartition(partitionId: TPartitionId, extensionId: TExtensionId): Extension | null {
-  //   const partitionMap = this._extensionsByPartition.get(extensionId);
-  //   if (!partitionMap) {
-  //     return null;
-  //   }
-  //
-  //   const extensionInstance = partitionMap.get(partitionId) || null;
-  //   return extensionInstance;
-  // }
 }

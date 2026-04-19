@@ -450,6 +450,9 @@ export class Tab extends UIView {
   }
 
   get isMuted(): boolean {
+    if (this.isDestroyed) {
+      return false;
+    }
     return this.webContents.audioMuted;
   }
 }

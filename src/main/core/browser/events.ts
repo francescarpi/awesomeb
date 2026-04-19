@@ -37,6 +37,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.rendererEmmiter.refreshTabContainers(window);
       browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.rendererEmmiter.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
+      browser.rendererEmmiter.refreshExtensions(window);
 
       window.renderViews();
       browser.refreshMainMenu();
@@ -59,6 +60,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, tab);
     browser.rendererEmmiter.refreshDesktops(window);
+    browser.rendererEmmiter.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -74,6 +76,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.rendererEmmiter.refreshTabNavigation(window);
+    browser.rendererEmmiter.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -98,6 +101,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
     browser.rendererEmmiter.refreshTabNavigation(window);
+    browser.rendererEmmiter.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -107,6 +111,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.rendererEmmiter.refreshTabContainers(window);
     browser.rendererEmmiter.refreshURLBar(window, null);
     browser.rendererEmmiter.refreshDesktops(window);
+    browser.rendererEmmiter.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 

@@ -2,16 +2,10 @@
 
 ---
 
-<div id="extensions" class="hidden sidebar:flex gap-2"></div>
+<div id="extensions" class="flex gap-2 mr-8 ml-6"></div>
 
 <script>
   import { IExtension } from '~/types';
-  import { getSearchParams } from '#/scripts';
-
-  const { winId } = getSearchParams();
-  const resp = await abExtensions.active(winId);
-
-  renderExtensions(resp.extensions);
 
   abExtensions.onRefresh((_event, extensions) => {
     renderExtensions(extensions);
@@ -27,8 +21,8 @@
       const extEl = document.createElement('img');
       extEl.src = ext.icon;
       extEl.classList.add(
-        'w-6',
-        'h-6',
+        'w-5',
+        'h-5',
         'rounded',
         'object-cover',
         'cursor-pointer',
