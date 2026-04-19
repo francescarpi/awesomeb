@@ -27,6 +27,8 @@ export function registerAppEvents(browser: Browser) {
       }
     }
 
+    // TODO unload all extensions
+
     app.exit(0);
   });
 

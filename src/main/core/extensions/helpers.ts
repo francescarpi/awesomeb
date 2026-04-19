@@ -146,8 +146,9 @@ export async function loadExtensionToSession(
     return;
   }
 
+  const sessionName = ses.storagePath?.split(path.sep).pop() || 'unknown';
   scopeLog.info(
-    `Loaded extension ${loadedExtension.name} (id: ${loadedExtension.id}) - ${extensionPath}`,
+    `Loaded extension ${loadedExtension.name} (id: ${loadedExtension.id}) | Session: ${sessionName}`,
   );
 
   ses.serviceWorkers.on('registration-completed', (_e, d) => {
@@ -167,5 +168,6 @@ export function unloadExtensionFromSession(ses: Session, extensionId: TExtension
   const sessionExtension = ses.extensions.getExtension(extensionId);
   if (sessionExtension) {
     ses.extensions.removeExtension(extensionId);
+    scopeLog.info(`Unloaded extension ${extensionId} from session`);
   }
 }
