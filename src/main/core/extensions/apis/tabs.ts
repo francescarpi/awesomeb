@@ -3,6 +3,7 @@ import { tabToChromeTab } from './helpers';
 import { TExtensionId, TPartitionId, TTabId } from '~/types';
 import { ITabUpdate } from './types';
 import log from 'electron-log';
+import { brotliCompress } from 'zlib';
 
 const scopeLog = log.scope('ChromeTabs');
 
@@ -31,7 +32,7 @@ export class ChromeTabs {
 
   async create(
     window: Window,
-    _partitionId: TPartitionId,
+    partitionId: TPartitionId,
     extensionId: TExtensionId,
     props: chrome.tabs.CreateProperties,
   ): Promise<chrome.tabs.Tab | undefined> {
@@ -41,7 +42,7 @@ export class ChromeTabs {
       return undefined;
     }
 
-    const url = `chrome-extension://${extensionId}/${props.url}`;
+    const url = `chrome-extension://${extensionId}/${props.url}?partitionId=${partitionId}&winId=${window.id}`;
     const response = await this._browser.openURL(url, {
       partitionId: selectedTab.tab.partition.id,
       selectTab: true,
@@ -51,6 +52,8 @@ export class ChromeTabs {
       scopeLog.warn('Failed to create a new tab with url:', url);
       return undefined;
     }
+
+    this._browser.extensions.closePopup(window);
 
     return tabToChromeTab(
       window,
@@ -67,6 +70,7 @@ export class ChromeTabs {
     props: ITabUpdate,
   ) {
     if (props.active) {
+      this._browser.extensions.closePopup(window);
       window.selectTab(props.tabId);
     }
   }

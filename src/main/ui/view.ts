@@ -46,7 +46,6 @@ export class UIView {
 
     wcv.setBorderRadius(this._borderRadius);
 
-    // TODO setBackgroundColor is not working as expected
     wcv.setBackgroundColor(this._backgroundColor);
 
     return wcv;

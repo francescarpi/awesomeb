@@ -44,7 +44,13 @@ export class Tab extends UIView {
     public readonly id: TTabId,
     props: ITabProps,
   ) {
-    super(`tab-${id}#`, props.partition.id === internalPartition.id ? 'browser' : 'tab', {
+    const preload = props?.url?.startsWith('chrome-extension')
+      ? 'extension'
+      : props.partition.id === internalPartition.id
+        ? 'browser'
+        : 'tab';
+
+    super(`tab-${id}#`, preload, {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',
