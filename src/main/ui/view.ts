@@ -18,7 +18,7 @@ export class UIView {
 
   constructor(
     public readonly viewId: TViewId,
-    private readonly preload: 'browser' | 'tab' = 'tab',
+    private readonly preload: 'browser' | 'tab' | 'extension' = 'tab',
     props?: IViewProps,
   ) {
     this._borderRadius = props?.borderRadius || 0;
@@ -100,6 +100,10 @@ export class UIView {
 
   setWidth(width: number) {
     this._webContentsView.setBounds({ ...this.bounds, width });
+  }
+
+  setSize(width: number, height: number) {
+    this._webContentsView.setBounds({ ...this.bounds, width, height });
   }
 
   get visible(): boolean {

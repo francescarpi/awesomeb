@@ -4,7 +4,8 @@ import { userDataPath, extensionsPath } from '@/paths';
 import { IExtension, TExtensionId } from '~/types';
 import { loadLatestExtensionManifests } from './helpers';
 import log from 'electron-log';
-import { Browser } from '@/core';
+import { Browser, Partition, Window } from '@/core';
+import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 
 const scopeLog = log.scope('Extensions');
 
@@ -53,7 +54,7 @@ export class Extensions {
   }
 
   toggle(id: TExtensionId): IExtension | null {
-    const extension = this._store.get(`extensions.${id}`);
+    const extension = this.getExtension(id);
     if (!extension) {
       scopeLog.warn(`Extension with id ${id} not found`);
       return null;
@@ -63,6 +64,42 @@ export class Extensions {
     this._store.set(`extensions.${id}.enabled`, enabled);
     this._browser.eventsChannel.emit('extensions:enabled-changed');
 
-    return this._store.get(`extensions.${id}`);
+    return this.getExtension(id);
+  }
+
+  getExtension(id: TExtensionId): IExtension | null {
+    return this._store.get(`extensions.${id}`) || null;
+  }
+
+  openPopup(extensionId: TExtensionId, window: Window, partition: Partition) {
+    const extension = this.getExtension(extensionId);
+    if (!extension) {
+      scopeLog.warn(`Extension with id ${extensionId} not found`);
+      return;
+    }
+
+    const overlay = new ExtensionPopupOverlay(window.id);
+    window.addView(overlay);
+
+    const popup = new ExtensionPopup(partition);
+    const popupUrl = `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`;
+    popup.webContents.loadURL(popupUrl);
+    window.addView(popup);
+
+    window.renderViews();
+  }
+
+  closePopup(window: Window) {
+    window.removeView('extension-popup-overlay');
+    window.removeView('extension-popup');
+  }
+
+  iniPopup(window: Window, width: number, height: number) {
+    const popup = window.getView<ExtensionPopup>('extension-popup');
+    if (popup) {
+      popup.setSize(width || 225, height || 100);
+      popup.render(window);
+      popup.setVisible(true);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { ALLOWED_PERMISSIONS, Browser, config, permissions } from '@/core';
-import { EDownloadStatus, TPartitionId } from '~/types';
-import { session, desktopCapturer } from 'electron';
+import { EDownloadStatus } from '~/types';
+import { desktopCapturer, Session } from 'electron';
 import { sanitizeUserAgent } from '@/utils';
 import log from 'electron-log';
 import path from 'path';
@@ -8,11 +8,7 @@ import fs from 'fs';
 
 const scopeLog = log.scope('SessionEvents');
 
-export function registerSessionEvents(browser: Browser, partitionId: TPartitionId) {
-  const ses = session.fromPartition(partitionId);
-
-  scopeLog.info(`Registering session events for partition: ${partitionId}`);
-
+export function registerSessionEvents(browser: Browser, ses: Session) {
   // ----------------------------------------------------------------------------------------------- //
   ses.setDisplayMediaRequestHandler(
     async (_request, callback) => {

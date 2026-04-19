@@ -8,7 +8,7 @@
   "compilerOptions": {
     "composite": true,
     "moduleResolution": "bundler",
-    "types": [],
+    "types": ["electron-vite/node", "chrome"],
     "paths": {
       "@/*": ["./src/main/*"],
       "~/*": ["./src/shared/*"]

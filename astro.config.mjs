@@ -56,6 +56,7 @@ const electronPreloadConfig = {
         input: {
           'preload/browser.preload': 'src/preload/browser.preload.ts',
           'preload/tab.preload': 'src/preload/tab.preload.ts',
+          'preload/extension.preload': 'src/preload/extension.preload.ts',
         },
         output: {
           inlineDynamicImports: false,

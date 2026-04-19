@@ -26,6 +26,7 @@
     "@electron-toolkit/tsconfig": "2.0.0",
     "@eslint/js": "10.0.1",
     "@tailwindcss/vite": "4.2.2",
+    "@types/chrome": "^0.1.40",
     "@types/mime-types": "3.0.1",
     "astro": "5.18.0",
     "astro-icon": "1.1.5",

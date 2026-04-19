@@ -6,6 +6,9 @@
 
 <script>
   import { IExtension } from '~/types';
+  import { getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
 
   abExtensions.onRefresh((_event, extensions) => {
     renderExtensions(extensions);
@@ -18,9 +21,9 @@
     for (const ext of extension) {
       if (!ext.icon) continue;
 
-      const extEl = document.createElement('img');
-      extEl.src = ext.icon;
-      extEl.classList.add(
+      const icon = document.createElement('img');
+      icon.src = ext.icon;
+      icon.classList.add(
         'w-5',
         'h-5',
         'rounded',
@@ -29,9 +32,12 @@
         'hover:bg-white/15',
         'p-0.5',
       );
-      extEl.style = 'app-region: no-drag;';
+      icon.style = 'app-region: no-drag;';
+      icon.onclick = () => {
+        abExtensions.openPopup(winId, ext.id);
+      };
 
-      container.appendChild(extEl);
+      container.appendChild(icon);
     }
   }
 </script>

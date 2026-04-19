@@ -24,7 +24,6 @@ import { BrowserRendererEmmiter } from './renderer.emmiter';
 import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
-import { registerSessionEvents } from './events.session';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('Browser');
@@ -41,13 +40,6 @@ export class Browser {
 
   constructor() {
     registerBrowserEvents(this);
-  }
-
-  async loadProfiles() {
-    const partitions = getPartitions();
-    for (const [id, _partition] of partitions) {
-      registerSessionEvents(this, id);
-    }
   }
 
   async loadSession() {

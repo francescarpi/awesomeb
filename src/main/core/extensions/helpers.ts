@@ -1,10 +1,27 @@
-import type { IExtension, IExtensionManifest } from '~/types';
+import type { IExtension, IExtensionManifest, TExtensionId } from '~/types';
 import * as fs from 'fs';
 import * as path from 'path';
 import log from 'electron-log';
+import { Session } from 'electron';
 
 const scopeLog = log.scope('ExtensionsHelper');
 
+/**
+ * Loads the latest manifest for each extension found in the given root directory.
+ * The directory structure is expected to be:
+ * rootDir/
+ *   extensionId1/
+ *     version1/
+ *       manifest.json
+ *     version2/
+ *       manifest.json
+ *   extensionId2/
+ *     version1/
+ *       manifest.json
+ *
+ * @param rootDir The root directory where extensions are stored.
+ * @returns An array of IExtension objects with the latest manifest data.
+ */
 export function loadLatestExtensionManifests(rootDir: string): IExtension[] {
   const manifests: IExtension[] = [];
 
@@ -63,6 +80,15 @@ export function loadLatestExtensionManifests(rootDir: string): IExtension[] {
   return manifests;
 }
 
+/**
+ * Loads the extension icon as a base64 data URL.
+ * It checks for the default_icon field in the manifest's action property.
+ * If it's an object, it tries to find the best available size (48, 32, 16).
+ *
+ * @param manifestPath The path to the extension's manifest directory.
+ * @param manifest The extension manifest object.
+ * @returns A base64 data URL of the icon, or null if not found or on error.
+ */
 function loadIcon(manifestPath: string, manifest: IExtensionManifest): string | null {
   let iconPath = manifest.action.default_icon;
   if (typeof iconPath === 'object') {
@@ -88,5 +114,62 @@ function loadIcon(manifestPath: string, manifest: IExtensionManifest): string | 
   } catch (err) {
     scopeLog.error(`Error reading icon file at ${fullPath}`, err);
     return null;
+  }
+}
+
+/**
+ * Loads an extension into the given Electron session.
+ * It checks if the extension is already loaded in the session before attempting to load it.
+ * It also sets up listeners for service worker events related to the extension.
+ *
+ * @param ses The Electron session to load the extension into.
+ * @param extensionId The ID of the extension to load.
+ * @param extensionPath The file system path to the extension's manifest directory.
+ */
+export async function loadExtensionToSession(
+  ses: Session,
+  extensionId: TExtensionId,
+  extensionPath: string,
+) {
+  const sessionExtension = ses.extensions.getExtension(extensionId);
+  if (sessionExtension) {
+    scopeLog.info(`Extension ${extensionId} already loaded in this session`);
+    return;
+  }
+
+  const loadedExtension = await ses.extensions.loadExtension(extensionPath);
+  if (!loadedExtension) {
+    scopeLog.error(`Failed to load extension ${extensionId} from path ${extensionPath}`);
+    return;
+  }
+
+  scopeLog.info(
+    `Loaded extension ${loadedExtension.name} (id: ${loadedExtension.id}) - ${extensionPath}`,
+  );
+
+  ses.serviceWorkers.on('registration-completed', (_e, d) => {
+    scopeLog.info(`SW registered for scope: ${d.scope}`);
+  });
+
+  ses.serviceWorkers.on('running-status-changed', (d) => {
+    scopeLog.info(`SW #${d.versionId} status: ${d.runningStatus}`);
+  });
+
+  ses.serviceWorkers.on('console-message', (_e, m) => {
+    scopeLog.info(`[SW console][${m.level}] ${m.sourceUrl}:${m.lineNumber} ${m.message}`);
+  });
+}
+
+/**
+ * Unloads an extension from the given Electron session.
+ * It checks if the extension is currently loaded in the session before attempting to unload it.
+ *
+ * @param ses The Electron session to unload the extension from.
+ * @param extensionId The ID of the extension to unload.
+ */
+export function unloadExtensionFromSession(ses: Session, extensionId: TExtensionId) {
+  const sessionExtension = ses.extensions.getExtension(extensionId);
+  if (sessionExtension) {
+    ses.extensions.removeExtension(extensionId);
   }
 }

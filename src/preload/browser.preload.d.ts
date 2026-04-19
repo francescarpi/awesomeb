@@ -15,6 +15,7 @@ import {
   TMarksAction,
   IConfig,
   IExtension,
+  TExtensionId,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -168,5 +169,7 @@ declare global {
     refresh: () => Promise<IExtension[]>;
     toggle: (id: TExtensionId) => Promise<IExtension[]>;
     onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => void;
+    openPopup: (winId: TWindowId, extensionId: TExtensionId) => Promise<void>;
+    closePopup: (winId: TWindowId) => Promise<void>;
   };
 }

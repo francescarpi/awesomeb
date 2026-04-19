@@ -50,4 +50,50 @@ export function setupExtensionsIPC(browser: Browser) {
       return browser.renderer.extensions();
     });
   });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'extensions:open-popup',
+    async (event, winId: TWindowId, extensionId: TExtensionId) => {
+      scopeLog.info('Opening extension popup', { extensionId, winId });
+      return await checkModalAndPagesSender(event, browser, winId, ['urlbar'], async (window) => {
+        const selectedTab = window.selectedTab;
+        if (!selectedTab) {
+          scopeLog.warn('No selected tab found for window', { winId });
+          return;
+        }
+        browser.extensions.openPopup(extensionId, window, selectedTab.tab.partition);
+      });
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on('extensions:close-popup', async (event, winId: TWindowId) => {
+    scopeLog.info('Closing extension popup', { winId });
+    return await checkModalAndPagesSender(
+      event,
+      browser,
+      winId,
+      ['extension-popup-overlay'],
+      async (window) => {
+        browser.extensions.closePopup(window);
+      },
+    );
+  });
+
+  //--------------------------------------------------------------------------------------
+  ipcMain.on(
+    'extensions:ini-popup',
+    async (event, winId: TWindowId, width: number, height: number) => {
+      return await checkModalAndPagesSender(
+        event,
+        browser,
+        winId,
+        ['extension-popup'],
+        async (window) => {
+          browser.extensions.iniPopup(window, width, height);
+        },
+      );
+    },
+  );
 }

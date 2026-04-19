@@ -36,6 +36,8 @@ app.whenReady().then(async () => {
 
   registerProtocols();
 
+  registerAppEvents(browser);
+
   setupUIIPC(browser);
   setupCommandsIPC(browser);
   setupBrowserIPC(browser);
@@ -52,8 +54,5 @@ app.whenReady().then(async () => {
   setupConfigIPC(browser);
   setupExtensionsIPC(browser);
 
-  await browser.loadProfiles();
   await browser.loadSession();
-
-  registerAppEvents(browser);
 });
