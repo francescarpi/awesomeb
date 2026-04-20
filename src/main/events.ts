@@ -1,6 +1,7 @@
 import { app, Session as ElectronSession } from 'electron';
 import { Session, Browser, registerSessionEvents, loadExtensionToSession } from '@/core';
 import log from 'electron-log';
+import * as path from 'path';
 
 const scopeLog = log.scope('AppEvents');
 
@@ -77,5 +78,10 @@ export function registerAppEvents(browser: Browser) {
     }
 
     await Promise.all(promises);
+
+    const sessionName = ses.storagePath?.split(path.sep).pop() || 'unknown';
+    scopeLog.info(
+      `Loaded ${ses.extensions.getAllExtensions().length} extensions into new session "${sessionName}"`,
+    );
   });
 }
