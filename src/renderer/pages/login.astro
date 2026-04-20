@@ -37,17 +37,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     document.getElementById('realm')!.textContent = realm;
   }
 
-  inputManager(
-    'username',
-    () => performLogin(),
-    () => performCancel(),
-  );
+  inputManager('username', {
+    onAccept: () => performLogin(),
+    onCancel: () => performCancel(),
+  });
 
-  inputManager(
-    'password',
-    () => performLogin(),
-    () => performCancel(),
-  );
+  inputManager('password', {
+    onAccept: () => performLogin(),
+    onCancel: () => performCancel(),
+  });
 
   function performLogin() {
     const username = (document.getElementById('username') as HTMLInputElement).value;

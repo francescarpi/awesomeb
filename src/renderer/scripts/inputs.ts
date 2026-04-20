@@ -3,9 +3,17 @@ export type TSetValue = (value: string) => void;
 
 export function inputManager(
   inputId: string,
-  onAccept: (newValue: string) => void,
-  onCancel: () => void,
-  onChange?: (newValue: string) => void,
+  {
+    onAccept,
+    onCancel,
+    onChange,
+    allowEmpty = false,
+  }: {
+    onAccept: (newValue: string) => void;
+    onCancel: () => void;
+    onChange?: (newValue: string) => void;
+    allowEmpty?: boolean;
+  },
 ): {
   setDefaultValue: TSetDefault;
   setValue: TSetValue;
@@ -14,6 +22,7 @@ export function inputManager(
   getValue: () => string;
 } {
   const inputEl = document.getElementById(inputId) as HTMLInputElement;
+
   const setDefaultValue = (value: string, props?: { select?: boolean }) => {
     inputEl.defaultValue = value;
     if (inputEl.defaultValue.length > 0 && props?.select) {
@@ -41,7 +50,7 @@ export function inputManager(
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const newValue = inputEl.value.trim();
-      if (newValue.length > 0) {
+      if (allowEmpty || newValue.length > 0) {
         onAccept(newValue);
       }
     } else if (e.key === 'Escape') {

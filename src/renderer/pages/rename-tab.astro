@@ -27,16 +27,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
       : tabsEntitites.find((d) => d.selected)!;
 
-    const { setDefaultValue } = inputManager(
-      'input',
-      (newValue: string) => {
+    const { setDefaultValue } = inputManager('input', {
+      onAccept: (newValue: string) => {
         abCommands.perform(winId, 'rename-tab', {
           tabId: parseInt(selectedTab.id, 10),
           name: newValue,
         });
       },
-      () => abModal.close(winId),
-    );
+      onCancel: () => abModal.close(winId),
+    });
     setDefaultValue(selectedTab.label || '', { select: true });
   }
 

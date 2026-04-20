@@ -27,15 +27,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)!
       : desktopEntities.find((d) => d.selected)!;
 
-    const { setDefaultValue } = inputManager(
-      'input',
-      (newValue: string) =>
+    const { setDefaultValue } = inputManager('input', {
+      onAccept: (newValue: string) =>
         abCommands.perform(winId, 'rename-desktop', {
           desktopId: parseInt(selectedDesktop.id, 10),
           name: newValue,
         }),
-      () => abModal.close(winId),
-    );
+      onCancel: () => abModal.close(winId),
+    });
     setDefaultValue(selectedDesktop.name || '', { select: true });
   }
 

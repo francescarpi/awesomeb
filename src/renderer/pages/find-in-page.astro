@@ -36,12 +36,11 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
   const prevBtn = document.querySelector('svg#previous')!;
   const nextBtn = document.querySelector('svg#next')!;
 
-  const {} = inputManager(
-    'search',
-    (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'next', value),
-    () => abTabs.closeFindInTab(parseInt(tabId, 10)),
-    (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'start', value),
-  );
+  const {} = inputManager('search', {
+    onAccept: (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'next', value),
+    onCancel: () => abTabs.closeFindInTab(parseInt(tabId, 10)),
+    onChange: (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'start', value),
+  });
 
   abTabs.onRefreshFindInPage((_event, result) => {
     if (result) {

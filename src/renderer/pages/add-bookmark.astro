@@ -30,27 +30,24 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     setVisible: setFolderNameVisible,
     focus: focusFolderName,
     getValue: getFolderName,
-  } = inputManager(
-    'folder-name',
-    () => handleSubmit(),
-    () => abModal.close(winId),
-  );
+  } = inputManager('folder-name', {
+    onAccept: () => handleSubmit(),
+    onCancel: () => abModal.close(winId),
+  });
 
   const {
     focus: focusTitle,
     setDefaultValue: setDefaultTitle,
     getValue: getTitle,
-  } = inputManager(
-    'title',
-    () => handleSubmit(),
-    () => abModal.close(winId),
-  );
+  } = inputManager('title', {
+    onAccept: () => handleSubmit(),
+    onCancel: () => abModal.close(winId),
+  });
 
-  const { setDefaultValue: setDefaultURL, getValue: getURL } = inputManager(
-    'url',
-    () => handleSubmit(),
-    () => abModal.close(winId),
-  );
+  const { setDefaultValue: setDefaultURL, getValue: getURL } = inputManager('url', {
+    onAccept: () => handleSubmit(),
+    onCancel: () => abModal.close(winId),
+  });
 
   setDefaultTitle(title);
   setDefaultURL(url);
