@@ -153,11 +153,7 @@ export class Extensions {
       }
 
       if (action === 'load') {
-        await loadExtensionToSession(
-          session.fromPartition(partition.id),
-          extension.id,
-          extension.manifestPath,
-        );
+        await loadExtensionToSession(session.fromPartition(partition.id), extension);
       } else {
         unloadExtensionFromSession(session.fromPartition(partition.id), extension.id);
       }

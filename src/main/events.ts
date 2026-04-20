@@ -70,8 +70,12 @@ export function registerAppEvents(browser: Browser) {
       return;
     }
 
+    const promises: Promise<void>[] = [];
+
     for (const extension of browser.extensions.active) {
-      await loadExtensionToSession(ses, extension.id, extension.manifestPath);
+      promises.push(loadExtensionToSession(ses, extension));
     }
+
+    await Promise.all(promises);
   });
 }

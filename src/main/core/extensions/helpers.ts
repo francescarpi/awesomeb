@@ -129,38 +129,49 @@ export function loadIcon(
  * @param extensionId The ID of the extension to load.
  * @param extensionPath The file system path to the extension's manifest directory.
  */
-export async function loadExtensionToSession(
-  ses: Session,
-  extensionId: TExtensionId,
-  extensionPath: string,
-) {
-  const sessionExtension = ses.extensions.getExtension(extensionId);
+export async function loadExtensionToSession(ses: Session, extension: IExtension) {
+  const sessionExtension = ses.extensions.getExtension(extension.id);
   if (sessionExtension) {
-    scopeLog.info(`Extension ${extensionId} already loaded in this session`);
+    scopeLog.info(`Extension ${extension.id} already loaded in this session`);
     return;
   }
 
-  const loadedExtension = await ses.extensions.loadExtension(extensionPath);
+  const loadedExtension = await ses.extensions.loadExtension(extension.manifestPath);
   if (!loadedExtension) {
-    scopeLog.error(`Failed to load extension ${extensionId} from path ${extensionPath}`);
+    scopeLog.error(`Failed to load extension ${extension.id} from path ${extension.manifestPath}`);
     return;
   }
 
   const sessionName = ses.storagePath?.split(path.sep).pop() || 'unknown';
-  scopeLog.info(
-    `Loaded extension ${loadedExtension.name} (id: ${loadedExtension.id}) | Session: ${sessionName}`,
-  );
 
   ses.serviceWorkers.on('registration-completed', (_e, d) => {
-    scopeLog.info(`SW registered for scope: ${d.scope}`);
+    scopeLog.info(`[Extension SW] registered for scope: ${d.scope}`);
   });
 
   ses.serviceWorkers.on('running-status-changed', (d) => {
-    scopeLog.info(`SW #${d.versionId} status: ${d.runningStatus}`);
+    scopeLog.info(`[Extension SW] #${d.versionId} status: ${d.runningStatus}`);
   });
 
   ses.serviceWorkers.on('console-message', (_e, m) => {
-    scopeLog.info(`[SW console][${m.level}] ${m.sourceUrl}:${m.lineNumber} ${m.message}`);
+    scopeLog.info(`[Extension SW Console][${m.level}] ${m.sourceUrl}:${m.lineNumber} ${m.message}`);
+  });
+
+  ses.extensions.once('extension-loaded', (_e, ext) => {
+    if (ext.id === extension.id) {
+      scopeLog.info(`Extension Loaded: ${extension.id} (${sessionName})`);
+    }
+  });
+
+  ses.extensions.once('extension-unloaded', (_e, ext) => {
+    if (ext.id === extension.id) {
+      scopeLog.info(`Extension Unloaded: ${extension.id} (${sessionName})`);
+    }
+  });
+
+  ses.extensions.once('extension-ready', (_e, ext) => {
+    if (ext.id === extension.id) {
+      scopeLog.info(`Extension Ready: ${extension.id} (${sessionName})`);
+    }
   });
 }
 
@@ -168,6 +179,5 @@ export function unloadExtensionFromSession(ses: Session, extensionId: TExtension
   const sessionExtension = ses.extensions.getExtension(extensionId);
   if (sessionExtension) {
     ses.extensions.removeExtension(extensionId);
-    scopeLog.info(`Unloaded extension ${extensionId} from session`);
   }
 }
