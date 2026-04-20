@@ -3,7 +3,6 @@ import { tabToChromeTab } from './helpers';
 import { TExtensionId, TPartitionId, TTabId } from '~/types';
 import { ITabUpdate } from './types';
 import log from 'electron-log';
-import { brotliCompress } from 'zlib';
 
 const scopeLog = log.scope('ChromeTabs');
 
@@ -44,7 +43,7 @@ export class ChromeTabs {
 
     const url = `chrome-extension://${extensionId}/${props.url}?partitionId=${partitionId}&winId=${window.id}`;
     const response = await this._browser.openURL(url, {
-      partitionId: selectedTab.tab.partition.id,
+      partitionId,
       selectTab: true,
     });
 

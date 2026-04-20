@@ -27,7 +27,10 @@ export function registerAppEvents(browser: Browser) {
       }
     }
 
-    // TODO unload all extensions
+    const extensions = browser.extensions.active;
+    for (const extension of extensions) {
+      await browser.extensions.loadUnloadExtensionToAllSessions(extension.id, 'unload');
+    }
 
     app.exit(0);
   });

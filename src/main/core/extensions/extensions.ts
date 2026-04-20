@@ -2,12 +2,18 @@ import Store from 'electron-store';
 import { IExtensionsStore } from './types';
 import { userDataPath, extensionsPath } from '@/paths';
 import { IExtension, TExtensionId } from '~/types';
-import { loadLatestExtensionManifests, loadIcon } from './helpers';
+import {
+  loadLatestExtensionManifests,
+  loadIcon,
+  loadExtensionToSession,
+  unloadExtensionFromSession,
+} from './helpers';
 import log from 'electron-log';
-import { Browser, Partition, Window } from '@/core';
+import { Browser, getPartitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
 import path from 'path';
+import { session } from 'electron';
 
 const scopeLog = log.scope('Extensions');
 
@@ -67,6 +73,8 @@ export class Extensions {
     const enabled = !extension.enabled;
     this._store.set(`extensions.${id}.enabled`, enabled);
     this._browser.eventsChannel.emit('extensions:enabled-changed');
+
+    this.loadUnloadExtensionToAllSessions(id, enabled ? 'load' : 'unload');
 
     return this.getExtension(id);
   }
@@ -128,6 +136,31 @@ export class Extensions {
       };
       this._store.set(`extensions.${extensionId}`, newExtension);
       this._browser.eventsChannel.emit('extensions:icon-updated', extensionId);
+    }
+  }
+
+  async loadUnloadExtensionToAllSessions(extensionId: TExtensionId, action: 'load' | 'unload') {
+    const extension = this.getExtension(extensionId);
+    if (!extension) {
+      scopeLog.warn(`Extension with id ${extensionId} not found for ${action}`);
+      return;
+    }
+
+    const partitions = Array.from(getPartitions().values());
+    for (const partition of partitions) {
+      if (partition.private) {
+        continue;
+      }
+
+      if (action === 'load') {
+        await loadExtensionToSession(
+          session.fromPartition(partition.id),
+          extension.id,
+          extension.manifestPath,
+        );
+      } else {
+        unloadExtensionFromSession(session.fromPartition(partition.id), extension.id);
+      }
     }
   }
 }
