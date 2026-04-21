@@ -1,5 +1,5 @@
 import { UIWindow } from '@/ui';
-import type { IProps } from './types';
+import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 import {
@@ -100,9 +100,13 @@ export class Window extends UIWindow {
     return null;
   }
 
-  getNextOrPreviousTabOfActiveDesktop(direction: 'next' | 'prev'): IDesConTab | null {
+  getNextOrPreviousTabOfActiveDesktop(
+    direction: 'next' | 'prev',
+    opts?: ISelectTabProps,
+  ): IDesConTab | null {
     const desktop = this.selectedDesktop;
     const tabContainer = desktop.selectedTabContainer;
+    const sameDesktop = opts?.sameDesktop ?? false;
 
     if (!tabContainer) {
       if (direction === 'next') {
@@ -116,7 +120,7 @@ export class Window extends UIWindow {
     }
 
     const selectedTab = tabContainer.selectedTab;
-    const tabs = this.tabs;
+    const tabs = sameDesktop ? desktop.tabs.map((t) => ({ ...t, desktop })) : this.tabs;
     const currentIndex = tabs.findIndex(
       (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
     );
@@ -137,11 +141,11 @@ export class Window extends UIWindow {
     return null;
   }
 
-  async selectTab(target: 'next' | 'prev' | TTabId) {
+  async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {
     this.renderViews();
 
     if (target === 'next' || target === 'prev') {
-      const conTab = this.getNextOrPreviousTabOfActiveDesktop(target);
+      const conTab = this.getNextOrPreviousTabOfActiveDesktop(target, opts);
       if (conTab) {
         await this.selectTab(conTab.tab.id);
       }
