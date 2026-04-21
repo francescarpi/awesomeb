@@ -28,7 +28,7 @@
     "@tailwindcss/vite": "4.2.3",
     "@types/chrome": "0.1.40",
     "@types/mime-types": "3.0.1",
-    "astro": "5.18.0",
+    "astro": "5.18.1",
     "astro-icon": "1.1.5",
     "concurrently": "9.2.1",
     "daisyui": "5.5.19",
