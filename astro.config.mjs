@@ -96,7 +96,9 @@ export default defineConfig({
 
   // === VITE CONFIG ===
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+    ],
     resolve: {
       alias: rendererAliases,
     },
