@@ -5,7 +5,8 @@ import electron from 'astro-electron';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import path from 'path';
 
-const MINIFY = false;
+const isBuild = process.env.NODE_ENV === 'production';
+const MINIFY = isBuild;
 
 // Shared aliases between main process and preload
 const electronAliases = {
@@ -52,7 +53,7 @@ const electronPreloadConfig = {
   vite: {
     build: {
       minify: MINIFY ? 'esbuild' : false,
-      rollupOptions: {
+      rolldownOptions: {
         input: {
           'preload/browser.preload': 'src/preload/browser.preload.ts',
           'preload/tab.preload': 'src/preload/tab.preload.ts',
@@ -69,6 +70,9 @@ const electronPreloadConfig = {
   },
 };
 
+// Configuration for the Electron preload
+const electronRendererConfig = {}
+
 export default defineConfig({
   // === INTEGRATIONS ===
   integrations: [
@@ -81,7 +85,7 @@ export default defineConfig({
     electron({
       main: electronMainConfig,
       preload: electronPreloadConfig,
-      renderer: {},
+      renderer: electronRendererConfig,
     }),
   ],
 
