@@ -1,0 +1,308 @@
+---
+
+---
+
+<div class="flex flex-col items-center justify-center gap-1">
+  <ul class="flex w-full justify-between" style="app-region: no-drag;"></ul>
+  <span class="text-xs self-start: sidebar:self-center hidden sidebar:block h-1" id="name"></span>
+</div>
+
+<template id="desktop-template">
+  <li
+    class="desktop border rounded-full cursor-pointer select-none flex flex-col items-center justify-center hover:bg-white/20"
+  >
+    <span class="flex justify-center items-center w-full" id="id"></span>
+    <div class="justify-center items-center gap-0.5 -mt-0.5 flex" id="indicators">
+      <div class="w-0.5 h-0.5 bg-white rounded-full" id="has-tabs"></div>
+      <div class="w-0.5 h-0.5 bg-white rounded-full" id="has-active-tabs"></div>
+    </div>
+    <div class="absolute top-0 right-0 hidden" id="require-attention">
+      <div class="w-2 h-2 bg-red-500 rounded-full absolute right-0 top-0"></div>
+      <div class="w-3 h-3 bg-red-500 rounded-full animate-ping absolute -right-0.5 -top-0.5"></div>
+    </div>
+  </li>
+</template>
+
+<script>
+  import { getSearchParams } from '../../scripts/url';
+  import { IDesktopEntity } from '~/types';
+
+  // ========================================
+  // DOM Elements & Constants
+  // ========================================
+
+  const TEMPLATE_ELEMENT = document.querySelector('#desktop-template') as HTMLTemplateElement;
+  const DESKTOP_NAME_ELEMENT = document.getElementById('name')!;
+  const DESKTOP_LIST_ELEMENT = document.querySelector('ul')!;
+  const { winId: WINDOW_ID } = getSearchParams();
+
+  // ========================================
+  // Initialization
+  // ========================================
+
+  initializeDesktopsComponent();
+
+  async function initializeDesktopsComponent() {
+    setupEventListeners();
+    await loadAndRenderDesktops();
+    subscribeToDesktopUpdates();
+  }
+
+  // ========================================
+  // Event Handling
+  // ========================================
+
+  /**
+   * Sets up click event listener for desktop selection
+   */
+  function setupEventListeners() {
+    DESKTOP_LIST_ELEMENT.addEventListener('click', handleDesktopClick);
+    DESKTOP_LIST_ELEMENT.addEventListener('contextmenu', handleContextMenu);
+    DESKTOP_LIST_ELEMENT.addEventListener('mouseenter', handleDesktopMouseEnter, true);
+    DESKTOP_LIST_ELEMENT.addEventListener('mouseleave', handleDesktopMouseLeave, true);
+  }
+
+  /**
+   * Handles click events on desktop items
+   */
+  function handleDesktopClick(event: Event) {
+    const clickedElement = event.target as HTMLElement;
+    const desktopItem = clickedElement.closest('li');
+
+    if (!desktopItem) return;
+
+    const desktopId = desktopItem.dataset.id;
+    if (!desktopId) return;
+
+    const numericDesktopId = parseInt(desktopId, 10);
+    abDesktops.select(WINDOW_ID, numericDesktopId);
+  }
+
+  /**
+   * Handles context menu events on desktop items
+   */
+  function handleContextMenu(event: Event) {
+    const clickedElement = event.target as HTMLElement;
+    const desktopItem = clickedElement.closest('li');
+
+    if (!desktopItem) return;
+
+    const desktopId = desktopItem.dataset.id;
+    if (!desktopId) return;
+
+    const numericDesktopId = parseInt(desktopId, 10);
+    abMenu.contextMenu(WINDOW_ID, 'desktop', {
+      desktopId: numericDesktopId,
+    });
+  }
+
+  /**
+   * Handles mouse enter events on desktop items
+   */
+  function handleDesktopMouseEnter(event: Event) {
+    const target = event.target as HTMLElement;
+    const desktopItem = target.closest('li.desktop');
+
+    if (!desktopItem) return;
+
+    const desktopName = desktopItem.dataset.name;
+    if (desktopName) {
+      updateDesktopNameWithTransition(desktopName);
+    }
+  }
+
+  /**
+   * Handles mouse leave events on desktop items
+   */
+  function handleDesktopMouseLeave(event: Event) {
+    const target = event.target as HTMLElement;
+    const desktopItem = target.closest('li.desktop');
+
+    if (!desktopItem) return;
+
+    // Restore the active desktop name
+    const activeDesktop = DESKTOP_LIST_ELEMENT.querySelector('li.desktop.active');
+    if (activeDesktop) {
+      const activeName = activeDesktop.dataset.name;
+      if (activeName) {
+        updateDesktopNameWithTransition(activeName);
+      }
+    }
+  }
+
+  /**
+   * Updates the desktop name with a smooth fade transition
+   */
+  function updateDesktopNameWithTransition(newName: string) {
+    // Fade out
+    DESKTOP_NAME_ELEMENT.style.opacity = '0';
+
+    // Change text and fade in after a short delay
+    setTimeout(() => {
+      DESKTOP_NAME_ELEMENT.textContent = newName;
+      DESKTOP_NAME_ELEMENT.style.opacity = '1';
+    }, 150);
+  }
+
+  // ========================================
+  // Data Management
+  // ========================================
+
+  /**
+   * Loads initial desktop data and renders it
+   */
+  async function loadAndRenderDesktops() {
+    try {
+      const desktops = await abEntities.fetch<IDesktopEntity>(WINDOW_ID, 'desktops');
+      renderDesktops(desktops);
+    } catch (error) {
+      console.error('Failed to load desktops:', error);
+    }
+  }
+
+  /**
+   * Subscribes to desktop update events
+   */
+  function subscribeToDesktopUpdates() {
+    abDesktops.onRefresh((_event, desktops) => {
+      renderDesktops(desktops);
+    });
+  }
+
+  // ========================================
+  // Rendering Logic
+  // ========================================
+
+  /**
+   * Renders the list of desktops
+   */
+  function renderDesktops(desktops: IDesktopEntity[]) {
+    clearDesktopList();
+
+    desktops.forEach((desktop) => {
+      const desktopElement = createDesktopElement(desktop);
+      DESKTOP_LIST_ELEMENT.appendChild(desktopElement);
+    });
+  }
+
+  /**
+   * Clears the desktop list container
+   */
+  function clearDesktopList() {
+    DESKTOP_LIST_ELEMENT.innerHTML = '';
+  }
+
+  /**
+   * Creates a desktop list item element from template
+   */
+  function createDesktopElement(desktop: IDesktopEntity): DocumentFragment {
+    const clonedTemplate = TEMPLATE_ELEMENT.content.cloneNode(true) as DocumentFragment;
+
+    // Get references to template elements
+    const elements = getDesktopElementReferences(clonedTemplate);
+
+    // Configure the desktop item
+    configureDesktopItem(elements, desktop);
+
+    return clonedTemplate;
+  }
+
+  /**
+   * Gets references to all relevant elements in the cloned template
+   */
+  function getDesktopElementReferences(template: DocumentFragment) {
+    return {
+      listItem: template.querySelector('li')!,
+      desktopId: template.querySelector('#id')!,
+      indicators: template.querySelector('#indicators')!,
+      hasTabsIndicator: template.querySelector('#has-tabs')!,
+      hasActiveTabsIndicator: template.querySelector('#has-active-tabs')!,
+      requireAttentionIndicator: template.querySelector('#require-attention')!,
+    };
+  }
+
+  /**
+   * Configures all aspects of a desktop item element
+   */
+  function configureDesktopItem(
+    elements: ReturnType<typeof getDesktopElementReferences>,
+    desktop: IDesktopEntity,
+  ) {
+    // Set basic desktop information
+    elements.listItem.dataset.id = desktop.id;
+    elements.listItem.dataset.name = desktop.name || ' ';
+    elements.desktopId.textContent = desktop.id;
+
+    // Handle selection state
+    updateSelectionState(elements.listItem, desktop.selected || false, desktop.name || ' ');
+
+    // Handle tab indicators
+    updateTabIndicators(elements, desktop);
+
+    // Handle attention indicator
+    updateAttentionIndicator(elements.requireAttentionIndicator, desktop.requireAttention);
+  }
+
+  /**
+   * Updates the selection state of a desktop item
+   */
+  function updateSelectionState(listItem: HTMLLIElement, isSelected: boolean, desktopName: string) {
+    if (isSelected) {
+      listItem.classList.add('active');
+      DESKTOP_NAME_ELEMENT.textContent = desktopName;
+    } else {
+      listItem.classList.remove('active');
+    }
+  }
+
+  /**
+   * Updates tab-related indicators for a desktop item
+   */
+  function updateTabIndicators(
+    elements: ReturnType<typeof getDesktopElementReferences>,
+    desktop: IDesktopEntity,
+  ) {
+    const { indicators, hasTabsIndicator, hasActiveTabsIndicator } = elements;
+
+    // Show/hide general tab indicator
+    toggleElementVisibility(indicators, desktop.hasTabs);
+    toggleElementVisibility(hasTabsIndicator, desktop.hasTabs);
+
+    // Show/hide active tabs indicator
+    toggleElementVisibility(hasActiveTabsIndicator, desktop.hasActiveTabs);
+  }
+
+  /**
+   * Updates the attention indicator for a desktop item
+   */
+  function updateAttentionIndicator(indicator: Element, requiresAttention: boolean) {
+    toggleElementVisibility(indicator, requiresAttention);
+  }
+
+  /**
+   * Toggles element visibility using the 'hidden' class
+   */
+  function toggleElementVisibility(element: Element, shouldShow: boolean) {
+    if (shouldShow) {
+      element.classList.remove('hidden');
+    } else {
+      element.classList.add('hidden');
+    }
+  }
+</script>
+
+<style>
+  @reference "../../assets/app.css";
+
+  li.desktop {
+    @apply hidden sidebar:flex w-5 h-5 text-xs sidebar:w-8.75 sidebar:h-8.75 sidebar:text-base relative;
+  }
+
+  li.desktop.active {
+    @apply bg-white/20 flex;
+  }
+
+  #name {
+    transition: opacity 100ms ease-in-out;
+  }
+</style>
