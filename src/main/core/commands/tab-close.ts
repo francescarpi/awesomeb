@@ -24,11 +24,20 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     const success = await browser.closeTab(tabToClose.id);
-    if (success) {
-      const lastAccessed = window.getLastAccessedTab();
-      if (lastAccessed) {
-        window.selectTab(lastAccessed.tab.id);
-      }
+    if (!success) {
+      scopeLog.error(`Failed to close tab with id ${tabToClose.id}.`);
+      return;
     }
+
+    // Need to get the desktop to select the last desktop's last accessed tab
+    const tabData = browser.getTab(tabToClose.id)!;
+    const desktop = tabData.desktop;
+
+    const lastAccessed = window.getLastAccessedTab(desktop);
+    if (!lastAccessed) {
+      return;
+    }
+
+    window.selectTab(lastAccessed.tab.id);
   },
 };
