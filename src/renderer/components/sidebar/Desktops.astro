@@ -9,7 +9,7 @@
   import { getSearchParams } from '#/scripts';
 
   const { winId } = getSearchParams();
-  const desktopsContainer = document.getElementById('desktops')!;
+  const container = document.getElementById('desktops')!;
 
   // Load and render desktops on initialization
   const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
@@ -25,13 +25,9 @@
    * @param desktops - Array of desktop entities to render
    */
   function renderDesktops(desktops: IDesktopEntity[]) {
-    desktopsContainer.innerHTML = '';
-    const totalDesktops = desktops.length.toString();
+    container.innerHTML = '';
     for (const desktop of desktops) {
-      renderDesktop(
-        desktop,
-        desktop.id === '1' ? 'first' : desktop.id === totalDesktops ? 'last' : 'other',
-      );
+      renderDesktop(desktop);
     }
   }
 
@@ -40,10 +36,18 @@
    * @param desktop - The desktop entity to render
    * @return void
    */
-  function renderDesktop(desktop: IDesktopEntity, position: 'first' | 'last' | 'other') {
-    const container = document.createElement('div');
-    container.classList.add('group', 'relative');
+  function renderDesktop(desktop: IDesktopEntity) {
+    // Desktop container
+    const desktopContainer = document.createElement('div');
+    desktopContainer.classList.add(
+      'group',
+      'relative',
+      'hidden',
+      'sidebar:block',
+      '[.selected]:block',
+    );
 
+    // Desktop circle
     const desktopElement = document.createElement('div');
     desktopElement.classList.add(
       'border',
@@ -58,40 +62,68 @@
       'sidebar:flex',
       'items-center',
       'justify-center',
-      'hidden',
-      'group-[.selected]:flex',
+      'flex',
     );
     desktopElement.style = 'app-region: no-drag;';
     desktopElement.textContent = desktop.id.toString();
+    desktopElement.onclick = () => abDesktops.select(winId, parseInt(desktop.id, 10));
+    desktopElement.oncontextmenu = () => {
+      abMenu.contextMenu(winId, 'desktop', {
+        desktopId: parseInt(desktop.id, 10),
+      });
+    };
 
     if (desktop.selected) {
-      container.classList.add('selected');
+      desktopContainer.classList.add('selected');
       desktopElement.classList.add('bg-white/20');
     }
 
+    if (desktop.hasActiveTabs) {
+      const hasTabsIndicator = document.createElement('div');
+      hasTabsIndicator.classList.add(
+        'w-[3px]',
+        'h-[3px]',
+        'rounded-full',
+        'absolute',
+        'bottom-1',
+        'left-1/2',
+        '-translate-x-1/2',
+        'bg-white',
+      );
+      desktopContainer.appendChild(hasTabsIndicator);
+    } else if (desktop.hasTabs) {
+      const hasTabsIndicator = document.createElement('div');
+      hasTabsIndicator.classList.add(
+        'w-[3px]',
+        'h-[3px]',
+        'rounded-full',
+        'absolute',
+        'bottom-1',
+        'left-1/2',
+        '-translate-x-1/2',
+        'bg-white/20',
+      );
+      desktopContainer.appendChild(hasTabsIndicator);
+    }
+
+    // Desktop name
     const desktopName = document.createElement('span');
     desktopName.classList.add(
-      'sidebar:group-[.selected]:block',
-      'sidebar:group-hover:block',
-      'hidden',
       'text-[10px]',
       'absolute',
       'mt-1',
       'whitespace-nowrap',
+      'left-1/2',
+      '-translate-x-1/2',
+      'sidebar:hidden',
+      'sidebar:group-[.selected]:block',
+      'sidebar:group-hover:block',
     );
     desktopName.textContent = desktop.name;
 
-    if (position === 'first') {
-      desktopName.classList.add('left-0');
-    } else if (position === 'last') {
-      desktopName.classList.add('right-0');
-    } else {
-      desktopName.classList.add('left-1/2', '-translate-x-1/2');
-    }
+    desktopContainer.appendChild(desktopElement);
+    desktopContainer.appendChild(desktopName);
 
-    container.appendChild(desktopElement);
-    container.appendChild(desktopName);
-
-    desktopsContainer.appendChild(container);
+    container.appendChild(desktopContainer);
   }
 </script>
