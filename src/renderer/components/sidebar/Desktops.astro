@@ -26,8 +26,12 @@
    */
   function renderDesktops(desktops: IDesktopEntity[]) {
     desktopsContainer.innerHTML = '';
+    const totalDesktops = desktops.length.toString();
     for (const desktop of desktops) {
-      renderDesktop(desktop);
+      renderDesktop(
+        desktop,
+        desktop.id === '1' ? 'first' : desktop.id === totalDesktops ? 'last' : 'other',
+      );
     }
   }
 
@@ -36,7 +40,10 @@
    * @param desktop - The desktop entity to render
    * @return void
    */
-  function renderDesktop(desktop: IDesktopEntity) {
+  function renderDesktop(desktop: IDesktopEntity, position: 'first' | 'last' | 'other') {
+    const container = document.createElement('div');
+    container.classList.add('group', 'relative');
+
     const desktopElement = document.createElement('div');
     desktopElement.classList.add(
       'border',
@@ -48,17 +55,43 @@
       'h-7',
       'text-xs',
       'cursor-pointer',
-      'flex',
+      'sidebar:flex',
       'items-center',
       'justify-center',
+      'hidden',
+      'group-[.selected]:flex',
     );
     desktopElement.style = 'app-region: no-drag;';
     desktopElement.textContent = desktop.id.toString();
 
     if (desktop.selected) {
+      container.classList.add('selected');
       desktopElement.classList.add('bg-white/20');
     }
 
-    desktopsContainer.appendChild(desktopElement);
+    const desktopName = document.createElement('span');
+    desktopName.classList.add(
+      'sidebar:group-[.selected]:block',
+      'sidebar:group-[:hover]:block',
+      'hidden',
+      'text-[10px]',
+      'absolute',
+      'mt-1',
+      'whitespace-nowrap',
+    );
+    desktopName.textContent = desktop.name;
+
+    if (position === 'first') {
+      desktopName.classList.add('left-0');
+    } else if (position === 'last') {
+      desktopName.classList.add('right-0');
+    } else {
+      desktopName.classList.add('left-1/2', '-translate-x-1/2');
+    }
+
+    container.appendChild(desktopElement);
+    container.appendChild(desktopName);
+
+    desktopsContainer.appendChild(container);
   }
 </script>
