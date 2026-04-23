@@ -7,6 +7,7 @@
 <script>
   import { IDesktopEntity } from '~/types';
   import { getSearchParams } from '#/scripts';
+  import * as C from './constants';
 
   const { winId } = getSearchParams();
   const container = document.getElementById('desktops')!;
@@ -39,31 +40,11 @@
   function renderDesktop(desktop: IDesktopEntity) {
     // Desktop container
     const desktopContainer = document.createElement('div');
-    desktopContainer.classList.add(
-      'group',
-      'relative',
-      'hidden',
-      'sidebar:block',
-      '[.selected]:block',
-    );
+    desktopContainer.classList.add(...C.DESKTOP_CONTAINER_CLASSES);
 
     // Desktop circle
     const desktopElement = document.createElement('div');
-    desktopElement.classList.add(
-      'border',
-      'rounded-full',
-      'sidebar:w-9',
-      'sidebar:h-9',
-      'sidebar:text-sm',
-      'w-7',
-      'h-7',
-      'text-xs',
-      'cursor-pointer',
-      'sidebar:flex',
-      'items-center',
-      'justify-center',
-      'flex',
-    );
+    desktopElement.classList.add(...C.DESKTOP_ELEMENT_CLASSES);
     desktopElement.style = 'app-region: no-drag;';
     desktopElement.textContent = desktop.id.toString();
     desktopElement.onclick = () => abDesktops.select(winId, parseInt(desktop.id, 10));
@@ -80,45 +61,26 @@
 
     if (desktop.hasActiveTabs) {
       const hasTabsIndicator = document.createElement('div');
-      hasTabsIndicator.classList.add(
-        'w-[3px]',
-        'h-[3px]',
-        'rounded-full',
-        'absolute',
-        'bottom-1',
-        'left-1/2',
-        '-translate-x-1/2',
-        'bg-white',
-      );
+      hasTabsIndicator.classList.add(...C.INDICATOR_CLASSES, 'bg-white');
       desktopContainer.appendChild(hasTabsIndicator);
     } else if (desktop.hasTabs) {
       const hasTabsIndicator = document.createElement('div');
-      hasTabsIndicator.classList.add(
-        'w-[3px]',
-        'h-[3px]',
-        'rounded-full',
-        'absolute',
-        'bottom-1',
-        'left-1/2',
-        '-translate-x-1/2',
-        'bg-white/20',
-      );
+      hasTabsIndicator.classList.add(...C.INDICATOR_CLASSES, 'bg-white/20');
       desktopContainer.appendChild(hasTabsIndicator);
+    }
+
+    const requireAttentionIndicator = document.createElement('div');
+    requireAttentionIndicator.classList.add(...C.ATTENTION_CLASSES);
+    const requireAttentionPing = document.createElement('div');
+    requireAttentionPing.classList.add(...C.ATTENTION_PING_CLASSES);
+    if (desktop.requireAttention) {
+      desktopContainer.appendChild(requireAttentionIndicator);
+      desktopContainer.appendChild(requireAttentionPing);
     }
 
     // Desktop name
     const desktopName = document.createElement('span');
-    desktopName.classList.add(
-      'text-[10px]',
-      'absolute',
-      'mt-1',
-      'whitespace-nowrap',
-      'left-1/2',
-      '-translate-x-1/2',
-      'sidebar:hidden',
-      'sidebar:group-[.selected]:block',
-      'sidebar:group-hover:block',
-    );
+    desktopName.classList.add(...C.DESKTOP_NAME_CLASSES);
     desktopName.textContent = desktop.name;
 
     desktopContainer.appendChild(desktopElement);
