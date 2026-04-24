@@ -8,3 +8,4 @@ export * from './buttons';
 export { TabContainersMng } from './tab-containers';
 export * from './settings';
 export * from './icons';
+export * from './vdom';

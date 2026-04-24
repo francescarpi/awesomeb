@@ -1,0 +1,75 @@
+---
+
+---
+
+<div class="flex items-center justify-between gap-2" id="desktops"></div>
+
+<script>
+  import { IDesktopEntity } from '~/types';
+  import { getSearchParams, h, render, type IVNode, diff } from '#/scripts';
+  import {
+    desktopContainerClasses,
+    desktopClasses,
+    indicatorClasses,
+    attentionClasses,
+    attentionPingClasses,
+    nameClasses,
+  } from './helpers';
+
+  const { winId } = getSearchParams();
+  const container = document.getElementById('desktops')!;
+  const desktopNodes: Record<string, IVNode> = {};
+
+  // Load and render desktops on initialization
+  const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
+  renderDesktops(desktops);
+
+  // Subscribe to desktop updates
+  abDesktops.onRefresh((_event, desktops) => {
+    for (const desktop of desktops) {
+      const d = desktopNode(desktop);
+      const diffResult = diff(desktopNodes[desktop.id], d);
+      console.log(desktop.id, diffResult);
+    }
+  });
+
+  /**
+   * Renders the list of desktops in the UI
+   * @param desktops - Array of desktop entities to render
+   */
+  function renderDesktops(desktops: IDesktopEntity[]) {
+    for (const desktop of desktops) {
+      const d = desktopNode(desktop);
+      desktopNodes[desktop.id] = d;
+      container.appendChild(render(d));
+    }
+  }
+
+  function desktopNode(desktop: IDesktopEntity): IVNode {
+    const d = h(
+      'div',
+      {
+        class: desktopContainerClasses(desktop),
+      },
+      h(
+        'div',
+        {
+          class: desktopClasses(desktop),
+          style: 'app-region: no-drag;',
+          onclick: () => abDesktops.select(winId, parseInt(desktop.id, 10)),
+          ondblclick: () => abModal.open(winId, 'rename-desktop'),
+          oncontextmenu: () =>
+            abMenu.contextMenu(winId, 'desktop', {
+              desktopId: parseInt(desktop.id, 10),
+            }),
+        },
+        desktop.id,
+        h('div', { class: indicatorClasses(desktop) }, ''),
+        h('div', { class: attentionClasses(desktop) }, ''),
+        h('div', { class: attentionPingClasses(desktop) }, ''),
+      ),
+      h('div', { class: nameClasses() }, desktop.name || ''),
+    );
+    return d;
+  }
+</script>
