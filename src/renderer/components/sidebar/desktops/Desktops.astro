@@ -2,11 +2,11 @@
 
 ---
 
-<div class="flex items-center justify-between gap-2" id="desktops"></div>
+<div id="desktops"></div>
 
 <script>
   import { IDesktopEntity } from '~/types';
-  import { getSearchParams, h, render, type IVNode, diff } from '#/scripts';
+  import { getSearchParams, h, render, diff, type VNode, patch } from '#/scripts';
   import {
     desktopContainerClasses,
     desktopClasses,
@@ -17,35 +17,34 @@
   } from './helpers';
 
   const { winId } = getSearchParams();
-  const container = document.getElementById('desktops')!;
-  const desktopNodes: Record<string, IVNode> = {};
 
   // Load and render desktops on initialization
   const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
-  renderDesktops(desktops);
+  let vdom = renderDesktops(desktops);
+  const el = render(vdom);
+  document.getElementById('desktops')!.appendChild(el);
 
   // Subscribe to desktop updates
   abDesktops.onRefresh((_event, desktops) => {
-    for (const desktop of desktops) {
-      const d = desktopNode(desktop);
-      const diffResult = diff(desktopNodes[desktop.id], d);
-      console.log(desktop.id, diffResult);
-    }
+    const newVdom = renderDesktops(desktops);
+    const domDiff = diff(vdom, newVdom);
+    patch(el, domDiff);
+    vdom = newVdom;
   });
 
   /**
    * Renders the list of desktops in the UI
    * @param desktops - Array of desktop entities to render
    */
-  function renderDesktops(desktops: IDesktopEntity[]) {
-    for (const desktop of desktops) {
-      const d = desktopNode(desktop);
-      desktopNodes[desktop.id] = d;
-      container.appendChild(render(d));
-    }
+  function renderDesktops(desktops: IDesktopEntity[]): VNode {
+    return h(
+      'div',
+      { class: 'flex items-center justify-between gap-2' },
+      ...desktops.map(desktopNode),
+    );
   }
 
-  function desktopNode(desktop: IDesktopEntity): IVNode {
+  function desktopNode(desktop: IDesktopEntity): VNode {
     const d = h(
       'div',
       {

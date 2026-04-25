@@ -1,16 +1,27 @@
-export type TVProps = Record<string, any>;
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-export type TNodeType = keyof HTMLElementTagNameMap;
+export type VNodeProps = {
+  [key: string]: string | number | boolean | EventListener | null | undefined;
+};
 
-export interface IVNode {
-  type: TNodeType;
-  props: TVProps;
-  children: (IVNode | Text)[];
+export type VNodeChild = VNode | string | number | null | undefined | false;
+
+export interface VNode {
+  tag: string;
+  props: VNodeProps;
+  children: (VNode | string)[];
 }
 
-export interface IDiffResult {
-  kind: 'CREATE' | 'REMOVE' | 'REPLACE' | 'UPDATE';
-  newNode?: IVNode;
-  propPatches?: Record<string, any>;
-  childPatches?: (IDiffResult | null)[];
-}
+// ---------------------------------------------------------------------------
+// Patch types — describe how to transform an old tree into a new one
+// ---------------------------------------------------------------------------
+
+export type Patch =
+  | { type: 'REPLACE'; newNode: VNode | string }
+  | { type: 'TEXT'; newText: string }
+  | { type: 'PROPS'; added: VNodeProps; removed: string[]; updated: VNodeProps }
+  | { type: 'CHILDREN'; patches: (Patch | null)[]; append: (VNode | string)[]; remove: number }
+  | { type: 'NONE' }
+  | { type: 'COMPOSITE'; patches: Patch[] };

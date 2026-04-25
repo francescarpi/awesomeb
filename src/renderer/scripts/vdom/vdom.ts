@@ -1,130 +1,293 @@
-import type { TVProps, TNodeType, IVNode, IDiffResult } from './types';
+// =============================================================================
+// vdom.ts — Minimal Virtual DOM in TypeScript
+// =============================================================================
 
-export function h(type: TNodeType, props: TVProps, ...children: (IVNode | string)[]): IVNode {
-  return {
-    type,
-    props: props || {},
-    children: children
-      .flat()
-      .map((child) =>
-        typeof child === 'string' || typeof child === 'number'
-          ? document.createTextNode(String(child))
-          : child,
-      ),
-  };
+import type { VNodeProps, VNodeChild, VNode, Patch } from './types';
+
+// ---------------------------------------------------------------------------
+// h — Hyperscript factory
+// ---------------------------------------------------------------------------
+
+/**
+ * Creates a Virtual DOM node.
+ *
+ * @example
+ * h('div', { class: 'container' },
+ *   h('p', { class: 'text' }, 'Hello world'),
+ *   'Just a string child',
+ * )
+ */
+export function h(tag: string, props: VNodeProps | null, ...rawChildren: VNodeChild[]): VNode {
+  const children = flattenChildren(rawChildren);
+  return { tag, props: props ?? {}, children };
 }
 
-export function render(vnode: IVNode | Text): HTMLElement | Text {
-  if (vnode instanceof Text) {
-    return vnode;
-  }
-
-  const el = document.createElement(vnode.type);
-
-  for (const [key, value] of Object.entries(vnode.props)) {
-    if (key.startsWith('on') && typeof value === 'function') {
-      el.addEventListener(key.slice(2).toLowerCase(), value);
+function flattenChildren(raw: VNodeChild[]): (VNode | string)[] {
+  const result: (VNode | string)[] = [];
+  for (const child of raw) {
+    if (child === null || child === undefined || child === false) continue;
+    if (Array.isArray(child)) {
+      result.push(...flattenChildren(child));
+    } else if (typeof child === 'number') {
+      result.push(String(child));
     } else {
-      el.setAttribute(key, value);
+      result.push(child as VNode | string);
     }
   }
+  return result;
+}
 
-  for (const child of vnode.children) {
+// ---------------------------------------------------------------------------
+// render — VNode → real DOM
+// ---------------------------------------------------------------------------
+
+/**
+ * Converts a VNode (or plain string) into a real HTMLElement / Text node.
+ *
+ * @example
+ * const vdom = h('div', { class: 'app' }, 'Hello')
+ * document.getElementById('root')!.appendChild(render(vdom))
+ */
+export function render(node: VNode | string): HTMLElement | Text {
+  if (typeof node === 'string') {
+    return document.createTextNode(node);
+  }
+
+  const el = document.createElement(node.tag);
+  applyProps(el, node.props, {});
+
+  for (const child of node.children) {
     el.appendChild(render(child));
   }
 
   return el;
 }
 
-export function diff(oldNode: IVNode | null, newNode: IVNode): IDiffResult | null {
-  if (!oldNode) {
-    return { kind: 'CREATE', newNode };
+// ---------------------------------------------------------------------------
+// diff — compare two VNode trees and produce a Patch
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes the difference between two virtual nodes.
+ * Returns a Patch that, when applied via `patch()`, transforms
+ * the real DOM from the oldNode shape to the newNode shape.
+ */
+export function diff(oldNode: VNode | string, newNode: VNode | string): Patch {
+  // Both are text nodes
+  if (typeof oldNode === 'string' && typeof newNode === 'string') {
+    return oldNode === newNode ? { type: 'NONE' } : { type: 'TEXT', newText: newNode };
   }
 
-  if (!newNode) {
-    return { kind: 'REMOVE' };
+  // Type changed (text ↔ element) or tag changed → full replace
+  if (
+    typeof oldNode !== typeof newNode ||
+    (typeof oldNode === 'object' && typeof newNode === 'object' && oldNode.tag !== newNode.tag)
+  ) {
+    return { type: 'REPLACE', newNode };
   }
 
-  if (oldNode.type !== newNode.type) {
-    return { kind: 'REPLACE', newNode };
-  }
+  // Both are VNodes with the same tag — diff props + children
+  const oldVNode = oldNode as VNode;
+  const newVNode = newNode as VNode;
 
-  if (oldNode instanceof Text && newNode instanceof Text) {
-    if (oldNode.textContent !== newNode.textContent) {
-      return { kind: 'REPLACE', newNode };
-    }
-    return null;
-  }
+  const collected: Patch[] = [];
 
-  const propPatches = {};
-  const allKeys = new Set([...Object.keys(oldNode.props), ...Object.keys(newNode.props)]);
+  const propsPatch = diffProps(oldVNode.props, newVNode.props);
+  if (propsPatch.type !== 'NONE') collected.push(propsPatch);
 
-  for (const key of allKeys) {
-    if (key.startsWith('on')) {
-      continue;
-    }
-    if (oldNode.props[key] !== newNode.props[key]) {
-      propPatches[key] = newNode.props[key];
-    }
-  }
+  const childrenPatch = diffChildren(oldVNode.children, newVNode.children);
+  if (childrenPatch.type !== 'NONE') collected.push(childrenPatch);
 
-  const childrenLen = Math.max(oldNode.children.length, newNode.children.length);
-
-  const childPatches = Array.from({ length: childrenLen }, (_, i) =>
-    diff(oldNode.children[i] as IVNode, newNode.children[i] as IVNode),
-  );
-
-  if (Object.keys(propPatches).length === 0 && childPatches.every((p) => p === null)) {
-    return null;
-  }
-
-  return { kind: 'UPDATE', propPatches, childPatches };
+  if (collected.length === 0) return { type: 'NONE' };
+  if (collected.length === 1) return collected[0];
+  return { type: 'COMPOSITE', patches: collected };
 }
 
-function patch(domNode: HTMLElement, patchDescriptor: IDiffResult | null) {
-  if (!patchDescriptor) return;
+function diffProps(oldProps: VNodeProps, newProps: VNodeProps): Patch {
+  const added: VNodeProps = {};
+  const updated: VNodeProps = {};
+  const removed: string[] = [];
 
-  const parent = domNode.parentNode;
-  if (!parent) return;
-
-  if (patchDescriptor.kind === 'REMOVE') {
-    parent.removeChild(domNode);
-    return;
+  for (const key in newProps) {
+    if (!(key in oldProps)) {
+      added[key] = newProps[key];
+    } else if (oldProps[key] !== newProps[key]) {
+      updated[key] = newProps[key];
+    }
   }
 
-  if (patchDescriptor.kind === 'CREATE') {
-    parent.appendChild(render(patchDescriptor.newVnode));
-    return;
+  for (const key in oldProps) {
+    if (!(key in newProps)) removed.push(key);
   }
 
-  if (patchDescriptor.kind === 'REPLACE') {
-    parent.replaceChild(render(patchDescriptor.newVnode), domNode);
-    return;
+  if (
+    Object.keys(added).length === 0 &&
+    Object.keys(updated).length === 0 &&
+    removed.length === 0
+  ) {
+    return { type: 'NONE' };
   }
 
-  if (patchDescriptor.kind instanceof Text) {
-    domNode.nodeValue = patchDescriptor;
-    return;
+  return { type: 'PROPS', added, removed, updated };
+}
+
+function diffChildren(oldChildren: (VNode | string)[], newChildren: (VNode | string)[]): Patch {
+  const maxLen = Math.max(oldChildren.length, newChildren.length);
+  if (maxLen === 0) return { type: 'NONE' };
+
+  const patches: (Patch | null)[] = [];
+  let hasChanges = false;
+
+  for (let i = 0; i < oldChildren.length; i++) {
+    if (i < newChildren.length) {
+      const p = diff(oldChildren[i], newChildren[i]);
+      patches.push(p.type === 'NONE' ? null : p);
+      if (p.type !== 'NONE') hasChanges = true;
+    } else {
+      // Extra old children will be removed
+      patches.push(null);
+    }
   }
 
-  if (patchDescriptor.kind === 'UPDATE') {
-    for (const [key, value] of Object.entries(patchDescriptor.propPatches)) {
-      if (key.startsWith('on') && typeof value === 'function') {
-        // Event handler updates are out of scope — skip for now
-      } else if (value === undefined) {
-        domNode.removeAttribute(key);
-      } else {
-        domNode.setAttribute(key, value);
-      }
+  const toAppend = newChildren.slice(oldChildren.length);
+  const toRemove = Math.max(0, oldChildren.length - newChildren.length);
+
+  if (!hasChanges && toAppend.length === 0 && toRemove === 0) {
+    return { type: 'NONE' };
+  }
+
+  return { type: 'CHILDREN', patches, append: toAppend, remove: toRemove };
+}
+
+// ---------------------------------------------------------------------------
+// patch — apply a Patch to a real DOM node
+// ---------------------------------------------------------------------------
+
+/**
+ * Applies a Patch (produced by `diff`) to an existing real DOM node,
+ * mutating the DOM in place.
+ *
+ * Returns the (potentially replaced) DOM node.
+ *
+ * @example
+ * let el = render(oldVNode)
+ * container.appendChild(el)
+ *
+ * const changes = diff(oldVNode, newVNode)
+ * el = patch(el, changes)
+ */
+export function patch(el: HTMLElement | Text, p: Patch): HTMLElement | Text {
+  switch (p.type) {
+    case 'NONE':
+      return el;
+
+    case 'REPLACE': {
+      const newEl = render(p.newNode);
+      el.parentNode?.replaceChild(newEl, el);
+      return newEl;
     }
 
-    const children = Array.from(domNode.childNodes);
-    patchDescriptor.childPatches.forEach((childPatch, i) => {
-      if (childPatch && childPatch.kind === 'CREATE') {
-        domNode.appendChild(render(childPatch.newVnode));
-      } else {
-        patch(children[i], childPatch);
+    case 'TEXT': {
+      el.textContent = p.newText;
+      return el;
+    }
+
+    case 'PROPS': {
+      const element = el as HTMLElement;
+      applyProps(element, { ...p.added, ...p.updated }, {});
+      for (const key of p.removed) {
+        removeProp(element, key);
       }
-    });
+      return el;
+    }
+
+    case 'CHILDREN': {
+      const element = el as HTMLElement;
+      const childNodes = Array.from(element.childNodes) as (HTMLElement | Text)[];
+
+      // Patch existing children
+      for (let i = 0; i < p.patches.length; i++) {
+        const childPatch = p.patches[i];
+        if (childPatch && childNodes[i]) {
+          patch(childNodes[i], childPatch);
+        }
+      }
+
+      // Remove surplus old children (from the end)
+      for (let i = 0; i < p.remove; i++) {
+        const last = element.lastChild;
+        if (last) element.removeChild(last);
+      }
+
+      // Append new children
+      for (const newChild of p.append) {
+        element.appendChild(render(newChild));
+      }
+
+      return el;
+    }
+
+    case 'COMPOSITE': {
+      let current = el;
+      for (const subPatch of p.patches) {
+        current = patch(current, subPatch);
+      }
+      return current;
+    }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+function applyProps(el: HTMLElement, props: VNodeProps, _oldProps: VNodeProps): void {
+  for (const key in props) {
+    const value = props[key];
+    setProp(el, key, value);
+  }
+}
+
+function setProp(el: HTMLElement, key: string, value: VNodeProps[string]): void {
+  if (value === null || value === undefined || value === false) {
+    removeProp(el, key);
+    return;
+  }
+
+  if (key.startsWith('on') && typeof value === 'function') {
+    // Remove any previously registered listener of the same type
+    const eventType = key.slice(2).toLowerCase();
+    const prev = (el as any).__vdom_listeners?.[eventType];
+    if (prev) el.removeEventListener(eventType, prev);
+    el.addEventListener(eventType, value as EventListener);
+    if (!(el as any).__vdom_listeners) (el as any).__vdom_listeners = {};
+    (el as any).__vdom_listeners[eventType] = value;
+    return;
+  }
+
+  if (key === 'style' && typeof value === 'object') {
+    Object.assign(el.style, value);
+    return;
+  }
+
+  if (typeof value === 'boolean') {
+    if (value) el.setAttribute(key, '');
+    else el.removeAttribute(key);
+    return;
+  }
+
+  el.setAttribute(key, String(value));
+}
+
+function removeProp(el: HTMLElement, key: string): void {
+  if (key.startsWith('on')) {
+    const eventType = key.slice(2).toLowerCase();
+    const prev = (el as any).__vdom_listeners?.[eventType];
+    if (prev) {
+      el.removeEventListener(eventType, prev);
+      delete (el as any).__vdom_listeners[eventType];
+    }
+    return;
+  }
+  el.removeAttribute(key);
 }
