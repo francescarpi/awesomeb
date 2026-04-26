@@ -6,6 +6,7 @@ export type TTabContainerId = number;
 
 export interface ITabContainer {
   id: TTabContainerId;
+  shortcut: number | null;
   selected: boolean;
   divider: boolean;
   tabs: ITab[];

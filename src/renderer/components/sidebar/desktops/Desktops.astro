@@ -20,16 +20,16 @@
 
   // Load and render desktops on initialization
   const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
-  let vdom = renderDesktops(desktops);
-  const el = render(vdom);
-  document.getElementById('desktops')!.appendChild(el);
+  let desktopsVDom = renderDesktops(desktops);
+  const desktopsEl = render(desktopsVDom);
+  document.getElementById('desktops')!.appendChild(desktopsEl);
 
   // Subscribe to desktop updates
   abDesktops.onRefresh((_event, desktops) => {
     const newVdom = renderDesktops(desktops);
-    const domDiff = diff(vdom, newVdom);
-    patch(el, domDiff);
-    vdom = newVdom;
+    const domDiff = diff(desktopsVDom, newVdom);
+    patch(desktopsEl, domDiff);
+    desktopsVDom = newVdom;
   });
 
   /**

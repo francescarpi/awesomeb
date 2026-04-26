@@ -7,7 +7,7 @@ import { ITheme, TFindInPageId } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
-export class BrowserRendererEmmiter {
+export class BrowserToRenderer {
   constructor(private readonly _browser: Browser) {}
 
   refreshDesktops(window: Window) {
@@ -15,6 +15,12 @@ export class BrowserRendererEmmiter {
     const desktops = this._browser.renderer.desktopsEntities(window);
     sidebar.send('desktops:refresh', desktops);
     scopeLog.info('Desktops refreshed in renderer');
+  }
+
+  refreshSelectedDesktop(window: Window) {
+    const desktop = window.selectedDesktop;
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    sidebar.send('desktops:refresh-selected', desktop.id);
   }
 
   refreshThemes(window: Window, desktop: Desktop) {
@@ -26,7 +32,7 @@ export class BrowserRendererEmmiter {
     window.webContents.send('desktop:theme-refresh', result);
   }
 
-  refreshTabContainers(window: Window) {
+  refreshTabContainersDeprecated(window: Window) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
     sidebar.send('tabs:refresh', tabContainers);

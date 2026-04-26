@@ -20,7 +20,7 @@ import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';
 import log from 'electron-log';
 import { BrowserRenderer } from './renderer.from';
-import { BrowserRendererEmmiter } from './renderer.to';
+import { BrowserToRenderer } from './renderer.to';
 import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
@@ -33,7 +33,7 @@ export class Browser {
   private _activeWindowId: TWindowId | null = null;
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
-  public readonly rendererEmmiter = new BrowserRendererEmmiter(this);
+  public readonly toRenderer = new BrowserToRenderer(this);
   public readonly idGenerator = new IdGenerator(this);
   public readonly downloads = new Downloads(this);
   public readonly extensions = new Extensions(this);

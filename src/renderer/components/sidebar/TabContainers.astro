@@ -2,23 +2,84 @@
 
 ---
 
-<ul id="tabContainers" style="app-region: no-drag;" class="flex flex-col gap-1.5"></ul>
+<div id="tabContainers"></div>
 
 <script>
-  import { getSearchParams, TabContainersMng } from '#/scripts';
+  import { getSearchParams, h, type VNode, render, cls } from '#/scripts';
+  import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const mng = new TabContainersMng();
-
+  // Tab containers...
   const tabContainers = await abTabs.getTabContainers(winId);
-  mng.renderTabContainers(winId, tabContainers);
+  const tabContainersVDom = renderTabContainers(tabContainers);
+  const tabContainersEl = render(tabContainersVDom);
+  document.getElementById('tabContainers')!.appendChild(tabContainersEl);
 
-  abTabs.onRefreshTabContainers((_event, tabContainers) => {
-    mng.renderTabContainers(winId, tabContainers);
+  // Selected desktop...
+  const desktops = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
+  const selected = parseInt(desktops.find((d) => d.selected)!.id, 10);
+  refreshSelectedDesktop(selected);
+  abDesktops.onRefreshSelected((_event, desktopId) => {
+    refreshSelectedDesktop(desktopId);
   });
 
-  abTabs.onRefreshOne((_event, tab) => {
-    mng.refreshTab(winId, tab);
-  });
+  // abTabs.onRefreshTabContainers((_event, tabContainers) => {
+  //   mng.renderTabContainers(winId, tabContainers);
+  // });
+
+  // abTabs.onRefreshOne((_event, tab) => {
+  //   mng.refreshTab(winId, tab);
+  // });
+
+  // ----------------------------------------------------------------------
+  function refreshSelectedDesktop(id: TDesktopId) {
+    document.getElementById('tabContainers')!.className = `group desktop-${id}`;
+  }
+
+  // ----------------------------------------------------------------------
+  function renderTabContainers(tabContainers: ITabContainer[]): VNode {
+    return h(
+      'div',
+      {
+        class: 'flex flex-col gap-1.5',
+        style: 'app-region: no-drag;',
+      },
+      ...tabContainers.map((tc) =>
+        h(
+          'div',
+          {
+            class: cls(
+              'items-center',
+              'gap-1',
+              'hidden',
+              `group-[.desktop-${tc.desktopId}]:flex`,
+              tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
+            ),
+          },
+          h(
+            'span',
+            { class: 'text-xs pl-1 text-white/20 hidden sidebar:block' },
+            tc.shortcut?.toString(),
+          ),
+          h(
+            'div',
+            { class: 'flex items-center' },
+            ...tc.tabs.map((t) =>
+              h(
+                'div',
+                { class: cls('flex', 'items-start', 'select-none') },
+                h(
+                  'img',
+                  { src: 'https://esdiscuss.org/static/5.4.0/logo.svg', class: 'w-6 h-6' },
+                  '',
+                ),
+                h('span', { class: 'text-sm overflow-hidden text-ellipsis text-nowrap' }, t.title),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 </script>

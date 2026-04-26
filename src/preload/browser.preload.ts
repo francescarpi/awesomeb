@@ -66,6 +66,9 @@ const abDesktops = {
   onThemeRefresh: (callback: (event: IpcRendererEvent, theme: unknown) => void) => {
     ipcRenderer.on('desktop:theme-refresh', callback);
   },
+  onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => {
+    ipcRenderer.on('desktops:refresh-selected', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------

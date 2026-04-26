@@ -17,6 +17,7 @@ import {
   EDownloadStatus,
   ITabSwitcherTab,
   IExtensions,
+  TDesktopId,
 } from '~/types';
 import {
   Browser,
@@ -139,16 +140,21 @@ export class BrowserRenderer {
   }
 
   tabContainers(window: Window): ITabContainer[] {
-    const desktop = window.selectedDesktop;
-    const selectedTabContainer = desktop.selectedTabContainer;
-
-    return desktop.tabContainers.map((tc) => ({
-      id: tc.id,
-      desktopId: desktop.id,
-      selected: selectedTabContainer?.id === tc.id,
-      divider: tc.divider,
-      tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
-    }));
+    const tabContainers: ITabContainer[] = [];
+    for (const desktop of window.desktops) {
+      const selectedTabContainer = desktop.selectedTabContainer;
+      for (const [idx, tc] of desktop.tabContainers.entries()) {
+        tabContainers.push({
+          id: tc.id,
+          shortcut: idx <= 9 ? idx + 1 : null,
+          desktopId: desktop.id,
+          selected: selectedTabContainer?.id === tc.id,
+          divider: tc.divider,
+          tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+        });
+      }
+    }
+    return tabContainers;
   }
 
   tab(window: Window, desktop: Desktop, selectedTabContainer: TabContainer | null, tab: Tab): ITab {

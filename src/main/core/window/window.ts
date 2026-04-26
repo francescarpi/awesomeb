@@ -308,13 +308,13 @@ export class Window extends UIWindow {
 
   openContextualModal(page: TPage, params: IContextualModalParams) {
     this.modal.openContextual(page, params);
-    this.browser.rendererEmmiter.refreshSidebarDrag(this, false);
+    this.browser.toRenderer.refreshSidebarDrag(this, false);
     this.renderViews();
   }
 
   closeContextualModal() {
     this.modal.closeContextual();
-    this.browser.rendererEmmiter.refreshSidebarDrag(this, true);
+    this.browser.toRenderer.refreshSidebarDrag(this, true);
     this.renderViews();
   }
 }

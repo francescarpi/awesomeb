@@ -43,6 +43,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abDesktops: {
     onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
+    onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => void;
     select: (winId: TWindowId, desktopId: TDesktopId) => void;
     getTheme: (winId: TWindowId) => Promise<ITheme>;
     onThemeRefresh: (callback: (event: IpcRendererEvent, theme: ITheme) => void) => void;

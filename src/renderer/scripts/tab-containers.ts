@@ -7,7 +7,7 @@ import Muted from '#/icons/muted.svg';
 /***************************************************************************************************************
  * MANAGER
  ***************************************************************************************************************/
-export class TabContainersMng {
+export class TabContainersMngDeprecated {
   private readonly _container: HTMLUListElement;
 
   constructor() {

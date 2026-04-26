@@ -32,12 +32,13 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'window:selected-desktop-did-change',
     async (window: Window, desktop: Desktop) => {
-      browser.rendererEmmiter.refreshDesktops(window);
-      browser.rendererEmmiter.refreshThemes(window, desktop);
-      browser.rendererEmmiter.refreshTabContainers(window);
-      browser.rendererEmmiter.refreshURLBar(window, desktop.selectedTab?.tab || null);
-      browser.rendererEmmiter.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
-      browser.rendererEmmiter.refreshExtensions(window);
+      browser.toRenderer.refreshDesktops(window);
+      browser.toRenderer.refreshThemes(window, desktop);
+      browser.toRenderer.refreshTabContainersDeprecated(window);
+      browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
+      browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
+      browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshSelectedDesktop(window);
 
       window.renderViews();
       browser.refreshMainMenu();
@@ -46,21 +47,21 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('desktop:name-did-change', async (window: Window, _desktop: Desktop) => {
-    browser.rendererEmmiter.refreshDesktops(window);
+    browser.toRenderer.refreshDesktops(window);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('desktop:theme-did-change', async (window: Window, desktop: Desktop) => {
-    browser.rendererEmmiter.refreshThemes(window, desktop);
+    browser.toRenderer.refreshThemes(window, desktop);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
-    browser.rendererEmmiter.refreshTabSwitcher(window);
-    browser.rendererEmmiter.refreshTabContainers(window);
-    browser.rendererEmmiter.refreshURLBar(window, tab);
-    browser.rendererEmmiter.refreshDesktops(window);
-    browser.rendererEmmiter.refreshExtensions(window);
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshURLBar(window, tab);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -71,12 +72,12 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabSwitcher(window);
-    browser.rendererEmmiter.refreshTabContainers(window);
-    browser.rendererEmmiter.refreshURLBar(window, null);
-    browser.rendererEmmiter.refreshDesktops(window);
-    browser.rendererEmmiter.refreshTabNavigation(window);
-    browser.rendererEmmiter.refreshExtensions(window);
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshURLBar(window, null);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshTabNavigation(window);
+    browser.toRenderer.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -97,21 +98,21 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-close', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
-    browser.rendererEmmiter.refreshURLBar(window, null);
-    browser.rendererEmmiter.refreshDesktops(window);
-    browser.rendererEmmiter.refreshTabNavigation(window);
-    browser.rendererEmmiter.refreshExtensions(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshURLBar(window, null);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshTabNavigation(window);
+    browser.toRenderer.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('browser:url-opened', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabSwitcher(window);
-    browser.rendererEmmiter.refreshTabContainers(window);
-    browser.rendererEmmiter.refreshURLBar(window, null);
-    browser.rendererEmmiter.refreshDesktops(window);
-    browser.rendererEmmiter.refreshExtensions(window);
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshURLBar(window, null);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshExtensions(window);
     browser.refreshMainMenu();
   });
 
@@ -164,7 +165,7 @@ export function registerBrowserEvents(browser: Browser) {
         return;
       }
 
-      browser.rendererEmmiter.refreshTabFindInPageResult(result.tab, requestId);
+      browser.toRenderer.refreshTabFindInPageResult(result.tab, requestId);
     },
   );
 
@@ -176,7 +177,7 @@ export function registerBrowserEvents(browser: Browser) {
       if (!tabContainerResult) {
         return;
       }
-      browser.rendererEmmiter.refreshTabContainers(tabContainerResult.window);
+      browser.toRenderer.refreshTabContainersDeprecated(tabContainerResult.window);
     },
   );
 
@@ -186,8 +187,8 @@ export function registerBrowserEvents(browser: Browser) {
     if (!tabResult) {
       return;
     }
-    browser.rendererEmmiter.refreshDesktops(tabResult.window);
-    browser.rendererEmmiter.refreshTabContainers(tabResult.window);
+    browser.toRenderer.refreshDesktops(tabResult.window);
+    browser.toRenderer.refreshTabContainersDeprecated(tabResult.window);
     await browser.refreshMainMenu();
   });
 
@@ -201,14 +202,14 @@ export function registerBrowserEvents(browser: Browser) {
       targetWindow: Window,
       _targetDesktop: Desktop,
     ) => {
-      browser.rendererEmmiter.refreshDesktops(targetWindow);
-      browser.rendererEmmiter.refreshTabContainers(targetWindow);
-      browser.rendererEmmiter.refreshURLBar(targetWindow, null);
+      browser.toRenderer.refreshDesktops(targetWindow);
+      browser.toRenderer.refreshTabContainersDeprecated(targetWindow);
+      browser.toRenderer.refreshURLBar(targetWindow, null);
 
       if (targetWindow.id !== sourceWindow.id) {
-        browser.rendererEmmiter.refreshDesktops(sourceWindow);
-        browser.rendererEmmiter.refreshTabContainers(sourceWindow);
-        browser.rendererEmmiter.refreshURLBar(sourceWindow, null);
+        browser.toRenderer.refreshDesktops(sourceWindow);
+        browser.toRenderer.refreshTabContainersDeprecated(sourceWindow);
+        browser.toRenderer.refreshURLBar(sourceWindow, null);
       }
 
       await browser.refreshMainMenu();
@@ -224,13 +225,13 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'desktop:tabcontainers-order-did-change',
     async (window: Window, _desktop: Desktop) => {
-      browser.rendererEmmiter.refreshTabContainers(window);
+      browser.toRenderer.refreshTabContainersDeprecated(window);
     },
   );
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('downloads:updated', async () => {
-    browser.rendererEmmiter.refreshDownloads();
+    browser.toRenderer.refreshDownloads();
   });
 
   //--------------------------------------------------------------------------------------
@@ -244,7 +245,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
-    browser.rendererEmmiter.refreshNoTabsInfo(window);
+    browser.toRenderer.refreshNoTabsInfo(window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -273,16 +274,16 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabpreview:closed', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabContainers(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
     browser.refreshMainMenu();
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabpreview:accepted', async (window: Window) => {
-    browser.rendererEmmiter.refreshTabSwitcher(window);
-    browser.rendererEmmiter.refreshTabContainers(window);
-    browser.rendererEmmiter.refreshURLBar(window, null);
-    browser.rendererEmmiter.refreshDesktops(window);
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshURLBar(window, null);
+    browser.toRenderer.refreshDesktops(window);
     browser.refreshMainMenu();
   });
 
@@ -292,20 +293,20 @@ export function registerBrowserEvents(browser: Browser) {
     if (!result) {
       return;
     }
-    browser.rendererEmmiter.refreshTabContainers(result.window);
+    browser.toRenderer.refreshTabContainersDeprecated(result.window);
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('extensions:enabled-changed', async () => {
     for (const window of browser.windows) {
-      browser.rendererEmmiter.refreshExtensions(window);
+      browser.toRenderer.refreshExtensions(window);
     }
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('extensions:icon-updated', async () => {
     for (const window of browser.windows) {
-      browser.rendererEmmiter.refreshExtensions(window);
+      browser.toRenderer.refreshExtensions(window);
     }
   });
 }

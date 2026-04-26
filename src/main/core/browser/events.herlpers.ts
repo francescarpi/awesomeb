@@ -17,13 +17,13 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   let someChanged = false;
 
   if (selectedTab?.tab.id === tab.id) {
-    browser.rendererEmmiter.refreshURLBar(window, tab);
-    browser.rendererEmmiter.refreshTabNavigation(window, tab);
+    browser.toRenderer.refreshURLBar(window, tab);
+    browser.toRenderer.refreshTabNavigation(window, tab);
     someChanged = true;
   }
 
   if (desktop.id === selectedDesktop.id) {
-    browser.rendererEmmiter.refreshTab(window, desktop, tab);
+    browser.toRenderer.refreshTab(window, desktop, tab);
     someChanged = true;
   }
 

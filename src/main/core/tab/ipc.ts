@@ -257,7 +257,7 @@ export function setupTabIPC(browser: Browser) {
 
     parentTabData.window.renderViews();
 
-    browser.rendererEmmiter.refreshTabContainers(parentTabData.window);
+    browser.toRenderer.refreshTabContainersDeprecated(parentTabData.window);
     browser.refreshMainMenu();
   });
 
