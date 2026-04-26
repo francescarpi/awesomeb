@@ -30,7 +30,12 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     // Need to get the desktop to select the last desktop's last accessed tab
-    const tabData = browser.getTab(tabToClose.id)!;
+    const tabData = browser.getTab(tabToClose.id);
+    if (!tabData) {
+      scopeLog.error(`Tab with id ${tabToClose.id} not found after closure.`);
+      return;
+    }
+
     const desktop = tabData.desktop;
 
     const lastAccessed = window.getLastAccessedTab(desktop);

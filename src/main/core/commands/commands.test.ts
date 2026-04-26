@@ -204,7 +204,7 @@ describe('Commands', () => {
 
       await browser.performCommand(window, tabNext.TRIGGER);
 
-      expect(selectSpy).toHaveBeenCalledWith('next');
+      expect(selectSpy).toHaveBeenCalledWith('next', { sameDesktop: true });
     });
 
     test('tab-prev: should switch to previous tab', async () => {
@@ -213,7 +213,7 @@ describe('Commands', () => {
 
       await browser.performCommand(window, tabPrev.TRIGGER);
 
-      expect(selectSpy).toHaveBeenCalledWith('prev');
+      expect(selectSpy).toHaveBeenCalledWith('prev', { sameDesktop: true });
     });
 
     test('tab-select: should select a specific tab', async () => {

@@ -30,7 +30,12 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     // Need to get the desktop to select the last desktop's last accessed tab
-    const tabData = browser.getTab(tabToSuspend.id)!;
+    const tabData = browser.getTab(tabToSuspend.id);
+    if (!tabData) {
+      scopeLog.error(`Tab with id ${tabToSuspend.id} not found after suspension.`);
+      return;
+    }
+
     const desktop = tabData.desktop;
 
     const lastAccessed = window.getLastAccessedTab(desktop);
