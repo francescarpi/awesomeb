@@ -5,28 +5,32 @@
 <div id="tabContainers"></div>
 
 <script>
-  import { getSearchParams, h, type VNode, render, cls } from '#/scripts';
+  import { getSearchParams, h, type VNode, render, cls, diff, patch } from '#/scripts';
   import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
 
   const { winId } = getSearchParams();
 
   // Tab containers...
   const tabContainers = await abTabs.getTabContainers(winId);
-  const tabContainersVDom = renderTabContainers(tabContainers);
+  let tabContainersVDom = renderTabContainers(tabContainers);
   const tabContainersEl = render(tabContainersVDom);
   document.getElementById('tabContainers')!.appendChild(tabContainersEl);
+
+  abTabs.onRefreshTabContainers((_event, tabContainers) => {
+    const newTabContainersVDom = renderTabContainers(tabContainers);
+    const domDiff = diff(tabContainersVDom, newTabContainersVDom);
+    patch(tabContainersEl, domDiff);
+    tabContainersVDom = newTabContainersVDom;
+  });
 
   // Selected desktop...
   const desktops = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
   const selected = parseInt(desktops.find((d) => d.selected)!.id, 10);
   refreshSelectedDesktop(selected);
+
   abDesktops.onRefreshSelected((_event, desktopId) => {
     refreshSelectedDesktop(desktopId);
   });
-
-  // abTabs.onRefreshTabContainers((_event, tabContainers) => {
-  //   mng.renderTabContainers(winId, tabContainers);
-  // });
 
   // abTabs.onRefreshOne((_event, tab) => {
   //   mng.refreshTab(winId, tab);
@@ -42,7 +46,7 @@
     return h(
       'div',
       {
-        class: 'flex flex-col gap-1.5',
+        class: cls('flex', 'flex-col', 'gap-1.5'),
         style: 'app-region: no-drag;',
       },
       ...tabContainers.map((tc) =>
@@ -59,22 +63,46 @@
           },
           h(
             'span',
-            { class: 'text-xs pl-1 text-white/20 hidden sidebar:block' },
+            { class: cls('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block') },
             tc.shortcut?.toString(),
           ),
           h(
             'div',
-            { class: 'flex items-center' },
+            { class: cls('flex', 'items-center') },
             ...tc.tabs.map((t) =>
               h(
                 'div',
-                { class: cls('flex', 'items-start', 'select-none') },
+                {
+                  class: cls(
+                    'py-1.5',
+                    'cursor-pointer',
+                    'hover:bg-white/5',
+                    'gap-1',
+                    'items-start',
+                    'rounded-tl-lg',
+                    'rounded-bl-lg',
+                    'sidebar:rounded-tl-full',
+                    'sidebar:rounded-bl-full',
+                    'grid',
+                    'grid-cols-1',
+                    'sidebar:grid-cols-[24px_auto_25px]',
+                    'select-none',
+                    t.selected && 'bg-white/20',
+                    t.suspended && 'group/suspended opacity-50',
+                  ),
+                  onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
+                },
                 h(
                   'img',
-                  { src: 'https://esdiscuss.org/static/5.4.0/logo.svg', class: 'w-6 h-6' },
+                  { src: 'https://esdiscuss.org/static/5.4.0/logo.svg', class: cls('w-6', 'h-6') },
                   '',
                 ),
-                h('span', { class: 'text-sm overflow-hidden text-ellipsis text-nowrap' }, t.title),
+                h(
+                  'span',
+                  { class: cls('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
+                  t.title,
+                ),
+                h('div', {}, ''),
               ),
             ),
           ),
