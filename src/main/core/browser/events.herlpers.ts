@@ -23,7 +23,7 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   }
 
   if (desktop.id === selectedDesktop.id) {
-    browser.toRenderer.refreshTab(window, desktop, tab);
+    browser.toRenderer.refreshTabContainers(window);
     someChanged = true;
   }
 

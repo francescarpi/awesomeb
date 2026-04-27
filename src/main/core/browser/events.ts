@@ -34,7 +34,7 @@ export function registerBrowserEvents(browser: Browser) {
     async (window: Window, desktop: Desktop) => {
       browser.toRenderer.refreshDesktops(window);
       browser.toRenderer.refreshThemes(window, desktop);
-      browser.toRenderer.refreshTabContainersDeprecated(window);
+      browser.toRenderer.refreshTabContainers(window);
       browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
@@ -58,7 +58,7 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
     browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, tab);
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshExtensions(window);
@@ -73,7 +73,7 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
     browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshTabNavigation(window);
@@ -98,7 +98,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-close', async (window: Window) => {
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshTabNavigation(window);
@@ -109,7 +109,7 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('browser:url-opened', async (window: Window) => {
     browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshExtensions(window);
@@ -177,7 +177,7 @@ export function registerBrowserEvents(browser: Browser) {
       if (!tabContainerResult) {
         return;
       }
-      browser.toRenderer.refreshTabContainersDeprecated(tabContainerResult.window);
+      browser.toRenderer.refreshTabContainers(tabContainerResult.window);
     },
   );
 
@@ -188,7 +188,7 @@ export function registerBrowserEvents(browser: Browser) {
       return;
     }
     browser.toRenderer.refreshDesktops(tabResult.window);
-    browser.toRenderer.refreshTabContainersDeprecated(tabResult.window);
+    browser.toRenderer.refreshTabContainers(tabResult.window);
     await browser.refreshMainMenu();
   });
 
@@ -203,12 +203,12 @@ export function registerBrowserEvents(browser: Browser) {
       _targetDesktop: Desktop,
     ) => {
       browser.toRenderer.refreshDesktops(targetWindow);
-      browser.toRenderer.refreshTabContainersDeprecated(targetWindow);
+      browser.toRenderer.refreshTabContainers(targetWindow);
       browser.toRenderer.refreshURLBar(targetWindow, null);
 
       if (targetWindow.id !== sourceWindow.id) {
         browser.toRenderer.refreshDesktops(sourceWindow);
-        browser.toRenderer.refreshTabContainersDeprecated(sourceWindow);
+        browser.toRenderer.refreshTabContainers(sourceWindow);
         browser.toRenderer.refreshURLBar(sourceWindow, null);
       }
 
@@ -225,7 +225,7 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'desktop:tabcontainers-order-did-change',
     async (window: Window, _desktop: Desktop) => {
-      browser.toRenderer.refreshTabContainersDeprecated(window);
+      browser.toRenderer.refreshTabContainers(window);
     },
   );
 
@@ -274,14 +274,14 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabpreview:closed', async (window: Window) => {
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.refreshMainMenu();
   });
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabpreview:accepted', async (window: Window) => {
     browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainersDeprecated(window);
+    browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
     browser.refreshMainMenu();
@@ -293,7 +293,7 @@ export function registerBrowserEvents(browser: Browser) {
     if (!result) {
       return;
     }
-    browser.toRenderer.refreshTabContainersDeprecated(result.window);
+    browser.toRenderer.refreshTabContainers(result.window);
   });
 
   //--------------------------------------------------------------------------------------

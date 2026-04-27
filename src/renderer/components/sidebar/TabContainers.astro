@@ -37,9 +37,7 @@
     refreshSelectedDesktop(desktopId);
   });
 
-  // abTabs.onRefreshOne((_event, tab) => {
-  //   mng.refreshTab(winId, tab);
-  // });
+  // const favicon = await abFavicons.get(winId, this._tab.id);
 
   // ----------------------------------------------------------------------
   function refreshSelectedDesktop(id: TDesktopId) {
@@ -48,15 +46,16 @@
 
   // ----------------------------------------------------------------------
   function renderTabContainers(tabContainers: ITabContainer[]): VNode {
+    console.log(tabContainers)
     return h(
-      'div',
+      'div', // Container
       {
         class: cls('flex', 'flex-col', 'gap-1.5'),
         style: 'app-region: no-drag;',
       },
       ...tabContainers.map((tc) =>
         h(
-          'div',
+          'div', // Tab container
           {
             class: cls(
               'items-center',
@@ -67,16 +66,16 @@
             ),
           },
           h(
-            'span',
+            'span', // Tab container shortcut (is a number between 1 and 9)
             { class: cls('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block') },
             tc.shortcut?.toString(),
           ),
           h(
-            'div',
+            'div', // Tab container's tabs list (in vertical)
             { class: cls('flex', 'flex-col', 'w-full') },
             ...tc.tabs.map((t) =>
               h(
-                'div',
+                'div', // Tab
                 {
                   class: cls(
                     'py-1.5',
@@ -95,7 +94,22 @@
                   onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
                 },
                 h(
-                  'img',
+                  'span', // Loading spinner
+                  {
+                    class: cls(
+                      'loading',
+                      'loading-spinner',
+                      'loading-xs',
+                      'ml-1',
+                      'mt-0.5',
+                      !t.loading && 'hidden',
+                      t.loading && 'block',
+                    ),
+                  },
+                  '',
+                ),
+                h(
+                  'img', // Favicon
                   {
                     src: Favicon.src,
                     class: cls(
@@ -109,23 +123,25 @@
                       'sidebar:ml-1',
                       'sidebar:mr-0',
                       'text-white',
+                      t.loading && 'hidden',
+                      !t.loading && 'block',
                     ),
                   },
                   '',
                 ),
                 h(
-                  'div',
+                  'div', // Title + indicators container
                   { class: cls('hidden', 'sidebar:flex', 'flex-col', 'min-w-0') },
                   h(
-                    'span',
+                    'span', // Title
                     { class: cls('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
                     t.title,
                   ),
                   h(
-                    'div',
+                    'div', // Indicators container
                     { class: cls('flex', 'gap-1') },
                     h(
-                      'img',
+                      'img', // Tab preview indicator
                       {
                         src: TabPreview.src,
                         class: cls('w-3.5', 'h-3.5', 'hidden', t.hasTabPreview && 'block'),
@@ -133,7 +149,7 @@
                       '',
                     ),
                     h(
-                      'img',
+                      'img', // Muted indicator
                       {
                         src: Muted.src,
                         class: cls('w-3.5', 'h-3.5', 'hidden', t.isMuted && 'block'),
@@ -143,10 +159,10 @@
                   ),
                 ),
                 h(
-                  'div',
+                  'div', // Partition and actions container
                   { class: cls('hidden', 'sidebar:flex', 'justify-end') },
                   h(
-                    'div',
+                    'div', // Partition/Profile color
                     {
                       class: cls('w-1', 'h-5', 'mr-1', 'group-hover/suspended:hidden'),
                       style: { backgroundColor: t.partition.color },
@@ -154,7 +170,7 @@
                     '',
                   ),
                   h(
-                    'img',
+                    'img', // Close button (to close the tab)
                     {
                       src: Close.src,
                       onclick: (e) => {
@@ -174,7 +190,7 @@
                     '',
                   ),
                   h(
-                    'img',
+                    'img', // Suspend button (to suspend the tab)
                     {
                       src: Minus.src,
                       onclick: (e) => {

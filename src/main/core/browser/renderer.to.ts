@@ -32,7 +32,7 @@ export class BrowserToRenderer {
     window.webContents.send('desktop:theme-refresh', result);
   }
 
-  refreshTabContainersDeprecated(window: Window) {
+  refreshTabContainers(window: Window) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
     sidebar.send('tabs:refresh', tabContainers);
@@ -41,15 +41,6 @@ export class BrowserToRenderer {
   refreshURLBar(window: Window, tab: Tab | null) {
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));
-  }
-
-  async refreshTab(window: Window, desktop: Desktop, tab: Tab) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    const selectedTabContainer = desktop.selectedTabContainer;
-    sidebar.send(
-      'tabs:refresh-one',
-      this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
-    );
   }
 
   refreshTabFindInPageResult(tab: Tab, requestId: TFindInPageId) {
