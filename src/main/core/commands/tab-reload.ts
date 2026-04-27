@@ -24,6 +24,7 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     tabToReload.clearFailLoad();
+    tabToReload.setLoading(false);
     tabToReload.reload();
   },
 };

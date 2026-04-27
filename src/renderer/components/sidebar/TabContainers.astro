@@ -12,6 +12,7 @@
   import Favicon from '#/icons/favicon.svg';
   import Minus from '#/icons/minus.svg';
   import Close from '#/icons/close.svg';
+  import Warning from '#/icons/warning.svg';
 
   const { winId } = getSearchParams();
 
@@ -156,6 +157,14 @@
                       {
                         src: Muted.src,
                         class: cls('w-3.5', 'h-3.5', t.isMuted ? 'block' : 'hidden'),
+                      },
+                      '',
+                    ),
+                    h(
+                      'img', // Require attention
+                      {
+                        src: Warning.src,
+                        class: cls('w-3.5', 'h-3.5', t.requireAttention ? 'block' : 'hidden'),
                       },
                       '',
                     ),
