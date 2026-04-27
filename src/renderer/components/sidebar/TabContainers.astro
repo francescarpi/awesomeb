@@ -7,6 +7,9 @@
 <script>
   import { getSearchParams, h, type VNode, render, cls, diff, patch } from '#/scripts';
   import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
+  import TabPreview from '#/icons/tab-preview.svg';
+  import Muted from '#/icons/muted.svg';
+  import Favicon from '#/icons/favicon.svg';
 
   const { winId } = getSearchParams();
 
@@ -68,7 +71,7 @@
           ),
           h(
             'div',
-            { class: cls('flex', 'items-center') },
+            { class: cls('flex', 'flex-col', 'w-full') },
             ...tc.tabs.map((t) =>
               h(
                 'div',
@@ -76,13 +79,9 @@
                   class: cls(
                     'py-1.5',
                     'cursor-pointer',
-                    'hover:bg-white/5',
+                    'hover:bg-white/20',
                     'gap-1',
                     'items-start',
-                    'rounded-tl-lg',
-                    'rounded-bl-lg',
-                    'sidebar:rounded-tl-full',
-                    'sidebar:rounded-bl-full',
                     'grid',
                     'grid-cols-1',
                     'sidebar:grid-cols-[24px_auto_25px]',
@@ -94,15 +93,64 @@
                 },
                 h(
                   'img',
-                  { src: 'https://esdiscuss.org/static/5.4.0/logo.svg', class: cls('w-6', 'h-6') },
+                  {
+                    src: Favicon.src,
+                    class: cls(
+                      'w-6',
+                      'h-6',
+                      'sidebar:w-[16px]',
+                      'sidebar:h-[16px]',
+                      'mt-0.5',
+                      'ml-auto',
+                      'mr-auto',
+                      'sidebar:ml-1',
+                      'sidebar:mr-0',
+                      'text-white',
+                    ),
+                  },
                   '',
                 ),
                 h(
-                  'span',
-                  { class: cls('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
-                  t.title,
+                  'div',
+                  { class: cls('hidden', 'sidebar:flex', 'flex-col', 'min-w-0') },
+                  h(
+                    'span',
+                    { class: cls('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
+                    t.title,
+                  ),
+                  h(
+                    'div',
+                    { class: cls('flex', 'gap-1') },
+                    h(
+                      'img',
+                      {
+                        src: TabPreview.src,
+                        class: cls('w-3.5', 'h-3.5', 'hidden', t.hasTabPreview && 'block'),
+                      },
+                      '',
+                    ),
+                    h(
+                      'img',
+                      {
+                        src: Muted.src,
+                        class: cls('w-3.5', 'h-3.5', 'hidden', t.isMuted && 'block'),
+                      },
+                      '',
+                    ),
+                  ),
                 ),
-                h('div', {}, ''),
+                h(
+                  'div',
+                  { class: cls('hidden', 'sidebar:flex', 'justify-end') },
+                  h(
+                    'div',
+                    {
+                      class: cls('w-1', 'h-5', 'mr-1'),
+                      style: { backgroundColor: t.partition.color },
+                    },
+                    '',
+                  ),
+                ),
               ),
             ),
           ),
