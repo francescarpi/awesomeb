@@ -46,7 +46,6 @@
 
   // ----------------------------------------------------------------------
   function renderTabContainers(tabContainers: ITabContainer[]): VNode {
-    console.log(tabContainers)
     return h(
       'div', // Container
       {
@@ -87,11 +86,15 @@
                     'grid-cols-1',
                     'sidebar:grid-cols-[24px_auto_25px]',
                     'select-none',
+                    'sidebar:rounded-tl',
+                    'sidebar:rounded-bl',
                     t.selected && 'bg-white/20',
                     t.suspended && 'group/suspended opacity-50',
                     !t.suspended && 'group/active',
                   ),
                   onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
+                  oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: t.id }),
+                  ondblclick: () => abModal.open(winId, 'rename-tab'),
                 },
                 h(
                   'span', // Loading spinner
@@ -102,8 +105,7 @@
                       'loading-xs',
                       'ml-1',
                       'mt-0.5',
-                      !t.loading && 'hidden',
-                      t.loading && 'block',
+                      t.loading ? 'block' : 'hidden',
                     ),
                   },
                   '',
@@ -123,8 +125,7 @@
                       'sidebar:ml-1',
                       'sidebar:mr-0',
                       'text-white',
-                      t.loading && 'hidden',
-                      !t.loading && 'block',
+                      t.loading ? 'hidden' : 'block',
                     ),
                   },
                   '',
@@ -144,7 +145,7 @@
                       'img', // Tab preview indicator
                       {
                         src: TabPreview.src,
-                        class: cls('w-3.5', 'h-3.5', 'hidden', t.hasTabPreview && 'block'),
+                        class: cls('w-3.5', 'h-3.5', t.hasTabPreview ? 'block' : 'hidden'),
                       },
                       '',
                     ),
@@ -152,7 +153,7 @@
                       'img', // Muted indicator
                       {
                         src: Muted.src,
-                        class: cls('w-3.5', 'h-3.5', 'hidden', t.isMuted && 'block'),
+                        class: cls('w-3.5', 'h-3.5', t.isMuted ? 'block' : 'hidden'),
                       },
                       '',
                     ),
