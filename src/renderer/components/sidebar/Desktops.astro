@@ -1,0 +1,152 @@
+---
+
+---
+
+<div id="desktops"></div>
+
+<script>
+  import { IDesktopEntity } from '~/types';
+  import { getSearchParams, h, render, diff, type VNode, patch, cls } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  // Load and render desktops on initialization
+  const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
+  let desktopsVDom = renderDesktops(desktops);
+  const desktopsEl = render(desktopsVDom);
+  document.getElementById('desktops')!.appendChild(desktopsEl);
+
+  // Subscribe to desktop updates
+  abDesktops.onRefresh((_event, desktops) => {
+    const newVdom = renderDesktops(desktops);
+    const domDiff = diff(desktopsVDom, newVdom);
+    patch(desktopsEl, domDiff);
+    desktopsVDom = newVdom;
+  });
+
+  /**
+   * Renders the list of desktops in the UI
+   * @param desktops - Array of desktop entities to render
+   */
+  function renderDesktops(desktops: IDesktopEntity[]): VNode {
+    return h(
+      'div',
+      { class: cls('flex', 'items-center', 'justify-between', 'gap-2') },
+      ...desktops.map(desktopNode),
+    );
+  }
+
+  function desktopNode(desktop: IDesktopEntity): VNode {
+    const d = h(
+      'div',
+      {
+        class: cls(
+          'group',
+          'relative',
+          'hidden',
+          'sidebar:block',
+          '[.selected]:block',
+          desktop.selected && 'selected',
+        ),
+      },
+      h(
+        'div',
+        {
+          class: cls(
+            'border',
+            'rounded-full',
+            'sidebar:w-9',
+            'sidebar:h-9',
+            'sidebar:text-sm',
+            'w-7',
+            'h-7',
+            'text-xs',
+            'cursor-pointer',
+            'sidebar:flex',
+            'items-center',
+            'justify-center',
+            'flex',
+            'select-none',
+            desktop.selected && 'bg-white/20',
+          ),
+          style: 'app-region: no-drag;',
+          onclick: () => abDesktops.select(winId, parseInt(desktop.id, 10)),
+          ondblclick: () => abModal.open(winId, 'rename-desktop'),
+          oncontextmenu: () =>
+            abMenu.contextMenu(winId, 'desktop', {
+              desktopId: parseInt(desktop.id, 10),
+            }),
+        },
+        desktop.id,
+        h(
+          'div',
+          {
+            class: cls(
+              'w-[3px]',
+              'h-[3px]',
+              'rounded-full',
+              'absolute',
+              'bottom-1',
+              'left-1/2',
+              '-translate-x-1/2',
+              desktop.hasTabs && desktop.hasActiveTabs && 'bg-white',
+              desktop.hasTabs && !desktop.hasActiveTabs && 'bg-white/20',
+            ),
+          },
+          '',
+        ),
+        h(
+          'div',
+          {
+            class: cls(
+              'w-2',
+              'h-2',
+              'bg-red-500',
+              'rounded-full',
+              'absolute',
+              'right-0',
+              'top-0',
+              desktop.requireAttention ? 'block' : 'hidden',
+            ),
+          },
+          '',
+        ),
+        h(
+          'div',
+          {
+            class: cls(
+              'w-3',
+              'h-3',
+              'bg-red-500',
+              'rounded-full',
+              'animate-ping',
+              'absolute',
+              '-right-0.5',
+              '-top-0.5',
+              desktop.requireAttention ? 'block' : 'hidden',
+            ),
+          },
+          '',
+        ),
+      ),
+      h(
+        'div',
+        {
+          class: cls(
+            'text-[10px]',
+            'absolute',
+            'mt-1',
+            'whitespace-nowrap',
+            'left-1/2',
+            '-translate-x-1/2',
+            'sidebar:hidden',
+            'sidebar:group-[.selected]:block',
+            'sidebar:group-hover:block',
+          ),
+        },
+        desktop.name || '',
+      ),
+    );
+    return d;
+  }
+</script>
