@@ -10,6 +10,8 @@
   import TabPreview from '#/icons/tab-preview.svg';
   import Muted from '#/icons/muted.svg';
   import Favicon from '#/icons/favicon.svg';
+  import Minus from '#/icons/minus.svg';
+  import Close from '#/icons/close.svg';
 
   const { winId } = getSearchParams();
 
@@ -88,6 +90,7 @@
                     'select-none',
                     t.selected && 'bg-white/20',
                     t.suspended && 'group/suspended opacity-50',
+                    !t.suspended && 'group/active',
                   ),
                   onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
                 },
@@ -145,8 +148,48 @@
                   h(
                     'div',
                     {
-                      class: cls('w-1', 'h-5', 'mr-1'),
+                      class: cls('w-1', 'h-5', 'mr-1', 'group-hover/suspended:hidden'),
                       style: { backgroundColor: t.partition.color },
+                    },
+                    '',
+                  ),
+                  h(
+                    'img',
+                    {
+                      src: Close.src,
+                      onclick: (e) => {
+                        e.stopPropagation();
+                        abCommands.perform(winId, 'close-tab', { tabId: t.id });
+                      },
+                      class: cls(
+                        'w-5',
+                        'h-5',
+                        'mr-1',
+                        'hover:bg-white/30',
+                        'rounded',
+                        'hidden',
+                        'group-hover/suspended:block',
+                      ),
+                    },
+                    '',
+                  ),
+                  h(
+                    'img',
+                    {
+                      src: Minus.src,
+                      onclick: (e) => {
+                        e.stopPropagation();
+                        abCommands.perform(winId, 'suspend-tab', { tabId: t.id });
+                      },
+                      class: cls(
+                        'w-5',
+                        'h-5',
+                        'mr-1',
+                        'hover:bg-white/30',
+                        'rounded',
+                        'hidden',
+                        'group-hover/active:block',
+                      ),
                     },
                     '',
                   ),
