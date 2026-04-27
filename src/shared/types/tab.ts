@@ -26,6 +26,7 @@ export interface ITab {
   hasTabPreview: boolean;
   requireAttention: boolean;
   isMuted: boolean;
+  favicon: string | null;
 }
 
 export interface ITabPartition {

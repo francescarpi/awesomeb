@@ -48,6 +48,7 @@ export class Session extends Store<ISessionStore> {
                 title: tab.title,
                 customTitle: tab.customTitle,
                 url: tab.url,
+                favicon: tab.favicon,
               })),
           }))
           .filter((tabContainer) => tabContainer.tabs.length > 0);

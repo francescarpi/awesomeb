@@ -63,6 +63,7 @@ export class Tab extends UIView {
     this._url = props.url ?? null;
     this._suspended = props.suspended ?? true;
     this._parent = props.parent ?? null;
+    this._favicon = props.favicon ?? null;
 
     registerTabEvents(browser, this);
   }
@@ -154,7 +155,7 @@ export class Tab extends UIView {
     return true;
   }
 
-  setFavicon(favicon: string | null): boolean {
+  setFavicon(favicon: string): boolean {
     if (this._favicon === favicon) {
       return false;
     }
@@ -295,7 +296,6 @@ export class Tab extends UIView {
     }
 
     this._loading = false;
-    this._favicon = null;
     this.clearFailLoad();
     this.close();
     this._suspended = true;

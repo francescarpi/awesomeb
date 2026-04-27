@@ -1,4 +1,4 @@
-import { type NativeImage, WebContents, nativeImage } from 'electron';
+import { type NativeImage, WebContents, nativeImage, net } from 'electron';
 import fs from 'fs';
 import slugify from 'slugify';
 import { faviconsPath } from '@/paths';
@@ -129,28 +129,36 @@ export async function getCachedFavicon(
 }
 
 export async function parseFavicon(
-  wc: WebContents,
+  _wc: WebContents,
   url: string,
   callback: (dataImage: string) => void,
 ) {
-  const dataImage = await fetchFavicon(wc, url);
+  const dataImage = await fetchFaviconUsingNet(url);
   callback(dataImage);
 }
 
-async function fetchFavicon(wc: WebContents, url: string): Promise<string> {
-  const { base64, type } = await wc.executeJavaScript(`
-    (async () => {
-      const response = await fetch('${url}');
-      const blob = await response.blob();
-      const arrayBuffer = await blob.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      return { base64: btoa(binary), type: blob.type };
-    })()
-  `);
+async function fetchFaviconUsingNet(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const request = net.request(url);
+    const chunks: Buffer[] = [];
 
-  return `data:${type};base64,${base64}`;
+    request.on('response', (response) => {
+      const contentType = (response.headers['content-type'] as string) || 'image/png';
+
+      response.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+
+      response.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const base64 = buffer.toString('base64');
+        resolve(`data:${contentType};base64,${base64}`);
+      });
+
+      response.on('error', reject);
+    });
+
+    request.on('error', reject);
+    request.end();
+  });
 }

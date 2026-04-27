@@ -25,6 +25,7 @@ export interface ISessionWindow {
         title: string | null;
         customTitle: string | null;
         url: string | null;
+        favicon: string | null;
       }[];
     }[];
   }[];

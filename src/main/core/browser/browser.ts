@@ -81,6 +81,7 @@ export class Browser {
               title: tabStore.title,
               customTitle: tabStore.customTitle,
               url: tabStore.url,
+              favicon: tabStore.favicon,
             });
           }
         }

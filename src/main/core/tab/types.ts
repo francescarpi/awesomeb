@@ -13,6 +13,7 @@ export interface ITabProps {
   url?: string | null;
   suspended?: boolean;
   parent?: Tab;
+  favicon?: string | null;
 }
 
 export type TBasicAuthCallback = (username?: string, password?: string) => void;

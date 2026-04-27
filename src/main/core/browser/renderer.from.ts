@@ -175,6 +175,7 @@ export class BrowserRenderer {
       hasTabPreview: tab.hasTabPreview,
       requireAttention: tab.requireAttention,
       isMuted: tab.isMuted,
+      favicon: tab.favicon,
     };
   }
 
