@@ -48,13 +48,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     } else {
       const vnode = h(
         'div',
-        { class: cls('flex', 'flex-col', 'gap-2', 'items-start') },
-        h('p', { class: cls('text-error', 'text-sm') }, 'Failed to get certificate info.'),
+        { class: cls('flex', 'flex-col', 'gap-2', 'items-center', 'justify-center', 'h-[220px]') },
+        h('p', { class: cls('text-error', 'text-sm') }, 'Failed to get the certificate info.'),
         h('button', { class: cls('btn', 'btn-sm'), onclick: () => abModal.close(winId) }, 'Close'),
       );
       renderer.update(vnode);
     }
   });
-
-  // TODO: Check how to redim the modal size based on content.
 </script>

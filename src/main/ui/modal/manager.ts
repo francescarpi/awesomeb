@@ -33,6 +33,12 @@ export class UIModalManager {
     }
   }
 
+  resize(width: number, height: number) {
+    if (this._modal) {
+      this._modal.bw.setSize(width, height);
+    }
+  }
+
   get modal(): UIModal | null {
     return this._modal;
   }

@@ -28,6 +28,7 @@ declare global {
     open: (winId: TWindowId, page: TPage) => void;
     openContextual: (winId: TWindowId, page: TPage, params: IContextualModalParams) => void;
     closeContextual: (winId: TWindowId) => void;
+    resize: (winId: TWindowId, width: number, height: number) => void;
   };
 
   //--------------------------------------------------------------------------------------

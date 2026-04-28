@@ -37,6 +37,9 @@ const abModal = {
   closeContextual: (winId: TWindowId) => {
     ipcRenderer.send('modal:close-contextual', winId);
   },
+  resize: (winId: TWindowId, width: number, height: number) => {
+    ipcRenderer.send('modal:resize', winId, width, height);
+  },
 };
 
 //--------------------------------------------------------------------------------------

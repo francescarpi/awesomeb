@@ -16,6 +16,14 @@ export function setupUIIPC(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
+  ipcMain.on('modal:resize', async (event, winId: TWindowId, width: number, height: number) => {
+    scopeLog.info(`Modal resize requested for window ID ${winId}`);
+    return await checkModalSender(event, browser, winId, (_win, modalManager) => {
+      modalManager.resize(width, height);
+    });
+  });
+
+  //--------------------------------------------------------------------------------------
   ipcMain.on('modal:open', async (event, winId: TWindowId, page: TPage) => {
     scopeLog.info(
       `IPC Received: layout-system:open-modal for window ID ${winId} with page ${page}`,
