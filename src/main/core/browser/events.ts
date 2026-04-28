@@ -33,12 +33,12 @@ export function registerBrowserEvents(browser: Browser) {
     'window:selected-desktop-did-change',
     async (window: Window, desktop: Desktop) => {
       browser.toRenderer.refreshDesktops(window);
+      browser.toRenderer.refreshSelectedDesktop(window);
       browser.toRenderer.refreshThemes(window, desktop);
       browser.toRenderer.refreshTabContainers(window);
       browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
-      browser.toRenderer.refreshSelectedDesktop(window);
 
       window.renderViews();
       browser.refreshMainMenu();
@@ -61,6 +61,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, tab);
     browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshSelectedDesktop(window);
     browser.toRenderer.refreshExtensions(window);
     browser.refreshMainMenu();
   });
