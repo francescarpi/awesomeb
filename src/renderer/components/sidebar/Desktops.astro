@@ -6,23 +6,16 @@
 
 <script>
   import { IDesktopEntity } from '~/types';
-  import { getSearchParams, h, render, diff, type VNode, patch, cls } from '#/scripts';
+  import { getSearchParams, h, type VNode, cls, Renderer } from '#/scripts';
 
   const { winId } = getSearchParams();
 
   // Load and render desktops on initialization
   const desktops = await abEntities.fetch<IDesktopEntity>(winId, 'desktops');
-  let desktopsVDom = renderDesktops(desktops);
-  const desktopsEl = render(desktopsVDom);
-  document.getElementById('desktops')!.appendChild(desktopsEl);
+  const renderer = new Renderer(renderDesktops(desktops), 'desktops').render();
 
   // Subscribe to desktop updates
-  abDesktops.onRefresh((_event, desktops) => {
-    const newVdom = renderDesktops(desktops);
-    const domDiff = diff(desktopsVDom, newVdom);
-    patch(desktopsEl, domDiff);
-    desktopsVDom = newVdom;
-  });
+  abDesktops.onRefresh((_event, desktops) => renderer.update(renderDesktops(desktops)));
 
   /**
    * Renders the list of desktops in the UI

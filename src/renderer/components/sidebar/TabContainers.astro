@@ -5,7 +5,7 @@
 <div id="tabContainers"></div>
 
 <script>
-  import { getSearchParams, h, type VNode, render, cls, diff, patch } from '#/scripts';
+  import { getSearchParams, h, type VNode, cls, Renderer } from '#/scripts';
   import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
   import TabPreview from '#/icons/tab-preview.svg';
   import Muted from '#/icons/muted.svg';
@@ -18,16 +18,11 @@
 
   // Tab containers...
   const tabContainers = await abTabs.getTabContainers(winId);
-  let tabContainersVDom = renderTabContainers(tabContainers);
-  const tabContainersEl = render(tabContainersVDom);
-  document.getElementById('tabContainers')!.appendChild(tabContainersEl);
+  const renderer = new Renderer(renderTabContainers(tabContainers), 'tabContainers').render();
 
-  abTabs.onRefreshTabContainers((_event, tabContainers) => {
-    const newTabContainersVDom = renderTabContainers(tabContainers);
-    const domDiff = diff(tabContainersVDom, newTabContainersVDom);
-    patch(tabContainersEl, domDiff);
-    tabContainersVDom = newTabContainersVDom;
-  });
+  abTabs.onRefreshTabContainers((_event, tabContainers) =>
+    renderer.update(renderTabContainers(tabContainers)),
+  );
 
   // Selected desktop...
   const desktops = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];

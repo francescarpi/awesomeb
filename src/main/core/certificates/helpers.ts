@@ -2,6 +2,10 @@ import { type PeerCertificate, TLSSocket } from 'tls';
 import * as https from 'https';
 
 export async function getPeerCertificate(url: string): Promise<PeerCertificate | null> {
+  if (!url.startsWith('https://')) {
+    throw new Error('URL must start with https://');
+  }
+
   return new Promise((resolve, reject) => {
     https
       .get(url, (res) => {

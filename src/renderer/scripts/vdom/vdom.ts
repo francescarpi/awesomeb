@@ -291,3 +291,35 @@ function removeProp(el: HTMLElement, key: string): void {
   }
   el.removeAttribute(key);
 }
+
+export class Renderer {
+  private el: HTMLElement | Text | null = null;
+  private currentVNode: VNode;
+
+  constructor(
+    initialVNode: VNode,
+    private readonly containerElementId: string,
+  ) {
+    this.currentVNode = initialVNode;
+  }
+
+  render(): Renderer {
+    this.el = render(this.currentVNode);
+    const container = document.getElementById(this.containerElementId);
+    if (!container) {
+      throw new Error(`Container element with ID "${this.containerElementId}" not found`);
+    }
+    container.appendChild(this.el);
+    return this;
+  }
+
+  update(newVNode: VNode) {
+    if (!this.el) {
+      throw new Error('Cannot patch before initial render');
+    }
+
+    const domdiff = diff(this.currentVNode, newVNode);
+    patch(this.el, domdiff);
+    this.currentVNode = newVNode;
+  }
+}

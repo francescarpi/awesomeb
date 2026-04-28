@@ -3,50 +3,58 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="Certificate Info">
-  <span class="loading loading-dots loading-xs"></span>
-
-  <div id="details" class="hidden grid-cols-2">
-    <span class="font-bold">Common Name</span>
-    <span></span>
-    <span class="font-bold">Issuer Country</span>
-    <span></span>
-    <span class="font-bold">Issuer Organization</span>
-    <span></span>
-    <span class="font-bold">Issuer Common Name</span>
-    <span></span>
-    <span class="font-bold">Valid From</span>
-    <span></span>
-    <span class="font-bold">Valid To</span>
-    <span></span>
-    <div class="col-span-2 mt-6 flex justify-center">
-      <button class="btn btn-sm"> Close </button>
-    </div>
-  </div>
-
-  <script>
-    import { getSearchParams } from '#/scripts';
-    import dayjs from 'dayjs';
-
-    const { winId } = getSearchParams();
-    const loading = document.querySelector('.loading')!;
-    const details = document.querySelector('#details')!;
-
-    abCertificates.info(winId).then((info) => {
-      loading.remove();
-
-      details.classList.remove('hidden');
-      details.classList.add('grid');
-
-      details.children[1].textContent = info.subject.CN;
-      details.children[3].textContent = info.issuer.C;
-      details.children[5].textContent = info.issuer.O;
-      details.children[7].textContent = info.issuer.CN;
-      details.children[9].textContent = dayjs(info?.valid_from).format('ddd, D MMM YYYY HH:mm:ss');
-      details.children[11].textContent = dayjs(info?.valid_to).format('ddd, D MMM YYYY HH:mm:ss');
-    });
-
-    document.querySelector('button')!.addEventListener('click', () => {
-      abModal.close(winId);
-    });
-  </script>
+  <div id="content"></div>
 </BlackBgWithTitle>
+
+<script>
+  import { getSearchParams, h, cls, Renderer } from '#/scripts';
+  import dayjs from 'dayjs';
+
+  const { winId } = getSearchParams();
+
+  const renderer = new Renderer(
+    h('div', {}, h('span', { class: cls('loading', 'loading-dots', 'loading-xs') }, '')),
+    'content',
+  ).render();
+
+  abCertificates.info(winId).then((data) => {
+    if (data) {
+      const vnode = h(
+        'div',
+        { class: cls('grid', 'grid-cols-2') },
+        h('span', { class: cls('font-bold') }, 'Common Name:'),
+        h('span', {}, data.subject.CN),
+        h('span', { class: cls('font-bold') }, 'Issuer Country:'),
+        h('span', {}, data.issuer.C),
+        h('span', { class: cls('font-bold') }, 'Issuer Organization:'),
+        h('span', {}, data.issuer.O),
+        h('span', { class: cls('font-bold') }, 'Issuer Common Name:'),
+        h('span', {}, data.issuer.CN),
+        h('span', { class: cls('font-bold') }, 'Valid From:'),
+        h('span', {}, dayjs(data.valid_from).format('ddd, D MMM YYYY HH:mm:ss')),
+        h('span', { class: cls('font-bold') }, 'Valid To:'),
+        h('span', {}, dayjs(data.valid_to).format('ddd, D MMM YYYY HH:mm:ss')),
+        h(
+          'div',
+          { class: cls('col-span-2', 'mt-6') },
+          h(
+            'button',
+            { class: cls('btn', 'btn-sm'), onclick: () => abModal.close(winId) },
+            'Close',
+          ),
+        ),
+      );
+      renderer.update(vnode);
+    } else {
+      const vnode = h(
+        'div',
+        { class: cls('flex', 'flex-col', 'gap-2', 'items-start') },
+        h('p', { class: cls('text-error', 'text-sm') }, 'Failed to get certificate info.'),
+        h('button', { class: cls('btn', 'btn-sm'), onclick: () => abModal.close(winId) }, 'Close'),
+      );
+      renderer.update(vnode);
+    }
+  });
+
+  // TODO: Check how to redim the modal size based on content.
+</script>

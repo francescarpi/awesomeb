@@ -17,8 +17,13 @@ export function setupCertificatesIPC(browser: Browser) {
         return null;
       }
 
-      const info = await getPeerCertificate(tabData.tab.url);
-      return info;
+      try {
+        const info = await getPeerCertificate(tabData.tab.url);
+        return info;
+      } catch (error) {
+        scopeLog.error(`Error fetching certificate info for URL ${tabData.tab.url}:`, error);
+        return null;
+      }
     });
   });
 }
