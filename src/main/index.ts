@@ -19,7 +19,7 @@ import {
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
-import { registerAppEvents } from './events';
+import { registerAppEvents } from './app.events';
 import { setupMenuIPC } from '@/menu';
 import electronDl from 'electron-dl';
 
