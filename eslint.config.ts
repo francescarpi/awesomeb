@@ -12,6 +12,8 @@ export default defineConfig([
     'src/**/*.d.ts',
     'dist-electron',
     '.astro',
+    'astro.config.mjs',
+    'tailwind.config.js',
   ]),
   js.configs.recommended,
   ...tseslint.configs.recommended,

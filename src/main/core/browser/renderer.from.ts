@@ -17,7 +17,6 @@ import {
   EDownloadStatus,
   ITabSwitcherTab,
   IExtensions,
-  TDesktopId,
 } from '~/types';
 import {
   Browser,

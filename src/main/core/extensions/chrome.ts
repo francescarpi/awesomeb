@@ -41,7 +41,7 @@ export class Chrome {
     }
 
     scopeLog.info(`Dispatching ${api}.${method} with args:`, args);
-    const response = await (instance[method] as Function)(
+    const response = await (instance[method] as CallableFunction)(
       window,
       partitionId,
       extensionId,

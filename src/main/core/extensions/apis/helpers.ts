@@ -10,7 +10,7 @@ export function tabToChromeTab(
   return {
     status: tabData.tab.suspended ? 'unloaded' : tabData.tab.loading ? 'loading' : 'complete',
     index: idx,
-    openerTabId: tabData.tab.parent ? tabData.tab.parent.id : undefined,
+    openerTabId: tabData.tab.parentTab ? tabData.tab.parentTab.id : undefined,
     title: tabData.tab.title,
     url: tabData.tab.url || undefined,
     highlighted: tabData.tab.requireAttention,

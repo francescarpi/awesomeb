@@ -13,9 +13,21 @@
     "format": "prettier --write src",
     "test": "vitest",
     "lint": "eslint .",
-    "tscheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
-    "tscheck:renderer": "tsc --noEmit -p tsconfig.renderer.json --composite false",
-    "tscheck": "npm run tscheck:node && npm run tscheck:renderer"
+    "tscheck:node": "tsc --noEmit --project tsconfig.node.json --composite false",
+    "tscheck:renderer": "tsc --noEmit --project tsconfig.renderer.json --composite false",
+    "tscheck": "npm run tscheck:node && npm run tscheck:renderer",
+    "husky:install": "husky"
+  },
+  "lint-staged": {
+    "!(*lock*).{ts,astro,js}": [
+      "pnpm astro check",
+      "bash -c 'pnpm tscheck'",
+      "bash -c 'pnpm test run'",
+      "pnpm lint"
+    ],
+    "!(*lock*).{ts,js,json,css,md,astro}": [
+      "pnpm exec prettier --write"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -23,6 +35,8 @@
   "packageManager": "pnpm@10.28.0",
   "devDependencies": {
     "@astrojs/check": "0.9.8",
+    "@commitlint/cli": "20.5.2",
+    "@commitlint/config-conventional": "20.5.0",
     "@electron-toolkit/tsconfig": "2.0.0",
     "@eslint/js": "10.0.1",
     "@tailwindcss/vite": "4.2.4",
@@ -34,15 +48,18 @@
     "daisyui": "5.5.19",
     "electron": "41.3.0",
     "electron-builder": "26.8.1",
+    "electron-vite": "5.0.0",
     "eslint": "10.2.1",
     "eslint-plugin-astro": "1.7.0",
     "globals": "17.5.0",
+    "husky": "9.1.7",
+    "lint-staged": "16.4.0",
     "prettier": "3.8.3",
     "prettier-plugin-astro": "0.14.1",
     "tailwindcss": "4.2.4",
     "tsc-alias": "1.8.16",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.59.0",
+    "typescript-eslint": "8.59.1",
     "vite": "8.0.10",
     "vite-plugin-static-copy": "4.1.0",
     "vitest": "4.1.5"

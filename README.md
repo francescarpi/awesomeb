@@ -2,11 +2,11 @@
 
 ## Develop
 
-Install dependencies and set up pre-commit hooks:
+Install dependencies:
 
 ```bash
 pnpm install
-pre-commit install
+pnpm husky:install
 ```
 
 Run the development server:

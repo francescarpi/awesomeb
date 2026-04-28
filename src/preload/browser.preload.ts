@@ -19,6 +19,7 @@ import {
   IContextualModalParams,
   TExtensionId,
   IExtension,
+  TDesktopId,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
