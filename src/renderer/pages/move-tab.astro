@@ -1,15 +1,16 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Move Tab">
+<Modal width="500px" height="600px">
+  <h1 class="text-lg mb-2 text-primary">Move Tab</h1>
   <div class="h-full">
-    <div id="pagesIndicator" class="fixed top-4 right-3"></div>
+    <div id="pagesIndicator" class="absolute top-4 right-4"></div>
     <ListWithSearch placeholder="Select a tab..." id="tab" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { paginatorManager, listWithSearchManager, getSearchParams } from '#/scripts';

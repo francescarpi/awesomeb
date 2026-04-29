@@ -1,8 +1,9 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle>
+<Modal width="600px" height="auto">
+  <h1 class="text-lg mb-2 text-primary">Add Bookmark</h1>
   <div class="flex flex-col gap-4">
     <input
       class="input w-full text-black rounded-full"
@@ -12,7 +13,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     <input class="input w-full text-black rounded-full" placeholder="Title..." id="title" />
     <input class="input w-full text-black rounded-full" placeholder="Url..." id="url" />
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, inputManager } from '#/scripts';

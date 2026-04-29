@@ -1,15 +1,16 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import Option1 from '#/components/edit-url/Option1.astro';
 import Option2 from '#/components/edit-url/Option2.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Edit URL">
+<Modal width="600px">
+  <h1 class="text-lg mb-2 text-primary">Edit URL</h1>
   <div class="h-full flex flex-col gap-4">
     <Option1 />
     <Option2 />
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { ITabEntity } from '~/types';

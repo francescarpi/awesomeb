@@ -1,11 +1,12 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Desktop Theme">
+<Modal>
+  <h1 class="text-lg mb-2 text-primary">Desktop Theme</h1>
   <ListWithSearch placeholder="Filter and select theme..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { IDesktopEntity, IThemeEntity } from '~/types';

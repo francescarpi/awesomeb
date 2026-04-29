@@ -1,11 +1,12 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Change Tab Profile">
+<Modal>
+  <h1 class="text-lg mb-2 text-primary">Change Tab Profile</h1>
   <ListWithSearch placeholder="Select new tab's profile..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';

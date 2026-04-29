@@ -1,10 +1,11 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Certificate Info">
+<Modal width="600px">
+  <h1 class="text-lg mb-2 text-primary">Certificate Info</h1>
   <div id="content"></div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, h, cls, Renderer } from '#/scripts';

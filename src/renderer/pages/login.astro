@@ -1,8 +1,9 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 ---
 
-<BlackBgWithTitle title="Login">
+<Modal>
+  <h1 class="text-lg mb-2 text-primary">Login</h1>
   <div class="flex flex-col gap-4">
     <p>
       This site (<i>XXX</i>) requires a username and password to continue.
@@ -21,7 +22,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       id="password"
     />
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { inputManager, getSearchParams } from '#/scripts';
