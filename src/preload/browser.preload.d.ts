@@ -168,7 +168,7 @@ declare global {
   const abExtensions: {
     get: (winId?: TWindowId) => Promise<IExtensions>;
     active: (winId?: TWindowId) => Promise<IExtensions>;
-    refresh: () => Promise<IExtension[]>;
+    refresh: () => Promise<IExtensions>;
     toggle: (id: TExtensionId) => Promise<IExtension[]>;
     onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => void;
     openPopup: (winId: TWindowId, extensionId: TExtensionId) => Promise<void>;
