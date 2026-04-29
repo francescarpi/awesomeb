@@ -1,7 +1,7 @@
 import { UIPageView, UIView } from '@/ui';
 import { Window, Partition } from '@/core';
 import { TWindowId } from '~/types';
-import { session, screen } from 'electron';
+import { screen } from 'electron';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
@@ -25,7 +25,7 @@ export class ExtensionPopupOverlay extends UIPageView {
 export class ExtensionPopup extends UIView {
   constructor(partition: Partition) {
     super('extension-popup', 'extension', {
-      session: session.fromPartition(partition.id),
+      session: partition.ses,
       backgroundColor: '#fff',
       visible: false,
     });

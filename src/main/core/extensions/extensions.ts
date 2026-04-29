@@ -13,7 +13,6 @@ import { Browser, partitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
 import path from 'path';
-import { session } from 'electron';
 
 const scopeLog = log.scope('Extensions');
 
@@ -152,9 +151,9 @@ export class Extensions {
       }
 
       if (action === 'load') {
-        await loadExtensionToSession(session.fromPartition(partition.id), extension);
+        await loadExtensionToSession(partition.ses, extension);
       } else {
-        unloadExtensionFromSession(session.fromPartition(partition.id), extension.id);
+        unloadExtensionFromSession(partition.ses, extension.id);
       }
     }
   }

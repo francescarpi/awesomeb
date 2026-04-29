@@ -11,7 +11,7 @@ import { registerTabEvents } from './events';
 import { sanitizeUserAgent } from '@/utils';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
-import { Certificate, session } from 'electron';
+import { Certificate } from 'electron';
 import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
 import { MARGIN, Sidebar, UIView, URLBar } from '@/ui';
@@ -54,7 +54,7 @@ export class Tab extends UIView {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',
-      session: session.fromPartition(props.partition.id),
+      session: props.partition.ses,
     });
 
     this._partition = props.partition;

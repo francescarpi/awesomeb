@@ -1,5 +1,5 @@
 import path from 'path';
-import { WebContentsView, Rectangle, WebContents, session, Session } from 'electron';
+import { WebContentsView, Rectangle, WebContents, Session } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools } from './helpers';
@@ -23,7 +23,7 @@ export class UIView {
   ) {
     this._borderRadius = props?.borderRadius || 0;
     this._backgroundColor = props?.backgroundColor || '#00000000';
-    this._session = props?.session || session.fromPartition(partitions.internal.id);
+    this._session = props?.session || partitions.internal.ses;
 
     this._webContentsView = this._createWebContentsView();
 

@@ -1,6 +1,6 @@
 import path from 'path';
 import { PRELOAD_FOLDER } from '@/paths';
-import { BrowserWindow, session } from 'electron';
+import { BrowserWindow } from 'electron';
 import { UIWindow } from '../window';
 import { IContextualModalParams, TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
@@ -37,7 +37,7 @@ export class UIModal {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        session: session.fromPartition(partitions.internal.id),
+        session: partitions.internal.ses,
       },
     });
 

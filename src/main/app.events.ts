@@ -1,7 +1,6 @@
 import { app, Session as ElectronSession } from 'electron';
-import { Session, Browser, registerSessionEvents, loadExtensionToSession } from '@/core';
+import { Session, Browser, registerSessionEvents } from '@/core';
 import log from 'electron-log';
-import * as path from 'path';
 
 const scopeLog = log.scope('AppEvents');
 
@@ -65,23 +64,5 @@ export function registerAppEvents(browser: Browser) {
   // ----------------------------------------------------------------------------------------------- //
   app.on('session-created', async (ses: ElectronSession) => {
     registerSessionEvents(browser, ses);
-
-    if (!ses.isPersistent()) {
-      scopeLog.info('Non-persistent session created, skipping extension loading');
-      return;
-    }
-
-    const promises: Promise<void>[] = [];
-
-    for (const extension of browser.extensions.active) {
-      promises.push(loadExtensionToSession(ses, extension));
-    }
-
-    await Promise.all(promises);
-
-    const sessionName = ses.storagePath?.split(path.sep).pop() || 'unknown';
-    scopeLog.info(
-      `Loaded ${ses.extensions.getAllExtensions().length} extensions into new session "${sessionName}"`,
-    );
   });
 }

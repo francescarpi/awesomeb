@@ -1,5 +1,5 @@
 import path from 'path';
-import { BrowserWindow, WebContents, app, Rectangle, session } from 'electron';
+import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
 import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
@@ -49,7 +49,7 @@ export class UIWindow {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        session: session.fromPartition(partitions.internal.id),
+        session: partitions.internal.ses,
       },
     });
 

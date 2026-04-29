@@ -37,6 +37,10 @@ app.whenReady().then(async () => {
 
   const browser = new Browser();
 
+  for (const ext of browser.extensions.active) {
+    browser.extensions.loadUnloadExtensionToAllSessions(ext.id, 'load');
+  }
+
   registerProtocols();
 
   registerAppEvents(browser);
