@@ -174,4 +174,9 @@ declare global {
     openPopup: (winId: TWindowId, extensionId: TExtensionId) => Promise<void>;
     closePopup: (winId: TWindowId) => Promise<void>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abPrompts: {
+    response: (winId: TWindowId, response: unknown) => void;
+  };
 }

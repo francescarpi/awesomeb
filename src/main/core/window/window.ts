@@ -1,6 +1,6 @@
 import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
-import { Desktop, IDesktopProps, Browser } from '@/core';
+import { Desktop, IDesktopProps, Browser, PromptsManager } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 import {
   IContextualModalParams,
@@ -19,6 +19,7 @@ const scopeLog = log.scope('Window');
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
   private _selectedDesktopId: number;
+  public readonly prompts = new PromptsManager(this);
 
   constructor(
     public readonly browser: Browser,

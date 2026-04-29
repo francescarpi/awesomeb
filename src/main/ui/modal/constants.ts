@@ -54,4 +54,8 @@ export const DEFAULT_MODALS_PROPS = {
   'open-closed': {
     height: 600,
   },
+  'prompt-alert': {
+    width: 500,
+    height: 250,
+  },
 };

@@ -273,6 +273,13 @@ const abExtensions = {
 };
 
 //--------------------------------------------------------------------------------------
+const abPrompts = {
+  response: (winId: TWindowId, response: unknown) => {
+    ipcRenderer.send('prompts:response', winId, response);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -291,3 +298,4 @@ contextBridge.exposeInMainWorld('abCertificates', abCertificates);
 contextBridge.exposeInMainWorld('abConfig', abConfig);
 contextBridge.exposeInMainWorld('abSidebar', abSidebar);
 contextBridge.exposeInMainWorld('abExtensions', abExtensions);
+contextBridge.exposeInMainWorld('abPrompts', abPrompts);

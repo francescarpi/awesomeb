@@ -9,7 +9,7 @@ export class UIModalManager {
 
   constructor(private readonly _win: UIWindow) {}
 
-  open(page: TPage, props?: IProps) {
+  open(page: TPage, props?: IProps): UIModal {
     if (this._modal) {
       this.close();
     }
@@ -24,6 +24,8 @@ export class UIModalManager {
     }
 
     this._modal = new UIModal(this._win, page, modalProps);
+
+    return this._modal;
   }
 
   close() {

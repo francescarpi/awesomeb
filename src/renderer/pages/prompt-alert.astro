@@ -1,0 +1,42 @@
+---
+import Base from '#/layouts/Base.astro';
+---
+
+<Base>
+  <div
+    class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4 fixed inset-0"
+    id="container"
+  >
+  </div>
+</Base>
+
+<script>
+  import { Renderer, h, cls, getSearchParams } from '#/scripts';
+
+  const { searchParams, winId } = getSearchParams();
+
+  const message = searchParams.get('message')!;
+  const url = new URL(searchParams.get('url')!);
+
+  new Renderer(
+    h(
+      'div',
+      { classs: cls('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: cls('text-lg') }, `${url.hostname} says`),
+      h('p', { class: cls('text-md', 'my-6') }, message),
+      h(
+        'div',
+        { class: cls('flex', 'justify-center') },
+        h(
+          'button',
+          {
+            class: cls('btn', 'btn-primary', 'btn-sm', 'w-full'),
+            onclick: () => abPrompts.response(winId, undefined),
+          },
+          'OK',
+        ),
+      ),
+    ),
+    'container',
+  ).render();
+</script>

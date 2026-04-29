@@ -291,6 +291,22 @@ export class Browser {
     return null;
   }
 
+  getTabByWebcontentsId(id: number): IWinDesConTab | null {
+    for (const window of this._windows.values()) {
+      for (const tab of window.tabs) {
+        if (tab.tab.id === id) {
+          return {
+            window,
+            desktop: tab.desktop,
+            tabContainer: tab.tabContainer,
+            tab: tab.tab,
+          };
+        }
+      }
+    }
+    return null;
+  }
+
   getTabByWebContentsId(webContentsId: number): IWinDesConTab | null {
     for (const tabInfo of this.tabs) {
       if (tabInfo.tab.webContentsId === webContentsId) {
