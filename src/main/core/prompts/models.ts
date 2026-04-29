@@ -51,13 +51,37 @@ export class AlertPrompt extends PromptBase {
 }
 
 export class ConfirmPrompt extends PromptBase {
-  constructor(tabData: IWinDesConTab, event: IpcMainEvent) {
+  constructor(
+    tabData: IWinDesConTab,
+    event: IpcMainEvent,
+    private readonly message: string,
+  ) {
     super(tabData, event, 'confirm');
+  }
+
+  protected query(): Record<string, string> {
+    return {
+      message: this.message,
+      url: this.event.sender.getURL(),
+    };
   }
 }
 
 export class PromptPrompt extends PromptBase {
-  constructor(tabData: IWinDesConTab, event: IpcMainEvent) {
+  constructor(
+    tabData: IWinDesConTab,
+    event: IpcMainEvent,
+    private readonly message: string,
+    private readonly defaultValue: string | undefined,
+  ) {
     super(tabData, event, 'prompt');
+  }
+
+  protected query(): Record<string, string> {
+    return {
+      message: this.message,
+      defaultValue: this.defaultValue || '',
+      url: this.event.sender.getURL(),
+    };
   }
 }

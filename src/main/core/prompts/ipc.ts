@@ -20,16 +20,16 @@ export function setupPromptsIpc(browser: Browser) {
   ipcMain.on('prompts:confirm', async (event, { message }) => {
     scopeLog.info(`Confirm: ${message}`);
     return await checkPromptsSender(event, browser, (tab) => {
-      const obj = new ConfirmPrompt(tab, event);
+      const obj = new ConfirmPrompt(tab, event, message);
       tab.window.prompts.enqueue(obj);
     });
   });
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('prompts:prompt', async (event, { message }) => {
+  ipcMain.on('prompts:prompt', async (event, { message, defaultValue }) => {
     scopeLog.info(`Prompt: ${message}`);
     return await checkPromptsSender(event, browser, (tab) => {
-      const obj = new PromptPrompt(tab, event);
+      const obj = new PromptPrompt(tab, event, message, defaultValue);
       tab.window.prompts.enqueue(obj);
     });
   });

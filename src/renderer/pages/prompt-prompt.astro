@@ -1,0 +1,69 @@
+---
+import Base from '#/layouts/Base.astro';
+---
+
+<Base>
+  <div
+    class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4 fixed inset-0"
+    id="container"
+  >
+  </div>
+</Base>
+
+<script>
+  import { Renderer, h, cls, getSearchParams } from '#/scripts';
+
+  const { searchParams, winId } = getSearchParams();
+
+  const message = searchParams.get('message')!;
+  const url = new URL(searchParams.get('url')!);
+  const defaultValue = searchParams.get('defaultValue');
+
+  new Renderer(
+    h(
+      'div',
+      { classs: cls('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: cls('text-lg') }, `${url.hostname} says`),
+      h(
+        'fieldset',
+        { class: cls('fieldset', 'mb-6') },
+        h('legend', { class: cls('fieldset-legend', 'text-white') }, message),
+        h(
+          'input',
+          {
+            type: 'text',
+            class: cls('input', 'input-sm', 'text-black', 'w-full'),
+            value: defaultValue,
+            id: 'prompt-input',
+          },
+          '',
+        ),
+      ),
+      h(
+        'div',
+        { class: cls('flex', 'justify-center', 'gap-3') },
+        h(
+          'button',
+          {
+            class: cls('btn', 'btn-sm', 'flex-1'),
+            onclick: () => abPrompts.response(winId, null),
+          },
+          'Cancel',
+        ),
+        h(
+          'button',
+          {
+            class: cls('btn', 'btn-primary', 'btn-sm', 'flex-1'),
+            onclick: () =>
+              abPrompts.response(
+                winId,
+                (document.getElementById('prompt-input') as HTMLInputElement).value,
+              ),
+          },
+          'OK',
+        ),
+      ),
+    ),
+    'container',
+  ).render();
+</script>
