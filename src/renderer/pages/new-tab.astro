@@ -1,16 +1,17 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
-<BlackBgWithTitle title="New Tab">
+<Modal width="700px" height="600px">
+  <h1 class="text-lg mb-2 text-primary">New Tab</h1>
   <div class="h-full">
-    <div id="pagesIndicator" class="fixed top-4 right-3"></div>
+    <div id="pagesIndicator" class="absolute top-4 right-4"></div>
     <ListWithSearch placeholder="Enter a query or a valid url..." id="query" />
     <ListWithSearch placeholder="Select a profile..." id="partition" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { listWithSearchManager, getSearchParams, paginatorManager } from '#/scripts';

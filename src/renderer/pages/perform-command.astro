@@ -1,11 +1,12 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
-<BlackBgWithTitle title="Perform Command">
+<Modal width="800px" height="600px">
+  <h1 class="text-lg mb-2 text-primary">Perform Command</h1>
   <ListWithSearch placeholder="Start typing to search commands..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';

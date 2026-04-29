@@ -1,11 +1,12 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
 ---
 
-<BlackBgWithTitle title="Select Desktop">
+<Modal width="300px" height="500px">
+  <h1 class="text-lg mb-2 text-primary">Select Desktop</h1>
   <ListWithSearch placeholder="Filter and select desktop..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';

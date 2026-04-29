@@ -1,10 +1,20 @@
 ---
 import Base from './Base.astro';
+
+interface Props {
+  width?: string;
+  height?: string;
+}
+
+const { width, height } = Astro.props;
 ---
 
 <Base>
-  <div class="fixed inset-0 flex justify-center items-center">
-    <div class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4 w-96">
+  <div class="fixed inset-0 flex justify-center items-center bg-white/20">
+    <div
+      class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4 rounded-lg shadow-xl relative"
+      style={`width: ${width ?? '400px'}; max-height: ${height ?? 'auto'}; height: ${height ?? 'auto'};`}
+    >
       <slot />
     </div>
   </div>

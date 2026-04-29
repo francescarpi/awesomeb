@@ -1,3 +1,4 @@
+// TODO Delete this constants!!!
 export const DEFAULT_MODALS_PROPS = {
   'edit-url': {
     width: 700,
