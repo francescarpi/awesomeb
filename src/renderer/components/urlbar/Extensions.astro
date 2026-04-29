@@ -2,42 +2,42 @@
 
 ---
 
-<div id="extensions" class="flex gap-2 mr-8 ml-6 min-w-6"></div>
+<div id="extensions"></div>
 
 <script>
   import { IExtension } from '~/types';
-  import { getSearchParams } from '#/scripts';
+  import { getSearchParams, Renderer, h, cls } from '#/scripts';
 
   const { winId } = getSearchParams();
 
-  abExtensions.onRefresh((_event, extensions) => {
-    renderExtensions(extensions);
-  });
+  const renderer = new Renderer(renderExtensions([]), 'extensions').render();
 
-  function renderExtensions(extension: IExtension[]) {
-    const container = document.getElementById('extensions')!;
-    container.innerHTML = '';
+  abExtensions.onRefresh((_event, extensions) => renderer.update(renderExtensions(extensions)));
 
-    for (const ext of extension) {
-      if (!ext.icon) continue;
-
-      const icon = document.createElement('img');
-      icon.src = ext.icon;
-      icon.classList.add(
-        'w-5',
-        'h-5',
-        'rounded',
-        'object-cover',
-        'cursor-pointer',
-        'hover:bg-white/15',
-        'p-0.5',
-      );
-      icon.style = 'app-region: no-drag;';
-      icon.onclick = () => {
-        abExtensions.openPopup(winId, ext.id);
-      };
-
-      container.appendChild(icon);
+  function renderExtensions(extensions: IExtension[]) {
+    if (extensions.length === 0) {
+      return h('div', {}, '');
     }
+
+    return h(
+      'div',
+      { class: cls('flex', 'gap-2', 'mr-8', 'ml-3', 'min-w-6') },
+      ...extensions.map((extension) =>
+        h('img', {
+          src: extension.icon,
+          class: cls(
+            'w-5',
+            'h-5',
+            'rounded',
+            'object-cover',
+            'cursor-pointer',
+            'hover:bg-white/15',
+            'p-0.5',
+          ),
+          style: 'app-region: no-drag;',
+          onclick: () => abExtensions.openPopup(winId, extension.id),
+        }),
+      ),
+    );
   }
 </script>

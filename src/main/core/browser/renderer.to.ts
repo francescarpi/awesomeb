@@ -1,4 +1,4 @@
-import { Browser, Window, Desktop, Tab } from '@/core';
+import { Browser, Window, Desktop, Tab, partitions } from '@/core';
 import { Sidebar, TabSwitcher, URLBar } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
@@ -105,6 +105,11 @@ export class BrowserToRenderer {
 
     const selectedTab = window.selectedTab;
     if (!selectedTab) {
+      urlbar.send('extensions:on-refresh', []);
+      return;
+    }
+
+    if (selectedTab.tab.partition.id === partitions.internal.id) {
       urlbar.send('extensions:on-refresh', []);
       return;
     }
