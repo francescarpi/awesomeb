@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { iniPrompts } from './tab_scripts/';
 
 const awesomePublicAPI = {
   showTabPreview: (url: string) => {
@@ -43,9 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// ----------------------------------------------------------------------------------------------- //
 function removeFocusActiveElement() {
   const activeElement = document.activeElement as HTMLElement | null;
   if (activeElement) {
     activeElement.blur();
   }
 }
+
+iniPrompts();

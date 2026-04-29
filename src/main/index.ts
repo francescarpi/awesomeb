@@ -17,6 +17,7 @@ import {
   setupConfigIPC,
   setupExtensionsIPC,
   partitions,
+  setupPromptsIpc,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -60,6 +61,7 @@ app.whenReady().then(async () => {
   setupCertificatesIPC(browser);
   setupConfigIPC(browser);
   setupExtensionsIPC(browser);
+  setupPromptsIpc(browser);
 
   await browser.loadSession();
 });
