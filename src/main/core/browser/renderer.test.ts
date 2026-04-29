@@ -1,63 +1,68 @@
-import { expect, test } from 'vitest';
-import { Browser } from './browser';
+import { expect, test, describe, beforeEach } from 'vitest';
+import { Browser, partitions, Window } from '@/core';
 
-test("commands renderer shouldn' return any command becaise there is no focused window", () => {
-  const browser = new Browser();
-  browser.createWindow(1);
+describe('Renderer', () => {
+  let browser: Browser;
+  let window: Window;
 
-  expect(browser.renderer.commandsEntities().length).toBeGreaterThan(0);
-});
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
 
-test('desktops renderer sould return expected data', () => {
-  const browser = new Browser();
-  const w = browser.createWindow(1);
-  w.createDefaultDesktops();
+  test("commands renderer shouldn' return any command becaise there is no focused window", () => {
+    expect(browser.renderer.commandsEntities().length).toBeGreaterThan(0);
+  });
 
-  expect(browser.renderer.desktopsEntities(w)).toEqual([
-    {
-      id: '1',
-      label: '1: Unnamed',
-      selected: true,
-      requireAttention: false,
-      hasTabs: false,
-      hasActiveTabs: false,
-      name: null,
-    },
-    {
-      id: '2',
-      label: '2: Unnamed',
-      selected: false,
-      requireAttention: false,
-      hasTabs: false,
-      hasActiveTabs: false,
-      name: null,
-    },
-    {
-      id: '3',
-      label: '3: Unnamed',
-      selected: false,
-      requireAttention: false,
-      hasTabs: false,
-      hasActiveTabs: false,
-      name: null,
-    },
-    {
-      id: '4',
-      label: '4: Unnamed',
-      selected: false,
-      requireAttention: false,
-      hasTabs: false,
-      hasActiveTabs: false,
-      name: null,
-    },
-    {
-      id: '5',
-      label: '5: Unnamed',
-      selected: false,
-      requireAttention: false,
-      hasTabs: false,
-      hasActiveTabs: false,
-      name: null,
-    },
-  ]);
+  test('desktops renderer sould return expected data', () => {
+    expect(browser.renderer.desktopsEntities(window)).toEqual([
+      {
+        id: '1',
+        label: '1: Unnamed',
+        selected: true,
+        requireAttention: false,
+        hasTabs: false,
+        hasActiveTabs: false,
+        name: null,
+      },
+      {
+        id: '2',
+        label: '2: Unnamed',
+        selected: false,
+        requireAttention: false,
+        hasTabs: false,
+        hasActiveTabs: false,
+        name: null,
+      },
+      {
+        id: '3',
+        label: '3: Unnamed',
+        selected: false,
+        requireAttention: false,
+        hasTabs: false,
+        hasActiveTabs: false,
+        name: null,
+      },
+      {
+        id: '4',
+        label: '4: Unnamed',
+        selected: false,
+        requireAttention: false,
+        hasTabs: false,
+        hasActiveTabs: false,
+        name: null,
+      },
+      {
+        id: '5',
+        label: '5: Unnamed',
+        selected: false,
+        requireAttention: false,
+        hasTabs: false,
+        hasActiveTabs: false,
+        name: null,
+      },
+    ]);
+  });
 });

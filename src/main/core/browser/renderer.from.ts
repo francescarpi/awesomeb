@@ -23,13 +23,13 @@ import {
   config,
   Desktop,
   getCommands,
-  getPartitions,
   getThemes,
   Tab,
   TabContainer,
   Window,
   bookmarks,
   closedHistory,
+  partitions,
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
@@ -87,9 +87,8 @@ export class BrowserRenderer {
   }
 
   partitionsEntities(browser: Browser): IPartitionEntity[] {
-    const partitions = getPartitions();
     const selectedTabResult = browser.selectedTab;
-    return Array.from(partitions.values()).map((partition) => ({
+    return partitions.all.map((partition) => ({
       id: partition.id,
       label: partition.name,
       color: partition.color,

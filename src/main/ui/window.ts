@@ -4,7 +4,7 @@ import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import EventEmitter from 'events';
-import { internalPartition, Window } from '@/core';
+import { partitions, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
 import { Sidebar, URLBar, TabSwitcher, TabMarks } from './views';
@@ -49,7 +49,7 @@ export class UIWindow {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        session: session.fromPartition(internalPartition.id),
+        session: session.fromPartition(partitions.internal.id),
       },
     });
 

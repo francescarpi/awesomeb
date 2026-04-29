@@ -1,4 +1,4 @@
-import { Browser, bookmarks, Window, getPartitions } from '@/core';
+import { Browser, bookmarks, Window, partitions } from '@/core';
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
@@ -6,7 +6,6 @@ import { createColorImage } from '@/utils';
 
 export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   const { tab, window, tabContainer, desktop } = tabInfo;
-  const partitions = Array.from(getPartitions().values());
 
   const menu = Menu.buildFromTemplate([
     {
@@ -70,7 +69,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     {
       label: 'Change profile...',
       icon: getIcon(EIcon.Partition),
-      submenu: partitions.map((partition) => ({
+      submenu: partitions.all.map((partition) => ({
         label: partition.name,
         icon: createColorImage(partition.color),
         click: async () => {

@@ -1,5 +1,5 @@
 import { protocol, session } from 'electron';
-import { internalPartition } from '@/core';
+import { partitions } from '@/core';
 import path from 'path';
 import fs from 'fs/promises';
 import mimeTypes from 'mime-types';
@@ -24,7 +24,7 @@ export function setupProtocols() {
 }
 
 export function registerProtocols() {
-  const ses = session.fromPartition(internalPartition.id);
+  const ses = session.fromPartition(partitions.internal.id);
   ses.protocol.handle(INTERNAL_PROTOCOL, async (request) => {
     const url = new URL(request.url);
     const page = url.hostname;

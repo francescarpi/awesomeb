@@ -5,7 +5,7 @@ import { UIWindow } from '../window';
 import { IContextualModalParams, TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
-import { internalPartition, Window } from '@/core';
+import { partitions, Window } from '@/core';
 import { UIPageView } from '../view';
 
 export class UIModal {
@@ -37,7 +37,7 @@ export class UIModal {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        session: session.fromPartition(internalPartition.id),
+        session: session.fromPartition(partitions.internal.id),
       },
     });
 

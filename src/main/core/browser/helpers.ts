@@ -2,11 +2,10 @@ import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
 import {
   config,
   Browser,
-  defaultPartition,
-  getPartitions,
   TabContainer,
   Partition,
   getNextPreviousBounds,
+  partitions,
 } from '@/core';
 import { HandlerDetails, WindowOpenHandlerResponse, Notification } from 'electron';
 import log from 'electron-log';
@@ -123,12 +122,11 @@ export function parseTarget(
 
   let partition: Partition;
   if (partitionId) {
-    const partitions = getPartitions();
-    partition = partitions.get(partitionId) || defaultPartition;
+    partition = partitions.get(partitionId) || partitions.default;
   } else if (selectedTab) {
     partition = selectedTab.tab.partition;
   } else {
-    partition = defaultPartition;
+    partition = partitions.default;
   }
 
   return { window, desktop, tabContainer, partition };

@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { Browser } from '@/core';
+import { Browser, partitions } from '@/core';
 import * as windowMinimize from './window-minimize';
 import * as windowMaximize from './window-maximize';
 import * as windowClose from './window-close';
@@ -23,6 +23,7 @@ describe('Commands', () => {
 
   beforeEach(() => {
     browser = new Browser();
+    partitions.init();
     const window = browser.createWindow(1);
     window.createDefaultDesktops();
   });

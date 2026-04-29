@@ -3,7 +3,7 @@ import { WebContentsView, Rectangle, WebContents, session, Session } from 'elect
 import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools } from './helpers';
-import { internalPartition, Window } from '@/core';
+import { partitions, Window } from '@/core';
 import { buildScopeLog } from '@/utils';
 
 const scopeLog = buildScopeLog('UIView', process.env.AB_LOG_UI === 'true');
@@ -23,7 +23,7 @@ export class UIView {
   ) {
     this._borderRadius = props?.borderRadius || 0;
     this._backgroundColor = props?.backgroundColor || '#00000000';
-    this._session = props?.session || session.fromPartition(internalPartition.id);
+    this._session = props?.session || session.fromPartition(partitions.internal.id);
 
     this._webContentsView = this._createWebContentsView();
 

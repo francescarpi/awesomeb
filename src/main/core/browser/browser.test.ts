@@ -1,77 +1,81 @@
-import { expect, test } from 'vitest';
-import { Browser, privatePartition } from '@/core';
+import { expect, test, describe, beforeEach } from 'vitest';
+import { Browser, partitions } from '@/core';
 
-test('should create a browser window successfully', () => {
-  const browser = new Browser();
-  const w1 = browser.createWindow(1);
-  expect(browser.windows.length).toBe(1);
-  expect(w1).toBeDefined();
-  expect(browser.getWindow(w1.id)).toBe(w1);
-});
+describe('Browser', () => {
+  let browser: Browser;
 
-test('openURL in active window/desktop should create a new tabcontainer and tab', () => {
-  const browser = new Browser();
-  const w = browser.createWindow(1);
-  w.createDefaultDesktops();
-
-  const desktop = w.selectedDesktop;
-  expect(desktop.tabContainers.length).toBe(0);
-
-  const result = browser.openURL('https://example.com');
-  expect(result).not.toBeNull();
-
-  expect(desktop.tabContainers.length).toBe(1);
-  expect(desktop.tabContainers[0].id).toBe(1);
-
-  expect(desktop.tabContainers[0].tabs.length).toBe(1);
-});
-
-test('move tab (tabcontainer) to another desktop', async () => {
-  const browser = new Browser();
-  const w = browser.createWindow(1);
-  w.createDefaultDesktops();
-
-  const result = await browser.openURL('http://example.com');
-  expect(result).not.toBeNull();
-
-  expect(result!.desktop.id).toBe(1);
-
-  browser.moveTab(result!.tab.id, 'desktop-2');
-
-  const tabResult = browser.getTab(result!.tab.id);
-  expect(tabResult).not.toBeNull();
-  expect(tabResult!.desktop.id).toBe(2);
-
-  expect(w.getDesktop(1)?.tabContainers.length).toBe(0);
-  expect(w.getDesktop(2)?.tabContainers.length).toBe(1);
-});
-
-test('duplicate a tab in the same desktop', async () => {
-  const browser = new Browser();
-  const w = browser.createWindow(1, { withDesktops: true });
-  const result = await browser.openURL('http://example.com');
-  expect(result).not.toBeNull();
-
-  expect(w.selectedDesktop.tabs.length).toBe(1);
-
-  const duplicateResult = await browser.duplicateTab(result!.tab.id);
-  expect(duplicateResult).not.toBeNull();
-  expect(w.selectedDesktop.tabs.length).toBe(2);
-});
-
-test('duplicate a tab with another partition', async () => {
-  const browser = new Browser();
-  const w = browser.createWindow(1, { withDesktops: true });
-  const result = await browser.openURL('http://example.com');
-  expect(result).not.toBeNull();
-
-  expect(w.selectedDesktop.tabs.length).toBe(1);
-
-  const duplicateResult = await browser.duplicateTab(result!.tab.id, {
-    partitionId: privatePartition.id,
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
   });
 
-  expect(duplicateResult).not.toBeNull();
-  expect(w.selectedDesktop.tabs.length).toBe(2);
-  expect(duplicateResult!.tab.partition.id).toBe(privatePartition.id);
+  test('should create a browser window successfully', () => {
+    const w1 = browser.createWindow(1);
+    expect(browser.windows.length).toBe(1);
+    expect(w1).toBeDefined();
+    expect(browser.getWindow(w1.id)).toBe(w1);
+  });
+
+  test('openURL in active window/desktop should create a new tabcontainer and tab', () => {
+    const w = browser.createWindow(1);
+    w.createDefaultDesktops();
+
+    const desktop = w.selectedDesktop;
+    expect(desktop.tabContainers.length).toBe(0);
+
+    const result = browser.openURL('https://example.com');
+    expect(result).not.toBeNull();
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(desktop.tabContainers[0].id).toBe(1);
+
+    expect(desktop.tabContainers[0].tabs.length).toBe(1);
+  });
+
+  test('move tab (tabcontainer) to another desktop', async () => {
+    const w = browser.createWindow(1);
+    w.createDefaultDesktops();
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+
+    expect(result!.desktop.id).toBe(1);
+
+    browser.moveTab(result!.tab.id, 'desktop-2');
+
+    const tabResult = browser.getTab(result!.tab.id);
+    expect(tabResult).not.toBeNull();
+    expect(tabResult!.desktop.id).toBe(2);
+
+    expect(w.getDesktop(1)?.tabContainers.length).toBe(0);
+    expect(w.getDesktop(2)?.tabContainers.length).toBe(1);
+  });
+
+  test('duplicate a tab in the same desktop', async () => {
+    const w = browser.createWindow(1, { withDesktops: true });
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+
+    expect(w.selectedDesktop.tabs.length).toBe(1);
+
+    const duplicateResult = await browser.duplicateTab(result!.tab.id);
+    expect(duplicateResult).not.toBeNull();
+    expect(w.selectedDesktop.tabs.length).toBe(2);
+  });
+
+  test('duplicate a tab with another partition', async () => {
+    const w = browser.createWindow(1, { withDesktops: true });
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+
+    expect(w.selectedDesktop.tabs.length).toBe(1);
+
+    const duplicateResult = await browser.duplicateTab(result!.tab.id, {
+      partitionId: partitions.private.id,
+    });
+
+    expect(duplicateResult).not.toBeNull();
+    expect(w.selectedDesktop.tabs.length).toBe(2);
+    expect(duplicateResult!.tab.partition.id).toBe(partitions.private.id);
+  });
 });

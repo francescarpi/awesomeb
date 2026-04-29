@@ -16,6 +16,7 @@ import {
   setupCertificatesIPC,
   setupConfigIPC,
   setupExtensionsIPC,
+  partitions,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -32,6 +33,8 @@ electronDl();
 setupProtocols();
 
 app.whenReady().then(async () => {
+  partitions.init();
+
   const browser = new Browser();
 
   registerProtocols();

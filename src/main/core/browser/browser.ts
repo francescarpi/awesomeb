@@ -5,13 +5,11 @@ import {
   Session,
   IWindowProps,
   getTheme,
-  getPartitions,
-  defaultPartition,
-  internalPartition,
   openURLHistory,
   Downloads,
   closedHistory,
   Extensions,
+  partitions,
 } from '@/core';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
@@ -57,8 +55,6 @@ export class Browser {
         bounds: winStore.bounds,
       });
 
-      const partitions = getPartitions();
-
       for (const deskStore of winStore.desktops) {
         const theme = getTheme(deskStore.theme);
         const { name } = deskStore;
@@ -73,8 +69,8 @@ export class Browser {
           for (const tabStore of tabConStore.tabs) {
             const partition =
               tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
-                ? internalPartition
-                : partitions.get(tabStore.partitionId) || defaultPartition;
+                ? partitions.internal
+                : partitions.get(tabStore.partitionId) || partitions.default;
 
             tabContainer.createTab(tabStore.id, {
               partition,
@@ -203,7 +199,7 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
-    const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? internalPartition : null;
+    const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? partitions.internal : null;
 
     const tab = tabContainer.createTab(this.idGenerator.nextTabId, {
       partition: intPartition || partition,

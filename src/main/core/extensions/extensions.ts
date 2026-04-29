@@ -9,7 +9,7 @@ import {
   unloadExtensionFromSession,
 } from './helpers';
 import log from 'electron-log';
-import { Browser, getPartitions, Partition, Window } from '@/core';
+import { Browser, partitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
 import path from 'path';
@@ -146,8 +146,7 @@ export class Extensions {
       return;
     }
 
-    const partitions = Array.from(getPartitions().values());
-    for (const partition of partitions) {
+    for (const partition of partitions.allForExtensions) {
       if (partition.private) {
         continue;
       }
