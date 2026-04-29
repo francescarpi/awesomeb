@@ -17,15 +17,16 @@ export class UIModal {
     props?: IProps,
   ) {
     const modal = props?.modal !== undefined ? props.modal : true;
+    const parentBounds = this._parent.bw.getBounds();
 
     this.bw = new BrowserWindow({
-      width: props?.width || 400,
-      height: props?.height || 400,
+      width: parentBounds.width,
+      height: parentBounds.height,
       frame: false,
       parent: _parent.bw,
       transparent: true,
       backgroundMaterial: 'none',
-      backgroundColor: process.platform === 'darwin' ? '#00000000' : '#000000',
+      backgroundColor: '#00000000',
       roundedCorners: true,
       hasShadow: false,
       modal,
