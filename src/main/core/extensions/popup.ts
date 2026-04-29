@@ -29,6 +29,12 @@ export class ExtensionPopup extends UIView {
       backgroundColor: '#fff',
       visible: false,
     });
+
+    this.webContents.on('did-finish-load', () => {
+      this.webContents.insertCSS(
+        'body { border: 1px solid rgba(0,0,0,0.5); box-sizing: border-box; height: 100vh; margin: 0 !important; }',
+      );
+    });
   }
 
   render(window: Window) {
