@@ -18,13 +18,13 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
 
   const { disable: disableBack, enable: enableBack } = buttonManager('back', {
     handleClick: () => {
-      abCommands.perform(winId, 'go-back', { tabId });
+      abCommands.perform(winId, 'go-back');
     },
   });
 
   const { disable: disableForward, enable: enableForward } = buttonManager('forward', {
     handleClick: () => {
-      abCommands.perform(winId, 'go-forward', { tabId });
+      abCommands.perform(winId, 'go-forward');
     },
   });
 
@@ -35,13 +35,13 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
     enable: enableReload,
   } = buttonManager('reload', {
     handleClick: () => {
-      abCommands.perform(winId, 'reload-tab', { tabId });
+      abCommands.perform(winId, 'reload-tab');
     },
   });
 
   const { show: showClose, hide: hideClose } = buttonManager('close', {
     handleClick: () => {
-      abCommands.perform(winId, 'stop-tab', { tabId });
+      abCommands.perform(winId, 'stop-tab');
     },
   });
 
