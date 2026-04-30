@@ -1,7 +1,6 @@
 import { ALLOWED_PERMISSIONS, Browser, config, permissions } from '@/core';
 import { EDownloadStatus } from '~/types';
 import { desktopCapturer, Session } from 'electron';
-import { sanitizeUserAgent } from '@/utils';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
@@ -18,29 +17,6 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
     },
     { useSystemPicker: true },
   );
-
-  // ----------------------------------------------------------------------------------------------- //
-  ses.webRequest.onBeforeSendHeaders({ urls: ['<all_urls>'] }, (details, callback) => {
-    const newHeaders = { ...details.requestHeaders };
-    const uaKey = Object.keys(newHeaders).find((key) => key.toLowerCase() === 'user-agent');
-
-    if (!uaKey) {
-      scopeLog.warn('User-Agent header not found in request headers:', details.requestHeaders);
-      callback({});
-      return;
-    }
-
-    const userAgent = newHeaders[uaKey];
-    if (!userAgent) {
-      scopeLog.warn('User-Agent header is empty:', details.requestHeaders);
-      callback({});
-      return;
-    }
-
-    newHeaders[uaKey] = sanitizeUserAgent(userAgent, new URL(details.url));
-
-    callback({ requestHeaders: newHeaders });
-  });
 
   // ----------------------------------------------------------------------------------------------- //
   ses.on('will-download', async (_event, item, wc) => {

@@ -8,7 +8,6 @@ import {
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
-import { sanitizeUserAgent } from '@/utils';
 import { FindInPage } from './find-in-page';
 import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
@@ -238,9 +237,8 @@ export class Tab extends UIView {
 
   async loadURL(url: string) {
     this._url = url;
-    const userAgent = sanitizeUserAgent(this.webContents.getUserAgent(), new URL(url));
     try {
-      await this.webContents.loadURL(url, { userAgent });
+      await this.webContents.loadURL(url);
     } catch (error) {
       scopeLog.error(`Failed to load URL ${url} in tab`);
     }
