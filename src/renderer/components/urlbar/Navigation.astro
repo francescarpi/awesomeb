@@ -14,7 +14,6 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
   import { ITabNavigation } from '~/types';
   import { getSearchParams } from '../../scripts/url';
   const { winId } = getSearchParams();
-  let tabId = -1;
 
   const { disable: disableBack, enable: enableBack } = buttonManager('back', {
     handleClick: () => {
@@ -51,8 +50,6 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
   disableReload();
 
   abUrlBar.onTabNavigationRefresh((_event, data: ITabNavigation) => {
-    tabId = data.tabId;
-
     if (data.canGoBack) {
       enableBack();
     } else {
