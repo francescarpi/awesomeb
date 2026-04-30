@@ -10,20 +10,21 @@ import { UIPageView } from '../view';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
+  private readonly modal: boolean;
 
   constructor(
-    private readonly _parent: UIWindow,
-    private readonly _page: TPage,
+    private readonly parent: UIWindow,
+    private readonly page: TPage,
     props?: IProps,
   ) {
-    const modal = props?.modal !== undefined ? props.modal : true;
-    const parentBounds = this._parent.bw.getBounds();
+    this.modal = props?.modal !== undefined ? props.modal : true;
+    const parentBounds = this.parent.bw.getBounds();
 
     this.bw = new BrowserWindow({
       width: parentBounds.width,
       height: parentBounds.height,
       frame: false,
-      parent: _parent.bw,
+      parent: parent.bw,
       transparent: true,
       backgroundMaterial: 'none',
       backgroundColor: '#00000000',
@@ -42,26 +43,41 @@ export class UIModal {
       },
     });
 
-    const query = { winId: this._parent.browserWindowId.toString(), ...(props?.query || {}) };
-    loadPage(this.bw.webContents, this._page, query);
+    const query = { winId: this.parent.browserWindowId.toString(), ...(props?.query || {}) };
+    loadPage(this.bw.webContents, this.page, query);
 
     openDevTools(this.bw.webContents, 'modal');
 
-    if (!modal) {
-      const parentBounds = this._parent.bw.getBounds();
-      const modalBounds = this.bw.getBounds();
-      const x = parentBounds.x + (parentBounds.width - modalBounds.width) / 2;
-      const y = parentBounds.y + (parentBounds.height - modalBounds.height) / 2;
-      this.bw.setBounds({ x, y, width: modalBounds.width, height: modalBounds.height });
-    }
+    this.refreshBounds();
 
     this.bw.once('ready-to-show', () => {
       this.bw.show();
     });
 
     this.bw.once('closed', () => {
-      this._parent.focus();
+      this.parent.focus();
+      parent.bw.off('move', this.refreshBounds);
     });
+
+    parent.bw.on('move', this.refreshBounds);
+  }
+
+  private refreshBounds() {
+    if (this.modal) {
+      const parentBounds = this.parent.bw.getBounds();
+      this.bw.setBounds({
+        x: parentBounds.x,
+        y: parentBounds.y,
+        width: parentBounds.width,
+        height: parentBounds.height,
+      });
+    } else {
+      const parentBounds = this.parent.bw.getBounds();
+      const modalBounds = this.bw.getBounds();
+      const x = parentBounds.x + (parentBounds.width - modalBounds.width) / 2;
+      const y = parentBounds.y + (parentBounds.height - modalBounds.height) / 2;
+      this.bw.setBounds({ x, y, width: modalBounds.width, height: modalBounds.height });
+    }
   }
 
   get wcId(): number {
