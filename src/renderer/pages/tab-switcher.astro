@@ -3,112 +3,128 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base noDrag>
-  <div class="fixed inset-0 bg-white/50 flex items-center justify-center">
-    <ul class="w-80 bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4">No tabs...</ul>
-  </div>
+  <div id="container"></div>
 </Base>
 
 <script>
-  import { TTabId, ITabSwitcherTab } from '~/types';
-  import { getSearchParams } from '#/scripts';
+  import { Renderer, h, cls, getSearchParams, type VNode } from '#/scripts';
+  import type { ITabSwitcherTab } from '~/types';
 
   const { winId } = getSearchParams();
-  let selectedIndex = 0;
 
-  abTabSwitcher.refresh((_event, tabs) => renderTabs(tabs));
+  let selectedIndex = 0;
+  let tabsList: ITabSwitcherTab[] = [];
+
+  const renderer = new Renderer(renderTabs(), 'container').render();
+
+  abTabSwitcher.refresh((_event, tabs) => {
+    tabsList = tabs;
+    renderer.update(renderTabs());
+    updateFavicons();
+  });
+
+  function renderTabs(): VNode {
+    return h(
+      'div',
+      { class: cls('fixed', 'inset-0', 'bg-white/50', 'flex', 'items-center', 'justify-center') },
+      h(
+        'div',
+        {
+          class: cls(
+            'w-80',
+            'bg-linear-to-br',
+            'from-gray-900',
+            'to-gray-800',
+            'text-gray-200',
+            'p-4',
+            'rounded-lg',
+            'shadow-xl',
+            'flex',
+            'flex-col',
+            'gap-2',
+          ),
+        },
+        ...(tabsList.length > 0
+          ? tabsList.map((t, idx) =>
+              h(
+                'div',
+                {
+                  'data-tab-id': t.id.toString(),
+                  class: cls(
+                    'ab-tab',
+                    'flex',
+                    'p-2',
+                    'gap-2',
+                    'items-center',
+                    idx === selectedIndex ? 'bg-white/20' : '',
+                  ),
+                },
+                h('img', { class: cls('w-5', 'h-5') }, ''),
+                h('span', { class: cls('truncate', 'w-full') }, t.title),
+                h(
+                  'span',
+                  {
+                    class: cls('w-4', 'h-3'),
+                    style: { backgroundColor: t.partitionColor || '#000' },
+                  },
+                  '',
+                ),
+              ),
+            )
+          : 'No tabs...'),
+      ),
+    );
+  }
 
   function handleKeyUp(event: KeyboardEvent) {
     if (event.key === 'Control') {
       event.preventDefault();
 
-      const selectedLi = document.querySelectorAll('ul li')[selectedIndex] as
-        | HTMLLIElement
+      const selected = document.querySelectorAll('.ab-tab')[selectedIndex] as
+        | HTMLDivElement
         | undefined;
 
-      if (selectedLi) {
-        const tabId = parseInt(selectedLi.dataset.tabId!, 10);
+      if (selected) {
+        const tabId = parseInt(selected.dataset.tabId!, 10);
+        selectedIndex = 0;
         abTabSwitcher.close(winId);
         abCommands.perform(winId, 'select-tab', {
           tabId,
         });
       } else {
+        selectedIndex = 0;
         abTabSwitcher.close(winId);
       }
     }
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    const totalTabs = document.querySelectorAll('ul li').length;
-
+    const totalTabs = document.querySelectorAll('.ab-tab').length;
     if (event.key === 'Tab' && event.ctrlKey && !event.shiftKey) {
       event.preventDefault();
       selectedIndex = (selectedIndex + 1) % totalTabs;
-      updateSelection();
+      renderer.update(renderTabs());
     } else if (event.key === 'Tab' && event.shiftKey && event.ctrlKey) {
       event.preventDefault();
       selectedIndex = (selectedIndex - 1 + totalTabs) % totalTabs;
-      updateSelection();
+      renderer.update(renderTabs());
     }
   }
 
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
 
-  function renderTabs(tabs: ITabSwitcherTab[]) {
-    const ul = document.querySelector('ul')!;
-
-    ul.innerHTML = '';
-    selectedIndex = 0;
-
-    tabs.forEach((tab) => {
-      const li = document.createElement('li');
-      li.dataset.tabId = tab.id.toString();
-
-      const div = document.createElement('div');
-      div.classList.add('p-2', 'flex', 'gap-2', 'items-center');
-
-      li.appendChild(div);
-      ul.appendChild(li);
-
-      const favicon = document.createElement('img');
-      favicon.classList.add('w-5', 'h-5');
-
-      const title = document.createElement('span');
-      title.classList.add('truncate', 'w-full');
-      title.textContent = tab.title;
-
-      const partitionColor = document.createElement('span');
-      partitionColor.classList.add('w-3', 'h-3');
-      partitionColor.style.backgroundColor = tab.partitionColor || '#000';
-
-      div.appendChild(favicon);
-      div.appendChild(title);
-      div.appendChild(partitionColor);
-
-      updateFavicon(tab.id);
-    });
-
-    updateSelection();
-  }
-
-  function updateSelection() {
-    const items = document.querySelectorAll('ul li div');
-    items.forEach((item, idx) => {
-      if (idx === selectedIndex) {
-        item.classList.add('bg-white/20');
-      } else {
-        item.classList.remove('bg-white/20');
+  async function updateFavicons() {
+    for (const tab of tabsList) {
+      const favicon = await abFavicons.get(winId, tab.id);
+      const img = document.querySelector(
+        `.ab-tab[data-tab-id="${tab.id}"] img`,
+      ) as HTMLImageElement | null;
+      if (favicon && img) {
+        img.src = favicon;
+      } else if (img) {
+        img.src = '';
       }
-    });
-  }
-
-  async function updateFavicon(tabId: TTabId) {
-    const favicon = await abFavicons.get(winId, tabId);
-    const img = document.querySelector(`li[data-tab-id="${tabId}"] img`) as HTMLImageElement;
-    if (favicon) {
-      img.src = favicon;
-    } else {
-      img.src = '';
     }
   }
 </script>
