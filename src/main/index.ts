@@ -39,13 +39,16 @@ app.whenReady().then(async () => {
   partitions.init();
 
   const browser = new Browser();
+  const extPromises = new Set<Promise<void>>();
 
   for (const partition of partitions.allForExtensions) {
-    for (const ext of browser.extensions.active) {
-      await loadExtensionToSession(partition.ses, ext);
-    }
     registerSessionEvents(browser, partition.ses);
+    for (const ext of browser.extensions.active) {
+      extPromises.add(loadExtensionToSession(partition.ses, ext));
+    }
   }
+
+  await Promise.all(extPromises);
 
   registerProtocols();
 

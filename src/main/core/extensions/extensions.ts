@@ -146,10 +146,6 @@ export class Extensions {
     }
 
     for (const partition of partitions.allForExtensions) {
-      if (partition.private) {
-        continue;
-      }
-
       if (action === 'load') {
         await loadExtensionToSession(partition.ses, extension);
       } else {
