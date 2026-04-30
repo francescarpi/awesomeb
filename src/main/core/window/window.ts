@@ -26,7 +26,7 @@ export class Window extends UIWindow {
     public readonly id: TWindowId,
     props?: IProps,
   ) {
-    super(browser.eventsChannel, props?.bounds);
+    super(id, browser.eventsChannel, props?.bounds);
 
     registerWindowEvents(this);
 
@@ -85,6 +85,7 @@ export class Window extends UIWindow {
     for (let numDesktop = 0; numDesktop < MIN_DESKTOPS; numDesktop++) {
       this.createDesktop(numDesktop + 1);
     }
+    scopeLog.info(`Created ${MIN_DESKTOPS} default desktops for window ${this.id}`);
   }
 
   getTab(id: TTabId): IDesConTab | null {

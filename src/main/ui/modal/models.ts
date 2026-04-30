@@ -43,7 +43,7 @@ export class UIModal {
       },
     });
 
-    const query = { winId: this.parent.browserWindowId.toString(), ...(props?.query || {}) };
+    const query = { winId: this.parent.winId.toString(), ...(props?.query || {}) };
     loadPage(this.bw.webContents, this.page, query);
 
     openDevTools(this.bw.webContents, 'modal');
@@ -90,7 +90,7 @@ export class UIContextualModal extends UIPageView {
     super('contextual-modal', 'browser', {
       page,
       query: {
-        winId: win.browserWindowId.toString(),
+        winId: win.winId.toString(),
         x: props.bounds.x.toString(),
         y: props.bounds.y.toString(),
         width: props.bounds.width.toString(),

@@ -45,7 +45,7 @@ export class Sidebar extends UIPageView {
         : {};
 
     loadPage(this.webContents, 'sidebar', {
-      winId: window.browserWindowId.toString(),
+      winId: window.id.toString(),
       ...theme,
     });
   }

@@ -86,6 +86,7 @@ export function parseTarget(
       bounds: newBounds,
       withDesktops: true,
     });
+
     scopeLog.info(
       `Created new window with id ${window.id}, default desktop is ${window.selectedDesktop.id}`,
     );

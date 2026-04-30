@@ -5,12 +5,8 @@ export class IdGenerator {
   constructor(private readonly _browser: Browser) {}
 
   get nextWindowId(): TWindowId {
-    let maxId = 0;
-    for (const window of this._browser.windows.values()) {
-      if (window.id > maxId) {
-        maxId = window.id;
-      }
-    }
+    const winIds = this._browser.windows.values().map((window) => window.id);
+    const maxId = Math.max(0, ...winIds);
     return (maxId + 1) as TWindowId;
   }
 

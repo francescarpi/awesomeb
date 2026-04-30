@@ -9,6 +9,7 @@ import { UIView } from './view';
 import { TViewId } from './types';
 import { Sidebar, URLBar, TabSwitcher, TabMarks } from './views';
 import log from 'electron-log';
+import type { TWindowId } from '~/types';
 
 const scopeLog = log.scope('UIWindow');
 
@@ -21,6 +22,7 @@ export class UIWindow {
   private _fullScreen = false;
 
   constructor(
+    public readonly winId: TWindowId,
     public readonly eventsChannel: EventEmitter,
     bounds?: Rectangle,
   ) {
@@ -54,7 +56,7 @@ export class UIWindow {
     });
 
     loadPage(this.bw.webContents, 'window', {
-      winId: this.browserWindowId.toString(),
+      winId: winId.toString(),
       sidebarCollapsed: this._sidebarCollapsed.toString(),
       areaMaximized: this._areaMaximized.toString(),
     });
@@ -67,10 +69,10 @@ export class UIWindow {
   }
 
   private buildLayout() {
-    this.addView(new Sidebar(this.browserWindowId));
-    this.addView(new URLBar(this.browserWindowId));
-    this.addView(new TabSwitcher(this.browserWindowId));
-    this.addView(new TabMarks(this.browserWindowId));
+    this.addView(new Sidebar(this.winId));
+    this.addView(new URLBar(this.winId));
+    this.addView(new TabSwitcher(this.winId));
+    this.addView(new TabMarks(this.winId));
   }
 
   /**
@@ -96,7 +98,7 @@ export class UIWindow {
   removeView(id: TViewId) {
     const view = this._views.get(id);
     if (!view) {
-      scopeLog.error(`View with id ${id} not found in window ${this.browserWindowId}`);
+      scopeLog.error(`View with id ${id} not found in window ${this.winId}`);
       return;
     }
 
@@ -117,10 +119,6 @@ export class UIWindow {
 
   get views(): UIView[] {
     return Array.from(this._views.values());
-  }
-
-  get browserWindowId(): number {
-    return this.bw.id;
   }
 
   get webContentsId(): number {
