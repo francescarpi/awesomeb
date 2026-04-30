@@ -1,5 +1,5 @@
-import { app, Session as ElectronSession } from 'electron';
-import { Session, Browser, registerSessionEvents } from '@/core';
+import { app } from 'electron';
+import { Session, Browser } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('AppEvents');
@@ -59,10 +59,5 @@ export function registerAppEvents(browser: Browser) {
   // ----------------------------------------------------------------------------------------------- //
   app.on('open-url', async (_event, url) => {
     await browser.openURL(url, { selectTab: true });
-  });
-
-  // ----------------------------------------------------------------------------------------------- //
-  app.on('session-created', async (ses: ElectronSession) => {
-    registerSessionEvents(browser, ses);
   });
 }

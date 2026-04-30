@@ -171,6 +171,11 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
       return;
     }
 
+    const selectedTab = browser.selectedTab;
+    if (selectedTab && selectedTab.desktop.id !== tabResult.desktop.id) {
+      tabResult.window.selectTab(tabResult.tab.id);
+    }
+
     tabResult.tab.setRequestPermission([permission, host, callback]);
 
     tabResult.window.modal.open('request-permission', {

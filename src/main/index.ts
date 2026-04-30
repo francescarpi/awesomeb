@@ -18,6 +18,8 @@ import {
   setupExtensionsIPC,
   partitions,
   setupPromptsIpc,
+  registerSessionEvents,
+  loadExtensionToSession,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -38,8 +40,11 @@ app.whenReady().then(async () => {
 
   const browser = new Browser();
 
-  for (const ext of browser.extensions.active) {
-    browser.extensions.loadUnloadExtensionToAllSessions(ext.id, 'load');
+  for (const partition of partitions.allForExtensions) {
+    for (const ext of browser.extensions.active) {
+      await loadExtensionToSession(partition.ses, ext);
+    }
+    registerSessionEvents(browser, partition.ses);
   }
 
   registerProtocols();
