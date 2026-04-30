@@ -1,10 +1,11 @@
 ---
 import Modal from '#/layouts/Modal.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="800px" height="600px">
-  <h1 class="text-lg mb-2 text-primary">Perform Command</h1>
+  <Title>Perform Command</Title>
   <ListWithSearch placeholder="Start typing to search commands..." id="list" />
 </Modal>
 

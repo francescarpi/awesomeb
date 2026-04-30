@@ -1,11 +1,13 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
 ---
 
-<BlackBgWithTitle title="Remove All Desktop Dividers">
+<Modal width="400px" height="400px">
+  <Title>Remove all dividers from a desktop</Title>
   <ListWithSearch placeholder="Filter and select a desktop..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';

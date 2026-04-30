@@ -1,12 +1,14 @@
 ---
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
 import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <h1 class="text-lg mb-2 text-primary">Open Bookmark</h1>
+  <Title>Open Bookmark</Title>
   <div class="h-full">
-    <div id="pagesIndicator" class="absolute top-4 right-4"></div>
+    <Pagination />
     <ListWithSearch placeholder="Filter and select a bookmark..." id="list" />
     <ListWithSearch placeholder="Select a profile..." id="partition" />
     <ListWithSearch placeholder="Select a target" id="target" />

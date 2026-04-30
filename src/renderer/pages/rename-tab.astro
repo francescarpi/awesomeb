@@ -1,15 +1,17 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
 ---
 
-<BlackBgWithTitle title="Rename Tab">
+<Modal>
+  <Title>Rename Tab</Title>
   <input
     class="input w-full text-black rounded-full"
     placeholder="Set new tab name..."
     autofocus
     id="input"
   />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { ITabEntity } from '~/types';

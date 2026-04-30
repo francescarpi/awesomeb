@@ -1,8 +1,10 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
 ---
 
-<BlackBgWithTitle title="Grant permission">
+<Modal>
+  <Title>Grant permission</Title>
   <div class="flex flex-col gap-4">
     <p>
       The site <strong></strong> is requesting permission for <strong></strong>.
@@ -13,7 +15,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       <button class="btn btn-success" id="grant">Grant</button>
     </div>
   </div>
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, onClick } from '#/scripts';

@@ -1,11 +1,13 @@
 ---
-import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
 ---
 
-<BlackBgWithTitle title="Remove Tab Container Divider">
+<Modal width="400px" height="500px">
+  <Title>Remove a divider from a tab container</Title>
   <ListWithSearch placeholder="Filter and select a tab container..." id="list" />
-</BlackBgWithTitle>
+</Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';

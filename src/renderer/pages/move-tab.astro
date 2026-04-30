@@ -1,12 +1,14 @@
 ---
 import ListWithSearch from '#/components/common/ListWithSearch.astro';
 import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <h1 class="text-lg mb-2 text-primary">Move Tab</h1>
+  <Title>Move Tab</Title>
   <div class="h-full">
-    <div id="pagesIndicator" class="absolute top-4 right-4"></div>
+    <Pagination />
     <ListWithSearch placeholder="Select a tab..." id="tab" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
