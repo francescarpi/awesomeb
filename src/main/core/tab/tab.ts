@@ -347,11 +347,12 @@ export class Tab extends UIView {
   }
 
   setFailLoad(code: number, description: string, url: string) {
+    this.setLoading(false);
+
     if (this._failLoad) {
       return;
     }
 
-    this._loading = false;
     this._failLoad = new FailLoad(this, code, description, url);
 
     this.browser.eventsChannel.emit('tab:fail-load-did-change', this, true, this._failLoad);
