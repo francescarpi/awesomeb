@@ -20,6 +20,7 @@ import {
   setupPromptsIpc,
   registerSessionEvents,
   loadExtensionToSession,
+  setupWebauthIpc,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -70,6 +71,7 @@ app.whenReady().then(async () => {
   setupConfigIPC(browser);
   setupExtensionsIPC(browser);
   setupPromptsIpc(browser);
+  setupWebauthIpc(browser);
 
   await browser.loadSession();
 });

@@ -1,4 +1,5 @@
-import { iniPrompts, iniAnchors } from './tab/';
+import { iniPrompts, iniAnchors, iniWebAuth } from './tab/';
 
 iniAnchors();
 iniPrompts();
+iniWebAuth();
