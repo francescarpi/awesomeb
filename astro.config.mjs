@@ -29,6 +29,9 @@ const electronMainConfig = {
     build: {
       minify: MINIFY ? 'esbuild' : false,
       outDir: 'dist-electron/main',
+      rollupOptions: {
+        external: ['@electron-webauthn/macos']
+      }
     },
     plugins: [
       // Copy icons for the main process
