@@ -1,71 +1,84 @@
 ---
 import Layout from '#/layouts/Base.astro';
-import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
 <Layout backgroundColor="#000" borderRadius="12px">
-  <div class="flex items-center gap-2 p-2">
-    <ButtonIcon icon="close" />
-    <input
-      class="input text-black rounded-full input-xs"
-      placeholder="Find in page..."
-      autofocus
-      id="search"
-    />
-    <ButtonIcon icon="previous" />
-    <ButtonIcon icon="next" />
-    <div id="result" class="text-sm hidden">
-      <span>0</span> of <span>0</span>
-      <span>matches</span>
-    </div>
-  </div>
+  <div id="container"></div>
 </Layout>
 
 <script>
-  import { inputManager, getSearchParams } from '#/scripts';
+  import { Renderer, h, cls, inputManager, getSearchParams, type VNode } from '#/scripts';
+  import type { IFindInPageResult } from '~/types';
+  import Close from '#/icons/close.svg';
+  import Previous from '#/icons/previous.svg';
+  import Next from '#/icons/next.svg';
 
   const { searchParams } = getSearchParams();
-  const tabId = searchParams.get('tabId')!;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const inputEl = document.querySelector('input')! as HTMLInputElement;
-  const resultEl = document.getElementById('result')!;
-  const currentMatchEl = resultEl.querySelector('span:nth-child(1)')!;
-  const totalMatchesEl = resultEl.querySelector('span:nth-child(2)')!;
-  const wordEl = resultEl.querySelector('span:nth-child(3)')!;
-  const closeBtn = document.querySelector('svg#close')!;
-  const prevBtn = document.querySelector('svg#previous')!;
-  const nextBtn = document.querySelector('svg#next')!;
+  const renderer = new Renderer(render(), 'container').render();
 
-  const {} = inputManager('search', {
-    onAccept: (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'next', value),
-    onCancel: () => abTabs.closeFindInTab(parseInt(tabId, 10)),
-    onChange: (value) => abTabs.findInPageAction(parseInt(tabId, 10), 'start', value),
+  const { inputEl } = inputManager('search', {
+    onAccept: (value) => abTabs.findInPageAction(tabId, 'next', value),
+    onCancel: () => abTabs.closeFindInTab(tabId),
+    onChange: (value) => abTabs.findInPageAction(tabId, 'start', value),
   });
 
-  abTabs.onRefreshFindInPage((_event, result) => {
-    if (result) {
-      currentMatchEl.textContent = result.activeMatch.toString();
-      totalMatchesEl.textContent = result.matches.toString();
-      wordEl.textContent = result.matches === 1 ? 'match' : 'matches';
-      resultEl.classList.remove('hidden');
-    } else {
-      resultEl.classList.add('hidden');
-    }
+  abTabs.onRefreshFindInPage((_event, result: IFindInPageResult | null) => {
+    renderer.update(render(result));
   });
 
-  closeBtn.addEventListener('click', () => {
-    abTabs.closeFindInTab(parseInt(tabId, 10));
-  });
-
-  prevBtn.addEventListener('click', () => {
-    abTabs.findInPageAction(parseInt(tabId, 10), 'previous', inputEl.value);
-  });
-
-  nextBtn.addEventListener('click', () => {
-    abTabs.findInPageAction(parseInt(tabId, 10), 'next', inputEl.value);
-  });
-
-  inputEl.addEventListener('focus', () => {
-    inputEl.select();
-  });
+  function render(result?: IFindInPageResult | null): VNode {
+    return h(
+      'div',
+      { class: cls('flex', 'items-center', 'gap-2', 'p-2') },
+      h(
+        'img',
+        {
+          src: Close.src,
+          class: cls('w-4', 'h-4', 'cursor-pointer', 'hover:bg-white/30'),
+          onclick: () => abTabs.closeFindInTab(tabId),
+        },
+        '',
+      ),
+      h(
+        'input',
+        {
+          class: cls('input', 'input-xs', 'text-black', 'rounded-full'),
+          placeholder: 'Find in page...',
+          autofocus: true,
+          onfocus: (event) => (event.target as HTMLInputElement).select(),
+          id: 'search',
+        },
+        '',
+      ),
+      h(
+        'img',
+        {
+          src: Previous.src,
+          class: cls('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
+          onclick: () => abTabs.findInPageAction(tabId, 'previous', inputEl.value),
+        },
+        '',
+      ),
+      h(
+        'img',
+        {
+          src: Next.src,
+          class: cls('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
+          onclick: () => abTabs.findInPageAction(tabId, 'next', inputEl.value),
+        },
+        '',
+      ),
+      result
+        ? h(
+            'div',
+            { class: cls('text-sm', 'ml-4') },
+            `${result.activeMatch} of ${result.matches} ${
+              result.matches === 1 ? 'match' : 'matches'
+            }`,
+          )
+        : null,
+    );
+  }
 </script>

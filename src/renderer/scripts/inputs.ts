@@ -20,6 +20,7 @@ export function inputManager(
   setVisible: (visible: boolean) => void;
   focus: (select?: boolean) => void;
   getValue: () => string;
+  inputEl: HTMLInputElement;
 } {
   const inputEl = document.getElementById(inputId) as HTMLInputElement;
 
@@ -64,5 +65,5 @@ export function inputManager(
     });
   }
 
-  return { setDefaultValue, setValue, setVisible, focus, getValue };
+  return { setDefaultValue, setValue, setVisible, focus, getValue, inputEl };
 }
