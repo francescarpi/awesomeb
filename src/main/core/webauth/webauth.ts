@@ -25,21 +25,8 @@ export async function webauthGet(
   });
 
   if (!result.success) {
-    switch (result.error) {
-      case 'TypeError':
-        scopeLog.error('Invalid parameters provided');
-        break;
-      case 'NotAllowedError':
-        scopeLog.error('User cancelled or operation not allowed');
-        break;
-      case 'SecurityError':
-        scopeLog.error('Origin or rpId validation failed');
-        break;
-      case 'AbortError':
-        scopeLog.error('Operation was aborted');
-        break;
-    }
-    return null;
+    scopeLog.error('webauthn getCredential failed', result.errorObject);
+    return result.error;
   }
 
   return result.data;
