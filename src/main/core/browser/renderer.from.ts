@@ -100,7 +100,7 @@ export class BrowserRenderer {
     const result = [
       {
         id: 'current-desktop-window',
-        label: 'Current window/desktop',
+        label: 'New tab',
       },
       {
         id: 'into-selected-tab-container',
