@@ -64,4 +64,8 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
   nextBtn.addEventListener('click', () => {
     abTabs.findInPageAction(parseInt(tabId, 10), 'next', inputEl.value);
   });
+
+  inputEl.addEventListener('focus', () => {
+    inputEl.select();
+  });
 </script>
