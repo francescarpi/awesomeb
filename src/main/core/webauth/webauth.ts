@@ -24,8 +24,6 @@ export async function webauthGet(
     nativeWindowHandle: tabData.window.bw.getNativeWindowHandle(),
   });
 
-  console.log(result);
-
   if (!result.success) {
     switch (result.error) {
       case 'TypeError':
