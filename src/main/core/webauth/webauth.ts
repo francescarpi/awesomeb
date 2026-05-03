@@ -16,7 +16,7 @@ export async function webauthGet(
 
   const result = await getCredential(publicKey, {
     currentOrigin,
-    topFrameOrigin,
+    topFrameOrigin: topFrameOrigin === currentOrigin ? undefined : topFrameOrigin,
     isPublicSuffix: (domain: string) => {
       const result = parse(domain, { allowPrivateDomains: false });
       return result.domain === null;
