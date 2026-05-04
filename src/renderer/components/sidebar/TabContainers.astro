@@ -7,12 +7,12 @@
 <script>
   import { getSearchParams, h, type VNode, cls, Renderer } from '#/scripts';
   import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
-  import TabPreview from '#/icons/tab-preview.svg';
-  import Muted from '#/icons/muted.svg';
+  import TabPreview from '#/icons/tab-preview.svg?raw';
+  import Muted from '#/icons/muted.svg?raw';
   import Favicon from '#/icons/favicon.svg';
   import Minus from '#/icons/minus.svg';
   import Close from '#/icons/close.svg';
-  import Warning from '#/icons/warning.svg';
+  import Warning from '#/icons/warning.svg?raw';
 
   const { winId } = getSearchParams();
 
@@ -139,30 +139,9 @@
                   h(
                     'div', // Indicators container
                     { class: cls('flex', 'gap-1') },
-                    h(
-                      'img', // Tab preview indicator
-                      {
-                        src: TabPreview.src,
-                        class: cls('w-3.5', 'h-3.5', t.hasTabPreview ? 'block' : 'hidden'),
-                      },
-                      '',
-                    ),
-                    h(
-                      'img', // Muted indicator
-                      {
-                        src: Muted.src,
-                        class: cls('w-3.5', 'h-3.5', t.isMuted ? 'block' : 'hidden'),
-                      },
-                      '',
-                    ),
-                    h(
-                      'img', // Require attention
-                      {
-                        src: Warning.src,
-                        class: cls('w-3.5', 'h-3.5', t.requireAttention ? 'block' : 'hidden'),
-                      },
-                      '',
-                    ),
+                    highlightIcon(TabPreview, t.hasTabPreview),
+                    highlightIcon(Muted, t.isMuted),
+                    highlightIcon(Warning, t.requireAttention),
                   ),
                 ),
                 h(
@@ -222,6 +201,24 @@
           ),
         ),
       ),
+    );
+  }
+
+  function highlightIcon(icon: string, visible: boolean): VNode {
+    return h(
+      'div',
+      {
+        class: cls(
+          'w-3.5',
+          'h-3.5',
+          visible ? 'block' : 'hidden',
+          'text-red-500',
+          '[&>svg]:w-full',
+          '[&>svg]:h-full',
+        ),
+        innerHTML: icon,
+      },
+      '',
     );
   }
 </script>

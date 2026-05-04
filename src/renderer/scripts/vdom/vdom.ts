@@ -276,6 +276,11 @@ function setProp(el: HTMLElement, key: string, value: VNodeProps[string]): void 
     return;
   }
 
+  if (key === 'innerHTML' && typeof value === 'string') {
+    el.innerHTML = value;
+    return;
+  }
+
   el.setAttribute(key, String(value));
 }
 
