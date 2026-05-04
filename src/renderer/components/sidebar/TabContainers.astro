@@ -139,9 +139,9 @@
                   h(
                     'div', // Indicators container
                     { class: cls('flex', 'gap-1') },
-                    highlightIcon(TabPreview, t.hasTabPreview),
-                    highlightIcon(Muted, t.isMuted),
-                    highlightIcon(Warning, t.requireAttention),
+                    highlightIcon(TabPreview, t.hasTabPreview, 'text-white'),
+                    highlightIcon(Muted, t.isMuted, 'text-white'),
+                    highlightIcon(Warning, t.requireAttention, 'text-red-500'),
                   ),
                 ),
                 h(
@@ -204,7 +204,7 @@
     );
   }
 
-  function highlightIcon(icon: string, visible: boolean): VNode {
+  function highlightIcon(icon: string, visible: boolean, color: string): VNode {
     return h(
       'div',
       {
@@ -212,7 +212,7 @@
           'w-3.5',
           'h-3.5',
           visible ? 'block' : 'hidden',
-          'text-red-500',
+          color,
           '[&>svg]:w-full',
           '[&>svg]:h-full',
         ),
