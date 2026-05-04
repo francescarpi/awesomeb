@@ -15,6 +15,7 @@ export async function listWithSearchManager(
       inputValue: string,
       entity: IEntity,
       inputEl: HTMLInputElement,
+      originalEntities: IEntity[],
     ) => Promise<IEntity[] | void>;
   },
 ): Promise<{ getSelected: () => IEntity | null; inputEl: HTMLInputElement }> {
@@ -35,7 +36,7 @@ export async function listWithSearchManager(
   const originalEntities = await abEntities.fetch<IEntity>(winId, props.entity);
 
   if (props.onChange && originalEntities.length > 0) {
-    props.onChange(input.value, originalEntities[0], input);
+    props.onChange(input.value, originalEntities[0], input, originalEntities);
   }
 
   let filteredEntities = originalEntities;
@@ -53,12 +54,14 @@ export async function listWithSearchManager(
       e.preventDefault();
       indexSelected = (indexSelected + 1) % items.length;
       selectItemAtIndex(ul, indexSelected);
-      if (props.onChange) props.onChange(input.value, filteredEntities[indexSelected], input);
+      if (props.onChange)
+        props.onChange(input.value, filteredEntities[indexSelected], input, originalEntities);
     } else if (e.key === 'ArrowUp' || e.key === 'K') {
       e.preventDefault();
       indexSelected = (indexSelected - 1 + items.length) % items.length;
       selectItemAtIndex(ul, indexSelected);
-      if (props.onChange) props.onChange(input.value, filteredEntities[indexSelected], input);
+      if (props.onChange)
+        props.onChange(input.value, filteredEntities[indexSelected], input, originalEntities);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (props.onAccept) {
@@ -94,9 +97,14 @@ export async function listWithSearchManager(
     filteredEntities = originalEntities;
 
     if (props.onChange && filteredEntities.length > 0) {
-      const result = await props.onChange(input.value, filteredEntities[indexSelected], input);
+      const result = await props.onChange(
+        input.value,
+        filteredEntities[indexSelected],
+        input,
+        originalEntities,
+      );
       if (result !== undefined) {
-        filteredEntities = [...result, ...originalEntities];
+        filteredEntities = [...result];
         renderEntity(ul, tpl, filteredEntities, props.renderExtra);
         indexSelected = 0;
         selectItemAtIndex(ul, indexSelected);
@@ -149,7 +157,7 @@ function renderEntity(
     const extra = clone.querySelector('small') as HTMLElement;
 
     const container = clone.querySelector('p') as HTMLElement;
-    container.textContent = item.label;
+    container.innerHTML = item.label;
 
     if (item.extra) {
       extra.textContent = `(${item.extra})`;

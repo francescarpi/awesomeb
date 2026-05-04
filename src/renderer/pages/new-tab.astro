@@ -9,16 +9,20 @@ import Pagination from '#/components/common/Pagination.astro';
   <Title>New Tab</Title>
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Enter a query or a valid url..." id="query" />
+    <ListWithSearch placeholder="Enter a query or a valid url..." oneColumn id="query" />
     <ListWithSearch placeholder="Select a profile..." id="partition" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
 </Modal>
 
 <script>
-  import { listWithSearchManager, getSearchParams, paginatorManager } from '#/scripts';
-  import { IPartitionEntity, IEntity } from '~/types';
-  import { TFindUrlResult } from '@/core';
+  import {
+    listWithSearchManager,
+    getSearchParams,
+    paginatorManager,
+    highlightString,
+  } from '#/scripts';
+  import { IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();
 
@@ -38,12 +42,20 @@ import Pagination from '#/components/common/Pagination.astro';
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
     onAccept: () => handleSelect(),
-    onChange: async (inputValue) => {
+    onChange: async (inputValue, _entity, _inputEl, originalEntities) => {
       const matches = await abOpenURLHistory.find(winId, inputValue);
-      return matches.map((item) => ({
-        id: item.value,
-        label: item.value,
-      }));
+      console.log('matches', matches);
+      return [
+        ...matches.map((item) => ({
+          id: item.value,
+          label: highlightString(item.value, item.range),
+        })),
+        ...originalEntities.map((item) => ({
+          id: item.id,
+          label:
+            inputValue.trim().length > 0 ? `${inputValue} - Search by ${item.label}` : item.label,
+        })),
+      ];
     },
   });
 

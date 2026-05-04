@@ -3,9 +3,10 @@ interface Props {
   placeholder: string;
   id: string;
   className?: string;
+  oneColumn?: boolean;
 }
 
-const { placeholder, id, className } = Astro.props;
+const { placeholder, id, className, oneColumn } = Astro.props;
 ---
 
 <div class={`h-full grid grid-rows-[40px_auto] gap-3 ${className}`} id={id}>
@@ -19,8 +20,10 @@ const { placeholder, id, className } = Astro.props;
   </ul>
 
   <template id="row-template">
-    <li class="list-row border-b border-white/50 grid grid-cols-2">
-      <p class="truncate"></p>
+    <li
+      class={`list-row border-b border-white/50 grid ${oneColumn ? 'grid-cols-1' : 'grid-cols-2'}`}
+    >
+      <p class="truncate [&>mark]:text-primary [&>mark]:bg-transparent"></p>
       <small class="justify-self-end text-right"></small>
     </li>
   </template>

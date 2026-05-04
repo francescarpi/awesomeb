@@ -9,3 +9,4 @@ export * from './settings';
 export * from './icons';
 export * from './vdom';
 export * from './classnames';
+export * from './string';
