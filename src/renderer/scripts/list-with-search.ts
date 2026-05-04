@@ -11,9 +11,13 @@ export async function listWithSearchManager(
     onShiftTab?: () => void;
     renderExtra?: (item: IEntity, el: HTMLElement) => void;
     filtering?: boolean;
-    onChange?: (inputValue: string, entity: IEntity, inputEl: HTMLInputElement) => void;
+    onChange?: (
+      inputValue: string,
+      entity: IEntity,
+      inputEl: HTMLInputElement,
+    ) => Promise<IEntity[] | void>;
   },
-): Promise<{ getSelected: () => IEntity | null }> {
+): Promise<{ getSelected: () => IEntity | null; inputEl: HTMLInputElement }> {
   const listEl = document.getElementById(listElId)!;
 
   // Validate elements
@@ -27,6 +31,7 @@ export async function listWithSearchManager(
 
   // Load entities & render
   const { winId } = getSearchParams();
+
   const originalEntities = await abEntities.fetch<IEntity>(winId, props.entity);
 
   if (props.onChange && originalEntities.length > 0) {
@@ -85,16 +90,24 @@ export async function listWithSearchManager(
   });
 
   // handle input change
-  input.addEventListener('input', () => {
+  input.addEventListener('input', async () => {
+    filteredEntities = originalEntities;
+
     if (props.onChange && filteredEntities.length > 0) {
-      props.onChange(input.value, filteredEntities[indexSelected], input);
+      const result = await props.onChange(input.value, filteredEntities[indexSelected], input);
+      if (result !== undefined) {
+        filteredEntities = [...result, ...originalEntities];
+        renderEntity(ul, tpl, filteredEntities, props.renderExtra);
+        indexSelected = 0;
+        selectItemAtIndex(ul, indexSelected);
+      }
     }
 
     if (props.filtering === false) {
       return;
     }
 
-    filteredEntities = originalEntities.filter((ent) =>
+    filteredEntities = filteredEntities.filter((ent) =>
       ent.label.toLowerCase().includes(input.value.toLowerCase()),
     );
 
@@ -108,6 +121,7 @@ export async function listWithSearchManager(
       if (filteredEntities.length === 0) return null;
       return filteredEntities[indexSelected];
     },
+    inputEl: input,
   };
 }
 

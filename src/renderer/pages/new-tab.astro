@@ -9,57 +9,42 @@ import Pagination from '#/components/common/Pagination.astro';
   <Title>New Tab</Title>
   <div class="h-full">
     <Pagination />
-    <div id="pageQuery" class="h-full relative">
-      <div id="history" class="absolute top-10.5 left-1"></div>
-      <ListWithSearch
-        placeholder="Enter a query or a valid url..."
-        id="query"
-        className="[&>ul]:mt-2"
-      />
-    </div>
+    <ListWithSearch placeholder="Enter a query or a valid url..." id="query" />
     <ListWithSearch placeholder="Select a profile..." id="partition" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
 </Modal>
 
 <script>
-  import {
-    listWithSearchManager,
-    getSearchParams,
-    paginatorManager,
-    Renderer,
-    h,
-    cls,
-  } from '#/scripts';
-  import { IPartitionEntity } from '~/types';
+  import { listWithSearchManager, getSearchParams, paginatorManager } from '#/scripts';
+  import { IPartitionEntity, IEntity } from '~/types';
   import { TFindUrlResult } from '@/core';
 
   const { winId } = getSearchParams();
 
-  let query = '';
-
   const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
     'pagesIndicator',
-    ['pageQuery', 'partition', 'target'],
+    ['query', 'partition', 'target'],
   );
 
   refreshPageVisibility();
   refreshPageIndicator();
 
-  const historyRenderer = new Renderer(h('div', {}, ''), 'history').render();
-  renderHistory([]);
-
   // ------------------------------------------------------
-  const { getSelected: getSearchEngine } = await listWithSearchManager('query', {
+  const { getSelected: getSearchEngine, inputEl: queryEl } = await listWithSearchManager('query', {
     entity: 'searchEngines',
     filtering: false,
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: async (inputValue, _entity, _inputEl) => {
-      query = await searchInHistory(inputValue);
-    },
     onAccept: () => handleSelect(),
+    onChange: async (inputValue) => {
+      const matches = await abOpenURLHistory.find(winId, inputValue);
+      return matches.map((item) => ({
+        id: item.value,
+        label: item.value,
+      }));
+    },
   });
 
   const { getSelected: getPartition } = await listWithSearchManager('partition', {
@@ -85,10 +70,13 @@ import Pagination from '#/components/common/Pagination.astro';
 
   // ------------------------------------------------------
   function handleSelect() {
-    if (query.trim().length > 0) {
+    if (queryEl.value.trim().length > 0) {
       const partitionId = getPartition()!.id;
-      const searchEngineCode = getSearchEngine()!.id;
+      const searchEngine = getSearchEngine()!.id;
       const targetId = getTarget()!.id;
+
+      const query = searchEngine.startsWith('http') ? searchEngine : queryEl.value;
+      const searchEngineCode = searchEngine.startsWith('http') ? '' : searchEngine;
 
       abCommands.perform(winId, 'new-tab', {
         query,
@@ -97,22 +85,5 @@ import Pagination from '#/components/common/Pagination.astro';
         targetId,
       });
     }
-  }
-
-  // ------------------------------------------------------
-  async function searchInHistory(query: string): Promise<string> {
-    const matches: TFindUrlResult[] = await abOpenURLHistory.find(winId, query);
-    renderHistory(matches);
-    return query;
-  }
-
-  // ------------------------------------------------------
-  function renderHistory(matches: TFindUrlResult[]) {
-    if (matches.length === 0) {
-      historyRenderer.update(h('div', { class: cls('text-xs') }, 'Empty'));
-      return;
-    }
-
-    historyRenderer.update(h('div', { class: cls('bg-primary', 'p-2') }, ''));
   }
 </script>
