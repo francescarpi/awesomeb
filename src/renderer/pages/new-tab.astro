@@ -44,7 +44,6 @@ import Pagination from '#/components/common/Pagination.astro';
     onAccept: () => handleSelect(),
     onChange: async (inputValue, _entity, _inputEl, originalEntities) => {
       const matches = await abOpenURLHistory.find(winId, inputValue);
-      console.log('matches', matches);
       return [
         ...matches.map((item) => ({
           id: item.value,
