@@ -1,6 +1,6 @@
 import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
-import { Desktop, IDesktopProps, Browser, PromptsManager } from '@/core';
+import { Desktop, IDesktopProps, Browser, PromptsManager, openURLHistory } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 import {
   IContextualModalParams,
@@ -177,6 +177,11 @@ export class Window extends UIWindow {
       this.addView(tab);
       this.renderViews();
       this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
+
+      if (!tab.partition.private && tab.url) {
+        openURLHistory.add(tab.url);
+      }
+
       return;
     }
 

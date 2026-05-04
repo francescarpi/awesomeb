@@ -18,15 +18,14 @@ export class OpenURLHistory {
   }
 
   add(url: string) {
-    const sanitizedUrl = url.replace(/(^\w+:|^)\/\//, '');
     const urls = this._store.get('urls');
-    const newUrls = [sanitizedUrl, ...urls.filter((u) => u !== url)].slice(0, TOTAL_URLS_TO_KEEP);
+    const newUrls = [url, ...urls.filter((u) => u !== url)].slice(0, TOTAL_URLS_TO_KEEP);
     this._store.set('urls', newUrls);
   }
 
-  find(query: string): TFindUrlResult {
+  find(query: string): TFindUrlResult[] {
     if (query.trim() === '') {
-      return null;
+      return [];
     }
 
     const urls = this._store.get('urls');

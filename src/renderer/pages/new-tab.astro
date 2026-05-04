@@ -9,14 +9,28 @@ import Pagination from '#/components/common/Pagination.astro';
   <Title>New Tab</Title>
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Enter a query or a valid url..." id="query" />
+    <div id="pageQuery" class="h-full relative">
+      <div id="history" class="absolute top-10.5 left-1"></div>
+      <ListWithSearch
+        placeholder="Enter a query or a valid url..."
+        id="query"
+        className="[&>ul]:mt-2"
+      />
+    </div>
     <ListWithSearch placeholder="Select a profile..." id="partition" />
     <ListWithSearch placeholder="Select a target" id="target" />
   </div>
 </Modal>
 
 <script>
-  import { listWithSearchManager, getSearchParams, paginatorManager } from '#/scripts';
+  import {
+    listWithSearchManager,
+    getSearchParams,
+    paginatorManager,
+    Renderer,
+    h,
+    cls,
+  } from '#/scripts';
   import { IPartitionEntity } from '~/types';
   import { TFindUrlResult } from '@/core';
 
@@ -26,11 +40,14 @@ import Pagination from '#/components/common/Pagination.astro';
 
   const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
     'pagesIndicator',
-    ['query', 'partition', 'target'],
+    ['pageQuery', 'partition', 'target'],
   );
 
   refreshPageVisibility();
   refreshPageIndicator();
+
+  const historyRenderer = new Renderer(h('div', {}, ''), 'history').render();
+  renderHistory([]);
 
   // ------------------------------------------------------
   const { getSelected: getSearchEngine } = await listWithSearchManager('query', {
@@ -39,8 +56,8 @@ import Pagination from '#/components/common/Pagination.astro';
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: async (inputValue, _entity, inputEl) => {
-      query = await searchInHistory(inputValue, inputEl);
+    onChange: async (inputValue, _entity, _inputEl) => {
+      query = await searchInHistory(inputValue);
     },
     onAccept: () => handleSelect(),
   });
@@ -83,21 +100,19 @@ import Pagination from '#/components/common/Pagination.astro';
   }
 
   // ------------------------------------------------------
-  async function searchInHistory(query: string, inputEl: HTMLInputElement): Promise<string> {
-    if (query.trim().length === 0 || query.length < 3) {
-      inputEl.setSelectionRange(query.length, query.length);
-      return query;
+  async function searchInHistory(query: string): Promise<string> {
+    const matches: TFindUrlResult[] = await abOpenURLHistory.find(winId, query);
+    renderHistory(matches);
+    return query;
+  }
+
+  // ------------------------------------------------------
+  function renderHistory(matches: TFindUrlResult[]) {
+    if (matches.length === 0) {
+      historyRenderer.update(h('div', { class: cls('text-xs') }, 'Empty'));
+      return;
     }
 
-    const result: TFindUrlResult = await abOpenURLHistory.find(winId, query);
-    if (!result) {
-      inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
-      return query;
-    }
-
-    inputEl.value = result.value;
-    inputEl.setSelectionRange(result.range[1] + 1, result.value.length);
-
-    return result.value;
+    historyRenderer.update(h('div', { class: cls('bg-primary', 'p-2') }, ''));
   }
 </script>

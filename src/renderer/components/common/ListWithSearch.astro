@@ -2,12 +2,13 @@
 interface Props {
   placeholder: string;
   id: string;
+  className?: string;
 }
 
-const { placeholder, id } = Astro.props;
+const { placeholder, id, className } = Astro.props;
 ---
 
-<div class="h-full grid grid-rows-[40px_auto] gap-3" id={id}>
+<div class={`h-full grid grid-rows-[40px_auto] gap-3 ${className}`} id={id}>
   <input class="input w-full text-black rounded-full" placeholder={placeholder} autofocus />
   <ul class="list border rounded-xl overflow-y-auto mb-9">
     <li class="list-row border-b border-white/50">
