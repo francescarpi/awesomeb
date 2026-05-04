@@ -24,7 +24,7 @@ export class Desktop {
       return;
     }
 
-    this._name = name;
+    this._name = name.trim() === '' ? null : name;
 
     this.browser.eventsChannel.emit('desktop:name-did-change', this.window, this);
   }

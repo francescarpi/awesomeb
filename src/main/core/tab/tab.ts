@@ -225,7 +225,12 @@ export class Tab extends UIView {
       return;
     }
 
-    this._customTitle = customTitle;
+    if (typeof customTitle === 'string' && customTitle.trim() === '') {
+      this._customTitle = null;
+    } else {
+      this._customTitle = customTitle;
+    }
+
     this.browser.eventsChannel.emit('tab:title-did-change', this);
   }
 

@@ -36,6 +36,7 @@ import Title from '#/components/common/Title.astro';
           name: newValue,
         }),
       onCancel: () => abModal.close(winId),
+      allowEmpty: true,
     });
     setDefaultValue(selectedDesktop.name || '', { select: true });
   }

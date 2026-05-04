@@ -37,6 +37,7 @@ import Title from '#/components/common/Title.astro';
         });
       },
       onCancel: () => abModal.close(winId),
+      allowEmpty: true,
     });
     setDefaultValue(selectedTab.label || '', { select: true });
   }
