@@ -9,9 +9,14 @@ import Pagination from '#/components/common/Pagination.astro';
   <Title>New Tab</Title>
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Enter a query or a valid url..." oneColumn id="query" />
-    <ListWithSearch placeholder="Select a profile..." id="partition" />
-    <ListWithSearch placeholder="Select a target" id="target" />
+    <ListWithSearch
+      placeholder="Enter a query or a valid url..."
+      oneColumn
+      id="query"
+      title="URL or Search Query"
+    />
+    <ListWithSearch placeholder="Select a profile..." id="partition" title="Profile" />
+    <ListWithSearch placeholder="Select a target" id="target" title="Target" />
   </div>
 </Modal>
 
