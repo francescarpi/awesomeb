@@ -318,14 +318,14 @@ export class Browser {
 
   get selectedTab(): IWinDesConTab | null {
     for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        const selectedTabContainer = desktop.selectedTabContainer;
-        if (selectedTabContainer) {
-          const selectedTab = selectedTabContainer.selectedTab;
-          if (selectedTab) {
-            return { window, desktop, tabContainer: selectedTabContainer, tab: selectedTab };
-          }
-        }
+      const selectedTab = window.selectedTab;
+      if (selectedTab) {
+        return {
+          window,
+          desktop: selectedTab.desktop,
+          tabContainer: selectedTab.tabContainer,
+          tab: selectedTab.tab,
+        };
       }
     }
     return null;
