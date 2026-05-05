@@ -5,11 +5,26 @@ import Menu from '#/components/settings/Menu.astro';
 
 <BlackBgWithTitle title="Settings">
   <Menu />
+  <div id="settingsPageContent"></div>
 </BlackBgWithTitle>
 
 <script>
-  // import { getSearchParams } from '#/scripts';
+  import { settingsMenuItems, Renderer, h, getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
 
   document.title = 'Settings';
-  // const { winId } = getSearchParams();
+
+  const pageRenderer = new Renderer(h('div', {}, ''), 'settingsPageContent').render();
+
+  async function renderContent() {
+    const config = await abConfig.get(winId);
+    const menuItem = settingsMenuItems.find((item) => item.hash.includes(window.location.hash));
+    if (menuItem) {
+      pageRenderer.update(menuItem.renderFnc(config));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderContent);
+  window.addEventListener('app:navigate', renderContent);
 </script>
