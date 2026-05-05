@@ -23,16 +23,16 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    const success = await browser.closeTab(tabToClose.id);
-    if (!success) {
-      scopeLog.error(`Failed to close tab with id ${tabToClose.id}.`);
-      return;
-    }
-
     // Need to get the desktop to select the last desktop's last accessed tab
     const tabData = browser.getTab(tabToClose.id);
     if (!tabData) {
       scopeLog.error(`Tab with id ${tabToClose.id} not found after closure.`);
+      return;
+    }
+
+    const success = await browser.closeTab(tabToClose.id);
+    if (!success) {
+      scopeLog.error(`Failed to close tab with id ${tabToClose.id}.`);
       return;
     }
 

@@ -23,16 +23,16 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    const success = await window.suspendTab(tabToSuspend.id);
-    if (!success) {
-      scopeLog.error(`Failed to suspend tab with id ${tabToSuspend.id}.`);
-      return;
-    }
-
     // Need to get the desktop to select the last desktop's last accessed tab
     const tabData = browser.getTab(tabToSuspend.id);
     if (!tabData) {
       scopeLog.error(`Tab with id ${tabToSuspend.id} not found after suspension.`);
+      return;
+    }
+
+    const success = await window.suspendTab(tabToSuspend.id);
+    if (!success) {
+      scopeLog.error(`Failed to suspend tab with id ${tabToSuspend.id}.`);
       return;
     }
 
