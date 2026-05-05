@@ -1,52 +1,48 @@
 ---
-const PAGES = [
-  { id: 'general', name: 'General', section: '' },
-  { id: 'profiles', name: 'Profiles', section: 'profiles' },
-  { id: 'themes', name: 'Themes', section: 'themes' },
-  { id: 'permissions', name: 'Permissions', section: 'permissions' },
-];
+
 ---
 
-<div role="tablist" class="tabs tabs-box my-4">
-  {
-    PAGES.map((page) => (
-      <a role="tab" class="tab [--tab-bg:black]" href={`?${page.section}`} id={page.id}>
-        {page.name}
-      </a>
-    ))
-  }
-</div>
-
-<style>
-  @reference "../../assets/app.css";
-  .tab.tab-active:hover {
-    @apply text-white/80;
-  }
-</style>
+<div id="settings-menu"></div>
 
 <script>
-  function updateActiveTab() {
-    const section = window.location.search.substring(1);
-    const tabs = document.querySelectorAll('.tab');
-    const containers = document.querySelectorAll('.tab-content');
+  import { Renderer, h, cls, type VNode } from '#/scripts';
 
-    containers.forEach((container) => container.classList.add('hidden'));
+  const menuItems = [
+    { name: 'General', hash: ['#/', ''] },
+    { name: 'Profiles', hash: ['#/profiles'] },
+    { name: 'Themes', hash: ['#/themes'] },
+    { name: 'Permissions', hash: ['#/permissions'] },
+  ];
 
-    tabs.forEach((tab) => {
-      tab.classList.remove('tab-active');
+  const renderer = new Renderer(renderMenu(), 'settings-menu').render();
 
-      const href = tab.getAttribute('href');
-      if (href === `?${section}`) {
-        tab.classList.add('tab-active');
-        const content = document.querySelector(`#tab-${tab.id}`);
-        if (content) {
-          content.classList.remove('hidden');
-          content.classList.add('flex');
-        }
-      }
-    });
+  function renderMenu(): VNode {
+    return h(
+      'ul',
+      {
+        class: cls('menu menu-horizontal bg-white/10 rounded-box w-full'),
+      },
+      ...menuItems.map((item) =>
+        h(
+          'li',
+          {},
+          h(
+            'a',
+            {
+              onclick: () => handleNavItemClick(item.hash[0]),
+              class: cls(item.hash.includes(window.location.hash) && 'menu-active'),
+            },
+            item.name,
+          ),
+        ),
+      ),
+    );
   }
 
-  document.addEventListener('DOMContentLoaded', () => updateActiveTab());
-  document.addEventListener('hashchange', () => updateActiveTab());
+  function handleNavItemClick(hash: string) {
+    window.history.pushState({}, '', hash);
+    renderer.update(renderMenu());
+  }
+
+  document.addEventListener('DOMContentLoaded', renderMenu);
 </script>

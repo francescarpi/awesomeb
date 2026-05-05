@@ -1,29 +1,15 @@
 ---
 import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import Menu from '#/components/settings/Menu.astro';
-import Section from '#/components/settings/Section.astro';
-import SearchEngines from '#/components/settings/sections/SearchEngines.astro';
-import DownloadFolder from '#/components/settings/sections/DownloadFolder.astro';
 ---
 
 <BlackBgWithTitle title="Settings">
   <Menu />
-
-  <div class="hidden flex-col gap-4 tab-content" id="tab-general">
-    <Section title="Search engines" description="Configure the search engine settings">
-      <SearchEngines />
-    </Section>
-    <Section title="Download folder" description="Download folder">
-      <DownloadFolder />
-    </Section>
-  </div>
 </BlackBgWithTitle>
 
 <script>
-  import { settingsManager, getSearchParams } from '#/scripts';
+  // import { getSearchParams } from '#/scripts';
 
   document.title = 'Settings';
-  const { winId } = getSearchParams();
-
-  settingsManager(winId);
+  // const { winId } = getSearchParams();
 </script>

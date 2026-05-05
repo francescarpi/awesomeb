@@ -1,4 +1,12 @@
 import { vi } from 'vitest';
+import { JSDOM } from 'jsdom';
+
+const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>');
+global.document = dom.window.document;
+global.HTMLElement = dom.window.HTMLElement;
+global.Text = dom.window.Text;
+global.Element = dom.window.Element;
+global.Node = dom.window.Node;
 
 vi.mock('electron-context-menu', () => ({
   default: vi.fn(),
