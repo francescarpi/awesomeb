@@ -3,65 +3,67 @@ import type { IConfig, IConfigSearchEngine, TWindowId } from '~/types';
 import { type VNode, h, c } from '#/scripts';
 
 export function renderSearchEngines(winId: TWindowId, config: IConfig): VNode {
+  const engines = h(
+    'table',
+    { class: c('w-full', 'border-collapse'), id: 'search-engines-table' },
+    h(
+      'thead',
+      {},
+      h(
+        'tr',
+        {},
+        h('th', { class: c('text-left', 'px-1') }, 'Name'),
+        h('th', { class: c('text-left', 'px-1') }, 'URL'),
+        h('th', {}, ''),
+      ),
+    ),
+    h(
+      'tbody',
+      {},
+      ...config.searchEngines.map((engine) =>
+        h(
+          'tr',
+          {
+            'data-code': engine.code,
+          },
+          h(
+            'td',
+            { class: c('p-0.5') },
+            h(
+              'input',
+              {
+                value: engine.label,
+                class: c('outline-none', 'bg-white/10', 'px-2', 'py-1', 'w-full'),
+              },
+              '',
+            ),
+          ),
+          h(
+            'td',
+            { class: c('p-0.5') },
+            h(
+              'input',
+              {
+                value: engine.url,
+                class: c('outline-none', 'bg-white/10', 'px-2', 'py-1', 'w-full'),
+                type: 'url',
+              },
+              '',
+            ),
+          ),
+          h('td', {}, ''),
+        ),
+      ),
+    ),
+  );
+
   return box(
     'Search Engines',
     'Configuration for search engines',
     h(
       'div',
       { class: c('text-sm', 'flex', 'flex-col', 'gap-2') },
-      h(
-        'table',
-        { class: c('w-full', 'border-collapse'), id: 'search-engines-table' },
-        h(
-          'thead',
-          {},
-          h(
-            'tr',
-            {},
-            h('th', { class: c('text-left', 'p-0.5') }, 'Name'),
-            h('th', { class: c('text-left', 'p-0.5') }, 'URL'),
-            h('th', {}, ''),
-          ),
-        ),
-        h(
-          'tbody',
-          {},
-          ...config.searchEngines.map((engine) =>
-            h(
-              'tr',
-              {
-                'data-code': engine.code,
-              },
-              h(
-                'td',
-                { class: c('p-0.5') },
-                h(
-                  'input',
-                  {
-                    value: engine.label,
-                    class: c('outline-none', 'bg-white/10', 'px-0.5', 'w-full'),
-                  },
-                  '',
-                ),
-              ),
-              h(
-                'td',
-                { class: c('p-0.5') },
-                h(
-                  'input',
-                  {
-                    value: engine.url,
-                    class: c('outline-none', 'bg-white/10', 'px-0.5', 'w-full'),
-                    type: 'url',
-                  },
-                  '',
-                ),
-              ),
-              h('td', {}, ''),
-            ),
-          ),
-        ),
-      ),
+      engines,
       h(
         'div',
         { class: c('flex', 'justify-between') },
