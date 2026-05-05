@@ -31,7 +31,9 @@ export class FailLoad extends UIPageView {
     return this._url;
   }
 
-  render(_window: Window) {
+  render(window: Window) {
+    const selectedTab = window.selectedTab;
+    this.setVisible(selectedTab?.tab.id === this.tab.id);
     this.webContentsView.setBounds({
       x: this.tab.left,
       y: this.tab.top,
