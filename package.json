@@ -58,9 +58,9 @@
     "prettier": "3.8.3",
     "prettier-plugin-astro": "0.14.1",
     "tailwindcss": "4.2.4",
-    "tsc-alias": "1.8.16",
+    "tsc-alias": "1.8.17",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.59.1",
+    "typescript-eslint": "8.59.2",
     "vite": "8.0.10",
     "vite-plugin-static-copy": "4.1.0",
     "vitest": "4.1.5"
