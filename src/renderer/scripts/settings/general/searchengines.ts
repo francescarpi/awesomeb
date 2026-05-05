@@ -52,6 +52,7 @@ export function renderSearchEngines(winId: TWindowId, config: IConfig): VNode {
                   {
                     value: engine.url,
                     class: c('outline-none', 'bg-white/10', 'px-0.5', 'w-full'),
+                    type: 'url',
                   },
                   '',
                 ),
