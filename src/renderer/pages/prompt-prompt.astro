@@ -7,7 +7,7 @@ import Modal from '#/layouts/Modal.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, cls, getSearchParams } from '#/scripts';
+  import { Renderer, h, c, getSearchParams } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
 
@@ -18,17 +18,17 @@ import Modal from '#/layouts/Modal.astro';
   new Renderer(
     h(
       'div',
-      { classs: cls('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: cls('text-lg') }, `${url.hostname} says`),
+      { classs: c('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
       h(
         'fieldset',
-        { class: cls('fieldset', 'mb-6') },
-        h('legend', { class: cls('fieldset-legend', 'text-white') }, message),
+        { class: c('fieldset', 'mb-6') },
+        h('legend', { class: c('fieldset-legend', 'text-white') }, message),
         h(
           'input',
           {
             type: 'text',
-            class: cls('input', 'input-sm', 'text-black', 'w-full'),
+            class: c('input', 'input-sm', 'text-black', 'w-full'),
             value: defaultValue,
             id: 'prompt-input',
           },
@@ -37,11 +37,11 @@ import Modal from '#/layouts/Modal.astro';
       ),
       h(
         'div',
-        { class: cls('flex', 'justify-center', 'gap-3') },
+        { class: c('flex', 'justify-center', 'gap-3') },
         h(
           'button',
           {
-            class: cls('btn', 'btn-sm', 'flex-1'),
+            class: c('btn', 'btn-sm', 'flex-1'),
             onclick: () => abPrompts.response(winId, null),
           },
           'Cancel',
@@ -49,7 +49,7 @@ import Modal from '#/layouts/Modal.astro';
         h(
           'button',
           {
-            class: cls('btn', 'btn-primary', 'btn-sm', 'flex-1'),
+            class: c('btn', 'btn-primary', 'btn-sm', 'flex-1'),
             onclick: () =>
               abPrompts.response(
                 winId,

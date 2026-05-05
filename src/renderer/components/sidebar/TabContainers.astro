@@ -5,7 +5,7 @@
 <div id="tabContainers"></div>
 
 <script>
-  import { getSearchParams, h, type VNode, cls, Renderer } from '#/scripts';
+  import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
   import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
   import TabPreview from '#/icons/tab-preview.svg?raw';
   import Muted from '#/icons/muted.svg?raw';
@@ -45,14 +45,14 @@
     return h(
       'div', // Container
       {
-        class: cls('flex', 'flex-col', 'gap-1.5'),
+        class: c('flex', 'flex-col', 'gap-1.5'),
         style: 'app-region: no-drag;',
       },
       ...tabContainers.map((tc) =>
         h(
           'div', // Tab container
           {
-            class: cls(
+            class: c(
               'items-center',
               'gap-1',
               'hidden',
@@ -62,17 +62,17 @@
           },
           h(
             'span', // Tab container shortcut (is a number between 1 and 9)
-            { class: cls('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block') },
+            { class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block') },
             tc.shortcut?.toString(),
           ),
           h(
             'div', // Tab container's tabs list (in vertical)
-            { class: cls('flex', 'flex-col', 'w-full') },
+            { class: c('flex', 'flex-col', 'w-full') },
             ...tc.tabs.map((t) =>
               h(
                 'div', // Tab
                 {
-                  class: cls(
+                  class: c(
                     'py-1.5',
                     'cursor-pointer',
                     'hover:bg-white/20',
@@ -94,7 +94,7 @@
                 h(
                   'span', // Loading spinner
                   {
-                    class: cls(
+                    class: c(
                       'loading',
                       'loading-spinner',
                       'loading-xs',
@@ -112,7 +112,7 @@
                   'img', // Favicon
                   {
                     src: t.favicon || Favicon.src,
-                    class: cls(
+                    class: c(
                       'w-5',
                       'h-5',
                       'sidebar:w-[16px]',
@@ -130,15 +130,15 @@
                 ),
                 h(
                   'div', // Title + indicators container
-                  { class: cls('hidden', 'sidebar:flex', 'flex-col', 'min-w-0') },
+                  { class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0') },
                   h(
                     'span', // Title
-                    { class: cls('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
+                    { class: c('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
                     t.title,
                   ),
                   h(
                     'div', // Indicators container
-                    { class: cls('flex', 'gap-1') },
+                    { class: c('flex', 'gap-1') },
                     highlightIcon(TabPreview, t.hasTabPreview, 'text-white'),
                     highlightIcon(Muted, t.isMuted, 'text-white'),
                     highlightIcon(Warning, t.requireAttention, 'text-red-500'),
@@ -146,11 +146,11 @@
                 ),
                 h(
                   'div', // Partition and actions container
-                  { class: cls('hidden', 'sidebar:flex', 'justify-end') },
+                  { class: c('hidden', 'sidebar:flex', 'justify-end') },
                   h(
                     'div', // Partition/Profile color
                     {
-                      class: cls('w-1', 'h-5', 'mr-1', 'group-hover/suspended:hidden'),
+                      class: c('w-1', 'h-5', 'mr-1', 'group-hover/suspended:hidden'),
                       style: { backgroundColor: t.partition.color },
                     },
                     '',
@@ -163,7 +163,7 @@
                         e.stopPropagation();
                         abCommands.perform(winId, 'close-tab', { tabId: t.id });
                       },
-                      class: cls(
+                      class: c(
                         'w-5',
                         'h-5',
                         'mr-1',
@@ -183,7 +183,7 @@
                         e.stopPropagation();
                         abCommands.perform(winId, 'suspend-tab', { tabId: t.id });
                       },
-                      class: cls(
+                      class: c(
                         'w-5',
                         'h-5',
                         'mr-1',
@@ -208,7 +208,7 @@
     return h(
       'div',
       {
-        class: cls(
+        class: c(
           'w-3.5',
           'h-3.5',
           visible ? 'block' : 'hidden',

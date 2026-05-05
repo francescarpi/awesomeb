@@ -5,7 +5,7 @@
 <div id="settings-menu"></div>
 
 <script>
-  import { Renderer, h, cls, type VNode, settingsMenuItems } from '#/scripts';
+  import { Renderer, h, c, type VNode, settingsMenuItems } from '#/scripts';
 
   const renderer = new Renderer(renderMenu(), 'settings-menu').render();
 
@@ -13,7 +13,7 @@
     return h(
       'ul',
       {
-        class: cls('menu', 'menu-horizontal', 'bg-white/10', 'rounded-box', 'w-full', 'mb-4'),
+        class: c('menu', 'menu-horizontal', 'bg-white/10', 'rounded-box', 'w-full', 'mb-4'),
       },
       ...settingsMenuItems.map((item) =>
         h(
@@ -23,7 +23,7 @@
             'a',
             {
               onclick: () => handleNavItemClick(item.hash[0]),
-              class: cls(item.hash.includes(window.location.hash) && 'menu-active'),
+              class: c(item.hash.includes(window.location.hash) && 'menu-active'),
             },
             item.name,
           ),

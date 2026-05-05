@@ -4,11 +4,11 @@
  * It filters out falsy values and joins the remaining class names into a single string.
  *
  * Example usage:
- * cls('foo', false && 'bar', undefined, null, 'baz'); // returns 'foo baz'
+ * c('foo', false && 'bar', undefined, null, 'baz'); // returns 'foo baz'
  *
  * @param classes - An array of class names or boolean values.
  * @returns A string of class names separated by spaces.
  */
-export function cls(...classes: (string | boolean | undefined | null)[]) {
+export function c(...classes: (string | boolean | undefined | null)[]) {
   return classes.filter(Boolean).join(' ');
 }

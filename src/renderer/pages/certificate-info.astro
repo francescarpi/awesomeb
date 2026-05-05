@@ -9,13 +9,13 @@ import Title from '#/components/common/Title.astro';
 </Modal>
 
 <script>
-  import { getSearchParams, h, cls, Renderer } from '#/scripts';
+  import { getSearchParams, h, c, Renderer } from '#/scripts';
   import dayjs from 'dayjs';
 
   const { winId } = getSearchParams();
 
   const renderer = new Renderer(
-    h('div', {}, h('span', { class: cls('loading', 'loading-dots', 'loading-xs') }, '')),
+    h('div', {}, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
     'content',
   ).render();
 
@@ -23,36 +23,32 @@ import Title from '#/components/common/Title.astro';
     if (data) {
       const vnode = h(
         'div',
-        { class: cls('grid', 'grid-cols-2') },
-        h('span', { class: cls('font-bold') }, 'Common Name:'),
+        { class: c('grid', 'grid-cols-2') },
+        h('span', { class: c('font-bold') }, 'Common Name:'),
         h('span', {}, data.subject.CN),
-        h('span', { class: cls('font-bold') }, 'Issuer Country:'),
+        h('span', { class: c('font-bold') }, 'Issuer Country:'),
         h('span', {}, data.issuer.C),
-        h('span', { class: cls('font-bold') }, 'Issuer Organization:'),
+        h('span', { class: c('font-bold') }, 'Issuer Organization:'),
         h('span', {}, data.issuer.O),
-        h('span', { class: cls('font-bold') }, 'Issuer Common Name:'),
+        h('span', { class: c('font-bold') }, 'Issuer Common Name:'),
         h('span', {}, data.issuer.CN),
-        h('span', { class: cls('font-bold') }, 'Valid From:'),
+        h('span', { class: c('font-bold') }, 'Valid From:'),
         h('span', {}, dayjs(data.valid_from).format('ddd, D MMM YYYY HH:mm:ss')),
-        h('span', { class: cls('font-bold') }, 'Valid To:'),
+        h('span', { class: c('font-bold') }, 'Valid To:'),
         h('span', {}, dayjs(data.valid_to).format('ddd, D MMM YYYY HH:mm:ss')),
         h(
           'div',
-          { class: cls('col-span-2', 'mt-6') },
-          h(
-            'button',
-            { class: cls('btn', 'btn-sm'), onclick: () => abModal.close(winId) },
-            'Close',
-          ),
+          { class: c('col-span-2', 'mt-6') },
+          h('button', { class: c('btn', 'btn-sm'), onclick: () => abModal.close(winId) }, 'Close'),
         ),
       );
       renderer.update(vnode);
     } else {
       const vnode = h(
         'div',
-        { class: cls('flex', 'flex-col', 'gap-2', 'items-center', 'justify-center', 'h-[220px]') },
-        h('p', { class: cls('text-error', 'text-sm') }, 'Failed to get the certificate info.'),
-        h('button', { class: cls('btn', 'btn-sm'), onclick: () => abModal.close(winId) }, 'Close'),
+        { class: c('flex', 'flex-col', 'gap-2', 'items-center', 'justify-center', 'h-[220px]') },
+        h('p', { class: c('text-error', 'text-sm') }, 'Failed to get the certificate info.'),
+        h('button', { class: c('btn', 'btn-sm'), onclick: () => abModal.close(winId) }, 'Close'),
       );
       renderer.update(vnode);
     }

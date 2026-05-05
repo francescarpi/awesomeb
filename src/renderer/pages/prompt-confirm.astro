@@ -7,7 +7,7 @@ import Modal from '#/layouts/Modal.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, cls, getSearchParams } from '#/scripts';
+  import { Renderer, h, c, getSearchParams } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
 
@@ -17,16 +17,16 @@ import Modal from '#/layouts/Modal.astro';
   new Renderer(
     h(
       'div',
-      { classs: cls('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: cls('text-lg') }, `${url.hostname} says`),
-      h('p', { class: cls('text-md', 'my-6') }, message),
+      { classs: c('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h('p', { class: c('text-md', 'my-6') }, message),
       h(
         'div',
-        { class: cls('flex', 'justify-center', 'gap-3') },
+        { class: c('flex', 'justify-center', 'gap-3') },
         h(
           'button',
           {
-            class: cls('btn', 'btn-sm', 'flex-1'),
+            class: c('btn', 'btn-sm', 'flex-1'),
             onclick: () => abPrompts.response(winId, false),
           },
           'Cancel',
@@ -34,7 +34,7 @@ import Modal from '#/layouts/Modal.astro';
         h(
           'button',
           {
-            class: cls('btn', 'btn-primary', 'btn-sm', 'flex-1'),
+            class: c('btn', 'btn-primary', 'btn-sm', 'flex-1'),
             onclick: () => abPrompts.response(winId, true),
           },
           'OK',

@@ -6,7 +6,7 @@
 
 <script>
   import { IDesktopEntity } from '~/types';
-  import { getSearchParams, h, type VNode, cls, Renderer } from '#/scripts';
+  import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
 
   const { winId } = getSearchParams();
 
@@ -24,7 +24,7 @@
   function renderDesktops(desktops: IDesktopEntity[]): VNode {
     return h(
       'div',
-      { class: cls('flex', 'items-center', 'justify-between', 'gap-2') },
+      { class: c('flex', 'items-center', 'justify-between', 'gap-2') },
       ...desktops.map(desktopNode),
     );
   }
@@ -33,7 +33,7 @@
     const d = h(
       'div',
       {
-        class: cls(
+        class: c(
           'group',
           'relative',
           'hidden',
@@ -45,7 +45,7 @@
       h(
         'div',
         {
-          class: cls(
+          class: c(
             'border',
             'rounded-full',
             'sidebar:w-9',
@@ -74,7 +74,7 @@
         h(
           'div',
           {
-            class: cls(
+            class: c(
               'w-[3px]',
               'h-[3px]',
               'rounded-full',
@@ -91,7 +91,7 @@
         h(
           'div',
           {
-            class: cls(
+            class: c(
               'w-2',
               'h-2',
               'bg-red-500',
@@ -107,7 +107,7 @@
         h(
           'div',
           {
-            class: cls(
+            class: c(
               'w-3',
               'h-3',
               'bg-red-500',
@@ -125,7 +125,7 @@
       h(
         'div',
         {
-          class: cls(
+          class: c(
             'text-[10px]',
             'absolute',
             'mt-1',

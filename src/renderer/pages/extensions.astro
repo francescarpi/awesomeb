@@ -8,12 +8,12 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { h, cls, Renderer } from '#/scripts';
+  import { h, c, Renderer } from '#/scripts';
   import { IExtension } from '~/types';
 
   // Initial loading state...
   const infoRenderer = new Renderer(
-    h('div', {}, h('span', { class: cls('loading', 'loading-dots', 'loading-xs') }, '')),
+    h('div', {}, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
     'content',
   ).render();
 
@@ -23,7 +23,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   infoRenderer.update(
     h(
       'div',
-      { class: cls('flex', 'gap-2') },
+      { class: c('flex', 'gap-2') },
       h(
         'p',
         {},
@@ -32,7 +32,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       h(
         'button',
         {
-          class: cls('btn', 'btn-primary', 'btn-sm'),
+          class: c('btn', 'btn-primary', 'btn-sm'),
           onclick: async () => {
             const resp = await abExtensions.refresh();
             renderExtensions(resp.extensions);
@@ -55,19 +55,19 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     const container = h(
       'div',
-      { class: cls('grid', 'grid-cols-2', 'gap-2') },
+      { class: c('grid', 'grid-cols-2', 'gap-2') },
       ...extensions.map((ext) => {
         const header = h(
           'div',
-          { class: cls('grid', 'grid-cols-[30px_1fr_40px]') },
+          { class: c('grid', 'grid-cols-[30px_1fr_40px]') },
           ext.icon
-            ? h('img', { src: ext.icon, class: cls('w-6', 'h-6') })
-            : h('div', { class: cls('w-6', 'h-6', 'bg-white/20', 'rounded') }),
+            ? h('img', { src: ext.icon, class: c('w-6', 'h-6') })
+            : h('div', { class: c('w-6', 'h-6', 'bg-white/20', 'rounded') }),
           h('span', {}, ext.manifest.name),
           h('input', {
             type: 'checkbox',
             checked: ext.enabled,
-            class: cls('toggle'),
+            class: c('toggle'),
             onchange: async () => {
               await abExtensions.toggle(ext.id);
             },
@@ -76,22 +76,22 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
         const descp = h(
           'p',
-          { class: cls('text-sm', 'text-gray-400', 'mt-1') },
+          { class: c('text-sm', 'text-gray-400', 'mt-1') },
           ext.manifest.description || 'No description',
         );
 
         const footer = h(
           'div',
-          { class: cls('flex', 'gap-2', 'mt-3') },
+          { class: c('flex', 'gap-2', 'mt-3') },
           h(
             'span',
-            { class: cls('text-xs', 'text-gray-500', 'w-full') },
+            { class: c('text-xs', 'text-gray-500', 'w-full') },
             `Version: ${ext.manifest.version}`,
           ),
-          h('span', { class: cls('text-xs', 'text-gray-500', 'w-full') }, `ID: ${ext.id}`),
+          h('span', { class: c('text-xs', 'text-gray-500', 'w-full') }, `ID: ${ext.id}`),
         );
 
-        return h('div', { class: cls('bg-white/10', 'p-2', 'rounded') }, header, descp, footer);
+        return h('div', { class: c('bg-white/10', 'p-2', 'rounded') }, header, descp, footer);
       }),
     );
 

@@ -7,7 +7,7 @@ import Layout from '#/layouts/Base.astro';
 </Layout>
 
 <script>
-  import { Renderer, h, cls, inputManager, getSearchParams, type VNode } from '#/scripts';
+  import { Renderer, h, c, inputManager, getSearchParams, type VNode } from '#/scripts';
   import type { IFindInPageResult } from '~/types';
   import Close from '#/icons/close.svg';
   import Previous from '#/icons/previous.svg';
@@ -31,12 +31,12 @@ import Layout from '#/layouts/Base.astro';
   function render(result?: IFindInPageResult | null): VNode {
     return h(
       'div',
-      { class: cls('flex', 'items-center', 'gap-2', 'p-2') },
+      { class: c('flex', 'items-center', 'gap-2', 'p-2') },
       h(
         'img',
         {
           src: Close.src,
-          class: cls('w-4', 'h-4', 'cursor-pointer', 'hover:bg-white/30'),
+          class: c('w-4', 'h-4', 'cursor-pointer', 'hover:bg-white/30'),
           onclick: () => abTabs.closeFindInTab(tabId),
         },
         '',
@@ -44,7 +44,7 @@ import Layout from '#/layouts/Base.astro';
       h(
         'input',
         {
-          class: cls('input', 'input-xs', 'text-black', 'rounded-full'),
+          class: c('input', 'input-xs', 'text-black', 'rounded-full'),
           placeholder: 'Find in page...',
           autofocus: true,
           onfocus: (event) => (event.target as HTMLInputElement).select(),
@@ -56,7 +56,7 @@ import Layout from '#/layouts/Base.astro';
         'img',
         {
           src: Previous.src,
-          class: cls('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
+          class: c('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
           onclick: () => abTabs.findInPageAction(tabId, 'previous', inputEl.value),
         },
         '',
@@ -65,7 +65,7 @@ import Layout from '#/layouts/Base.astro';
         'img',
         {
           src: Next.src,
-          class: cls('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
+          class: c('w-4', 'h-4', 'cursor-pointer', 'invert', 'hover:bg-black/30'),
           onclick: () => abTabs.findInPageAction(tabId, 'next', inputEl.value),
         },
         '',
@@ -73,7 +73,7 @@ import Layout from '#/layouts/Base.astro';
       result
         ? h(
             'div',
-            { class: cls('text-sm', 'ml-4') },
+            { class: c('text-sm', 'ml-4') },
             `${result.activeMatch} of ${result.matches} ${
               result.matches === 1 ? 'match' : 'matches'
             }`,

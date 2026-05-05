@@ -6,7 +6,7 @@
 
 <script>
   import { IExtension } from '~/types';
-  import { getSearchParams, Renderer, h, cls } from '#/scripts';
+  import { getSearchParams, Renderer, h, c } from '#/scripts';
 
   const { winId } = getSearchParams();
 
@@ -21,11 +21,11 @@
 
     return h(
       'div',
-      { class: cls('flex', 'gap-2', 'mr-8', 'ml-3', 'min-w-6') },
+      { class: c('flex', 'gap-2', 'mr-8', 'ml-3', 'min-w-6') },
       ...extensions.map((extension) =>
         h('img', {
           src: extension.icon,
-          class: cls(
+          class: c(
             'w-5',
             'h-5',
             'rounded',

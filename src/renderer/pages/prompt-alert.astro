@@ -7,7 +7,7 @@ import Modal from '#/layouts/Modal.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, cls, getSearchParams } from '#/scripts';
+  import { Renderer, h, c, getSearchParams } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
 
@@ -17,16 +17,16 @@ import Modal from '#/layouts/Modal.astro';
   new Renderer(
     h(
       'div',
-      { classs: cls('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: cls('text-lg') }, `${url.hostname} says`),
-      h('p', { class: cls('text-md', 'my-6') }, message),
+      { classs: c('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h('p', { class: c('text-md', 'my-6') }, message),
       h(
         'div',
-        { class: cls('flex', 'justify-center') },
+        { class: c('flex', 'justify-center') },
         h(
           'button',
           {
-            class: cls('btn', 'btn-primary', 'btn-sm', 'w-full'),
+            class: c('btn', 'btn-primary', 'btn-sm', 'w-full'),
             onclick: () => abPrompts.response(winId, undefined),
           },
           'OK',

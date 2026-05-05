@@ -21,7 +21,7 @@ import Menu from '#/components/settings/Menu.astro';
     const config = await abConfig.get(winId);
     const menuItem = settingsMenuItems.find((item) => item.hash.includes(window.location.hash));
     if (menuItem) {
-      pageRenderer.update(menuItem.renderFnc(config));
+      pageRenderer.update(menuItem.renderFnc(winId, config));
     }
   }
 
