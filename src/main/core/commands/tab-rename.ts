@@ -21,7 +21,7 @@ export const Command: ICommand<ICommandParams> = {
     page: 'rename-tab',
   },
   async handler({ browser, tab, params }) {
-    const tabToRename = getTab(browser, tab!, params?.tabId);
+    const tabToRename = getTab(browser, tab, params?.tabId);
     if (!tabToRename) {
       scopeLog.warn('No tab available');
       return;

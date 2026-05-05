@@ -21,7 +21,7 @@ export const Command: ICommand<ICommandParams> = {
     page: 'change-tab-profile',
   },
   async handler({ browser, tab, params }) {
-    const affectedTab = getTab(browser, tab!, params?.tabId);
+    const affectedTab = getTab(browser, tab, params?.tabId);
     if (!affectedTab) {
       scopeLog.warn('No tab available.');
       return;

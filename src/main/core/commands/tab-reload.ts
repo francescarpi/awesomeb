@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Reloads the specified browser tab.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, tab, params }) {
-    const tabToReload = getTab(browser, tab!, params?.tabId);
+    const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {
       scopeLog.warn('No tab available');
       return;

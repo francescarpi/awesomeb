@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Navigates back in the browsing history of the specified tab.',
   visibility: ({ tab }) => !!tab && tab.canGoBack,
   async handler({ browser, tab, params }) {
-    const tabToReload = getTab(browser, tab!, params?.tabId);
+    const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {
       scopeLog.warn('No tab available');
       return;

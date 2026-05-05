@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Toggles the mute state of the current tab.',
   visibility: ({ tab }) => !!tab,
   async handler({ tab, browser, params }) {
-    const targetTab = getTab(browser, tab!, params?.tabId);
+    const targetTab = getTab(browser, tab, params?.tabId);
     if (!targetTab) {
       scopeLog.warn('No tab available');
       return;

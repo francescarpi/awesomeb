@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Suspends the currently active tab in the focused window.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
-    const tabToSuspend = getTab(browser, tab!, params?.tabId);
+    const tabToSuspend = getTab(browser, tab, params?.tabId);
     if (!tabToSuspend) {
       scopeLog.warn('No tab available to suspend.');
       return;

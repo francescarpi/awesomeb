@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Stop loading the current tab or a specified tab',
   visibility: ({ tab }) => !!tab && tab.webContents.isLoading(),
   async handler({ browser, tab, params }) {
-    const tabToReload = getTab(browser, tab!, params?.tabId);
+    const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {
       scopeLog.warn('No tab available');
       return;

@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Closes all tabs below the current one.',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
-    const tabToClose = getTab(browser, tab!, params?.tabId);
+    const tabToClose = getTab(browser, tab, params?.tabId);
     if (!tabToClose) {
       scopeLog.warn('No tab available to close.');
       return;
