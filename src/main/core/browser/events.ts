@@ -63,6 +63,10 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshSelectedDesktop(window);
     browser.toRenderer.refreshExtensions(window);
+
+    const result = browser.getTab(tab.id)!;
+    browser.toRenderer.refreshThemes(window, result.desktop);
+
     browser.refreshMainMenu();
   });
 
