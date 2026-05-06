@@ -210,13 +210,13 @@ const abTabSwitcher = {
 //--------------------------------------------------------------------------------------
 const abTabMarks = {
   close: (winId: TWindowId) => {
-    ipcRenderer.send('tabmarks:close', winId);
+    ipcRenderer.send('tabmarks:close', { winId });
   },
   get: (winId: TWindowId) => {
-    return ipcRenderer.invoke('tabmarks:get', winId);
+    return ipcRenderer.invoke('tabmarks:get', { winId });
   },
   perform: (winId: TWindowId, action: TMarksAction) => {
-    return ipcRenderer.invoke('tabmarks:perform', winId, action);
+    return ipcRenderer.invoke('tabmarks:perform', { winId, action });
   },
   onChangeVisibility: (callback: (event: IpcRendererEvent, visible: boolean) => void) => {
     ipcRenderer.on('tabmarks:change-visibility', callback);
