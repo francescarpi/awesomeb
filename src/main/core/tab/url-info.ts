@@ -2,7 +2,8 @@ import { UIPageView } from '@/ui';
 import { Window } from '@/core';
 import { Tab } from './tab';
 
-const HEIGHT = 30;
+const HEIGHT = 24;
+const WIDTH = 400;
 
 export class URLInfoView extends UIPageView {
   constructor(
@@ -21,7 +22,7 @@ export class URLInfoView extends UIPageView {
     this.webContentsView.setBounds({
       x: this.tab.left,
       y: this.tab.top + this.tab.height - HEIGHT,
-      width: 400,
+      width: WIDTH,
       height: HEIGHT,
     });
   }

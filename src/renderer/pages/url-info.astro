@@ -3,7 +3,10 @@ import Base from '#/layouts/Base.astro';
 ---
 
 <Base>
-  <div class="bg-black fixed inset-0 text-white flex items-center text-sm p-2 rounded-bl-xl">
+  <div
+    class="bg-black fixed inset-0 text-white items-center text-sm px-2 rounded-bl-xl hidden rounded-tr-md"
+    id="wrapper"
+  >
     <div class="overflow-hidden flex-1">
       <span class="inline-block whitespace-nowrap"></span>
     </div>
@@ -17,6 +20,7 @@ import Base from '#/layouts/Base.astro';
   const url = searchParams.get('url')!;
   const span = document.querySelector('span')!;
   const container = span.parentElement!;
+  const wrapper = document.getElementById('wrapper')!;
 
   span.textContent = url;
 
@@ -34,5 +38,10 @@ import Base from '#/layouts/Base.astro';
       span.style.transition = `transform ${duration}ms linear`;
       span.style.transform = `translateX(-${distance}px)`;
     }
+  }, 2000);
+
+  setTimeout(() => {
+    wrapper.classList.remove('hidden');
+    wrapper.classList.add('flex');
   }, 1000);
 </script>
