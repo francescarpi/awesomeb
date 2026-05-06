@@ -250,25 +250,25 @@ const abSidebar = {
 //--------------------------------------------------------------------------------------
 const abExtensions = {
   get: (winId?: TWindowId) => {
-    return ipcRenderer.invoke('extensions:get', winId);
+    return ipcRenderer.invoke('extensions:get', { winId });
   },
   active: (winId?: TWindowId) => {
-    return ipcRenderer.invoke('extensions:active', winId);
+    return ipcRenderer.invoke('extensions:active', { winId });
   },
   refresh: () => {
     return ipcRenderer.invoke('extensions:refresh');
   },
   toggle: (id: TExtensionId) => {
-    return ipcRenderer.invoke('extensions:toggle', id);
+    return ipcRenderer.invoke('extensions:toggle', { id });
   },
   onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => {
     ipcRenderer.on('extensions:on-refresh', callback);
   },
   openPopup: (winId: TWindowId, extensionId: TExtensionId) => {
-    ipcRenderer.send('extensions:open-popup', winId, extensionId);
+    ipcRenderer.send('extensions:open-popup', { winId, extensionId });
   },
   closePopup: (winId: TWindowId) => {
-    ipcRenderer.send('extensions:close-popup', winId);
+    ipcRenderer.send('extensions:close-popup', { winId });
   },
 };
 

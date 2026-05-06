@@ -86,11 +86,16 @@ contextBridge.executeInMainWorld({
   },
   args: [
     (width: number, height: number) =>
-      ipcRenderer.send('extensions:ini-popup', winId, width, height),
+      ipcRenderer.send('extensions:ini-popup', { winId, width, height }),
     (method: string, ...args: unknown[]) =>
-      ipcRenderer.invoke('extensions:crx-message', winId, partitionId, extensionId, {
-        method,
-        args,
+      ipcRenderer.invoke('extensions:crx-message', {
+        winId,
+        partitionId,
+        extensionId,
+        action: {
+          method,
+          args,
+        },
       }),
   ],
 });

@@ -6,6 +6,7 @@ import { internalPageChecker, createHandler, viewChecker, extensionChecker } fro
 const scopeLog = log.scope('ExtensionsIPC');
 
 export function setupExtensionsIPC(browser: Browser) {
+  //--------------------------------------------------------------------------------
   createHandler(
     'extensions:get',
     'handle',
@@ -14,6 +15,7 @@ export function setupExtensionsIPC(browser: Browser) {
     async () => browser.renderer.extensions(),
   );
 
+  //--------------------------------------------------------------------------------
   createHandler(
     'extensions:refresh',
     'handle',
@@ -25,25 +27,25 @@ export function setupExtensionsIPC(browser: Browser) {
     },
   );
 
-  createHandler<[IWinDesConTab, TExtensionId]>(
+  //--------------------------------------------------------------------------------
+  createHandler<{ tabData: IWinDesConTab; extensionId: TExtensionId }>(
     'extensions:toggle',
     'handle',
     browser,
     [internalPageChecker.bind(null, 'extensions')],
-    async (args) => {
-      const [_tabResult, id] = args;
-      browser.extensions.toggle(id as TExtensionId);
+    async ({ extensionId }) => {
+      browser.extensions.toggle(extensionId);
       return browser.renderer.extensions();
     },
   );
 
-  createHandler<[Window, TWindowId, TExtensionId]>(
+  //--------------------------------------------------------------------------------
+  createHandler<{ win: Window; winId: TWindowId; extensionId: TExtensionId }>(
     'extensions:open-popup',
     'on',
     browser,
     [viewChecker.bind(null, 'urlbar')],
-    async (args) => {
-      const [win, winId, extensionId] = args;
+    async ({ win, winId, extensionId }) => {
       const selectedTab = win.selectedTab;
       if (!selectedTab) {
         scopeLog.warn('No selected tab found for window', { winId });
@@ -53,45 +55,49 @@ export function setupExtensionsIPC(browser: Browser) {
     },
   );
 
-  createHandler<[Window]>(
+  //--------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
     'extensions:close-popup',
     'on',
     browser,
     [viewChecker.bind(null, 'extension-popup-overlay')],
-    async (args) => {
-      const [win] = args;
+    async ({ win }) => {
       browser.extensions.closePopup(win);
     },
   );
 
-  createHandler<[Window, TWindowId, number, number]>(
+  //--------------------------------------------------------------------------------
+  createHandler<{ win: Window; winId: TWindowId; width: number; height: number }>(
     'extensions:ini-popup',
     'on',
     browser,
     [viewChecker.bind(null, 'extension-popup')],
-    async (args) => {
-      const [win, _winId, width, height] = args;
+    async ({ win, width, height }) => {
       browser.extensions.iniPopup(win, width, height);
     },
   );
 
-  createHandler<
-    [
-      Window,
-      IExtension,
-      TWindowId,
-      TPartitionId,
-      TExtensionId,
-      { method: string; args: Record<string, unknown> },
-    ]
-  >('extensions:crx-message', 'handle', browser, [extensionChecker], async (args) => {
-    const [win, extension, _winId, partitionId, _extensionId, action] = args;
-    return await browser.extensions.chrome.dispatch(
-      win,
-      partitionId,
-      extension.id,
-      action.method,
-      action.args,
-    );
-  });
+  //--------------------------------------------------------------------------------
+  createHandler<{
+    win: Window;
+    extension: IExtension;
+    winId: TWindowId;
+    partitionId: TPartitionId;
+    extensionId: TExtensionId;
+    action: { method: string; args: Record<string, unknown> };
+  }>(
+    'extensions:crx-message',
+    'handle',
+    browser,
+    [extensionChecker],
+    async ({ win, partitionId, extension, action }) => {
+      return await browser.extensions.chrome.dispatch(
+        win,
+        partitionId,
+        extension.id,
+        action.method,
+        action.args,
+      );
+    },
+  );
 }

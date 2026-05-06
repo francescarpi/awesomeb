@@ -8,9 +8,8 @@ import type { IWinDesConTab, TWindowId, TExtensionId, IExtension } from '~/types
 const scopeLog = log.scope('IPCEventManager');
 
 // TODO split checkers into little parts. One to check the window and send the window to the next one
-// TODO events should receive the parameters via objects, not an arrays!
 
-export function createHandler<T extends unknown[]>(
+export function createHandler<T extends object>(
   channel: string,
   method: 'handle' | 'on',
   browser: Browser,
@@ -19,11 +18,11 @@ export function createHandler<T extends unknown[]>(
 ) {
   const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
 
-  ipcMethod(channel, async (event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
+  ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
     scopeLog.info(`[${channel}] received with props: `, rawArgs);
 
     const results = (await Promise.all(
-      checkers.map((checker) => checker(browser, event, ...rawArgs)),
+      checkers.map((checker) => checker(browser, event, rawArgs)),
     )) as unknown[];
 
     const valid = results.every((r) => r !== null);
@@ -32,7 +31,11 @@ export function createHandler<T extends unknown[]>(
       return;
     }
 
-    const args = [...results, ...rawArgs] as T;
+    const args = { ...rawArgs } as T;
+    for (const result of results) {
+      Object.assign(args, result);
+    }
+
     return await callback(args);
   });
 }
@@ -41,12 +44,12 @@ export async function internalPageChecker(
   page: string,
   browser: Browser,
   event: IpcMainInvokeEvent,
-  ..._args: unknown[]
-): Promise<IWinDesConTab | null> {
-  for (const tabResult of browser.tabs) {
-    if (tabResult.tab.url && tabResult.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
-      if (tabResult.tab.webContentsId === event.sender.id) {
-        return tabResult;
+  _args: Record<string, unknown>,
+): Promise<{ tabData: IWinDesConTab } | null> {
+  for (const tabData of browser.tabs) {
+    if (tabData.tab.url && tabData.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
+      if (tabData.tab.webContentsId === event.sender.id) {
+        return { tabData };
       }
     }
   }
@@ -57,9 +60,9 @@ export async function viewChecker(
   viewId: string,
   browser: Browser,
   event: IpcMainInvokeEvent,
-  ...args: unknown[]
-): Promise<Window | null> {
-  const winId = args[0] as TWindowId | undefined;
+  args: Record<string, unknown>,
+): Promise<{ win: Window } | null> {
+  const { winId } = args as { winId?: TWindowId };
   if (!winId) {
     scopeLog.warn(`[ViewChecker] Missing window ID for view ${viewId}`);
     return null;
@@ -80,15 +83,15 @@ export async function viewChecker(
     return null;
   }
 
-  return win;
+  return { win };
 }
 
 export async function extensionChecker(
   browser: Browser,
   event: IpcMainInvokeEvent,
-  ...args: unknown[]
-): Promise<[Window, IExtension] | null> {
-  const winId = args[0] as TWindowId | undefined;
+  args: Record<string, unknown>,
+): Promise<{ win: Window; extension: IExtension } | null> {
+  const { winId, extensionId } = args as { winId?: TWindowId; extensionId?: TExtensionId };
 
   if (!winId) {
     scopeLog.warn(`[ExtensionChecker] Missing window ID for extension action`);
@@ -101,7 +104,6 @@ export async function extensionChecker(
     return null;
   }
 
-  const extensionId = args[2] as TExtensionId | undefined; // TODO Fix! Receive objects
   if (!extensionId) {
     scopeLog.warn(
       `[ExtensionChecker] Missing extension ID for extension action in window ${winId}`,
@@ -128,5 +130,5 @@ export async function extensionChecker(
     return null;
   }
 
-  return [win, extension];
+  return { win, extension };
 }
