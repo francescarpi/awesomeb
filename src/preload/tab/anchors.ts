@@ -41,10 +41,10 @@ export function iniAnchors() {
     },
     args: [
       (url: string) => {
-        ipcRenderer.send('tabs:open-tab-preview', url);
+        ipcRenderer.send('tabs:open-tab-preview', { url });
       },
       (url: string | null) => {
-        ipcRenderer.send('tab:show-url-info', url);
+        ipcRenderer.send('tab:show-url-info', { url });
       },
     ],
   });

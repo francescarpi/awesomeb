@@ -1,10 +1,11 @@
 import { type IpcMainInvokeEvent, ipcMain } from 'electron';
 import log from 'electron-log';
-import { Browser, Window } from '@/core';
+import { Browser, FindInPage, Window } from '@/core';
 import { UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import type { IWinDesConTab, TWindowId, TExtensionId, IExtension } from '~/types';
+import type { IWinDesConTab, TWindowId, TExtensionId, IExtension, TTabId } from '~/types';
 import { PromptBase } from '@/core/prompts/models';
+import { CertificateError } from '@/core/tab/certificate-error';
 
 const scopeLog = log.scope('IPCEventManager');
 
@@ -204,13 +205,21 @@ export function modalChecker(
 export function tabChecker(
   browser: Browser,
   event: IpcMainInvokeEvent,
-  _args: Record<string, unknown>,
+  args: Record<string, unknown>,
 ): { tab: IWinDesConTab } | null {
-  const tab = browser.getTabByWebContentsId(event.sender.id);
+  let tab: IWinDesConTab | null;
+
+  if (args.tabId) {
+    tab = browser.getTab(args.tabId as TTabId);
+  } else {
+    tab = browser.getTabByWebContentsId(event.sender.id);
+  }
+
   if (!tab) {
     scopeLog.warn(`[TabChecker] No tab found for WebContents ID ${event.sender.id}`);
     return null;
   }
+
   return { tab };
 }
 
@@ -239,4 +248,62 @@ export function promptChecker(
   }
 
   return { prompt: win.prompts.current };
+}
+
+//--------------------------------------------------------------------------------
+export function findInPageChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { findInPage: FindInPage } | null {
+  const { tab } = args as { tab?: IWinDesConTab };
+  if (!tab) {
+    scopeLog.warn(`[FindInPageChecker] Missing tab object for find-in-page action`);
+    return null;
+  }
+
+  if (!tab.tab.findInPage) {
+    scopeLog.warn(
+      `[FindInPageChecker] Tab ${tab.tab.id} does not have a find-in-page view for find-in-page action`,
+    );
+    return null;
+  }
+
+  if (tab.tab.findInPage.webContentsId !== event.sender.id) {
+    scopeLog.warn(
+      `[FindInPageChecker] WebContents ID ${event.sender.id} does not match find-in-page WebContents ID ${tab.tab.findInPage.webContentsId} for tab ${tab.tab.id}`,
+    );
+    return null;
+  }
+
+  return { findInPage: tab.tab.findInPage };
+}
+
+//--------------------------------------------------------------------------------
+export function certificateErrorChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { certificateError: CertificateError } | null {
+  const { tab } = args as { tab?: IWinDesConTab };
+  if (!tab) {
+    scopeLog.warn(`[CertificateErrorChecker] Missing tab object for certificate error response`);
+    return null;
+  }
+
+  if (!tab.tab.certificateError) {
+    scopeLog.warn(
+      `[CertificateErrorChecker] Tab ${tab.tab.id} does not have a pending certificate error for certificate error response`,
+    );
+    return null;
+  }
+
+  if (tab.tab.certificateError.webContentsId !== event.sender.id) {
+    scopeLog.warn(
+      `[CertificateErrorChecker] WebContents ID ${event.sender.id} does not match certificate error WebContents ID ${tab.tab.certificateError.webContentsId} for tab ${tab.tab.id}`,
+    );
+    return null;
+  }
+
+  return { certificateError: tab.tab.certificateError };
 }

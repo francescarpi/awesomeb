@@ -97,7 +97,7 @@ const abMenu = {
 //--------------------------------------------------------------------------------------
 const abTabs = {
   getTabContainers: (winId: TWindowId) => {
-    return ipcRenderer.invoke('tabs:get-tab-containers', winId);
+    return ipcRenderer.invoke('tabs:get-tab-containers', { winId });
   },
   onRefreshTabContainers: (
     callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
@@ -108,10 +108,10 @@ const abTabs = {
     ipcRenderer.on('tabs:refresh-one', callback);
   },
   closeFindInTab: (tabId: TTabId) => {
-    ipcRenderer.send('tabs:close-find-in-tab', tabId);
+    ipcRenderer.send('tabs:close-find-in-tab', { tabId });
   },
   findInPageAction: (tabId: TTabId, action: TFindInPageAction, query: string) => {
-    return ipcRenderer.invoke('tabs:find-in-page-action', tabId, action, query);
+    return ipcRenderer.invoke('tabs:find-in-page-action', { tabId, action, query });
   },
   onRefreshFindInPage: (
     callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
@@ -119,22 +119,22 @@ const abTabs = {
     ipcRenderer.on('tabs:refresh-find-in-page', callback);
   },
   retryFailed: (tabId: TTabId) => {
-    ipcRenderer.send('tabs:retry-failed', tabId);
+    ipcRenderer.send('tabs:retry-failed', { tabId });
   },
   login: (winId: TWindowId, tabId: TTabId, data: { username: string; password: string } | null) => {
-    ipcRenderer.send('tabs:login', winId, tabId, data);
+    ipcRenderer.send('tabs:login', { winId, tabId, data });
   },
   clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => {
-    ipcRenderer.send('tabs:client-certificate', winId, tabId, fingeprint);
+    ipcRenderer.send('tabs:client-certificate', { winId, tabId, fingeprint });
   },
   trustCertificateError: (tabId: TTabId) => {
-    ipcRenderer.send('tabs:trust-certificate-error', tabId);
+    ipcRenderer.send('tabs:trust-certificate-error', { tabId });
   },
   grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => {
-    ipcRenderer.send('tabs:grant-permission', winId, tabId, value);
+    ipcRenderer.send('tabs:grant-permission', { winId, tabId, value });
   },
-  tabPreviewAction: (parentTabId: TTabId, action: 'close' | 'accept') => {
-    ipcRenderer.send('tabs:tab-preview-action', parentTabId, action);
+  tabPreviewAction: (tabId: TTabId, action: 'close' | 'accept') => {
+    ipcRenderer.send('tabs:tab-preview-action', { tabId, action });
   },
 };
 

@@ -1,280 +1,256 @@
-import { Browser, permissions } from '@/core';
+import { Browser, permissions, Window, FindInPage } from '@/core';
 import {
-  checkCertificateErrorSender,
-  checkFailLoadSender,
-  checkFindInPageSender,
-  checkModalAndPagesSender,
+  createHandler,
+  windowChecker,
+  viewChecker,
+  findInPageChecker,
+  tabChecker,
+  certificateErrorChecker,
+  modalChecker,
 } from '@/utils';
-import { FindInPageOptions, ipcMain, Certificate } from 'electron';
-import { TFindInPageAction, TTabId, TWindowId } from '~/types';
+import { FindInPageOptions, Certificate, type IpcMainInvokeEvent } from 'electron';
+import { IWinDesConTab, TFindInPageAction } from '~/types';
 import log from 'electron-log';
 import { URLInfoView } from './url-info';
 import { Tab } from './tab';
 import { TabPreview } from './tab-preview';
+import { CertificateError } from '@/core/tab/certificate-error';
 
 const scopeLog = log.scope('TabIPC');
 
 export function setupTabIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('tabs:get-tab-containers', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC tabs:get-tab-containers received for window ${winId}`);
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-      return browser.renderer.tabContainers(window);
-    });
-  });
+  createHandler<{ win: Window }>(
+    'tabs:get-tab-containers',
+    'handle',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    async ({ win }) => {
+      return browser.renderer.tabContainers(win);
+    },
+  );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('tabs:close-find-in-tab', async (event, tabId: TTabId) => {
-    scopeLog.info(`IPC tabs:close-find-in-tab received for tab ${tabId}`);
-    return await checkFindInPageSender(event, browser, tabId, async (tab, _findInPage) => {
-      tab.webContents.stopFindInPage('clearSelection');
-      tab.stopFindInPage();
-    });
-  });
+  createHandler<{ tab: IWinDesConTab }>(
+    'tabs:close-find-in-tab',
+    'on',
+    browser,
+    [tabChecker, findInPageChecker],
+    async ({ tab }) => {
+      tab.tab.webContents.stopFindInPage('clearSelection');
+      tab.tab.stopFindInPage();
+    },
+  );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle(
+  createHandler<{
+    tab: IWinDesConTab;
+    query: string;
+    action: TFindInPageAction;
+    findInPage: FindInPage;
+  }>(
     'tabs:find-in-page-action',
-    async (event, tabId: TTabId, action: TFindInPageAction, query: string) => {
-      scopeLog.info(
-        `IPC tabs:find-in-page-action received for tab ${tabId} with action ${action} and query "${query}"`,
-      );
-      return await checkFindInPageSender(event, browser, tabId, async (tab, findInPage) => {
-        const wc = tab.webContents;
+    'handle',
+    browser,
+    [tabChecker, findInPageChecker],
+    async ({ tab, query, action, findInPage }) => {
+      const wc = tab.tab.webContents;
 
-        if (query.trim() === '') {
-          wc.stopFindInPage('clearSelection');
-          return null;
-        }
+      if (query.trim() === '') {
+        wc.stopFindInPage('clearSelection');
+        return null;
+      }
 
-        const options: FindInPageOptions = {};
-        if (action === 'next') {
-          options.findNext = true;
-        } else if (action === 'previous') {
-          options.forward = false;
-        } else {
-          options.forward = true;
-        }
+      const options: FindInPageOptions = {};
+      if (action === 'next') {
+        options.findNext = true;
+      } else if (action === 'previous') {
+        options.forward = false;
+      } else {
+        options.forward = true;
+      }
 
-        const requestId = wc.findInPage(query, options);
-        findInPage.addSearch(requestId, query, action);
-        return requestId;
-      });
+      const requestId = wc.findInPage(query, options);
+      findInPage.addSearch(requestId, query, action);
+      return requestId;
     },
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('tabs:retry-failed', async (event, tabId: TTabId) => {
-    scopeLog.info(`IPC tabs:retry-failed received for tab ${tabId}`);
-    return await checkFailLoadSender(event, browser, tabId, async (tab, _failLoad) => {
-      tab.clearFailLoad();
-      tab.webContents.reload();
-    });
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on(
-    'tabs:login',
-    async (
-      event,
-      winId: TWindowId,
-      tabId: TTabId,
-      data: { username: string; password: string } | null,
-    ) => {
-      scopeLog.info(`IPC tabs:login received for window ${winId} and tab ${tabId}`);
-      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
-        const tabData = window.getTab(tabId);
-        if (!tabData) {
-          scopeLog.warn(`Login IPC: Tab ${tabId} not found in window ${winId}`);
-          return;
-        }
-
-        const tab = tabData.tab;
-        if (!tab.basicAuthCallback) {
-          scopeLog.warn(
-            `Login IPC: Tab ${tabId} in window ${winId} does not have a basicAuthCallback set`,
-          );
-          return;
-        }
-
-        window.modal.close();
-
-        if (data) {
-          tab.basicAuthCallback(data.username, data.password);
-        } else {
-          tab.basicAuthCallback();
-        }
-
-        tab.setBasicAuthCallback(null);
-      });
+  createHandler<{ tab: IWinDesConTab }>(
+    'tabs:retry-failed',
+    'on',
+    browser,
+    [tabChecker],
+    async ({ tab }) => {
+      tab.tab.clearFailLoad();
+      tab.tab.webContents.reload();
     },
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on(
-    'tabs:client-certificate',
-    async (event, winId: TWindowId, tabId: TTabId, fingerprint: string | null) => {
-      scopeLog.info(
-        `IPC tabs:client-certificate received for window ${winId} and tab ${tabId} with fingerprint ${fingerprint}`,
-      );
-      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
-        const tabData = window.getTab(tabId);
-        if (!tabData) {
-          scopeLog.warn(`Login IPC: Tab ${tabId} not found in window ${winId}`);
-          return;
-        }
-
-        const tab = tabData.tab;
-        if (!tab.clientCertificates) {
-          scopeLog.warn(
-            `Client Certificate IPC: Tab ${tabId} in window ${winId} does not have clientCertificates set`,
-          );
-          return;
-        }
-
-        const [certificates, callback] = tab.clientCertificates;
-
-        window.modal.close();
-
-        if (fingerprint) {
-          const certificate = certificates.find((cert) => cert.fingerprint === fingerprint);
-          if (certificate) {
-            callback(certificate);
-          } else {
-            scopeLog.warn(
-              `Client Certificate IPC: Certificate with fingerprint ${fingerprint} not found for tab ${tabId} in window ${winId}`,
-            );
-            callback(null as unknown as Certificate);
-          }
-        } else {
-          callback(null as unknown as Certificate);
-        }
-
-        tab.setClientCertificates(null);
-      });
-    },
-  );
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('tab:show-url-info', async (event, url: string | null) => {
-    scopeLog.info(`IPC tabs:show-url-info received with url ${url}`);
-    const selectedTab = browser.selectedTab;
-    if (!selectedTab || selectedTab.tab.webContentsId !== event.sender.id) {
+  createHandler<{
+    win: Window;
+    tab: IWinDesConTab;
+    data: { username: string; password: string } | null;
+  }>('tabs:login', 'on', browser, [windowChecker, tabChecker], async ({ win, tab, data }) => {
+    if (!tab.tab.basicAuthCallback) {
       scopeLog.warn(
-        `URL Info IPC: No selected tab or sender does not match selected tab's webContentsId`,
+        `Login IPC: Tab ${tab.tab.id} in window ${win.id} does not have a basicAuthCallback set`,
       );
       return;
     }
 
-    // Remove previous URL info view if exists
-    for (const view of selectedTab.window.views) {
-      if (view.viewId.startsWith(`tab-${selectedTab.tab.id}#url-info`)) {
-        view.close();
-        selectedTab.window.removeView(view.viewId);
-      }
-    }
+    win.modal.close();
 
-    if (url) {
-      const view = new URLInfoView(selectedTab.tab, url);
-      selectedTab.window.addView(view);
-      selectedTab.window.renderViews();
+    if (data) {
+      tab.tab.basicAuthCallback(data.username, data.password);
     } else {
-      const viewId = `url-info-${selectedTab.tab.id}`;
-      const view = selectedTab.window.getView<URLInfoView>(viewId);
-      if (view) {
-        view.close();
-        selectedTab.window.removeView(view.viewId);
-      }
-    }
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('tabs:trust-certificate-error', async (event, tabId: TTabId) => {
-    scopeLog.info(`IPC tabs:trust-certificate-error received for tab ${tabId}`);
-    return await checkCertificateErrorSender(
-      event,
-      browser,
-      tabId,
-      async (tab, certificateError) => {
-        certificateError.callback(true);
-        tab.cleanCertificateError();
-      },
-    );
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on(
-    'tabs:grant-permission',
-    async (event, winId: TWindowId, tabId: TTabId, value: boolean) => {
-      scopeLog.info(
-        `IPC tabs:grant-permission received for window ${winId}, tab ${tabId} with value ${value}`,
-      );
-      return await checkModalAndPagesSender(event, browser, winId, [], async (window) => {
-        const tabData = window.getTab(tabId);
-        if (!tabData) {
-          scopeLog.warn(`Grant Permission IPC: Tab ${tabId} not found in window ${winId}`);
-          return;
-        }
-
-        if (!tabData.tab.requestPermission) {
-          scopeLog.warn(
-            `Grant Permission IPC: Tab ${tabId} in window ${winId} does not have requestPermission set`,
-          );
-          return;
-        }
-
-        const [permission, host, callback] = tabData.tab.requestPermission;
-
-        callback(value);
-        permissions.set(host, permission, value);
-        tabData.tab.setRequestPermission(null);
-      });
-    },
-  );
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('tabs:open-tab-preview', async (event, url: string) => {
-    const parentTabData = browser.getTabByWebContentsId(event.sender.id);
-    if (!parentTabData) {
-      scopeLog.warn(`No tab found for webContents ID ${event.sender.id}`);
-      return;
+      tab.tab.basicAuthCallback();
     }
 
-    const tab = new Tab(browser, browser.idGenerator.nextTabId, {
-      partition: parentTabData.tab.partition,
-      suspended: false,
-      parent: parentTabData.tab,
-    });
-
-    tab.setVisible(true);
-    tab.loadURL(url);
-
-    const tabPreview = new TabPreview(parentTabData.tab, tab);
-    parentTabData.tab.setTabPreview(tabPreview);
-
-    parentTabData.window.addView(tabPreview);
-    parentTabData.window.addView(tabPreview.tab);
-
-    parentTabData.window.renderViews();
-
-    browser.toRenderer.refreshTabContainers(parentTabData.window);
-    browser.refreshMainMenu();
+    tab.tab.setBasicAuthCallback(null);
   });
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on(
-    'tabs:tab-preview-action',
-    async (event, parentTabId: TTabId, action: 'close' | 'accept') => {
-      scopeLog.info(`tab previoew action received for parent tab ${parentTabId}`);
-      const parentTabData = browser.getTab(parentTabId);
-      if (!parentTabData) {
-        scopeLog.warn(`No tab found for parent tab ID ${parentTabId}`);
+  createHandler<{ win: Window; tab: IWinDesConTab; fingerprint: string | null }>(
+    'tabs:client-certificate',
+    'on',
+    browser,
+    [windowChecker, tabChecker],
+    async ({ tab, win, fingerprint }) => {
+      if (!tab.tab.clientCertificates) {
+        scopeLog.warn(
+          `Client Certificate IPC: Tab ${tab.tab.id} in window ${win.id} does not have clientCertificates set`,
+        );
         return;
       }
 
-      const tabPreview = parentTabData.tab.tabPreview;
+      const [certificates, callback] = tab.tab.clientCertificates;
+
+      win.modal.close();
+
+      if (fingerprint) {
+        const certificate = certificates.find((cert) => cert.fingerprint === fingerprint);
+        if (certificate) {
+          callback(certificate);
+        } else {
+          scopeLog.warn(
+            `Client Certificate IPC: Certificate with fingerprint ${fingerprint} not found for tab ${tab.tab.id} in window ${win.id}`,
+          );
+          callback(null as unknown as Certificate);
+        }
+      } else {
+        callback(null as unknown as Certificate);
+      }
+
+      tab.tab.setClientCertificates(null);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tab: IWinDesConTab; url: string | null }>(
+    'tab:show-url-info',
+    'on',
+    browser,
+    [tabChecker],
+    async ({ tab, url }) => {
+      // Remove previous URL info view if exists
+      for (const view of tab.window.views) {
+        if (view.viewId.startsWith(`tab-${tab.tab.id}#url-info`)) {
+          view.close();
+          tab.window.removeView(view.viewId);
+        }
+      }
+
+      if (url) {
+        const view = new URLInfoView(tab.tab, url);
+        tab.window.addView(view);
+        tab.window.renderViews();
+      } else {
+        const viewId = `url-info-${tab.tab.id}`;
+        const view = tab.window.getView<URLInfoView>(viewId);
+        if (view) {
+          view.close();
+          tab.window.removeView(view.viewId);
+        }
+      }
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ certificateError: CertificateError; tab: IWinDesConTab }>(
+    'tabs:trust-certificate-error',
+    'on',
+    browser,
+    [tabChecker, certificateErrorChecker],
+    async ({ certificateError, tab }) => {
+      certificateError.callback(true);
+      tab.tab.cleanCertificateError();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tab: IWinDesConTab; win: Window; value: boolean }>(
+    'tabs:grant-permission',
+    'on',
+    browser,
+    [windowChecker, tabChecker, modalChecker],
+    async ({ tab, win, value }) => {
+      if (!tab.tab.requestPermission) {
+        scopeLog.warn(
+          `Grant Permission IPC: Tab ${tab} in window ${win.id} does not have requestPermission set`,
+        );
+        return;
+      }
+
+      const [permission, host, callback] = tab.tab.requestPermission;
+
+      callback(value);
+      permissions.set(host, permission, value);
+      tab.tab.setRequestPermission(null);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tab: IWinDesConTab; url: string }>(
+    'tabs:open-tab-preview',
+    'on',
+    browser,
+    [tabChecker],
+    async ({ tab, url }) => {
+      const previewTab = new Tab(browser, browser.idGenerator.nextTabId, {
+        partition: tab.tab.partition,
+        suspended: false,
+        parent: tab.tab,
+      });
+
+      previewTab.setVisible(true);
+      previewTab.loadURL(url);
+
+      const tabPreview = new TabPreview(tab.tab, previewTab);
+      tab.tab.setTabPreview(tabPreview);
+
+      tab.window.addView(tabPreview);
+      tab.window.addView(tabPreview.tab);
+
+      tab.window.renderViews();
+
+      browser.toRenderer.refreshTabContainers(tab.window);
+      browser.refreshMainMenu();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tab: IWinDesConTab; event: IpcMainInvokeEvent; action: 'close' | 'accept' }>(
+    'tabs:tab-preview-action',
+    'on',
+    browser,
+    [tabChecker],
+    async ({ tab, event, action }) => {
+      const tabPreview = tab.tab.tabPreview;
       if (!tabPreview) {
-        scopeLog.warn(`No preview tab found for parent tab ID ${parentTabId}`);
+        scopeLog.warn(`No preview tab found for parent tab ID ${tab.tab.id}`);
         return;
       }
 
@@ -285,7 +261,7 @@ export function setupTabIPC(browser: Browser) {
         return;
       }
 
-      browser.performCommand(parentTabData.window, `${action}-tab-preview`);
+      browser.performCommand(tab.window, `${action}-tab-preview`);
     },
   );
 }
