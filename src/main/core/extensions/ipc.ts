@@ -99,7 +99,7 @@ export function setupExtensionsIPC(browser: Browser) {
 
   // ----------------------------------------------------------------------------------------------- //
   ipcMain.handle(
-    'extension-crx-message',
+    'extensions:crx-message',
     async (
       _event,
       winId: TWindowId,
@@ -108,7 +108,7 @@ export function setupExtensionsIPC(browser: Browser) {
       action: { method: string; args: Record<string, unknown> },
     ) => {
       scopeLog.info(
-        `Received extension-crx-message from extension ${extensionId} and partitionId: ${partitionId}:`,
+        `crx-message from extension ${extensionId} and partitionId: ${partitionId}:`,
         action.method,
         action.args,
       );
