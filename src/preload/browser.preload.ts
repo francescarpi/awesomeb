@@ -226,7 +226,7 @@ const abTabMarks = {
 //--------------------------------------------------------------------------------------
 const abCertificates = {
   info: (winId: TWindowId) => {
-    return ipcRenderer.invoke('certificates:info', winId);
+    return ipcRenderer.invoke('certificates:info', { winId });
   },
 };
 
