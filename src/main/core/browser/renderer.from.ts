@@ -144,7 +144,7 @@ export class BrowserRenderer {
       for (const [idx, tc] of desktop.tabContainers.entries()) {
         tabContainers.push({
           id: tc.id,
-          shortcut: idx <= 9 ? idx + 1 : null,
+          shortcut: idx < 9 ? idx + 1 : null,
           desktopId: desktop.id,
           selected: selectedTabContainer?.id === tc.id,
           divider: tc.divider,
