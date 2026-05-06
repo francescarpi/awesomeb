@@ -1,35 +1,27 @@
 import { Browser, config } from '@/core';
-import { checkInternalPage } from '@/utils';
-import { ipcMain } from 'electron';
-import { TWindowId, IConfig } from '~/types';
-import log from 'electron-log';
-
-const scopeLog = log.scope('ConfigIPC');
+import { createHandler, internalPageChecker } from '@/utils';
+import { IConfig } from '~/types';
 
 export function setupConfigIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('config:get', async (event, winId: TWindowId) => {
-    scopeLog.info(`Get config for window ID ${winId}`);
-    return await checkInternalPage(
-      event,
-      browser,
-      'settings',
-      (_window, _desktop, _tabContainer, _tab) => {
-        return config.config;
-      },
-    );
-  });
+  createHandler<{}>(
+    'config:get',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'settings')],
+    async ({}) => {
+      return config.config;
+    },
+  );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('config:save', async (event, winId: TWindowId, newConfig: IConfig) => {
-    scopeLog.info(`Get config for window ID ${winId}`);
-    return await checkInternalPage(
-      event,
-      browser,
-      'settings',
-      (_window, _desktop, _tabContainer, _tab) => {
-        config.save(newConfig);
-      },
-    );
-  });
+  createHandler<{ newConfig: IConfig }>(
+    'config:save',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'settings')],
+    async ({ newConfig }) => {
+      config.save(newConfig);
+    },
+  );
 }
