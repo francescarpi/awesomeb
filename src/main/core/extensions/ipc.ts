@@ -1,7 +1,13 @@
 import { Browser, Window } from '@/core';
 import { TExtensionId, TWindowId, TPartitionId, IWinDesConTab, IExtension } from '~/types';
 import log from 'electron-log';
-import { internalPageChecker, createHandler, viewChecker, extensionChecker } from '@/utils';
+import {
+  internalPageChecker,
+  createHandler,
+  viewChecker,
+  extensionChecker,
+  windowChecker,
+} from '@/utils';
 
 const scopeLog = log.scope('ExtensionsIPC');
 
@@ -44,7 +50,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:open-popup',
     'on',
     browser,
-    [viewChecker.bind(null, 'urlbar')],
+    [windowChecker, viewChecker.bind(null, 'urlbar')],
     async ({ win, winId, extensionId }) => {
       const selectedTab = win.selectedTab;
       if (!selectedTab) {
@@ -60,7 +66,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:close-popup',
     'on',
     browser,
-    [viewChecker.bind(null, 'extension-popup-overlay')],
+    [windowChecker, viewChecker.bind(null, 'extension-popup-overlay')],
     async ({ win }) => {
       browser.extensions.closePopup(win);
     },
@@ -71,7 +77,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:ini-popup',
     'on',
     browser,
-    [viewChecker.bind(null, 'extension-popup')],
+    [windowChecker, viewChecker.bind(null, 'extension-popup')],
     async ({ win, width, height }) => {
       browser.extensions.iniPopup(win, width, height);
     },
@@ -89,7 +95,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:crx-message',
     'handle',
     browser,
-    [extensionChecker],
+    [windowChecker, extensionChecker],
     async ({ win, partitionId, extension, action }) => {
       return await browser.extensions.chrome.dispatch(
         win,

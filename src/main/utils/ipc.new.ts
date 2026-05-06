@@ -7,8 +7,7 @@ import type { IWinDesConTab, TWindowId, TExtensionId, IExtension } from '~/types
 
 const scopeLog = log.scope('IPCEventManager');
 
-// TODO split checkers into little parts. One to check the window and send the window to the next one
-
+//--------------------------------------------------------------------------------
 export function createHandler<T extends object>(
   channel: string,
   method: 'handle' | 'on',
@@ -21,18 +20,13 @@ export function createHandler<T extends object>(
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
     scopeLog.info(`[${channel}] received with props: `, rawArgs);
 
-    const results = (await Promise.all(
-      checkers.map((checker) => checker(browser, event, rawArgs)),
-    )) as unknown[];
-
-    const valid = results.every((r) => r !== null);
-    if (!valid) {
-      scopeLog.warn(`[${channel}] validation failed`, { results });
-      return;
-    }
-
     const args = { ...rawArgs } as T;
-    for (const result of results) {
+    for (const checker of checkers) {
+      const result = checker(browser, event, args);
+      if (result === null) {
+        scopeLog.warn(`[${channel}] validation failed in checker ${checker.name}`);
+        return;
+      }
       Object.assign(args, result);
     }
 
@@ -40,12 +34,13 @@ export function createHandler<T extends object>(
   });
 }
 
-export async function internalPageChecker(
+//--------------------------------------------------------------------------------
+export function internalPageChecker(
   page: string,
   browser: Browser,
   event: IpcMainInvokeEvent,
   _args: Record<string, unknown>,
-): Promise<{ tabData: IWinDesConTab } | null> {
+): { tabData: IWinDesConTab } | null {
   for (const tabData of browser.tabs) {
     if (tabData.tab.url && tabData.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
       if (tabData.tab.webContentsId === event.sender.id) {
@@ -56,27 +51,43 @@ export async function internalPageChecker(
   return null;
 }
 
-export async function viewChecker(
-  viewId: string,
+//--------------------------------------------------------------------------------
+export function windowChecker(
   browser: Browser,
-  event: IpcMainInvokeEvent,
+  _event: IpcMainInvokeEvent,
   args: Record<string, unknown>,
-): Promise<{ win: Window } | null> {
+): { win: Window } | null {
   const { winId } = args as { winId?: TWindowId };
   if (!winId) {
-    scopeLog.warn(`[ViewChecker] Missing window ID for view ${viewId}`);
+    scopeLog.warn(`[WindowChecker] Missing window ID`);
     return null;
   }
 
   const win = browser.getWindow(winId);
   if (!win) {
-    scopeLog.warn(`[ViewChecker] No window found with ID ${winId} for view ${viewId}`);
+    scopeLog.warn(`[WindowChecker] No window found with ID ${winId}`);
+    return null;
+  }
+
+  return { win };
+}
+
+//--------------------------------------------------------------------------------
+export function viewChecker(
+  viewId: string,
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window } | null {
+  const { win } = args as { win?: Window };
+  if (!win) {
+    scopeLog.warn(`[ViewChecker] Missing window object for view ${viewId}`);
     return null;
   }
 
   const view = win.getView<UIPageView>(viewId);
   if (view?.webContentsId !== event.sender.id) {
-    scopeLog.warn(`[ViewChecker] WebContents ID mismatch for view ${viewId} in window ${winId}`, {
+    scopeLog.warn(`[ViewChecker] WebContents ID mismatch for view ${viewId} in window ${win.id}`, {
       expected: view?.webContentsId,
       actual: event.sender.id,
     });
@@ -86,34 +97,28 @@ export async function viewChecker(
   return { win };
 }
 
-export async function extensionChecker(
+//--------------------------------------------------------------------------------
+export function extensionChecker(
   browser: Browser,
   event: IpcMainInvokeEvent,
   args: Record<string, unknown>,
-): Promise<{ win: Window; extension: IExtension } | null> {
-  const { winId, extensionId } = args as { winId?: TWindowId; extensionId?: TExtensionId };
-
-  if (!winId) {
-    scopeLog.warn(`[ExtensionChecker] Missing window ID for extension action`);
-    return null;
-  }
-
-  const win = browser.getWindow(winId);
+): { win: Window; extension: IExtension } | null {
+  const { win, extensionId } = args as { win?: Window; extensionId?: TExtensionId };
   if (!win) {
-    scopeLog.warn(`[ExtensionChecker] No window found with ID ${winId} for extension action`);
+    scopeLog.warn(`[ExtensionChecker] Missing window object for extension action`);
     return null;
   }
 
   if (!extensionId) {
     scopeLog.warn(
-      `[ExtensionChecker] Missing extension ID for extension action in window ${winId}`,
+      `[ExtensionChecker] Missing extension ID for extension action in window ${win.id}`,
     );
     return null;
   }
 
   if (!event.sender.getURL().startsWith(`chrome-extension://${extensionId}/`)) {
     scopeLog.warn(
-      `[ExtensionChecker] WebContents URL does not match expected extension URL for extension ${extensionId} in window ${winId}`,
+      `[ExtensionChecker] WebContents URL does not match expected extension URL for extension ${extensionId} in window ${win.id}`,
       {
         expectedPrefix: `chrome-extension://${extensionId}/`,
         actual: event.sender.getURL(),
@@ -125,7 +130,7 @@ export async function extensionChecker(
   const extension = browser.extensions.getExtension(extensionId);
   if (!extension) {
     scopeLog.warn(
-      `[ExtensionChecker] No extension found with ID ${extensionId} for extension action in window ${winId}`,
+      `[ExtensionChecker] No extension found with ID ${extensionId} for extension action in window ${win.id}`,
     );
     return null;
   }
