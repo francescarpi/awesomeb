@@ -13,7 +13,7 @@ export function setupBookmarksIPC(browser: Browser) {
     'bookmarks:add',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, 'sidebar')],
+    [windowChecker, viewChecker.bind(null, ['sidebar'])],
     async ({ parentFolderId, title, url, newFolderName }) => {
       bookmarks.add(parentFolderId, title, url, newFolderName.trim() === '' ? null : newFolderName);
       notification('Bookmark Added', 'Bookmark added successfully');

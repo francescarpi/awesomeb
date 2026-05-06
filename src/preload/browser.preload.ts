@@ -45,7 +45,7 @@ const abModal = {
 //--------------------------------------------------------------------------------------
 const abEntities = {
   fetch: async (winId: TWindowId, entity: TEntityType) => {
-    return await ipcRenderer.invoke('entities:fetch', winId, entity);
+    return await ipcRenderer.invoke('entities:fetch', { winId, entity });
   },
 };
 

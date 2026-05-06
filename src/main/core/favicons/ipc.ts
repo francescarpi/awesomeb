@@ -11,7 +11,7 @@ export function setupFaviconsIpc(browser: Browser) {
     'favicons:get',
     'handle',
     browser,
-    [windowChecker, viewChecker.bind(null, 'tab-switcher')],
+    [windowChecker, viewChecker.bind(null, ['tab-switcher'])],
     async ({ win, tabId }) => {
       const tabData = win.getTab(tabId);
       if (!tabData) {

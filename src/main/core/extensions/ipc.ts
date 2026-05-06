@@ -50,7 +50,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:open-popup',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, 'urlbar')],
+    [windowChecker, viewChecker.bind(null, ['urlbar'])],
     async ({ win, winId, extensionId }) => {
       const selectedTab = win.selectedTab;
       if (!selectedTab) {
@@ -66,7 +66,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:close-popup',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, 'extension-popup-overlay')],
+    [windowChecker, viewChecker.bind(null, ['extension-popup-overlay'])],
     async ({ win }) => {
       browser.extensions.closePopup(win);
     },
@@ -77,7 +77,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:ini-popup',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, 'extension-popup')],
+    [windowChecker, viewChecker.bind(null, ['extension-popup'])],
     async ({ win, width, height }) => {
       browser.extensions.iniPopup(win, width, height);
     },

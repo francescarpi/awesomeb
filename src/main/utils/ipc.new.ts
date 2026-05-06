@@ -74,23 +74,37 @@ export function windowChecker(
 
 //--------------------------------------------------------------------------------
 export function viewChecker(
-  viewId: string,
+  viewsIds: string[],
   _browser: Browser,
   event: IpcMainInvokeEvent,
   args: Record<string, unknown>,
 ): { win: Window } | null {
   const { win } = args as { win?: Window };
   if (!win) {
-    scopeLog.warn(`[ViewChecker] Missing window object for view ${viewId}`);
+    scopeLog.warn(`[ViewChecker] Missing window object for views ${viewsIds.join(', ')}`);
     return null;
   }
 
-  const view = win.getView<UIPageView>(viewId);
-  if (view?.webContentsId !== event.sender.id) {
-    scopeLog.warn(`[ViewChecker] WebContents ID mismatch for view ${viewId} in window ${win.id}`, {
-      expected: view?.webContentsId,
-      actual: event.sender.id,
-    });
+  const allowedIds: number[] = [];
+  for (const viewId of viewsIds) {
+    const view = win.getView<UIPageView>(viewId);
+    if (!view) {
+      scopeLog.warn(`[ViewChecker] No view found with ID ${viewId} in window ${win.id}`);
+      return null;
+    }
+    allowedIds.push(view.webContentsId);
+  }
+
+  if (!allowedIds.includes(event.sender.id)) {
+    scopeLog.warn(
+      `[ViewChecker] WebContents ID ${event.sender.id} does not match any allowed IDs for views ${viewsIds.join(
+        ', ',
+      )} in window ${win.id}`,
+      {
+        allowedIds,
+        actual: event.sender.id,
+      },
+    );
     return null;
   }
 
@@ -136,4 +150,31 @@ export function extensionChecker(
   }
 
   return { win, extension };
+}
+
+//--------------------------------------------------------------------------------
+export function modalChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window } | null {
+  const { win } = args as { win?: Window };
+  if (!win) {
+    scopeLog.warn(`[ModalChecker] Missing window object for modal action`);
+    return null;
+  }
+
+  if (!win.modal) {
+    scopeLog.warn(`[ModalChecker] Window ${win.id} is not a modal`);
+    return null;
+  }
+
+  if (event.sender.id !== win.modal.id) {
+    scopeLog.warn(
+      `[ModalChecker] WebContents ID ${event.sender.id} does not match modal WebContents ID ${win.modal.id} for window ${win.id}`,
+    );
+    return null;
+  }
+
+  return { win };
 }
