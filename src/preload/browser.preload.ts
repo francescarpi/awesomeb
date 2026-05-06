@@ -157,13 +157,13 @@ const abBookmarks = {
     url: string,
     newFolderName: string,
   ) => {
-    ipcRenderer.send('bookmarks:add', winId, parentFolderId, title, url, newFolderName);
+    ipcRenderer.send('bookmarks:add', { winId, parentFolderId, title, url, newFolderName });
   },
   get: async (): Promise<IBookmark[]> => {
     return await ipcRenderer.invoke('bookmarks:get');
   },
-  update: async (bookmarks: IBookmark[]) => {
-    await ipcRenderer.invoke('bookmarks:update', bookmarks);
+  update: async (bookmarksList: IBookmark[]) => {
+    await ipcRenderer.invoke('bookmarks:update', { bookmarksList });
   },
 };
 

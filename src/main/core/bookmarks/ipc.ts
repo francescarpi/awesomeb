@@ -1,63 +1,46 @@
 import { Browser, bookmarks, notification } from '@/core';
-import { checkInternalPage, checkModalAndPagesSender } from '@/utils';
-import { ipcMain } from 'electron';
-import log from 'electron-log';
-import { IBookmark, TWindowId } from '~/types';
-
-const scopeLog = log.scope('BookmarksIPC');
+import { createHandler, windowChecker, viewChecker, internalPageChecker } from '@/utils';
+import { IBookmark } from '~/types';
 
 export function setupBookmarksIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on(
+  createHandler<{
+    parentFolderId: string;
+    title: string;
+    url: string;
+    newFolderName: string;
+  }>(
     'bookmarks:add',
-    async (
-      event,
-      winId: TWindowId,
-      parentFolderId: string,
-      title: string,
-      url: string,
-      newFolderName: string,
-    ) => {
-      scopeLog.info(`Add bookmark as a child of: ${parentFolderId}`);
-      return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-        window.modal.close();
-        bookmarks.add(
-          parentFolderId,
-          title,
-          url,
-          newFolderName.trim() === '' ? null : newFolderName,
-        );
-        notification('Bookmark Added', 'Bookmark added successfully');
-        browser.refreshMainMenu();
-      });
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, 'sidebar')],
+    async ({ parentFolderId, title, url, newFolderName }) => {
+      bookmarks.add(parentFolderId, title, url, newFolderName.trim() === '' ? null : newFolderName);
+      notification('Bookmark Added', 'Bookmark added successfully');
+      browser.refreshMainMenu();
     },
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('bookmarks:get', async (event) => {
-    scopeLog.info('Get bookmarks');
-    return await checkInternalPage(
-      event,
-      browser,
-      'bookmarks',
-      async (_window, _desktop, _tabContainer, _tab) => {
-        return browser.renderer.bookmarks();
-      },
-    );
-  });
-
+  createHandler<{}>(
+    'bookmarks:get',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'bookmarks')],
+    async ({}) => {
+      return browser.renderer.bookmarks();
+    },
+  );
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('bookmarks:update', async (event, newList: IBookmark[]) => {
-    scopeLog.info('Update bookmarks');
-    return await checkInternalPage(
-      event,
-      browser,
-      'bookmarks',
-      async (_window, _desktop, _tabContainer, _tab) => {
-        bookmarks.update(newList);
-        notification('Bookmarks Updated', 'Bookmarks updated successfully');
-        browser.refreshMainMenu();
-      },
-    );
-  });
+  createHandler<{ bookmarksList: IBookmark[] }>(
+    'bookmarks:update',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'bookmarks')],
+    async ({ bookmarksList }) => {
+      bookmarks.update(bookmarksList);
+      notification('Bookmarks Updated', 'Bookmarks updated successfully');
+      browser.refreshMainMenu();
+    },
+  );
 }
