@@ -52,7 +52,7 @@ const abEntities = {
 //--------------------------------------------------------------------------------------
 const abCommands = {
   perform: async (winId: TWindowId, trigger: string, params?: Record<string, unknown>) => {
-    await ipcRenderer.invoke('commands:perform', winId, trigger, params);
+    await ipcRenderer.invoke('commands:perform', { winId, trigger, params });
   },
 };
 

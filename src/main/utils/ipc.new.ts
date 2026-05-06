@@ -24,7 +24,7 @@ export function createHandler<T extends object>(
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
     scopeLog.info(`[${channel}] received with props: `, rawArgs);
 
-    const args = { ...rawArgs } as T;
+    const args = { ...rawArgs, event } as T;
     for (const checker of checkers) {
       if (Array.isArray(checker)) {
         let anyPassed = false;
