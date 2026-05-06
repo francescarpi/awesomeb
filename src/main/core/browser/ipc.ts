@@ -8,8 +8,7 @@ export function setupBrowserIPC(browser: Browser) {
     'entities:fetch',
     'handle',
     browser,
-    // [windowChecker, modalChecker, viewChecker.bind(null, ['sidebar', 'tab-switcher'])],
-    [windowChecker],
+    [windowChecker, [modalChecker, viewChecker.bind(null, ['sidebar', 'tab-switcher'])]],
     async ({ win, entity }) => {
       switch (entity) {
         case 'commands':

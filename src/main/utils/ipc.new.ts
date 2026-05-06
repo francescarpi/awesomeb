@@ -8,11 +8,15 @@ import type { IWinDesConTab, TWindowId, TExtensionId, IExtension } from '~/types
 const scopeLog = log.scope('IPCEventManager');
 
 //--------------------------------------------------------------------------------
+type CheckerFn = Function; // eslint-disable-line
+type CheckerGroup = CheckerFn[];
+type Checker = CheckerFn | CheckerGroup;
+
 export function createHandler<T extends object>(
   channel: string,
   method: 'handle' | 'on',
   browser: Browser,
-  checkers: Function[], // eslint-disable-line
+  checkers: Checker[],
   callback: (args: T) => Promise<unknown>,
 ) {
   const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
@@ -22,12 +26,28 @@ export function createHandler<T extends object>(
 
     const args = { ...rawArgs } as T;
     for (const checker of checkers) {
-      const result = checker(browser, event, args);
-      if (result === null) {
-        scopeLog.warn(`[${channel}] validation failed in checker ${checker.name}`);
-        return;
+      if (Array.isArray(checker)) {
+        let anyPassed = false;
+        for (const altChecker of checker) {
+          const result = altChecker(browser, event, args);
+          if (result !== null) {
+            Object.assign(args, result);
+            anyPassed = true;
+            break;
+          }
+        }
+        if (!anyPassed) {
+          scopeLog.warn(`[${channel}] validation failed: no checker passed OR group`);
+          return;
+        }
+      } else {
+        const result = checker(browser, event, args);
+        if (result === null) {
+          scopeLog.warn(`[${channel}] validation failed in checker ${checker.name}`);
+          return;
+        }
+        Object.assign(args, result);
       }
-      Object.assign(args, result);
     }
 
     return await callback(args);
