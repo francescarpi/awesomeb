@@ -193,7 +193,7 @@ const abDownloads = {
 //--------------------------------------------------------------------------------------
 const abFavicons = {
   get: (winId: TWindowId, tabId: TTabId) => {
-    return ipcRenderer.invoke('favicons:get', winId, tabId);
+    return ipcRenderer.invoke('favicons:get', { winId, tabId });
   },
 };
 
