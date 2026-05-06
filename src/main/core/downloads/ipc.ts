@@ -40,8 +40,6 @@ export function setupDownloadsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{}>('downloads:action', 'on', browser, [], async ({}) => {});
-
   ipcMain.on(
     'downloads:action',
     async (

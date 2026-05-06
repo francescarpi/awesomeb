@@ -4,6 +4,7 @@ import { Browser, Window } from '@/core';
 import { UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import type { IWinDesConTab, TWindowId, TExtensionId, IExtension } from '~/types';
+import { PromptBase } from '@/core/prompts/models';
 
 const scopeLog = log.scope('IPCEventManager');
 
@@ -197,4 +198,45 @@ export function modalChecker(
   }
 
   return { win };
+}
+
+//--------------------------------------------------------------------------------
+export function tabChecker(
+  browser: Browser,
+  event: IpcMainInvokeEvent,
+  _args: Record<string, unknown>,
+): { tab: IWinDesConTab } | null {
+  const tab = browser.getTabByWebContentsId(event.sender.id);
+  if (!tab) {
+    scopeLog.warn(`[TabChecker] No tab found for WebContents ID ${event.sender.id}`);
+    return null;
+  }
+  return { tab };
+}
+
+//--------------------------------------------------------------------------------
+export function promptChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { prompt: PromptBase } | null {
+  const { win } = args as { win?: Window };
+  if (!win) {
+    scopeLog.warn(`[PromptChecker] Missing window object for prompt response`);
+    return null;
+  }
+
+  if (!win.prompts.current) {
+    scopeLog.warn(`[PromptChecker] No active prompt found in window ${win.id} for prompt response`);
+    return null;
+  }
+
+  if (event.sender.id !== win.prompts.current.modalId) {
+    scopeLog.warn(
+      `[PromptChecker] WebContents ID ${event.sender.id} does not match current prompt modal ID ${win.prompts.current.modalId} in window ${win.id}`,
+    );
+    return null;
+  }
+
+  return { prompt: win.prompts.current };
 }

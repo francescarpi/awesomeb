@@ -170,7 +170,7 @@ const abBookmarks = {
 //--------------------------------------------------------------------------------------
 const abOpenURLHistory = {
   find: async (winId: TWindowId, query: string) => {
-    return await ipcRenderer.invoke('open-url-history:find', winId, query);
+    return await ipcRenderer.invoke('open-url-history:find', { winId, query });
   },
 };
 
@@ -275,7 +275,7 @@ const abExtensions = {
 //--------------------------------------------------------------------------------------
 const abPrompts = {
   response: (winId: TWindowId, response: unknown) => {
-    ipcRenderer.send('prompts:response', winId, response);
+    ipcRenderer.send('prompts:response', { winId, response });
   },
 };
 

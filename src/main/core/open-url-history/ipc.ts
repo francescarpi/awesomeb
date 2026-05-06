@@ -1,17 +1,15 @@
-import { checkModalSender } from '@/utils';
-import { ipcMain } from 'electron';
-import log from 'electron-log';
+import { createHandler, windowChecker, modalChecker } from '@/utils';
 import { Browser, openURLHistory } from '@/core';
-import { TWindowId } from '~/types';
-
-const scopeLog = log.scope('OpenURLHistoryIpc');
 
 export function setupOpenURLHistoryIpc(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('open-url-history:find', async (event, winId: TWindowId, query: string) => {
-    scopeLog.info(`IPC: open-url-history:find - winId: ${winId}, query: ${query}`);
-    return await checkModalSender(event, browser, winId, async (_window, _modalManager) => {
+  createHandler<{ query: string }>(
+    'open-url-history:find',
+    'handle',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ query }) => {
       return openURLHistory.find(query);
-    });
-  });
+    },
+  );
 }
