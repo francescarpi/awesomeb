@@ -1,33 +1,33 @@
-import { Browser } from '@/core';
-import { checkModalAndPagesSender, checkWindowSender } from '@/utils';
-import { ipcMain } from 'electron';
-import { TWindowId, TDesktopId, ITheme } from '~/types';
-import log from 'electron-log';
-
-const scopeLog = log.scope('DesktopIPC');
+import { Browser, Window } from '@/core';
+import { createHandler, windowChecker, viewChecker } from '@/utils';
+import { TDesktopId, ITheme } from '~/types';
 
 export function setupDesktopIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('desktops:select', async (event, winId: TWindowId, desktopId: TDesktopId) => {
-    scopeLog.info(
-      `IPC Received: desktops:select for window ID ${winId} and desktop ID ${desktopId}`,
-    );
-    return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-      window.selectDesktop(desktopId);
-    });
-  });
+  createHandler<{ win: Window; desktopId: TDesktopId }>(
+    'desktops:select',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    async ({ win, desktopId }) => {
+      win.selectDesktop(desktopId);
+    },
+  );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('desktops:get-theme', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC Received: desktops:get-theme for window ID ${winId}`);
-    return await checkWindowSender(event, browser, winId, (window) => {
-      const theme = window.selectedDesktop.theme;
+  createHandler<{ win: Window }>(
+    'desktops:get-theme',
+    'handle',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      const theme = win.selectedDesktop.theme;
       const result: ITheme = {
         primary: theme.primary,
         secondary: theme.secondary,
         degrees: theme.degrees,
       };
       return result;
-    });
-  });
+    },
+  );
 }

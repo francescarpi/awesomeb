@@ -62,10 +62,10 @@ const abDesktops = {
     ipcRenderer.on('desktops:refresh', callback);
   },
   select: (winId: TWindowId, desktopId: string) => {
-    ipcRenderer.send('desktops:select', winId, desktopId);
+    ipcRenderer.send('desktops:select', { winId, desktopId });
   },
   getTheme: async (winId: TWindowId) => {
-    return await ipcRenderer.invoke('desktops:get-theme', winId);
+    return await ipcRenderer.invoke('desktops:get-theme', { winId });
   },
   onThemeRefresh: (callback: (event: IpcRendererEvent, theme: unknown) => void) => {
     ipcRenderer.on('desktop:theme-refresh', callback);
@@ -233,10 +233,10 @@ const abCertificates = {
 //--------------------------------------------------------------------------------------
 const abConfig = {
   get: (winId: TWindowId) => {
-    return ipcRenderer.invoke('config:get', winId);
+    return ipcRenderer.invoke('config:get', { winId });
   },
   save: (winId: TWindowId, config: IConfig) => {
-    return ipcRenderer.invoke('config:save', winId, config);
+    return ipcRenderer.invoke('config:save', { winId, config });
   },
 };
 
