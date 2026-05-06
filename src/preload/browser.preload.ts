@@ -78,7 +78,7 @@ const abDesktops = {
 //--------------------------------------------------------------------------------------
 const abWindow = {
   readyToShow: (winId: TWindowId) => {
-    ipcRenderer.send('window:ready-to-show', winId);
+    ipcRenderer.send('window:ready-to-show', { winId });
   },
   onRefreshNoTabsInfo: (
     callback: (event: IpcRendererEvent, sidebarCollapsed: boolean, areaMaximized: boolean) => void,

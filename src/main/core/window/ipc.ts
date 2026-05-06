@@ -1,18 +1,16 @@
-import { Browser } from '@/core';
-import { checkWindowSender } from '@/utils';
-import { ipcMain } from 'electron';
-import { TWindowId } from '~/types';
-import log from 'electron-log';
-
-const scopeLog = log.scope('WindowIPC');
+import { Browser, Window } from '@/core';
+import { createHandler, windowChecker } from '@/utils';
 
 export function setupWindowIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('window:ready-to-show', async (event, winId: TWindowId) => {
-    scopeLog.info(`Received 'window:ready-to-show' for window ID ${winId}`);
-    return await checkWindowSender(event, browser, winId, (window) => {
-      window.show();
-      window.focus();
-    });
-  });
+  createHandler<{ win: Window }>(
+    'window:ready-to-show',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      win.show();
+      win.focus();
+    },
+  );
 }
