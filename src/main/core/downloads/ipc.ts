@@ -1,42 +1,47 @@
-import { Browser } from '@/core';
+import { Browser, Window } from '@/core';
 import { ipcMain } from 'electron';
 import { TWindowId } from '~/types';
 import log from 'electron-log';
-import { checkInternalPage, checkModalAndPagesSender } from '@/utils';
+import {
+  checkInternalPage,
+  checkModalAndPagesSender,
+  createHandler,
+  windowChecker,
+  viewChecker,
+} from '@/utils';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('DownloadsIPC');
 
 export function setupDownloadsIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('downloads:open-page', async (event, winId: TWindowId) => {
-    scopeLog.info(`Open-page received for window ${winId}`);
-    return await checkModalAndPagesSender(
-      event,
-      browser,
-      winId,
-      ['sidebar', 'contextual-modal'],
-      async (window) => {
-        window.closeContextualModal();
+  createHandler<{ win: Window }>(
+    'downloads:open-page',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['sidebar', 'contextual-modal'])],
+    async ({ win }) => {
+      win.closeContextualModal();
 
-        let downloadsFound = false;
+      let downloadsFound = false;
 
-        for (const tabData of window.tabs) {
-          if (tabData.tab.url === `${INTERNAL_PROTOCOL}://downloads/`) {
-            window.selectTab(tabData.tab.id);
-            downloadsFound = true;
-            break;
-          }
+      for (const tabData of win.tabs) {
+        if (tabData.tab.url === `${INTERNAL_PROTOCOL}://downloads/`) {
+          win.selectTab(tabData.tab.id);
+          downloadsFound = true;
+          break;
         }
+      }
 
-        if (!downloadsFound) {
-          browser.openURL(`${INTERNAL_PROTOCOL}://downloads/`, { selectTab: true });
-        }
-      },
-    );
-  });
+      if (!downloadsFound) {
+        browser.openURL(`${INTERNAL_PROTOCOL}://downloads/`, { selectTab: true });
+      }
+    },
+  );
 
   //--------------------------------------------------------------------------------------
+  createHandler<{}>('downloads:action', 'on', browser, [], async ({}) => {});
+
   ipcMain.on(
     'downloads:action',
     async (
