@@ -19,12 +19,16 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     {
       label: 'Rotate tabs clockwise',
       icon: getIcon(EIcon.RotateRight),
-      click: () => {},
+      click: () => {
+        browser.performCommand(win, 'rotate-tabs-clockwise', {});
+      },
     },
     {
       label: 'Rotate tabs counter-clockwise',
       icon: getIcon(EIcon.RotateLeft),
-      click: () => {},
+      click: () => {
+        browser.performCommand(win, 'rotate-tabs-counterclockwise', {});
+      },
     },
     { type: 'separator' },
     {

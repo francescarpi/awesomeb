@@ -109,4 +109,23 @@ export class TabContainer {
     this._layout = layout;
     this.browser.eventsChannel.emit('tabcontainer:layout-did-change', this);
   }
+
+  rotateTabs(clockwise: boolean) {
+    if (this.tabs.length <= 1) {
+      return;
+    }
+
+    const tabsArray = this.tabs;
+    const rotatedTabs = clockwise
+      ? [tabsArray[tabsArray.length - 1], ...tabsArray.slice(0, tabsArray.length - 1)]
+      : [...tabsArray.slice(1), tabsArray[0]];
+
+    // Update the order of tabs in the container
+    this._tabs.clear();
+    for (const tab of rotatedTabs) {
+      this._tabs.set(tab.id, tab);
+    }
+
+    this.browser.eventsChannel.emit('tabcontainer:tabs-rotated', this);
+  }
 }

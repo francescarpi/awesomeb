@@ -319,8 +319,21 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabcontainer:layout-did-change', async () => {
     const selectedTab = browser.selectedTab;
-    if (selectedTab) {
-      selectedTab.window.renderViews();
+    if (!selectedTab) {
+      return;
     }
+
+    selectedTab.window.renderViews();
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabcontainer:tabs-rotated', async () => {
+    const selectedTab = browser.selectedTab;
+    if (!selectedTab) {
+      return;
+    }
+    selectedTab.window.renderViews();
+    browser.toRenderer.refreshTabContainers(selectedTab.window);
+    browser.toRenderer.refreshTabSwitcher(selectedTab.window);
   });
 }

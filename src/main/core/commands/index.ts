@@ -52,6 +52,8 @@ import * as tabPrint from './tab-print';
 import * as extensionsManage from './extensions-manage';
 import * as sessionSave from './session-save';
 import * as layoutSelect from './layout-select';
+import * as layoutRotateClockwise from './layout-rotate-clockwise';
+import * as layoutRotateCounterclockwise from './layout-rotate-counterclockwise';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -103,6 +105,8 @@ const COMMANDS = {
   [extensionsManage.TRIGGER]: extensionsManage.Command,
   [sessionSave.TRIGGER]: sessionSave.Command,
   [layoutSelect.TRIGGER]: layoutSelect.Command,
+  [layoutRotateClockwise.TRIGGER]: layoutRotateClockwise.Command,
+  [layoutRotateCounterclockwise.TRIGGER]: layoutRotateCounterclockwise.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
