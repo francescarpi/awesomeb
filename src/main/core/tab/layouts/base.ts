@@ -1,7 +1,11 @@
 import { Rectangle } from 'electron';
+import { EIcon, getIcon } from '@/menu/utils';
 
 export class LayoutBase {
-  protected id: string = '';
+  public readonly id: string = 'base';
+  public readonly label: string = 'Basae';
+  public readonly icon: string = getIcon(EIcon.Divider);
+
   protected readonly MARGIN = 2;
 
   calculateBounds(_availableArea: Rectangle, _tabNumber: number): Rectangle {

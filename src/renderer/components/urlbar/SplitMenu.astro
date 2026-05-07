@@ -1,0 +1,38 @@
+---
+
+---
+
+<div class="ml-3" id="split-menu"></div>
+
+<script>
+  import { Renderer, h, c, type VNode, getSearchParams } from '#/scripts';
+  import Split from '#/icons/split.svg?raw';
+
+  const renderer = new Renderer(renderIcon(false), 'split-menu').render();
+  const { winId } = getSearchParams();
+
+  abTabs.onRefreshShowSplitMenu((_event, value) => {
+    renderer.update(renderIcon(value));
+  });
+
+  function renderIcon(visible: boolean): VNode {
+    return h(
+      'div',
+      {
+        class: c(
+          visible ? 'block' : 'hidden',
+          '[&>svg]:w-full',
+          '[&>svg]:h-full',
+          'text-white',
+          'hover:bg-white/30',
+          'cursor-pointer',
+        ),
+        innerHTML: Split,
+        onclick: () => {
+          abMenu.contextMenu(winId, 'split');
+        },
+      },
+      '',
+    );
+  }
+</script>

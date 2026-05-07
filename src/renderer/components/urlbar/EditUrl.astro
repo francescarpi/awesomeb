@@ -9,10 +9,6 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
   import { getSearchParams } from '../../scripts/url';
   const { winId } = getSearchParams();
 
-  function handleEdit() {
-    abModal.open(winId, 'edit-url');
-  }
-
   const { disable, enable } = buttonManager('edit', {
     handleClick: () => {
       abModal.open(winId, 'edit-url');

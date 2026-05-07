@@ -30,6 +30,7 @@ import {
   bookmarks,
   closedHistory,
   partitions,
+  Layouts,
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
@@ -333,5 +334,16 @@ export class BrowserRenderer {
       path: extensionsPath(),
       extensions: active ? this._browser.extensions.active : this._browser.extensions.all,
     };
+  }
+
+  layoutsEntities(browser: Browser): IEntity[] {
+    const selectedTab = browser.selectedTab;
+    const selectedLayoutId = selectedTab?.tabContainer.layout.id;
+
+    return Object.values(Layouts).map((layout) => ({
+      id: layout.id,
+      label: layout.label,
+      selected: selectedLayoutId === layout.id,
+    }));
   }
 }

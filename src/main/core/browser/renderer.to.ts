@@ -116,4 +116,11 @@ export class BrowserToRenderer {
 
     urlbar.send('extensions:on-refresh', this._browser.extensions.active);
   }
+  refreshShowSplitMenu(window: Window) {
+    const selectedTab = window.selectedTab;
+    const hasSplit = selectedTab ? selectedTab.tabContainer.isSplit : false;
+
+    const urlbar = window.getView<URLBar>('urlbar')!;
+    urlbar.send('tab:has-split', hasSplit);
+  }
 }

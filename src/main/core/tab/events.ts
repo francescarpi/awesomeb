@@ -80,6 +80,11 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('focus', async () => {
     tab.setRequireAttention(false);
+
+    const selected = browser.selectedTab;
+    if (selected && selected.tab.id !== tab.id) {
+      selected.window.selectTab(tab.id);
+    }
   });
 
   // ----------------------------------------------------------------------------------------------- //

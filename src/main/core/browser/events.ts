@@ -63,6 +63,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshSelectedDesktop(window);
     browser.toRenderer.refreshExtensions(window);
+    browser.toRenderer.refreshShowSplitMenu(window);
 
     const result = browser.getTab(tab.id)!;
     browser.toRenderer.refreshThemes(window, result.desktop);
@@ -312,6 +313,14 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('extensions:icon-updated', async () => {
     for (const window of browser.windows) {
       browser.toRenderer.refreshExtensions(window);
+    }
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabcontainer:layout-did-change', async () => {
+    const selectedTab = browser.selectedTab;
+    if (selectedTab) {
+      selectedTab.window.renderViews();
     }
   });
 }

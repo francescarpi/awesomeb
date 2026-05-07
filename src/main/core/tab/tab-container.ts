@@ -97,4 +97,16 @@ export class TabContainer {
   get layout(): LayoutBase {
     return this._layout;
   }
+
+  get isSplit(): boolean {
+    return this.tabs.length > 1;
+  }
+
+  setLayout(layout: LayoutBase) {
+    if (this._layout.id === layout.id) {
+      return;
+    }
+    this._layout = layout;
+    this.browser.eventsChannel.emit('tabcontainer:layout-did-change', this);
+  }
 }

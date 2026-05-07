@@ -31,6 +31,8 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.bookmarksEntities();
         case 'closedTabs':
           return browser.renderer.closedTabsEntities();
+        case 'layouts':
+          return browser.renderer.layoutsEntities(browser);
       }
     },
   );

@@ -1,8 +1,11 @@
 import { LayoutBase } from './base';
 import { Rectangle } from 'electron';
+import { EIcon, getIcon } from '@/menu/utils';
 
 export class LayoutHorizontal extends LayoutBase {
-  id: string = 'horizontal';
+  public readonly id: string = 'horizontal';
+  public readonly label: string = 'Horizontal';
+  public readonly icon: string = getIcon(EIcon.Horizontal);
 
   calculateBounds(availableArea: Rectangle, tabNumber: number): Rectangle {
     const x = availableArea.x;

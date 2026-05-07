@@ -136,6 +136,9 @@ const abTabs = {
   tabPreviewAction: (tabId: TTabId, action: 'close' | 'accept') => {
     ipcRenderer.send('tabs:tab-preview-action', { tabId, action });
   },
+  onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => {
+    ipcRenderer.on('tab:has-split', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------

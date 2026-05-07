@@ -89,6 +89,7 @@ declare global {
     trustCertificateError: (tabId: TTabId) => void;
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
     tabPreviewAction: (parentTabId: TTabId, action: 'close' | 'accept') => void;
+    onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => void;
   };
 
   //--------------------------------------------------------------------------------------
