@@ -1,16 +1,16 @@
 import { ICommand } from './types';
 import log from 'electron-log';
 
-const scopeLog = log.scope('RotateTabsClockwiseCommand');
+const scopeLog = log.scope('SwapTabsCommand');
 
 export interface ICommandParams {}
 
-export const TRIGGER = 'rotate-tabs-clockwise';
+export const TRIGGER = 'swap-tabs';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rotate tabs clockwise',
-  description: 'Rotate the order of tabs in the current container clockwise',
+  name: 'Swap Tabs',
+  description: 'Rotate the position of tabs in a split container',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   async handler({ tabContainer }) {
     if (!tabContainer) {

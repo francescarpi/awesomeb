@@ -17,17 +17,10 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     ...layouts,
     { type: 'separator' },
     {
-      label: 'Rotate tabs clockwise',
+      label: 'Swap tabs',
       icon: getIcon(EIcon.RotateRight),
       click: () => {
-        browser.performCommand(win, 'rotate-tabs-clockwise', {});
-      },
-    },
-    {
-      label: 'Rotate tabs counter-clockwise',
-      icon: getIcon(EIcon.RotateLeft),
-      click: () => {
-        browser.performCommand(win, 'rotate-tabs-counterclockwise', {});
+        browser.performCommand(win, 'swap-tabs', {});
       },
     },
     { type: 'separator' },
