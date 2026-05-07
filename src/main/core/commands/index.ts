@@ -54,6 +54,7 @@ import * as sessionSave from './session-save';
 import * as layoutSelect from './layout-select';
 import * as layoutSwapTabs from './layout-swap-tabs';
 import * as layoutUnsplitt from './layout-unsplit';
+import * as layoutSize from './layout-size';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -107,6 +108,7 @@ const COMMANDS = {
   [layoutSelect.TRIGGER]: layoutSelect.Command,
   [layoutSwapTabs.TRIGGER]: layoutSwapTabs.Command,
   [layoutUnsplitt.TRIGGER]: layoutUnsplitt.Command,
+  [layoutSize.TRIGGER]: layoutSize.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

@@ -28,6 +28,7 @@ export enum EIcon {
   RotateRight = 'rotate-right.png',
   Search = 'search.png',
   Sidebar = 'sidebar.png',
+  Size = 'size.png',
   Suspend = 'suspend.png',
   Tab = 'tab.png',
   Theme = 'theme.png',

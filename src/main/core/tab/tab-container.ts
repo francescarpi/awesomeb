@@ -9,6 +9,7 @@ export class TabContainer {
   private readonly _tabs: Map<TTabId, Tab> = new Map();
   private _selectedTabId: TTabId | null = null;
   private _layout: LayoutBase = Layouts['vertical'];
+  private _layoutSize: number = 50;
 
   constructor(
     public readonly browser: Browser,
@@ -140,5 +141,17 @@ export class TabContainer {
       this._selectedTabId = null;
     }
     return poppedTab;
+  }
+
+  get layoutSize(): number {
+    return this._layoutSize;
+  }
+
+  setLayoutSize(size: number) {
+    if (this._layoutSize === size) {
+      return;
+    }
+    this._layoutSize = size;
+    this.browser.eventsChannel.emit('tabcontainer:layout-size-did-change', this);
   }
 }

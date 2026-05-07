@@ -7,12 +7,18 @@ export class LayoutHorizontal extends LayoutBase {
   public readonly label: string = 'Horizontal';
   public readonly icon: string = getIcon(EIcon.Horizontal);
 
-  calculateBounds(availableArea: Rectangle, tabNumber: number): Rectangle {
+  calculateBounds(availableArea: Rectangle, tabNumber: number, percentSize: number): Rectangle {
+    const totalHeight = availableArea.height;
+
+    const pos1Height = Math.round((totalHeight * percentSize) / 100);
+    const pos2Height = totalHeight - pos1Height;
+    const splitPos = Math.max(pos1Height, pos2Height);
+
     const x = availableArea.x;
-    const y = tabNumber === 1 ? 0 : availableArea.height / 2 + this.MARGIN;
+    const y = tabNumber === 1 ? 0 : splitPos + this.MARGIN;
 
     const width = availableArea.width;
-    const height = availableArea.height / 2 - this.MARGIN;
+    const height = tabNumber === 1 ? splitPos - this.MARGIN : totalHeight - splitPos - this.MARGIN;
 
     return {
       x,

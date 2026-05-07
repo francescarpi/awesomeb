@@ -1,5 +1,5 @@
 import { Menu, MenuItemConstructorOptions } from 'electron';
-import { Browser, TabContainer, Layouts, Window } from '@/core';
+import { Browser, TabContainer, Layouts, Window, LAYOUT_SIZES } from '@/core';
 import { getIcon, EIcon } from './utils';
 
 export function splitMenu(browser: Browser, win: Window, tabContainer: TabContainer): Menu {
@@ -32,6 +32,18 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
       },
     },
     { type: 'separator' },
+    {
+      label: 'Size',
+      icon: getIcon(EIcon.Size),
+      submenu: LAYOUT_SIZES.map((size) => ({
+        label: `${size}%`,
+        type: 'checkbox',
+        checked: tabContainer.layoutSize === size,
+        click: () => {
+          browser.performCommand(win, 'change-layout-size', { size });
+        },
+      })),
+    },
   ]);
   return menu;
 }

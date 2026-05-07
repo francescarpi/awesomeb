@@ -343,4 +343,13 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabSwitcher(win);
     browser.toRenderer.refreshShowSplitMenu(win);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabcontainer:layout-size-did-change', async () => {
+    const selectedTab = browser.selectedTab;
+    if (!selectedTab) {
+      return;
+    }
+    selectedTab.window.renderViews();
+  });
 }
