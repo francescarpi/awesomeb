@@ -30,7 +30,7 @@ export function setupUIIPC(browser: Browser) {
     'modal:open',
     'on',
     browser,
-    [windowChecker, modalChecker],
+    [windowChecker],
     async ({ win, page }) => {
       win.modal.open(page);
     },

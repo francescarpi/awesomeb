@@ -1,5 +1,5 @@
-import { Browser, bookmarks, notification } from '@/core';
-import { createHandler, windowChecker, viewChecker, internalPageChecker } from '@/utils';
+import { Browser, bookmarks, notification, Window } from '@/core';
+import { createHandler, windowChecker, internalPageChecker, modalChecker } from '@/utils';
 import { IBookmark } from '~/types';
 
 export function setupBookmarksIPC(browser: Browser) {
@@ -9,13 +9,15 @@ export function setupBookmarksIPC(browser: Browser) {
     title: string;
     url: string;
     newFolderName: string;
+    win: Window;
   }>(
     'bookmarks:add',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
-    async ({ parentFolderId, title, url, newFolderName }) => {
+    [windowChecker, modalChecker],
+    async ({ parentFolderId, title, url, newFolderName, win }) => {
       bookmarks.add(parentFolderId, title, url, newFolderName.trim() === '' ? null : newFolderName);
+      win.modal.close();
       notification('Bookmark Added', 'Bookmark added successfully');
       browser.refreshMainMenu();
     },
