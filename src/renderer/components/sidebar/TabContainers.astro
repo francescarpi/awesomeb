@@ -67,7 +67,14 @@
           ),
           h(
             'div', // Tab container's tabs list (in vertical)
-            { class: c('flex', 'flex-col', 'w-full') },
+            {
+              class: c(
+                'flex',
+                'flex-col',
+                'w-full',
+                tc.tabs.length > 1 && 'border border-white/20 rounded',
+              ),
+            },
             ...tc.tabs.map((t) =>
               h(
                 'div', // Tab

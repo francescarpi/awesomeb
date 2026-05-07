@@ -88,6 +88,10 @@ export class Tab extends UIView {
 
     this.setVisible(true);
 
+    if (!this.visible) {
+      return;
+    }
+
     // Calculate bounds...
     const bounds = window.bounds;
     if (window.fullScreen) {
@@ -125,6 +129,20 @@ export class Tab extends UIView {
       y += 16;
       width -= 65;
       height -= 16 * 2;
+    }
+
+    // Split tabs calculation
+    if (selectedTab?.tabContainer.tabs.length === 2) {
+      const firstTab = selectedTab.tabContainer.tabs[0];
+      const tabNum = firstTab.id === this.id ? 1 : 2;
+      const positon = selectedTab.tabContainer.layout.calculateBounds(
+        { x, y, width, height },
+        tabNum,
+      );
+      x = positon.x;
+      y = positon.y;
+      width = positon.width;
+      height = positon.height;
     }
 
     this.webContentsView.setBounds({

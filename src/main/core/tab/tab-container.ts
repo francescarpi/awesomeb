@@ -2,12 +2,13 @@ import { TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
 import { ITabContainerProps, ITabProps } from './types';
 import { Browser } from '@/core';
+import { Layouts, LayoutBase } from './layouts';
 
 export class TabContainer {
   private _divider: boolean;
-
   private readonly _tabs: Map<TTabId, Tab> = new Map();
   private _selectedTabId: TTabId | null = null;
+  private _layout: LayoutBase = Layouts['vertical'];
 
   constructor(
     public readonly browser: Browser,
@@ -91,5 +92,9 @@ export class TabContainer {
     tab.close();
 
     return true;
+  }
+
+  get layout(): LayoutBase {
+    return this._layout;
   }
 }

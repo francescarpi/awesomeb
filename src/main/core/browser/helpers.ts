@@ -113,7 +113,7 @@ export function parseTarget(
 
   const { selectedTab } = desktop;
   let tabContainer: TabContainer;
-  if (targetId === 'selected-tab-container' && selectedTab) {
+  if (targetId === 'into-selected-tab-container' && selectedTab) {
     tabContainer = selectedTab.tabContainer;
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
