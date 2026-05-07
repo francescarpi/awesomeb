@@ -5,7 +5,7 @@ import {
   TCertificateCallback,
   TPermissionRequestCallback,
 } from './types';
-import { TTabId } from '~/types';
+import { IDesConTab, TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
 import { FindInPage } from './find-in-page';
@@ -67,8 +67,8 @@ export class Tab extends UIView {
     registerTabEvents(browser, this);
   }
 
-  render(window: Window) {
-    const selectedTab = window.selectedTab;
+  private setVisibilityOnRender(win: Window): IDesConTab | null {
+    const selectedTab = win.selectedTab;
     const visibleTabs: number[] = [];
 
     if (selectedTab) {
@@ -83,11 +83,16 @@ export class Tab extends UIView {
 
     if (!visibleTabs.includes(this.id)) {
       this.setVisible(false);
-      return;
+      return selectedTab;
     }
 
     this.setVisible(true);
 
+    return selectedTab;
+  }
+
+  render(window: Window) {
+    const selectedTab = this.setVisibilityOnRender(window);
     if (!this.visible) {
       return;
     }
@@ -124,17 +129,17 @@ export class Tab extends UIView {
       height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
     }
 
-    if (this.isPreview) {
-      x += 16;
-      y += 16;
-      width -= 65;
-      height -= 16 * 2;
-    }
-
     // Split tabs calculation
     if (selectedTab?.tabContainer.isSplit) {
       const firstTab = selectedTab.tabContainer.tabs[0];
-      const tabNum = firstTab.id === this.id ? 1 : 2;
+      const tabNum = this.isPreview
+        ? firstTab.id === this.parentTab!.id
+          ? 1
+          : 2
+        : firstTab.id === this.id
+          ? 1
+          : 2;
+
       const percentSize =
         tabNum === 1
           ? selectedTab.tabContainer.layoutSize
@@ -148,6 +153,13 @@ export class Tab extends UIView {
       y = positon.y;
       width = positon.width;
       height = positon.height;
+    }
+
+    if (this.isPreview) {
+      x += 16;
+      y += 16;
+      width -= 65;
+      height -= 16 * 2;
     }
 
     this.webContentsView.setBounds({
