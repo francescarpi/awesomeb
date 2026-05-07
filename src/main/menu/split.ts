@@ -27,7 +27,9 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     {
       label: 'Unsplit tabs',
       icon: getIcon(EIcon.Unsplit),
-      click: () => {},
+      click: () => {
+        browser.performCommand(win, 'unsplit-tabs', {});
+      },
     },
     { type: 'separator' },
   ]);

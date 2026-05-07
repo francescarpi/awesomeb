@@ -1,9 +1,11 @@
 import { Partition } from '../partitions';
 import { Certificate } from 'electron';
 import { Tab } from './tab';
+import type { TTabContainerId } from '~/types';
 
 export interface ITabContainerProps {
   divider?: boolean;
+  justAfter?: TTabContainerId;
 }
 
 export interface ITabProps {

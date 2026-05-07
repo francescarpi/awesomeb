@@ -473,4 +473,35 @@ export class Browser {
 
     return true;
   }
+
+  unsplitTabContainer(tabContainerId: TTabContainerId) {
+    const result = this.getTabContainer(tabContainerId);
+    if (!result) {
+      scopeLog.warn(`Tab container with id ${tabContainerId} not found for unsplitting`);
+      return;
+    }
+
+    const { window, desktop, tabContainer } = result;
+
+    if (!tabContainer.isSplit) {
+      scopeLog.warn(`Tab container with id ${tabContainerId} is not split`);
+      return;
+    }
+
+    const lastTab = tabContainer.popTab();
+    if (!lastTab) {
+      scopeLog.warn(`No tabs found in tab container with id ${tabContainerId} for unsplitting`);
+      return;
+    }
+
+    const newTabContainer = desktop.createTabContainer(this.idGenerator.nextTabContainerId, {
+      justAfter: tabContainer.id,
+    });
+    newTabContainer.addTab(lastTab);
+
+    window.renderViews();
+    window.selectTab(lastTab.id);
+
+    this.eventsChannel.emit('tabcontainer:did-unsplit', window, desktop);
+  }
 }

@@ -112,8 +112,14 @@ export function parseTarget(
   }
 
   const { selectedTab } = desktop;
+  const totalSelectedTabContainerTabs = selectedTab?.tabContainer.tabs.length || 0;
+
   let tabContainer: TabContainer;
-  if (targetId === 'into-selected-tab-container' && selectedTab) {
+  if (
+    targetId === 'into-selected-tab-container' &&
+    selectedTab &&
+    totalSelectedTabContainerTabs < 2 // Limit to 2 tabs by tab container
+  ) {
     tabContainer = selectedTab.tabContainer;
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;

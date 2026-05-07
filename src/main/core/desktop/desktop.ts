@@ -80,8 +80,22 @@ export class Desktop {
     return Array.from(this._tabContainers.values());
   }
 
-  addTabContainer(tabContainer: TabContainer) {
-    this._tabContainers.set(tabContainer.id, tabContainer);
+  addTabContainer(tabContainer: TabContainer, justAfter?: TTabContainerId) {
+    if (justAfter && this._tabContainers.has(justAfter)) {
+      const tabContainers = this.tabContainers;
+      const index = tabContainers.findIndex((tc) => tc.id === justAfter);
+      if (index !== -1) {
+        tabContainers.splice(index + 1, 0, tabContainer);
+        // Update the internal map to reflect the new order
+        this._tabContainers.clear();
+        for (const tc of tabContainers) {
+          this._tabContainers.set(tc.id, tc);
+        }
+        return;
+      }
+    } else {
+      this._tabContainers.set(tabContainer.id, tabContainer);
+    }
   }
 
   selectTabContainer(id: TTabContainerId | null) {
@@ -149,7 +163,7 @@ export class Desktop {
 
   createTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {
     const tabContainer = new TabContainer(this.browser, id, props);
-    this.addTabContainer(tabContainer);
+    this.addTabContainer(tabContainer, props?.justAfter);
     return tabContainer;
   }
 

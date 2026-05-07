@@ -336,4 +336,11 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabContainers(selectedTab.window);
     browser.toRenderer.refreshTabSwitcher(selectedTab.window);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabcontainer:did-unsplit', async (win: Window, _desktop: Desktop) => {
+    browser.toRenderer.refreshTabContainers(win);
+    browser.toRenderer.refreshTabSwitcher(win);
+    browser.toRenderer.refreshShowSplitMenu(win);
+  });
 }

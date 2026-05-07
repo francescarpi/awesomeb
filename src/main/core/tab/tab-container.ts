@@ -128,4 +128,17 @@ export class TabContainer {
 
     this.browser.eventsChannel.emit('tabcontainer:tabs-rotated', this);
   }
+
+  popTab(): Tab | null {
+    const tabsArray = this.tabs;
+    if (tabsArray.length === 0) {
+      return null;
+    }
+    const poppedTab = tabsArray[tabsArray.length - 1];
+    this._tabs.delete(poppedTab.id);
+    if (this._selectedTabId === poppedTab.id) {
+      this._selectedTabId = null;
+    }
+    return poppedTab;
+  }
 }
