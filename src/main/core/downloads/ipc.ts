@@ -1,13 +1,11 @@
 import { Browser, Window } from '@/core';
-import { ipcMain } from 'electron';
-import { TWindowId } from '~/types';
 import log from 'electron-log';
 import {
-  checkInternalPage,
-  checkModalAndPagesSender,
   createHandler,
   windowChecker,
   viewChecker,
+  conditionalChecker,
+  internalPageChecker,
 } from '@/utils';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
@@ -40,16 +38,19 @@ export function setupDownloadsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on(
+  createHandler<{ savePath: string; action: 'cancel' | 'pause' | 'resume' | 'open' }>(
     'downloads:action',
-    async (
-      event,
-      savePath: string,
-      action: 'cancel' | 'pause' | 'resume' | 'open',
-      winId?: TWindowId,
-    ) => {
-      scopeLog.info(`Cancel download received for save path ${savePath}`);
-
+    'on',
+    browser,
+    [
+      conditionalChecker.bind(
+        null,
+        (args) => typeof args.winId === 'number',
+        [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+        [internalPageChecker.bind(null, 'downloads')],
+      ),
+    ],
+    async ({ savePath, action }) => {
       const performAction = () => {
         const downloadItem = browser.downloads.get(savePath);
         if (!downloadItem) {
@@ -72,41 +73,25 @@ export function setupDownloadsIPC(browser: Browser) {
             break;
         }
       };
-
-      if (winId) {
-        return await checkModalAndPagesSender(
-          event,
-          browser,
-          winId,
-          ['contextual-modal'],
-          async (_window) => {
-            return performAction();
-          },
-        );
-      }
-
-      return await checkInternalPage(event, browser, 'downloads', async (_window) => {
-        return performAction();
-      });
+      return performAction();
     },
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.handle('downloads:get', async (event, winId?: TWindowId) => {
-    scopeLog.info(`Get downloads received`);
-    if (winId) {
-      return await checkModalAndPagesSender(
-        event,
-        browser,
-        winId,
-        ['contextual-modal'],
-        async (_window) => {
-          return browser.renderer.downloads();
-        },
-      );
-    }
-    return await checkInternalPage(event, browser, 'downloads', async (_window) => {
+  createHandler<{}>(
+    'downloads:get',
+    'handle',
+    browser,
+    [
+      conditionalChecker.bind(
+        null,
+        (args) => typeof args.winId === 'number',
+        [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+        [internalPageChecker.bind(null, 'downloads')],
+      ),
+    ],
+    async () => {
       return browser.renderer.downloads();
-    });
-  });
+    },
+  );
 }

@@ -1,74 +1,71 @@
-import { Browser } from '@/core';
-import { ipcMain } from 'electron';
-import log from 'electron-log';
-import { IContextualModalParams, TPage, TWindowId } from '~/types';
-import { checkModalAndPagesSender, checkModalSender, checkContextualModal } from '@/utils';
-
-const scopeLog = log.scope('IPCUI');
+import { Browser, Window } from '@/core';
+import { IContextualModalParams, TPage } from '~/types';
+import { createHandler, modalChecker, windowChecker, viewChecker } from '@/utils';
 
 export function setupUIIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  ipcMain.on('modal:close', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC Received: layout-system:close-modal for window ID ${winId}`);
-    return await checkModalSender(event, browser, winId, (_win, modalManager) => {
-      modalManager.close();
-    });
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('modal:resize', async (event, winId: TWindowId, width: number, height: number) => {
-    scopeLog.info(`Modal resize requested for window ID ${winId}`);
-    return await checkModalSender(event, browser, winId, (_win, modalManager) => {
-      modalManager.resize(width, height);
-    });
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('modal:open', async (event, winId: TWindowId, page: TPage) => {
-    scopeLog.info(
-      `IPC Received: layout-system:open-modal for window ID ${winId} with page ${page}`,
-    );
-    return await checkModalAndPagesSender(
-      event,
-      browser,
-      winId,
-      ['urlbar', 'sidebar'],
-      async (window) => {
-        window.modal.open(page);
-      },
-    );
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on('tabswitcher:close', async (event, winId: TWindowId) => {
-    scopeLog.info(`IPC Received: layout-system:close-tab-switcher for window ID ${winId}`);
-    return await checkModalAndPagesSender(
-      event,
-      browser,
-      winId,
-      ['tab-switcher'],
-      async (window) => {
-        window.hideTabSwitcher();
-      },
-    );
-  });
-
-  //--------------------------------------------------------------------------------------
-  ipcMain.on(
-    'modal:open-contextual',
-    async (event, winId: TWindowId, page: TPage, params: IContextualModalParams) => {
-      scopeLog.info(`Open contextual modal "${page}" for window ${winId}.`);
-      return await checkModalAndPagesSender(event, browser, winId, ['sidebar'], async (window) => {
-        window.openContextualModal(page, params);
-      });
+  createHandler<{ win: Window }>(
+    'modal:close',
+    'on',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ win }) => {
+      win.modal.close();
     },
   );
 
   //--------------------------------------------------------------------------------------
-  ipcMain.on('modal:close-contextual', async (event, winId: TWindowId) => {
-    scopeLog.info(`Close contextual modal for window ${winId}.`);
-    return await checkContextualModal(event, browser, winId, async (window) => {
-      window.closeContextualModal();
-    });
-  });
+  createHandler<{ win: Window; width: number; height: number }>(
+    'modal:resize',
+    'on',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ win, width, height }) => {
+      win.modal.resize(width, height);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window; page: TPage }>(
+    'modal:open',
+    'on',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ win, page }) => {
+      win.modal.open(page);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'tabswitcher:close',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['tab-switcher'])],
+    async ({ win }) => {
+      win.hideTabSwitcher();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window; page: TPage; params: IContextualModalParams }>(
+    'modal:open-contextual',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    async ({ win, page, params }) => {
+      win.openContextualModal(page, params);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'modal:close-contextual',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+    async ({ win }) => {
+      win.closeContextualModal();
+    },
+  );
 }

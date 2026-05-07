@@ -1,244 +1,336 @@
-import { IpcMainInvokeEvent } from 'electron';
-import { Browser, Window, Tab, FindInPage, Desktop, TabContainer, FailLoad } from '@/core';
-import { TTabId, TWindowId, TExtensionId, IExtension } from '~/types';
+import { type IpcMainInvokeEvent, ipcMain } from 'electron';
 import log from 'electron-log';
-import { UIModalManager, UIPageView } from '@/ui';
+import { Browser, FindInPage, Window } from '@/core';
+import { UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import type { IWinDesConTab, TWindowId, TExtensionId, IExtension, TTabId } from '~/types';
+import { PromptBase } from '@/core/prompts/models';
 import { CertificateError } from '@/core/tab/certificate-error';
-import { UIContextualModal } from '@/ui/modal/models';
 
-const scopeLog = log.scope('UtilsIPC');
+const scopeLog = log.scope('IPCEventManager');
 
-export async function checkModalSender(
-  event: IpcMainInvokeEvent,
+//--------------------------------------------------------------------------------
+type CheckerFn = Function; // eslint-disable-line
+type CheckerGroup = CheckerFn[];
+type Checker = CheckerFn | CheckerGroup;
+
+export function createHandler<T extends object>(
+  channel: string,
+  method: 'handle' | 'on',
   browser: Browser,
-  winId: TWindowId,
-  callback: (window: Window, modalManager: UIModalManager) => void,
-): Promise<void> {
-  const win = browser.getWindow(winId);
-  if (!win || !win.modal) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
-  }
-
-  if (win.modal.id !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: modal WC ID ${win.modal.id} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(win, win.modal);
-}
-
-export async function checkModalAndPagesSender<T>(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  winId: TWindowId,
-  pages: string[],
-  callback: (window: Window, modalManager: UIModalManager | null) => Promise<T>,
+  checkers: Checker[],
+  callback: (args: T) => Promise<unknown>,
 ) {
-  const win = browser.getWindow(winId);
-  if (!win || !win.modal) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
-  }
+  const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
 
-  const allowedSenders: number[] = [];
+  ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
+    scopeLog.info(`[${channel}] received with props: `, rawArgs);
 
-  if (win.modal.id) {
-    allowedSenders.push(win.modal.id);
-  }
+    const args = { ...rawArgs, event } as T;
 
-  for (const page of pages) {
-    const view = win.getView<UIPageView>(page);
-    if (view) {
-      allowedSenders.push(view.webContentsId);
+    const resolvedCheckers: Checker[] = [];
+    for (const checker of checkers) {
+      if (Array.isArray(checker)) {
+        resolvedCheckers.push(checker);
+      } else if (checker.name === 'bound conditionalChecker') {
+        const conditionalResult = checker(args);
+        if (conditionalResult === null) {
+          scopeLog.warn(`[${channel}] conditionalChecker failed`);
+          return;
+        }
+        resolvedCheckers.push(() => conditionalResult);
+      } else {
+        resolvedCheckers.push(checker);
+      }
     }
-  }
 
-  if (!allowedSenders.includes(event.sender.id)) {
-    scopeLog.error(
-      `WebContents ID mismatch: modal and pages WC IDs ${allowedSenders.join(
-        ', ',
-      )} do not match sender WC ID ${event.sender.id} and url ${event.sender.getURL()}`,
-    );
-    return;
-  }
+    for (const checker of resolvedCheckers) {
+      if (Array.isArray(checker)) {
+        let anyPassed = false;
+        for (const altChecker of checker) {
+          const result = altChecker(browser, event, args);
+          if (result !== null) {
+            Object.assign(args, result);
+            anyPassed = true;
+            break;
+          }
+        }
+        if (!anyPassed) {
+          scopeLog.warn(`[${channel}] validation failed: no checker passed OR group`);
+          return;
+        }
+      } else {
+        const result = checker(browser, event, args);
+        if (result === null) {
+          scopeLog.warn(`[${channel}] validation failed in checker ${checker.name}`);
+          return;
+        }
+        Object.assign(args, result);
+      }
+    }
 
-  return await callback(win, win.modal);
+    return await callback(args);
+  });
 }
 
-export async function checkWindowSender(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  winId: TWindowId,
-  callback: (window: Window) => void,
-): Promise<void> {
-  const win = browser.getWindow(winId);
-  if (!win) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
-  }
-
-  if (win.webContentsId !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: window WC ID ${win.webContentsId} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(win);
-}
-
-export async function checkFindInPageSender(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  tabId: TTabId,
-  callback: (tab: Tab, findInPage: FindInPage) => void,
-): Promise<void> {
-  const result = browser.getTab(tabId);
-  if (!result) {
-    scopeLog.error(`No tab found with ID ${tabId}`);
-    return;
-  }
-
-  const { tab } = result;
-  if (!tab.findInPage) {
-    scopeLog.error(`Tab with ID ${tabId} does not have a findInPage view`);
-    return;
-  }
-
-  if (tab.findInPage.webContentsId !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: findInPage WC ID ${tab.findInPage.webContentsId} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(tab, tab.findInPage);
-}
-
-export async function checkInternalPage(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
+//--------------------------------------------------------------------------------
+export function internalPageChecker(
   page: string,
-  callback: (window: Window, desktop: Desktop, tabContainer: TabContainer, tab: Tab) => void,
-): Promise<void> {
-  for (const tabResult of browser.tabs) {
-    if (tabResult.tab.url && tabResult.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
-      if (tabResult.tab.webContentsId === event.sender.id) {
-        return callback(tabResult.window, tabResult.desktop, tabResult.tabContainer, tabResult.tab);
+  browser: Browser,
+  event: IpcMainInvokeEvent,
+  _args: Record<string, unknown>,
+): { tabData: IWinDesConTab } | null {
+  for (const tabData of browser.tabs) {
+    if (tabData.tab.url && tabData.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
+      if (tabData.tab.webContentsId === event.sender.id) {
+        return { tabData };
       }
     }
   }
-
-  scopeLog.error(
-    `No internal page found with name ${page} matching sender WC ID ${event.sender.id}`,
-  );
+  return null;
 }
 
-export async function checkFailLoadSender(
-  event: IpcMainInvokeEvent,
+//--------------------------------------------------------------------------------
+export function windowChecker(
   browser: Browser,
-  tabId: TTabId,
-  callback: (tab: Tab, failLoad: FailLoad) => void,
-): Promise<void> {
-  const result = browser.getTab(tabId);
-  if (!result) {
-    scopeLog.error(`No tab found with ID ${tabId}`);
-    return;
+  _event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window } | null {
+  const { winId } = args as { winId?: TWindowId };
+  if (!winId) {
+    scopeLog.warn(`[WindowChecker] Missing window ID`);
+    return null;
   }
 
-  const { tab } = result;
-  if (!tab.failLoad) {
-    scopeLog.error(`Tab with ID ${tabId} does not have a fail load view`);
-    return;
-  }
-
-  if (tab.failLoad.webContentsId !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: fail load WC ID ${tab.failLoad.webContentsId} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(tab, tab.failLoad);
-}
-
-export async function checkCertificateErrorSender(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  tabId: TTabId,
-  callback: (tab: Tab, certificateError: CertificateError) => void,
-): Promise<void> {
-  const result = browser.getTab(tabId);
-  if (!result) {
-    scopeLog.error(`No tab found with ID ${tabId}`);
-    return;
-  }
-
-  const { tab } = result;
-  if (!tab.certificateError) {
-    scopeLog.error(`Tab with ID ${tabId} does not have a certificate error view`);
-    return;
-  }
-
-  if (tab.certificateError.webContentsId !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: fail load WC ID ${tab.certificateError.webContentsId} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return callback(tab, tab.certificateError);
-}
-
-export async function checkContextualModal<T>(
-  event: IpcMainInvokeEvent,
-  browser: Browser,
-  winId: TWindowId,
-  callback: (window: Window, view: UIContextualModal) => Promise<T>,
-) {
   const win = browser.getWindow(winId);
   if (!win) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
+    scopeLog.warn(`[WindowChecker] No window found with ID ${winId}`);
+    return null;
   }
 
-  const view = win.getView<UIContextualModal>('contextual-modal');
-  if (!view) {
-    scopeLog.error(`No contextual modal found for window ID ${winId}`);
-    return;
-  }
-
-  if (view.webContentsId !== event.sender.id) {
-    scopeLog.error(
-      `WebContents ID mismatch: contextual modal WC ID ${view.webContentsId} does not match sender WC ID ${event.sender.id}`,
-    );
-    return;
-  }
-
-  return await callback(win, view);
+  return { win };
 }
 
-export async function checkExtensionSender<T>(
-  browser: Browser,
-  winId: TWindowId,
-  extensionId: TExtensionId,
-  callback: (window: Window, extension: IExtension) => Promise<T>,
-) {
-  const win = browser.getWindow(winId);
+//--------------------------------------------------------------------------------
+export function viewChecker(
+  viewsIds: string[],
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window } | null {
+  const { win } = args as { win?: Window };
   if (!win) {
-    scopeLog.error(`No window found with ID ${winId}`);
-    return;
+    scopeLog.warn(`[ViewChecker] Missing window object for views ${viewsIds.join(', ')}`);
+    return null;
+  }
+
+  const allowedIds: number[] = [];
+  for (const viewId of viewsIds) {
+    const view = win.getView<UIPageView>(viewId);
+    if (!view) {
+      scopeLog.warn(`[ViewChecker] No view found with ID ${viewId} in window ${win.id}`);
+      return null;
+    }
+    allowedIds.push(view.webContentsId);
+  }
+
+  if (!allowedIds.includes(event.sender.id)) {
+    scopeLog.warn(
+      `[ViewChecker] WebContents ID ${event.sender.id} does not match any allowed IDs for views ${viewsIds.join(
+        ', ',
+      )} in window ${win.id}`,
+      {
+        allowedIds,
+        actual: event.sender.id,
+      },
+    );
+    return null;
+  }
+
+  return { win };
+}
+
+//--------------------------------------------------------------------------------
+export function extensionChecker(
+  browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window; extension: IExtension } | null {
+  const { win, extensionId } = args as { win?: Window; extensionId?: TExtensionId };
+  if (!win) {
+    scopeLog.warn(`[ExtensionChecker] Missing window object for extension action`);
+    return null;
+  }
+
+  if (!extensionId) {
+    scopeLog.warn(
+      `[ExtensionChecker] Missing extension ID for extension action in window ${win.id}`,
+    );
+    return null;
+  }
+
+  if (!event.sender.getURL().startsWith(`chrome-extension://${extensionId}/`)) {
+    scopeLog.warn(
+      `[ExtensionChecker] WebContents URL does not match expected extension URL for extension ${extensionId} in window ${win.id}`,
+      {
+        expectedPrefix: `chrome-extension://${extensionId}/`,
+        actual: event.sender.getURL(),
+      },
+    );
+    return null;
   }
 
   const extension = browser.extensions.getExtension(extensionId);
   if (!extension) {
-    scopeLog.error(`No extension found with ID ${extensionId}`);
-    return;
+    scopeLog.warn(
+      `[ExtensionChecker] No extension found with ID ${extensionId} for extension action in window ${win.id}`,
+    );
+    return null;
   }
 
-  return await callback(win, extension);
+  return { win, extension };
+}
+
+//--------------------------------------------------------------------------------
+export function modalChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { win: Window } | null {
+  const { win } = args as { win?: Window };
+  if (!win) {
+    scopeLog.warn(`[ModalChecker] Missing window object for modal action`);
+    return null;
+  }
+
+  if (!win.modal) {
+    scopeLog.warn(`[ModalChecker] Window ${win.id} is not a modal`);
+    return null;
+  }
+
+  if (event.sender.id !== win.modal.id) {
+    scopeLog.warn(
+      `[ModalChecker] WebContents ID ${event.sender.id} does not match modal WebContents ID ${win.modal.id} for window ${win.id}`,
+    );
+    return null;
+  }
+
+  return { win };
+}
+
+//--------------------------------------------------------------------------------
+export function tabChecker(
+  browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { tab: IWinDesConTab } | null {
+  let tab: IWinDesConTab | null;
+
+  if (args.tabId) {
+    tab = browser.getTab(args.tabId as TTabId);
+  } else {
+    tab = browser.getTabByWebContentsId(event.sender.id);
+  }
+
+  if (!tab) {
+    scopeLog.warn(`[TabChecker] No tab found for WebContents ID ${event.sender.id}`);
+    return null;
+  }
+
+  return { tab };
+}
+
+//--------------------------------------------------------------------------------
+export function promptChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { prompt: PromptBase } | null {
+  const { win } = args as { win?: Window };
+  if (!win) {
+    scopeLog.warn(`[PromptChecker] Missing window object for prompt response`);
+    return null;
+  }
+
+  if (!win.prompts.current) {
+    scopeLog.warn(`[PromptChecker] No active prompt found in window ${win.id} for prompt response`);
+    return null;
+  }
+
+  if (event.sender.id !== win.prompts.current.modalId) {
+    scopeLog.warn(
+      `[PromptChecker] WebContents ID ${event.sender.id} does not match current prompt modal ID ${win.prompts.current.modalId} in window ${win.id}`,
+    );
+    return null;
+  }
+
+  return { prompt: win.prompts.current };
+}
+
+//--------------------------------------------------------------------------------
+export function findInPageChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { findInPage: FindInPage } | null {
+  const { tab } = args as { tab?: IWinDesConTab };
+  if (!tab) {
+    scopeLog.warn(`[FindInPageChecker] Missing tab object for find-in-page action`);
+    return null;
+  }
+
+  if (!tab.tab.findInPage) {
+    scopeLog.warn(
+      `[FindInPageChecker] Tab ${tab.tab.id} does not have a find-in-page view for find-in-page action`,
+    );
+    return null;
+  }
+
+  if (tab.tab.findInPage.webContentsId !== event.sender.id) {
+    scopeLog.warn(
+      `[FindInPageChecker] WebContents ID ${event.sender.id} does not match find-in-page WebContents ID ${tab.tab.findInPage.webContentsId} for tab ${tab.tab.id}`,
+    );
+    return null;
+  }
+
+  return { findInPage: tab.tab.findInPage };
+}
+
+//--------------------------------------------------------------------------------
+export function certificateErrorChecker(
+  _browser: Browser,
+  event: IpcMainInvokeEvent,
+  args: Record<string, unknown>,
+): { certificateError: CertificateError } | null {
+  const { tab } = args as { tab?: IWinDesConTab };
+  if (!tab) {
+    scopeLog.warn(`[CertificateErrorChecker] Missing tab object for certificate error response`);
+    return null;
+  }
+
+  if (!tab.tab.certificateError) {
+    scopeLog.warn(
+      `[CertificateErrorChecker] Tab ${tab.tab.id} does not have a pending certificate error for certificate error response`,
+    );
+    return null;
+  }
+
+  if (tab.tab.certificateError.webContentsId !== event.sender.id) {
+    scopeLog.warn(
+      `[CertificateErrorChecker] WebContents ID ${event.sender.id} does not match certificate error WebContents ID ${tab.tab.certificateError.webContentsId} for tab ${tab.tab.id}`,
+    );
+    return null;
+  }
+
+  return { certificateError: tab.tab.certificateError };
+}
+
+//--------------------------------------------------------------------------------
+export function conditionalChecker(
+  criteriaFn: (args: Record<string, unknown>) => boolean,
+  checker1: CheckerFn[],
+  checker2: CheckerFn[],
+  args: Record<string, unknown>,
+): CheckerFn[] {
+  return criteriaFn(args) ? checker1 : checker2;
 }

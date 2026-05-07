@@ -26,19 +26,19 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 //--------------------------------------------------------------------------------------
 const abModal = {
   close: (winId: TWindowId) => {
-    ipcRenderer.send('modal:close', winId);
+    ipcRenderer.send('modal:close', { winId });
   },
   open: (winId: TWindowId, page: TPage) => {
-    ipcRenderer.send('modal:open', winId, page);
+    ipcRenderer.send('modal:open', { winId, page });
   },
   openContextual: (winId: TWindowId, page: TPage, params: IContextualModalParams) => {
-    ipcRenderer.send('modal:open-contextual', winId, page, params);
+    ipcRenderer.send('modal:open-contextual', { winId, page, params });
   },
   closeContextual: (winId: TWindowId) => {
-    ipcRenderer.send('modal:close-contextual', winId);
+    ipcRenderer.send('modal:close-contextual', { winId });
   },
   resize: (winId: TWindowId, width: number, height: number) => {
-    ipcRenderer.send('modal:resize', winId, width, height);
+    ipcRenderer.send('modal:resize', { winId, width, height });
   },
 };
 
@@ -90,7 +90,7 @@ const abWindow = {
 //--------------------------------------------------------------------------------------
 const abMenu = {
   contextMenu: (winId: TWindowId, type: TMenuType, params: Record<string, unknown>) => {
-    ipcRenderer.send('menu:context-menu', winId, type, params);
+    ipcRenderer.send('menu:context-menu', { winId, type, params });
   },
 };
 
@@ -200,7 +200,7 @@ const abFavicons = {
 //--------------------------------------------------------------------------------------
 const abTabSwitcher = {
   close: (winId: TWindowId) => {
-    ipcRenderer.send('tabswitcher:close', winId);
+    ipcRenderer.send('tabswitcher:close', { winId });
   },
   refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => {
     ipcRenderer.on('tabswitcher:refresh', callback);
