@@ -171,7 +171,7 @@ declare global {
     refresh: () => Promise<IExtensions>;
     toggle: (id: TExtensionId) => Promise<IExtension[]>;
     onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => void;
-    openPopup: (winId: TWindowId, extensionId: TExtensionId) => Promise<void>;
+    openPopup: (winId: TWindowId, extensionId: TExtensionId, x: number, y: number) => Promise<void>;
     closePopup: (winId: TWindowId) => Promise<void>;
   };
 

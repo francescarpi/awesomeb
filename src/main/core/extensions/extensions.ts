@@ -82,7 +82,7 @@ export class Extensions {
     return this._store.get(`extensions.${id}`) || null;
   }
 
-  openPopup(extensionId: TExtensionId, window: Window, partition: Partition) {
+  openPopup(extensionId: TExtensionId, window: Window, partition: Partition, x: number, y: number) {
     const extension = this.getExtension(extensionId);
     if (!extension) {
       scopeLog.warn(`Extension with id ${extensionId} not found`);
@@ -92,7 +92,7 @@ export class Extensions {
     const overlay = new ExtensionPopupOverlay(window.id);
     window.addView(overlay);
 
-    const popup = new ExtensionPopup(partition);
+    const popup = new ExtensionPopup(partition, x, y);
     const popupUrl = `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`;
     popup.webContents.loadURL(popupUrl);
     window.addView(popup);

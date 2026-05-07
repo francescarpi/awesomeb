@@ -264,8 +264,8 @@ const abExtensions = {
   onRefresh: (callback: (event: IpcRendererEvent, extensions: IExtension[]) => void) => {
     ipcRenderer.on('extensions:on-refresh', callback);
   },
-  openPopup: (winId: TWindowId, extensionId: TExtensionId) => {
-    ipcRenderer.send('extensions:open-popup', { winId, extensionId });
+  openPopup: (winId: TWindowId, extensionId: TExtensionId, x: number, y: number) => {
+    ipcRenderer.send('extensions:open-popup', { winId, extensionId, x, y });
   },
   closePopup: (winId: TWindowId) => {
     ipcRenderer.send('extensions:close-popup', { winId });

@@ -1,7 +1,6 @@
-import { UIPageView, UIView } from '@/ui';
+import { UIPageView, UIView, Sidebar } from '@/ui';
 import { Window, Partition } from '@/core';
 import { TWindowId } from '~/types';
-import { screen } from 'electron';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
@@ -23,7 +22,11 @@ export class ExtensionPopupOverlay extends UIPageView {
 }
 
 export class ExtensionPopup extends UIView {
-  constructor(partition: Partition) {
+  constructor(
+    partition: Partition,
+    private readonly x: number,
+    private readonly y: number,
+  ) {
     super('extension-popup', 'extension', {
       session: partition.ses,
       backgroundColor: '#fff',
@@ -38,14 +41,11 @@ export class ExtensionPopup extends UIView {
   }
 
   render(window: Window) {
-    const winBounds = window.bounds;
     const bounds = this.webContentsView.getBounds();
-    const point = screen.getCursorScreenPoint();
+    const sidebar = window.getView<Sidebar>('sidebar')!;
 
-    // calculate x, y to position the popup taking into account the anchor point is
-    // the top-right corner of the popup
-    const x = point.x - bounds.width - winBounds.x;
-    const y = point.y - winBounds.y + 10;
+    const x = this.x + sidebar.bounds.width - bounds.width + 16;
+    const y = this.y + 30;
 
     this.webContentsView.setBounds({
       x,

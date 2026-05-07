@@ -46,18 +46,18 @@ export function setupExtensionsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------
-  createHandler<{ win: Window; winId: TWindowId; extensionId: TExtensionId }>(
+  createHandler<{ win: Window; winId: TWindowId; extensionId: TExtensionId; x: number; y: number }>(
     'extensions:open-popup',
     'on',
     browser,
     [windowChecker, viewChecker.bind(null, ['urlbar'])],
-    async ({ win, winId, extensionId }) => {
+    async ({ win, winId, extensionId, x, y }) => {
       const selectedTab = win.selectedTab;
       if (!selectedTab) {
         scopeLog.warn('No selected tab found for window', { winId });
         return;
       }
-      browser.extensions.openPopup(extensionId, win, selectedTab.tab.partition);
+      browser.extensions.openPopup(extensionId, win, selectedTab.tab.partition, x, y);
     },
   );
 

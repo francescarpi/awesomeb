@@ -35,7 +35,14 @@
             'p-0.5',
           ),
           style: 'app-region: no-drag;',
-          onclick: () => abExtensions.openPopup(winId, extension.id),
+          onclick: (e) => {
+            const img = e.target as HTMLImageElement;
+            const bounds = img.getBoundingClientRect();
+
+            const y = Math.round(bounds.top);
+            const x = Math.round(bounds.left);
+            abExtensions.openPopup(winId, extension.id, x, y);
+          },
         }),
       ),
     );
