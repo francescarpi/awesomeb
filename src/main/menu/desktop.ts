@@ -31,6 +31,21 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
         });
       },
     },
+    { type: 'separator' },
+    {
+      label: 'Move left',
+      icon: getIcon(EIcon.Previous),
+      click: () => {
+        browser.performCommand(window, 'move-desktop-left');
+      },
+    },
+    {
+      label: 'Move right',
+      icon: getIcon(EIcon.Next),
+      click: () => {
+        browser.performCommand(window, 'move-desktop-right');
+      },
+    },
   ]);
 
   return menu;
