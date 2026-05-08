@@ -7,6 +7,8 @@ import * as windowMinimize from './window-minimize';
 import * as windowMaximize from './window-maximize';
 import * as windowClose from './window-close';
 import * as windowToggleSidebar from './window-toggle-sidebar';
+import * as desktopMoveLeft from './desktop-move-left';
+import * as desktopMoveRight from './desktop-move-right';
 import * as desktopNext from './desktop-next';
 import * as desktopPrev from './desktop-prev';
 import * as desktopSelect from './desktop-select';
@@ -63,6 +65,8 @@ const COMMANDS = {
   [windowMaximize.TRIGGER]: windowMaximize.Command,
   [windowClose.TRIGGER]: windowClose.Command,
   [windowToggleSidebar.TRIGGER]: windowToggleSidebar.Command,
+  [desktopMoveLeft.TRIGGER]: desktopMoveLeft.Command,
+  [desktopMoveRight.TRIGGER]: desktopMoveRight.Command,
   [desktopNext.TRIGGER]: desktopNext.Command,
   [desktopPrev.TRIGGER]: desktopPrev.Command,
   [desktopSelect.TRIGGER]: desktopSelect.Command,
