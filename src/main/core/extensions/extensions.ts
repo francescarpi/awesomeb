@@ -111,7 +111,7 @@ export class Extensions {
     const popup = window.getView<ExtensionPopup>('extension-popup');
     if (popup) {
       popup.setSize(width || 225, height || 100);
-      popup.render(window);
+      popup.refreshBounds(window);
       popup.setVisible(true);
     }
   }

@@ -9,7 +9,7 @@ export class ExtensionPopupOverlay extends UIPageView {
     });
   }
 
-  render(window: Window) {
+  refreshBounds(window: Window) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({
@@ -40,7 +40,7 @@ export class ExtensionPopup extends UIView {
     });
   }
 
-  render(window: Window) {
+  refreshBounds(window: Window) {
     const bounds = this.webContentsView.getBounds();
     const sidebar = window.getView<Sidebar>('sidebar')!;
 

@@ -10,7 +10,7 @@ export class TabSwitcher extends UIPageView {
     });
   }
 
-  render(window: Window) {
+  refreshBounds(window: Window) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({

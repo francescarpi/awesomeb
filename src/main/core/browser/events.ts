@@ -72,8 +72,9 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:tab-did-resume', async (_window: Window, tab: Tab) => {
+  browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
     await tab.loadHistoryOrURL();
+    browser.toRenderer.refreshShowSplitMenu(window);
   });
 
   //--------------------------------------------------------------------------------------

@@ -242,6 +242,7 @@ export class Window extends UIWindow {
       desktop.selectTabContainer(null);
     }
 
+    tab.setVisible(false);
     this.removeView(tab.viewId);
     this.renderViews();
 
@@ -276,7 +277,14 @@ export class Window extends UIWindow {
 
   renderViews() {
     for (const view of this.views) {
-      view.render(this);
+      view.checkVisibility(this);
+    }
+
+    for (const view of this.views) {
+      if (!view.visible) {
+        continue;
+      }
+      view.refreshBounds(this);
     }
   }
 

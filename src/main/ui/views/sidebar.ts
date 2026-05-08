@@ -11,7 +11,7 @@ export class Sidebar extends UIPageView {
     });
   }
 
-  render(window: Window) {
+  refreshBounds(window: Window) {
     const bounds = window.bounds;
 
     let width: number;

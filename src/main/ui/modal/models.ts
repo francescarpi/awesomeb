@@ -100,7 +100,7 @@ export class UIContextualModal extends UIPageView {
     });
   }
 
-  render(window: Window) {
+  refreshBounds(window: Window) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({

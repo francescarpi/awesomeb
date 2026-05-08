@@ -141,8 +141,10 @@ export class UIView {
     }
   }
 
-  render(window: Window) {
-    scopeLog.error('Not implemented render for UIView', window.id);
+  checkVisibility(_window: Window) {}
+
+  refreshBounds(_window: Window) {
+    throw new Error('Not implemented render for UIView');
   }
 
   close() {

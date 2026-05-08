@@ -5,7 +5,7 @@ import {
   TCertificateCallback,
   TPermissionRequestCallback,
 } from './types';
-import { IDesConTab, TTabId } from '~/types';
+import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
 import { FindInPage } from './find-in-page';
@@ -67,8 +67,8 @@ export class Tab extends UIView {
     registerTabEvents(browser, this);
   }
 
-  private setVisibilityOnRender(win: Window): IDesConTab | null {
-    const selectedTab = win.selectedTab;
+  checkVisibility(window: Window) {
+    const selectedTab = window.selectedTab;
     const visibleTabs: number[] = [];
 
     if (selectedTab) {
@@ -83,19 +83,14 @@ export class Tab extends UIView {
 
     if (!visibleTabs.includes(this.id)) {
       this.setVisible(false);
-      return selectedTab;
+      return;
     }
 
     this.setVisible(true);
-
-    return selectedTab;
   }
 
-  render(window: Window) {
-    const selectedTab = this.setVisibilityOnRender(window);
-    if (!this.visible) {
-      return;
-    }
+  refreshBounds(window: Window) {
+    const selectedTab = window.selectedTab;
 
     // Calculate bounds...
     const bounds = window.bounds;
@@ -128,13 +123,6 @@ export class Tab extends UIView {
     if (this.findInPage) {
       height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
     }
-
-    console.log(
-      'CESC',
-      this.id,
-      selectedTab?.tabContainer.isSplit,
-      selectedTab?.tabContainer.visibleTabs.map((t) => t.id),
-    );
 
     // Split tabs calculation
     if (selectedTab?.tabContainer.isSplit) {
