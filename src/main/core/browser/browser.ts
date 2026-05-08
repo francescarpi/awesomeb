@@ -367,59 +367,89 @@ export class Browser {
   }
 
   closeTabPreview(tabId: TTabId) {
-    const tabData = this.getTab(tabId);
-    if (!tabData) {
+    const parentTabData = this.getTab(tabId);
+    if (!parentTabData) {
       scopeLog.warn(`Tab with id ${tabId} not found for closing preview`);
       return;
     }
 
-    const tabPreview = tabData.tab.tabPreview;
+    const tabPreview = parentTabData.tab.tabPreview;
     if (!tabPreview) {
-      scopeLog.warn(`No preview tab found for Tab ID ${tabData.tab.id}`);
+      scopeLog.warn(`No preview tab found for Tab ID ${parentTabData.tab.id}`);
       return;
     }
 
-    tabData.window.removeView(tabPreview.tab.viewId);
-    tabData.window.removeView(tabPreview.viewId);
+    parentTabData.window.removeView(tabPreview.tab.viewId);
+    parentTabData.window.removeView(tabPreview.viewId);
 
-    tabData.tab.setTabPreview(null);
+    parentTabData.tab.setTabPreview(null);
 
     tabPreview.close();
 
-    tabData.window.renderViews();
+    parentTabData.window.renderViews();
 
-    this.eventsChannel.emit('tabpreview:closed', tabData.window);
+    this.eventsChannel.emit('tabpreview:closed', parentTabData.window);
   }
 
   acceptTabPreview(tabId: TTabId) {
-    const tabData = this.getTab(tabId);
-    if (!tabData) {
+    const parentTabData = this.getTab(tabId);
+    if (!parentTabData) {
       scopeLog.warn(`Tab with id ${tabId} not found for accepting preview`);
       return;
     }
 
-    const tabPreview = tabData.tab.tabPreview;
+    const tabPreview = parentTabData.tab.tabPreview;
     if (!tabPreview) {
-      scopeLog.warn(`No preview tab found for Tab ID ${tabData.tab.id}`);
+      scopeLog.warn(`No preview tab found for Tab ID ${parentTabData.tab.id}`);
       return;
     }
 
-    const tabContainer = tabData.desktop.createTabContainer(this.idGenerator.nextTabContainerId);
+    const tabContainer = parentTabData.desktop.createTabContainer(
+      this.idGenerator.nextTabContainerId,
+    );
     tabContainer.addTab(tabPreview.tab);
     tabContainer.selectTab(tabPreview.tab.id);
-
-    tabData.desktop.selectTabContainer(tabContainer.id);
+    parentTabData.desktop.selectTabContainer(tabContainer.id);
 
     tabPreview.tab.clearParent();
 
-    tabData.window.removeView(tabPreview.viewId);
+    parentTabData.window.removeView(tabPreview.viewId);
     tabPreview.close();
 
-    tabData.tab.setTabPreview(null);
+    parentTabData.tab.setTabPreview(null);
 
-    tabData.window.renderViews();
+    parentTabData.window.renderViews();
 
-    this.eventsChannel.emit('tabpreview:accepted', tabData.window);
+    this.eventsChannel.emit('tabpreview:accepted', parentTabData.window, tabPreview.tab);
+  }
+
+  splitTabPreview(tabId: TTabId) {
+    const parentTabData = this.getTab(tabId);
+    if (!parentTabData) {
+      scopeLog.warn(`Tab with id ${tabId} not found for splitting preview`);
+      return;
+    }
+
+    const tabPreview = parentTabData.tab.tabPreview;
+    if (!tabPreview) {
+      scopeLog.warn(`No preview tab found for Tab ID ${parentTabData.tab.id}`);
+      return;
+    }
+
+    parentTabData.tabContainer.addTab(tabPreview.tab);
+    parentTabData.tabContainer.selectTab(tabPreview.tab.id);
+    parentTabData.desktop.selectTabContainer(parentTabData.tabContainer.id);
+
+    tabPreview.tab.clearParent();
+
+    parentTabData.window.removeView(tabPreview.viewId);
+    tabPreview.close();
+
+    parentTabData.tab.setTabPreview(null);
+
+    parentTabData.window.renderViews();
+
+    this.eventsChannel.emit('tabpreview:split', parentTabData.window, tabPreview.tab);
   }
 
   /**

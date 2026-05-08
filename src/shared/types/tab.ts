@@ -55,3 +55,5 @@ export interface ITabSwitcherTab {
   title: string;
   partitionColor: string;
 }
+
+export type TTabPreviewAction = 'close' | 'accept' | 'split';

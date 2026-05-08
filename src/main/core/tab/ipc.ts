@@ -9,7 +9,7 @@ import {
   modalChecker,
 } from '@/utils';
 import { FindInPageOptions, Certificate, type IpcMainInvokeEvent } from 'electron';
-import { IWinDesConTab, TFindInPageAction } from '~/types';
+import type { IWinDesConTab, TFindInPageAction, TTabPreviewAction } from '~/types';
 import log from 'electron-log';
 import { URLInfoView } from './url-info';
 import { Tab } from './tab';
@@ -242,26 +242,24 @@ export function setupTabIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{ tab: IWinDesConTab; event: IpcMainInvokeEvent; action: 'close' | 'accept' }>(
-    'tabs:tab-preview-action',
-    'on',
-    browser,
-    [tabChecker],
-    async ({ tab, event, action }) => {
-      const tabPreview = tab.tab.tabPreview;
-      if (!tabPreview) {
-        scopeLog.warn(`No preview tab found for parent tab ID ${tab.tab.id}`);
-        return;
-      }
+  createHandler<{
+    tab: IWinDesConTab;
+    event: IpcMainInvokeEvent;
+    action: TTabPreviewAction;
+  }>('tabs:tab-preview-action', 'on', browser, [tabChecker], async ({ tab, event, action }) => {
+    const tabPreview = tab.tab.tabPreview;
+    if (!tabPreview) {
+      scopeLog.warn(`No preview tab found for parent tab ID ${tab.tab.id}`);
+      return;
+    }
 
-      if (tabPreview.webContentsId !== event.sender.id) {
-        scopeLog.warn(
-          `Sender webContents ID ${event.sender.id} does not match preview tab's webContentsId ${tabPreview.webContentsId}`,
-        );
-        return;
-      }
+    if (tabPreview.webContentsId !== event.sender.id) {
+      scopeLog.warn(
+        `Sender webContents ID ${event.sender.id} does not match preview tab's webContentsId ${tabPreview.webContentsId}`,
+      );
+      return;
+    }
 
-      browser.performCommand(tab.window, `${action}-tab-preview`);
-    },
-  );
+    browser.performCommand(tab.window, `${action}-tab-preview`);
+  });
 }

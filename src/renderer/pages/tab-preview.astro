@@ -22,8 +22,9 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
   import { onClick, getSearchParams } from '#/scripts';
 
   const { searchParams } = getSearchParams();
-  const parentTabId = searchParams.get('tabId')!;
+  const parentTabId = parseInt(searchParams.get('tabId')!, 10);
 
-  onClick('close', () => abTabs.tabPreviewAction(parseInt(parentTabId, 10), 'close'));
-  onClick('maximize', () => abTabs.tabPreviewAction(parseInt(parentTabId, 10), 'accept'));
+  onClick('close', () => abTabs.tabPreviewAction(parentTabId, 'close'));
+  onClick('maximize', () => abTabs.tabPreviewAction(parentTabId, 'accept'));
+  onClick('split', () => abTabs.tabPreviewAction(parentTabId, 'split'));
 </script>

@@ -1,4 +1,4 @@
-import {
+import type {
   TWindowId,
   TEntityType,
   IDesktopEntity,
@@ -20,6 +20,7 @@ import {
   TExtensionId,
   IExtension,
   TDesktopId,
+  TTabPreviewAction,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -133,7 +134,7 @@ const abTabs = {
   grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => {
     ipcRenderer.send('tabs:grant-permission', { winId, tabId, value });
   },
-  tabPreviewAction: (tabId: TTabId, action: 'close' | 'accept') => {
+  tabPreviewAction: (tabId: TTabId, action: TTabPreviewAction) => {
     ipcRenderer.send('tabs:tab-preview-action', { tabId, action });
   },
   onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => {

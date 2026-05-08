@@ -1,4 +1,4 @@
-import {
+import type {
   TWindowId,
   TEntityType,
   IEntity,
@@ -16,6 +16,7 @@ import {
   IConfig,
   IExtension,
   TExtensionId,
+  TTabPreviewAction,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -88,7 +89,7 @@ declare global {
     clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => void;
     trustCertificateError: (tabId: TTabId) => void;
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
-    tabPreviewAction: (parentTabId: TTabId, action: 'close' | 'accept') => void;
+    tabPreviewAction: (parentTabId: TTabId, action: TTabPreviewAction) => void;
     onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => void;
   };
 

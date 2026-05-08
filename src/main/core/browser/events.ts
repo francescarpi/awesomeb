@@ -286,10 +286,20 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('tabpreview:accepted', async (window: Window) => {
+  browser.eventsChannel.on('tabpreview:split', async (window: Window, tab: Tab) => {
     browser.toRenderer.refreshTabSwitcher(window);
     browser.toRenderer.refreshTabContainers(window);
-    browser.toRenderer.refreshURLBar(window, null);
+    browser.toRenderer.refreshURLBar(window, tab);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshShowSplitMenu(window);
+    browser.refreshMainMenu();
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabpreview:accepted', async (window: Window, tab: Tab) => {
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainers(window);
+    browser.toRenderer.refreshURLBar(window, tab);
     browser.toRenderer.refreshDesktops(window);
     browser.refreshMainMenu();
   });
