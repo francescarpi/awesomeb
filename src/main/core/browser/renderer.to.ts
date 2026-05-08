@@ -123,4 +123,9 @@ export class BrowserToRenderer {
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('tab:has-split', hasSplit);
   }
+
+  refreshWindowHasVisibleTabs(window: Window) {
+    const hasVisibleTabs = window.tabs.some((tab) => tab.tab.visible);
+    window.webContents.send('window:has-visible-tabs', hasVisibleTabs);
+  }
 }

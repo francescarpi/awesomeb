@@ -61,6 +61,9 @@ declare global {
         areaMaximized: boolean,
       ) => void,
     ) => void;
+    onRefreshHasVisibleTabs: (
+      callback: (event: IpcRendererEvent, hasVisibleTabs: boolean) => void,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------

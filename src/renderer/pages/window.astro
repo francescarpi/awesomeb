@@ -8,7 +8,7 @@ import Layout from '#/layouts/Base.astro';
       id="no-tabs-info"
       class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute right-1 bottom-1 select-none"
     >
-      <p>Cmd/Ctrl + P to open the commands tool</p>
+      <p id="helpCommandsTool">Cmd/Ctrl + P to open the commands tool</p>
     </div>
   </div>
 </Layout>
@@ -18,6 +18,7 @@ import Layout from '#/layouts/Base.astro';
 
   const { winId, searchParams } = getSearchParams();
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
+  const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
 
   const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
   const areaMaximized = searchParams.get('areaMaximized') === 'true';
@@ -37,6 +38,14 @@ import Layout from '#/layouts/Base.astro';
 
   abWindow.onRefreshNoTabsInfo((_e, sidebarCollapsed, areaMaximized) => {
     refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
+  });
+
+  abWindow.onRefreshHasVisibleTabs((_e, hasVisibleTabs) => {
+    if (hasVisibleTabs) {
+      helpCommandsTool.classList.add('hidden');
+    } else {
+      helpCommandsTool.classList.remove('hidden');
+    }
   });
 
   function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {

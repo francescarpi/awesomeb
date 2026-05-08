@@ -86,6 +86,11 @@ const abWindow = {
   ) => {
     ipcRenderer.on('window:refresh-no-tabs-info', callback);
   },
+  onRefreshHasVisibleTabs: (
+    callback: (event: IpcRendererEvent, hasVisibleTabs: boolean) => void,
+  ) => {
+    ipcRenderer.on('window:has-visible-tabs', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------
