@@ -1,4 +1,5 @@
 import { expect, test, describe, vi, beforeEach } from 'vitest';
+import type { TDesktopId } from '~/types';
 import { Browser, partitions, TabContainer, Window } from '@/core';
 import { MIN_DESKTOPS } from './constants';
 
@@ -908,5 +909,76 @@ describe('Window Move Desktop', () => {
 
     // Same desktop object, now at position 1 with id=1
     expect(result!.desktop.id).toBe(1);
+  });
+});
+
+describe('Window Close Desktop', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('close desktop removes and renumbers', () => {
+    window.createDesktop(6);
+    window.createDesktop(7);
+
+    window.closeDesktop(3);
+
+    expect(window.desktops.map((d) => d.id)).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  test('close desktop returns false at MIN_DESKTOPS', () => {
+    expect(window.closeDesktop(3)).toBe(false);
+    expect(window.desktops.length).toBe(MIN_DESKTOPS);
+  });
+
+  test('close desktop returns false for non-existent id', () => {
+    expect(window.closeDesktop(99 as TDesktopId)).toBe(false);
+  });
+
+  test('close desktop returns false when desktop has tabs', async () => {
+    window.selectDesktop(3);
+    await browser.openURL('http://example.com');
+
+    expect(window.closeDesktop(3)).toBe(false);
+  });
+
+  test('close desktop selects next when current deleted', () => {
+    window.createDesktop(6);
+    window.createDesktop(7);
+
+    window.selectDesktop(3);
+    window.closeDesktop(3);
+
+    expect(window.selectedDesktop.id).toBe(3);
+  });
+
+  test('close desktop renumbers preserving names', () => {
+    window.createDesktop(6);
+    window.createDesktop(7);
+
+    window.getDesktop(5)!.setName('Five');
+
+    window.closeDesktop(3);
+
+    const d = window.getDesktop(4)!;
+    expect(d.name).toBe('Five');
+    expect(d.id).toBe(4);
+  });
+
+  test('close desktop emits desktops-order-did-change event', () => {
+    window.createDesktop(6);
+
+    const eventSpy = vi.fn();
+    window.eventsChannel.on('window:desktops-order-did-change', eventSpy);
+
+    window.closeDesktop(3);
+
+    expect(eventSpy).toHaveBeenCalledWith(window);
   });
 });

@@ -88,6 +88,37 @@ export class Window extends UIWindow {
     scopeLog.info(`Created ${MIN_DESKTOPS} default desktops for window ${this.id}`);
   }
 
+  closeDesktop(id: TDesktopId): boolean {
+    if (this._desktops.size <= MIN_DESKTOPS) return false;
+
+    const desktop = this._desktops.get(id);
+    if (!desktop) return false;
+    if (desktop.hasTabs) return false;
+
+    let nextSelectedDesktop: Desktop | null = null;
+    if (this._selectedDesktopId === id) {
+      const ids = Array.from(this._desktops.keys()).sort((a, b) => a - b);
+      const idx = ids.indexOf(id);
+      nextSelectedDesktop = this._desktops.get(ids[Math.min(idx + 1, ids.length - 1)])!;
+    }
+
+    this._desktops.delete(id);
+
+    const allDesktops = Array.from(this._desktops.values()).sort((a, b) => a.id - b.id);
+    this._desktops.clear();
+    for (let i = 0; i < allDesktops.length; i++) {
+      allDesktops[i].setId(i + 1);
+      this._desktops.set(i + 1, allDesktops[i]);
+    }
+
+    if (nextSelectedDesktop) {
+      this._selectedDesktopId = nextSelectedDesktop.id;
+    }
+
+    this.browser.eventsChannel.emit('window:desktops-order-did-change', this);
+    return true;
+  }
+
   moveDesktop(id: TDesktopId, direction: 'left' | 'right') {
     const neighborId = direction === 'left' ? id - 1 : id + 1;
 
