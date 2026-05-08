@@ -757,3 +757,134 @@ describe('Window Close Tab', () => {
     expect(window.getDesktop(3)!.tabContainers.length).toBe(0);
   });
 });
+
+describe('Window Move Desktop', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('move desktop left should swap desktops in the map', () => {
+    const origDesktop1 = window.getDesktop(1)!;
+    const origDesktop2 = window.getDesktop(2)!;
+
+    window.moveDesktop(2, 'left');
+
+    expect(window.getDesktop(1)).toBe(origDesktop2);
+    expect(window.getDesktop(1)!.id).toBe(1);
+
+    expect(window.getDesktop(2)).toBe(origDesktop1);
+    expect(window.getDesktop(2)!.id).toBe(2);
+  });
+
+  test('move desktop right should swap desktops in the map', () => {
+    const origDesktop1 = window.getDesktop(1)!;
+    const origDesktop2 = window.getDesktop(2)!;
+
+    window.moveDesktop(1, 'right');
+
+    expect(window.getDesktop(1)).toBe(origDesktop2);
+    expect(window.getDesktop(1)!.id).toBe(1);
+
+    expect(window.getDesktop(2)).toBe(origDesktop1);
+    expect(window.getDesktop(2)!.id).toBe(2);
+  });
+
+  test('move left at first position does nothing', () => {
+    expect(window.getDesktop(1)!.id).toBe(1);
+
+    window.moveDesktop(1, 'left');
+
+    expect(window.getDesktop(1)!.id).toBe(1);
+    expect(window.desktops.length).toBe(MIN_DESKTOPS);
+  });
+
+  test('move right at last position does nothing', () => {
+    expect(window.getDesktop(MIN_DESKTOPS)!.id).toBe(MIN_DESKTOPS);
+
+    window.moveDesktop(MIN_DESKTOPS, 'right');
+
+    expect(window.getDesktop(MIN_DESKTOPS)!.id).toBe(MIN_DESKTOPS);
+    expect(window.desktops.length).toBe(MIN_DESKTOPS);
+  });
+
+  test('selected desktop follows the move', () => {
+    window.selectDesktop(2);
+    expect(window.selectedDesktop.id).toBe(2);
+
+    window.moveDesktop(2, 'left');
+
+    expect(window.selectedDesktop.id).toBe(1);
+  });
+
+  test('label updates after move', () => {
+    const d1 = window.getDesktop(1)!;
+    const d2 = window.getDesktop(2)!;
+
+    d1.setName('Work');
+    d2.setName('Personal');
+
+    window.moveDesktop(2, 'left');
+
+    // d1 was at position 1, now at position 2 (id=2, name=Work)
+    expect(d1.label).toBe('2: Work');
+    // d2 was at position 2, now at position 1 (id=1, name=Personal)
+    expect(d2.label).toBe('1: Personal');
+  });
+
+  test('move desktop emits desktops-order-did-change event', () => {
+    const eventSpy = vi.fn();
+    window.eventsChannel.on('window:desktops-order-did-change', eventSpy);
+
+    window.moveDesktop(2, 'left');
+
+    expect(eventSpy).toHaveBeenCalledWith(window);
+  });
+
+  test('tabs follow desktop when moving left', async () => {
+    window.selectDesktop(2);
+    const result = await browser.openURL('http://example.com');
+
+    expect(window.getDesktop(1)!.tabs.length).toBe(0);
+    expect(window.getDesktop(2)!.tabs.length).toBe(1);
+
+    window.moveDesktop(2, 'left');
+
+    expect(window.getDesktop(1)!.tabs.length).toBe(1);
+    expect(window.getDesktop(1)!.getTab(result!.tab.id)).not.toBeNull();
+
+    expect(window.getDesktop(2)!.tabs.length).toBe(0);
+  });
+
+  test('tabs follow desktop when moving right', async () => {
+    window.selectDesktop(1);
+    const result = await browser.openURL('http://example.com');
+
+    expect(window.getDesktop(1)!.tabs.length).toBe(1);
+    expect(window.getDesktop(2)!.tabs.length).toBe(0);
+
+    window.moveDesktop(1, 'right');
+
+    expect(window.getDesktop(2)!.tabs.length).toBe(1);
+    expect(window.getDesktop(2)!.getTab(result!.tab.id)).not.toBeNull();
+
+    expect(window.getDesktop(1)!.tabs.length).toBe(0);
+  });
+
+  test('tab desktop property reflects moved id', async () => {
+    window.selectDesktop(2);
+    const result = await browser.openURL('http://example.com');
+
+    expect(result!.desktop.id).toBe(2);
+
+    window.moveDesktop(2, 'left');
+
+    // Same desktop object, now at position 1 with id=1
+    expect(result!.desktop.id).toBe(1);
+  });
+});

@@ -47,6 +47,14 @@ export function registerBrowserEvents(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:desktops-order-did-change', async (window: Window) => {
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshSelectedDesktop(window);
+    browser.toRenderer.refreshTabContainers(window);
+    browser.refreshMainMenu();
+  });
+
+  //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('desktop:name-did-change', async (window: Window, _desktop: Desktop) => {
     browser.toRenderer.refreshDesktops(window);
   });

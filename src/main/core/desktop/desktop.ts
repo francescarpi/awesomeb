@@ -5,6 +5,7 @@ import { IProps } from './types';
 export class Desktop {
   private _name: string | null = null;
   private _theme: Theme;
+  private _id: TDesktopId;
 
   private readonly _tabContainers: Map<TTabContainerId, TabContainer> = new Map();
   private _selectedTabContainerId: TTabContainerId | null = null;
@@ -12,11 +13,24 @@ export class Desktop {
   constructor(
     public readonly browser: Browser,
     public readonly window: Window,
-    public readonly id: TDesktopId,
+    id: TDesktopId,
     props?: IProps,
   ) {
+    this._id = id;
     this._theme = props?.theme || defaultTheme;
     this._name = props?.name || null;
+  }
+
+  get id(): TDesktopId {
+    return this._id;
+  }
+
+  setId(newId: TDesktopId) {
+    if (newId === this._id) {
+      return;
+    }
+
+    this._id = newId;
   }
 
   setName(name: string) {

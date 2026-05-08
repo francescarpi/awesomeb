@@ -88,6 +88,32 @@ export class Window extends UIWindow {
     scopeLog.info(`Created ${MIN_DESKTOPS} default desktops for window ${this.id}`);
   }
 
+  moveDesktop(id: TDesktopId, direction: 'left' | 'right') {
+    const neighborId = direction === 'left' ? id - 1 : id + 1;
+
+    const desktop = this._desktops.get(id);
+    const neighbor = this._desktops.get(neighborId);
+
+    if (!desktop || !neighbor) return;
+
+    this._desktops.delete(id);
+    this._desktops.delete(neighborId);
+
+    desktop.setId(neighborId);
+    neighbor.setId(id);
+
+    this._desktops.set(neighborId, desktop);
+    this._desktops.set(id, neighbor);
+
+    if (this._selectedDesktopId === id) {
+      this._selectedDesktopId = neighborId;
+    } else if (this._selectedDesktopId === neighborId) {
+      this._selectedDesktopId = id;
+    }
+
+    this.browser.eventsChannel.emit('window:desktops-order-did-change', this);
+  }
+
   getTab(id: TTabId): IDesConTab | null {
     for (const desktop of this._desktops.values()) {
       const conTab = desktop.getTab(id);
