@@ -172,10 +172,9 @@ export class Window extends UIWindow {
     if (tab.suspended) {
       tab.resume();
 
-      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-
       this.addView(tab);
       this.renderViews();
+      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
       this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
 
       if (!tab.partition.private && tab.url) {
@@ -185,9 +184,9 @@ export class Window extends UIWindow {
       return;
     }
 
-    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-
     this.renderViews();
+
+    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
 
     tab.focus();
   }
@@ -291,12 +290,10 @@ export class Window extends UIWindow {
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
     this.moveViewToTop('sidebar');
-    this.renderViews();
   }
 
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
-    this.renderViews();
   }
 
   get tabsRequireAttention(): IDesConTab[] {

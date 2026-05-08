@@ -77,7 +77,6 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
     await tab.loadHistoryOrURL();
     browser.toRenderer.refreshShowSplitMenu(window);
-    browser.toRenderer.refreshLayoutData(window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -258,6 +257,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
+    window.renderViews();
     browser.toRenderer.refreshLayoutData(window);
   });
 
