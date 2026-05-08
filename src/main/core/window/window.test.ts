@@ -813,6 +813,28 @@ describe('Window Move Desktop', () => {
     expect(window.desktops.length).toBe(MIN_DESKTOPS);
   });
 
+  test('iteration order stays sequential by id after moving right', () => {
+    const origD3 = window.getDesktop(3)!;
+    const origD4 = window.getDesktop(4)!;
+
+    window.moveDesktop(3, 'right');
+
+    expect(window.desktops.map((d) => d.id)).toEqual([1, 2, 3, 4, 5]);
+    expect(window.getDesktop(3)).toBe(origD4);
+    expect(window.getDesktop(4)).toBe(origD3);
+  });
+
+  test('iteration order stays sequential by id after moving left', () => {
+    const origD1 = window.getDesktop(1)!;
+    const origD2 = window.getDesktop(2)!;
+
+    window.moveDesktop(2, 'left');
+
+    expect(window.desktops.map((d) => d.id)).toEqual([1, 2, 3, 4, 5]);
+    expect(window.getDesktop(1)).toBe(origD2);
+    expect(window.getDesktop(2)).toBe(origD1);
+  });
+
   test('selected desktop follows the move', () => {
     window.selectDesktop(2);
     expect(window.selectedDesktop.id).toBe(2);

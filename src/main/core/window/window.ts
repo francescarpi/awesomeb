@@ -102,8 +102,14 @@ export class Window extends UIWindow {
     desktop.setId(neighborId);
     neighbor.setId(id);
 
-    this._desktops.set(neighborId, desktop);
-    this._desktops.set(id, neighbor);
+    // Rebuild map sorted by ID to preserve iteration order
+    const allDesktops = Array.from(this._desktops.values());
+    allDesktops.push(desktop, neighbor);
+    allDesktops.sort((a, b) => a.id - b.id);
+    this._desktops.clear();
+    for (const d of allDesktops) {
+      this._desktops.set(d.id, d);
+    }
 
     if (this._selectedDesktopId === id) {
       this._selectedDesktopId = neighborId;
