@@ -6,12 +6,12 @@ import {
 } from 'electron';
 import { Actions } from 'electron-context-menu';
 import { EIcon, getIcon } from './utils';
-import { Browser, Window, Partition } from '@/core';
+import { createColorImage } from '@/utils';
+import { Browser, Window, partitions } from '@/core';
 
 export function tabWebContentsMenu(
   browser: Browser,
   window: Window,
-  partition: Partition,
   actions: Actions,
   params: ContextMenuParams,
   wc: WebContents,
@@ -20,7 +20,7 @@ export function tabWebContentsMenu(
   const res: MenuItemConstructorOptions[] = [
     ...navigationOptions(wc),
     { type: 'separator' },
-    ...openOptions(browser, window, partition, params.linkURL),
+    ...openOptions(browser, window, params.linkURL),
     { type: 'separator' },
     actions.copy({}),
     actions.copyLink({}),
@@ -66,15 +66,12 @@ function navigationOptions(wc: WebContents): MenuItemConstructorOptions[] {
   ];
 }
 
-function openOptions(
-  browser: Browser,
-  window: Window,
-  partition: Partition,
-  url: string,
-): MenuItemConstructorOptions[] {
+function openOptions(browser: Browser, window: Window, url: string): MenuItemConstructorOptions[] {
   if (url === '') {
     return [];
   }
+
+  console.log(partitions);
 
   return [
     {
@@ -82,8 +79,17 @@ function openOptions(
       icon: getIcon(EIcon.Open),
       submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
         label: target.label,
-        click: () =>
-          browser.openURL(url, { targetId: target.id, partitionId: partition.id, selectTab: true }),
+        submenu: partitions.all.map((par) => ({
+          label: par.name,
+          icon: createColorImage(par.color),
+          click: () => {
+            browser.openURL(url, {
+              targetId: target.id,
+              partitionId: par.id,
+              selectTab: true,
+            });
+          },
+        })),
       })),
     },
   ];

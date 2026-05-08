@@ -168,7 +168,6 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
       return tabWebContentsMenu(
         browser,
         tabData.window,
-        tabData.tab.partition,
         actions,
         params,
         browserWindow as WebContents,
