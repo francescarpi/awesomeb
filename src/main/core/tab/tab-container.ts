@@ -99,8 +99,12 @@ export class TabContainer {
     return this._layout;
   }
 
+  get visibleTabs(): Tab[] {
+    return this.tabs.filter((t) => t.visible);
+  }
+
   get isSplit(): boolean {
-    return this.tabs.length > 1;
+    return this.visibleTabs.length > 1;
   }
 
   setLayout(layout: LayoutBase) {

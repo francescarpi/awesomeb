@@ -129,26 +129,30 @@ export class Tab extends UIView {
       height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
     }
 
+    console.log(
+      'CESC',
+      this.id,
+      selectedTab?.tabContainer.isSplit,
+      selectedTab?.tabContainer.visibleTabs.map((t) => t.id),
+    );
+
     // Split tabs calculation
     if (selectedTab?.tabContainer.isSplit) {
-      const firstTab = selectedTab.tabContainer.tabs[0];
-      const tabNum = this.isPreview
-        ? firstTab.id === this.parentTab!.id
-          ? 1
-          : 2
-        : firstTab.id === this.id
-          ? 1
-          : 2;
+      const firstTab = selectedTab.tabContainer.visibleTabs[0];
+      const tabIdToCompare = this.isPreview ? this.parentTab!.id : this.id;
+      const tabNum = firstTab.id === tabIdToCompare ? 1 : 2;
 
       const percentSize =
         tabNum === 1
           ? selectedTab.tabContainer.layoutSize
           : 100 - selectedTab.tabContainer.layoutSize;
+
       const positon = selectedTab.tabContainer.layout.calculateBounds(
         { x, y, width, height },
         tabNum,
         percentSize,
       );
+
       x = positon.x;
       y = positon.y;
       width = positon.width;
@@ -156,12 +160,14 @@ export class Tab extends UIView {
     }
 
     if (this.isPreview) {
+      // Adjust position inside the preview layout
       x += 16;
       y += 16;
       width -= 65;
       height -= 16 * 2;
     }
 
+    // Apply bounds
     this.webContentsView.setBounds({
       x,
       y,

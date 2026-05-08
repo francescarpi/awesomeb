@@ -145,32 +145,34 @@ export async function loadExtensionToSession(ses: Session, extension: IExtension
   const sessionName = ses.storagePath?.split(path.sep).pop() || 'unknown';
 
   ses.serviceWorkers.on('registration-completed', (_e, d) => {
-    scopeLog.info(`[Extension SW] registered for scope: ${d.scope}`);
+    scopeLog.debug(`[Extension SW] registered for scope: ${d.scope}`);
   });
 
   ses.serviceWorkers.on('running-status-changed', (d) => {
-    scopeLog.info(`[Extension SW] #${d.versionId} status: ${d.runningStatus}`);
+    scopeLog.debug(`[Extension SW] #${d.versionId} status: ${d.runningStatus}`);
   });
 
   ses.serviceWorkers.on('console-message', (_e, m) => {
-    scopeLog.info(`[Extension SW Console][${m.level}] ${m.sourceUrl}:${m.lineNumber} ${m.message}`);
+    scopeLog.debug(
+      `[Extension SW Console][${m.level}] ${m.sourceUrl}:${m.lineNumber} ${m.message}`,
+    );
   });
 
   ses.extensions.once('extension-loaded', (_e, ext) => {
     if (ext.id === extension.id) {
-      scopeLog.info(`Extension Loaded: ${extension.id} (${sessionName})`);
+      scopeLog.debug(`Extension Loaded: ${extension.id} (${sessionName})`);
     }
   });
 
   ses.extensions.once('extension-unloaded', (_e, ext) => {
     if (ext.id === extension.id) {
-      scopeLog.info(`Extension Unloaded: ${extension.id} (${sessionName})`);
+      scopeLog.debug(`Extension Unloaded: ${extension.id} (${sessionName})`);
     }
   });
 
   ses.extensions.once('extension-ready', (_e, ext) => {
     if (ext.id === extension.id) {
-      scopeLog.info(`Extension Ready: ${extension.id} (${sessionName})`);
+      scopeLog.debug(`Extension Ready: ${extension.id} (${sessionName})`);
     }
   });
 }
