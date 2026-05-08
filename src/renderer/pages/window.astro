@@ -4,6 +4,7 @@ import Layout from '#/layouts/Base.astro';
 
 <Layout>
   <div class="fixed inset-0">
+    <div id="selectedTab" class="border-2 border-yellow-400 absolute rounded-[14px]"></div>
     <div
       id="no-tabs-info"
       class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute right-1 bottom-1 select-none"
@@ -15,10 +16,14 @@ import Layout from '#/layouts/Base.astro';
 
 <script>
   import { getSearchParams } from '#/scripts';
+  import { Rectangle } from 'electron';
+
+  const BORDER_WIDTH = 2;
 
   const { winId, searchParams } = getSearchParams();
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
   const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
+  const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
 
   const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
   const areaMaximized = searchParams.get('areaMaximized') === 'true';
@@ -36,16 +41,17 @@ import Layout from '#/layouts/Base.astro';
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
   });
 
-  abWindow.onRefreshNoTabsInfo((_e, sidebarCollapsed, areaMaximized) => {
-    refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
-  });
+  abWindow.onRefreshLayoutData((_e, data) => {
+    console.log(data.selectedTabBounds);
+    refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
 
-  abWindow.onRefreshHasVisibleTabs((_e, hasVisibleTabs) => {
-    if (hasVisibleTabs) {
+    if (data.hasVisibleTabs) {
       helpCommandsTool.classList.add('hidden');
     } else {
       helpCommandsTool.classList.remove('hidden');
     }
+
+    refreshSelectedTabBounds(data.selectedTabBounds);
   });
 
   function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
@@ -59,5 +65,18 @@ import Layout from '#/layouts/Base.astro';
       noTabsInfo.style.left = '254px';
       noTabsInfo.style.top = '34px';
     }
+  }
+
+  function refreshSelectedTabBounds(bounds: Rectangle | null) {
+    if (!bounds) {
+      selectedTab.classList.add('hidden');
+      return;
+    }
+
+    selectedTab.classList.remove('hidden');
+    selectedTab.style.left = `${bounds.x - BORDER_WIDTH}px`;
+    selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
+    selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
+    selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
   }
 </script>

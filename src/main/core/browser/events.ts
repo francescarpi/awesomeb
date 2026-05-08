@@ -39,6 +39,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshLayoutData(window);
 
       window.renderViews();
       browser.refreshMainMenu();
@@ -64,7 +65,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshSelectedDesktop(window);
     browser.toRenderer.refreshExtensions(window);
     browser.toRenderer.refreshShowSplitMenu(window);
-    browser.toRenderer.refreshWindowHasVisibleTabs(window);
+    browser.toRenderer.refreshLayoutData(window);
 
     const result = browser.getTab(tab.id)!;
     browser.toRenderer.refreshThemes(window, result.desktop);
@@ -76,7 +77,7 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
     await tab.loadHistoryOrURL();
     browser.toRenderer.refreshShowSplitMenu(window);
-    browser.toRenderer.refreshWindowHasVisibleTabs(window);
+    browser.toRenderer.refreshLayoutData(window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshTabNavigation(window);
     browser.toRenderer.refreshExtensions(window);
-    browser.toRenderer.refreshWindowHasVisibleTabs(window);
+    browser.toRenderer.refreshLayoutData(window);
     browser.refreshMainMenu();
   });
 
@@ -113,7 +114,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshTabNavigation(window);
     browser.toRenderer.refreshExtensions(window);
-    browser.toRenderer.refreshWindowHasVisibleTabs(window);
+    browser.toRenderer.refreshLayoutData(window);
     browser.refreshMainMenu();
   });
 
@@ -124,7 +125,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshExtensions(window);
-    browser.toRenderer.refreshWindowHasVisibleTabs(window);
+    browser.toRenderer.refreshLayoutData(window);
     browser.refreshMainMenu();
   });
 
@@ -257,7 +258,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
-    browser.toRenderer.refreshNoTabsInfo(window);
+    browser.toRenderer.refreshLayoutData(window);
   });
 
   //--------------------------------------------------------------------------------------

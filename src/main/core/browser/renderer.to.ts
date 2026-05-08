@@ -3,7 +3,7 @@ import { Sidebar, TabSwitcher, URLBar } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import { ITheme, TFindInPageId } from '~/types';
+import type { ITheme, TFindInPageId, ILayoutData } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -87,12 +87,15 @@ export class BrowserToRenderer {
     urlbar.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
 
-  refreshNoTabsInfo(window: Window) {
-    window.webContents.send(
-      'window:refresh-no-tabs-info',
-      window.sidebarCollapsed,
-      window.areaMaximized,
-    );
+  refreshLayoutData(window: Window) {
+    const selectedTab = window.selectedTab;
+    const data: ILayoutData = {
+      sidebarCollapsed: window.sidebarCollapsed,
+      areaMaximized: window.areaMaximized,
+      hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
+      selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
+    };
+    window.webContents.send('window:refresh-layout-data', data);
   }
 
   refreshSidebarDrag(window: Window, dragable: boolean) {
@@ -122,10 +125,5 @@ export class BrowserToRenderer {
 
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('tab:has-split', hasSplit);
-  }
-
-  refreshWindowHasVisibleTabs(window: Window) {
-    const hasVisibleTabs = window.tabs.some((tab) => tab.tab.visible);
-    window.webContents.send('window:has-visible-tabs', hasVisibleTabs);
   }
 }

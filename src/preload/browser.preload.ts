@@ -21,6 +21,7 @@ import type {
   IExtension,
   TDesktopId,
   TTabPreviewAction,
+  ILayoutData,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -81,15 +82,8 @@ const abWindow = {
   readyToShow: (winId: TWindowId) => {
     ipcRenderer.send('window:ready-to-show', { winId });
   },
-  onRefreshNoTabsInfo: (
-    callback: (event: IpcRendererEvent, sidebarCollapsed: boolean, areaMaximized: boolean) => void,
-  ) => {
-    ipcRenderer.on('window:refresh-no-tabs-info', callback);
-  },
-  onRefreshHasVisibleTabs: (
-    callback: (event: IpcRendererEvent, hasVisibleTabs: boolean) => void,
-  ) => {
-    ipcRenderer.on('window:has-visible-tabs', callback);
+  onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => {
+    ipcRenderer.on('window:refresh-layout-data', callback);
   },
 };
 

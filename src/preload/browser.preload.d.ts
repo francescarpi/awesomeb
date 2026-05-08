@@ -17,6 +17,7 @@ import type {
   IExtension,
   TExtensionId,
   TTabPreviewAction,
+  ILayoutData,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -54,16 +55,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abWindow: {
     readyToShow: (winId: TWindowId) => void;
-    onRefreshNoTabsInfo: (
-      callback: (
-        event: IpcRendererEvent,
-        sidebarCollapsed: boolean,
-        areaMaximized: boolean,
-      ) => void,
-    ) => void;
-    onRefreshHasVisibleTabs: (
-      callback: (event: IpcRendererEvent, hasVisibleTabs: boolean) => void,
-    ) => void;
+    onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => void;
   };
 
   //--------------------------------------------------------------------------------------
