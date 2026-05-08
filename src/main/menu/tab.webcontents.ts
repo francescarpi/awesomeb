@@ -71,8 +71,6 @@ function openOptions(browser: Browser, window: Window, url: string): MenuItemCon
     return [];
   }
 
-  console.log(partitions);
-
   return [
     {
       label: 'Open link...',
