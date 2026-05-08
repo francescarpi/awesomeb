@@ -1,4 +1,5 @@
 import { expect, test, describe, beforeEach } from 'vitest';
+import type { TTabContainerId } from '~/types';
 import { Browser, partitions, Window } from '@/core';
 
 describe('Desktop', () => {
@@ -68,5 +69,37 @@ describe('Desktop', () => {
 
     const tabsBelowTab3 = d.getTabsBelow(tab3.id);
     expect(tabsBelowTab3.map((t) => t.tab.id)).toEqual([]);
+  });
+
+  test('addTabContainer with justAfter inserts tab container in specified position', () => {
+    const d = window.getDesktop(2)!;
+
+    const tc1 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const tc2 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const tc3 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([tc1.id, tc2.id, tc3.id]);
+
+    const tc4 = d.createTabContainer(browser.idGenerator.nextTabContainerId, {
+      justAfter: tc1.id,
+    });
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([tc1.id, tc4.id, tc2.id, tc3.id]);
+
+    const tc5 = d.createTabContainer(browser.idGenerator.nextTabContainerId, {
+      justAfter: tc3.id,
+    });
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([tc1.id, tc4.id, tc2.id, tc3.id, tc5.id]);
+
+    const tc6 = d.createTabContainer(browser.idGenerator.nextTabContainerId, {
+      justAfter: -1 as TTabContainerId,
+    });
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([
+      tc1.id,
+      tc4.id,
+      tc2.id,
+      tc3.id,
+      tc5.id,
+      tc6.id,
+    ]);
   });
 });
