@@ -44,6 +44,14 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
+      label: 'Copy URL',
+      icon: getIcon(EIcon.Copy),
+      click: async () => {
+        await browser.performCommand(window, 'copy-url', { tabId: tab.id });
+      },
+    },
+    { type: 'separator' },
+    {
       label: 'Move...',
       icon: getIcon(EIcon.Move),
       submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
