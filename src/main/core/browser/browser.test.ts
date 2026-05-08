@@ -1,5 +1,6 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { Browser, partitions } from '@/core';
+import { Layouts } from '../tab/layouts';
 
 describe('Browser', () => {
   let browser: Browser;
@@ -77,5 +78,244 @@ describe('Browser', () => {
     expect(duplicateResult).not.toBeNull();
     expect(w.selectedDesktop.tabs.length).toBe(2);
     expect(duplicateResult!.tab.partition.id).toBe(partitions.private.id);
+  });
+
+  describe('Split Tabs', () => {
+    describe('Creation', () => {
+      test('should open a tab in split mode (into selected tab container)', async () => {
+        const w = browser.createWindow(1, { withDesktops: true });
+        const desktop = w.selectedDesktop;
+
+        const result1 = await browser.openURL('http://example.com', { selectTab: true });
+        expect(result1).not.toBeNull();
+
+        expect(desktop.tabContainers.length).toBe(1);
+        const tabContainer = desktop.tabContainers[0];
+        expect(tabContainer.tabs.length).toBe(1);
+
+        const result2 = await browser.openURL('http://example2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+        expect(result2).not.toBeNull();
+
+        expect(desktop.tabContainers.length).toBe(1);
+        expect(tabContainer.tabs.length).toBe(2);
+        expect(tabContainer.isSplit).toBe(true);
+      });
+
+      test('should not allow more than 2 tabs in a tab container', async () => {
+        const w = browser.createWindow(1, { withDesktops: true });
+        const desktop = w.selectedDesktop;
+
+        const result1 = await browser.openURL('http://example.com', { selectTab: true });
+        expect(result1).not.toBeNull();
+
+        const tabContainer = result1!.tabContainer;
+        expect(tabContainer.tabs.length).toBe(1);
+
+        const result2 = await browser.openURL('http://example2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+        expect(result2).not.toBeNull();
+        expect(tabContainer.tabs.length).toBe(2);
+
+        const result3 = await browser.openURL('http://example3.com', {
+          targetId: 'into-selected-tab-container',
+        });
+        expect(result3).not.toBeNull();
+
+        expect(result3!.tabContainer).not.toBe(tabContainer);
+        expect(tabContainer.tabs.length).toBe(2);
+        expect(desktop.tabContainers.length).toBe(2);
+      });
+    });
+
+    describe('Rotation', () => {
+      test('should rotate tabs clockwise', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const tabContainer = result1!.tabContainer;
+        const tabsBefore = tabContainer.tabs.map((t) => t.id);
+
+        tabContainer.rotateTabs(true);
+
+        const tabsAfter = tabContainer.tabs.map((t) => t.id);
+        expect(tabsAfter[0]).toBe(tabsBefore[1]);
+        expect(tabsAfter[1]).toBe(tabsBefore[0]);
+      });
+
+      test('should rotate tabs counter-clockwise', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const tabContainer = result1!.tabContainer;
+        const tabsBefore = tabContainer.tabs.map((t) => t.id);
+
+        tabContainer.rotateTabs(false);
+
+        const tabsAfter = tabContainer.tabs.map((t) => t.id);
+        expect(tabsAfter[0]).toBe(tabsBefore[1]);
+        expect(tabsAfter[1]).toBe(tabsBefore[0]);
+      });
+
+      test('should not rotate when only one tab', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result = await browser.openURL('http://tab1.com');
+
+        const tabContainer = result!.tabContainer;
+        const tabsBefore = tabContainer.tabs.map((t) => t.id);
+
+        tabContainer.rotateTabs(true);
+
+        const tabsAfter = tabContainer.tabs.map((t) => t.id);
+        expect(tabsAfter).toEqual(tabsBefore);
+      });
+    });
+
+    describe('Layout', () => {
+      test('should change layout from vertical to horizontal', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const tabContainer = result1!.tabContainer;
+        expect(tabContainer.layout.id).toBe('vertical');
+
+        tabContainer.setLayout(Layouts['horizontal']);
+
+        expect(tabContainer.layout.id).toBe('horizontal');
+      });
+
+      test('should change layout size', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const tabContainer = result1!.tabContainer;
+        expect(tabContainer.layoutSize).toBe(50);
+
+        tabContainer.setLayoutSize(75);
+
+        expect(tabContainer.layoutSize).toBe(75);
+      });
+    });
+
+    describe('Unsplit', () => {
+      test('should unsplit tab container - separates tabs into different containers', async () => {
+        const w = browser.createWindow(1, { withDesktops: true });
+        const desktop = w.selectedDesktop;
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        const result2 = await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const originalTabContainer = result1!.tabContainer;
+        const tabToMove = result2!.tab;
+
+        expect(desktop.tabContainers.length).toBe(1);
+        expect(originalTabContainer.tabs.length).toBe(2);
+
+        browser.unsplitTabContainer(originalTabContainer.id);
+
+        expect(desktop.tabContainers.length).toBe(2);
+        expect(originalTabContainer.tabs.length).toBe(1);
+        expect(originalTabContainer.isSplit).toBe(false);
+
+        const newTabContainer = desktop.tabContainers.find(
+          (tc) => tc.id !== originalTabContainer.id,
+        );
+        expect(newTabContainer).toBeDefined();
+        expect(newTabContainer!.tabs.length).toBe(1);
+        expect(newTabContainer!.tabs[0].id).toBe(tabToMove.id);
+
+        expect(newTabContainer!.selectedTab?.id).toBe(tabToMove.id);
+      });
+
+      test('should not unsplit when tab container is not split', async () => {
+        const w = browser.createWindow(1, { withDesktops: true });
+        const desktop = w.selectedDesktop;
+
+        const result = await browser.openURL('http://tab1.com');
+
+        const tabContainer = result!.tabContainer;
+        expect(tabContainer.tabs.length).toBe(1);
+        expect(tabContainer.isSplit).toBe(false);
+
+        browser.unsplitTabContainer(tabContainer.id);
+
+        expect(desktop.tabContainers.length).toBe(1);
+        expect(tabContainer.tabs.length).toBe(1);
+      });
+
+      test('unsplit after layout change should work correctly', async () => {
+        const w = browser.createWindow(1, { withDesktops: true });
+        const desktop = w.selectedDesktop;
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        const result2 = await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        const tabContainer = result1!.tabContainer;
+        tabContainer.setLayout(Layouts['horizontal']);
+        expect(tabContainer.layout.id).toBe('horizontal');
+
+        const tabToMoveId = result2!.tab.id;
+
+        browser.unsplitTabContainer(tabContainer.id);
+
+        expect(desktop.tabContainers.length).toBe(2);
+        expect(tabContainer.isSplit).toBe(false);
+
+        const newTabContainer = desktop.tabContainers.find((tc) => tc.id !== tabContainer.id);
+        expect(newTabContainer!.tabs[0].id).toBe(tabToMoveId);
+      });
+    });
+
+    describe('Selection', () => {
+      test('isSplit should return false for single tab and true for split', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        const result1 = await browser.openURL('http://tab1.com', { selectTab: true });
+        const tabContainer = result1!.tabContainer;
+
+        expect(tabContainer.tabs.length).toBe(1);
+
+        await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+        });
+
+        expect(tabContainer.tabs.length).toBe(2);
+      });
+
+      test('openURL with selectTab should select the new tab in split', async () => {
+        browser.createWindow(1, { withDesktops: true });
+
+        await browser.openURL('http://tab1.com', { selectTab: true });
+        const result2 = await browser.openURL('http://tab2.com', {
+          targetId: 'into-selected-tab-container',
+          selectTab: true,
+        });
+
+        expect(result2!.tabContainer.selectedTab?.id).toBe(result2!.tab.id);
+      });
+    });
   });
 });
