@@ -1,7 +1,7 @@
 import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, openURLHistory } from '@/core';
-import { MIN_DESKTOPS } from './constants';
+import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 import {
   IContextualModalParams,
   IDesCon,
@@ -123,7 +123,8 @@ export class Window extends UIWindow {
     return this.selectedDesktop;
   }
 
-  createDesktop(id: TDesktopId, props?: IDesktopProps): Desktop {
+  createDesktop(id: TDesktopId, props?: IDesktopProps): Desktop | null {
+    if (this._desktops.size >= MAX_DESKTOPS) return null;
     const newDesktop = new Desktop(this.browser, this, id, props);
     this._desktops.set(id, newDesktop);
     this.browser.eventsChannel.emit('window:desktop-did-create', this, newDesktop);

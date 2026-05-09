@@ -61,6 +61,7 @@ export class Browser {
         const { name } = deskStore;
 
         const desktop = newWindow.createDesktop(deskStore.id, { theme, name });
+        if (!desktop) continue;
 
         for (const tabConStore of deskStore.tabContainers) {
           const tabContainer = desktop.createTabContainer(tabConStore.id, {

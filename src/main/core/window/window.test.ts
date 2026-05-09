@@ -1,7 +1,7 @@
 import { expect, test, describe, vi, beforeEach } from 'vitest';
 import type { TDesktopId } from '~/types';
-import { Browser, partitions, TabContainer, Window } from '@/core';
-import { MIN_DESKTOPS } from './constants';
+import { Browser, getCommand, partitions, TabContainer, Window } from '@/core';
+import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 
 describe('Window', () => {
   let browser: Browser;
@@ -1075,6 +1075,43 @@ describe('Window Close Desktop', () => {
 
       expect(result).toBeNull();
       expect(window.visibleDesktopsRange).toEqual(range);
+    });
+  });
+
+  describe('MAX_DESKTOPS', () => {
+    test('createDesktop succeeds up to MAX_DESKTOPS', () => {
+      for (let i = MIN_DESKTOPS + 1; i <= MAX_DESKTOPS; i++) {
+        const desktop = window.createDesktop(i);
+        expect(desktop).not.toBeNull();
+        expect(desktop!.id).toBe(i);
+      }
+      expect(window.desktops.length).toBe(MAX_DESKTOPS);
+    });
+
+    test('createDesktop returns null beyond MAX_DESKTOPS', () => {
+      for (let i = MIN_DESKTOPS + 1; i <= MAX_DESKTOPS; i++) {
+        window.createDesktop(i);
+      }
+
+      const result = window.createDesktop(MAX_DESKTOPS + 1);
+      expect(result).toBeNull();
+      expect(window.desktops.length).toBe(MAX_DESKTOPS);
+    });
+
+    test('add-desktop command visibility is false at max desktops', () => {
+      const command = getCommand('add-desktop');
+      expect(command).not.toBeNull();
+      expect(command!.visibility).toBeDefined();
+
+      const visibilityArgs = { window, desktop: null, tabContainer: null, tab: null };
+
+      expect(command!.visibility!(visibilityArgs)).toBe(true);
+
+      for (let i = MIN_DESKTOPS + 1; i <= MAX_DESKTOPS; i++) {
+        window.createDesktop(i);
+      }
+
+      expect(command!.visibility!(visibilityArgs)).toBe(false);
     });
   });
 });
