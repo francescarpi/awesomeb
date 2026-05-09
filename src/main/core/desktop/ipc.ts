@@ -30,4 +30,15 @@ export function setupDesktopIPC(browser: Browser) {
       return result;
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'desktops:get-visible',
+    'handle',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      return browser.renderer.visibleDesktops(win);
+    },
+  );
 }

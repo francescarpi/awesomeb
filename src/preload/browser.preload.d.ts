@@ -18,6 +18,7 @@ import type {
   TExtensionId,
   TTabPreviewAction,
   ILayoutData,
+  IVisibleDesktops,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -45,11 +46,14 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abDesktops: {
-    onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => void;
+    onRefresh: (
+      callback: (event: IpcRendererEvent, visibleDesktops: IVisibleDesktops) => void,
+    ) => void;
     onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => void;
     select: (winId: TWindowId, desktopId: TDesktopId) => void;
     getTheme: (winId: TWindowId) => Promise<ITheme>;
     onThemeRefresh: (callback: (event: IpcRendererEvent, theme: ITheme) => void) => void;
+    getVisible: (winId: TWindowId) => Promise<IVisibleDesktops>;
   };
 
   //--------------------------------------------------------------------------------------

@@ -17,6 +17,7 @@ import {
   EDownloadStatus,
   ITabSwitcherTab,
   IExtensions,
+  IVisibleDesktops,
 } from '~/types';
 import {
   Browser,
@@ -87,8 +88,8 @@ export class BrowserRenderer {
     }));
   }
 
-  partitionsEntities(browser: Browser): IPartitionEntity[] {
-    const selectedTabResult = browser.selectedTab;
+  partitionsEntities(): IPartitionEntity[] {
+    const selectedTabResult = this._browser.selectedTab;
     return partitions.all.map((partition) => ({
       id: partition.id,
       label: partition.name,
@@ -97,7 +98,7 @@ export class BrowserRenderer {
     }));
   }
 
-  targetsEntities(browser: Browser, window: Window): IEntity[] {
+  targetsEntities(window: Window): IEntity[] {
     const result = [
       {
         id: 'current-desktop-window',
@@ -121,7 +122,7 @@ export class BrowserRenderer {
       },
     ];
 
-    for (const win of browser.windows) {
+    for (const win of this._browser.windows) {
       result.push({
         id: `window-${win.id}`,
         label: `Window ${win.id}`,
@@ -198,8 +199,8 @@ export class BrowserRenderer {
     return data;
   }
 
-  tabsEntities(browser: Browser, window: Window): ITabEntity[] {
-    const tabs = browser.tabs;
+  tabsEntities(window: Window): ITabEntity[] {
+    const tabs = this._browser.tabs;
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 
@@ -336,8 +337,8 @@ export class BrowserRenderer {
     };
   }
 
-  layoutsEntities(browser: Browser): IEntity[] {
-    const selectedTab = browser.selectedTab;
+  layoutsEntities(): IEntity[] {
+    const selectedTab = this._browser.selectedTab;
     const selectedLayoutId = selectedTab?.tabContainer.layout.id;
 
     return Object.values(Layouts).map((layout) => ({
@@ -345,5 +346,21 @@ export class BrowserRenderer {
       label: layout.label,
       selected: selectedLayoutId === layout.id,
     }));
+  }
+
+  visibleDesktops(window: Window) {
+    const result: IVisibleDesktops = {
+      hasLess: window.hasLessDesktops,
+      hasMore: window.hasMoreDesktops,
+      desktops: window.visibleDesktops.map((desk) => ({
+        id: desk.id,
+        name: desk.name,
+        selected: desk.id === window.selectedDesktop.id,
+        requireAttention: desk.requireAttention,
+        hasTabs: desk.hasTabs,
+        hasActiveTabs: desk.hasActiveTabs,
+      })),
+    };
+    return result;
   }
 }

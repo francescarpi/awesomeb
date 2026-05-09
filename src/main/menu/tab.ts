@@ -54,7 +54,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     {
       label: 'Move...',
       icon: getIcon(EIcon.Move),
-      submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
+      submenu: browser.renderer.targetsEntities(window).map((target) => ({
         label: target.label,
         click: async () => {
           await browser.performCommand(window, 'move-tab', { tabId: tab.id, targetId: target.id });
@@ -64,7 +64,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     {
       label: 'Duplicate...',
       icon: getIcon(EIcon.Copy),
-      submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
+      submenu: browser.renderer.targetsEntities(window).map((target) => ({
         label: target.label,
         click: async () => {
           await browser.performCommand(window, 'duplicate-tab', {

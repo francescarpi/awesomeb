@@ -12,8 +12,8 @@ export class BrowserToRenderer {
 
   refreshDesktops(window: Window) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
-    const desktops = this._browser.renderer.desktopsEntities(window);
-    sidebar.send('desktops:refresh', desktops);
+    const desktops = this._browser.renderer.visibleDesktops(window);
+    sidebar.send('desktops:refresh-visible', desktops);
     scopeLog.info('Desktops refreshed in renderer');
   }
 

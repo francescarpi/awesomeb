@@ -75,7 +75,7 @@ function openOptions(browser: Browser, window: Window, url: string): MenuItemCon
     {
       label: 'Open link...',
       icon: getIcon(EIcon.Open),
-      submenu: browser.renderer.targetsEntities(browser, window).map((target) => ({
+      submenu: browser.renderer.targetsEntities(window).map((target) => ({
         label: target.label,
         submenu: partitions.all.map((par) => ({
           label: par.name,

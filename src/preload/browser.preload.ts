@@ -1,7 +1,6 @@
 import type {
   TWindowId,
   TEntityType,
-  IDesktopEntity,
   TMenuType,
   ITabContainer,
   IURLTabData,
@@ -22,6 +21,7 @@ import type {
   TDesktopId,
   TTabPreviewAction,
   ILayoutData,
+  IVisibleDesktops,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -60,8 +60,8 @@ const abCommands = {
 
 //--------------------------------------------------------------------------------------
 const abDesktops = {
-  onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktopEntity[]) => void) => {
-    ipcRenderer.on('desktops:refresh', callback);
+  onRefresh: (callback: (event: IpcRendererEvent, visibleDesktops: IVisibleDesktops) => void) => {
+    ipcRenderer.on('desktops:refresh-visible', callback);
   },
   select: (winId: TWindowId, desktopId: string) => {
     ipcRenderer.send('desktops:select', { winId, desktopId });
@@ -74,6 +74,9 @@ const abDesktops = {
   },
   onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => {
     ipcRenderer.on('desktops:refresh-selected', callback);
+  },
+  getVisible: async (winId: TWindowId) => {
+    return await ipcRenderer.invoke('desktops:get-visible', { winId });
   },
 };
 

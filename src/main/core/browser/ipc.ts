@@ -20,11 +20,11 @@ export function setupBrowserIPC(browser: Browser) {
         case 'searchEngines':
           return browser.renderer.searchEnginesEntities();
         case 'partitions':
-          return browser.renderer.partitionsEntities(browser);
+          return browser.renderer.partitionsEntities();
         case 'targets':
-          return browser.renderer.targetsEntities(browser, win);
+          return browser.renderer.targetsEntities(win);
         case 'tabs':
-          return browser.renderer.tabsEntities(browser, win);
+          return browser.renderer.tabsEntities(win);
         case 'tabContainers':
           return browser.renderer.tabContainersEntities(win);
         case 'bookmarks':
@@ -32,7 +32,7 @@ export function setupBrowserIPC(browser: Browser) {
         case 'closedTabs':
           return browser.renderer.closedTabsEntities();
         case 'layouts':
-          return browser.renderer.layoutsEntities(browser);
+          return browser.renderer.layoutsEntities();
       }
     },
   );
