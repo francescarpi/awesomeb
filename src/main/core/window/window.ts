@@ -48,6 +48,29 @@ export class Window extends UIWindow {
     this._visibleDesktopsRange = range;
   }
 
+  private _recalculateVisibleRange() {
+    const total = this._desktops.size;
+    let [, max] = this._visibleDesktopsRange;
+    let [min] = this._visibleDesktopsRange;
+    const selected = this._selectedDesktopId;
+
+    if (selected < min) {
+      min = selected;
+      max = Math.min(selected + MIN_DESKTOPS - 1, total);
+    } else if (selected > max) {
+      max = selected;
+      min = Math.max(1, selected - MIN_DESKTOPS + 1);
+    }
+
+    if (max > total) {
+      const overflow = max - total;
+      max = total;
+      min = Math.max(1, min - overflow);
+    }
+
+    this._visibleDesktopsRange = [min, max];
+  }
+
   get visibleDesktops(): Desktop[] {
     const [min, max] = this._visibleDesktopsRange;
     return this.desktops.filter((d) => d.id >= min && d.id <= max);
@@ -90,6 +113,7 @@ export class Window extends UIWindow {
     }
 
     this._selectedDesktopId = deskIds[newIndex];
+    this._recalculateVisibleRange();
     this.browser.eventsChannel.emit(
       'window:selected-desktop-did-change',
       this,
@@ -139,6 +163,7 @@ export class Window extends UIWindow {
 
     if (nextSelectedDesktop) {
       this._selectedDesktopId = nextSelectedDesktop.id;
+      this._recalculateVisibleRange();
     }
 
     this.browser.eventsChannel.emit('window:desktop-did-remove', this);
@@ -251,6 +276,7 @@ export class Window extends UIWindow {
     const { desktop, tabContainer, tab } = result;
 
     this._selectedDesktopId = desktop.id;
+    this._recalculateVisibleRange();
 
     tabContainer.selectTab(tab.id);
     desktop.selectTabContainer(tabContainer.id);

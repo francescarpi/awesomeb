@@ -997,4 +997,84 @@ describe('Window Close Desktop', () => {
 
     expect(eventSpy).toHaveBeenCalledWith(window);
   });
+
+  describe('visibleDesktopsRange', () => {
+    test('initial range is [1, MIN_DESKTOPS]', () => {
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+    });
+
+    test('selecting desktop within range does not change it', () => {
+      window.selectDesktop(3);
+
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+    });
+
+    test('selectDesktop shifts range right when selected > max', () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+    });
+
+    test('selectDesktop shifts range left when selected < min', () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+      window.selectDesktop(1);
+
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+    });
+
+    test('selectDesktop next cycles and shifts range', () => {
+      window.createDesktop(6);
+      window.selectDesktop(5);
+      window.selectDesktop('next');
+
+      expect(window.selectedDesktop.id).toBe(6);
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+    });
+
+    test('selectDesktop prev cycles and shifts range', () => {
+      window.createDesktop(6);
+      window.selectDesktop(2);
+      window.selectDesktop('prev');
+
+      expect(window.selectedDesktop.id).toBe(1);
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+    });
+
+    test('selectTab recalculates visibleDesktopsRange', async () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      window.selectDesktop(1);
+
+      await window.selectTab(result!.tab.id);
+
+      expect(window.selectedDesktop.id).toBe(6);
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+    });
+
+    test('closeDesktop with selected at edge recalculates range', () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+      expect(window.selectedDesktop.id).toBe(6);
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+
+      window.closeDesktop(6);
+
+      expect(window.selectedDesktop.id).toBe(5);
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+    });
+
+    test('calling selectDesktop with invalid id returns null and does not change range', () => {
+      const range = window.visibleDesktopsRange;
+      const result = window.selectDesktop(99 as TDesktopId);
+
+      expect(result).toBeNull();
+      expect(window.visibleDesktopsRange).toEqual(range);
+    });
+  });
 });
