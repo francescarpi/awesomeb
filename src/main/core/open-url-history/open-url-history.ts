@@ -18,6 +18,9 @@ export class OpenURLHistory {
   }
 
   add(url: string) {
+    if (!url || !url.match(/^https?:\/\//i)) {
+      return;
+    }
     const urls = this._store.get('urls');
     const newUrls = [url, ...urls.filter((u) => u !== url)].slice(0, TOTAL_URLS_TO_KEEP);
     this._store.set('urls', newUrls);
