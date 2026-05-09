@@ -22,6 +22,7 @@ import { BrowserToRenderer } from './renderer.to';
 import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
+import { MIN_DESKTOPS } from '../window/constants';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('Browser');
@@ -84,6 +85,7 @@ export class Browser {
       }
 
       newWindow.selectDesktop(winStore.selectedDesktopId);
+      newWindow.visibleDesktopsRange = winStore.visibleDesktopsRange ?? [1, MIN_DESKTOPS];
     }
 
     await this.refreshMainMenu();

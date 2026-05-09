@@ -9,7 +9,7 @@ export interface ISessionWindow {
   id: TWindowId;
   bounds: Rectangle;
   selectedDesktopId: TDesktopId;
-  visibleDesktopsRange: [number, number];
+  visibleDesktopsRange?: [number, number];
   sidebarCollapsed: boolean;
   areaMaximized: boolean;
   desktops: {

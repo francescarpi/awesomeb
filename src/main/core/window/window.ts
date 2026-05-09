@@ -18,7 +18,7 @@ const scopeLog = log.scope('Window');
 
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
-  private readonly _visibleDesktopsRange: [number, number] = [1, MIN_DESKTOPS];
+  private _visibleDesktopsRange: [number, number] = [1, MIN_DESKTOPS];
   private _selectedDesktopId: TDesktopId;
   public readonly prompts = new PromptsManager(this);
 
@@ -42,6 +42,10 @@ export class Window extends UIWindow {
 
   get visibleDesktopsRange(): [number, number] {
     return this._visibleDesktopsRange;
+  }
+
+  set visibleDesktopsRange(range: [number, number]) {
+    this._visibleDesktopsRange = range;
   }
 
   get visibleDesktops(): Desktop[] {
