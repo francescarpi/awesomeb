@@ -55,6 +55,36 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'window:desktop-did-create',
+    async (window: Window, desktop: Desktop) => {
+      browser.toRenderer.refreshDesktops(window);
+      browser.toRenderer.refreshSelectedDesktop(window);
+      browser.toRenderer.refreshThemes(window, desktop);
+      browser.toRenderer.refreshTabContainers(window);
+      browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
+      browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
+      browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshLayoutData(window);
+
+      window.renderViews();
+      browser.refreshMainMenu();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:desktop-did-remove', async (window: Window) => {
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshSelectedDesktop(window);
+    browser.toRenderer.refreshTabContainers(window);
+    browser.toRenderer.refreshExtensions(window);
+    browser.toRenderer.refreshLayoutData(window);
+
+    window.renderViews();
+    browser.refreshMainMenu();
+  });
+
+  //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('desktop:name-did-change', async (window: Window, _desktop: Desktop) => {
     browser.toRenderer.refreshDesktops(window);
   });

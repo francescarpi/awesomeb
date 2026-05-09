@@ -958,6 +958,22 @@ describe('Window Close Desktop', () => {
     expect(window.selectedDesktop.id).toBe(3);
   });
 
+  test('close last desktop selects previous', () => {
+    window.createDesktop(6);
+    window.selectDesktop(6);
+    window.closeDesktop(6);
+
+    expect(window.selectedDesktop.id).toBe(5);
+  });
+
+  test('close first desktop selects next', () => {
+    window.createDesktop(6);
+    window.selectDesktop(1);
+    window.closeDesktop(1);
+
+    expect(window.selectedDesktop.id).toBe(1);
+  });
+
   test('close desktop renumbers preserving names', () => {
     window.createDesktop(6);
     window.createDesktop(7);
@@ -971,11 +987,11 @@ describe('Window Close Desktop', () => {
     expect(d.id).toBe(4);
   });
 
-  test('close desktop emits desktops-order-did-change event', () => {
+  test('close desktop emits desktop-did-remove event', () => {
     window.createDesktop(6);
 
     const eventSpy = vi.fn();
-    window.eventsChannel.on('window:desktops-order-did-change', eventSpy);
+    window.eventsChannel.on('window:desktop-did-remove', eventSpy);
 
     window.closeDesktop(3);
 

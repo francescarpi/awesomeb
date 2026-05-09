@@ -18,7 +18,7 @@ const scopeLog = log.scope('Window');
 
 export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
-  private _selectedDesktopId: number;
+  private _selectedDesktopId: TDesktopId;
   public readonly prompts = new PromptsManager(this);
 
   constructor(
@@ -78,6 +78,7 @@ export class Window extends UIWindow {
   createDesktop(id: TDesktopId, props?: IDesktopProps): Desktop {
     const newDesktop = new Desktop(this.browser, this, id, props);
     this._desktops.set(id, newDesktop);
+    this.browser.eventsChannel.emit('window:desktop-did-create', this, newDesktop);
     return newDesktop;
   }
 
@@ -99,7 +100,8 @@ export class Window extends UIWindow {
     if (this._selectedDesktopId === id) {
       const ids = Array.from(this._desktops.keys()).sort((a, b) => a - b);
       const idx = ids.indexOf(id);
-      nextSelectedDesktop = this._desktops.get(ids[Math.min(idx + 1, ids.length - 1)])!;
+      const nextIdx = idx + 1 < ids.length ? idx + 1 : idx - 1;
+      nextSelectedDesktop = this._desktops.get(ids[nextIdx])!;
     }
 
     this._desktops.delete(id);
@@ -115,7 +117,7 @@ export class Window extends UIWindow {
       this._selectedDesktopId = nextSelectedDesktop.id;
     }
 
-    this.browser.eventsChannel.emit('window:desktops-order-did-change', this);
+    this.browser.eventsChannel.emit('window:desktop-did-remove', this);
     return true;
   }
 
