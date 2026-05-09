@@ -58,6 +58,7 @@ describe('Session', () => {
         ],
         selectedDesktopId: 1,
         sidebarCollapsed: false,
+        visibleDesktopsRange: [1, 5],
       },
     ]);
   });

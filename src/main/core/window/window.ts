@@ -40,6 +40,10 @@ export class Window extends UIWindow {
     return Array.from(this._desktops.values());
   }
 
+  get visibleDesktopsRange(): [number, number] {
+    return this._visibleDesktopsRange;
+  }
+
   get visibleDesktops(): Desktop[] {
     const [min, max] = this._visibleDesktopsRange;
     return this.desktops.filter((d) => d.id >= min && d.id <= max);

@@ -32,6 +32,7 @@ export class Session extends Store<ISessionStore> {
       id: window.id,
       bounds: window.bounds,
       selectedDesktopId: window.selectedDesktop.id,
+      visibleDesktopsRange: window.visibleDesktopsRange,
       sidebarCollapsed: window.sidebarCollapsed,
       areaMaximized: window.areaMaximized,
       desktops: window.desktops.map((desktop) => {
