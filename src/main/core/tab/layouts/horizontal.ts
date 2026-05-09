@@ -11,8 +11,7 @@ export class LayoutHorizontal extends LayoutBase {
     const totalHeight = availableArea.height;
 
     const pos1Height = Math.round((totalHeight * percentSize) / 100);
-    const pos2Height = totalHeight - pos1Height;
-    const splitPos = Math.max(pos1Height, pos2Height);
+    const splitPos = pos1Height;
 
     const x = availableArea.x;
     const y = tabNumber === 1 ? 0 : splitPos + this.MARGIN;

@@ -130,10 +130,7 @@ export class Tab extends UIView {
       const tabIdToCompare = this.isPreview ? this.parentTab!.id : this.id;
       const tabNum = firstTab.id === tabIdToCompare ? 1 : 2;
 
-      const percentSize =
-        tabNum === 1
-          ? selectedTab.tabContainer.layoutSize
-          : 100 - selectedTab.tabContainer.layoutSize;
+      const percentSize = selectedTab.tabContainer.layoutSize;
 
       const positon = selectedTab.tabContainer.layout.calculateBounds(
         { x, y, width, height },

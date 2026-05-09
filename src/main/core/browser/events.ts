@@ -406,5 +406,6 @@ export function registerBrowserEvents(browser: Browser) {
       return;
     }
     selectedTab.window.renderViews();
+    browser.toRenderer.refreshLayoutData(selectedTab.window);
   });
 }

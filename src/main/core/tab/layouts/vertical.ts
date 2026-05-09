@@ -11,8 +11,7 @@ export class LayoutVertical extends LayoutBase {
     const totalWidth = availableArea.width;
 
     const pos1Width = Math.round((totalWidth * percentSize) / 100);
-    const pos2Width = totalWidth - pos1Width;
-    const splitPos = Math.max(pos1Width, pos2Width);
+    const splitPos = pos1Width;
 
     const x = tabNumber === 1 ? 0 : splitPos + this.MARGIN;
     const y = availableArea.y;
