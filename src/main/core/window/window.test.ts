@@ -1114,4 +1114,65 @@ describe('Window Close Desktop', () => {
       expect(command!.visibility!(visibilityArgs)).toBe(false);
     });
   });
+
+  describe('hasLessDesktops and hasMoreDesktops', () => {
+    test('both are false with exactly MIN_DESKTOPS desktops', () => {
+      expect(window.hasLessDesktops).toBe(false);
+      expect(window.hasMoreDesktops).toBe(false);
+    });
+
+    test('hasMore is true when desktops exist beyond range to the right', () => {
+      window.createDesktop(6);
+
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+      expect(window.hasLessDesktops).toBe(false);
+      expect(window.hasMoreDesktops).toBe(true);
+    });
+
+    test('hasLess is true when desktops exist beyond range to the left', () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+      expect(window.hasLessDesktops).toBe(true);
+      expect(window.hasMoreDesktops).toBe(false);
+    });
+
+    test('both are true when desktops exist on both sides of range', () => {
+      window.createDesktop(6);
+      window.createDesktop(7);
+      window.selectDesktop(4);
+
+      expect(window.visibleDesktopsRange).toEqual([1, 5]);
+      expect(window.hasLessDesktops).toBe(false);
+      expect(window.hasMoreDesktops).toBe(true);
+
+      window.selectDesktop(6);
+
+      expect(window.visibleDesktopsRange).toEqual([2, 6]);
+      expect(window.hasLessDesktops).toBe(true);
+      expect(window.hasMoreDesktops).toBe(true);
+    });
+
+    test('hasMore is false when range includes the last desktop', () => {
+      window.createDesktop(6);
+      window.selectDesktop(6);
+
+      expect(window.hasMoreDesktops).toBe(false);
+    });
+
+    test('hasLess is false when range starts at desktop 1', () => {
+      expect(window.hasLessDesktops).toBe(false);
+
+      window.createDesktop(6);
+      window.selectDesktop(6);
+
+      expect(window.hasLessDesktops).toBe(true);
+
+      window.selectDesktop(1);
+
+      expect(window.visibleDesktopsRange).toEqual([1, MIN_DESKTOPS]);
+      expect(window.hasLessDesktops).toBe(false);
+    });
+  });
 });

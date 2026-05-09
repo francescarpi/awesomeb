@@ -7,6 +7,8 @@
 <script>
   import { type IVisibleDesktops } from '~/types';
   import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
+  import Left from '#/icons/left.svg?raw';
+  import Right from '#/icons/right.svg?raw';
 
   const { winId } = getSearchParams();
 
@@ -25,8 +27,11 @@
     return h(
       'div',
       { class: c('flex', 'items-center', 'justify-between', 'gap-2') },
-      ...visibleDesktops.desktops.map((desktop) =>
-        h(
+      ...visibleDesktops.desktops.map((desktop, index) => {
+        const isFirst = index === 0;
+        const isLast = index === visibleDesktops.desktops.length - 1;
+
+        return h(
           'div',
           {
             class: c(
@@ -44,6 +49,7 @@
               class: c(
                 'border',
                 'rounded-full',
+                'relative',
                 'sidebar:w-9',
                 'sidebar:h-9',
                 'sidebar:text-sm',
@@ -67,6 +73,46 @@
                 }),
             },
             desktop.id,
+            h(
+              'div',
+              {
+                class: c(
+                  'absolute',
+                  'left-0',
+                  'inset-y-0',
+                  'flex',
+                  'items-center',
+                  'w-3',
+                  'text-white/40',
+                  'pointer-events-none',
+                  '[&>svg]:w-full',
+                  '[&>svg]:h-full',
+                  !(isFirst && visibleDesktops.hasLess) && 'hidden',
+                ),
+                innerHTML: Left,
+              },
+              '',
+            ),
+            h(
+              'div',
+              {
+                class: c(
+                  'absolute',
+                  'right-0',
+                  'inset-y-0',
+                  'flex',
+                  'items-center',
+                  'w-3',
+                  'text-white/40',
+                  'pointer-events-none',
+                  '[&>svg]:w-full',
+                  '[&>svg]:h-full',
+                  !(isLast && visibleDesktops.hasMore) && 'hidden',
+                ),
+                innerHTML: Right,
+              },
+              '',
+            ),
             h(
               'div',
               {
@@ -135,8 +181,8 @@
             },
             desktop.name || '',
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 </script>
