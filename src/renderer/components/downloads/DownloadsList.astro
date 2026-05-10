@@ -107,7 +107,7 @@ const { isPage = false } = Astro.props;
         h(
           'button',
           {
-            class: c('btn', 'btn-xs', 'btn-outline'),
+            class: c('btn', 'btn-xs', 'btn-outline', !hasDownloads && 'hidden'),
             onclick: () => abDownloads.clearCompleted(),
           },
           'Clear Completed',
