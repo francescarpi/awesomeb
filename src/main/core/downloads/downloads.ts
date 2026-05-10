@@ -1,6 +1,7 @@
 import { DownloadItem } from 'electron';
 import { Browser } from '@/core';
 import { Download } from './download';
+import { EDownloadStatus } from '~/types';
 
 export class Downloads {
   private _downloads: Map<string, Download> = new Map();
@@ -18,5 +19,17 @@ export class Downloads {
 
   get all(): Download[] {
     return Array.from(this._downloads.values());
+  }
+
+  clearCompleted() {
+    for (const [savePath, download] of this._downloads) {
+      if (
+        download.status === EDownloadStatus.Completed ||
+        download.status === EDownloadStatus.Cancelled
+      ) {
+        this._downloads.delete(savePath);
+      }
+    }
+    this._browser.eventsChannel.emit('downloads:updated');
   }
 }

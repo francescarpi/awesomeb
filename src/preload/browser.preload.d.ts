@@ -128,6 +128,7 @@ declare global {
       winId?: TWindowId,
     ) => void;
     get: (winId?: TWindowId) => Promise<IDownloads>;
+    clearCompleted: () => void;
   };
 
   //--------------------------------------------------------------------------------------

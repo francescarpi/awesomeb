@@ -194,6 +194,9 @@ const abDownloads = {
   get: async (winId?: TWindowId) => {
     return await ipcRenderer.invoke('downloads:get', { winId });
   },
+  clearCompleted: () => {
+    ipcRenderer.send('downloads:clear-completed');
+  },
 };
 
 //--------------------------------------------------------------------------------------

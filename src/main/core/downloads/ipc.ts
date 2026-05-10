@@ -78,7 +78,7 @@ export function setupDownloadsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{}>(
+  createHandler(
     'downloads:get',
     'handle',
     browser,
@@ -94,4 +94,9 @@ export function setupDownloadsIPC(browser: Browser) {
       return browser.renderer.downloads();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  createHandler('downloads:clear-completed', 'on', browser, [], async () => {
+    browser.downloads.clearCompleted();
+  });
 }

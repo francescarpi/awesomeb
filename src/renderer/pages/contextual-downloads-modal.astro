@@ -50,7 +50,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
         ),
         h(
           'div',
-          { class: c('mt-4') },
+          { class: c('mt-4', 'flex', 'gap-2') },
           h(
             'button',
             {
@@ -58,6 +58,14 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
               onclick: () => abDownloads.openPage(winId),
             },
             'View All',
+          ),
+          h(
+            'button',
+            {
+              class: c('btn', 'btn-xs', 'btn-outline'),
+              onclick: () => abDownloads.clearCompleted(),
+            },
+            'Clear Completed',
           ),
         ),
       ),
