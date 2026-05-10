@@ -2,19 +2,46 @@
 import ButtonIcon from '#/components/common/ButtonIcon.astro';
 ---
 
-<ButtonIcon icon="downloads" />
+<div class="relative">
+  <ButtonIcon icon="downloads" />
+  <span
+    id="download-badge"
+    class="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold rounded-full min-w-4 w-fit h-4 px-0.75 items-center justify-center hidden"
+  ></span>
+</div>
 
 <script>
   import { getSearchParams, onClick } from '#/scripts';
 
   const { winId } = getSearchParams();
   const downloads = document.getElementById('downloads')!;
+  const badge = document.getElementById('download-badge')!;
+  let prevCount = 0;
+  let bounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   abDownloads.onRefresh((_event, data) => {
-    if (data.downloading) {
-      downloads.classList.add('animate-pulse', 'text-red-500');
+    const newCount = data.items.length;
+
+    if (newCount !== prevCount) {
+      if (bounceTimer) clearTimeout(bounceTimer);
+      downloads.classList.remove('spring-pop');
+      void downloads.offsetWidth;
+      downloads.classList.add('spring-pop');
+      bounceTimer = setTimeout(() => downloads.classList.remove('spring-pop'), 800);
+    }
+
+    prevCount = newCount;
+
+    const pendingCount = data.items.filter(
+      (i) => i.status === 'in_progress' || i.status === 'paused',
+    ).length;
+
+    if (pendingCount > 0) {
+      badge.textContent = pendingCount > 9 ? '9+' : String(pendingCount);
+      badge.classList.remove('hidden');
+      badge.classList.add('flex');
     } else {
-      downloads.classList.remove('animate-pulse', 'text-red-500');
+      badge.classList.add('hidden');
     }
   });
 
@@ -31,3 +58,26 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
     });
   });
 </script>
+
+<style is:global>
+  @keyframes spring-pop {
+    0% {
+      transform: scale(1);
+    }
+    35% {
+      transform: scale(2);
+    }
+    60% {
+      transform: scale(0.92);
+    }
+    80% {
+      transform: scale(1.04);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .spring-pop {
+    animation: spring-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+</style>
