@@ -4,3 +4,4 @@ dist
 .astro
 node_modules
 .DS_Store
+.claude
