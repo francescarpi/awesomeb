@@ -2,111 +2,96 @@
 import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
-<ContextualModal>
-  <div>
-    <div id="no-downloads" class="text-center mt-2 hidden">No downloads for this session.</div>
-    <ul id="downloads-list" class="divide-y mt-2">
-      <!-- Downloads will be rendered here -->
-    </ul>
-    <div class="flex justify-end mt-4 border-t pt-2">
-      <button class="btn btn-xs" id="show-all">Show all downloads</button>
-    </div>
-  </div>
+<ContextualModal width="w-[500px]">
+  <div id="container"></div>
 </ContextualModal>
 
 <script>
-  import { onClick, getSearchParams } from '#/scripts';
-  import { EDownloadStatus, IDownloads, IDownloadItem } from '~/types';
+  import { Renderer, h, c, type VNode, getSearchParams, btnIcon } from '#/scripts';
+  import { type IDownloads, EDownloadStatus, type IDownloadItem } from '~/types';
+  import Search from '#/icons/search.svg?raw';
+  import Pause from '#/icons/pause.svg?raw';
+  import Resume from '#/icons/resume.svg?raw';
+  import Cancel from '#/icons/cancel.svg?raw';
 
   const { winId } = getSearchParams();
 
-  onClick('show-all', () => {
-    abDownloads.openPage(winId);
-  });
+  const data = await abDownloads.get(winId);
+  const renderer = new Renderer(renderDownloads(data), 'container').render();
+  abDownloads.onRefresh((_event, data) => renderer.update(renderDownloads(data)));
 
-  abDownloads.onRefresh((_event, data) => renderDownloads(data));
-  abDownloads.get(winId).then((data) => renderDownloads(data));
-
-  function renderDownloads(data: IDownloads) {
-    const noDownloadsEl = document.getElementById('no-downloads')!;
-    if (data.items.length === 0) {
-      noDownloadsEl.classList.remove('hidden');
-      return;
-    }
-
-    const downloadsListEl = document.getElementById('downloads-list')!;
-    downloadsListEl.innerHTML = '';
-
-    for (const item of data.items) {
-      const li = createRow(item);
-
-      const name = createFileName(item);
-
-      const content = document.createElement('div');
-      content.classList.add('flex', 'items-center', 'gap-2');
-
-      if (item.status === EDownloadStatus.Cancelled) {
-        content.classList.add('opacity-30');
-      }
-
-      const progress = document.createElement('progress');
-      progress.className = 'progress progress-primary';
-      progress.value = item.progress;
-      progress.max = 100;
-
-      const progressText = document.createElement('span');
-      progressText.textContent = `${item.progress}%`;
-      progressText.className = 'text-xs';
-
-      content.appendChild(progress);
-      content.appendChild(progressText);
-
-      li.appendChild(name);
-      li.appendChild(content);
-      downloadsListEl.appendChild(li);
-    }
+  function renderDownloads(data: IDownloads): VNode {
+    const hasDownloads = data.items.length > 0;
+    return h(
+      'div',
+      {
+        style: 'app-region; no-drag',
+      },
+      h('div', { class: c(hasDownloads ? 'hidden' : 'block') }, 'No downloads for this session'),
+      h(
+        'div',
+        { class: c(hasDownloads ? 'block' : 'hidden') },
+        h(
+          'div',
+          { class: c('gap-2', 'grid', 'grid-cols-[auto_40px_42px]') },
+          ...data.items.flatMap((item) => {
+            const paused = item.status === EDownloadStatus.Paused;
+            const cancelled = item.status === EDownloadStatus.Cancelled;
+            return [
+              h(
+                'div',
+                { class: c('truncate', paused && 'opacity-30', cancelled && 'line-through') },
+                item.fileName,
+              ),
+              h('div', { class: c('text-right', paused && 'opacity-30') }, `${item.progress}%`),
+              itemAction(item),
+            ];
+          }),
+        ),
+        h(
+          'div',
+          { class: c('mt-4') },
+          h(
+            'button',
+            {
+              class: c('btn', 'btn-xs', 'btn-outline'),
+              onclick: () => abDownloads.openPage(winId),
+            },
+            'View All',
+          ),
+        ),
+      ),
+    );
   }
 
-  function createRow(item: IDownloadItem): HTMLLIElement {
-    const li = document.createElement('li');
-    li.classList.add('py-2');
-
-    if (item.status === EDownloadStatus.Paused) {
-      li.classList.add('opacity-30');
+  function itemAction(item: IDownloadItem): VNode {
+    switch (item.status) {
+      case EDownloadStatus.InProgress:
+        return h(
+          'div',
+          { class: c('flex', 'gap-1') },
+          btnIcon(Pause, {
+            onClick: () => abDownloads.action(item.savePath, 'pause', winId),
+          }),
+          btnIcon(Cancel, {
+            onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
+          }),
+        );
+      case EDownloadStatus.Completed:
+        return btnIcon(Search, { onClick: () => abDownloads.action(item.savePath, 'open', winId) });
+      case EDownloadStatus.Paused:
+        return h(
+          'div',
+          { class: c('flex', 'gap-1') },
+          btnIcon(Resume, {
+            onClick: () => abDownloads.action(item.savePath, 'resume', winId),
+          }),
+          btnIcon(Cancel, {
+            onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
+          }),
+        );
+      default:
+        return h('div', {}, '');
     }
-
-    return li;
-  }
-
-  function createFileName(item: IDownloadItem): HTMLDivElement {
-    const nameContainer = document.createElement('div');
-    nameContainer.classList.add('flex', 'gap-2');
-
-    const name = document.createElement('span');
-    name.classList.add('truncate');
-    name.textContent = item.fileName;
-    nameContainer.appendChild(name);
-
-    if (item.status === EDownloadStatus.Cancelled) {
-      name.classList.add('line-through');
-    }
-
-    if (item.status === EDownloadStatus.InProgress) {
-      const btn = document.createElement('button') as HTMLButtonElement;
-      btn.className = 'btn btn-xs btn-error';
-      btn.textContent = 'X';
-      btn.onclick = () => abDownloads.action(item.savePath, 'cancel', winId);
-
-      nameContainer.appendChild(btn);
-    } else if (item.status === EDownloadStatus.Completed) {
-      const btn = document.createElement('button') as HTMLButtonElement;
-      btn.className = 'btn btn-xs';
-      btn.textContent = 'Show in folder';
-      btn.onclick = () => abDownloads.action(item.savePath, 'open', winId);
-
-      nameContainer.appendChild(btn);
-    }
-
-    return nameContainer;
   }
 </script>

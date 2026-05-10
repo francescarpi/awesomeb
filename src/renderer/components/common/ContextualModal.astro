@@ -1,11 +1,17 @@
 ---
 import Base from '../../layouts/Base.astro';
+
+interface Props {
+  width?: string;
+}
+
+const { width = 'w-87.5' } = Astro.props;
 ---
 
 <Base noDrag>
   <div class="fixed inset-0" id="overlay"></div>
   <div
-    class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 w-87.5 absolute rounded-lg p-2 hidden border border-white/50 dropshadow-md"
+    class={`bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 ${width} absolute rounded-lg p-2 hidden border border-white/50 dropshadow-md`}
     id="wrapper"
   >
     <div id="content" class="text-sm p-4"><slot /></div>

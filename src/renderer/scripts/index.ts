@@ -7,6 +7,5 @@ export { dialogWithSelect, type IOption } from './dialog-with-select';
 export * from './buttons';
 export * from './icons';
 export * from './vdom';
-export * from './classnames';
 export * from './string';
 export * from './settings';
