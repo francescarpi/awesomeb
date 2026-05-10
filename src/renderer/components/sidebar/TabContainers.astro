@@ -97,7 +97,6 @@
                   ),
                   onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
                   oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: t.id }),
-                  ondblclick: () => abModal.open(winId, 'rename-tab'),
                 },
                 h(
                   'span', // Loading spinner
@@ -138,7 +137,10 @@
                 ),
                 h(
                   'div', // Title + indicators container
-                  { class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0') },
+                  {
+                    class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0'),
+                    ondblclick: () => abModal.open(winId, 'rename-tab'),
+                  },
                   h(
                     'span', // Title
                     { class: c('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
