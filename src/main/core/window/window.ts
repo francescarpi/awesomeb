@@ -396,7 +396,7 @@ export class Window extends UIWindow {
     }
 
     for (const view of this.views) {
-      if (!view.visible) {
+      if (!view.visible && !['tab-switcher', 'tab-marks'].includes(view.viewId)) {
         continue;
       }
       view.refreshBounds(this);
