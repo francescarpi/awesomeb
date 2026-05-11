@@ -37,6 +37,7 @@ export class Tab extends UIView {
   private _requestPermission: [string, string, TPermissionRequestCallback] | null = null;
   private _parent: Tab | null = null;
   private _preview: TabPreview | null = null;
+  private _eventsRegistered: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -330,6 +331,7 @@ export class Tab extends UIView {
     this.clearFailLoad();
     this.close();
     this._suspended = true;
+    this._eventsRegistered = false;
   }
 
   close() {
@@ -492,5 +494,13 @@ export class Tab extends UIView {
       return false;
     }
     return this.webContents.audioMuted;
+  }
+
+  get eventsRegistered(): boolean {
+    return this._eventsRegistered;
+  }
+
+  set eventsRegistered(value: boolean) {
+    this._eventsRegistered = value;
   }
 }
