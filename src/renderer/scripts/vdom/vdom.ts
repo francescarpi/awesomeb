@@ -308,13 +308,18 @@ export class Renderer {
     this.currentVNode = initialVNode;
   }
 
-  render(): Renderer {
+  render(onRendered?: () => void): Renderer {
     this.el = render(this.currentVNode);
     const container = document.getElementById(this.containerElementId);
     if (!container) {
       throw new Error(`Container element with ID "${this.containerElementId}" not found`);
     }
     container.appendChild(this.el);
+
+    if (onRendered) {
+      onRendered();
+    }
+
     return this;
   }
 

@@ -31,6 +31,18 @@ import Modal from '#/layouts/Modal.astro';
             class: c('input', 'input-sm', 'text-black', 'w-full'),
             value: defaultValue,
             id: 'prompt-input',
+            autofocus: true,
+            onkeydown: (e) => {
+              const ev = e as KeyboardEvent;
+              if (ev.key === 'Enter') {
+                abPrompts.response(
+                  winId,
+                  (document.getElementById('prompt-input') as HTMLInputElement).value,
+                );
+              } else if (ev.key === 'Escape') {
+                abPrompts.response(winId, null);
+              }
+            },
           },
           '',
         ),
@@ -61,5 +73,9 @@ import Modal from '#/layouts/Modal.astro';
       ),
     ),
     'container',
-  ).render();
+  ).render(() => {
+    const input = document.getElementById('prompt-input') as HTMLInputElement;
+    input.focus();
+    input.select();
+  });
 </script>
