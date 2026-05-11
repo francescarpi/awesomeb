@@ -63,7 +63,7 @@
     "typescript-eslint": "8.59.2",
     "vite": "8.0.12",
     "vite-plugin-static-copy": "4.1.0",
-    "vitest": "4.1.5"
+    "vitest": "4.1.6"
   },
   "dependencies": {
     "@electron-webauthn/macos": "1.3.1",
