@@ -16,6 +16,8 @@ function checkIfRequireAttention(browser: Browser, tab: Tab) {
 }
 
 export function registerTabEvents(browser: Browser, tab: Tab) {
+  tab.webContents.removeAllListeners();
+
   //--------------------------------------------------------------------------------------
   tab.webContents.on('did-start-loading', () => {
     tab.setLoading(true);

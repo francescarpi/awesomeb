@@ -285,6 +285,8 @@ export class Tab extends UIView {
       this.refreshWebContentsView();
     }
 
+    registerTabEvents(this.browser, this);
+
     this._suspended = false;
   }
 

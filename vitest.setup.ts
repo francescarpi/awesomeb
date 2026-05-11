@@ -41,6 +41,7 @@ vi.mock('electron', () => {
     stop: vi.fn(),
     close: vi.fn(),
     on: vi.fn(),
+    removeAllListeners: vi.fn(),
     focus: vi.fn(),
     getUserAgent: vi.fn(
       () =>

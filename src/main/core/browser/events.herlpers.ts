@@ -6,6 +6,7 @@ const scopeLog = log.scope('BrowserEventsHelpers');
 export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   const result = browser.getTab(tab.id);
   if (!result) {
+    scopeLog.warn('Could not find tab with id', tab.id, 'to refresh URL bar or tab');
     return;
   }
 
@@ -30,5 +31,7 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
   if (someChanged) {
     browser.refreshMainMenu();
     scopeLog.info('Refreshed URL bar or tab for tab with id', tab.id);
+  } else {
+    scopeLog.debug('No need to refresh URL bar or tab for tab with id', tab.id);
   }
 }
