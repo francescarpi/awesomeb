@@ -64,7 +64,7 @@ import Base from '../layouts/Base.astro';
                 h('img', { class: c('w-5', 'h-5') }, ''),
                 h(
                   'div',
-                  { class: c('flex', 'flex-col', 'w-full', '-mt-1.5') },
+                  { class: c('flex', 'flex-col', 'w-full', '-mt-1.5', 'truncate') },
                   h('span', { class: c('truncate', 'w-full') }, t.title),
                   h('span', { class: c('text-[10px]', '-mt-1') }, t.desktopName || ''),
                 ),
