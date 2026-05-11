@@ -54,6 +54,7 @@ export interface ITabSwitcherTab {
   id: TTabId;
   title: string;
   partitionColor: string;
+  desktopName: string | null;
 }
 
 export type TTabPreviewAction = 'close' | 'accept' | 'split';

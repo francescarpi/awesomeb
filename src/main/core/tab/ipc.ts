@@ -262,4 +262,15 @@ export function setupTabIPC(browser: Browser) {
 
     browser.performCommand(tab.window, `${action}-tab-preview`);
   });
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'tabswitcher:get',
+    'handle',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      return browser.renderer.tabSwitcherData(win);
+    },
+  );
 }

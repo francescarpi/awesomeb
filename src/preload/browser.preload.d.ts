@@ -140,6 +140,7 @@ declare global {
   const abTabSwitcher: {
     close: (winId: TWindowId) => void;
     refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => void;
+    get: (winId: TWindowId) => Promise<ITabSwitcherTab[]>;
   };
 
   //--------------------------------------------------------------------------------------

@@ -304,9 +304,8 @@ export class BrowserRenderer {
 
   tabSwitcherData(window: Window): ITabSwitcherTab[] {
     const sortedTabs = window.tabs
-      .map((tab) => tab.tab)
-      .filter((tab) => !tab.suspended)
-      .sort((a, b) => a.lastAccessed - b.lastAccessed)
+      .filter((tab) => !tab.tab.suspended)
+      .sort((a, b) => a.tab.lastAccessed - b.tab.lastAccessed)
       .reverse();
 
     if (sortedTabs.length > 1) {
@@ -316,9 +315,10 @@ export class BrowserRenderer {
     }
 
     return sortedTabs.map((tab) => ({
-      id: tab.id,
-      title: tab.title,
-      partitionColor: tab.partition.color,
+      id: tab.tab.id,
+      title: tab.tab.title,
+      partitionColor: tab.tab.partition.color,
+      desktopName: tab.desktop.name,
     }));
   }
 

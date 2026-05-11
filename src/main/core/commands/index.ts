@@ -61,6 +61,7 @@ import * as layoutUnsplitt from './layout-unsplit';
 import * as layoutSize from './layout-size';
 import * as tabpreviewSplit from './tabpreview-split';
 import * as devtoolsWindow from './devtools-window';
+import * as devtoolsTabswitcher from './devtools-tabswitcher';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -121,6 +122,7 @@ const COMMANDS = {
   [layoutSize.TRIGGER]: layoutSize.Command,
   [tabpreviewSplit.TRIGGER]: tabpreviewSplit.Command,
   [devtoolsWindow.TRIGGER]: devtoolsWindow.Command,
+  [devtoolsTabswitcher.TRIGGER]: devtoolsTabswitcher.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

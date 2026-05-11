@@ -214,6 +214,9 @@ const abTabSwitcher = {
   refresh: (callback: (event: IpcRendererEvent, tabs: ITabSwitcherTab[]) => void) => {
     ipcRenderer.on('tabswitcher:refresh', callback);
   },
+  get: (winId: TWindowId) => {
+    return ipcRenderer.invoke('tabswitcher:get', { winId });
+  },
 };
 
 //--------------------------------------------------------------------------------------
