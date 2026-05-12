@@ -58,8 +58,13 @@ import Base from '../layouts/Base.astro';
                     'pb-1',
                     'gap-2',
                     'items-start',
+                    'cursor-pointer',
                     idx === selectedIndex ? 'bg-white/20 rounded' : '',
                   ),
+                  onmouseenter: () => {
+                    selectedIndex = idx;
+                    renderer.update(renderTabs());
+                  },
                 },
                 h('img', { class: c('w-5', 'h-5') }, ''),
                 h(
