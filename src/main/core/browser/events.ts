@@ -113,10 +113,12 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
-    await tab.loadHistoryOrURL().then(() => {
-      browser.toRenderer.refreshShowSplitMenu(window);
-      browser.toRenderer.refreshTabNavigation(window, tab);
-      browser.toRenderer.refreshURLBar(window, tab);
+    tab.loadHistoryOrURL().then(() => {
+      if (window.selectedTab?.tab.id === tab.id) {
+        browser.toRenderer.refreshShowSplitMenu(window);
+        browser.toRenderer.refreshTabNavigation(window, tab);
+        browser.toRenderer.refreshURLBar(window, tab);
+      }
     });
   });
 
