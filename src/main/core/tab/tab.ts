@@ -239,6 +239,11 @@ export class Tab extends UIView {
       return;
     }
 
+    if (requireAttention && this.isMuted) {
+      // If muted, we don't want to require attention because the user won't hear it anyway
+      return;
+    }
+
     this._requireAttention = requireAttention;
     this.browser.eventsChannel.emit('tab:require-attention-did-change', this);
   }
