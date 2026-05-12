@@ -16,7 +16,8 @@ export class Sidebar extends UIPageView {
 
     let width: number;
     if (window.areaMaximized) {
-      width = window.sidebarCollapsed ? 0 : SIDEBAR_DEFAULT_WIDTH;
+      // Note: Minimum width should be '1' for app-region dragin.
+      width = window.sidebarCollapsed ? 1 : SIDEBAR_DEFAULT_WIDTH;
     } else {
       width = window.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH;
     }
