@@ -20,6 +20,7 @@ export class Window extends UIWindow {
   private readonly _desktops: Map<TDesktopId, Desktop> = new Map();
   private _visibleDesktopsRange: [number, number] = [1, MIN_DESKTOPS];
   private _selectedDesktopId: TDesktopId;
+  private _whoInitiateRequireAttention: TTabId | null = null;
   public readonly prompts = new PromptsManager(this);
 
   constructor(
@@ -442,5 +443,13 @@ export class Window extends UIWindow {
     this.modal.closeContextual();
     this.browser.toRenderer.refreshSidebarDrag(this, true);
     this.renderViews();
+  }
+
+  get whoInitiateRequireAttention(): TTabId | null {
+    return this._whoInitiateRequireAttention;
+  }
+
+  setWhoInitiateRequireAttention(id: TTabId | null) {
+    this._whoInitiateRequireAttention = id;
   }
 }

@@ -9,10 +9,21 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Select First Tab Requiring Attention',
   description: 'Select the first tab that has a badge indicating it requires attention.',
   visibility: ({ window }) => (window ? window.tabsRequireAttention.length > 0 : false),
-  async handler({ window }) {
+  async handler({ window, tab }) {
     const nextTab = window.tabsRequireAttention[0];
-    if (nextTab) {
-      window.selectTab(nextTab.tab.id);
+    if (!nextTab) {
+      if (window.whoInitiateRequireAttention) {
+        window.selectTab(window.whoInitiateRequireAttention);
+        window.setWhoInitiateRequireAttention(null);
+      }
+
+      return;
     }
+
+    if (!window.whoInitiateRequireAttention && tab) {
+      window.setWhoInitiateRequireAttention(tab.id);
+    }
+
+    window.selectTab(nextTab.tab.id);
   },
 };

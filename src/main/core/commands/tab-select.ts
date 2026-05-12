@@ -14,5 +14,6 @@ export const Command: ICommand<ICommandParams> = {
   visibility: ({ tab }) => !!tab,
   async handler({ window, params }) {
     await window.selectTab(params.tabId);
+    window.setWhoInitiateRequireAttention(null);
   },
 };

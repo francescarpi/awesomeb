@@ -271,7 +271,6 @@ function tabsMenu(
 ): MenuItemConstructorOptions {
   const tabs: MenuItemConstructorOptions[] = [];
   const totalContainers = window?.selectedDesktop?.tabContainers.length || 0;
-  const requireAttention = window ? window.tabsRequireAttention.length > 0 : false;
 
   for (let i = 1; i <= 9; i++) {
     tabs.push({
@@ -330,9 +329,8 @@ function tabsMenu(
         label: 'Select require attention',
         accelerator: 'CmdOrCtrl+U',
         icon: getIcon(EIcon.Notification),
-        enabled: requireAttention,
         click: async () => {
-          if (window && requireAttention) {
+          if (window) {
             await browser.performCommand(window, 'select-first-tab-require-attention');
           }
         },
