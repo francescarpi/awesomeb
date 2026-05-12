@@ -19,6 +19,20 @@
   // Subscribe to desktop updates
   abDesktops.onRefresh((_event, desktops) => renderer.update(renderDesktops(desktops)));
 
+  // Navigate desktops on horizontal scroll (throttled)
+  let lastScroll = 0;
+  document.getElementById('desktops')!.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    if (now - lastScroll < 300) return;
+    if (e.deltaX > 0) {
+      lastScroll = now;
+      abCommands.perform(winId, 'next-desktop');
+    } else if (e.deltaX < 0) {
+      lastScroll = now;
+      abCommands.perform(winId, 'previous-desktop');
+    }
+  });
+
   /**
    * Renders the list of desktops in the UI
    * @param desktops - Array of desktop entities to render
