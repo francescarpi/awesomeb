@@ -201,6 +201,19 @@ export class UIWindow {
     view.focus();
   }
 
+  checkViewsNeedTheFocus() {
+    const views = [
+      this.getView<TabSwitcher>('tab-switcher')!,
+      this.getView<TabMarks>('tab-marks')!,
+    ];
+
+    for (const view of views) {
+      if (view.visible && !view.webContents.isFocused()) {
+        view.focus();
+      }
+    }
+  }
+
   get isTabSwitcherVisible(): boolean {
     const view = this.getView<TabSwitcher>('tab-switcher')!;
     return view.visible;

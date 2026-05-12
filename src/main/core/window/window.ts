@@ -303,8 +303,6 @@ export class Window extends UIWindow {
     this.renderViews();
 
     this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-
-    tab.focus();
   }
 
   get tabs(): IDesConTab[] {

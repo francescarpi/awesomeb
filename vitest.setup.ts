@@ -38,6 +38,7 @@ vi.mock('electron', () => {
     loadURL: vi.fn().mockResolvedValue(undefined),
     send: vi.fn(),
     isDestroyed: vi.fn(() => false),
+    isFocused: vi.fn(() => false),
     stop: vi.fn(),
     close: vi.fn(),
     on: vi.fn(),
