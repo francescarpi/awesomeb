@@ -88,7 +88,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
     tab.setRequireAttention(false);
 
     const selected = browser.selectedTab;
-    if (selected && selected.tab.id !== tab.id) {
+    if (selected && selected.tab.id !== tab.id && tab.webContentsView.getVisible()) {
       selected.window.selectTab(tab.id);
     }
   });
