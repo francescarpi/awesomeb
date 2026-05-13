@@ -14,10 +14,14 @@ import Title from '#/components/common/Title.astro';
     <input class="input w-full text-black rounded-full" placeholder="Title..." id="title" />
     <input class="input w-full text-black rounded-full" placeholder="Url..." id="url" />
   </div>
+  <div class="flex justify-end gap-2 mt-4">
+    <button class="btn" id="cancel">Cancel</button>
+    <button class="btn btn-primary" id="save">Save</button>
+  </div>
 </Modal>
 
 <script>
-  import { getSearchParams, inputManager } from '#/scripts';
+  import { getSearchParams, inputManager, buttonManager } from '#/scripts';
 
   const { winId, searchParams } = getSearchParams();
 
@@ -28,12 +32,19 @@ import Title from '#/components/common/Title.astro';
   const createFolder = searchParams.get('createFolder');
   const h1 = document.querySelector('h1')!;
 
+  buttonManager('save', {
+    handleClick: () => handleSubmit(),
+  });
+
+  buttonManager('cancel', {
+    handleClick: () => abModal.close(winId),
+  });
+
   const {
     setVisible: setFolderNameVisible,
     focus: focusFolderName,
     getValue: getFolderName,
   } = inputManager('folder-name', {
-    onAccept: () => handleSubmit(),
     onCancel: () => abModal.close(winId),
   });
 
@@ -42,12 +53,10 @@ import Title from '#/components/common/Title.astro';
     setDefaultValue: setDefaultTitle,
     getValue: getTitle,
   } = inputManager('title', {
-    onAccept: () => handleSubmit(),
     onCancel: () => abModal.close(winId),
   });
 
   const { setDefaultValue: setDefaultURL, getValue: getURL } = inputManager('url', {
-    onAccept: () => handleSubmit(),
     onCancel: () => abModal.close(winId),
   });
 

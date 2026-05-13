@@ -9,8 +9,8 @@ export function inputManager(
     onChange,
     allowEmpty = false,
   }: {
-    onAccept: (newValue: string) => void;
-    onCancel: () => void;
+    onAccept?: (newValue: string) => void;
+    onCancel?: () => void;
     onChange?: (newValue: string) => void;
     allowEmpty?: boolean;
   },
@@ -51,10 +51,10 @@ export function inputManager(
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const newValue = inputEl.value.trim();
-      if (allowEmpty || newValue.length > 0) {
+      if ((allowEmpty || newValue.length > 0) && onAccept) {
         onAccept(newValue);
       }
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && onCancel) {
       onCancel();
     }
   });

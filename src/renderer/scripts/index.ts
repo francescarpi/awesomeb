@@ -9,3 +9,4 @@ export * from './icons';
 export * from './vdom';
 export * from './string';
 export * from './settings';
+export * from './button-manager';
