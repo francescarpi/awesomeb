@@ -5,11 +5,15 @@ import Modal from '#/layouts/Modal.astro';
 import Title from '#/components/common/Title.astro';
 ---
 
-<Modal width="600px">
+<Modal width="800px">
   <Title>Edit URL</Title>
   <div class="h-full flex flex-col gap-4">
     <Option1 />
     <Option2 />
+  </div>
+  <div class="flex justify-end gap-2 mt-4">
+    <button id="btn-cancel" class="btn btn-ghost">Cancel</button>
+    <button id="btn-accept" class="btn btn-primary">Accept</button>
   </div>
 </Modal>
 
@@ -27,27 +31,79 @@ import Title from '#/components/common/Title.astro';
   const pathnameEl = document.querySelector('#input-pathname') as HTMLInputElement;
   const hashEl = document.querySelector('#input-hash') as HTMLInputElement;
 
-  function fillOption2(
-    url: string,
-    setProtocol: TSetValue | TSetDefault,
-    setHostname: TSetValue | TSetDefault,
-    setPort: TSetValue | TSetDefault,
-    setPathname: TSetValue | TSetDefault,
-    setHash: TSetValue | TSetDefault,
-  ) {
-    try {
-      const urlObj = new URL(url);
-      setProtocol(urlObj.protocol.replace(':', ''));
-      setHostname(urlObj.hostname);
-      setPort(urlObj.port);
-      setPathname(urlObj.pathname);
-      setHash(urlObj.hash);
-    } catch (error) {
-      return;
-    }
+  const queryParamsContainer = document.querySelector('#query-params-container') as HTMLDivElement;
+  const queryParamsBody = document.querySelector('#query-params-body') as HTMLTableSectionElement;
+  const btnAddQueryParam = document.querySelector('#btn-add-query-param') as HTMLButtonElement;
+  const btnCancel = document.querySelector('#btn-cancel') as HTMLButtonElement;
+  const btnAccept = document.querySelector('#btn-accept') as HTMLButtonElement;
+
+  function getQueryParamsFromDOM(): Array<{ key: string; value: string }> {
+    const rows = queryParamsBody.querySelectorAll('tr');
+    const params: Array<{ key: string; value: string }> = [];
+    rows.forEach((row) => {
+      const keyInput = row.querySelector('.query-key') as HTMLInputElement;
+      const valueInput = row.querySelector('.query-value') as HTMLInputElement;
+      params.push({ key: keyInput?.value || '', value: valueInput?.value || '' });
+    });
+    return params;
   }
 
-  function fillOption1(setFullURL: TSetValue) {
+  function hasEmptyQueryParamAtEnd(): boolean {
+    const params = getQueryParamsFromDOM();
+    if (params.length === 0) return false;
+    const last = params[params.length - 1];
+    return last.key === '' && last.value === '';
+  }
+
+  function createQueryParamRow(key: string = '', value: string = '', onChange?: () => void) {
+    const row = document.createElement('tr');
+
+    const keyTd = document.createElement('td');
+    const keyInput = document.createElement('input');
+    keyInput.type = 'text';
+    keyInput.className = 'input input-xs w-full query-key text-black';
+    keyInput.placeholder = 'Key';
+    keyInput.value = key;
+    keyInput.addEventListener('input', () => {
+      if (onChange) onChange();
+    });
+    keyTd.appendChild(keyInput);
+
+    const valueTd = document.createElement('td');
+    const valueInput = document.createElement('input');
+    valueInput.type = 'text';
+    valueInput.className = 'input input-xs w-full query-value text-black';
+    valueInput.placeholder = 'Value';
+    valueInput.value = value;
+    valueInput.addEventListener('input', () => {
+      if (onChange) onChange();
+    });
+    valueTd.appendChild(valueInput);
+
+    const actionsTd = document.createElement('td');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-xs btn-ghost text-error';
+    deleteBtn.textContent = '×';
+    deleteBtn.addEventListener('click', () => {
+      row.remove();
+      if (onChange) onChange();
+    });
+    actionsTd.appendChild(deleteBtn);
+
+    row.appendChild(keyTd);
+    row.appendChild(valueTd);
+    row.appendChild(actionsTd);
+
+    return row;
+  }
+
+  function addQueryParam(onChange?: () => void) {
+    if (hasEmptyQueryParamAtEnd()) return;
+    const row = createQueryParamRow('', '', onChange);
+    queryParamsBody.appendChild(row);
+  }
+
+  function buildFullURL(setFullURL: TSetValue) {
     const protocol = protocolEl.value;
     const hostname = hostnameEl.value;
     const port = portEl.value;
@@ -58,10 +114,56 @@ import Title from '#/components/common/Title.astro';
       url += `:${port}`;
     }
     url += pathname;
+
+    const params = getQueryParamsFromDOM();
+    const filteredParams = params.filter((p) => p.key !== '' || p.value !== '');
+    if (filteredParams.length > 0) {
+      const searchParams = new URLSearchParams();
+      filteredParams.forEach((p) => searchParams.append(p.key, p.value));
+      url += '?' + searchParams.toString();
+    }
+
     if (hash) {
       url += `#${hash}`;
     }
     setFullURL(url);
+  }
+
+  function fillOption2(
+    url: string,
+    setProtocol: TSetValue | TSetDefault,
+    setHostname: TSetValue | TSetDefault,
+    setPort: TSetValue | TSetDefault,
+    setPathname: TSetValue | TSetDefault,
+    setHash: TSetValue | TSetDefault,
+    setFullURL?: TSetValue,
+  ) {
+    try {
+      const urlObj = new URL(url);
+      setProtocol(urlObj.protocol.replace(':', ''));
+      setHostname(urlObj.hostname);
+      setPort(urlObj.port);
+      setPathname(urlObj.pathname);
+      setHash(urlObj.hash);
+
+      queryParamsBody.innerHTML = '';
+      const hasQueryParams = urlObj.searchParams.toString() !== '';
+      if (hasQueryParams) {
+        queryParamsContainer.classList.remove('hidden');
+        urlObj.searchParams.forEach((value, key) => {
+          const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
+          queryParamsBody.appendChild(row);
+        });
+      } else {
+        queryParamsContainer.classList.add('hidden');
+      }
+    } catch (error) {
+      return;
+    }
+  }
+
+  function fillOption1(setFullURL: TSetValue) {
+    buildFullURL(setFullURL);
   }
 
   async function setup() {
@@ -72,6 +174,18 @@ import Title from '#/components/common/Title.astro';
     const selectedTab = tabId
       ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
       : tabsEntitites.find((d) => d.selected)!;
+
+    // Button handlers
+    btnCancel.addEventListener('click', () => {
+      abModal.close(winId);
+    });
+
+    btnAccept.addEventListener('click', () => {
+      abCommands.perform(winId, 'edit-url', {
+        tabId: parseInt(selectedTab.id, 10),
+        url: fullURLEl.value,
+      });
+    });
 
     // -----------------------------------------------------------------
     // OPTION 1
@@ -86,12 +200,25 @@ import Title from '#/components/common/Title.astro';
         },
         onCancel: () => abModal.close(winId),
         onChange: (newValue: string) => {
-          fillOption2(newValue, setProtocol, setHostname, setPort, setPathname, setHash);
+          fillOption2(
+            newValue,
+            setProtocol,
+            setHostname,
+            setPort,
+            setPathname,
+            setHash,
+            setFullURL,
+          );
         },
       },
     );
 
     setDefaultFullURL(selectedTab.url || '', { select: true });
+
+    // Add Query Param button listener
+    btnAddQueryParam.addEventListener('click', () => {
+      addQueryParam(() => buildFullURL(setFullURL));
+    });
 
     // -----------------------------------------------------------------
     // OPTION 2
@@ -179,6 +306,7 @@ import Title from '#/components/common/Title.astro';
       setDefaultPort,
       setDefaultPathname,
       setDefaultHash,
+      setFullURL,
     );
   }
 
