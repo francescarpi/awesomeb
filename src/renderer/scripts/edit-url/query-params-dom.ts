@@ -15,7 +15,7 @@ export function createQueryParamRow(
   container.className = 'flex items-center gap-2';
 
   const keyLabel = document.createElement('label');
-  keyLabel.className = 'input text-black w-full flex-1';
+  keyLabel.className = 'input text-black w-50 ';
 
   const keySpan = document.createElement('span');
   keySpan.className = 'w-12';

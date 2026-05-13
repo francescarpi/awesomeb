@@ -86,7 +86,7 @@ import Title from '#/components/common/Title.astro';
     }
   }
 
-  function fillOption1(setFullURL: TSetValue) {
+  function fillOption1(setFullURL?: TSetValue) {
     const params = getQueryParamsFromDOM(queryParamsBody);
     const parts = {
       protocol: protocolEl.value,
@@ -98,7 +98,7 @@ import Title from '#/components/common/Title.astro';
       searchParams: useHashParams ? [] : params,
     };
     const url = buildURL(parts, useHashParams);
-    setFullURL(url);
+    if (setFullURL) setFullURL(url);
   }
 
   async function setup() {
