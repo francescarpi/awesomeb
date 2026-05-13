@@ -38,6 +38,9 @@ export class Tab extends UIView {
   private _parent: Tab | null = null;
   private _preview: TabPreview | null = null;
   private _eventsRegistered: boolean = false;
+  private _zoomStep: number = 0;
+  private static readonly MIN_ZOOM_STEP = -5;
+  private static readonly MAX_ZOOM_STEP = 9;
 
   constructor(
     public readonly browser: Browser,
@@ -507,5 +510,20 @@ export class Tab extends UIView {
 
   set eventsRegistered(value: boolean) {
     this._eventsRegistered = value;
+  }
+
+  setZoom(type: 'in' | 'out' | 'reset') {
+    switch (type) {
+      case 'in':
+        this._zoomStep = Math.min(this._zoomStep + 1, Tab.MAX_ZOOM_STEP);
+        break;
+      case 'out':
+        this._zoomStep = Math.max(this._zoomStep - 1, Tab.MIN_ZOOM_STEP);
+        break;
+      case 'reset':
+        this._zoomStep = 0;
+        break;
+    }
+    this.webContents.setZoomFactor((100 + this._zoomStep * 10) / 100);
   }
 }

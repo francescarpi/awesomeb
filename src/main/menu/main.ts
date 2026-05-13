@@ -457,6 +457,37 @@ function tabsMenu(
           }
         },
       },
+      { type: 'separator' },
+      {
+        label: 'Zoom in',
+        enabled: !!tab,
+        accelerator: 'CmdOrCtrl+Plus',
+        click: () => {
+          if (tab && window) {
+            browser.performCommand(window, 'zoom-in');
+          }
+        },
+      },
+      {
+        label: 'Zoom out',
+        enabled: !!tab,
+        accelerator: 'CmdOrCtrl+-',
+        click: () => {
+          if (tab && window) {
+            browser.performCommand(window, 'zoom-out');
+          }
+        },
+      },
+      {
+        label: 'Zoom reset',
+        enabled: !!tab,
+        accelerator: 'CmdOrCtrl+0',
+        click: () => {
+          if (tab && window) {
+            browser.performCommand(window, 'zoom-reset');
+          }
+        },
+      },
     ],
   };
 }

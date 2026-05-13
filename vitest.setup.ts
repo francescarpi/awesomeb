@@ -56,6 +56,7 @@ vi.mock('electron', () => {
       restore: vi.fn().mockResolvedValue(undefined),
     },
     setWindowOpenHandler: vi.fn(),
+    setZoomFactor: vi.fn(),
   });
 
   const webContents = createWebContents();

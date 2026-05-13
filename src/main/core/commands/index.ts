@@ -62,6 +62,9 @@ import * as layoutSize from './layout-size';
 import * as tabpreviewSplit from './tabpreview-split';
 import * as devtoolsWindow from './devtools-window';
 import * as devtoolsTabswitcher from './devtools-tabswitcher';
+import * as tabZoomIn from './tab-zoom-in';
+import * as tabZoomOut from './tab-zoom-out';
+import * as tabZoomReset from './tab-zoom-reset';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -123,6 +126,9 @@ const COMMANDS = {
   [tabpreviewSplit.TRIGGER]: tabpreviewSplit.Command,
   [devtoolsWindow.TRIGGER]: devtoolsWindow.Command,
   [devtoolsTabswitcher.TRIGGER]: devtoolsTabswitcher.Command,
+  [tabZoomIn.TRIGGER]: tabZoomIn.Command,
+  [tabZoomOut.TRIGGER]: tabZoomOut.Command,
+  [tabZoomReset.TRIGGER]: tabZoomReset.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
