@@ -414,4 +414,10 @@ export function registerBrowserEvents(browser: Browser) {
     selectedTab.window.renderViews();
     browser.toRenderer.refreshLayoutData(selectedTab.window);
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:window-did-resize', async (win: Window) => {
+    win.renderViews();
+    browser.toRenderer.refreshLayoutData(win);
+  });
 }

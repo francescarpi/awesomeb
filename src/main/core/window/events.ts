@@ -21,7 +21,7 @@ export function registerWindowEvents(window: Window) {
 
   //--------------------------------------------------------------------------------------
   window.bw.on('resize', () => {
-    window.renderViews();
+    window.browser.eventsChannel.emit('window:window-did-resize', window);
   });
 
   //--------------------------------------------------------------------------------------
