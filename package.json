@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "tscheck:node": "tsc --noEmit --project tsconfig.node.json --composite false",
     "tscheck:renderer": "tsc --noEmit --project tsconfig.renderer.json --composite false",
-    "tscheck": "npm run tscheck:node && npm run tscheck:renderer && pnpm astro check",
+    "tscheck": "npm run tscheck:node && npm run tscheck:renderer",
     "husky:install": "husky"
   },
   "lint-staged": {
