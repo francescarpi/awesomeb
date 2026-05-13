@@ -31,16 +31,15 @@ import Title from '#/components/common/Title.astro';
   const pathnameEl = document.querySelector('#input-pathname') as HTMLInputElement;
   const hashEl = document.querySelector('#input-hash') as HTMLInputElement;
 
-  const queryParamsContainer = document.querySelector('#query-params-container') as HTMLDivElement;
   const queryParamsBody = document.querySelector('#query-params-body') as HTMLTableSectionElement;
   const btnAddQueryParam = document.querySelector('#btn-add-query-param') as HTMLButtonElement;
   const btnCancel = document.querySelector('#btn-cancel') as HTMLButtonElement;
   const btnAccept = document.querySelector('#btn-accept') as HTMLButtonElement;
 
   function getQueryParamsFromDOM(): Array<{ key: string; value: string }> {
-    const rows = queryParamsBody.querySelectorAll('tr');
+    const rows = queryParamsBody.children;
     const params: Array<{ key: string; value: string }> = [];
-    rows.forEach((row) => {
+    Array.from(rows).forEach((row) => {
       const keyInput = row.querySelector('.query-key') as HTMLInputElement;
       const valueInput = row.querySelector('.query-value') as HTMLInputElement;
       params.push({ key: keyInput?.value || '', value: valueInput?.value || '' });
@@ -56,45 +55,58 @@ import Title from '#/components/common/Title.astro';
   }
 
   function createQueryParamRow(key: string = '', value: string = '', onChange?: () => void) {
-    const row = document.createElement('tr');
+    const container = document.createElement('div');
+    container.className = 'flex items-center gap-2';
 
-    const keyTd = document.createElement('td');
+    const keyLabel = document.createElement('label');
+    keyLabel.className = 'input text-black w-full flex-1';
+
+    const keySpan = document.createElement('span');
+    keySpan.className = 'w-12';
+    keySpan.textContent = 'Key:';
+    keyLabel.appendChild(keySpan);
+
     const keyInput = document.createElement('input');
     keyInput.type = 'text';
-    keyInput.className = 'input input-xs w-full query-key text-black';
+    keyInput.className = 'grow query-key';
     keyInput.placeholder = 'Key';
     keyInput.value = key;
     keyInput.addEventListener('input', () => {
       if (onChange) onChange();
     });
-    keyTd.appendChild(keyInput);
+    keyLabel.appendChild(keyInput);
 
-    const valueTd = document.createElement('td');
+    const valueLabel = document.createElement('label');
+    valueLabel.className = 'input text-black w-full flex-1';
+
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'w-12';
+    valueSpan.textContent = 'Value:';
+    valueLabel.appendChild(valueSpan);
+
     const valueInput = document.createElement('input');
     valueInput.type = 'text';
-    valueInput.className = 'input input-xs w-full query-value text-black';
+    valueInput.className = 'grow query-value';
     valueInput.placeholder = 'Value';
     valueInput.value = value;
     valueInput.addEventListener('input', () => {
       if (onChange) onChange();
     });
-    valueTd.appendChild(valueInput);
+    valueLabel.appendChild(valueInput);
 
-    const actionsTd = document.createElement('td');
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn btn-xs btn-ghost text-error';
     deleteBtn.textContent = '×';
     deleteBtn.addEventListener('click', () => {
-      row.remove();
+      container.remove();
       if (onChange) onChange();
     });
-    actionsTd.appendChild(deleteBtn);
 
-    row.appendChild(keyTd);
-    row.appendChild(valueTd);
-    row.appendChild(actionsTd);
+    container.appendChild(keyLabel);
+    container.appendChild(valueLabel);
+    container.appendChild(deleteBtn);
 
-    return row;
+    return container;
   }
 
   function addQueryParam(onChange?: () => void) {
@@ -147,15 +159,14 @@ import Title from '#/components/common/Title.astro';
       setHash(urlObj.hash);
 
       queryParamsBody.innerHTML = '';
-      const hasQueryParams = urlObj.searchParams.toString() !== '';
-      if (hasQueryParams) {
-        queryParamsContainer.classList.remove('hidden');
+      if (urlObj.searchParams.toString() === '') {
+        const row = createQueryParamRow('', '', () => buildFullURL(setFullURL));
+        queryParamsBody.appendChild(row);
+      } else {
         urlObj.searchParams.forEach((value, key) => {
           const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
           queryParamsBody.appendChild(row);
         });
-      } else {
-        queryParamsContainer.classList.add('hidden');
       }
     } catch (error) {
       return;
