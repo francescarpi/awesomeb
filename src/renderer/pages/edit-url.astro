@@ -36,6 +36,8 @@ import Title from '#/components/common/Title.astro';
   const btnCancel = document.querySelector('#btn-cancel') as HTMLButtonElement;
   const btnAccept = document.querySelector('#btn-accept') as HTMLButtonElement;
 
+  let useHashParams = false;
+
   function getQueryParamsFromDOM(): Array<{ key: string; value: string }> {
     const rows = queryParamsBody.children;
     const params: Array<{ key: string; value: string }> = [];
@@ -115,7 +117,7 @@ import Title from '#/components/common/Title.astro';
     queryParamsBody.appendChild(row);
   }
 
-  function buildFullURL(setFullURL: TSetValue) {
+  function buildFullURL(setFullURL?: TSetValue) {
     const protocol = protocolEl.value;
     const hostname = hostnameEl.value;
     const port = portEl.value;
@@ -125,20 +127,41 @@ import Title from '#/components/common/Title.astro';
     if (port) {
       url += `:${port}`;
     }
-    url += pathname;
 
     const params = getQueryParamsFromDOM();
     const filteredParams = params.filter((p) => p.key !== '' || p.value !== '');
+    let qs = '';
     if (filteredParams.length > 0) {
-      const searchParams = new URLSearchParams();
-      filteredParams.forEach((p) => searchParams.append(p.key, p.value));
-      url += '?' + searchParams.toString();
+      const sp = new URLSearchParams();
+      filteredParams.forEach((p) => sp.append(p.key, p.value));
+      qs = '?' + sp.toString();
     }
 
-    if (hash) {
-      url += `#${hash}`;
+    const hashStr = hash ? (hash.startsWith('#') ? hash : `#${hash}`) : '';
+
+    if (useHashParams) {
+      url += pathname + hashStr + qs;
+    } else {
+      url += pathname + qs + hashStr;
     }
-    setFullURL(url);
+
+    if (setFullURL) setFullURL(url);
+  }
+
+  function parseHashQueryParams(hash: string): {
+    base: string;
+    params: Array<{ key: string; value: string }>;
+  } {
+    if (!hash) return { base: '', params: [] };
+    const h = hash.startsWith('#') ? hash.slice(1) : hash;
+    const qIndex = h.indexOf('?');
+    if (qIndex === -1) return { base: h, params: [] };
+    const base = h.slice(0, qIndex);
+    const searchParams = new URLSearchParams(h.slice(qIndex + 1));
+    return {
+      base,
+      params: Array.from(searchParams.entries()).map(([key, value]) => ({ key, value })),
+    };
   }
 
   function fillOption2(
@@ -156,17 +179,32 @@ import Title from '#/components/common/Title.astro';
       setHostname(urlObj.hostname);
       setPort(urlObj.port);
       setPathname(urlObj.pathname);
-      setHash(urlObj.hash);
 
       queryParamsBody.innerHTML = '';
-      if (urlObj.searchParams.toString() === '') {
-        const row = createQueryParamRow('', '', () => buildFullURL(setFullURL));
-        queryParamsBody.appendChild(row);
-      } else {
+
+      const hashInfo = parseHashQueryParams(urlObj.hash);
+      const hasHashParams = hashInfo.params.length > 0;
+      const hasSearchParams = urlObj.searchParams.toString() !== '';
+
+      if (hasHashParams) {
+        useHashParams = true;
+        setHash(hashInfo.base);
+        hashInfo.params.forEach(({ key, value }) => {
+          const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
+          queryParamsBody.appendChild(row);
+        });
+      } else if (hasSearchParams) {
+        useHashParams = false;
+        setHash(urlObj.hash.replace('#', ''));
         urlObj.searchParams.forEach((value, key) => {
           const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
           queryParamsBody.appendChild(row);
         });
+      } else {
+        useHashParams = !!urlObj.hash;
+        setHash(urlObj.hash.replace('#', ''));
+        const row = createQueryParamRow('', '', () => buildFullURL(setFullURL));
+        queryParamsBody.appendChild(row);
       }
     } catch (error) {
       return;
