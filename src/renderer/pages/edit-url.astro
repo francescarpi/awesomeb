@@ -20,6 +20,13 @@ import Title from '#/components/common/Title.astro';
 <script>
   import { ITabEntity } from '~/types';
   import { getSearchParams, inputManager, type TSetValue, type TSetDefault } from '#/scripts';
+  import { parseURL, buildURL } from '#/scripts/edit-url/url-builder';
+  import {
+    createQueryParamRow,
+    getQueryParamsFromDOM,
+    addQueryParamRow,
+    populateQueryParamsTable,
+  } from '#/scripts/edit-url/query-params-dom';
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId');
@@ -38,132 +45,6 @@ import Title from '#/components/common/Title.astro';
 
   let useHashParams = false;
 
-  function getQueryParamsFromDOM(): Array<{ key: string; value: string }> {
-    const rows = queryParamsBody.children;
-    const params: Array<{ key: string; value: string }> = [];
-    Array.from(rows).forEach((row) => {
-      const keyInput = row.querySelector('.query-key') as HTMLInputElement;
-      const valueInput = row.querySelector('.query-value') as HTMLInputElement;
-      params.push({ key: keyInput?.value || '', value: valueInput?.value || '' });
-    });
-    return params;
-  }
-
-  function hasEmptyQueryParamAtEnd(): boolean {
-    const params = getQueryParamsFromDOM();
-    if (params.length === 0) return false;
-    const last = params[params.length - 1];
-    return last.key === '' && last.value === '';
-  }
-
-  function createQueryParamRow(key: string = '', value: string = '', onChange?: () => void) {
-    const container = document.createElement('div');
-    container.className = 'flex items-center gap-2';
-
-    const keyLabel = document.createElement('label');
-    keyLabel.className = 'input text-black w-full flex-1';
-
-    const keySpan = document.createElement('span');
-    keySpan.className = 'w-12';
-    keySpan.textContent = 'Key:';
-    keyLabel.appendChild(keySpan);
-
-    const keyInput = document.createElement('input');
-    keyInput.type = 'text';
-    keyInput.className = 'grow query-key';
-    keyInput.placeholder = 'Key';
-    keyInput.value = key;
-    keyInput.addEventListener('input', () => {
-      if (onChange) onChange();
-    });
-    keyLabel.appendChild(keyInput);
-
-    const valueLabel = document.createElement('label');
-    valueLabel.className = 'input text-black w-full flex-1';
-
-    const valueSpan = document.createElement('span');
-    valueSpan.className = 'w-12';
-    valueSpan.textContent = 'Value:';
-    valueLabel.appendChild(valueSpan);
-
-    const valueInput = document.createElement('input');
-    valueInput.type = 'text';
-    valueInput.className = 'grow query-value';
-    valueInput.placeholder = 'Value';
-    valueInput.value = value;
-    valueInput.addEventListener('input', () => {
-      if (onChange) onChange();
-    });
-    valueLabel.appendChild(valueInput);
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'btn btn-xs btn-ghost text-error';
-    deleteBtn.textContent = '×';
-    deleteBtn.addEventListener('click', () => {
-      container.remove();
-      if (onChange) onChange();
-    });
-
-    container.appendChild(keyLabel);
-    container.appendChild(valueLabel);
-    container.appendChild(deleteBtn);
-
-    return container;
-  }
-
-  function addQueryParam(onChange?: () => void) {
-    if (hasEmptyQueryParamAtEnd()) return;
-    const row = createQueryParamRow('', '', onChange);
-    queryParamsBody.appendChild(row);
-  }
-
-  function buildFullURL(setFullURL?: TSetValue) {
-    const protocol = protocolEl.value;
-    const hostname = hostnameEl.value;
-    const port = portEl.value;
-    const pathname = pathnameEl.value;
-    const hash = hashEl.value;
-    let url = `${protocol}://${hostname}`;
-    if (port) {
-      url += `:${port}`;
-    }
-
-    const params = getQueryParamsFromDOM();
-    const filteredParams = params.filter((p) => p.key !== '' || p.value !== '');
-    let qs = '';
-    if (filteredParams.length > 0) {
-      const sp = new URLSearchParams();
-      filteredParams.forEach((p) => sp.append(p.key, p.value));
-      qs = '?' + sp.toString();
-    }
-
-    const hashStr = hash ? (hash.startsWith('#') ? hash : `#${hash}`) : '';
-
-    if (useHashParams) {
-      url += pathname + hashStr + qs;
-    } else {
-      url += pathname + qs + hashStr;
-    }
-
-    if (setFullURL) setFullURL(url);
-  }
-
-  function parseHashQueryParams(hash: string): {
-    base: string;
-    params: Array<{ key: string; value: string }>;
-  } {
-    if (!hash) return { base: '', params: [] };
-    const h = hash.startsWith('#') ? hash.slice(1) : hash;
-    const qIndex = h.indexOf('?');
-    if (qIndex === -1) return { base: h, params: [] };
-    const base = h.slice(0, qIndex);
-    const searchParams = new URLSearchParams(h.slice(qIndex + 1));
-    return {
-      base,
-      params: Array.from(searchParams.entries()).map(([key, value]) => ({ key, value })),
-    };
-  }
-
   function fillOption2(
     url: string,
     setProtocol: TSetValue | TSetDefault,
@@ -174,36 +55,30 @@ import Title from '#/components/common/Title.astro';
     setFullURL?: TSetValue,
   ) {
     try {
-      const urlObj = new URL(url);
-      setProtocol(urlObj.protocol.replace(':', ''));
-      setHostname(urlObj.hostname);
-      setPort(urlObj.port);
-      setPathname(urlObj.pathname);
+      const parts = parseURL(url);
+      setProtocol(parts.protocol);
+      setHostname(parts.hostname);
+      setPort(parts.port);
+      setPathname(parts.pathname);
 
-      queryParamsBody.innerHTML = '';
-
-      const hashInfo = parseHashQueryParams(urlObj.hash);
-      const hasHashParams = hashInfo.params.length > 0;
-      const hasSearchParams = urlObj.searchParams.toString() !== '';
+      const hasHashParams = parts.hashParams.length > 0;
+      const hasSearchParams = parts.searchParams.length > 0;
 
       if (hasHashParams) {
         useHashParams = true;
-        setHash(hashInfo.base);
-        hashInfo.params.forEach(({ key, value }) => {
-          const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
-          queryParamsBody.appendChild(row);
-        });
+        setHash(parts.hash);
+        populateQueryParamsTable(queryParamsBody, parts.hashParams, () => fillOption1(setFullURL));
       } else if (hasSearchParams) {
         useHashParams = false;
-        setHash(urlObj.hash.replace('#', ''));
-        urlObj.searchParams.forEach((value, key) => {
-          const row = createQueryParamRow(key, value, () => buildFullURL(setFullURL));
-          queryParamsBody.appendChild(row);
-        });
+        setHash(parts.hash);
+        populateQueryParamsTable(queryParamsBody, parts.searchParams, () =>
+          fillOption1(setFullURL),
+        );
       } else {
-        useHashParams = !!urlObj.hash;
-        setHash(urlObj.hash.replace('#', ''));
-        const row = createQueryParamRow('', '', () => buildFullURL(setFullURL));
+        useHashParams = !!parts.hash;
+        setHash(parts.hash);
+        queryParamsBody.innerHTML = '';
+        const row = createQueryParamRow('', '', () => fillOption1(setFullURL));
         queryParamsBody.appendChild(row);
       }
     } catch (error) {
@@ -212,22 +87,27 @@ import Title from '#/components/common/Title.astro';
   }
 
   function fillOption1(setFullURL: TSetValue) {
-    buildFullURL(setFullURL);
+    const params = getQueryParamsFromDOM(queryParamsBody);
+    const parts = {
+      protocol: protocolEl.value,
+      hostname: hostnameEl.value,
+      port: portEl.value,
+      pathname: pathnameEl.value,
+      hash: hashEl.value,
+      hashParams: useHashParams ? params : [],
+      searchParams: useHashParams ? [] : params,
+    };
+    const url = buildURL(parts, useHashParams);
+    setFullURL(url);
   }
 
   async function setup() {
-    // Fetch tabs
     const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
-
-    // Find selected tab
     const selectedTab = tabId
       ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
       : tabsEntitites.find((d) => d.selected)!;
 
-    // Button handlers
-    btnCancel.addEventListener('click', () => {
-      abModal.close(winId);
-    });
+    btnCancel.addEventListener('click', () => abModal.close(winId));
 
     btnAccept.addEventListener('click', () => {
       abCommands.perform(winId, 'edit-url', {
@@ -236,8 +116,6 @@ import Title from '#/components/common/Title.astro';
       });
     });
 
-    // -----------------------------------------------------------------
-    // OPTION 1
     const { setDefaultValue: setDefaultFullURL, setValue: setFullURL } = inputManager(
       'input-full-url',
       {
@@ -264,85 +142,67 @@ import Title from '#/components/common/Title.astro';
 
     setDefaultFullURL(selectedTab.url || '', { select: true });
 
-    // Add Query Param button listener
     btnAddQueryParam.addEventListener('click', () => {
-      addQueryParam(() => buildFullURL(setFullURL));
+      addQueryParamRow(queryParamsBody, () => fillOption1(setFullURL));
     });
 
-    // -----------------------------------------------------------------
-    // OPTION 2
-    // -----------------------------------------------------------------
-    // Protocol
     const { setDefaultValue: setDefaultProtocol, setValue: setProtocol } = inputManager(
       'input-protocol',
       {
-        onAccept: () => {
+        onAccept: () =>
           abCommands.perform(winId, 'edit-url', {
             tabId: parseInt(selectedTab.id, 10),
             url: fullURLEl.value,
-          });
-        },
+          }),
         onCancel: () => abModal.close(winId),
         onChange: () => fillOption1(setFullURL),
       },
     );
 
-    // -----------------------------------------------------------------
-    // Hostname
     const { setDefaultValue: setDefaultHostname, setValue: setHostname } = inputManager(
       'input-hostname',
       {
-        onAccept: () => {
+        onAccept: () =>
           abCommands.perform(winId, 'edit-url', {
             tabId: parseInt(selectedTab.id, 10),
             url: fullURLEl.value,
-          });
-        },
+          }),
         onCancel: () => abModal.close(winId),
         onChange: () => fillOption1(setFullURL),
       },
     );
 
-    // -----------------------------------------------------------------
-    // Port
     const { setDefaultValue: setDefaultPort, setValue: setPort } = inputManager('input-port', {
-      onAccept: () => {
+      onAccept: () =>
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
           url: fullURLEl.value,
-        });
-      },
+        }),
       onCancel: () => abModal.close(winId),
       onChange: () => fillOption1(setFullURL),
       allowEmpty: true,
     });
 
-    // -----------------------------------------------------------------
-    // Pathname
     const { setDefaultValue: setDefaultPathname, setValue: setPathname } = inputManager(
       'input-pathname',
       {
-        onAccept: () => {
+        onAccept: () =>
           abCommands.perform(winId, 'edit-url', {
             tabId: parseInt(selectedTab.id, 10),
             url: fullURLEl.value,
-          });
-        },
+          }),
         onCancel: () => abModal.close(winId),
         onChange: () => fillOption1(setFullURL),
         allowEmpty: true,
       },
     );
 
-    // -----------------------------------------------------------------
-    // Hash
     const { setDefaultValue: setDefaultHash, setValue: setHash } = inputManager('input-hash', {
-      onAccept: () => {
+      onAccept: () =>
         abCommands.perform(winId, 'edit-url', {
           tabId: parseInt(selectedTab.id, 10),
           url: fullURLEl.value,
-        });
-      },
+        }),
       onCancel: () => abModal.close(winId),
       onChange: () => fillOption1(setFullURL),
       allowEmpty: true,
