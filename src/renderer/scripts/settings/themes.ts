@@ -56,7 +56,7 @@ function buildGeneralBody(
           h(
             'tbody',
             {},
-            ...themes.map((theme, idx) =>
+            ...themes.map((theme) =>
               h(
                 'tr',
                 { 'data-name': theme.name },
@@ -96,8 +96,11 @@ function buildGeneralBody(
                 ),
                 h(
                   'td',
-                  { class: c(idx === 0 && 'hidden') },
-                  btnIcon(Delete, { onClick: callbacks.onDelete.bind(null, theme.name) }),
+                  {},
+                  btnIcon(Delete, {
+                    onClick: callbacks.onDelete.bind(null, theme.name),
+                    doubleConfirmation: true,
+                  }),
                 ),
               ),
             ),

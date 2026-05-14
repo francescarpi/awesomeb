@@ -18,9 +18,7 @@ export async function renderGeneralPage(config: IConfig): Promise<{
     }),
   );
 
-  const callback = () => {
-    console.log('General page rendered');
-  };
+  const callback = () => {};
 
   return { renderer, callback };
 }
@@ -117,7 +115,10 @@ function renderSearchEngines(
           h(
             'td',
             { class: c(idx === 0 && 'hidden') },
-            btnIcon(Delete, { onClick: handleDelete.bind(null, engine.code) }),
+            btnIcon(Delete, {
+              onClick: handleDelete.bind(null, engine.code),
+              doubleConfirmation: true,
+            }),
           ),
         ),
       ),

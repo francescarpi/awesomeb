@@ -75,7 +75,10 @@ function buildGeneralBody(
                 h(
                   'td',
                   {},
-                  btnIcon(Delete, { onClick: callbacks.onDelete.bind(null, partition.name) }),
+                  btnIcon(Delete, {
+                    onClick: callbacks.onDelete.bind(null, partition.name),
+                    doubleConfirmation: true,
+                  }),
                 ),
               ),
             ),
