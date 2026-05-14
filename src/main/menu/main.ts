@@ -207,8 +207,21 @@ function desktopsMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
-  const desktops = window?.desktops || [];
-  const selectedDesktop = window?.selectedDesktop;
+  const totalDesktops = window?.desktops.length || 0;
+  const desktopItems: MenuItemConstructorOptions[] = [];
+
+  for (let i = 1; i <= 9; i++) {
+    desktopItems.push({
+      label: `Desktop ${i}`,
+      accelerator: `Shift+CmdOrCtrl+${i}`,
+      enabled: i <= totalDesktops,
+      click: async () => {
+        if (window) {
+          await browser.performCommand(window, 'select-desktop', { desktopId: i });
+        }
+      },
+    });
+  }
 
   return {
     label: 'Desktops',
@@ -226,16 +239,7 @@ function desktopsMenu(
         },
       },
       { type: 'separator' },
-      ...desktops.map((desktop) => ({
-        label: `Desktop ${desktop.id}`,
-        accelerator: `Shift+CmdOrCtrl+${desktop.id}`,
-        enabled: !selectedDesktop || selectedDesktop.id !== desktop.id,
-        click: async () => {
-          if (window) {
-            await browser.performCommand(window, 'select-desktop', { desktopId: desktop.id });
-          }
-        },
-      })),
+      ...desktopItems,
       { type: 'separator' },
       {
         label: 'Previous',
