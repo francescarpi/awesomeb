@@ -160,6 +160,7 @@ declare global {
   const abConfig: {
     get: () => Promise<IConfig>;
     save: (config: IConfig) => Promise<IConfig>;
+    selectDownloadFolder: () => Promise<string | null>;
   };
 
   //--------------------------------------------------------------------------------------

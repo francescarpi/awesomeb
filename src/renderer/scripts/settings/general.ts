@@ -1,28 +1,56 @@
-import { h, c, Renderer, type VNode, btnIcon } from '#/scripts';
+import { h, c, Renderer, type VNode, btnIcon, input } from '#/scripts';
 import type { IConfig, IConfigSearchEngine } from '~/types';
 import { box } from './common';
 import slugify from 'slugify';
 import Delete from '#/icons/delete.svg?raw';
 
-export function renderGeneralPage(config: IConfig): Renderer {
-  const renderer = new Renderer(
+function buildGeneralBody(
+  engines: IConfigSearchEngine[],
+  downloadLocation: string | null,
+  config: IConfig,
+  callbacks: {
+    onSave: () => Promise<void>;
+    onAdd: () => void;
+    onDelete: (code: string) => void;
+    onSelectDownloadLocation: () => void;
+  },
+): VNode {
+  return h(
+    'div',
+    { class: c('flex', 'flex-col', 'gap-2') },
+    renderSearchEngines(engines, callbacks.onAdd, callbacks.onDelete),
+    renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation),
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
-      renderSearchEngines(
-        config.searchEngines,
-        () => updateSearchEngines(config),
-        () => addSearchEngine(renderer, config),
-        (code) => deleteSearchEngine(code, renderer, config),
-      ),
+      { class: c('flex', 'justify-end') },
+      h('button', { class: c('btn', 'btn-primary'), onclick: callbacks.onSave }, 'Save changes'),
     ),
+  );
+}
+
+function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
+  return {
+    onSave: () => saveChanges(config),
+    onAdd: () => addSearchEngine(renderer, config),
+    onDelete: (code: string) => deleteSearchEngine(code, renderer, config),
+    onSelectDownloadLocation: () => selectDownloadLocation(renderer, config),
+  };
+}
+
+export function renderGeneralPage(config: IConfig): Renderer {
+  const renderer = new Renderer(
+    buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
+      onSave: () => saveChanges(config),
+      onAdd: () => addSearchEngine(renderer, config),
+      onDelete: (code) => deleteSearchEngine(code, renderer, config),
+      onSelectDownloadLocation: () => selectDownloadLocation(renderer, config),
+    }),
   );
   return renderer;
 }
 
 function renderSearchEngines(
   searchEngines: IConfigSearchEngine[],
-  handleSave: () => Promise<void>,
   handleAdd: () => void,
   handleDelete: (code: string) => void,
 ): VNode {
@@ -95,20 +123,33 @@ function renderSearchEngines(
         'div',
         { class: c('flex', 'justify-between') },
         h('button', { class: c('btn', 'btn-xs', 'btn-outline'), onclick: handleAdd }, 'Add'),
-        h(
-          'button',
-          {
-            class: c('btn', 'btn-xs', 'btn-primary'),
-            onclick: handleSave,
-          },
-          'Save Changes',
-        ),
       ),
     ),
   );
 }
 
-async function updateSearchEngines(config: IConfig) {
+function renderDownloadLocation(
+  config: IConfig,
+  downloadsLocation: string | null,
+  handleChange: () => void,
+): VNode {
+  return box(
+    'Download Location',
+    'Set the default download location for files.',
+    h(
+      'div',
+      { class: c('flex', 'gap-2') },
+      input('downloads-location', 'Location', downloadsLocation || config.downloadsFolder, {
+        width: 'w-92',
+        readonly: true,
+      }),
+      h('button', { class: c('btn', 'btn-primary'), onClick: handleChange }, 'Change'),
+    ),
+  );
+}
+
+async function saveChanges(config: IConfig) {
+  // Search engines
   const table = document.getElementById('search-engines-table') as HTMLTableElement;
   const searchEnginesRows = Array.from(table.tBodies[0].rows);
 
@@ -129,7 +170,11 @@ async function updateSearchEngines(config: IConfig) {
     }
   }
 
-  const newConfig = { ...config, searchEngines };
+  // Donwloads location
+  const downloadsLocationInput = document.getElementById('downloads-location') as HTMLInputElement;
+  const downloadsFolder = downloadsLocationInput.value;
+
+  const newConfig = { ...config, searchEngines, downloadsFolder };
   await abConfig.save(newConfig);
 }
 
@@ -139,24 +184,38 @@ function addSearchEngine(renderer: Renderer, config: IConfig) {
     { code: 'new', label: 'New Engine', url: 'https://example.com/search?q={query}' },
   ];
 
-  const newContent = renderSearchEngines(
-    engines,
-    () => updateSearchEngines(config),
-    () => addSearchEngine(renderer, config),
-    (code) => deleteSearchEngine(code, renderer, config),
+  renderer.update(
+    buildGeneralBody(
+      engines,
+      config.downloadsFolder,
+      config,
+      buildGeneralCallbacks(renderer, config),
+    ),
   );
-
-  renderer.update(newContent);
 }
 
 function deleteSearchEngine(code: string, renderer: Renderer, config: IConfig) {
   const engines = config.searchEngines.filter((engine) => engine.code !== code);
-  const newContent = renderSearchEngines(
-    engines,
-    () => updateSearchEngines(config),
-    () => addSearchEngine(renderer, config),
-    (code) => deleteSearchEngine(code, renderer, config),
+  renderer.update(
+    buildGeneralBody(
+      engines,
+      config.downloadsFolder,
+      config,
+      buildGeneralCallbacks(renderer, config),
+    ),
   );
+}
 
-  renderer.update(newContent);
+async function selectDownloadLocation(renderer: Renderer, config: IConfig) {
+  const folder = await abConfig.selectDownloadFolder();
+  if (folder) {
+    renderer.update(
+      buildGeneralBody(
+        config.searchEngines,
+        folder,
+        config,
+        buildGeneralCallbacks(renderer, config),
+      ),
+    );
+  }
 }

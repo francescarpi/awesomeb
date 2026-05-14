@@ -250,6 +250,9 @@ const abConfig = {
   save: (config: IConfig) => {
     return ipcRenderer.invoke('config:save', { config });
   },
+  selectDownloadFolder: () => {
+    return ipcRenderer.invoke('config:select-download-folder', {});
+  },
 };
 
 //--------------------------------------------------------------------------------------
