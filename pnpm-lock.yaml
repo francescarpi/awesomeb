@@ -22,6 +22,9 @@ importers:
       '@electron-webauthn/macos':
         specifier: 1.3.1
         version: 1.3.1(typescript@6.0.3)
+      '@thednp/color-picker':
+        specifier: 2.0.4
+        version: 2.0.4
       astro-electron:
         specifier: 0.5.0
         version: 0.5.0(astro@5.18.1(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.60.1)(typescript@6.0.3)(yaml@2.8.4))(electron@42.0.1)(vite-plugin-electron-renderer@0.14.6)
@@ -35,8 +38,8 @@ importers:
         specifier: 4.0.0
         version: 4.0.0
       electron-log:
-        specifier: 5.4.3
-        version: 5.4.3
+        specifier: 5.4.4
+        version: 5.4.4
       electron-store:
         specifier: 11.0.2
         version: 11.0.2
@@ -111,7 +114,7 @@ importers:
         specifier: 9.1.7
         version: 9.1.7
       jsdom:
-        specifier: ^29.1.1
+        specifier: 29.1.1
         version: 29.1.1
       lint-staged:
         specifier: 17.0.4
@@ -1477,6 +1480,16 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
+  '@thednp/color-picker@2.0.4':
+    resolution: {integrity: sha512-acxVg+2MdHm8y4gwxnmiY+Y5z25GTcs6FZuWbz6sjX1L+fLjN0aypDU/Es2OibPYwImkLmAzjGpybaDxrEadXQ==}
+
+  '@thednp/color@1.0.14':
+    resolution: {integrity: sha512-MpzcLi2Jb9Xdi/ZbMgrJDxT0HQnZvceTr/t9BKO2A71vBDnPe2gsA6Tx0gYu5jiIagXbZtUwJqBDSLgmRpepew==}
+
+  '@thednp/shorty@2.0.14':
+    resolution: {integrity: sha512-jCxbkyQryQjovIzK5ko683RNq1pZRAKiscJfhtF71yGxneEzFR9IQgzayw/WRjQ5KDD/5UVqTwgtfQ7pJpmIYA==}
+    engines: {node: '>=16', pnpm: '>=8.6.0'}
+
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
@@ -2382,8 +2395,8 @@ packages:
     resolution: {integrity: sha512-8TjjAh8Ec51hUi3o4TaU0mD3GMTOESi866oRNavj9A3IQJ7pmv+MJVmdZBFGw4GFT36X7bkqnuDNYvkQgvyI8Q==}
     engines: {node: '>=18'}
 
-  electron-log@5.4.3:
-    resolution: {integrity: sha512-sOUsM3LjZdugatazSQ/XTyNcw8dfvH1SYhXWiJyfYodAAKOZdHs0txPiLDXFzOZbhXgAgshQkshH2ccq0feyLQ==}
+  electron-log@5.4.4:
+    resolution: {integrity: sha512-istWgaXjBfURBSS8LWVW9C3jsc6+ac+tY1lXrQEOTp0lVj+a4OlO1Tmqb36GgnEUDv92DGC9VI1HNXwJinWpgA==}
     engines: {node: '>= 14'}
 
   electron-publish@26.3.4:
@@ -6214,6 +6227,15 @@ snapshots:
       tailwindcss: 4.3.0
       vite: 8.0.12(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.4)
 
+  '@thednp/color-picker@2.0.4':
+    dependencies:
+      '@thednp/color': 1.0.14
+      '@thednp/shorty': 2.0.14
+
+  '@thednp/color@1.0.14': {}
+
+  '@thednp/shorty@2.0.14': {}
+
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
@@ -7445,7 +7467,7 @@ snapshots:
 
   electron-is-dev@3.0.1: {}
 
-  electron-log@5.4.3: {}
+  electron-log@5.4.4: {}
 
   electron-publish@26.3.4:
     dependencies:

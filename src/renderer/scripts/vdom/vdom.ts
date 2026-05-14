@@ -328,7 +328,7 @@ export class Renderer {
     return this;
   }
 
-  update(newVNode: VNode) {
+  update(newVNode: VNode, opts?: { onUpdated?: () => void }) {
     if (!this.el) {
       throw new Error('Cannot patch before initial render');
     }
@@ -336,5 +336,9 @@ export class Renderer {
     const domdiff = diff(this.currentVNode, newVNode);
     patch(this.el, domdiff);
     this.currentVNode = newVNode;
+
+    if (opts?.onUpdated) {
+      opts.onUpdated();
+    }
   }
 }

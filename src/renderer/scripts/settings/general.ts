@@ -4,6 +4,25 @@ import { box } from './common';
 import slugify from 'slugify';
 import Delete from '#/icons/delete.svg?raw';
 
+//-----------------------------------------------------------------------------
+export function renderGeneralPage(config: IConfig): { renderer: Renderer; callback: () => void } {
+  const renderer = new Renderer(
+    buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
+      onSave: () => saveChanges(config),
+      onAdd: () => addSearchEngine(renderer, config),
+      onDelete: (code) => deleteSearchEngine(code, renderer, config),
+      onSelectDownloadLocation: () => selectDownloadLocation(renderer, config),
+    }),
+  );
+
+  const callback = () => {
+    console.log('General page rendered');
+  };
+
+  return { renderer, callback };
+}
+
+//-----------------------------------------------------------------------------
 function buildGeneralBody(
   engines: IConfigSearchEngine[],
   downloadLocation: string | null,
@@ -28,6 +47,7 @@ function buildGeneralBody(
   );
 }
 
+//-----------------------------------------------------------------------------
 function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
   return {
     onSave: () => saveChanges(config),
@@ -37,18 +57,7 @@ function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
   };
 }
 
-export function renderGeneralPage(config: IConfig): Renderer {
-  const renderer = new Renderer(
-    buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
-      onSave: () => saveChanges(config),
-      onAdd: () => addSearchEngine(renderer, config),
-      onDelete: (code) => deleteSearchEngine(code, renderer, config),
-      onSelectDownloadLocation: () => selectDownloadLocation(renderer, config),
-    }),
-  );
-  return renderer;
-}
-
+//-----------------------------------------------------------------------------
 function renderSearchEngines(
   searchEngines: IConfigSearchEngine[],
   handleAdd: () => void,
@@ -128,6 +137,7 @@ function renderSearchEngines(
   );
 }
 
+//-----------------------------------------------------------------------------
 function renderDownloadLocation(
   config: IConfig,
   downloadsLocation: string | null,
@@ -148,13 +158,76 @@ function renderDownloadLocation(
   );
 }
 
+//-----------------------------------------------------------------------------
 async function saveChanges(config: IConfig) {
   // Search engines
-  const table = document.getElementById('search-engines-table') as HTMLTableElement;
-  const searchEnginesRows = Array.from(table.tBodies[0].rows);
+  const searchEngines = getTableSearchEngines();
 
+  // Donwloads location
+  const downloadsLocationInput = document.getElementById('downloads-location') as HTMLInputElement;
+  const downloadsFolder = downloadsLocationInput.value;
+
+  const newConfig = { ...config, searchEngines, downloadsFolder };
+  await abConfig.save(newConfig);
+}
+
+//-----------------------------------------------------------------------------
+function addSearchEngine(renderer: Renderer, config: IConfig) {
+  const engines = getTableSearchEngines();
+  if (engines.some((engine) => engine.code === 'new-engine')) {
+    return;
+  }
+
+  const newEngines: IConfigSearchEngine[] = [
+    ...engines,
+    { code: 'new-engine', label: 'New Engine', url: 'https://example.com/search?q={query}' },
+  ];
+
+  renderer.update(
+    buildGeneralBody(
+      newEngines,
+      config.downloadsFolder,
+      config,
+      buildGeneralCallbacks(renderer, config),
+    ),
+  );
+}
+
+//-----------------------------------------------------------------------------
+function deleteSearchEngine(code: string, renderer: Renderer, config: IConfig) {
+  const engines = getTableSearchEngines().filter((engine) => engine.code !== code);
+  renderer.update(
+    buildGeneralBody(
+      engines,
+      config.downloadsFolder,
+      config,
+      buildGeneralCallbacks(renderer, config),
+    ),
+  );
+}
+
+//-----------------------------------------------------------------------------
+async function selectDownloadLocation(renderer: Renderer, config: IConfig) {
+  const folder = await abConfig.selectDownloadFolder();
+  if (folder) {
+    renderer.update(
+      buildGeneralBody(
+        config.searchEngines,
+        folder,
+        config,
+        buildGeneralCallbacks(renderer, config),
+      ),
+    );
+  }
+}
+
+//-----------------------------------------------------------------------------
+function getTableSearchEngines(): IConfigSearchEngine[] {
+  const table = document.getElementById('search-engines-table') as HTMLTableElement;
+  const rows = Array.from(table.tBodies[0].rows);
   const searchEngines: IConfigSearchEngine[] = [];
-  for (const row of searchEnginesRows) {
+
+  for (const row of rows) {
     let code = row.dataset.code;
 
     const label = (row.cells[0].firstChild as HTMLInputElement).value;
@@ -170,52 +243,5 @@ async function saveChanges(config: IConfig) {
     }
   }
 
-  // Donwloads location
-  const downloadsLocationInput = document.getElementById('downloads-location') as HTMLInputElement;
-  const downloadsFolder = downloadsLocationInput.value;
-
-  const newConfig = { ...config, searchEngines, downloadsFolder };
-  await abConfig.save(newConfig);
-}
-
-function addSearchEngine(renderer: Renderer, config: IConfig) {
-  const engines: IConfigSearchEngine[] = [
-    ...config.searchEngines,
-    { code: 'new', label: 'New Engine', url: 'https://example.com/search?q={query}' },
-  ];
-
-  renderer.update(
-    buildGeneralBody(
-      engines,
-      config.downloadsFolder,
-      config,
-      buildGeneralCallbacks(renderer, config),
-    ),
-  );
-}
-
-function deleteSearchEngine(code: string, renderer: Renderer, config: IConfig) {
-  const engines = config.searchEngines.filter((engine) => engine.code !== code);
-  renderer.update(
-    buildGeneralBody(
-      engines,
-      config.downloadsFolder,
-      config,
-      buildGeneralCallbacks(renderer, config),
-    ),
-  );
-}
-
-async function selectDownloadLocation(renderer: Renderer, config: IConfig) {
-  const folder = await abConfig.selectDownloadFolder();
-  if (folder) {
-    renderer.update(
-      buildGeneralBody(
-        config.searchEngines,
-        folder,
-        config,
-        buildGeneralCallbacks(renderer, config),
-      ),
-    );
-  }
+  return searchEngines;
 }
