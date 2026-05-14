@@ -7,7 +7,9 @@ import ColorPicker from '@thednp/color-picker';
 const { init, selector } = ColorPicker;
 
 //-----------------------------------------------------------------------------
-export function renderThemesPage(config: IConfig): { renderer: Renderer; callback: () => void } {
+export async function renderThemesPage(
+  config: IConfig,
+): Promise<{ renderer: Renderer; callback: () => void }> {
   const renderer = new Renderer(
     buildGeneralBody(config.themes, {
       onSave: () => saveChanges(config),

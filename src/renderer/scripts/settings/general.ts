@@ -5,7 +5,10 @@ import slugify from 'slugify';
 import Delete from '#/icons/delete.svg?raw';
 
 //-----------------------------------------------------------------------------
-export function renderGeneralPage(config: IConfig): { renderer: Renderer; callback: () => void } {
+export async function renderGeneralPage(config: IConfig): Promise<{
+  renderer: Renderer;
+  callback: () => void;
+}> {
   const renderer = new Renderer(
     buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
       onSave: () => saveChanges(config),

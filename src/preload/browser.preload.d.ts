@@ -19,6 +19,7 @@ import type {
   TTabPreviewAction,
   ILayoutData,
   IVisibleDesktops,
+  TPermissions,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -182,5 +183,11 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abPrompts: {
     response: (winId: TWindowId, response: unknown) => void;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abPermissions: {
+    get: () => Promise<TPermissions>;
+    save: (permissions: TPermissions) => Promise<void>;
   };
 }

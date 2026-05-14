@@ -1,5 +1,5 @@
-import type { THost, TPermission } from '~/types';
+import type { TPermissions } from '~/types';
 
 export interface IPermissionsStore {
-  permissions: Record<THost, Record<TPermission, boolean>>;
+  permissions: TPermissions;
 }

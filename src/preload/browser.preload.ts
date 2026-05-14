@@ -22,6 +22,7 @@ import type {
   TTabPreviewAction,
   ILayoutData,
   IVisibleDesktops,
+  TPermissions,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -295,6 +296,16 @@ const abPrompts = {
 };
 
 //--------------------------------------------------------------------------------------
+const abPermissions = {
+  get: () => {
+    return ipcRenderer.invoke('permissions:get', {});
+  },
+  save: (permissions: TPermissions) => {
+    return ipcRenderer.invoke('permissions:save', { permissions });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -314,3 +325,4 @@ contextBridge.exposeInMainWorld('abConfig', abConfig);
 contextBridge.exposeInMainWorld('abSidebar', abSidebar);
 contextBridge.exposeInMainWorld('abExtensions', abExtensions);
 contextBridge.exposeInMainWorld('abPrompts', abPrompts);
+contextBridge.exposeInMainWorld('abPermissions', abPermissions);

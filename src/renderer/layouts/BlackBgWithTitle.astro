@@ -9,7 +9,7 @@ const { title } = Astro.props;
 
 <Base>
   <div class="bg-linear-to-br from-gray-900 to-gray-800 text-gray-200 p-4 fixed inset-0">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto overflow-y-auto h-full">
       <h1 class="text-lg mb-2 text-primary">{title}</h1>
       <slot />
     </div>

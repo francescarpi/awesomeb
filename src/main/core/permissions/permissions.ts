@@ -53,4 +53,10 @@ export class Permissions {
       this._store.set('permissions', permissions);
     }
   }
+
+  saveAll(permissions: IPermissionsStore['permissions']): void {
+    scopeLog.info('Saving all permissions');
+
+    this._store.set('permissions', permissions);
+  }
 }

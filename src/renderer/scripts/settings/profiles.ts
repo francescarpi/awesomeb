@@ -7,7 +7,9 @@ import ColorPicker from '@thednp/color-picker';
 const { init, selector } = ColorPicker;
 
 //-----------------------------------------------------------------------------
-export function renderProfilesPage(config: IConfig): { renderer: Renderer; callback: () => void } {
+export async function renderProfilesPage(
+  config: IConfig,
+): Promise<{ renderer: Renderer; callback: () => void }> {
   const renderer = new Renderer(
     buildGeneralBody(config.partitions, {
       onSave: () => saveChanges(config),
