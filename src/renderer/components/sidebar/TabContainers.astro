@@ -18,7 +18,7 @@
 
   // Tab containers...
   const tabContainers = await abTabs.getTabContainers(winId);
-  const renderer = new Renderer(renderTabContainers(tabContainers), 'tabContainers').render();
+  const renderer = new Renderer(renderTabContainers(tabContainers)).render('tabContainers');
 
   abTabs.onRefreshTabContainers((_event, tabContainers) =>
     renderer.update(renderTabContainers(tabContainers)),

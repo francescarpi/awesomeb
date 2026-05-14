@@ -557,9 +557,8 @@ describe('Renderer class', () => {
 
   test('initial render', () => {
     const initial = h('div', { class: 'app' }, 'Hello');
-    const renderer = new Renderer(initial, 'root');
-
-    renderer.render();
+    const renderer = new Renderer(initial);
+    renderer.render('root');
     const el = container.querySelector('div');
     expect(el?.className).toBe('app');
     expect(el?.textContent).toBe('Hello');
@@ -567,8 +566,8 @@ describe('Renderer class', () => {
 
   test('update applies diff and patch', () => {
     const initial = h('div', null, 'initial');
-    const renderer = new Renderer(initial, 'root');
-    renderer.render();
+    const renderer = new Renderer(initial);
+    renderer.render('root');
 
     renderer.update(h('div', null, 'updated'));
     expect(container.textContent).toBe('updated');
@@ -576,7 +575,7 @@ describe('Renderer class', () => {
 
   test('update throws if called before render', () => {
     const initial = h('div', null, 'x');
-    const renderer = new Renderer(initial, 'root');
+    const renderer = new Renderer(initial);
 
     expect(() => renderer.update(h('div', null, 'y'))).toThrow(
       'Cannot patch before initial render',
@@ -585,8 +584,8 @@ describe('Renderer class', () => {
 
   test('update handles props changes', () => {
     const initial = h('div', { class: 'old' }, 'text');
-    const renderer = new Renderer(initial, 'root');
-    renderer.render();
+    const renderer = new Renderer(initial);
+    renderer.render('root');
 
     renderer.update(h('div', { class: 'new' }, 'text'));
     expect(container.querySelector('div')?.className).toBe('new');
@@ -594,8 +593,8 @@ describe('Renderer class', () => {
 
   test('update handles nested structure', () => {
     const initial = vn('div', {}, vn('ul', {}, vn('li', {}, 'a'), vn('li', {}, 'b')));
-    const renderer = new Renderer(initial, 'root');
-    renderer.render();
+    const renderer = new Renderer(initial);
+    renderer.render('root');
 
     renderer.update(
       vn('div', {}, vn('ul', {}, vn('li', {}, 'a'), vn('li', {}, 'b'), vn('li', {}, 'c'))),
@@ -608,9 +607,11 @@ describe('Renderer class', () => {
 
   test('throws if container element not found', () => {
     const initial = h('div', null, 'x');
-    const renderer = new Renderer(initial, 'nonexistent');
+    const renderer = new Renderer(initial);
 
-    expect(() => renderer.render()).toThrow('Container element with ID "nonexistent" not found');
+    expect(() => renderer.render('nonexistent')).toThrow(
+      'Container element with ID "nonexistent" not found',
+    );
   });
 });
 

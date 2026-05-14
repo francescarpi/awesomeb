@@ -72,10 +72,11 @@ import Modal from '#/layouts/Modal.astro';
         ),
       ),
     ),
-    'container',
-  ).render(() => {
-    const input = document.getElementById('prompt-input') as HTMLInputElement;
-    input.focus();
-    input.select();
+  ).render('container', {
+    onRendered: () => {
+      const input = document.getElementById('prompt-input') as HTMLInputElement;
+      input.focus();
+      input.select();
+    },
   });
 </script>

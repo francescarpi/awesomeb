@@ -22,7 +22,7 @@ const { isPage = false } = Astro.props;
   const { winId } = getSearchParams();
 
   const data = await abDownloads.get(winId);
-  const renderer = new Renderer(renderDownloads(data), 'downloads-list-container').render();
+  const renderer = new Renderer(renderDownloads(data)).render('downloads-list-container');
   abDownloads.onRefresh((_event, data) => renderer.update(renderDownloads(data)));
 
   function renderDownloads(data: IDownloads): VNode {

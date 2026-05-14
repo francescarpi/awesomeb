@@ -16,8 +16,7 @@ import Title from '#/components/common/Title.astro';
 
   const renderer = new Renderer(
     h('div', {}, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
-    'content',
-  ).render();
+  ).render('content');
 
   abCertificates.info(winId).then((data) => {
     if (data) {

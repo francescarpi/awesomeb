@@ -8,7 +8,7 @@
   import { Renderer, h, c, type VNode, getSearchParams } from '#/scripts';
   import Split from '#/icons/split.svg?raw';
 
-  const renderer = new Renderer(renderIcon(false), 'split-menu').render();
+  const renderer = new Renderer(renderIcon(false)).render('split-menu');
   const { winId } = getSearchParams();
 
   abTabs.onRefreshShowSplitMenu((_event, value) => {

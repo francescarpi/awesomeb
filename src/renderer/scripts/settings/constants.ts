@@ -4,8 +4,8 @@ import { renderThemesPage } from './themes';
 import { renderPermissionsPage } from './permissions';
 
 export const settingsMenuItems = [
-  { name: 'General', hash: ['#/', ''], renderFnc: renderGeneralPage },
-  { name: 'Profiles', hash: ['#/profiles'], renderFnc: renderProfilesPage },
-  { name: 'Themes', hash: ['#/themes'], renderFnc: renderThemesPage },
-  { name: 'Permissions', hash: ['#/permissions'], renderFnc: renderPermissionsPage },
+  { name: 'General', hash: ['#/', ''], rendererFnc: renderGeneralPage },
+  { name: 'Profiles', hash: ['#/profiles'], rendererFnc: renderProfilesPage },
+  { name: 'Themes', hash: ['#/themes'], rendererFnc: renderThemesPage },
+  { name: 'Permissions', hash: ['#/permissions'], rendererFnc: renderPermissionsPage },
 ];

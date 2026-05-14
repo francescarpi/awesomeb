@@ -1,5 +1,5 @@
-import { type VNode, h } from '#/scripts';
+import { h, Renderer } from '#/scripts';
 
-export function renderProfilesPage(): VNode {
-  return h('div', {}, 'Profiles');
+export function renderProfilesPage(): Renderer {
+  return new Renderer(h('div', {}, 'Profiles'));
 }

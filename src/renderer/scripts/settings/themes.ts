@@ -1,5 +1,5 @@
-import { type VNode, h } from '#/scripts';
+import { h, Renderer } from '#/scripts';
 
-export function renderThemesPage(): VNode {
-  return h('div', {}, 'Themes');
+export function renderThemesPage(): Renderer {
+  return new Renderer(h('div', {}, 'Themes'));
 }

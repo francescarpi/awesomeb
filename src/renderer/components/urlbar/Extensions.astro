@@ -10,7 +10,7 @@
 
   const { winId } = getSearchParams();
 
-  const renderer = new Renderer(renderExtensions([]), 'extensions').render();
+  const renderer = new Renderer(renderExtensions([])).render('extensions');
 
   abExtensions.onRefresh((_event, extensions) => renderer.update(renderExtensions(extensions)));
 

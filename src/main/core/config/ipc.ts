@@ -15,12 +15,12 @@ export function setupConfigIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{ newConfig: IConfig }>(
+  createHandler<{ config: IConfig }>(
     'config:save',
     'handle',
     browser,
     [internalPageChecker.bind(null, 'settings')],
-    async ({ newConfig }) => {
+    async ({ config: newConfig }) => {
       config.save(newConfig);
     },
   );

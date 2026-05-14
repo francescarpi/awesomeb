@@ -301,23 +301,28 @@ export class Renderer {
   private el: HTMLElement | Text | null = null;
   private currentVNode: VNode;
 
-  constructor(
-    initialVNode: VNode,
-    private readonly containerElementId: string,
-  ) {
+  constructor(initialVNode: VNode) {
     this.currentVNode = initialVNode;
   }
 
-  render(onRendered?: () => void): Renderer {
+  render(
+    containerElementId: string,
+    opts?: { onRendered?: () => void; replace?: boolean },
+  ): Renderer {
     this.el = render(this.currentVNode);
-    const container = document.getElementById(this.containerElementId);
+    const container = document.getElementById(containerElementId);
     if (!container) {
-      throw new Error(`Container element with ID "${this.containerElementId}" not found`);
+      throw new Error(`Container element with ID "${containerElementId}" not found`);
     }
+
+    if (opts?.replace) {
+      container.innerHTML = '';
+    }
+
     container.appendChild(this.el);
 
-    if (onRendered) {
-      onRendered();
+    if (opts?.onRendered) {
+      opts.onRendered();
     }
 
     return this;

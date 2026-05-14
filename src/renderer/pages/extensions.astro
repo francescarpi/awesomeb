@@ -14,8 +14,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   // Initial loading state...
   const infoRenderer = new Renderer(
     h('div', {}, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
-    'content',
-  ).render();
+  ).render('content');
 
   const resp = await abExtensions.get();
 
@@ -44,7 +43,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   );
 
   // Render the list of extensions
-  const extensionsRenderer = new Renderer(h('div', {}, ''), 'extensions').render();
+  const extensionsRenderer = new Renderer(h('div', {}, '')).render('extensions');
   renderExtensions(resp.extensions);
 
   function renderExtensions(extensions: IExtension[]) {

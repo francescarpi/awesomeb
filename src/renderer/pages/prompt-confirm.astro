@@ -41,15 +41,16 @@ import Modal from '#/layouts/Modal.astro';
         ),
       ),
     ),
-    'container',
-  ).render(() => {
-    document.addEventListener('keydown', (e) => {
-      const ev = e as KeyboardEvent;
-      if (ev.key === 'Enter') {
-        abPrompts.response(winId, true);
-      } else if (ev.key === 'Escape') {
-        abPrompts.response(winId, false);
-      }
-    });
+  ).render('container', {
+    onRendered: () => {
+      document.addEventListener('keydown', (e) => {
+        const ev = e as KeyboardEvent;
+        if (ev.key === 'Enter') {
+          abPrompts.response(winId, true);
+        } else if (ev.key === 'Escape') {
+          abPrompts.response(winId, false);
+        }
+      });
+    },
   });
 </script>

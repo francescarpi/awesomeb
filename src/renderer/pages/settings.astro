@@ -9,19 +9,16 @@ import Menu from '#/components/settings/Menu.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { settingsMenuItems, Renderer, h, getSearchParams } from '#/scripts';
-
-  const { winId } = getSearchParams();
+  import { settingsMenuItems } from '#/scripts';
 
   document.title = 'Settings';
 
-  const pageRenderer = new Renderer(h('div', {}, ''), 'settingsPageContent').render();
-
   async function renderContent() {
-    const config = await abConfig.get(winId);
+    const config = await abConfig.get();
     const menuItem = settingsMenuItems.find((item) => item.hash.includes(window.location.hash));
     if (menuItem) {
-      pageRenderer.update(menuItem.renderFnc(winId, config));
+      const pageRenderer = menuItem.rendererFnc(config);
+      pageRenderer.render('settingsPageContent', { replace: true });
     }
   }
 

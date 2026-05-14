@@ -16,7 +16,7 @@ import Layout from '#/layouts/Base.astro';
   const { searchParams } = getSearchParams();
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const renderer = new Renderer(render(), 'container').render();
+  const renderer = new Renderer(render()).render('container');
 
   const { inputEl } = inputManager('search', {
     onAccept: (value) => abTabs.findInPageAction(tabId, 'next', value),

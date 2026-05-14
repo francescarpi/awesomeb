@@ -244,11 +244,11 @@ const abCertificates = {
 
 //--------------------------------------------------------------------------------------
 const abConfig = {
-  get: (winId: TWindowId) => {
-    return ipcRenderer.invoke('config:get', { winId });
+  get: () => {
+    return ipcRenderer.invoke('config:get', {});
   },
-  save: (winId: TWindowId, config: IConfig) => {
-    return ipcRenderer.invoke('config:save', { winId, config });
+  save: (config: IConfig) => {
+    return ipcRenderer.invoke('config:save', { config });
   },
 };
 

@@ -7,7 +7,7 @@
 <script>
   import { Renderer, h, c, type VNode, settingsMenuItems } from '#/scripts';
 
-  const renderer = new Renderer(renderMenu(), 'settings-menu').render();
+  const renderer = new Renderer(renderMenu()).render('settings-menu');
 
   function renderMenu(): VNode {
     return h(

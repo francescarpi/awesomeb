@@ -14,7 +14,7 @@
 
   // Load and render desktops on initialization
   const desktops = await abDesktops.getVisible(winId);
-  const renderer = new Renderer(renderDesktops(desktops), 'desktops').render();
+  const renderer = new Renderer(renderDesktops(desktops)).render('desktops');
 
   // Subscribe to desktop updates
   abDesktops.onRefresh((_event, desktops) => renderer.update(renderDesktops(desktops)));
