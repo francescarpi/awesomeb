@@ -1,6 +1,6 @@
 import { h, Renderer, type VNode, c, btnIcon } from '#/scripts';
 import type { IConfig, IConfigPartition } from '~/types';
-import { box } from './common';
+import { box, inputColorPicker } from './common';
 import Delete from '#/icons/delete.svg?raw';
 import ColorPicker from '@thednp/color-picker';
 
@@ -69,24 +69,7 @@ function buildGeneralBody(
                     '',
                   ),
                 ),
-                h(
-                  'td',
-                  { class: c('px-1') },
-                  h(
-                    'div',
-                    { class: 'color-picker' },
-                    h(
-                      'input',
-                      {
-                        'data-function': 'color-picker',
-                        'data-format': 'hex',
-                        class: c('w-18'),
-                        value: partition.color,
-                      },
-                      '',
-                    ),
-                  ),
-                ),
+                h('td', { class: c('px-1') }, inputColorPicker(partition.color)),
                 h(
                   'td',
                   {},

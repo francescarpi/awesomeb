@@ -13,3 +13,20 @@ export function box(title: string, desc: string, ...content: VNode[]): VNode {
     ...content,
   );
 }
+
+export function inputColorPicker(color: string, classNames?: string[]): VNode {
+  return h(
+    'div',
+    { class: 'color-picker' },
+    h(
+      'input',
+      {
+        'data-function': 'color-picker',
+        'data-format': 'hex',
+        class: c(...(classNames || [])),
+        value: color,
+      },
+      '',
+    ),
+  );
+}
