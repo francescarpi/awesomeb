@@ -3,6 +3,8 @@ import { Menu } from 'electron';
 import { EIcon, getIcon } from './utils';
 
 export function desktopMenu(browser: Browser, window: Window, desktop: Desktop): Menu {
+  const { desktops, selectedDesktop } = window;
+
   const menu = Menu.buildFromTemplate([
     {
       label: 'Suspend all tabs',
@@ -46,6 +48,14 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
         browser.performCommand(window, 'move-desktop-right');
       },
     },
+    { type: 'separator' },
+    ...desktops.map((d) => ({
+      label: d.label,
+      enabled: d.id !== selectedDesktop.id,
+      click: () => {
+        browser.performCommand(window, 'select-desktop', { desktopId: d.id });
+      },
+    })),
   ]);
 
   return menu;
