@@ -1,4 +1,4 @@
-import { Browser, permissions } from '@/core';
+import { Browser, permissions, notification } from '@/core';
 import { createHandler, internalPageChecker } from '@/utils';
 import type { TPermissions } from '~/types';
 
@@ -22,6 +22,7 @@ export function setupPermissionsIPC(browser: Browser) {
     [internalPageChecker.bind(null, 'settings')],
     async ({ permissions: perms }) => {
       permissions.saveAll(perms);
+      notification('Permission saved', 'Your permission have been saved successfully.');
     },
   );
 }

@@ -1,9 +1,15 @@
 import { h, Renderer, c, btnIcon, type VNode } from '#/scripts';
 import { box } from './common';
-import type { IConfig, TPermission, THost, TPermissions } from '~/types';
+import {
+  type IConfig,
+  type TPermission,
+  type THost,
+  type TPermissions,
+  EPermissionConfigType,
+} from '~/types';
 import Delete from '#/icons/delete.svg?raw';
 
-export async function renderPermissionsPage(_config: IConfig): Promise<{
+export async function renderPermissionsPage(config: IConfig): Promise<{
   renderer: Renderer;
   callback: () => void;
 }> {
@@ -14,6 +20,28 @@ export async function renderPermissionsPage(_config: IConfig): Promise<{
     h(
       'div',
       {},
+      box(
+        'Security Level',
+        "This setting determines the level of access granted to websites regarding your device's functionalities (sensors, APIs, etc.).<br/><br/><strong>Standard</strong>: Allows common permissions necessary for most web pages to function correctly.<br/><strong>Strict</strong>: Requires your explicit consent for every permission a website attempts to use, offering maximum privacy.",
+        h(
+          'div',
+          { class: c('text-black') },
+          h(
+            'select',
+            { class: c('select', 'w-40'), onchange: (e) => updateSecurityLevel(e, config) },
+            h(
+              'option',
+              { selected: config.permissionsType === 'standard', value: 'standard' },
+              'Standard',
+            ),
+            h(
+              'option',
+              { selected: config.permissionsType === 'strict', value: 'strict' },
+              'Strict',
+            ),
+          ),
+        ),
+      ),
       box(
         'Permissions',
         'Manage the permissions required for the extension to function properly.',
@@ -121,4 +149,10 @@ async function savePermission(
   }
   newPermissions[host][perm] = newVal;
   await abPermissions.save(newPermissions);
+}
+
+async function updateSecurityLevel(e: Event, config: IConfig) {
+  const permissionsType = (e.target as HTMLSelectElement).value as EPermissionConfigType;
+  const newConfig = { ...config, permissionsType };
+  await abConfig.save(newConfig);
 }
