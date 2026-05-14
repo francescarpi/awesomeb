@@ -90,6 +90,11 @@ export class Desktop {
     this.browser.eventsChannel.emit('desktop:theme-did-change', this.window, this);
   }
 
+  updateTheme(theme: Theme) {
+    this._theme = theme;
+    this.browser.eventsChannel.emit('desktop:theme-did-change', this.window, this);
+  }
+
   get tabContainers(): TabContainer[] {
     return Array.from(this._tabContainers.values());
   }

@@ -1,4 +1,4 @@
-import { Browser, config, notification } from '@/core';
+import { Browser, config, notification, getTheme } from '@/core';
 import { createHandler, internalPageChecker } from '@/utils';
 import type { IConfig, IWinDesConTab } from '~/types';
 import { dialog } from 'electron';
@@ -23,6 +23,15 @@ export function setupConfigIPC(browser: Browser) {
     [internalPageChecker.bind(null, 'settings')],
     async ({ config: newConfig }) => {
       config.save(newConfig);
+
+      for (const window of browser.windows) {
+        const desktop = window.selectedDesktop;
+        if (desktop) {
+          const theme = getTheme(desktop.theme.name);
+          desktop.updateTheme(theme);
+        }
+      }
+
       notification('Settings saved', 'Your settings have been saved successfully.');
     },
   );
