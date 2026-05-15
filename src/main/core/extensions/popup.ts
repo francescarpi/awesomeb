@@ -1,6 +1,7 @@
 import { UIPageView, UIView, Sidebar } from '@/ui';
-import { Window, Partition } from '@/core';
+import { Window, Partition, windowOpenHadler, Browser } from '@/core';
 import { TWindowId } from '~/types';
+import { type HandlerDetails } from 'electron';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
@@ -23,6 +24,7 @@ export class ExtensionPopupOverlay extends UIPageView {
 
 export class ExtensionPopup extends UIView {
   constructor(
+    browser: Browser,
     partition: Partition,
     private readonly x: number,
     private readonly y: number,
@@ -37,6 +39,10 @@ export class ExtensionPopup extends UIView {
       this.webContents.insertCSS(
         'body { border: 1px solid rgba(0,0,0,0.5); box-sizing: border-box; height: 100vh; margin: 0 !important; }',
       );
+    });
+
+    this.webContents.setWindowOpenHandler((details: HandlerDetails) => {
+      return windowOpenHadler(browser, details);
     });
   }
 

@@ -73,6 +73,7 @@ export class Browser {
               tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
                 ? partitions.internal
                 : partitions.get(tabStore.partitionId) || partitions.default;
+            const isExtension = tabStore.url?.startsWith('chrome-extension://');
 
             tabContainer.createTab(tabStore.id, {
               partition,
@@ -80,6 +81,7 @@ export class Browser {
               customTitle: tabStore.customTitle,
               url: tabStore.url,
               favicon: tabStore.favicon,
+              isExtension,
             });
           }
         }
@@ -203,10 +205,12 @@ export class Browser {
     const { window, desktop, tabContainer, partition } = result;
 
     const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? partitions.internal : null;
+    const isExtension = url.startsWith('chrome-extension://');
 
     const tab = tabContainer.createTab(this.idGenerator.nextTabId, {
       partition: intPartition || partition,
       suspended: false,
+      isExtension,
     });
 
     if (props?.selectTab) {

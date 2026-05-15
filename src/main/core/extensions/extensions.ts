@@ -92,7 +92,7 @@ export class Extensions {
     const overlay = new ExtensionPopupOverlay(window.id);
     window.addView(overlay);
 
-    const popup = new ExtensionPopup(partition, x, y);
+    const popup = new ExtensionPopup(this._browser, partition, x, y);
     const popupUrl = `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`;
     popup.webContents.loadURL(popupUrl);
     window.addView(popup);

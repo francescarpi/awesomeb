@@ -47,7 +47,7 @@ export class Tab extends UIView {
     public readonly id: TTabId,
     props: ITabProps,
   ) {
-    const preload = props?.url?.startsWith('chrome-extension')
+    const preload = props?.isExtension
       ? 'extension'
       : props.partition.id === partitions.internal.id
         ? 'browser'
