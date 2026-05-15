@@ -1,4 +1,12 @@
-import { Browser, Tab, Window, bookmarks, getCachedFavicon, closedHistory } from '@/core';
+import {
+  Browser,
+  Tab,
+  Window,
+  bookmarks,
+  getCachedFavicon,
+  closedHistory,
+  getShortcut,
+} from '@/core';
 import { MenuItemConstructorOptions, Menu, NativeImage } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -33,6 +41,7 @@ function appMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
+  const preferences = getShortcut('preferences');
   return {
     role: 'appMenu',
     icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
@@ -40,8 +49,8 @@ function appMenu(
       { role: 'about' },
       { type: 'separator' },
       {
-        label: 'Preferences',
-        accelerator: 'CmdOrCtrl+,',
+        label: preferences.label,
+        accelerator: preferences.key,
         icon: getIcon(EIcon.Command),
         enabled: !!window,
         click: () => {
@@ -67,13 +76,17 @@ function fileMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
+  const performCommand = getShortcut('performCommand');
+  const newTab = getShortcut('newTab');
+  const openRecentlyClosed = getShortcut('openRecentlyClosed');
+
   return {
     label: 'File',
     icon: showRootIcon ? getIcon(EIcon.File) : undefined,
     submenu: [
       {
-        label: 'Perform command',
-        accelerator: 'CmdOrCtrl+P',
+        label: performCommand.label,
+        accelerator: performCommand.key,
         enabled: !!window,
         icon: getIcon(EIcon.Command),
         click: () => {
@@ -84,8 +97,8 @@ function fileMenu(
       },
       { type: 'separator' },
       {
-        label: 'New tab',
-        accelerator: 'CmdOrCtrl+T',
+        label: newTab.label,
+        accelerator: newTab.key,
         icon: getIcon(EIcon.Tab),
         click: () => {
           if (window) {
@@ -94,8 +107,8 @@ function fileMenu(
         },
       },
       {
-        label: 'Open recently closed tab',
-        accelerator: 'Shift+CmdOrCtrl+T',
+        label: openRecentlyClosed.label,
+        accelerator: openRecentlyClosed.key,
         enabled: closedHistory.tabs.length > 0,
         icon: getIcon(EIcon.Open),
         click: async () => {
@@ -115,6 +128,10 @@ function editMenu(
   window: Window | null,
   tab: Tab | null,
 ): MenuItemConstructorOptions {
+  const copyUrl = getShortcut('copyUrl');
+  const editUrl = getShortcut('editUrl');
+  const findInPage = getShortcut('findInPage');
+
   return {
     label: 'Edit',
     icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
@@ -130,8 +147,8 @@ function editMenu(
       { role: 'selectAll' },
       { type: 'separator' },
       {
-        label: 'Copy URL',
-        accelerator: 'CmdOrCtrl+Shift+C',
+        label: copyUrl.label,
+        accelerator: copyUrl.key,
         icon: getIcon(EIcon.Copy),
         enabled: Boolean(tab),
         click: async () => {
@@ -141,8 +158,8 @@ function editMenu(
         },
       },
       {
-        label: 'Edit URL',
-        accelerator: 'CmdOrCtrl+E',
+        label: editUrl.label,
+        accelerator: editUrl.key,
         icon: getIcon(EIcon.Edit),
         enabled: Boolean(tab),
         click: () => {
@@ -153,8 +170,8 @@ function editMenu(
       },
       { type: 'separator' },
       {
-        label: 'Find in page...',
-        accelerator: 'CmdOrCtrl+F',
+        label: findInPage.label,
+        accelerator: findInPage.key,
         icon: getIcon(EIcon.Search),
         enabled: Boolean(tab),
         click: async () => {
@@ -172,13 +189,16 @@ function windowMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
+  const toggleSidebar = getShortcut('toggleSidebar');
+  const toggleMaximizeArea = getShortcut('toggleMaximizeArea');
+
   return {
     label: 'Window',
     icon: showRootIcon ? getIcon(EIcon.Windows) : undefined,
     submenu: [
       {
-        label: 'Toggle sidebar',
-        accelerator: 'CmdOrCtrl+S',
+        label: toggleSidebar.label,
+        accelerator: toggleSidebar.key,
         enabled: !!window,
         icon: getIcon(EIcon.Sidebar),
         click: async () => {
@@ -188,8 +208,8 @@ function windowMenu(
         },
       },
       {
-        label: 'Toggle maximize area',
-        accelerator: 'CmdOrCtrl+I',
+        label: toggleMaximizeArea.label,
+        accelerator: toggleMaximizeArea.key,
         enabled: !!window,
         icon: getIcon(EIcon.Maximize),
         click: async () => {
@@ -207,13 +227,30 @@ function desktopsMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): MenuItemConstructorOptions {
+  const findDesktop = getShortcut('findDesktop');
+  const previousDesktop = getShortcut('previousDesktop');
+  const nextDesktop = getShortcut('nextDesktop');
+
   const totalDesktops = window?.desktops.length || 0;
   const desktopItems: MenuItemConstructorOptions[] = [];
 
+  const desktopShortcuts = [
+    'selectDesktop1',
+    'selectDesktop2',
+    'selectDesktop3',
+    'selectDesktop4',
+    'selectDesktop5',
+    'selectDesktop6',
+    'selectDesktop7',
+    'selectDesktop8',
+    'selectDesktop9',
+  ];
+
   for (let i = 1; i <= 9; i++) {
+    const shortcut = getShortcut(desktopShortcuts[i - 1]);
     desktopItems.push({
       label: `Desktop ${i}`,
-      accelerator: `Shift+CmdOrCtrl+${i}`,
+      accelerator: shortcut.key,
       enabled: i <= totalDesktops,
       click: async () => {
         if (window) {
@@ -228,8 +265,8 @@ function desktopsMenu(
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
-        label: 'Find...',
-        accelerator: 'CmdOrCtrl+D',
+        label: findDesktop.label,
+        accelerator: findDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Desktop),
         click: () => {
@@ -243,7 +280,7 @@ function desktopsMenu(
       { type: 'separator' },
       {
         label: 'Previous',
-        accelerator: 'Shift+CmdOrCtrl+[',
+        accelerator: previousDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
         click: async () => {
@@ -254,7 +291,7 @@ function desktopsMenu(
       },
       {
         label: 'Next',
-        accelerator: 'Shift+CmdOrCtrl+]',
+        accelerator: nextDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
         click: async () => {
@@ -273,14 +310,44 @@ function tabsMenu(
   window: Window | null,
   tab: Tab | null,
 ): MenuItemConstructorOptions {
+  const findTab = getShortcut('findTab');
+  const previousTab = getShortcut('previousTab');
+  const nextTab = getShortcut('nextTab');
+  const selectTabAttention = getShortcut('selectTabAttention');
+  const tabSwitcher = getShortcut('tabSwitcher');
+  const tabMarks = getShortcut('tabMarks');
+  const moveTabUp = getShortcut('moveTabUp');
+  const moveTabDown = getShortcut('moveTabDown');
+  const suspendTab = getShortcut('suspendTab');
+  const closeTab = getShortcut('closeTab');
+  const reloadTab = getShortcut('reloadTab');
+  const goBack = getShortcut('goBack');
+  const goForward = getShortcut('goForward');
+  const zoomIn = getShortcut('zoomIn');
+  const zoomOut = getShortcut('zoomOut');
+  const zoomReset = getShortcut('zoomReset');
+
   const tabs: MenuItemConstructorOptions[] = [];
   const totalContainers = window?.selectedDesktop?.tabContainers.length || 0;
 
+  const tabShortcuts = [
+    'selectTab1',
+    'selectTab2',
+    'selectTab3',
+    'selectTab4',
+    'selectTab5',
+    'selectTab6',
+    'selectTab7',
+    'selectTab8',
+    'selectTab9',
+  ];
+
   for (let i = 1; i <= 9; i++) {
+    const shortcut = getShortcut(tabShortcuts[i - 1]);
     tabs.push({
       label: `Tab ${i}`,
       enabled: i <= totalContainers,
-      accelerator: `CmdOrCtrl+${i}`,
+      accelerator: shortcut.key,
       click: () => {
         if (window) {
           browser.performCommand(window, 'select-tabcontainer-by-index', { index: i });
@@ -294,8 +361,8 @@ function tabsMenu(
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
       {
-        label: 'Find...',
-        accelerator: 'CmdOrCtrl+.',
+        label: findTab.label,
+        accelerator: findTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Tab),
         click: () => {
@@ -309,7 +376,7 @@ function tabsMenu(
       { type: 'separator' },
       {
         label: 'Previous',
-        accelerator: 'CmdOrCtrl+]',
+        accelerator: previousTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
         click: async () => {
@@ -320,7 +387,7 @@ function tabsMenu(
       },
       {
         label: 'Next',
-        accelerator: 'CmdOrCtrl+[',
+        accelerator: nextTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
         click: async () => {
@@ -330,8 +397,8 @@ function tabsMenu(
         },
       },
       {
-        label: 'Select require attention',
-        accelerator: 'CmdOrCtrl+U',
+        label: selectTabAttention.label,
+        accelerator: selectTabAttention.key,
         icon: getIcon(EIcon.Notification),
         click: async () => {
           if (window) {
@@ -341,7 +408,7 @@ function tabsMenu(
       },
       {
         label: 'Tab switcher...',
-        accelerator: 'Control+Tab',
+        accelerator: tabSwitcher.key,
         icon: getIcon(EIcon.Tab),
         click: async () => {
           if (window && !window.isTabSwitcherVisible) {
@@ -350,8 +417,8 @@ function tabsMenu(
         },
       },
       {
-        label: 'Marks',
-        accelerator: 'CmdOrCtrl+;',
+        label: tabMarks.label,
+        accelerator: tabMarks.key,
         icon: getIcon(EIcon.Bookmarks),
         click: async () => {
           if (window && !window.isTabMarksVisible) {
@@ -361,8 +428,8 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: 'Move up',
-        accelerator: 'CmdOrCtrl+Alt+]',
+        label: moveTabUp.label,
+        accelerator: moveTabUp.key,
         icon: getIcon(EIcon.Up),
         click: async () => {
           if (window && tab) {
@@ -372,8 +439,8 @@ function tabsMenu(
         enabled: !!tab,
       },
       {
-        label: 'Move down',
-        accelerator: 'CmdOrCtrl+Alt+[',
+        label: moveTabDown.label,
+        accelerator: moveTabDown.key,
         icon: getIcon(EIcon.Down),
         click: async () => {
           if (window && tab) {
@@ -384,8 +451,8 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: 'Suspend',
-        accelerator: 'CmdOrCtrl+Shift+S',
+        label: suspendTab.label,
+        accelerator: suspendTab.key,
         enabled: tab !== null && !tab?.suspended,
         icon: getIcon(EIcon.Suspend),
         click: async () => {
@@ -395,8 +462,8 @@ function tabsMenu(
         },
       },
       {
-        label: 'Close',
-        accelerator: 'CmdOrCtrl+W',
+        label: closeTab.label,
+        accelerator: closeTab.key,
         enabled: tab !== null,
         icon: getIcon(EIcon.Close),
         click: async () => {
@@ -407,8 +474,8 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: 'Reload',
-        accelerator: 'CmdOrCtrl+R',
+        label: reloadTab.label,
+        accelerator: reloadTab.key,
         enabled: !!tab && !tab?.suspended,
         icon: getIcon(EIcon.Reload),
         click: async () => {
@@ -418,9 +485,9 @@ function tabsMenu(
         },
       },
       {
-        label: 'Go back',
+        label: goBack.label,
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoBack,
-        accelerator: 'CmdOrCtrl+Left',
+        accelerator: goBack.key,
         icon: getIcon(EIcon.Back),
         click: () => {
           if (window && tab) {
@@ -429,9 +496,9 @@ function tabsMenu(
         },
       },
       {
-        label: 'Go forward',
+        label: goForward.label,
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoForward,
-        accelerator: 'CmdOrCtrl+Right',
+        accelerator: goForward.key,
         icon: getIcon(EIcon.Forward),
         click: () => {
           if (window && tab) {
@@ -463,9 +530,9 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: 'Zoom in',
+        label: zoomIn.label,
         enabled: !!tab,
-        accelerator: 'CmdOrCtrl+Plus',
+        accelerator: zoomIn.key,
         click: () => {
           if (tab && window) {
             browser.performCommand(window, 'zoom-in');
@@ -473,9 +540,9 @@ function tabsMenu(
         },
       },
       {
-        label: 'Zoom out',
+        label: zoomOut.label,
         enabled: !!tab,
-        accelerator: 'CmdOrCtrl+-',
+        accelerator: zoomOut.key,
         click: () => {
           if (tab && window) {
             browser.performCommand(window, 'zoom-out');
@@ -483,9 +550,9 @@ function tabsMenu(
         },
       },
       {
-        label: 'Zoom reset',
+        label: zoomReset.label,
         enabled: !!tab,
-        accelerator: 'CmdOrCtrl+0',
+        accelerator: zoomReset.key,
         click: () => {
           if (tab && window) {
             browser.performCommand(window, 'zoom-reset');
@@ -501,6 +568,8 @@ async function bookmarksMenu(
   showRootIcon: boolean,
   window: Window | null,
 ): Promise<MenuItemConstructorOptions> {
+  const openBookmark = getShortcut('openBookmark');
+
   return {
     label: 'Bookmarks',
     icon: showRootIcon ? getIcon(EIcon.Bookmarks) : undefined,
@@ -516,8 +585,8 @@ async function bookmarksMenu(
         },
       },
       {
-        label: 'Open bookmark',
-        accelerator: 'CmdOrCtrl+B',
+        label: openBookmark.label,
+        accelerator: openBookmark.key,
         icon: getIcon(EIcon.Open),
         click: () => {
           if (window) {

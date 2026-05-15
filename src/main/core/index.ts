@@ -19,3 +19,4 @@ export * from './closed-history';
 export * from './extensions';
 export * from './prompts';
 export * from './webauth';
+export * from './shortcuts';

@@ -1,4 +1,5 @@
 import { EPermissionConfigType } from './permissions';
+import type { TShortcutMapId } from './shortcuts';
 
 export type TSearchEngineCode = string;
 
@@ -8,6 +9,7 @@ export interface IConfig {
   downloadsFolder: string;
   themes: IConfigTheme[];
   permissionsType: EPermissionConfigType;
+  shortcutMap: TShortcutMapId;
 }
 
 export interface IConfigPartition {
