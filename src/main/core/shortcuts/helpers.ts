@@ -1,4 +1,4 @@
-import type { IShortcut, IShortcutMap } from './types';
+import type { IShortcut, IShortcutMap } from '~/types';
 import { config } from '@/core';
 import { SHORTCUTS_MAPS } from './index';
 

@@ -20,6 +20,8 @@ import type {
   ILayoutData,
   IVisibleDesktops,
   TPermissions,
+  IShortcutMap,
+  TShortcutMapId,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -189,5 +191,10 @@ declare global {
   const abPermissions: {
     get: () => Promise<TPermissions>;
     save: (permissions: TPermissions) => Promise<void>;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abShortcuts: {
+    maps: () => Promise<Record<TShortcutMapId, IShortcutMap>>;
   };
 }

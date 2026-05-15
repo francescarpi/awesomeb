@@ -306,6 +306,13 @@ const abPermissions = {
 };
 
 //--------------------------------------------------------------------------------------
+const abShortcuts = {
+  maps: () => {
+    return ipcRenderer.invoke('shortcuts:maps', {});
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -326,3 +333,4 @@ contextBridge.exposeInMainWorld('abSidebar', abSidebar);
 contextBridge.exposeInMainWorld('abExtensions', abExtensions);
 contextBridge.exposeInMainWorld('abPrompts', abPrompts);
 contextBridge.exposeInMainWorld('abPermissions', abPermissions);
+contextBridge.exposeInMainWorld('abShortcuts', abShortcuts);
