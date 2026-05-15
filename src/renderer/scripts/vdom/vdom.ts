@@ -334,7 +334,7 @@ export class Renderer {
     }
 
     const domdiff = diff(this.currentVNode, newVNode);
-    patch(this.el, domdiff);
+    this.el = patch(this.el, domdiff);
     this.currentVNode = newVNode;
 
     if (opts?.onUpdated) {

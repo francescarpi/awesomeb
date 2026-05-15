@@ -22,6 +22,7 @@ import type {
   TPermissions,
   IShortcutMap,
   TShortcutMapId,
+  TShortcutId,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -196,5 +197,6 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abShortcuts: {
     maps: () => Promise<Record<TShortcutMapId, IShortcutMap>>;
+    override: (mapId: TShortcutMapId, shortcutId: TShortcutId, key: string) => Promise<void>;
   };
 }

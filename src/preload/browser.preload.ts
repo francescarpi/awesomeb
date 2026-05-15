@@ -23,6 +23,8 @@ import type {
   ILayoutData,
   IVisibleDesktops,
   TPermissions,
+  TShortcutMapId,
+  TShortcutId,
 } from '~/types';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -309,6 +311,9 @@ const abPermissions = {
 const abShortcuts = {
   maps: () => {
     return ipcRenderer.invoke('shortcuts:maps', {});
+  },
+  override: (mapId: TShortcutMapId, shortcutId: TShortcutId, key: string) => {
+    return ipcRenderer.invoke('shortcuts:override', { mapId, shortcutId, key });
   },
 };
 

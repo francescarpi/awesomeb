@@ -47,6 +47,7 @@ export class Config extends Store<IConfig> {
         themes: [],
         permissionsType: EPermissionConfigType.Standard,
         shortcutMap: 'generic-iso',
+        shortcutsOverrides: {},
       },
     });
   }
