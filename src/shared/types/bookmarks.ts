@@ -8,6 +8,7 @@ export interface IUrlBookmark {
   type: EBookmarkType.Url;
   url: string;
   title: string;
+  dateAdded?: number;
 }
 
 export interface IFolderBookmark {
@@ -15,6 +16,8 @@ export interface IFolderBookmark {
   type: EBookmarkType.Folder;
   title: string;
   children: IBookmark[];
+  dateAdded?: number;
+  dateGroupModified?: number;
 }
 
 export type IBookmark = IUrlBookmark | IFolderBookmark;

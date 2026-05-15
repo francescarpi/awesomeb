@@ -69,6 +69,92 @@ contextBridge.executeInMainWorld({
           }
         },
       },
+      bookmarks: {
+        getTree: async (callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void) => {
+          const tree = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>('bookmarks.getTree');
+          if (callback) callback(tree);
+        },
+        getSubTree: async (
+          id: string,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ) => {
+          const tree = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            'bookmarks.getSubTree',
+            { id },
+          );
+          if (callback) callback(tree);
+        },
+        getChildren: async (
+          id: string,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ) => {
+          const children = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            'bookmarks.getChildren',
+            { id },
+          );
+          if (callback) callback(children);
+        },
+        getRecent: async (
+          numberOfItems: number,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ) => {
+          const items = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            'bookmarks.getRecent',
+            { numberOfItems },
+          );
+          if (callback) callback(items);
+        },
+        search: async (
+          query: string,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ) => {
+          const results = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            'bookmarks.search',
+            { query },
+          );
+          if (callback) callback(results);
+        },
+        create: async (
+          bookmark: chrome.bookmarks.CreateDetails,
+          callback?: (result: chrome.bookmarks.BookmarkTreeNode) => void,
+        ) => {
+          const result = await crxMessage<chrome.bookmarks.BookmarkTreeNode>(
+            'bookmarks.create',
+            bookmark,
+          );
+          if (callback) callback(result);
+        },
+        move: async (
+          id: string,
+          destination: chrome.bookmarks.MoveDestination,
+          callback?: (result: chrome.bookmarks.BookmarkTreeNode) => void,
+        ) => {
+          const result = await crxMessage<chrome.bookmarks.BookmarkTreeNode>('bookmarks.move', {
+            id,
+            destination,
+          });
+          if (callback) callback(result);
+        },
+        update: async (
+          id: string,
+          changes: chrome.bookmarks.UpdateChanges,
+          callback?: (result: chrome.bookmarks.BookmarkTreeNode) => void,
+        ) => {
+          const result = await crxMessage<chrome.bookmarks.BookmarkTreeNode>('bookmarks.update', {
+            id,
+            changes,
+          });
+          if (callback) callback(result);
+        },
+        remove: async (id: string, callback?: () => void) => {
+          await crxMessage('bookmarks.remove', { id });
+          if (callback) callback();
+        },
+        removeTree: async (id: string, callback?: () => void) => {
+          await crxMessage('bookmarks.removeTree', { id });
+          if (callback) callback();
+        },
+      },
     };
 
     for (const apiName in apis) {
