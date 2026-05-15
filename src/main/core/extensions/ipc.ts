@@ -34,12 +34,12 @@ export function setupExtensionsIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------
-  createHandler<{ tabData: IWinDesConTab; extensionId: TExtensionId }>(
+  createHandler<{ tabData: IWinDesConTab; id: TExtensionId }>(
     'extensions:toggle',
     'handle',
     browser,
     [internalPageChecker.bind(null, 'extensions')],
-    async ({ extensionId }) => {
+    async ({ id: extensionId }) => {
       browser.extensions.toggle(extensionId);
       return browser.renderer.extensions();
     },
