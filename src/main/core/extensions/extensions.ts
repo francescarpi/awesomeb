@@ -113,6 +113,7 @@ export class Extensions {
       popup.setSize(width || 225, height || 100);
       popup.refreshBounds(window);
       popup.setVisible(true);
+      // popup.webContents.openDevTools({ mode: 'detach' });
     }
   }
 

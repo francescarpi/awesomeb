@@ -12,7 +12,7 @@ contextBridge.executeInMainWorld({
   ) => {
     // Ini extension popup
     document.addEventListener('DOMContentLoaded', () => {
-      const clientRect = document.documentElement.getBoundingClientRect();
+      const clientRect = document.body.getBoundingClientRect();
       const width = Math.ceil(clientRect.width);
       const height = Math.ceil(clientRect.height);
       iniPopup(width, height);
