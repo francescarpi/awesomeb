@@ -1,8 +1,8 @@
 import type { IShortcutMap } from '../types';
 
 export const SHORTCUTS_MAP: IShortcutMap = {
-  id: 'macos-iso',
-  name: 'Mac OS ISO',
+  id: 'generic-iso',
+  name: 'Generic ISO',
   shortcuts: {
     preferences: { key: 'CmdOrCtrl+,', label: 'Preferences' },
     performCommand: { key: 'CmdOrCtrl+P', label: 'Perform command' },

@@ -46,7 +46,7 @@ export class Config extends Store<IConfig> {
         downloadsFolder: path.join(os.homedir(), 'Downloads'),
         themes: [],
         permissionsType: EPermissionConfigType.Standard,
-        shortcutMap: 'macos-iso',
+        shortcutMap: 'generic-iso',
       },
     });
   }

@@ -12,7 +12,7 @@ export function getShortcut(id: string): IShortcut {
 }
 
 function getDefaultMap(): IShortcutMap {
-  const id = config.get('shortcutMap') || 'macos-iso';
+  const id = config.get('shortcutMap') || 'generic-iso';
   const map = SHORTCUTS_MAPS[id];
   if (!map) {
     throw new Error(`Shortcut map with id "${id}" not found.`);
