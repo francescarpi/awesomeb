@@ -14,7 +14,7 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
   callback: () => void;
 }> {
   const permissions = await abPermissions.get();
-  const sortedKeys = Object.keys(permissions).sort();
+  const permissionsRenderer = new Renderer(h('ul', {}, h('li', {}, 'Loading...')));
 
   const renderer = new Renderer(
     h(
@@ -45,56 +45,15 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
       box(
         'Permissions',
         'Manage the permissions required for the extension to function properly.',
-        h(
-          'ul',
-          {},
-          ...sortedKeys.map((key) =>
-            h(
-              'li',
-              { class: c('mb-4') },
-              h('strong', { class: c('text-primary') }, key),
-              h(
-                'ul',
-                { class: c('ml-4') },
-                ...sortedPermissions(permissions[key]).map(([perm, value]) =>
-                  h(
-                    'li',
-                    { class: c('mb-2') },
-                    h(
-                      'div',
-                      { class: c('flex', 'gap-2', 'items-center') },
-                      btnIcon(Delete, { onClick: () => {} }),
-                      h('span', {}, perm),
-                      h(
-                        'div',
-                        { class: c('ml-4', 'flex', 'gap-2', 'items-center') },
-                        ...checkBox(
-                          `${key}-${perm}`,
-                          `${key}-${perm}-allow`,
-                          'Allow',
-                          value,
-                          savePermission.bind(null, key, perm, true, permissions),
-                        ),
-                        ...checkBox(
-                          `${key}-${perm}`,
-                          `${key}-${perm}-deny`,
-                          'Deny',
-                          !value,
-                          savePermission.bind(null, key, perm, false, permissions),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        h('div', { id: 'permissions-list', class: c('text-sm') }),
       ),
     ),
   );
 
-  const callback = () => {};
+  const callback = () => {
+    permissionsRenderer.render('permissions-list');
+    updatePermissionsList(permissionsRenderer, permissions);
+  };
 
   return { renderer, callback };
 }
@@ -149,6 +108,82 @@ async function savePermission(
   }
   newPermissions[host][perm] = newVal;
   await abPermissions.save(newPermissions);
+}
+
+function renderPermissionsList(permissions: TPermissions, renderer: Renderer): VNode {
+  const sortedKeys = Object.keys(permissions).sort();
+  return h(
+    'ul',
+    {},
+    ...sortedKeys.map((key) =>
+      h(
+        'li',
+        { class: c('mb-4') },
+        h('strong', { class: c('text-primary') }, key),
+        h(
+          'ul',
+          { class: c('ml-4') },
+          ...sortedPermissions(permissions[key]).map(([perm, value]) =>
+            h(
+              'li',
+              { class: c('mb-2') },
+              h(
+                'div',
+                { class: c('flex', 'gap-2', 'items-center') },
+                btnIcon(Delete, {
+                  onClick: () => deletePermission(key, perm, permissions, renderer),
+                  doubleConfirmation: true,
+                }),
+                h('span', {}, perm),
+                h(
+                  'div',
+                  { class: c('ml-4', 'flex', 'gap-2', 'items-center') },
+                  ...checkBox(
+                    `${key}-${perm}`,
+                    `${key}-${perm}-allow`,
+                    'Allow',
+                    value,
+                    savePermission.bind(null, key, perm, true, permissions),
+                  ),
+                  ...checkBox(
+                    `${key}-${perm}`,
+                    `${key}-${perm}-deny`,
+                    'Deny',
+                    !value,
+                    savePermission.bind(null, key, perm, false, permissions),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+function updatePermissionsList(renderer: Renderer, permissions: TPermissions) {
+  renderer.update(renderPermissionsList(permissions, renderer));
+}
+
+async function deletePermission(
+  host: THost,
+  perm: TPermission,
+  permissions: TPermissions,
+  renderer: Renderer,
+) {
+  if (!permissions[host]) return;
+
+  const { [perm]: _, ...remainingPerms } = permissions[host];
+
+  if (Object.keys(remainingPerms).length === 0) {
+    delete permissions[host];
+  } else {
+    permissions[host] = remainingPerms;
+  }
+
+  await abPermissions.save(permissions);
+  updatePermissionsList(renderer, permissions);
 }
 
 async function updateSecurityLevel(e: Event, config: IConfig) {
