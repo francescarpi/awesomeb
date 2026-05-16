@@ -20,7 +20,8 @@ contextBridge.executeInMainWorld({
 
     // Chrome APIS
     const chrome = globalThis.chrome;
-    if (!chrome) {
+    const browser = globalThis.browser;
+    if (!chrome || !browser) {
       console.error('Chrome API is not available in the extension context.');
       return;
     }
@@ -70,9 +71,8 @@ contextBridge.executeInMainWorld({
         },
       },
       bookmarks: {
-        getTree: async (callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void) => {
-          const tree = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>('bookmarks.getTree');
-          if (callback) callback(tree);
+        getTree: async () => {
+          return await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>('bookmarks.getTree');
         },
         getSubTree: async (
           id: string,
@@ -157,18 +157,18 @@ contextBridge.executeInMainWorld({
       },
     };
 
-    for (const apiName in apis) {
-      Object.defineProperty(chrome, apiName, {
-        value: {
-          ...(chrome as any)[apiName],
-          ...(apis as any)[apiName],
-        },
-        enumerable: true,
-        configurable: true,
-      });
+    for (const target of [chrome, browser]) {
+      for (const [key, methods] of Object.entries(apis)) {
+        Object.defineProperty(target, key, {
+          value: { ...target[key], ...methods },
+          enumerable: true,
+          configurable: true,
+        });
+      }
     }
 
     Object.freeze(chrome);
+    Object.freeze(browser);
   },
   args: [
     (width: number, height: number) =>

@@ -159,7 +159,14 @@ function bookmarkToChromeNode(
 }
 
 function bookmarkTreeToChrome(list: IBookmark[]): chrome.bookmarks.BookmarkTreeNode[] {
-  return list.map((bookmark, index) => bookmarkToChromeNode(bookmark, null, index));
+  return [
+    {
+      id: '0',
+      title: '',
+      syncing: false,
+      children: list.map((bookmark, index) => bookmarkToChromeNode(bookmark, null, index)),
+    },
+  ];
 }
 
 function enrichWithPosition(results: IBookmark[]): chrome.bookmarks.BookmarkTreeNode[] {
