@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+
+interface Props {
+  width?: string;
+}
+
+const { width = 'w-87.5' } = Astro.props;
+---
+
+<Base noDrag>
+  <div class="fixed inset-0" id="overlay"></div>
+  <div
+    class={`bg-base-200 text-base-content ${width} absolute rounded-lg p-2 hidden border border-base-content dropshadow-md`}
+    id="wrapper"
+  >
+    <div id="content" class="text-sm p-4"><slot /></div>
+  </div>
+</Base>
+
+<script>
+  import { getSearchParams, onClick } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+
+  onClick('overlay', () => {
+    abModal.closeContextual(winId);
+  });
+
+  function placeContent() {
+    const wrapper = document.getElementById('wrapper')!;
+
+    const x = parseFloat(searchParams.get('x')!);
+    const y = parseFloat(searchParams.get('y')!);
+    const anchor = searchParams.get('anchor')!;
+
+    switch (anchor) {
+      case 'bottom-left': {
+        wrapper.style.bottom = `${window.innerHeight - y + 7}px`;
+        wrapper.style.left = `${x}px`;
+        break;
+      }
+    }
+
+    wrapper.classList.remove('hidden');
+  }
+
+  placeContent();
+</script>

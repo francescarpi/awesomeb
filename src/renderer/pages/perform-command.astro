@@ -1,0 +1,26 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="800px" height="600px">
+  <Title>Perform Command</Title>
+  <ListWithSearch placeholder="Start typing to search commands..." id="list" />
+</Modal>
+
+<script>
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'commands',
+    onAccept: (item) => {
+      abCommands.perform(winId, item.id, {});
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

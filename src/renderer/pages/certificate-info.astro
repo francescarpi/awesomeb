@@ -1,0 +1,53 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="600px">
+  <Title>Certificate Info</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { getSearchParams, h, c, Renderer, confirmButtons } from '#/scripts';
+  import dayjs from 'dayjs';
+
+  const { winId } = getSearchParams();
+
+  const renderer = new Renderer(
+    h('div', null, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
+  ).render('content');
+
+  abCertificates.info(winId).then((data) => {
+    const [btns, registerBtnsEvents] = confirmButtons({ onConfirm: () => abModal.close(winId) });
+
+    if (data) {
+      const vnode = h(
+        'div',
+        { class: c('grid', 'grid-cols-2') },
+        h('span', { class: c('font-bold') }, 'Common Name:'),
+        h('span', null, data.subject.CN),
+        h('span', { class: c('font-bold') }, 'Issuer Country:'),
+        h('span', null, data.issuer.C),
+        h('span', { class: c('font-bold') }, 'Issuer Organization:'),
+        h('span', null, data.issuer.O),
+        h('span', { class: c('font-bold') }, 'Issuer Common Name:'),
+        h('span', null, data.issuer.CN),
+        h('span', { class: c('font-bold') }, 'Valid From:'),
+        h('span', null, dayjs(data.valid_from).format('ddd, D MMM YYYY HH:mm:ss')),
+        h('span', { class: c('font-bold') }, 'Valid To:'),
+        h('span', null, dayjs(data.valid_to).format('ddd, D MMM YYYY HH:mm:ss')),
+        h('div', { class: c('col-span-2', 'mt-6', 'flex', 'justify-center') }, ...btns),
+      );
+      renderer.update(vnode, { onUpdated: registerBtnsEvents });
+    } else {
+      const vnode = h(
+        'div',
+        { class: c('flex', 'flex-col', 'gap-2', 'items-center', 'justify-center', 'h-[220px]') },
+        h('p', { class: c('text-error', 'text-sm') }, 'Failed to get the certificate info.'),
+        ...btns,
+      );
+      renderer.update(vnode, { onUpdated: registerBtnsEvents });
+    }
+  });
+</script>

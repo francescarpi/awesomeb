@@ -1,0 +1,228 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="800px">
+  <Title>Edit URL</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import {
+    Renderer,
+    h,
+    c,
+    confirmButtons,
+    getSearchParams,
+    input,
+    btnIcon,
+    buildURL,
+    parseURL,
+  } from '#/scripts';
+  import type { UrlParts } from '#/scripts';
+  import deleteIcon from '#/icons/delete.svg?raw';
+  import type { ITabEntity } from '~/types';
+
+  const { winId, searchParams } = getSearchParams();
+  const tabId = searchParams.get('tabId');
+
+  const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
+  const selectedTab = tabId
+    ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
+    : tabsEntitites.find((d) => d.selected)!;
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      const fullURLEl = document.getElementById('fullURL') as HTMLInputElement;
+      abCommands.perform(winId, 'edit-url', {
+        tabId: parseInt(selectedTab.id, 10),
+        url: fullURLEl.value,
+      });
+      abModal.close(winId);
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+  });
+
+  const initialUrl = selectedTab.url || '';
+  let initialParts: UrlParts | null = null;
+  try {
+    initialParts = parseURL(initialUrl);
+  } catch {
+    // Invalid or empty URL, leave everything blank
+  }
+
+  const urlState = {
+    fullURL: initialUrl,
+    protocol: initialParts?.protocol || '',
+    hostname: initialParts?.hostname || '',
+    port: initialParts?.port || '',
+    pathname: initialParts?.pathname || '',
+    hash: initialParts?.hash || '',
+    queryParams:
+      initialParts && initialParts.searchParams.length > 0
+        ? initialParts.searchParams
+        : [{ key: '', value: '' }],
+  };
+
+  let isUpdating = false;
+
+  const syncStateFromDOM = () => {
+    urlState.fullURL = (document.getElementById('fullURL') as HTMLInputElement)?.value || '';
+    urlState.protocol = (document.getElementById('protocol') as HTMLInputElement)?.value || '';
+    urlState.hostname = (document.getElementById('hostname') as HTMLInputElement)?.value || '';
+    urlState.port = (document.getElementById('port') as HTMLInputElement)?.value || '';
+    urlState.pathname = (document.getElementById('pathname') as HTMLInputElement)?.value || '';
+    urlState.hash = (document.getElementById('hash') as HTMLInputElement)?.value || '';
+
+    urlState.queryParams = [];
+    let i = 0;
+    while (true) {
+      const keyEl = document.getElementById(`key_${i}`) as HTMLInputElement | null;
+      const valEl = document.getElementById(`value_${i}`) as HTMLInputElement | null;
+      if (!keyEl || !valEl) break;
+      urlState.queryParams.push({ key: keyEl.value, value: valEl.value });
+      i++;
+    }
+  };
+
+  const updateFullURL = () => {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    syncStateFromDOM();
+
+    const parts: UrlParts = {
+      protocol: urlState.protocol,
+      hostname: urlState.hostname,
+      port: urlState.port,
+      pathname: urlState.pathname,
+      hash: urlState.hash,
+      hashParams: [],
+      searchParams: urlState.queryParams,
+    };
+
+    try {
+      const url = buildURL(parts, false);
+      (document.getElementById('fullURL') as HTMLInputElement).value = url;
+    } catch (e) {
+      // Invalid URL, do not update
+    }
+
+    isUpdating = false;
+  };
+
+  const parseFullURL = () => {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    syncStateFromDOM();
+
+    try {
+      const parts = parseURL(urlState.fullURL);
+      urlState.protocol = parts.protocol;
+      urlState.hostname = parts.hostname;
+      urlState.port = parts.port;
+      urlState.pathname = parts.pathname;
+      urlState.hash = parts.hash;
+      urlState.queryParams =
+        parts.searchParams.length > 0 ? parts.searchParams : [{ key: '', value: '' }];
+
+      renderer.update(buildVDOM(urlState));
+    } catch (e) {
+      // Invalid URL
+    }
+
+    isUpdating = false;
+  };
+
+  const buildVDOM = (state: typeof urlState) =>
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h(
+        'div',
+        { class: c('flex', 'flex-col', 'gap-2') },
+        h(
+          'div',
+          { class: c('flex', 'flex-col', 'gap-2') },
+          h('h1', null, 'Modify full URL'),
+          input('fullURL', 'Full URL', state.fullURL, {
+            onInput: parseFullURL,
+            autofocus: true,
+            select: true,
+          }),
+        ),
+        h(
+          'div',
+          { class: c('flex', 'flex-col', 'gap-2', 'mt-3') },
+          h('h1', null, 'Modify URL parts'),
+          input('protocol', 'Protocol', state.protocol, { onInput: updateFullURL }),
+          input('hostname', 'Hostname', state.hostname, { onInput: updateFullURL }),
+          input('port', 'Port', state.port, { onInput: updateFullURL }),
+          input('pathname', 'Pathname', state.pathname, { onInput: updateFullURL }),
+          input('hash', 'Hash', state.hash, { onInput: updateFullURL }),
+          h('h2', { class: c('text-sm') }, 'Query Parameters'),
+          h(
+            'div',
+            { class: c('grid', 'grid-cols-[auto_auto_20px]', 'gap-2', 'items-center') },
+            ...state.queryParams
+              .map((param, index) => [
+                input(`key_${index}`, 'Key', param.key, {
+                  onInput: (value) => {
+                    state.queryParams[index].key = value;
+                    updateFullURL();
+                  },
+                }),
+                input(`value_${index}`, 'Value', param.value, {
+                  onInput: (value) => {
+                    state.queryParams[index].value = value;
+                    updateFullURL();
+                  },
+                }),
+                state.queryParams.length > 1
+                  ? btnIcon(deleteIcon, {
+                      doubleConfirmation: true,
+                      onClick: () => {
+                        syncStateFromDOM();
+                        state.queryParams.splice(index, 1);
+                        updateFullURL();
+                        renderer.update(buildVDOM(urlState));
+                      },
+                    })
+                  : h('span', null, ''),
+              ])
+              .flat(),
+          ),
+          h(
+            'div',
+            null,
+            h(
+              'button',
+              {
+                class: c('btn', 'btn-sm', 'btn-ghost'),
+                onClick: () => {
+                  syncStateFromDOM();
+                  state.queryParams.push({ key: '', value: '' });
+                  updateFullURL();
+                  renderer.update(buildVDOM(urlState));
+                },
+              },
+              '+ Add',
+            ),
+          ),
+        ),
+      ),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    );
+
+  const renderer = new Renderer(buildVDOM(urlState));
+
+  renderer.render('content', {
+    onRendered: () => {
+      registerBtnsEvents();
+    },
+  });
+</script>

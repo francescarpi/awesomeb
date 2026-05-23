@@ -1,0 +1,62 @@
+---
+import '../assets/app.css';
+
+interface Props {
+  backgroundColor?: string;
+  borderRadius?: string;
+  noDrag?: boolean;
+}
+
+const { backgroundColor, borderRadius, noDrag } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="cupcake">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' awesomeb: data: https:; connect-src 'self' ws:; worker-src blob:;"
+    />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Last-Modified" content="0" />
+    <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+  </head>
+  <body style={noDrag ? 'app-region: no-drag' : ''}>
+    <div class="rootContainer fixed inset-0 text-white">
+      <slot />
+    </div>
+  </body>
+</html>
+
+<style
+  define:vars={{
+    backgroundColor: backgroundColor || 'transparent',
+    borderRadius: borderRadius || '0px',
+  }}
+>
+  .rootContainer {
+    background-color: var(--backgroundColor);
+    border-radius: var(--borderRadius);
+  }
+</style>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+  import type { IConfig } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  const config = await abConfig.get(winId);
+  applyTheme(config);
+
+  abConfig.refresh((_e, config) => {
+    applyTheme(config);
+  });
+
+  function applyTheme(config: IConfig) {
+    document.documentElement.setAttribute('data-theme', config.uiTheme);
+  }
+</script>

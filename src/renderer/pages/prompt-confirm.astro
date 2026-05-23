@@ -1,0 +1,31 @@
+---
+import Modal from '#/layouts/Modal.astro';
+---
+
+<Modal>
+  <div id="container"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+
+  const { searchParams, winId } = getSearchParams();
+
+  const message = searchParams.get('message') as string;
+  const url = new URL(searchParams.get('url') as string);
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => abPrompts.response(winId, true),
+    onCancel: () => abPrompts.response(winId, false),
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { classs: c('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h('p', { class: c('text-md', 'my-6') }, message),
+      h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
+    ),
+  ).render('container', { onRendered: registerBtnsEvents });
+</script>

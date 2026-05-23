@@ -1,0 +1,40 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Grant permission</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+
+  const { searchParams, winId } = getSearchParams();
+  const host = searchParams.get('host') as string;
+  const permission = searchParams.get('permission') as string;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      abTabs.grantPermission(winId, tabId, true);
+      abModal.close(winId);
+    },
+    onCancel: () => {
+      abTabs.grantPermission(winId, tabId, false);
+      abModal.close(winId);
+    },
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h('p', {
+        innerHTML: `The site <b>${host}</b> is requesting permission for <b>${permission}</b>.`,
+      }),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', { onRendered: registerBtnsEvents });
+</script>

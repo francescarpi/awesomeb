@@ -1,0 +1,55 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Rename Tab</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
+  import { ITabEntity } from '~/types';
+
+  const { winId, searchParams } = getSearchParams();
+  const tabId = searchParams.get('tabId') as string;
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      const nameField = document.getElementById('name') as HTMLInputElement;
+      const nameValue = nameField.value.trim();
+
+      if (nameValue) {
+        abCommands.perform(winId, 'rename-tab', {
+          tabId: parseInt(selectedTab.id, 10),
+          name: nameValue,
+        });
+      }
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+  });
+
+  const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
+  const selectedTab = tabId
+    ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
+    : tabsEntitites.find((d) => d.selected)!;
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      input('name', 'Tab name', selectedTab.label || ''),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', {
+    onRendered: () => {
+      const name = document.getElementById('name') as HTMLInputElement;
+      name.focus();
+      name.select();
+      registerBtnsEvents();
+    },
+  });
+</script>

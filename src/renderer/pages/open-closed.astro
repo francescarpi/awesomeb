@@ -1,0 +1,26 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="500px" height="600px">
+  <Title>Open Closed Tab</Title>
+  <ListWithSearch placeholder="Filter and select a tab..." id="list" />
+</Modal>
+
+<script>
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'closedTabs',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'open-closed', { url: item.id });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

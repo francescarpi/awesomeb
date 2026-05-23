@@ -1,0 +1,153 @@
+---
+import Base from '#/layouts/Base.astro';
+---
+
+<Base>
+  <div class="fixed inset-0 flex flex-col justify-end mr-1 mb-1">
+    <div
+      class="text-xs bg-base-200 text-base-content border border-base-content p-4 rounded-br-xl rounded-tl-xl"
+      id="short-version"
+    >
+      Listening for mark. <b class="text-primary">Hold</b> to see more details...
+    </div>
+    <div
+      class="text-xs bg-base-200 text-base-content border border-base-content p-4 rounded-br-xl rounded-tl-xl hidden flex-col gap-4"
+      id="full-version"
+    >
+      <p class="text-lg">Available tab marks...</p>
+
+      <p id="no-marks">No maks...</p>
+      <div id="marks-container"></div>
+
+      <div class="grid grid-cols-[50px_auto] border-t border-t-primary pt-2 mt-2">
+        <span class="text-primary">m</span>
+        <p>Press "m" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)</p>
+        <span class="text-primary">n</span>
+        <p>Delete the mark from the active tab</p>
+        <span class="text-primary">b</span>
+        <p>Delete all marks</p>
+        <span class="text-primary">&lt;letter&gt;</span>
+        <p>Select the tab marked with that letter (e.g., a, b, c, ...)</p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+  import { ITabMark } from '~/types';
+
+  const { winId } = getSearchParams();
+  const shortVersion = document.getElementById('short-version')!;
+  const fullVersion = document.getElementById('full-version')!;
+  const noMarks = document.getElementById('no-marks')!;
+  const marksContainer = document.getElementById('marks-container')!;
+
+  let markMode = false;
+  let marks: ITabMark[] = [];
+  let fullVersionTimeout: NodeJS.Timeout;
+
+  abTabMarks.onChangeVisibility((_event, visible) => {
+    if (visible) {
+      registerTimeout();
+    } else {
+      showShortVersion();
+    }
+  });
+
+  async function loadTabMarks() {
+    marks = await abTabMarks.get(winId);
+    updateMarks();
+  }
+
+  loadTabMarks();
+
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Meta') {
+      event.preventDefault();
+      abTabMarks.close(winId);
+    }
+  }
+
+  async function handleKeyDown(event: KeyboardEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.key === 'b') {
+      marks = await abTabMarks.perform(winId, { id: 'deleteAll' });
+      updateMarks();
+      return;
+    }
+
+    if (event.key === 'n') {
+      marks = await abTabMarks.perform(winId, { id: 'deleteOne' });
+      updateMarks();
+      return;
+    }
+
+    if (event.key === 'm' && !markMode) {
+      markMode = true;
+      return;
+    }
+
+    if (markMode) {
+      markMode = false;
+      marks = await abTabMarks.perform(winId, { id: 'add', trigger: event.key });
+      updateMarks();
+      return;
+    }
+
+    const mark = marks.find((m) => m.trigger.toLowerCase() === event.key.toLowerCase());
+    if (mark) {
+      abTabMarks.perform(winId, { id: 'select', trigger: mark.trigger });
+    }
+  }
+
+  window.addEventListener('keyup', handleKeyUp);
+  window.addEventListener('keydown', handleKeyDown);
+
+  function updateMarks() {
+    if (marks.length === 0) {
+      noMarks.classList.remove('hidden');
+      marksContainer.classList.add('hidden');
+      return;
+    }
+
+    marksContainer.innerHTML = '';
+    noMarks.classList.add('hidden');
+    marksContainer.classList.remove('hidden');
+
+    for (const mark of marks) {
+      const markElement = document.createElement('div');
+      markElement.className = 'flex items-center gap-2';
+      markElement.innerHTML = `
+        <span class="text-primary">${mark.trigger}</span>
+        <p>${mark.title}</p>
+      `;
+      marksContainer.appendChild(markElement);
+    }
+  }
+
+  function showFullVersion() {
+    shortVersion.classList.add('hidden');
+    fullVersion.classList.remove('hidden');
+    fullVersion.classList.add('flex');
+  }
+
+  function showShortVersion() {
+    shortVersion.classList.remove('hidden');
+    fullVersion.classList.add('hidden');
+    fullVersion.classList.remove('flex');
+
+    if (fullVersionTimeout) {
+      clearTimeout(fullVersionTimeout);
+    }
+  }
+
+  function registerTimeout() {
+    clearTimeout(fullVersionTimeout);
+    fullVersionTimeout = setTimeout(() => {
+      showFullVersion();
+    }, 1500);
+  }
+</script>

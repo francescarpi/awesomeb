@@ -1,0 +1,71 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+import Pagination from '#/components/common/Pagination.astro';
+---
+
+<Modal width="500px" height="600px">
+  <Title>Move Tab</Title>
+  <div class="h-full">
+    <Pagination />
+    <ListWithSearch placeholder="Select a tab..." id="tab" />
+    <ListWithSearch placeholder="Select a target" id="target" />
+  </div>
+</Modal>
+
+<script>
+  import { paginatorManager, listWithSearchManager, getSearchParams } from '#/scripts';
+  import { IEntity, IPartitionEntity } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
+    'pagesIndicator',
+    ['tab', 'target'],
+  );
+
+  refreshPageVisibility();
+  refreshPageIndicator();
+
+  let tab: IEntity | null = null;
+  let target: IPartitionEntity | null = null;
+
+  // ------------------------------------------------------
+  listWithSearchManager('tab', {
+    entity: 'tabs',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onChange: async (_inputValue, entity, _inputEl) => {
+      tab = entity as IEntity;
+    },
+    onAccept: () => {
+      if (target && tab) {
+        abCommands.perform(winId, 'move-tab', {
+          targetId: target.id,
+          tabId: parseInt(tab.id, 10),
+        });
+      }
+    },
+  });
+
+  // ------------------------------------------------------
+  listWithSearchManager('target', {
+    entity: 'targets',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onChange: async (_inputValue, entity) => {
+      target = entity as IPartitionEntity;
+    },
+    onAccept: () => {
+      if (target && tab) {
+        abCommands.perform(winId, 'move-tab', {
+          targetId: target.id,
+          tabId: parseInt(tab.id, 10),
+        });
+      }
+    },
+  });
+</script>

@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base noDrag>
+  <div id="container"></div>
+</Base>
+
+<script>
+  import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
+  import type { ITabSwitcherTab } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  let selectedIndex = 0;
+  let tabsList: ITabSwitcherTab[] = await abTabSwitcher.get(winId);
+
+  const renderer = new Renderer(renderTabs()).render('container');
+
+  abTabSwitcher.refresh((_event, tabs) => {
+    tabsList = tabs;
+    renderer.update(renderTabs());
+    updateFavicons();
+  });
+
+  function renderTabs(): VNode {
+    return h(
+      'div',
+      { class: c('fixed', 'inset-0', 'bg-black/70', 'flex', 'items-center', 'justify-center') },
+      h(
+        'div',
+        {
+          class: c(
+            'w-[400px]',
+            'bg-base-200',
+            'text-base-content',
+            'p-4',
+            'rounded-lg',
+            'shadow-xl',
+            'flex',
+            'flex-col',
+            'gap-2',
+            'menu',
+          ),
+        },
+        ...(tabsList.length > 0
+          ? tabsList.map((t, idx) =>
+              h(
+                'div',
+                {
+                  'data-tab-id': t.id.toString(),
+                  class: c(
+                    'ab-tab',
+                    'grid',
+                    'grid-cols-[20px_auto_20px]',
+                    'px-2',
+                    'pt-2',
+                    'pb-1',
+                    'gap-2',
+                    'items-start',
+                    'cursor-pointer',
+                    idx === selectedIndex ? 'menu-active rounded' : '',
+                  ),
+                  onmouseenter: () => {
+                    selectedIndex = idx;
+                    renderer.update(renderTabs());
+                  },
+                },
+                h('img', { class: c('w-5', 'h-5') }, ''),
+                h(
+                  'div',
+                  { class: c('flex', 'flex-col', 'w-full', 'min-w-0', '-mt-1.5') },
+                  h('span', { class: c('truncate', 'w-full') }, t.title),
+                  h('span', { class: c('text-[10px]', '-mt-1') }, t.desktopName || ''),
+                ),
+                h(
+                  'span',
+                  {
+                    class: c('w-4', 'h-4'),
+                    style: { backgroundColor: t.partitionColor || '#000' },
+                  },
+                  '',
+                ),
+              ),
+            )
+          : 'No tabs...'),
+      ),
+    );
+  }
+
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Control') {
+      event.preventDefault();
+
+      const selected = document.querySelectorAll('.ab-tab')[selectedIndex] as
+        | HTMLDivElement
+        | undefined;
+
+      if (selected) {
+        const tabId = parseInt(selected.dataset.tabId!, 10);
+        selectedIndex = 0;
+        abTabSwitcher.close(winId);
+        abCommands.perform(winId, 'select-tab', {
+          tabId,
+        });
+      } else {
+        selectedIndex = 0;
+        abTabSwitcher.close(winId);
+      }
+    }
+  }
+
+  function handleKeyDown(event: KeyboardEvent) {
+    const totalTabs = document.querySelectorAll('.ab-tab').length;
+    if (event.key === 'Tab' && event.ctrlKey && !event.shiftKey) {
+      event.preventDefault();
+      selectedIndex = (selectedIndex + 1) % totalTabs;
+      renderer.update(renderTabs());
+    } else if (event.key === 'Tab' && event.shiftKey && event.ctrlKey) {
+      event.preventDefault();
+      selectedIndex = (selectedIndex - 1 + totalTabs) % totalTabs;
+      renderer.update(renderTabs());
+    }
+  }
+
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keyup', handleKeyUp);
+
+  async function updateFavicons() {
+    for (const tab of tabsList) {
+      const favicon = await abFavicons.get(winId, tab.id);
+      const img = document.querySelector(
+        `.ab-tab[data-tab-id="${tab.id}"] img`,
+      ) as HTMLImageElement | null;
+      if (favicon && img) {
+        img.src = favicon;
+      } else if (img) {
+        img.src = '';
+      }
+    }
+  }
+</script>

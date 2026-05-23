@@ -1,0 +1,58 @@
+---
+import Layout from '#/layouts/Base.astro';
+---
+
+<Layout borderRadius="10px">
+  <div id="content"></div>
+</Layout>
+
+<script>
+  import { getSearchParams, Renderer, h, c } from '#/scripts';
+  import alert from '#/icons/alert.svg?raw';
+
+  const { searchParams } = getSearchParams();
+  const url = searchParams.get('url')!;
+  const error = searchParams.get('error')!;
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  new Renderer(
+    h(
+      'div',
+      {
+        class: c('bg-base-200', 'text-base-content', 'rounded-xl', 'fixed', 'inset-0'),
+      },
+      h(
+        'div',
+        {
+          class: c(
+            'max-w-6xl',
+            'mx-auto',
+            'flex',
+            'flex-col',
+            'items-center',
+            'justify-center',
+            'h-full',
+            'gap-4',
+          ),
+        },
+        h('div', {
+          innerHTML: alert,
+          class: c('w-30', 'h-30', 'text-error', '[&>svg]:w-full', '[&>svg]:h-full'),
+        }),
+        h('h6', { class: c('font-bold') }, 'Cannot Connect to the Website'),
+        h('p', {
+          class: c('w-full', 'px-10'),
+          innerHTML: `The certificate for url <i>${url}</i> is invalid. As a result, the connection between your browser and the server is not properly encrypted, which could allow an attacker to intercept or steal sensitive data. Error code: <strong>${error}</strong>.`,
+        }),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'btn-error'),
+            onclick: () => abTabs.trustCertificateError(tabId),
+          },
+          'I Understand the risks and choose to proceed anyway.',
+        ),
+      ),
+    ),
+  ).render('content');
+</script>

@@ -1,0 +1,81 @@
+---
+import Layout from '#/layouts/Base.astro';
+---
+
+<Layout>
+  <div class="fixed inset-0">
+    <div id="selectedTab" class="border-2 border-yellow-400 absolute rounded-[14px]"></div>
+    <div
+      id="no-tabs-info"
+      class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute right-1 bottom-1 select-none"
+    >
+      <p id="helpCommandsTool">Cmd/Ctrl + P to open the commands tool</p>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+  import { Rectangle } from 'electron';
+
+  const BORDER_WIDTH = 2;
+
+  const { winId, searchParams } = getSearchParams();
+  const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
+  const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
+  const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
+
+  const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
+  const areaMaximized = searchParams.get('areaMaximized') === 'true';
+
+  refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
+
+  abDesktops.getTheme(winId).then((theme) => {
+    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
+    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+    abWindow.readyToShow(winId);
+  });
+
+  abDesktops.onThemeRefresh((_e, theme) => {
+    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
+    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+  });
+
+  abWindow.onRefreshLayoutData((_e, data) => {
+    refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
+
+    if (data.hasVisibleTabs) {
+      helpCommandsTool.classList.add('hidden');
+    } else {
+      helpCommandsTool.classList.remove('hidden');
+    }
+
+    refreshSelectedTabBounds(data.selectedTabBounds);
+  });
+
+  function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
+    if (areaMaximized) {
+      noTabsInfo.style.left = '5px';
+      noTabsInfo.style.top = '5px';
+    } else if (sidebarCollapsed) {
+      noTabsInfo.style.left = '40px';
+      noTabsInfo.style.top = '34px';
+    } else {
+      noTabsInfo.style.left = '254px';
+      noTabsInfo.style.top = '34px';
+    }
+  }
+
+  function refreshSelectedTabBounds(bounds: Rectangle | null) {
+    if (!bounds) {
+      selectedTab.classList.add('hidden');
+      return;
+    }
+
+    selectedTab.classList.remove('hidden');
+    selectedTab.style.left = `${bounds.x - BORDER_WIDTH}px`;
+    selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
+    selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
+    selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
+  }
+</script>

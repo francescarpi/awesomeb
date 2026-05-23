@@ -1,0 +1,35 @@
+---
+import Base from './Base.astro';
+
+interface Props {
+  width?: string;
+  height?: string;
+}
+
+const { width, height } = Astro.props;
+---
+
+<Base>
+  <div class="fixed inset-0 flex justify-center items-center bg-black/70" id="modalBackdrop">
+    <div
+      class="bg-base-200 text-base-content px-6 py-4 rounded-lg shadow-xl relative"
+      style={`width: ${width ?? '400px'}; max-height: ${height ?? 'auto'}; height: ${height ?? 'auto'};`}
+      id="modal-content"
+    >
+      <slot />
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+  const { searchParams } = getSearchParams();
+
+  const position = searchParams.get('position');
+  const modalBackdrop = document.getElementById('modalBackdrop') as HTMLDivElement;
+  switch (position) {
+    case 'top':
+      modalBackdrop.classList.add('items-start', 'pt-9');
+      break;
+  }
+</script>

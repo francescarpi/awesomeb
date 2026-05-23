@@ -1,0 +1,48 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Desktop Theme</Title>
+  <ListWithSearch placeholder="Filter and select theme..." id="list" />
+</Modal>
+
+<script>
+  import { IDesktopEntity, IThemeEntity } from '~/types';
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+  const desktopId = searchParams.get('desktopId');
+
+  async function setup() {
+    // Fetch desktops
+    const desktopEntities = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
+
+    // Find selected desktop
+    const selectedDesktop = desktopId
+      ? desktopEntities.find((d: IDesktopEntity) => d.id === desktopId)!
+      : desktopEntities.find((d) => d.selected)!;
+
+    // Load themes for the selected desktop
+    listWithSearchManager('list', {
+      entity: 'themes',
+      onAccept: (item) => {
+        abCommands.perform(winId, 'desktop-theme', {
+          desktopId: parseInt(selectedDesktop.id, 10),
+          themeName: item.id,
+        });
+      },
+      onEscape: () => {
+        abModal.close(winId);
+      },
+      renderExtra: (item, el) => {
+        const entity = item as IThemeEntity;
+        const style = `background-image: linear-gradient(${entity.degrees}deg, ${entity.primary}, ${entity.secondary})`;
+        el.innerHTML = `<div class="w-[15px] h-[15px] bg-white" style="${style}"></div>`;
+      },
+    });
+  }
+  setup();
+</script>

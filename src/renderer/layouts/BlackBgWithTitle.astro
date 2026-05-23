@@ -1,0 +1,17 @@
+---
+import Base from './Base.astro';
+
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+<Base>
+  <div class="bg-base-200 text-base-content p-4 fixed inset-0">
+    <div class="max-w-6xl mx-auto overflow-y-auto h-full">
+      <h1 class="text-lg mb-10 opacity-30 border-b-2">{title}</h1>
+      <slot />
+    </div>
+  </div>
+</Base>

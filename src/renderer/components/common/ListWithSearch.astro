@@ -1,0 +1,30 @@
+---
+interface Props {
+  placeholder: string;
+  id: string;
+  className?: string;
+  oneColumn?: boolean;
+  title?: string;
+}
+
+const { placeholder, id, className, oneColumn, title } = Astro.props;
+---
+
+<div class={`h-full grid grid-rows-[40px_auto] gap-3 relative ${className}`} id={id}>
+  <input class="input input-sm w-full" placeholder={placeholder} autofocus />
+  {title && <h2 class="absolute left-0 bottom-6.25 text-[9px] px-2 w-full text-center">{title}</h2>}
+  <ul class="menu block overflow-y-auto mb-11 w-full">
+    <li>
+      <div>
+        <p>Empty...</p>
+      </div>
+    </li>
+  </ul>
+
+  <template id="row-template">
+    <li class={`grid ${oneColumn ? 'grid-cols-1' : 'grid-cols-2'}`}>
+      <p class="block truncate [&>mark]:text-info [&>mark]:bg-transparent"></p>
+      <small class={`justify-self-end text-right ${oneColumn ? 'hidden' : ''}`}></small>
+    </li>
+  </template>
+</div>

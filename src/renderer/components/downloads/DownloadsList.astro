@@ -1,0 +1,153 @@
+---
+interface Props {
+  isPage?: boolean;
+}
+const { isPage = false } = Astro.props;
+---
+
+<div id="downloads-list-root" data-is-page={isPage ? 'true' : 'false'}>
+  <div id="downloads-list-container"></div>
+</div>
+
+<script>
+  import { Renderer, h, c, type VNode, getSearchParams, btnIcon } from '#/scripts';
+  import { type IDownloads, EDownloadStatus, type IDownloadItem } from '~/types';
+  import Search from '#/icons/search.svg?raw';
+  import Pause from '#/icons/pause.svg?raw';
+  import Resume from '#/icons/resume.svg?raw';
+  import Cancel from '#/icons/cancel.svg?raw';
+
+  const root = document.getElementById('downloads-list-root')!;
+  const isPage = root.dataset.isPage === 'true';
+  const { winId } = getSearchParams();
+
+  const data = await abDownloads.get(winId);
+  const renderer = new Renderer(renderDownloads(data)).render('downloads-list-container');
+  abDownloads.onRefresh((_event, data) => renderer.update(renderDownloads(data)));
+
+  function renderDownloads(data: IDownloads): VNode {
+    const hasDownloads = data.items.length > 0;
+    const gridCols = isPage ? 'grid-cols-[auto_200px_60px_42px]' : 'grid-cols-[auto_56px_42px]';
+
+    return h(
+      'div',
+      { style: 'app-region: no-drag' },
+      h('div', { class: c(!hasDownloads ? 'block' : 'hidden') }, 'No downloads for this session'),
+      h(
+        'div',
+        { class: c(hasDownloads ? 'block' : 'hidden') },
+        ...(isPage
+          ? [
+              h(
+                'div',
+                { class: c('grid', gridCols, 'gap-2', 'text-xs', 'opacity-50', 'mb-1', 'px-1') },
+                h('span', null, 'Name'),
+                h('span', null, 'Date'),
+                h('span', { class: c('text-right') }, '%'),
+                h('span', null),
+              ),
+            ]
+          : []),
+        h(
+          'div',
+          { class: c('gap-2', 'grid', gridCols) },
+          ...data.items.flatMap((item) => {
+            const paused = item.status === EDownloadStatus.Paused;
+            const cancelled = item.status === EDownloadStatus.Cancelled;
+            const cells: (VNode | string)[] = [
+              h(
+                'div',
+                { class: c('truncate', paused && 'opacity-30', cancelled && 'line-through') },
+                item.fileName,
+              ),
+            ];
+
+            if (isPage) {
+              cells.push(
+                h(
+                  'div',
+                  { class: c('text-xs', 'opacity-70', paused && 'opacity-30') },
+                  new Date(item.created).toISOString(),
+                ),
+              );
+            }
+
+            const inProgress = item.status === EDownloadStatus.InProgress;
+            cells.push(
+              inProgress
+                ? h(
+                    'div',
+                    { class: c('flex', 'items-center', 'gap-1', 'justify-end') },
+                    h('span', { class: c('loading', 'loading-spinner', 'loading-xs') }),
+                    `${item.progress}%`,
+                  )
+                : h('div', { class: c('text-right', paused && 'opacity-30') }, `${item.progress}%`),
+              itemAction(item),
+            );
+
+            return cells;
+          }),
+        ),
+      ),
+      h(
+        'div',
+        { class: c('mt-4', 'flex', 'gap-2') },
+        ...(!isPage
+          ? [
+              h(
+                'button',
+                {
+                  class: c('btn', 'btn-sm', 'btn-outline'),
+                  onclick: () => abDownloads.openPage(winId),
+                },
+                'View All',
+              ),
+            ]
+          : []),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'btn-outline', !hasDownloads && 'hidden'),
+            onclick: () => abDownloads.clearCompleted(),
+          },
+          'Clear Completed',
+        ),
+      ),
+    );
+  }
+
+  function itemAction(item: IDownloadItem): VNode {
+    switch (item.status) {
+      case EDownloadStatus.InProgress:
+        return h(
+          'div',
+          { class: c('flex', 'gap-1') },
+          btnIcon(Pause, {
+            classNames: ['text-warning'],
+            onClick: () => abDownloads.action(item.savePath, 'pause', winId),
+          }),
+          btnIcon(Cancel, {
+            classNames: ['text-error'],
+            onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
+          }),
+        );
+      case EDownloadStatus.Completed:
+        return btnIcon(Search, { onClick: () => abDownloads.action(item.savePath, 'open', winId) });
+      case EDownloadStatus.Paused:
+        return h(
+          'div',
+          { class: c('flex', 'gap-1') },
+          btnIcon(Resume, {
+            classNames: ['text-base-content'],
+            onClick: () => abDownloads.action(item.savePath, 'resume', winId),
+          }),
+          btnIcon(Cancel, {
+            classNames: ['text-error'],
+            onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
+          }),
+        );
+      default:
+        return h('div', null, '');
+    }
+  }
+</script>

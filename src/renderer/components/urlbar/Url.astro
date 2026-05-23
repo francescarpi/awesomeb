@@ -1,0 +1,76 @@
+---
+
+---
+
+<div id="url-content" class="bg-white/10 rounded-lg w-full h-full pl-2"></div>
+
+<script>
+  import { Renderer, h, c, type VNode, getSearchParams } from '#/scripts';
+  import safe from '#/icons/safe.svg?raw';
+  import unsafe from '#/icons/unsafe.svg?raw';
+  import type { IURLTabData } from '~/types';
+
+  const { winId } = getSearchParams();
+  const data = await abUrlBar.get(winId);
+  const props: [boolean, boolean, string] = data
+    ? [data.loading, data.safe, data.url]
+    : [false, false, ''];
+  const renderer = new Renderer(renderBar(...props)).render('url-content');
+
+  abUrlBar.onRefresh((_event, data: IURLTabData) => {
+    renderer.update(renderBar(data.loading, data.safe, data.url));
+  });
+
+  function renderBar(loading: boolean, isSafe: boolean, url: string): VNode {
+    const hasUrl = url.trim().length > 0;
+    const showSafe = hasUrl && !loading && isSafe;
+    const showUnsafe = hasUrl && !loading && !isSafe;
+
+    return h(
+      'div',
+      { class: c('flex', 'gap-2', 'items-center', 'w-full', 'h-full') },
+      h('span', { class: c('loading', 'loading-spinner', 'loading-xs', !loading && 'hidden') }),
+      h('div', {
+        innerHTML: safe,
+        class: c(
+          'w-4',
+          'h-4',
+          '[&>svg]:w-full',
+          '[&>svg]:h-full',
+          'cursor-pointer',
+          'hover:bg-white/20',
+          'hover:rounded',
+          !showSafe && 'hidden',
+        ),
+        onclick: () => {
+          if (isSafe) {
+            abModal.open(winId, 'certificate-info');
+          }
+        },
+      }),
+      h('div', {
+        innerHTML: unsafe,
+        class: c(
+          'w-4',
+          'h-4',
+          '[&>svg]:w-full',
+          '[&>svg]:h-full',
+          'text-error',
+          !showUnsafe && 'hidden',
+        ),
+      }),
+      h('input', {
+        class: c('rounded-lg', 'text-sm', 'pr-2', 'cursor-pointer', 'w-full', 'outline-none'),
+        value: url,
+        readonly: true,
+        onclick: () => {
+          if (url.trim().length > 0) {
+            abModal.open(winId, 'edit-url');
+          } else {
+            abModal.open(winId, 'new-tab');
+          }
+        },
+      }),
+    );
+  }
+</script>

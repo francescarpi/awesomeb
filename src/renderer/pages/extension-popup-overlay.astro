@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base noDrag>
+  <div class="fixed inset-0" id="extension-popup-overlay"></div>
+</Base>
+
+<script>
+  import { onClick, getSearchParams } from '#/scripts';
+  const { winId } = getSearchParams();
+
+  onClick('extension-popup-overlay', () => {
+    abExtensions.closePopup(winId);
+  });
+</script>

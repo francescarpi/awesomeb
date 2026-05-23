@@ -1,0 +1,291 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="History">
+  <div id="content"></div>
+</BlackBgWithTitle>
+
+<script>
+  import { Renderer, h, c, type VNode } from '#/scripts';
+  import type { IHistoryItem } from '~/types';
+  import dayjs from 'dayjs';
+  import Search from '#/icons/search.svg?raw';
+
+  document.title = 'History';
+
+  let currentPage = 1;
+  let currentQuery = '';
+  let paginationInfo = { totalPages: 0, totalItems: 0, pageSize: 15, currentPage };
+  const selectedUrls = new Set<string>();
+  let currentItems: IHistoryItem[] = [];
+
+  const mainRenderer = new Renderer(h('div', null, 'Loading...')).render('content');
+  const headerActionsRenderer = new Renderer(h('div', null));
+  const tableRenderer = new Renderer(h('div', null));
+  const paginationRenderer = new Renderer(h('div', null));
+
+  mainRenderer.update(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h(
+        'div',
+        { class: c('flex', 'gap-2', 'items-center', 'mb-4') },
+        h(
+          'div',
+          { class: c('relative', 'w-full', 'mx-1') },
+          h('input', {
+            id: 'history-search-input',
+            type: 'text',
+            placeholder: 'Search history...',
+            class: c('input', 'input-sm', 'input-bordered', 'w-full', 'pl-8'),
+            onKeydown: (e) => {
+              if ((e as KeyboardEvent).key === 'Enter') {
+                currentQuery = (e.target as HTMLInputElement).value;
+                loadPage(1);
+              }
+            },
+          }),
+          h('div', {
+            class: c(
+              'absolute',
+              'left-2',
+              'top-3',
+              '-translate-y-1/2',
+              'w-[18px]',
+              'h-[18px]',
+              'text-base-content/50',
+            ),
+            innerHTML: Search,
+          }),
+        ),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'btn-ghost'),
+            onClick: () => {
+              const input = document.getElementById('history-search-input') as HTMLInputElement;
+              if (input) input.value = '';
+              currentQuery = '';
+              loadPage(1);
+            },
+          },
+          'Reset',
+        ),
+      ),
+      h('div', { id: 'header-actions', class: c('flex', 'gap-2', 'items-center', 'min-h-[2rem]') }),
+      h('div', { id: 'table' }),
+      h('div', { id: 'pagination', class: c('flex', 'justify-center', 'mt-4') }),
+    ),
+    {
+      onUpdated: async () => {
+        headerActionsRenderer.render('header-actions');
+        tableRenderer.render('table');
+        paginationRenderer.render('pagination');
+        await loadPage(1);
+      },
+    },
+  );
+
+  async function loadPage(page: number) {
+    currentPage = page;
+    const response = await abVisitHistory.get(currentPage, currentQuery);
+    paginationInfo = response.pagination;
+    currentItems = response.items;
+    renderHeaderActions();
+    renderTable(response.items);
+    renderPagination();
+  }
+
+  function renderHeaderActions() {
+    const buttons: VNode[] = [];
+
+    if (selectedUrls.size > 0) {
+      buttons.push(
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'btn-error'),
+            onClick: async () => {
+              if (window.confirm(`Delete ${selectedUrls.size} selected item(s)?`)) {
+                await abVisitHistory.deleteUrls([...selectedUrls]);
+                selectedUrls.clear();
+                loadPage(currentPage);
+              }
+            },
+          },
+          `Delete Selected (${selectedUrls.size})`,
+        ),
+      );
+    }
+
+    buttons.push(
+      h(
+        'button',
+        {
+          class: c('btn', 'btn-sm', 'btn-error', 'btn-outline'),
+          onClick: async () => {
+            if (window.confirm('Are you sure you want to clear all history?')) {
+              await abVisitHistory.deleteAll();
+              selectedUrls.clear();
+              loadPage(1);
+            }
+          },
+        },
+        'Clear History',
+      ),
+    );
+
+    headerActionsRenderer.update(
+      h('div', { class: c('flex', 'gap-2', 'items-center') }, ...buttons),
+    );
+  }
+
+  function renderTable(items: IHistoryItem[]) {
+    const allSelected = items.length > 0 && items.every((v) => selectedUrls.has(v.url));
+
+    tableRenderer.update(
+      h(
+        'table',
+        { class: c('table', 'w-full', 'table-fixed') },
+        h(
+          'thead',
+          null,
+          h(
+            'tr',
+            null,
+            h(
+              'th',
+              { class: c('w-12') },
+              h('input', {
+                type: 'checkbox',
+                class: c('checkbox', 'checkbox-sm'),
+                checked: allSelected,
+                onChange: (e) => {
+                  const checked = (e.target as HTMLInputElement).checked;
+                  items.forEach((item) => {
+                    if (checked) selectedUrls.add(item.url);
+                    else selectedUrls.delete(item.url);
+                  });
+                  renderHeaderActions();
+                  renderTable(items);
+                },
+              }),
+            ),
+            h('th', null, 'Title'),
+            h('th', null, 'URL'),
+            h('th', { class: c('w-40') }, 'Last Visit'),
+            h('th', { class: c('w-20', 'text-center') }, 'Visits'),
+            h('th', { class: c('w-20') }),
+          ),
+        ),
+        h(
+          'tbody',
+          null,
+          ...items.map((v) =>
+            h(
+              'tr',
+              null,
+              h(
+                'td',
+                null,
+                h('input', {
+                  type: 'checkbox',
+                  class: c('checkbox', 'checkbox-sm'),
+                  checked: selectedUrls.has(v.url),
+                  onChange: (e) => {
+                    const checked = (e.target as HTMLInputElement).checked;
+                    if (checked) selectedUrls.add(v.url);
+                    else selectedUrls.delete(v.url);
+                    renderHeaderActions();
+                    renderTable(items);
+                  },
+                }),
+              ),
+              h('td', { class: c('truncate'), title: v.title }, v.title),
+              h(
+                'td',
+                { class: c('truncate') },
+                h('a', { href: v.url, class: c('link'), title: v.url }, v.url),
+              ),
+              h('td', null, dayjs(v.lastVisitTime).format('YYYY-MM-DD HH:mm')),
+              h('td', { class: c('text-center') }, v.visitCount),
+              h('td', null),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  function getVisiblePages(current: number, total: number): (number | '...')[] {
+    const pages: (number | '...')[] = [];
+
+    pages.push(1);
+
+    const start = Math.max(2, current - 2);
+    const end = Math.min(total - 1, current + 2);
+
+    if (start > 2) pages.push('...');
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (end < total - 1) pages.push('...');
+
+    if (total > 1) pages.push(total);
+
+    return pages;
+  }
+
+  function renderPagination() {
+    const { currentPage: current, totalPages } = paginationInfo;
+    const visiblePages = getVisiblePages(current, totalPages);
+
+    const buttons: VNode[] = [];
+
+    // Previous
+    buttons.push(
+      h(
+        'button',
+        {
+          class: c('join-item', 'btn', 'btn-sm', current === 1 && 'btn-disabled'),
+          onClick: () => loadPage(current - 1),
+        },
+        '←',
+      ),
+    );
+
+    // Page numbers
+    visiblePages.forEach((page) => {
+      if (page === '...') {
+        buttons.push(
+          h('button', { class: c('join-item', 'btn', 'btn-sm', 'btn-disabled') }, '...'),
+        );
+      } else {
+        buttons.push(
+          h(
+            'button',
+            {
+              class: c('join-item', 'btn', 'btn-sm', page === current && 'btn-active'),
+              onClick: () => loadPage(page),
+            },
+            String(page),
+          ),
+        );
+      }
+    });
+
+    // Next
+    buttons.push(
+      h(
+        'button',
+        {
+          class: c('join-item', 'btn', 'btn-sm', current === totalPages && 'btn-disabled'),
+          onClick: () => loadPage(current + 1),
+        },
+        '→',
+      ),
+    );
+
+    paginationRenderer.update(h('div', { class: c('join') }, ...buttons));
+  }
+</script>

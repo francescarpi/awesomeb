@@ -1,0 +1,77 @@
+---
+import Layout from '#/layouts/Base.astro';
+---
+
+<Layout borderRadius="10px">
+  <div id="content"></div>
+</Layout>
+
+<script>
+  import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
+  import alert from '#/icons/alert.svg?raw';
+
+  const { searchParams } = getSearchParams();
+  const url = searchParams.get('url');
+  const code = searchParams.get('code');
+  const description = searchParams.get('description');
+  const tabId = parseInt(searchParams.get('tabId')!, 10);
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    confirmText: 'Retry',
+    onConfirm: () => {
+      abTabs.retryFailed(tabId);
+    },
+  });
+
+  new Renderer(
+    h(
+      'div',
+      {
+        class: c('bg-base-200', 'text-base-content', 'rounded-xl', 'fixed', 'inset-0'),
+      },
+      h(
+        'div',
+        {
+          class: c(
+            'max-w-6xl',
+            'mx-auto',
+            'flex',
+            'flex-col',
+            'items-center',
+            'justify-center',
+            'h-full',
+            'gap-4',
+          ),
+        },
+        h('div', {
+          innerHTML: alert,
+          class: c('w-30', 'h-30', 'text-error', '[&>svg]:w-full', '[&>svg]:h-full'),
+        }),
+        h('h6', { class: c('font-bold') }, 'Cannot Connect to the Website'),
+        h(
+          'p',
+          { class: c('w-full', 'truncate', 'text-center', 'px-10') },
+          'The page at ',
+          h('strong', null, url),
+          ' cannot be reached.',
+        ),
+        h(
+          'div',
+          {
+            class: c(
+              'bg-base-content/10',
+              'text-base-content',
+              'p-4',
+              'rounded',
+              'w-full',
+              'max-w-md',
+            ),
+          },
+          h('p', null, 'Error code: ', h('span', { class: 'code' }, code)),
+          h('p', null, 'Error: ', h('span', { class: 'description' }, description)),
+        ),
+        ...btns,
+      ),
+    ),
+  ).render('content', { onRendered: registerBtnsEvents });
+</script>

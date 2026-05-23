@@ -1,0 +1,42 @@
+---
+
+---
+
+<div id="settings-menu"></div>
+
+<script>
+  import { Renderer, h, c, type VNode, settingsMenuItems } from '#/scripts';
+
+  const renderer = new Renderer(renderMenu()).render('settings-menu');
+
+  function renderMenu(): VNode {
+    return h(
+      'ul',
+      {
+        class: c('menu', 'menu-horizontal', 'bg-white/10', 'rounded-box', 'w-full', 'mb-4'),
+      },
+      ...settingsMenuItems.map((item) =>
+        h(
+          'li',
+          null,
+          h(
+            'a',
+            {
+              onclick: () => handleNavItemClick(item.hash[0]),
+              class: c(item.hash.includes(window.location.hash) && 'menu-active'),
+            },
+            item.name,
+          ),
+        ),
+      ),
+    );
+  }
+
+  function handleNavItemClick(hash: string) {
+    window.history.pushState({}, '', hash);
+    renderer.update(renderMenu());
+    window.dispatchEvent(new CustomEvent('app:navigate'));
+  }
+
+  document.addEventListener('DOMContentLoaded', renderMenu);
+</script>

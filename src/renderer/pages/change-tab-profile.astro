@@ -1,0 +1,26 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Change Tab Profile</Title>
+  <ListWithSearch placeholder="Select new tab's profile..." id="list" />
+</Modal>
+
+<script>
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'partitions',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'change-tab-profile', { partitionId: item.id });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

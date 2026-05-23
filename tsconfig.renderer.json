@@ -1,0 +1,14 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+  "include": ["src/shared/**/*", "src/renderer/**/*", "src/preload/*.d.ts"],
+  "compilerOptions": {
+    "composite": true,
+    "moduleResolution": "bundler",
+    "types": ["chrome"],
+    "paths": {
+      "@/*": ["./src/main/*"],
+      "~/*": ["./src/shared/*"],
+      "#/*": ["./src/renderer/*"]
+    }
+  }
+}

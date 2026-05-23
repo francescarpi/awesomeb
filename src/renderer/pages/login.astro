@@ -1,0 +1,63 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Login</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+  const host = searchParams.get('host') as string;
+  const realm = searchParams.get('realm') as string;
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => performLogin(),
+    onCancel: () => performCancel(),
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-4') },
+      h('p', null, `The site (${host}) requires a username and password to continue.`),
+      h('p', { class: c(!realm || realm.trim() === '' ? 'hidden' : '') }, realm),
+      h('input', {
+        class: c('input', 'input-sm', 'w-full'),
+        placeholder: 'Username',
+        autofocus: true,
+        id: 'username',
+      }),
+      h('input', {
+        class: c('input', 'input-sm', 'w-full'),
+        placeholder: 'Password',
+        type: 'password',
+        id: 'password',
+      }),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', {
+    onRendered: registerBtnsEvents,
+  });
+
+  function performLogin() {
+    const usernameEl = document.getElementById('username') as HTMLInputElement;
+    const username = usernameEl.value.trim();
+
+    const passwordEl = document.getElementById('password') as HTMLInputElement;
+    const password = passwordEl.value;
+
+    if (username && password) {
+      abTabs.login(winId, tabId, { username, password });
+    }
+  }
+
+  function performCancel() {
+    abTabs.login(winId, tabId, null);
+  }
+</script>

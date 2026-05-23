@@ -1,0 +1,55 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal>
+  <Title>Rename Desktop</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
+  import { IDesktopEntity } from '~/types';
+
+  const { winId, searchParams } = getSearchParams();
+  const desktopId = searchParams.get('desktopId') as string;
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      const nameField = document.getElementById('name') as HTMLInputElement;
+      const nameValue = nameField.value.trim();
+
+      if (nameValue) {
+        abCommands.perform(winId, 'rename-desktop', {
+          desktopId: parseInt(selectedDesktop.id, 10),
+          name: nameValue,
+        });
+      }
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+  });
+
+  const desktopsEntities = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
+  const selectedDesktop = desktopId
+    ? desktopsEntities.find((d: IDesktopEntity) => d.id === desktopId)!
+    : desktopsEntities.find((d) => d.selected)!;
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      input('name', 'Desktop name', selectedDesktop.name || ''),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', {
+    onRendered: () => {
+      const name = document.getElementById('name') as HTMLInputElement;
+      name.focus();
+      name.select();
+      registerBtnsEvents();
+    },
+  });
+</script>

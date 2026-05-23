@@ -1,0 +1,27 @@
+---
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
+---
+
+<ButtonIcon icon="copy" />
+
+<script>
+  import { buttonManager } from '../../scripts/button-manager';
+  import { getSearchParams } from '../../scripts/url';
+  const { winId } = getSearchParams();
+
+  const { disable, enable } = buttonManager('copy', {
+    handleClick: () => {
+      abCommands.perform(winId, 'copy-url');
+    },
+  });
+
+  disable();
+
+  abUrlBar.onRefresh((_event, data) => {
+    if (data.url.trim().length === 0) {
+      disable();
+    } else {
+      enable();
+    }
+  });
+</script>

@@ -1,0 +1,105 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Title from '#/components/common/Title.astro';
+import Pagination from '#/components/common/Pagination.astro';
+---
+
+<Modal width="700px" height="600px">
+  <Title>New Tab</Title>
+  <div class="h-full">
+    <Pagination />
+    <ListWithSearch
+      placeholder="Enter a query or a valid url..."
+      oneColumn
+      id="query"
+      title="URL or Search Query"
+    />
+    <ListWithSearch placeholder="Select a profile..." id="partition" title="Profile" />
+    <ListWithSearch placeholder="Select a target" id="target" title="Target" />
+  </div>
+</Modal>
+
+<script>
+  import {
+    listWithSearchManager,
+    getSearchParams,
+    paginatorManager,
+    highlightString,
+  } from '#/scripts';
+  import { IPartitionEntity } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
+    'pagesIndicator',
+    ['query', 'partition', 'target'],
+  );
+
+  refreshPageVisibility();
+  refreshPageIndicator();
+
+  // ------------------------------------------------------
+  const { getSelected: getSearchEngine, inputEl: queryEl } = await listWithSearchManager('query', {
+    entity: 'searchEngines',
+    filtering: false,
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onAccept: () => handleSelect(),
+    onChange: async (inputValue, _entity, _inputEl, originalEntities) => {
+      const matches = await abVisitHistory.autocompleteUrls(inputValue);
+      return [
+        ...matches.map((item) => ({
+          id: item.value,
+          label: highlightString(item.value, item.range),
+        })),
+        ...originalEntities.map((item) => ({
+          id: item.id,
+          label:
+            inputValue.trim().length > 0 ? `${inputValue} - Search by ${item.label}` : item.label,
+        })),
+      ];
+    },
+  });
+
+  const { getSelected: getPartition } = await listWithSearchManager('partition', {
+    entity: 'partitions',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    renderExtra: (item, rowEl) => {
+      const entity = item as IPartitionEntity;
+      const style = `background-color: ${entity.color}`;
+      rowEl.innerHTML = `<div class="w-[15px] h-[15px] border" style="${style}"></div>`;
+    },
+    onAccept: () => handleSelect(),
+  });
+
+  const { getSelected: getTarget } = await listWithSearchManager('target', {
+    entity: 'targets',
+    onEscape: () => abModal.close(winId),
+    onTab: () => nextPage(),
+    onShiftTab: () => previousPage(),
+    onAccept: () => handleSelect(),
+  });
+
+  // ------------------------------------------------------
+  function handleSelect() {
+    if (queryEl.value.trim().length > 0) {
+      const partitionId = getPartition()!.id;
+      const searchEngine = getSearchEngine()!.id;
+      const targetId = getTarget()!.id;
+
+      const query = searchEngine.startsWith('http') ? searchEngine : queryEl.value;
+      const searchEngineCode = searchEngine.startsWith('http') ? '' : searchEngine;
+
+      abCommands.perform(winId, 'new-tab', {
+        query,
+        partitionId,
+        searchEngineCode,
+        targetId,
+      });
+    }
+  }
+</script>

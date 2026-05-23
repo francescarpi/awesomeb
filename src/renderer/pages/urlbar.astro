@@ -1,0 +1,20 @@
+---
+import Layout from '#/layouts/Base.astro';
+import Url from '#/components/urlbar/Url.astro';
+import IconMenu from '#/components/urlbar/IconMenu.astro';
+import CopyUrl from '#/components/urlbar/CopyUrl.astro';
+import Navigation from '#/components/urlbar/Navigation.astro';
+import Extensions from '#/components/urlbar/Extensions.astro';
+import SplitMenu from '#/components/urlbar/SplitMenu.astro';
+---
+
+<Layout>
+  <div class="flex items-center gap-2 w-full h-full">
+    <Navigation />
+    <Url />
+    <CopyUrl />
+    <SplitMenu />
+    <Extensions />
+    <IconMenu />
+  </div>
+</Layout>

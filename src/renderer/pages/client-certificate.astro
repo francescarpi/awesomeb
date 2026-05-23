@@ -1,0 +1,47 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="500px">
+  <Title>Choose a client certficiate</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+  const { winId, searchParams } = getSearchParams();
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
+  const url = searchParams.get('url') as string;
+  const rawCertificates = searchParams.get('certificates') as string;
+  const certificates = rawCertificates.split(',').map((cert) => {
+    const [fingerprint, subject] = cert.split('|');
+    return { fingerprint, subject };
+  });
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      const select = document.getElementById('cert-select') as HTMLSelectElement;
+      abTabs.clientCertificate(winId, tabId, select.value);
+    },
+    onCancel: () => {
+      abTabs.clientCertificate(winId, tabId, null);
+    },
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h('p', {
+        innerHTML: `Site <i>${url}</i> is requesting a client certificate for authentication. Please choose a certificate to proceed.`,
+      }),
+      h(
+        'select',
+        { class: c('select', 'select-sm', 'w-full', 'autofocus'), id: 'cert-select' },
+        ...certificates.map((cert) => h('option', { value: cert.fingerprint }, cert.subject)),
+      ),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', { onRendered: registerBtnsEvents });
+</script>

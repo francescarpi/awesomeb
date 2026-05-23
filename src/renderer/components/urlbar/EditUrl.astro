@@ -1,0 +1,27 @@
+---
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
+---
+
+<ButtonIcon icon="edit" />
+
+<script>
+  import { buttonManager } from '../../scripts/button-manager';
+  import { getSearchParams } from '../../scripts/url';
+  const { winId } = getSearchParams();
+
+  const { disable, enable } = buttonManager('edit', {
+    handleClick: () => {
+      abModal.open(winId, 'edit-url');
+    },
+  });
+
+  disable();
+
+  abUrlBar.onRefresh((_event, data) => {
+    if (data.url.trim().length === 0) {
+      disable();
+    } else {
+      enable();
+    }
+  });
+</script>

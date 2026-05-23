@@ -1,0 +1,36 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import Menu from '#/components/settings/Menu.astro';
+import '@thednp/color-picker/color-picker.css';
+---
+
+<BlackBgWithTitle title="Settings">
+  <Menu />
+  <div id="settingsPageContent"></div>
+</BlackBgWithTitle>
+
+<script>
+  import { settingsMenuItems } from '#/scripts';
+
+  document.title = 'Settings';
+
+  async function renderContent() {
+    const config = await abConfig.get();
+    const menuItem = settingsMenuItems.find((item) => item.hash.includes(window.location.hash));
+    if (menuItem) {
+      const { renderer, callback } = await menuItem.rendererFnc(config);
+      renderer.render('settingsPageContent', { replace: true, onRendered: callback });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', renderContent);
+  window.addEventListener('app:navigate', renderContent);
+</script>
+
+<style is:global>
+  .color-dropdown.picker {
+    left: auto;
+    right: 0;
+    --dropdown-bg: #000;
+  }
+</style>

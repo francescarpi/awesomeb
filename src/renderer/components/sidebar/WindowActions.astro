@@ -1,0 +1,33 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<div class="gap-1 flex">
+  <Icon name="close" id="close" />
+  <Icon name="down" id="minimize" />
+  <Icon name="up" id="maximize" />
+</div>
+
+<script>
+  import { getSearchParams } from '../../scripts/url';
+  import { onClick } from '../../scripts/buttons';
+
+  const { winId } = getSearchParams();
+
+  onClick('close', () => abCommands.perform(winId, 'close-window'));
+  onClick('minimize', () => abCommands.perform(winId, 'minimize-window'));
+  onClick('maximize', () => abCommands.perform(winId, 'maximize-window'));
+</script>
+
+<style>
+  svg {
+    cursor: pointer;
+    color: white;
+    app-region: no-drag;
+  }
+
+  svg:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+</style>

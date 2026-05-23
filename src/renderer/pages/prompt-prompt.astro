@@ -1,0 +1,49 @@
+---
+import Modal from '#/layouts/Modal.astro';
+---
+
+<Modal>
+  <div id="container"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, getSearchParams, confirmButtons, input } from '#/scripts';
+
+  const { searchParams, winId } = getSearchParams();
+
+  const message = searchParams.get('message') as string;
+  const url = new URL(searchParams.get('url') as string);
+  const defaultValue = searchParams.get('defaultValue');
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      abPrompts.response(
+        winId,
+        (document.getElementById('prompt-input') as HTMLInputElement).value,
+      );
+    },
+    onCancel: () => abPrompts.response(winId, null),
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { classs: c('flex', 'flex-col', 'gap-3') },
+      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h(
+        'fieldset',
+        { class: c('fieldset', 'mb-6') },
+        h('legend', { class: c('fieldset-legend') }, message),
+        input('prompt-input', '', defaultValue || ''),
+      ),
+      h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
+    ),
+  ).render('container', {
+    onRendered: () => {
+      const input = document.getElementById('prompt-input') as HTMLInputElement;
+      input.focus();
+      input.select();
+      registerBtnsEvents();
+    },
+  });
+</script>

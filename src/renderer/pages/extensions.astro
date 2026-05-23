@@ -1,0 +1,97 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Extensions">
+  <div id="content"></div>
+  <div id="extensions" class="mt-4"></div>
+</BlackBgWithTitle>
+
+<script>
+  import { h, c, Renderer } from '#/scripts';
+  import { IExtension } from '~/types';
+
+  // Initial loading state...
+  const infoRenderer = new Renderer(
+    h('div', null, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
+  ).render('content');
+
+  const resp = await abExtensions.get();
+
+  // Update the info section with instructions and refresh button
+  infoRenderer.update(
+    h(
+      'div',
+      { class: c('flex', 'gap-2') },
+      h('p', {
+        innerHTML: `AwesomeB offers limited support for Chrome extensions. At this time, installation must be done manually: place your extensions in the following directory (<i>${resp.path}</i>) and then click the Refresh Extensions button.`,
+      }),
+      h(
+        'button',
+        {
+          class: c('btn', 'btn-primary', 'btn-sm'),
+          onclick: async () => {
+            const resp = await abExtensions.refresh();
+            renderExtensions(resp.extensions);
+          },
+        },
+        'Refresh Extensions',
+      ),
+    ),
+  );
+
+  // Render the list of extensions
+  const extensionsRenderer = new Renderer(h('div', null, '')).render('extensions');
+  renderExtensions(resp.extensions);
+
+  function renderExtensions(extensions: IExtension[]) {
+    if (extensions.length === 0) {
+      extensionsRenderer.update(h('p', null, 'No extensions found.'));
+      return;
+    }
+
+    const container = h(
+      'div',
+      { class: c('grid', 'grid-cols-2', 'gap-2') },
+      ...extensions.map((ext) => {
+        const header = h(
+          'div',
+          { class: c('grid', 'grid-cols-[30px_1fr_40px]') },
+          ext.icon
+            ? h('img', { src: ext.icon, class: c('w-6', 'h-6') })
+            : h('div', { class: c('w-6', 'h-6', 'bg-white/20', 'rounded') }),
+          h('span', null, ext.manifest.name),
+          h('input', {
+            type: 'checkbox',
+            checked: ext.enabled,
+            class: c('toggle'),
+            onchange: async () => {
+              await abExtensions.toggle(ext.id);
+            },
+          }),
+        );
+
+        const descp = h(
+          'p',
+          { class: c('text-sm', 'text-gray-400', 'mt-1') },
+          ext.manifest.description || 'No description',
+        );
+
+        const footer = h(
+          'div',
+          { class: c('flex', 'gap-2', 'mt-3') },
+          h(
+            'span',
+            { class: c('text-xs', 'text-gray-500', 'w-full') },
+            `Version: ${ext.manifest.version}`,
+          ),
+          h('span', { class: c('text-xs', 'text-gray-500', 'w-full') }, `ID: ${ext.id}`),
+        );
+
+        return h('div', { class: c('bg-white/10', 'p-2', 'rounded') }, header, descp, footer);
+      }),
+    );
+
+    extensionsRenderer.update(container);
+  }
+</script>

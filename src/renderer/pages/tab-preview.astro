@@ -1,0 +1,30 @@
+---
+import Base from '#/layouts/Base.astro';
+import ButtonIcon from '#/components/common/ButtonIcon.astro';
+---
+
+<Base>
+  <div class="fixed inset-0 bg-black/70 rounded-xl p-4 flex gap-2">
+    <div
+      class="w-full border border-white rounded-xl flex justify-center items-center animate-pulse"
+    >
+      Loading site...
+    </div>
+    <div class="flex flex-col gap-1 justify-start items-center">
+      <ButtonIcon icon="close" />
+      <ButtonIcon icon="maximize" />
+      <ButtonIcon icon="split" />
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { onClick, getSearchParams } from '#/scripts';
+
+  const { searchParams } = getSearchParams();
+  const parentTabId = parseInt(searchParams.get('tabId')!, 10);
+
+  onClick('close', () => abTabs.tabPreviewAction(parentTabId, 'close'));
+  onClick('maximize', () => abTabs.tabPreviewAction(parentTabId, 'accept'));
+  onClick('split', () => abTabs.tabPreviewAction(parentTabId, 'split'));
+</script>

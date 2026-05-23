@@ -1,0 +1,53 @@
+---
+
+---
+
+<div id="extensions"></div>
+
+<script>
+  import { IExtension } from '~/types';
+  import { getSearchParams, Renderer, h, c } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  const renderer = new Renderer(renderExtensions([])).render('extensions');
+
+  abExtensions.onRefresh((_event, extensions) => renderer.update(renderExtensions(extensions)));
+
+  function renderExtensions(extensions: IExtension[]) {
+    if (extensions.length === 0) {
+      return h('div', {}, '');
+    }
+
+    return h(
+      'div',
+      { class: c('flex', 'gap-2', 'min-w-6', 'w-max') },
+      ...extensions.map((extension) =>
+        h('img', {
+          src: extension.icon,
+          class: c(
+            'w-5',
+            'h-5',
+            'rounded',
+            'object-cover',
+            'cursor-pointer',
+            'p-0.5',
+            'border',
+            'border-black/30',
+            'bg-white/80',
+            'hover:bg-white',
+          ),
+          style: 'app-region: no-drag;',
+          onclick: (e) => {
+            const img = e.target as HTMLImageElement;
+            const bounds = img.getBoundingClientRect();
+
+            const y = Math.round(bounds.top);
+            const x = Math.round(bounds.left);
+            abExtensions.openPopup(winId, extension.id, x, y);
+          },
+        }),
+      ),
+    );
+  }
+</script>

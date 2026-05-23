@@ -1,0 +1,8 @@
+dist-electron/
+release
+dist
+.astro
+node_modules
+.DS_Store
+.claude
+.atl

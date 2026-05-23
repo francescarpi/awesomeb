@@ -1,0 +1,14 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+import DownloadsList from '#/components/downloads/DownloadsList.astro';
+---
+
+<BlackBgWithTitle title="Downloads">
+  <div class="pr-1">
+    <DownloadsList isPage />
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  document.title = 'Downloads';
+</script>

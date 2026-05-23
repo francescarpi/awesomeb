@@ -1,0 +1,26 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="400px" height="500px">
+  <Title>Remove a divider from a tab container</Title>
+  <ListWithSearch placeholder="Filter and select a tab container..." id="list" />
+</Modal>
+
+<script>
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'tabContainers',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'remove-divider', { tabContainerId: parseInt(item.id, 10) });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

@@ -1,0 +1,79 @@
+---
+import ButtonIcon from '../../components/common/ButtonIcon.astro';
+---
+
+<div class="flex items-center gap-2">
+  <ButtonIcon icon="back" />
+  <ButtonIcon icon="forward" />
+  <ButtonIcon icon="reload" />
+  <ButtonIcon icon="close" />
+</div>
+
+<script>
+  import { buttonManager } from '../../scripts/button-manager';
+  import { ITabNavigation } from '~/types';
+  import { getSearchParams } from '../../scripts/url';
+  const { winId } = getSearchParams();
+
+  const { disable: disableBack, enable: enableBack } = buttonManager('back', {
+    handleClick: () => {
+      abCommands.perform(winId, 'go-back');
+    },
+  });
+
+  const { disable: disableForward, enable: enableForward } = buttonManager('forward', {
+    handleClick: () => {
+      abCommands.perform(winId, 'go-forward');
+    },
+  });
+
+  const {
+    show: showReload,
+    hide: hideReload,
+    disable: disableReload,
+    enable: enableReload,
+  } = buttonManager('reload', {
+    handleClick: () => {
+      abCommands.perform(winId, 'reload-tab');
+    },
+  });
+
+  const { show: showClose, hide: hideClose } = buttonManager('close', {
+    handleClick: () => {
+      abCommands.perform(winId, 'stop-tab');
+    },
+  });
+
+  disableBack();
+  disableForward();
+  hideClose();
+  disableReload();
+
+  abUrlBar.onTabNavigationRefresh((_event, data: ITabNavigation) => {
+    if (data.canGoBack) {
+      enableBack();
+    } else {
+      disableBack();
+    }
+
+    if (data.canGoForward) {
+      enableForward();
+    } else {
+      disableForward();
+    }
+
+    if (data.loading) {
+      hideReload();
+      showClose();
+    } else {
+      showReload();
+      hideClose();
+    }
+
+    if (data.hasURL) {
+      enableReload();
+    } else {
+      disableReload();
+    }
+  });
+</script>

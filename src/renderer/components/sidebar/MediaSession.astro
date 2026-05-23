@@ -1,0 +1,117 @@
+---
+
+---
+
+<div id="mediasession-content"></div>
+
+<script>
+  import { Renderer, c, h, btnIcon, getSearchParams, type VNode, animateString } from '#/scripts';
+  import Pause from '#/icons/pause.svg?raw';
+  import Muted from '#/icons/muted.svg?raw';
+  import Unmuted from '#/icons/unmuted.svg?raw';
+  import Play from '#/icons/play.svg?raw';
+  import type { ITabMediaSessionInfo } from '~/types';
+
+  const { winId } = getSearchParams();
+  let cleanupAnimation: (() => void) | null = null;
+
+  const animateTitle = () => {
+    if (cleanupAnimation) {
+      cleanupAnimation();
+    }
+
+    const title = document.getElementById('tabinfo-title');
+    if (title) {
+      cleanupAnimation = animateString(title);
+    }
+  };
+
+  const data = await abWindow.getMediaSession(winId);
+
+  const renderer = new Renderer(renderMediaSession(data)).render('mediasession-content', {
+    onRendered: animateTitle,
+  });
+
+  abWindow.onRefreshMediaSession((_event, tabInfo) => {
+    renderer.update(renderMediaSession(tabInfo), { onUpdated: animateTitle });
+  });
+
+  function renderMediaSession(tabInfo: ITabMediaSessionInfo | null): VNode {
+    if (!tabInfo) {
+      return h('div', null);
+    }
+
+    return h(
+      'div',
+      {
+        class: c('bg-white/30', 'rounded', 'mx-2', 'flex', 'flex-col', 'gap-1'),
+      },
+      h(
+        'div',
+        {
+          class: c(
+            'flex',
+            'gap-2',
+            'items-center',
+            'select-none',
+            'justify-between',
+            'flex-col',
+            'sidebar:flex-row',
+            'sidebar:border-b',
+            'border-white/20',
+            'sidebar:px-2',
+            'py-1',
+          ),
+          style: 'app-region: no-drag',
+        },
+        h('img', {
+          src: tabInfo.favicon,
+          class: c('w-4', 'h-4', 'hover:opacity-70', 'cursor-pointer'),
+          onclick: () => {
+            abCommands.perform(winId, 'select-tab', { tabId: tabInfo.tabId });
+          },
+        }),
+        btnIcon(Pause, {
+          classNames: ['text-white', tabInfo.state === 'playing' ? '' : 'hidden'],
+          size: 5,
+          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'pause'),
+        }),
+        btnIcon(Play, {
+          classNames: ['text-white', tabInfo.state === 'paused' ? '' : 'hidden'],
+          size: 5,
+          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'play'),
+        }),
+        btnIcon(Unmuted, {
+          classNames: ['text-white', tabInfo.volume > 0 ? '' : 'hidden'],
+          size: 5,
+          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'mute'),
+        }),
+        btnIcon(Muted, {
+          classNames: ['text-white', tabInfo.volume === 0 ? '' : 'hidden'],
+          size: 5,
+          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'unmute'),
+        }),
+      ),
+      h(
+        'div',
+        {
+          class: c('hidden', 'flex-col', 'sidebar:flex', 'px-2', 'pb-1'),
+        },
+        h(
+          'div',
+          { class: c('overflow-hidden') },
+          h(
+            'span',
+            { class: c('text-sm', 'inline-block', 'whitespace-nowrap'), id: 'tabinfo-title' },
+            tabInfo.title,
+          ),
+        ),
+        h(
+          'p',
+          { class: c('text-xs', 'truncate') },
+          `${tabInfo.album ? tabInfo.album + '-' : ''}${tabInfo.artist}`,
+        ),
+      ),
+    );
+  }
+</script>

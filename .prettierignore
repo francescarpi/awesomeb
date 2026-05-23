@@ -1,0 +1,22 @@
+# Ignore artifacts:
+dist
+build
+.astro/
+.cache/
+
+# Ignore logs:
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignore dependencies:
+node_modules/
+
+# Ignore IDE files:
+.vscode/
+.idea/
+
+# Ignore system files:
+.DS_Store
+Thumbs.db

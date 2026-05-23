@@ -1,0 +1,193 @@
+---
+
+---
+
+<div id="desktops"></div>
+
+<script>
+  import { type IVisibleDesktops } from '~/types';
+  import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
+  import Left from '#/icons/left.svg?raw';
+  import Right from '#/icons/right.svg?raw';
+
+  const { winId } = getSearchParams();
+
+  // Load and render desktops on initialization
+  const desktops = await abDesktops.getVisible(winId);
+  const renderer = new Renderer(renderDesktops(desktops)).render('desktops');
+
+  // Subscribe to desktop updates
+  abDesktops.onRefresh((_event, desktops) => renderer.update(renderDesktops(desktops)));
+
+  // Navigate desktops on horizontal scroll (throttled)
+  let lastScroll = 0;
+  document.getElementById('desktops')!.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    if (now - lastScroll < 300) return;
+    if (e.deltaX > 0) {
+      lastScroll = now;
+      abCommands.perform(winId, 'next-desktop');
+    } else if (e.deltaX < 0) {
+      lastScroll = now;
+      abCommands.perform(winId, 'previous-desktop');
+    }
+  });
+
+  /**
+   * Renders the list of desktops in the UI
+   * @param desktops - Array of desktop entities to render
+   */
+  function renderDesktops(visibleDesktops: IVisibleDesktops): VNode {
+    return h(
+      'div',
+      { class: c('flex', 'items-center', 'justify-between', 'gap-2') },
+      ...visibleDesktops.desktops.map((desktop, index) => {
+        const isFirst = index === 0;
+        const isLast = index === visibleDesktops.desktops.length - 1;
+
+        return h(
+          'div',
+          {
+            class: c(
+              'group',
+              'relative',
+              'hidden',
+              'sidebar:block',
+              '[.selected]:block',
+              desktop.selected && 'selected',
+            ),
+          },
+          h(
+            'div',
+            {
+              class: c(
+                'border',
+                'rounded-full',
+                'relative',
+                'sidebar:w-9',
+                'sidebar:h-9',
+                'sidebar:text-sm',
+                'w-7',
+                'h-7',
+                'text-xs',
+                'cursor-pointer',
+                'sidebar:flex',
+                'items-center',
+                'justify-center',
+                'flex',
+                'select-none',
+                desktop.selected && 'bg-white/20',
+              ),
+              style: 'app-region: no-drag;',
+              onclick: () => abDesktops.select(winId, desktop.id),
+              ondblclick: () => abModal.open(winId, 'rename-desktop'),
+              oncontextmenu: () =>
+                abMenu.contextMenu(winId, 'desktop', {
+                  desktopId: desktop.id,
+                }),
+            },
+            desktop.id,
+            h(
+              'div',
+              {
+                class: c(
+                  'absolute',
+                  'left-0',
+                  'inset-y-0',
+                  'sidebar:flex',
+                  'hidden',
+                  'items-center',
+                  'w-4',
+                  'text-white',
+                  'pointer-events-none',
+                  '[&>svg]:w-full',
+                  '[&>svg]:h-full',
+                  !(isFirst && visibleDesktops.hasLess) && 'sidebar:hidden',
+                ),
+                innerHTML: Left,
+              },
+              '',
+            ),
+            h(
+              'div',
+              {
+                class: c(
+                  'absolute',
+                  'right-0',
+                  'inset-y-0',
+                  'sidebar:flex',
+                  'hidden',
+                  'items-center',
+                  'w-4',
+                  'text-white',
+                  'pointer-events-none',
+                  '[&>svg]:w-full',
+                  '[&>svg]:h-full',
+                  !(isLast && visibleDesktops.hasMore) && 'sidebar:hidden',
+                ),
+                innerHTML: Right,
+              },
+              '',
+            ),
+            h(
+              'div',
+              {
+                class: c(
+                  'w-[3px]',
+                  'h-[3px]',
+                  'rounded-full',
+                  'absolute',
+                  'bottom-1',
+                  'left-1/2',
+                  '-translate-x-1/2',
+                  desktop.hasTabs && desktop.hasActiveTabs && 'bg-white',
+                  desktop.hasTabs && !desktop.hasActiveTabs && 'bg-white/20',
+                ),
+              },
+              '',
+            ),
+            h('div', {
+              class: c(
+                'status',
+                'status-error',
+                'status-lg',
+                'animate-ping',
+                'absolute',
+                '-right-0.5',
+                '-top-0.5',
+                desktop.requireAttention ? 'block' : 'hidden',
+              ),
+            }),
+            h('div', {
+              class: c(
+                'status',
+                'status-error',
+                'absolute',
+                'right-0',
+                'top-0',
+                desktop.requireAttention ? 'block' : 'hidden',
+              ),
+            }),
+          ),
+          h(
+            'div',
+            {
+              class: c(
+                'text-[10px]',
+                'absolute',
+                'mt-1',
+                'whitespace-nowrap',
+                'left-1/2',
+                '-translate-x-1/2',
+                'sidebar:hidden',
+                'sidebar:group-[.selected]:block',
+                'sidebar:group-hover:block',
+              ),
+            },
+            desktop.name || '',
+          ),
+        );
+      }),
+    );
+  }
+</script>

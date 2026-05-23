@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+
+@theme {
+  --breakpoint-sidebar: 100px;
+}
+
+@plugin "daisyui" {
+  themes: all;
+}
+
+:root {
+  background: transparent;
+}
+
+#sidebarContainer.dragable {
+  app-region: drag;
+}

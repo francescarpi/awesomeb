@@ -1,0 +1,76 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="600px" height="auto">
+  <Title>Add Bookmark</Title>
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+
+  const title = searchParams.get('title') as string;
+  const url = searchParams.get('url') as string;
+  const parentId = searchParams.get('parentId') as string;
+  const parentName = searchParams.get('parentName') as string;
+  const createFolder = (searchParams.get('createFolder') as string) === 'true';
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      const folderNameInput = document.getElementById('folder-name') as HTMLInputElement;
+      const titleInput = document.getElementById('title') as HTMLInputElement;
+      const urlInput = document.getElementById('url') as HTMLInputElement;
+
+      const titleValue = titleInput.value.trim();
+      const urlValue = urlInput.value.trim();
+
+      if (createFolder) {
+        const folderNameValue = folderNameInput.value.trim();
+        if (titleValue && urlValue && folderNameValue) {
+          abBookmarks.add(winId, parentId, titleValue, urlValue, folderNameValue);
+        }
+      } else {
+        if (titleValue && urlValue) {
+          abBookmarks.add(winId, parentId, titleValue, urlValue, null);
+        }
+      }
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h(
+        'div',
+        { class: c('flex', 'flex-col', 'gap-2') },
+        h('span', { class: c('text-sm') }, `Parent folder: ${parentName}`),
+        input('folder-name', 'Folder name', '', { visible: createFolder }),
+        input('title', 'Title', title),
+        input('url', 'URL', url),
+      ),
+      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+    ),
+  ).render('content', {
+    onRendered: () => {
+      const folderNameInput = document.getElementById('folder-name') as HTMLInputElement;
+      const titleInput = document.getElementById('title') as HTMLInputElement;
+
+      if (createFolder) {
+        folderNameInput.focus();
+      } else {
+        titleInput.focus();
+        titleInput.select();
+      }
+
+      registerBtnsEvents();
+    },
+  });
+</script>
