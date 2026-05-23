@@ -30,8 +30,8 @@ const electronMainConfig = {
       minify: MINIFY ? 'esbuild' : false,
       outDir: 'dist-electron/main',
       rollupOptions: {
-        external: ['@electron-webauthn/macos']
-      }
+        external: ['@electron-webauthn/macos'],
+      },
     },
     plugins: [
       // Copy icons for the main process
@@ -40,7 +40,7 @@ const electronMainConfig = {
           {
             src: './src/main/assets/icons',
             dest: './assets/icons',
-            rename: { stripBase: true }
+            rename: { stripBase: true },
           },
         ],
       }),
@@ -74,7 +74,7 @@ const electronPreloadConfig = {
 };
 
 // Configuration for the Electron preload
-const electronRendererConfig = {}
+const electronRendererConfig = {};
 
 export default defineConfig({
   // === INTEGRATIONS ===
@@ -103,9 +103,7 @@ export default defineConfig({
 
   // === VITE CONFIG ===
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
     resolve: {
       alias: rendererAliases,
     },
