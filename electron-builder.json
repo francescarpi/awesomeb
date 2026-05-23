@@ -31,10 +31,7 @@
   "protocols": [
     {
       "name": "HyperText Transfer Protocol",
-      "schemes": [
-        "http",
-        "https"
-      ]
+      "schemes": ["http", "https"]
     }
   ],
   "fileAssociations": [
