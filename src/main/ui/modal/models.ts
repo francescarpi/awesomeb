@@ -1,5 +1,3 @@
-import path from 'path';
-import { PRELOAD_FOLDER } from '@/paths';
 import { BrowserWindow } from 'electron';
 import { UIWindow } from '../window';
 import { IContextualModalParams, TPage } from '~/types';
@@ -35,7 +33,6 @@ export class UIModal {
       movable: false,
       show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'browser.preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -92,7 +89,7 @@ export class UIModal {
 
 export class UIContextualModal extends UIPageView {
   constructor(win: UIWindow, page: TPage, props: IContextualModalParams) {
-    super('contextual-modal', 'browser', {
+    super('contextual-modal', {
       page,
       query: {
         winId: win.winId.toString(),

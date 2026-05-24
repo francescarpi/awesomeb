@@ -5,7 +5,7 @@ import { type HandlerDetails } from 'electron';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
-    super('extension-popup-overlay', 'browser', {
+    super('extension-popup-overlay', {
       query: { winId: winId.toString() },
     });
   }
@@ -29,7 +29,7 @@ export class ExtensionPopup extends UIView {
     private readonly x: number,
     private readonly y: number,
   ) {
-    super('extension-popup', 'extension', {
+    super('extension-popup', {
       session: partition.ses,
       backgroundColor: '#fff',
       visible: false,

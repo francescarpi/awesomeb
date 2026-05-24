@@ -18,6 +18,7 @@ import type {
   IExtensions,
   IVisibleDesktops,
   IDebugWebContent,
+  TWindowId,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -36,7 +37,7 @@ import {
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
-import { type WebContentsView } from 'electron';
+import { type WebContentsView, type WebContents } from 'electron';
 import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
 
 export class BrowserRenderer {
@@ -368,36 +369,26 @@ export class BrowserRenderer {
   }
 
   debugWebContents(): IDebugWebContent[] {
-    const result: IDebugWebContent[] = [];
+    const webContents: { wc: WebContents; winId: TWindowId; visible: boolean }[] = [];
 
     for (const win of this._browser.windows) {
-      result.push({
-        winId: win.id,
-        url: win.bw.webContents.getURL(),
-        title: win.bw.webContents.getTitle(),
-        OSpid: win.bw.webContents.getOSProcessId(),
-        pid: win.bw.webContents.getProcessId(),
-        visible: true,
-        ...webContentsMemoryAndCPU(win.bw.webContents),
-        preloads: win.bw.webContents.session.getPreloadScripts().map((p) => p.filePath),
-        partition: getPartitionInfo(win.bw.webContents.session),
-      });
+      webContents.push({ winId: win.id, wc: win.bw.webContents, visible: true });
 
       const views = win.bw.getContentView().children as WebContentsView[];
       for (const view of views) {
-        result.push({
-          winId: win.id,
-          url: view.webContents.getURL(),
-          title: view.webContents.getTitle(),
-          OSpid: view.webContents.getOSProcessId(),
-          pid: view.webContents.getProcessId(),
-          visible: view.getVisible(),
-          ...webContentsMemoryAndCPU(view.webContents),
-          preloads: view.webContents.session.getPreloadScripts().map((p) => p.filePath),
-          partition: getPartitionInfo(view.webContents.session),
-        });
+        webContents.push({ winId: win.id, wc: view.webContents, visible: view.getVisible() });
       }
     }
-    return result;
+
+    return webContents.map((row) => ({
+      winId: row.winId,
+      url: row.wc.getURL(),
+      title: row.wc.getTitle(),
+      pid: row.wc.getOSProcessId(),
+      visible: row.visible,
+      preloads: row.wc.session.getPreloadScripts().map((p) => p.filePath),
+      partition: getPartitionInfo(row.wc.session),
+      ...webContentsMemoryAndCPU(row.wc),
+    }));
   }
 }

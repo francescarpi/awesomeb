@@ -10,7 +10,7 @@ export class URLInfoView extends UIPageView {
     private readonly tab: Tab,
     url: string,
   ) {
-    super(`tab-${tab.id}#url-info`, 'browser', {
+    super(`tab-${tab.id}#url-info`, {
       query: {
         url,
       },

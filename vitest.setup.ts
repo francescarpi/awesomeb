@@ -66,7 +66,9 @@ vi.mock('electron', () => {
 
   return {
     session: {
-      fromPartition: vi.fn(() => ({})),
+      fromPartition: vi.fn(() => ({
+        registerPreloadScript: vi.fn(),
+      })),
     },
     app: {
       name: 'AwesomeB',

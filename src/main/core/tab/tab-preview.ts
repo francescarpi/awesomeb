@@ -7,7 +7,7 @@ export class TabPreview extends UIPageView {
     private readonly parent: Tab,
     public readonly tab: Tab,
   ) {
-    super(`tab-${parent.id}#preview`, 'browser', {
+    super(`tab-${parent.id}#preview`, {
       query: {
         tabId: parent.id.toString(),
       },

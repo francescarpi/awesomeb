@@ -4,7 +4,6 @@ export interface IDebugWebContent {
   winId: TWindowId;
   url: string;
   title: string;
-  OSpid: number;
   pid: number;
   visible: boolean;
   memory: string;

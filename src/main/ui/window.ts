@@ -1,6 +1,4 @@
-import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
-import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import EventEmitter from 'events';
@@ -47,7 +45,6 @@ export class UIWindow {
       roundedCorners: true,
       show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'browser.preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -144,6 +141,9 @@ export class UIWindow {
   }
 
   get bounds(): Rectangle {
+    if (this.bw.isDestroyed()) {
+      return { x: 0, y: 0, width: 0, height: 0 };
+    }
     return this.bw.getBounds();
   }
 

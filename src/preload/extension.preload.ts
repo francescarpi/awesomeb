@@ -1,11 +1,10 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 
 const searchParams = new URLSearchParams(window.location.search);
-const winId = parseInt(searchParams.get('winId')!, 10);
-const partitionId = searchParams.get('partitionId')!;
 
 contextBridge.executeInMainWorld({
   func: (
+    isExtension: () => boolean,
     iniPopup: (width: number, height: number) => void,
     crxMessage: <T>(extensionId: string, method: string, ...args: unknown[]) => Promise<T>,
     crxEvent: <T>(
@@ -13,6 +12,10 @@ contextBridge.executeInMainWorld({
       callback: (event: IpcRendererEvent, params: T) => void,
     ) => void,
   ) => {
+    if (!isExtension()) {
+      return;
+    }
+
     // Ini extension popup
     document.addEventListener('DOMContentLoaded', () => {
       const clientRect = document.body.getBoundingClientRect();
@@ -142,13 +145,20 @@ contextBridge.executeInMainWorld({
     }
   },
   args: [
+    () => {
+      return process.type === 'service-worker' || location.href.startsWith('chrome-extension://');
+    },
     (width: number, height: number) => {
-      return ipcRenderer.send('extensions:ini-popup', { winId, width, height });
+      return ipcRenderer.send('extensions:ini-popup', {
+        winId: parseInt(searchParams.get('winId')!, 10),
+        width,
+        height,
+      });
     },
     (extensionId: string, method: string, ...args: unknown[]) => {
       return ipcRenderer.invoke('extensions:crx-message', {
-        winId,
-        partitionId,
+        winId: parseInt(searchParams.get('winId')!, 10),
+        partitionId: searchParams.get('partitionId')!,
         extensionId,
         action: {
           method,
