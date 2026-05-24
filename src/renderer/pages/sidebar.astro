@@ -36,6 +36,8 @@ import MediaSession from '#/components/sidebar/MediaSession.astro';
 <script>
   import { onClick, getSearchParams } from '#/scripts';
 
+  document.title = 'Sidebar';
+
   const { winId, searchParams } = getSearchParams();
 
   const colorPrimary = searchParams.get('colorPrimary');

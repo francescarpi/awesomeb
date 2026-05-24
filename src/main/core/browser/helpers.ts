@@ -7,9 +7,17 @@ import {
   getNextPreviousBounds,
   partitions,
 } from '@/core';
-import { HandlerDetails, WindowOpenHandlerResponse, Notification } from 'electron';
+import {
+  HandlerDetails,
+  WindowOpenHandlerResponse,
+  Notification,
+  type WebContents,
+  app,
+  type Session,
+} from 'electron';
 import log from 'electron-log';
 import { MAX_SPLIT_TABS } from '~/constants';
+import path from 'node:path';
 
 const scopeLog = log.scope('BrowserHelper');
 
@@ -184,4 +192,57 @@ export function notification(title: string, body: string, onClick?: () => void) 
   }
 
   notif.show();
+}
+
+export function webContentsMemoryAndCPU(wc: WebContents): {
+  memory: string;
+  memoryValue: number;
+  cpu: string;
+  cpuValue: number;
+} {
+  const metrics = app.getAppMetrics();
+  const metric = metrics.find((m) => m.pid === wc.getOSProcessId());
+  if (!metric) {
+    return {
+      memory: '-',
+      memoryValue: 0,
+      cpu: '-',
+      cpuValue: 0,
+    };
+  }
+
+  const memoryValue = metric ? metric.memory.workingSetSize / 1024 : 0;
+  const memory = `${memoryValue.toFixed(0)} MB`;
+
+  const cpuValue = metric ? metric.cpu.percentCPUUsage : 0;
+  const cpu = `${cpuValue.toFixed(2)} %`;
+
+  return {
+    memory,
+    memoryValue,
+    cpu,
+    cpuValue,
+  };
+}
+
+export function getPartitionInfo(ses: Session): { persistent: boolean; name: string } {
+  if (!ses.isPersistent()) {
+    return {
+      persistent: false,
+      name: 'Unnamed',
+    };
+  }
+
+  const p = ses.getStoragePath();
+  if (!p) {
+    return {
+      name: 'Unnamed',
+      persistent: ses.isPersistent(),
+    };
+  }
+
+  return {
+    persistent: true,
+    name: path.basename(p),
+  };
 }

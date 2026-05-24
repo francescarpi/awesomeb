@@ -1,4 +1,4 @@
-import { h, Renderer, c, btnIcon, type VNode } from '#/scripts';
+import { h, Renderer, c, btnIcon, type VNode, radioBtn } from '#/scripts';
 import { box } from './common';
 import {
   type IConfig,
@@ -68,37 +68,6 @@ function sortedPermissions(permissions: Record<TPermission, boolean>): [TPermiss
   ][];
 }
 
-function checkBox(
-  name: string,
-  id: string,
-  label: string,
-  checked: boolean,
-  onChange: () => void,
-): VNode[] {
-  return [
-    h(
-      'input',
-      {
-        type: 'radio',
-        class: c('radio', 'radio-xs'),
-        checked: checked,
-        name,
-        id,
-        onChange,
-      },
-      '',
-    ),
-    h(
-      'label',
-      {
-        class: c('ml-1', 'cursor-pointer', 'select-none'),
-        for: id,
-      },
-      label,
-    ),
-  ];
-}
-
 async function savePermission(
   host: THost,
   perm: TPermission,
@@ -141,14 +110,14 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
                 h(
                   'div',
                   { class: c('ml-4', 'flex', 'gap-2', 'items-center') },
-                  ...checkBox(
+                  radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-allow`,
                     'Allow',
                     value,
                     savePermission.bind(null, key, perm, true, permissions),
                   ),
-                  ...checkBox(
+                  radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-deny`,
                     'Deny',

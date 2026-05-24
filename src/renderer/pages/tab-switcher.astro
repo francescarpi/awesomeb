@@ -10,6 +10,8 @@ import Base from '../layouts/Base.astro';
   import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
   import type { ITabSwitcherTab } from '~/types';
 
+  document.title = 'Tab switcher';
+
   const { winId } = getSearchParams();
 
   let selectedIndex = 0;

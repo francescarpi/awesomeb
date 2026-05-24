@@ -348,6 +348,13 @@ const abShortcuts = {
 };
 
 //--------------------------------------------------------------------------------------
+const abDebug = {
+  webContents: () => {
+    return ipcRenderer.invoke('debug:webcontents', {});
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -369,3 +376,4 @@ contextBridge.exposeInMainWorld('abExtensions', abExtensions);
 contextBridge.exposeInMainWorld('abPrompts', abPrompts);
 contextBridge.exposeInMainWorld('abPermissions', abPermissions);
 contextBridge.exposeInMainWorld('abShortcuts', abShortcuts);
+contextBridge.exposeInMainWorld('abDebug', abDebug);
