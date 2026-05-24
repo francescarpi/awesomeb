@@ -37,6 +37,8 @@ import Base from '#/layouts/Base.astro';
   import { getSearchParams } from '#/scripts';
   import { ITabMark } from '~/types';
 
+  document.title = 'Tab marks';
+
   const { winId } = getSearchParams();
   const shortVersion = document.getElementById('short-version')!;
   const fullVersion = document.getElementById('full-version')!;

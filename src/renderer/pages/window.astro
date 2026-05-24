@@ -18,6 +18,8 @@ import Layout from '#/layouts/Base.astro';
   import { getSearchParams } from '#/scripts';
   import { Rectangle } from 'electron';
 
+  document.title = 'Window';
+
   const BORDER_WIDTH = 2;
 
   const { winId, searchParams } = getSearchParams();

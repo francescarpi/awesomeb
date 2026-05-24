@@ -27,6 +27,7 @@ import type {
   IVisitHistoryResponse,
   ITabMediaSessionInfo,
   TMediaSessionAction,
+  IDebugWebContent,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -212,5 +213,10 @@ declare global {
   const abShortcuts: {
     maps: () => Promise<Record<TShortcutMapId, IShortcutMap>>;
     override: (mapId: TShortcutMapId, shortcutId: TShortcutId, key: string) => Promise<void>;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abDebug: {
+    webContents: () => Promise<IDebugWebContent[]>;
   };
 }

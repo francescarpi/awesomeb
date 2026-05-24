@@ -1,0 +1,300 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Debug">
+  <div>
+    <div id="webcontents"></div>
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
+  import type { IDebugWebContent } from '~/types';
+
+  document.title = 'Debug page';
+
+  const state = {
+    rawWcs: [] as IDebugWebContent[],
+    filterWinId: -1,
+    ordering: 'none' as 'none' | 'mem' | 'cpu',
+    orderDir: 'asc' as 'asc' | 'desc',
+    searchQuery: '',
+    lastUpdated: 0,
+    error: null as string | null,
+  };
+
+  let intervalId: number | null = null;
+  let staticSelect: HTMLSelectElement | null = null;
+
+  async function fetchData() {
+    try {
+      const wcs = await abDebug.webContents();
+      state.rawWcs = wcs;
+      state.error = null;
+      state.lastUpdated = Date.now();
+      updateSelectOptions();
+      render();
+    } catch (err) {
+      console.error('Failed to fetch web contents:', err);
+      state.error = err instanceof Error ? err.message : String(err);
+      render();
+    }
+  }
+
+  function updateSelectOptions() {
+    if (!staticSelect) return;
+    const windowsIDs = [...new Set(state.rawWcs.map((v) => v.winId))].sort((a, b) => a - b);
+    const currentValue = staticSelect.value;
+
+    while (staticSelect.options.length > 1) {
+      staticSelect.remove(1);
+    }
+
+    for (const winID of windowsIDs) {
+      const opt = document.createElement('option');
+      opt.value = String(winID);
+      opt.textContent = String(winID);
+      staticSelect.appendChild(opt);
+    }
+
+    const stillValid = Array.from(staticSelect.options).some((o) => o.value === currentValue);
+    if (stillValid) {
+      staticSelect.value = currentValue;
+    } else if (currentValue !== '-1') {
+      state.filterWinId = -1;
+      staticSelect.value = '-1';
+    }
+  }
+
+  function onFilterChange(e: Event) {
+    state.filterWinId = parseInt((e.target as HTMLSelectElement).value, 10);
+    render();
+  }
+
+  function onChangeOrdering(e: Event) {
+    const newOrdering = (e.target as HTMLInputElement).id as 'none' | 'mem' | 'cpu';
+    if (state.ordering === newOrdering) {
+      if (newOrdering !== 'none') {
+        state.orderDir = state.orderDir === 'asc' ? 'desc' : 'asc';
+      }
+    } else {
+      state.ordering = newOrdering;
+      state.orderDir = 'asc';
+    }
+    render();
+  }
+
+  function onSearchInput(e: Event) {
+    state.searchQuery = (e.target as HTMLInputElement).value;
+    render();
+  }
+
+  function getRadioIndicator(id: 'none' | 'mem' | 'cpu'): string | undefined {
+    if (state.ordering !== id || id === 'none') return undefined;
+    return state.orderDir === 'asc' ? '↑' : '↓';
+  }
+
+  function renderWCs(): VNode {
+    if (state.error) {
+      return h('div', { class: c('p-4', 'text-error') }, `Error: ${state.error}`);
+    }
+
+    let displayWcs = [...state.rawWcs];
+
+    if (state.filterWinId !== -1) {
+      displayWcs = displayWcs.filter((wc) => wc.winId === state.filterWinId);
+    }
+
+    const q = state.searchQuery.trim().toLowerCase();
+    if (q) {
+      displayWcs = displayWcs.filter(
+        (wc) =>
+          wc.title.toLowerCase().includes(q) ||
+          wc.url.toLowerCase().includes(q) ||
+          String(wc.OSpid).includes(q),
+      );
+    }
+
+    if (state.ordering !== 'none') {
+      const dir = state.orderDir === 'asc' ? 1 : -1;
+      displayWcs.sort((a, b) => {
+        const valA = state.ordering === 'mem' ? a.memoryValue : a.cpuValue;
+        const valB = state.ordering === 'mem' ? b.memoryValue : b.cpuValue;
+        return (valA - valB) * dir;
+      });
+    }
+
+    const rowCount = displayWcs.length;
+    const countText = `${rowCount} item${rowCount !== 1 ? 's' : ''}`;
+
+    return h(
+      'div',
+      null,
+      h(
+        'p',
+        { class: c('text-sm', 'mb-4') },
+        'List of all registered web contents with useful information about each one. Remember that you can filter and sort.',
+      ),
+      h(
+        'div',
+        {
+          class: c('mb-2', 'px-1', 'flex', 'justify-between', 'items-center', 'gap-2', 'flex-wrap'),
+        },
+        h(
+          'div',
+          { class: c('flex', 'gap-2') },
+          h('div', { id: 'select-placeholder', class: c('w-40') }),
+          h('input', {
+            type: 'text',
+            placeholder: 'Search title, URL or PID...',
+            class: c('input', 'input-sm', 'w-80'),
+            oninput: onSearchInput,
+          }),
+        ),
+        h(
+          'div',
+          { class: c('flex', 'items-center', 'gap-2') },
+          radioBtn('performance', 'none', 'No order', state.ordering === 'none', onChangeOrdering),
+          radioBtn(
+            'performance',
+            'mem',
+            'Memory',
+            state.ordering === 'mem',
+            onChangeOrdering,
+            getRadioIndicator('mem'),
+          ),
+          radioBtn(
+            'performance',
+            'cpu',
+            'CPU',
+            state.ordering === 'cpu',
+            onChangeOrdering,
+            getRadioIndicator('cpu'),
+          ),
+        ),
+      ),
+      h(
+        'div',
+        { class: c('border', 'rounded', 'border-base-content/30') },
+        h(
+          'table',
+          { class: c('table', 'table-sm') },
+          h(
+            'thead',
+            null,
+            h(
+              'tr',
+              null,
+              h('th', { class: c('w-10', 'font-mono') }, 'Win'),
+              h('th', { class: c('w-16', 'font-mono') }, 'Pid'),
+              h('th', null, `Title/URL (${countText})`),
+              h('th', { class: c('text-center', 'w-20') }, 'Visible'),
+              h('th', { class: c('text-left', 'w-40') }, 'Profile'),
+              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
+              h('th', { class: c('text-right', 'w-20', 'font-mono') }, 'CPU'),
+            ),
+          ),
+          h(
+            'tbody',
+            null,
+            ...displayWcs.map((view) =>
+              h(
+                'tr',
+                null,
+                h('td', { class: c('text-center', 'font-mono') }, view.winId),
+                h('td', { class: c('font-mono') }, view.OSpid),
+                h(
+                  'td',
+                  null,
+                  h(
+                    'div',
+                    {
+                      class: c('max-w-md', 'truncate'),
+                      title: `${view.title}\n${view.url}`,
+                    },
+                    view.title || view.url,
+                  ),
+                ),
+                h(
+                  'td',
+                  { class: c('flex', 'justify-center') },
+                  bool(view.visible, { colorized: true }),
+                ),
+                h(
+                  'td',
+                  { class: c('text-left') },
+                  `${view.partition.name} (${view.partition.persistent ? 'disk' : 'memory'})`,
+                ),
+                h(
+                  'td',
+                  {
+                    class: c('text-right', 'font-mono'),
+                    title: `Raw: ${view.memoryValue}`,
+                  },
+                  view.memory,
+                ),
+                h(
+                  'td',
+                  {
+                    class: c('text-right', 'font-mono'),
+                    title: `Raw: ${view.cpuValue}`,
+                  },
+                  view.cpu,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  const renderer = new Renderer(renderWCs());
+  renderer.render('webcontents');
+
+  const placeholder = document.getElementById('select-placeholder');
+  if (placeholder) {
+    staticSelect = document.createElement('select');
+    staticSelect.className = c('select', 'select-sm', 'w-40');
+    staticSelect.addEventListener('change', onFilterChange);
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '-1';
+    defaultOpt.textContent = 'Filter by window';
+    staticSelect.appendChild(defaultOpt);
+
+    placeholder.parentNode!.insertBefore(staticSelect, placeholder);
+    placeholder.remove();
+  }
+
+  function startInterval() {
+    if (intervalId !== null) return;
+    fetchData();
+    intervalId = window.setInterval(fetchData, 1000);
+  }
+
+  function stopInterval() {
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
+  function render() {
+    renderer.update(renderWCs());
+  }
+
+  startInterval();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      stopInterval();
+    } else {
+      startInterval();
+    }
+  });
+
+  window.addEventListener('pagehide', stopInterval);
+  window.addEventListener('beforeunload', stopInterval);
+</script>

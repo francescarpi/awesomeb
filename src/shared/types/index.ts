@@ -16,3 +16,4 @@ export * from './permissions';
 export * from './extensions';
 export * from './shortcuts';
 export * from './visit-history';
+export * from './debug';
