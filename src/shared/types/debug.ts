@@ -12,4 +12,8 @@ export interface IDebugWebContent {
   cpu: string;
   cpuValue: number;
   preloads: string[];
+  partition: {
+    persistent: boolean;
+    name: string;
+  };
 }

@@ -187,9 +187,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               'tr',
               null,
               h('th', { class: c('w-10', 'font-mono') }, 'Win'),
-              h('th', { class: c('w-16', 'font-mono') }, 'OS Pid'),
+              h('th', { class: c('w-16', 'font-mono') }, 'Pid'),
               h('th', null, `Title/URL (${countText})`),
               h('th', { class: c('text-center', 'w-20') }, 'Visible'),
+              h('th', { class: c('text-left', 'w-40') }, 'Profile'),
               h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
               h('th', { class: c('text-right', 'w-20', 'font-mono') }, 'CPU'),
             ),
@@ -219,6 +220,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                   'td',
                   { class: c('flex', 'justify-center') },
                   bool(view.visible, { colorized: true }),
+                ),
+                h(
+                  'td',
+                  { class: c('text-left') },
+                  `${view.partition.name} (${view.partition.persistent ? 'disk' : 'memory'})`,
                 ),
                 h(
                   'td',

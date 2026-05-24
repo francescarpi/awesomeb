@@ -37,7 +37,7 @@ import {
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
 import { type WebContentsView } from 'electron';
-import { webContentsMemoryAndCPU } from './helpers';
+import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -380,6 +380,7 @@ export class BrowserRenderer {
         visible: true,
         ...webContentsMemoryAndCPU(win.bw.webContents),
         preloads: win.bw.webContents.session.getPreloadScripts().map((p) => p.filePath),
+        partition: getPartitionInfo(win.bw.webContents.session),
       });
 
       const views = win.bw.getContentView().children as WebContentsView[];
@@ -393,6 +394,7 @@ export class BrowserRenderer {
           visible: view.getVisible(),
           ...webContentsMemoryAndCPU(view.webContents),
           preloads: view.webContents.session.getPreloadScripts().map((p) => p.filePath),
+          partition: getPartitionInfo(view.webContents.session),
         });
       }
     }

@@ -13,9 +13,11 @@ import {
   Notification,
   type WebContents,
   app,
+  type Session,
 } from 'electron';
 import log from 'electron-log';
 import { MAX_SPLIT_TABS } from '~/constants';
+import path from 'node:path';
 
 const scopeLog = log.scope('BrowserHelper');
 
@@ -220,5 +222,27 @@ export function webContentsMemoryAndCPU(wc: WebContents): {
     memoryValue,
     cpu,
     cpuValue,
+  };
+}
+
+export function getPartitionInfo(ses: Session): { persistent: boolean; name: string } {
+  if (!ses.isPersistent()) {
+    return {
+      persistent: false,
+      name: 'Unnamed',
+    };
+  }
+
+  const p = ses.getStoragePath();
+  if (!p) {
+    return {
+      name: 'Unnamed',
+      persistent: ses.isPersistent(),
+    };
+  }
+
+  return {
+    persistent: true,
+    name: path.basename(p),
   };
 }
