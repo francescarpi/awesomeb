@@ -1,6 +1,4 @@
-import path from 'path';
 import { BrowserWindow, WebContents, app, Rectangle } from 'electron';
-import { PRELOAD_FOLDER } from '@/paths';
 import { UIModalManager } from './modal';
 import { loadPage, openDevTools } from './helpers';
 import EventEmitter from 'events';
@@ -47,7 +45,6 @@ export class UIWindow {
       roundedCorners: true,
       show: false,
       webPreferences: {
-        preload: path.join(PRELOAD_FOLDER, 'browser.preload.js'),
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,

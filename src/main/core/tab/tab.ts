@@ -1,4 +1,4 @@
-import { Partition, history, Browser, Window, partitions } from '@/core';
+import { Partition, history, Browser, Window } from '@/core';
 import {
   ITabProps,
   TBasicAuthCallback,
@@ -48,13 +48,7 @@ export class Tab extends UIView {
     public readonly id: TTabId,
     props: ITabProps,
   ) {
-    const preload = props?.url?.startsWith('chrome-extension')
-      ? 'extension'
-      : props.partition.id === partitions.internal.id
-        ? 'browser'
-        : 'tab';
-
-    super(`tab-${id}#`, preload, {
+    super(`tab-${id}#`, {
       visible: false,
       borderRadius: 12,
       backgroundColor: '#ffffff',

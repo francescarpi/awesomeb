@@ -27,4 +27,11 @@ export class Partition {
   get color(): string {
     return this._color;
   }
+
+  registerPreloadScript(filePath: string) {
+    this.ses.registerPreloadScript({
+      type: 'frame',
+      filePath,
+    });
+  }
 }

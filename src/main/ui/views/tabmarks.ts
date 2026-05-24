@@ -4,7 +4,7 @@ import { UIPageView } from '../view';
 
 export class TabMarks extends UIPageView {
   constructor(winId: TWindowId) {
-    super('tab-marks', 'browser', {
+    super('tab-marks', {
       query: { winId: winId.toString() },
       visible: false,
     });

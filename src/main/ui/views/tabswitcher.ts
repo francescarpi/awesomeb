@@ -4,7 +4,7 @@ import { UIPageView } from '../view';
 
 export class TabSwitcher extends UIPageView {
   constructor(winId: TWindowId) {
-    super('tab-switcher', 'browser', {
+    super('tab-switcher', {
       query: { winId: winId.toString() },
       visible: false,
     });

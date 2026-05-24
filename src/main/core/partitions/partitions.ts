@@ -1,5 +1,6 @@
 import { Partition } from './partition';
 import { config } from '@/core';
+import { TAB_PRELOAD, BROWSER_PRELOAD } from '@/paths';
 import { TPartitionId } from '~/types';
 
 export class Partitions {
@@ -31,11 +32,17 @@ export class Partitions {
 
   init() {
     this._default = new Partition('Default', '#ffffff', false);
+    this._default.registerPreloadScript(TAB_PRELOAD);
+
     this._private = new Partition('Private', '#000000', true);
+    this._private.registerPreloadScript(TAB_PRELOAD);
+
     this._internal = new Partition('Internal', '#00000000', true);
+    this._internal.registerPreloadScript(BROWSER_PRELOAD);
 
     for (const partitionConfig of config.getProperty('partitions')) {
       const partition = new Partition(partitionConfig.name, partitionConfig.color, false);
+      partition.registerPreloadScript(TAB_PRELOAD);
       this._customPartitions.set(partition.id, partition);
     }
   }
