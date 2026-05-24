@@ -6,7 +6,7 @@ import {
   modalChecker,
   internalPageChecker,
 } from '@/utils';
-import type { TEntityType, IWinDesConTab } from '~/types';
+import type { TEntityType } from '~/types';
 
 export function setupBrowserIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------

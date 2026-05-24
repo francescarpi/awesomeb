@@ -14,12 +14,12 @@ import type {
   IBookmark,
   ITabNavigation,
   IDownloads,
-  EDownloadStatus,
   ITabSwitcherTab,
   IExtensions,
   IVisibleDesktops,
   IDebugWebContent,
 } from '~/types';
+import { EDownloadStatus } from '~/types';
 import {
   Browser,
   config,
