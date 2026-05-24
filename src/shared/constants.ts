@@ -6,6 +6,7 @@ export const ALLOWED_PAGES: string[] = [
   'settings',
   'extensions',
   'history',
+  'debug',
 ];
 
 export const UI_THEMES = [

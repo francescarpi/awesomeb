@@ -1,6 +1,12 @@
 import { Browser, Window } from '@/core';
-import { createHandler, windowChecker, viewChecker, modalChecker } from '@/utils';
-import { TEntityType } from '~/types';
+import {
+  createHandler,
+  windowChecker,
+  viewChecker,
+  modalChecker,
+  internalPageChecker,
+} from '@/utils';
+import type { TEntityType, IWinDesConTab } from '~/types';
 
 export function setupBrowserIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -34,6 +40,17 @@ export function setupBrowserIPC(browser: Browser) {
         case 'layouts':
           return browser.renderer.layoutsEntities();
       }
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{}>(
+    'debug:webcontents',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'debug')],
+    async ({}) => {
+      return browser.renderer.debugWebContents();
     },
   );
 }

@@ -1,4 +1,4 @@
-import {
+import type {
   IEntity,
   IDesktopEntity,
   IThemeEntity,
@@ -18,6 +18,7 @@ import {
   ITabSwitcherTab,
   IExtensions,
   IVisibleDesktops,
+  IDebugWebContent,
 } from '~/types';
 import {
   Browser,
@@ -35,6 +36,8 @@ import {
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
+import { type WebContentsView } from 'electron';
+import { webContentsMemoryAndCPU } from './helpers';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -361,6 +364,38 @@ export class BrowserRenderer {
         hasActiveTabs: desk.hasActiveTabs,
       })),
     };
+    return result;
+  }
+
+  debugWebContents(): IDebugWebContent[] {
+    const result: IDebugWebContent[] = [];
+
+    for (const win of this._browser.windows) {
+      result.push({
+        winId: win.id,
+        url: win.bw.webContents.getURL(),
+        title: win.bw.webContents.getTitle(),
+        OSpid: win.bw.webContents.getOSProcessId(),
+        pid: win.bw.webContents.getProcessId(),
+        visible: true,
+        ...webContentsMemoryAndCPU(win.bw.webContents),
+        preloads: win.bw.webContents.session.getPreloadScripts().map((p) => p.filePath),
+      });
+
+      const views = win.bw.getContentView().children as WebContentsView[];
+      for (const view of views) {
+        result.push({
+          winId: win.id,
+          url: view.webContents.getURL(),
+          title: view.webContents.getTitle(),
+          OSpid: view.webContents.getOSProcessId(),
+          pid: view.webContents.getProcessId(),
+          visible: view.getVisible(),
+          ...webContentsMemoryAndCPU(view.webContents),
+          preloads: view.webContents.session.getPreloadScripts().map((p) => p.filePath),
+        });
+      }
+    }
     return result;
   }
 }

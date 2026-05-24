@@ -1,0 +1,143 @@
+---
+import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
+---
+
+<BlackBgWithTitle title="Debug">
+  <div>
+    <div id="webcontents"></div>
+  </div>
+</BlackBgWithTitle>
+
+<script>
+  import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
+  import type { IDebugWebContent } from '~/types';
+
+  document.title = 'Debug page';
+
+  let filterWinId: number = -1;
+  let ordering: 'mem' | 'cpu' | 'none' = 'none';
+
+  const renderer = new Renderer(h('div', null, 'Loading...')).render('webcontents');
+
+  let wcs = await abDebug.webContents();
+  let wcsOriginal = [...wcs];
+
+  applyFilterAndOrdering();
+
+  setInterval(async () => {
+    wcs = await abDebug.webContents();
+    wcsOriginal = [...wcs];
+    applyFilterAndOrdering();
+  }, 1000);
+
+  function onFilterWindowChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value;
+    filterWinId = parseInt(value, 10);
+    applyFilterAndOrdering();
+  }
+
+  function onChangeOrdering(e: Event) {
+    ordering = (e.target as HTMLInputElement).id as 'mem' | 'cpu' | 'none';
+    applyFilterAndOrdering();
+  }
+
+  function applyFilterAndOrdering() {
+    let filtered = [...wcs];
+    const select = (document.getElementById('filter-window') as HTMLSelectElement) || null;
+    if (select && select.value !== '-1') {
+      filtered = wcs.filter((wc) => wc.winId === parseInt(select.value, 10));
+    }
+
+    switch (ordering) {
+      case 'mem':
+        filtered = filtered.sort((a, b) => a.memoryValue - b.memoryValue);
+        break;
+      case 'cpu':
+        filtered = filtered.sort((a, b) => a.cpuValue - b.cpuValue);
+        break;
+    }
+
+    renderer.update(renderWCs(filtered));
+  }
+
+  function renderWCs(views: IDebugWebContent[]): VNode {
+    const windowsIDs = [...new Set(wcsOriginal.map((v) => v.winId))];
+
+    return h(
+      'div',
+      null,
+      h(
+        'p',
+        { class: c('text-sm', 'mb-4') },
+        'List of all registered web contents with useful information about each one. Remember that you can filter an sort.',
+      ),
+      h(
+        'div',
+        { class: c('mb-2', 'px-1', 'flex', 'justify-between', 'items-center') },
+        h(
+          'select',
+          {
+            class: c('select', 'select-sm', 'w-40'),
+            onchange: onFilterWindowChange,
+            id: 'filter-window',
+          },
+          h('option', { value: -1 }, 'Filter by window'),
+          ...windowsIDs.map((winID) =>
+            h('option', { value: winID, selected: filterWinId === winID }, winID.toString()),
+          ),
+        ),
+        h(
+          'div',
+          { class: c('flex', 'items-center', 'gap-2') },
+          radioBtn('performance', 'none', 'No order', ordering === 'none', onChangeOrdering),
+          radioBtn('performance', 'mem', 'Memory', ordering === 'mem', onChangeOrdering),
+          radioBtn('performance', 'cpu', 'CPU', ordering === 'cpu', onChangeOrdering),
+        ),
+      ),
+      h(
+        'div',
+        { class: c('border', 'rounded', 'border-base-content/30') },
+        h(
+          'table',
+          { class: c('table') },
+          h(
+            'thead',
+            null,
+            h(
+              'tr',
+              null,
+              h('th', { class: c('w-10') }, 'Win'),
+              h('th', { class: c('w-10') }, 'OS Pid'),
+              h('th', null, 'Title/URL'),
+              h('th', { class: c('text-center', 'w-20') }, 'Visible'),
+              // h('th', null, 'Preloads'),
+              h('th', { class: c('text-right', 'w-20') }, 'Memory'),
+              h('th', { class: c('text-right', 'w-20') }, 'CPU'),
+            ),
+          ),
+          h(
+            'tbody',
+            null,
+            ...views.map((view) =>
+              h(
+                'tr',
+                null,
+                h('td', { class: c('text-center') }, view.winId),
+                h('td', null, view.OSpid),
+                h('td', null, h('span', { title: view.url }, view.title)),
+                h(
+                  'td',
+                  { class: c('flex', 'justify-center') },
+                  bool(view.visible, { colorized: true }),
+                ),
+                // h('td', { innerHTML: view.preloads.join('<br/>') }),
+                h('td', { class: c('text-right') }, view.memory),
+                h('td', { class: c('text-right') }, view.cpu),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+</script>
