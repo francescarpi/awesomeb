@@ -386,7 +386,9 @@ export class BrowserRenderer {
       title: row.wc.getTitle(),
       pid: row.wc.getOSProcessId(),
       visible: row.visible,
-      preloads: row.wc.session.getPreloadScripts().map((p) => p.filePath),
+      preloads: row.wc.session
+        .getPreloadScripts()
+        .map((p) => ({ filePath: p.filePath, type: p.type })),
       partition: getPartitionInfo(row.wc.session),
       ...webContentsMemoryAndCPU(row.wc),
     }));
