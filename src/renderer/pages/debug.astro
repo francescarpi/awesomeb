@@ -227,7 +227,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h('td', {
                   class: c('text-left', 'truncate', 'max-w-xs'),
                   innerHTML:
-                    view.preloads.map((p) => p.split(/[\\\\\\/]/).pop()).join('<br/>') || '-',
+                    view.preloads
+                      .map((p) => `${p.filePath.split(/[\\\\\\/]/).pop()} (${p.type})`)
+                      .join('<br/>') || '-',
                 }),
                 h(
                   'td',

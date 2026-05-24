@@ -92,14 +92,16 @@ export class UIWindow {
     this.bw.contentView.addChildView(view.webContentsView);
   }
 
-  removeView(id: TViewId) {
+  removeView(id: TViewId, close = true) {
     const view = this._views.get(id);
     if (!view) {
       scopeLog.error(`View with id ${id} not found in window ${this.winId}`);
       return;
     }
 
-    view.webContentsView.webContents.close();
+    if (close) {
+      view.webContentsView.webContents.close();
+    }
 
     this.bw.contentView.removeChildView(view.webContentsView);
 
