@@ -112,7 +112,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         (wc) =>
           wc.title.toLowerCase().includes(q) ||
           wc.url.toLowerCase().includes(q) ||
-          String(wc.OSpid).includes(q) ||
+          String(wc.pid).includes(q) ||
           wc.preloads.some((p) => p.toLowerCase().includes(q)),
       );
     }
@@ -205,7 +205,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 'tr',
                 null,
                 h('td', { class: c('text-center', 'font-mono') }, view.winId),
-                h('td', { class: c('font-mono') }, view.OSpid),
+                h('td', { class: c('font-mono') }, view.pid),
                 h(
                   'td',
                   null,
