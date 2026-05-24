@@ -213,7 +213,7 @@ export function webContentsMemoryAndCPU(wc: WebContents): {
   const memory = `${memoryValue.toFixed(0)} MB`;
 
   const cpuValue = metric ? metric.cpu.percentCPUUsage : 0;
-  const cpu = `${cpuValue.toFixed(1)} %`;
+  const cpu = `${cpuValue.toFixed(2)} %`;
 
   return {
     memory,

@@ -8,7 +8,9 @@ export function radioBtn(
   label: string,
   checked: boolean,
   onChange: (e: Event) => void,
+  indicator?: string,
 ): VNode {
+  const displayLabel = indicator ? `${label} ${indicator}` : label;
   return h(
     'div',
     { className: c('flex', 'items-center') },
@@ -30,7 +32,7 @@ export function radioBtn(
         class: c('ml-1', 'cursor-pointer', 'select-none', 'text-sm'),
         for: id,
       },
-      label,
+      displayLabel,
     ),
   );
 }
