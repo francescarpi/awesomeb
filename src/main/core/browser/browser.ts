@@ -227,73 +227,78 @@ export class Browser {
   }
 
   async moveTab(tabId: TTabId, targetId: string, props?: IMoveTabProps) {
-    const tabResult = this.getTab(tabId);
-    if (!tabResult) {
+    const sourceData = this.getTab(tabId);
+    if (!sourceData) {
       scopeLog.error(`Tab with id ${tabId} not found`);
       return;
     }
 
-    const targetResult = parseTarget(this, {
+    const targetData = parseTarget(this, {
       targetId: targetId,
-      partitionId: tabResult.tab.partition.id,
-      tabContainer: tabResult.tabContainer,
+      partitionId: sourceData.tab.partition.id,
+      tabContainer: sourceData.tabContainer,
     });
 
-    if (!targetResult) {
+    if (!targetData) {
       scopeLog.error(`Invalid targetId provided for moving tab: ${targetId}`);
       return;
     }
 
     if (targetId === 'split-tab') {
-      targetResult.tabContainer.addTab(tabResult.tab);
+      targetData.tabContainer.addTab(sourceData.tab);
       if (props?.selectTab) {
-        targetResult.tabContainer.selectTab(tabResult.tab.id);
+        targetData.tabContainer.selectTab(sourceData.tab.id);
       }
 
-      tabResult.desktop.closeTabContainer(tabResult.tabContainer.id);
-      tabResult.window.renderViews();
+      sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+      sourceData.window.renderViews();
 
       this.eventsChannel.emit(
         'browser:tab-did-move',
-        tabResult.tab.id,
-        tabResult.window,
-        tabResult.desktop,
-        targetResult.window,
-        targetResult.desktop,
+        sourceData.tab.id,
+        sourceData.window,
+        sourceData.desktop,
+        targetData.window,
+        targetData.desktop,
       );
       return;
     }
 
     if (
-      tabResult.window.id == targetResult.window.id &&
-      tabResult.desktop.id == targetResult.desktop.id
+      sourceData.window.id == targetData.window.id &&
+      sourceData.desktop.id == targetData.desktop.id
     ) {
       scopeLog.warn('Tab is already in the target desktop/window');
       return;
     }
 
-    tabResult.desktop.closeTabContainer(tabResult.tabContainer.id);
-    targetResult.desktop.addTabContainer(tabResult.tabContainer);
+    sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+    targetData.desktop.addTabContainer(sourceData.tabContainer);
 
-    if (tabResult.window.id !== targetResult.window.id) {
-      tabResult.window.removeView(tabResult.tab.viewId);
-      targetResult.window.addView(tabResult.tab);
+    if (sourceData.window.id !== targetData.window.id) {
+      scopeLog.info(
+        'Source window is different to target',
+        sourceData.window.id,
+        targetData.window.id,
+      );
+      sourceData.window.removeView(sourceData.tab.viewId, false);
+      targetData.window.addView(sourceData.tab);
+      targetData.window.renderViews();
     }
 
-    tabResult.window.renderViews();
-    targetResult.window.renderViews();
+    sourceData.window.renderViews();
 
     if (props?.selectTab) {
-      targetResult.window.selectTab(tabResult.tab.id);
+      targetData.window.selectTab(sourceData.tab.id);
     }
 
     this.eventsChannel.emit(
       'browser:tab-did-move',
-      tabResult.tab.id,
-      tabResult.window,
-      tabResult.desktop,
-      targetResult.window,
-      targetResult.desktop,
+      sourceData.tab.id,
+      sourceData.window,
+      sourceData.desktop,
+      targetData.window,
+      targetData.desktop,
     );
   }
 

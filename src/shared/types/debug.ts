@@ -10,7 +10,7 @@ export interface IDebugWebContent {
   memoryValue: number;
   cpu: string;
   cpuValue: number;
-  preloads: string[];
+  preloads: { filePath: string; type: string }[];
   partition: {
     persistent: boolean;
     name: string;

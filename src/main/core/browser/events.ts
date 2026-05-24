@@ -262,23 +262,18 @@ export function registerBrowserEvents(browser: Browser) {
     'browser:tab-did-move',
     async (
       _tabId: TTabId,
-      sourceWindow: Window,
+      _sourceWindow: Window,
       _sourceDesktop: Desktop,
-      targetWindow: Window,
+      _targetWindow: Window,
       _targetDesktop: Desktop,
     ) => {
-      browser.toRenderer.refreshDesktops(targetWindow);
-      browser.toRenderer.refreshTabContainers(targetWindow);
-      browser.toRenderer.refreshURLBar(targetWindow, null);
-      browser.toRenderer.refreshShowSplitMenu(targetWindow);
-      browser.toRenderer.refreshLayoutData(targetWindow);
-
-      if (targetWindow.id !== sourceWindow.id) {
-        browser.toRenderer.refreshDesktops(sourceWindow);
-        browser.toRenderer.refreshTabContainers(sourceWindow);
-        browser.toRenderer.refreshURLBar(sourceWindow, null);
+      for (const win of browser.windows) {
+        browser.toRenderer.refreshDesktops(win);
+        browser.toRenderer.refreshTabContainers(win);
+        browser.toRenderer.refreshURLBar(win, null);
+        browser.toRenderer.refreshShowSplitMenu(win);
+        browser.toRenderer.refreshLayoutData(win);
       }
-
       await browser.refreshMainMenu();
     },
   );
