@@ -28,9 +28,9 @@ export class Partition {
     return this._color;
   }
 
-  registerPreloadScript(filePath: string) {
+  registerPreloadScript(filePath: string, type: 'frame' | 'service-worker' = 'frame') {
     this.ses.registerPreloadScript({
-      type: 'frame',
+      type,
       filePath,
     });
   }

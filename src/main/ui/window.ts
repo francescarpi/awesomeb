@@ -141,6 +141,9 @@ export class UIWindow {
   }
 
   get bounds(): Rectangle {
+    if (this.bw.isDestroyed()) {
+      return { x: 0, y: 0, width: 0, height: 0 };
+    }
     return this.bw.getBounds();
   }
 

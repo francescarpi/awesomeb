@@ -177,7 +177,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
       h(
         'div',
-        { class: c('border', 'rounded', 'border-base-content/30') },
+        { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
         h(
           'table',
           { class: c('table', 'table-sm') },
@@ -194,7 +194,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               h('th', { class: c('text-left', 'w-40') }, 'Profile'),
               h('th', { class: c('text-left', 'w-48') }, 'Preloads'),
               h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
-              h('th', { class: c('text-right', 'w-20', 'font-mono') }, 'CPU'),
+              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'CPU'),
             ),
           ),
           h(
@@ -240,7 +240,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h(
                   'td',
                   {
-                    class: c('text-right', 'font-mono'),
+                    class: c('text-right', 'font-mono', 'whitespace-nowrap'),
                     title: `Raw: ${view.cpuValue}`,
                   },
                   view.cpu,
