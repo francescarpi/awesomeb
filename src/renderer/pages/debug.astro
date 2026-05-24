@@ -112,7 +112,8 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         (wc) =>
           wc.title.toLowerCase().includes(q) ||
           wc.url.toLowerCase().includes(q) ||
-          String(wc.OSpid).includes(q),
+          String(wc.pid).includes(q) ||
+          wc.preloads.some((p) => p.toLowerCase().includes(q)),
       );
     }
 
@@ -176,7 +177,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
       h(
         'div',
-        { class: c('border', 'rounded', 'border-base-content/30') },
+        { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
         h(
           'table',
           { class: c('table', 'table-sm') },
@@ -191,8 +192,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               h('th', null, `Title/URL (${countText})`),
               h('th', { class: c('text-center', 'w-20') }, 'Visible'),
               h('th', { class: c('text-left', 'w-40') }, 'Profile'),
+              h('th', { class: c('text-left', 'w-48') }, 'Preloads'),
               h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
-              h('th', { class: c('text-right', 'w-20', 'font-mono') }, 'CPU'),
+              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'CPU'),
             ),
           ),
           h(
@@ -203,7 +205,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 'tr',
                 null,
                 h('td', { class: c('text-center', 'font-mono') }, view.winId),
-                h('td', { class: c('font-mono') }, view.OSpid),
+                h('td', { class: c('font-mono') }, view.pid),
                 h(
                   'td',
                   null,
@@ -216,16 +218,17 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                     view.title || view.url,
                   ),
                 ),
-                h(
-                  'td',
-                  { class: c('flex', 'justify-center') },
-                  bool(view.visible, { colorized: true }),
-                ),
+                h('td', { align: 'center' }, bool(view.visible, { colorized: true })),
                 h(
                   'td',
                   { class: c('text-left') },
                   `${view.partition.name} (${view.partition.persistent ? 'disk' : 'memory'})`,
                 ),
+                h('td', {
+                  class: c('text-left', 'truncate', 'max-w-xs'),
+                  innerHTML:
+                    view.preloads.map((p) => p.split(/[\\\\\\/]/).pop()).join('<br/>') || '-',
+                }),
                 h(
                   'td',
                   {
@@ -237,7 +240,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h(
                   'td',
                   {
-                    class: c('text-right', 'font-mono'),
+                    class: c('text-right', 'font-mono', 'whitespace-nowrap'),
                     title: `Raw: ${view.cpuValue}`,
                   },
                   view.cpu,

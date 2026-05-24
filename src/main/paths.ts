@@ -4,6 +4,10 @@ import fs from 'fs';
 
 export const PRELOAD_FOLDER = path.join(__dirname, '..', 'preload');
 
+export const TAB_PRELOAD = path.join(PRELOAD_FOLDER, 'tab.preload.js');
+export const BROWSER_PRELOAD = path.join(PRELOAD_FOLDER, 'browser.preload.js');
+export const EXTENSION_PRELOAD = path.join(PRELOAD_FOLDER, 'extension.preload.js');
+
 export const RENDERER_FOLDER = path.join(__dirname, '..', 'renderer');
 
 const APP_CONFIG_FOLDER = '.awesomeb';

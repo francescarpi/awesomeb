@@ -8,7 +8,7 @@ export class FailLoad extends UIPageView {
     private readonly _description: string,
     private readonly _url: string,
   ) {
-    super(`tab-${tab.id}#fail-load`, 'browser', {
+    super(`tab-${tab.id}#fail-load`, {
       query: {
         tabId: tab.id.toString(),
         url: _url,

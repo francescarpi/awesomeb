@@ -1,6 +1,4 @@
-import path from 'path';
 import { WebContentsView, Rectangle, WebContents, Session } from 'electron';
-import { PRELOAD_FOLDER } from '@/paths';
 import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools } from './helpers';
 import { partitions, Window } from '@/core';
@@ -18,7 +16,6 @@ export class UIView {
 
   constructor(
     public readonly viewId: TViewId,
-    private readonly preload: 'browser' | 'tab' | 'extension' = 'tab',
     props?: IViewProps,
   ) {
     this._borderRadius = props?.borderRadius || 0;
@@ -37,7 +34,6 @@ export class UIView {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
-        preload: path.join(PRELOAD_FOLDER, `${this.preload}.preload.js`),
         webSecurity: true,
         transparent: true,
         session: this._session,
@@ -168,8 +164,8 @@ export class UIView {
 }
 
 export class UIPageView extends UIView {
-  constructor(id: TViewId, preload: 'browser' | 'tab', props?: IPageViewProps) {
-    super(id, preload, props);
+  constructor(id: TViewId, props?: IPageViewProps) {
+    super(id, props);
 
     loadPage(this.webContents, props?.page || id, props?.query);
 

@@ -12,7 +12,7 @@ export class FindInPage extends UIPageView {
     public readonly eventsChannel: EventEmitter,
     private readonly tab: Tab,
   ) {
-    super(`tab-${tab.id}#find-in-page`, 'browser', {
+    super(`tab-${tab.id}#find-in-page`, {
       query: {
         tabId: tab.id.toString(),
       },

@@ -8,6 +8,6 @@ export function bool(value: boolean, opts?: { colorized?: boolean }): VNode {
   const colorized = opts?.colorized || false;
   return h('div', {
     innerHTML: value ? True : False,
-    class: c(colorized ? (value ? 'text-success' : 'text-error') : '', 'h-5'),
+    class: c(colorized ? (value ? 'text-success' : 'text-error') : ''),
   });
 }
