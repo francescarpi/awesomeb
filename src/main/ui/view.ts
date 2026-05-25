@@ -114,9 +114,6 @@ export class UIView {
   }
 
   reload() {
-    if (this.webContents.isDestroyed()) {
-      return;
-    }
     this.webContents.reload();
   }
 
