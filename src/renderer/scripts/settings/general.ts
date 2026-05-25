@@ -81,7 +81,7 @@ function renderSearchEngines(
         {},
         h('th', { class: c('text-left', 'px-1') }, 'Name'),
         h('th', { class: c('text-left', 'px-1') }, 'URL'),
-        h('th', { class: c('w-4') }, ''),
+        h('th', { class: c('w-13') }, ''),
       ),
     ),
     h(

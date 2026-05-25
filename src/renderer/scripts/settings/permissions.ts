@@ -105,6 +105,7 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
                 btnIcon(Delete, {
                   onClick: () => deletePermission(key, perm, permissions, renderer),
                   doubleConfirmation: true,
+                  classNames: ['w-4'],
                 }),
                 h('span', {}, perm),
                 h(

@@ -52,7 +52,7 @@ function buildGeneralBody(
               h('th', { class: c('text-left', 'px-1') }, 'Primary'),
               h('th', { class: c('text-left', 'px-1') }, 'Secondary'),
               h('th', { class: c('text-left', 'px-1') }, 'Degrees'),
-              h('th', { class: c('w-6') }, ''),
+              h('th', { class: c('w-13') }, ''),
             ),
           ),
           h(
@@ -99,7 +99,7 @@ function buildGeneralBody(
                 ),
                 h(
                   'td',
-                  {},
+                  null,
                   btnIcon(Delete, {
                     onClick: callbacks.onDelete.bind(null, theme.name),
                     doubleConfirmation: true,
