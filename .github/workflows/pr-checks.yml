@@ -17,6 +17,7 @@ run-name: PR Checks ${{ github.ref_name }}
 
 jobs:
   lint-pr-title:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
