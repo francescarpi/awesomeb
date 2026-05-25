@@ -17,6 +17,7 @@ export enum EShortcutGroup {
   General = 'General',
   Navigation = 'Navigation',
   TabManagement = 'Tab Management',
+  WindowManagement = 'Window Management',
   TabNavigation = 'Tab Navigation',
   Zoom = 'Zoom',
   Desktops = 'Desktops',
