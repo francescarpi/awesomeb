@@ -5,10 +5,8 @@ permissions:
 
 on:
   push:
-    # tags:
-    #   - 'v*'
-    branches:
-      - '**'
+    tags:
+      - 'v*'
 
 run-name: Release ${{ github.ref_name }}
 
