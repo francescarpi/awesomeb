@@ -28,11 +28,27 @@ export function input(
     : undefined;
   return h(
     'label',
-    { class: c('input', 'input-sm', opts?.width || 'w-full', !visible && 'hidden') },
+    {
+      class: c(
+        'input',
+        'input-sm',
+        opts?.width || 'w-full',
+        !visible && 'hidden',
+        'text-base-content/40',
+      ),
+    },
     label,
     h(
       'input',
-      { value, readonly: opts?.readonly, id, autofocus: opts?.autofocus, onInput, onFocus },
+      {
+        value,
+        readonly: opts?.readonly,
+        id,
+        autofocus: opts?.autofocus,
+        onInput,
+        onFocus,
+        class: c('text-base-content'),
+      },
       '',
     ),
   );
