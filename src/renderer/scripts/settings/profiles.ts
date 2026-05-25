@@ -48,7 +48,7 @@ function buildGeneralBody(
               {},
               h('th', { class: c('text-left', 'px-1') }, 'Name'),
               h('th', { class: c('text-left', 'px-1', 'w-25') }, 'Color'),
-              h('th', { class: c('w-6') }, ''),
+              h('th', { class: c('w-13') }, ''),
             ),
           ),
           h(
