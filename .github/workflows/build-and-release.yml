@@ -46,19 +46,19 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: pnpm run build:mac -p always
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
-        run: pnpm run build:linux -p always
+        run: pnpm run build:linux -p always --config.npmRebuild=false
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm run build:win -p always
+        run: pnpm run build:win -p always --config.npmRebuild=false
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v7.0.1
