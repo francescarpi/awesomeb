@@ -102,16 +102,10 @@ export class BrowserRenderer {
     }));
   }
 
-  targetsEntities(window: Window): IEntity[] {
-    const result = [
-      {
-        id: 'current-desktop-window',
-        label: 'New tab',
-      },
-      {
-        id: 'split-tab',
-        label: 'Split into selected tab',
-      },
+  targetsEntities(window: Window, props?: { onlyNewWindow?: boolean }): IEntity[] {
+    const onlyNewWindow = props?.onlyNewWindow ?? false;
+
+    const newWindowOption = [
       {
         id: 'new-window',
         label: 'New window',
@@ -124,6 +118,22 @@ export class BrowserRenderer {
         id: 'new-window-right',
         label: 'New right window',
       },
+    ];
+
+    if (onlyNewWindow) {
+      return newWindowOption;
+    }
+
+    const result = [
+      {
+        id: 'current-desktop-window',
+        label: 'New tab',
+      },
+      {
+        id: 'split-tab',
+        label: 'Split into selected tab',
+      },
+      ...newWindowOption,
     ];
 
     for (const win of this._browser.windows) {

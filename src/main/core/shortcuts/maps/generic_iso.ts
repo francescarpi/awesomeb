@@ -18,6 +18,7 @@ export const SHORTCUTS_MAP: IShortcutMap = {
     editUrl: { key: 'CmdOrCtrl+E', label: 'Edit URL', group: EShortcutGroup.Navigation },
     findInPage: { key: 'CmdOrCtrl+F', label: 'Find in page', group: EShortcutGroup.Navigation },
     newTab: { key: 'CmdOrCtrl+T', label: 'New tab', group: EShortcutGroup.TabManagement },
+    newWindow: { key: 'CmdOrCtrl+N', label: 'New window', group: EShortcutGroup.WindowManagement },
     pasteAndGo: {
       key: '',
       label: 'Paste and go',

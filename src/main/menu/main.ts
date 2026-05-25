@@ -78,6 +78,7 @@ function fileMenu(
 ): MenuItemConstructorOptions {
   const performCommand = getShortcut('performCommand');
   const newTab = getShortcut('newTab');
+  const newWindow = getShortcut('newWindow');
   const pasteAndGo = getShortcut('pasteAndGo');
   const openRecentlyClosed = getShortcut('openRecentlyClosed');
 
@@ -97,6 +98,16 @@ function fileMenu(
         },
       },
       { type: 'separator' },
+      {
+        label: newWindow.label,
+        accelerator: newWindow.key,
+        icon: getIcon(EIcon.Windows),
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'new-window', { target: 'new-window' });
+          }
+        },
+      },
       {
         label: newTab.label,
         accelerator: newTab.key,

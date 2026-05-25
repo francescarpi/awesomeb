@@ -1,0 +1,26 @@
+---
+import ListWithSearch from '#/components/common/ListWithSearch.astro';
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal height="400px">
+  <Title>New Window</Title>
+  <ListWithSearch placeholder="Select the target..." id="list" />
+</Modal>
+
+<script>
+  import { getSearchParams, listWithSearchManager } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  listWithSearchManager('list', {
+    entity: 'newWindowtargets',
+    onAccept: (item) => {
+      abCommands.perform(winId, 'new-window', { target: item.id });
+    },
+    onEscape: () => {
+      abModal.close(winId);
+    },
+  });
+</script>

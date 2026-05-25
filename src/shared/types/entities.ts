@@ -5,6 +5,7 @@ export type TEntityType =
   | 'searchEngines'
   | 'partitions'
   | 'targets'
+  | 'newWindowtargets'
   | 'tabs'
   | 'tabContainers'
   | 'bookmarks'
