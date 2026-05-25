@@ -146,7 +146,7 @@ contextBridge.executeInMainWorld({
   },
   args: [
     () => {
-      return process.type === 'service-worker' || location.href.startsWith('chrome-extension://');
+      return location.href.startsWith('chrome-extension://');
     },
     (width: number, height: number) => {
       return ipcRenderer.send('extensions:ini-popup', {
