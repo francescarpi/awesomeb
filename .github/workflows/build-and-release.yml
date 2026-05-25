@@ -5,8 +5,10 @@ permissions:
 
 on:
   push:
-    tags:
-      - 'v*'
+    # tags:
+    #   - 'v*'
+    branches:
+      - '**'
 
 run-name: Release ${{ github.ref_name }}
 
@@ -50,13 +52,13 @@ jobs:
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
-        run: pnpm run build:linux -p always
+        run: pnpm run build:linux -p always --config.npmRebuild=false
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm run build:win -p always
+        run: pnpm run build:win -p always --config.npmRebuild=false
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
