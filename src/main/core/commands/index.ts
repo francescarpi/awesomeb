@@ -67,6 +67,7 @@ import * as tabZoomOut from './tab-zoom-out';
 import * as tabZoomReset from './tab-zoom-reset';
 import * as visitHistoryPage from './visit-history-page';
 import * as debugPage from './debug-page';
+import * as windowNew from './window-new';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -133,6 +134,7 @@ const COMMANDS = {
   [tabZoomReset.TRIGGER]: tabZoomReset.Command,
   [visitHistoryPage.TRIGGER]: visitHistoryPage.Command,
   [debugPage.TRIGGER]: debugPage.Command,
+  [windowNew.TRIGGER]: windowNew.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
