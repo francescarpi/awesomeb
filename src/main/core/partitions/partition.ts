@@ -1,5 +1,5 @@
 import { type TPartitionId } from '~/types';
-import { session, type Session } from 'electron';
+import { session, type Session, app } from 'electron';
 
 export class Partition {
   public readonly id: TPartitionId;
@@ -14,6 +14,11 @@ export class Partition {
     this.id = this._private ? id : `persist:${id}`;
 
     this.ses = session.fromPartition(this.id);
+    this.ses.setSpellCheckerLanguages([
+      'en-US',
+      'en-GB',
+      `${app.getLocale()}-${app.getLocaleCountryCode()}`,
+    ]);
   }
 
   get name(): string {
