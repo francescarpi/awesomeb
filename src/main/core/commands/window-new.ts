@@ -1,6 +1,6 @@
 import type { ICommand } from './types';
 import type { TEntityType } from '~/types';
-import { parseTarget } from '@/core';
+import { parseTarget, Window } from '@/core';
 import log from 'electron-log';
 
 const scopeLog = log.scope('NewWindowCommand');
@@ -11,7 +11,7 @@ export interface ICommandParams {
 
 export const TRIGGER = 'new-window';
 
-export const Command: ICommand<ICommandParams> = {
+export const Command: ICommand<ICommandParams, { window: Window | null }> = {
   trigger: TRIGGER,
   name: 'New Window',
   description: 'Open a new window',
@@ -22,10 +22,13 @@ export const Command: ICommand<ICommandParams> = {
     const result = parseTarget(browser, { targetId: params.target });
     if (!result) {
       scopeLog.error('Failed to parse target', { params });
-      return;
+      return { window: null };
     }
-    setTimeout(() => {
-      result.window.focus();
-    }, 200);
+    return { window: result.window };
+  },
+  onPerformed({ window }) {
+    if (window) {
+      window.focus();
+    }
   },
 };

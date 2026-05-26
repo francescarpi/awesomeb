@@ -149,22 +149,33 @@ export class Browser {
     window: Window,
     trigger: TCommandTrigger,
     params?: Record<string, unknown>,
-  ): Promise<boolean> {
+  ): Promise<unknown> {
     const command = getCommand(trigger);
     if (!command) {
       scopeLog.error(`Command not found for trigger: ${trigger}`);
-      return false;
+      return;
     }
 
     const desktop = window.selectedDesktop;
     const tabContainer = desktop?.selectedTabContainer || null;
     const tab = tabContainer?.selectedTab || null;
 
-    await command.handler({ browser: this, window, desktop, tabContainer, tab, params });
+    const result = await command.handler({
+      browser: this,
+      window,
+      desktop,
+      tabContainer,
+      tab,
+      params,
+    });
+
+    if (command.onPerformed) {
+      command.onPerformed(result);
+    }
 
     await this.refreshMainMenu();
 
-    return true;
+    return result;
   }
 
   async duplicateTab(tabId: TTabId, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
