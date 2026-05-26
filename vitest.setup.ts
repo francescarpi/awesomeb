@@ -68,6 +68,7 @@ vi.mock('electron', () => {
     session: {
       fromPartition: vi.fn(() => ({
         registerPreloadScript: vi.fn(),
+        setSpellCheckerLanguages: vi.fn(),
       })),
     },
     app: {
@@ -75,6 +76,8 @@ vi.mock('electron', () => {
       isPackaged: false,
       getName: vi.fn(() => 'AwesomeB'),
       getVersion: vi.fn(() => '1.0.0'),
+      getLocale: vi.fn(() => 'en'),
+      getLocaleCountryCode: vi.fn(() => 'US'),
     },
     BrowserWindow: class {
       constructor() {}
