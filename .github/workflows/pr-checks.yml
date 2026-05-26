@@ -5,7 +5,7 @@ permissions:
 
 on:
   pull_request:
-  push:
+    types: [opened, edited, synchronize]
 
 run-name: PR Checks ${{ github.ref_name }}
 
