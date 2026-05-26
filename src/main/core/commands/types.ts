@@ -2,7 +2,7 @@ import { Browser, Desktop, Tab, TabContainer, Window } from '@/core';
 import { IModalProps } from '@/ui';
 import { TPage } from '~/types';
 
-export interface ICommand<T> {
+export interface ICommand<T, R = void> {
   trigger: string;
   name: string;
   description: string;
@@ -20,7 +20,8 @@ export interface ICommand<T> {
     tabContainer: TabContainer | null;
     tab: Tab | null;
     params: T;
-  }) => Promise<void>;
+  }) => Promise<R>;
+  onPerformed?: (result: R) => void;
 }
 
 interface ICommandModal {

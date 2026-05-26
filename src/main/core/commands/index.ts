@@ -139,7 +139,7 @@ const COMMANDS = {
 
 export type TCommandTrigger = keyof typeof COMMANDS;
 
-export function getCommands(browser: Browser): ICommand<any>[] {
+export function getCommands(browser: Browser): ICommand<any, any>[] {
   const window = browser.activeWindow;
   const desktop = window?.selectedDesktop || null;
   const tabContainer = desktop?.selectedTabContainer || null;
@@ -152,6 +152,6 @@ export function getCommands(browser: Browser): ICommand<any>[] {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function getCommand(trigger: TCommandTrigger): ICommand<any> | null {
+export function getCommand(trigger: TCommandTrigger): ICommand<any, any> | null {
   return COMMANDS[trigger] || null;
 }

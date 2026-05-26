@@ -34,18 +34,26 @@ export function setupCommandsIPC(browser: Browser) {
         return;
       }
 
-      // Perform command action...
-      const success = await browser.performCommand(win, trigger, params);
-      if (!success) {
-        scopeLog.error(`Failed to perform command for trigger: ${trigger}`);
-        return;
+      const promises: Promise<unknown>[] = [];
+
+      // Close modal
+      if (win.modal && win.modal.isOpen) {
+        promises.push(
+          new Promise((resolve) => {
+            win.modal.close();
+            resolve(null);
+          }),
+        );
       }
 
-      if (win.modal && win.modal.isOpen) {
-        setTimeout(() => {
-          win.modal.close();
-        }, 100);
-      }
+      // Perform command
+      promises.push(browser.performCommand(win, trigger, params));
+
+      Promise.all(promises).then((result) => {
+        if (command.onPerformed) {
+          command.onPerformed(result[1] as unknown as void);
+        }
+      });
     },
   );
 }
