@@ -1,4 +1,4 @@
-import { ChromeTabs, ChromeAction, ChromeBookmarks } from './apis';
+import { ChromeTabs, ChromeAction, ChromeBookmarks, ChromePermissions } from './apis';
 import { Browser, Window } from '@/core';
 import { TExtensionId, TPartitionId } from '~/types';
 
@@ -6,13 +6,19 @@ import log from 'electron-log';
 const scopeLog = log.scope('Chrome');
 
 export class Chrome {
-  private readonly _apis: { tabs: ChromeTabs; action: ChromeAction; bookmarks: ChromeBookmarks };
+  private readonly _apis: {
+    tabs: ChromeTabs;
+    action: ChromeAction;
+    bookmarks: ChromeBookmarks;
+    permissions: ChromePermissions;
+  };
 
   constructor(private readonly _browser: Browser) {
     this._apis = {
       tabs: new ChromeTabs(_browser),
       action: new ChromeAction(_browser),
       bookmarks: new ChromeBookmarks(_browser),
+      permissions: new ChromePermissions(_browser),
     };
   }
 
