@@ -132,6 +132,44 @@ contextBridge.executeInMainWorld({
           });
         },
       },
+      permissions: {
+        contains: async (
+          permissions: chrome.permissions.Permissions,
+          callback?: (result: boolean) => void,
+        ) => {
+          const result = await crxMessage<boolean>(extensionId, 'permissions.contains', {
+            permissions,
+          });
+          if (callback) {
+            callback(result);
+          }
+          return result;
+        },
+        request: async (
+          permissions: chrome.permissions.Permissions,
+          callback?: (granted: boolean) => void,
+        ) => {
+          const result = await crxMessage<boolean>(extensionId, 'permissions.request', {
+            permissions,
+          });
+          if (callback) {
+            callback(result);
+          }
+          return result;
+        },
+        remove: async (
+          permissions: chrome.permissions.Permissions,
+          callback?: (removed: boolean) => void,
+        ) => {
+          const result = await crxMessage<boolean>(extensionId, 'permissions.remove', {
+            permissions,
+          });
+          if (callback) {
+            callback(result);
+          }
+          return result;
+        },
+      },
     };
 
     for (const target of [chrome, browser]) {
