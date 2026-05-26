@@ -8,6 +8,7 @@ export interface ILayoutData {
   areaMaximized: boolean;
   hasVisibleTabs: boolean;
   selectedTabBounds: Rectangle | null;
+  selectedTabPartitionColor: string | null;
 }
 
 export interface IMediaSessionInfo {
