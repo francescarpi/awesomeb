@@ -32,6 +32,7 @@ export class UIView {
     const wcv = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
+        spellcheck: true,
         contextIsolation: true,
         sandbox: true,
         webSecurity: true,
