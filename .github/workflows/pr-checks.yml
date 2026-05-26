@@ -19,12 +19,20 @@ jobs:
   lint-pr-title:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
+      - name: Validate PR title
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! echo "$PR_TITLE" | grep -qP '^[A-Z]'; then
+            echo "::error::PR title must start with an uppercase letter. Got: $PR_TITLE"
+            exit 1
+          fi
+          if echo "$PR_TITLE" | grep -qP '^[a-z]+(\(.+\))?:'; then
+            echo "::error::PR title must not use conventional commit format (feat:, fix:, etc.). Use a descriptive sentence starting with uppercase instead. Got: $PR_TITLE"
+            exit 1
+          fi
+          echo "✅ PR title looks good: $PR_TITLE"
 
   pr-checks:
     runs-on: ubuntu-latest
