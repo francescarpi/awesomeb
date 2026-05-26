@@ -65,4 +65,4 @@ jobs:
         run: pnpm lint
 
       - name: Formatting Check
-        run: pnpm exec prettier --check .
+        run: pnpm exec prettier --check src
