@@ -52,7 +52,7 @@ import Layout from '#/layouts/Base.astro';
       helpCommandsTool.classList.remove('hidden');
     }
 
-    refreshSelectedTabBounds(data.selectedTabBounds);
+    refreshSelectedTabBounds(data.selectedTabBounds, data.selectedTabPartitionColor);
   });
 
   function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
@@ -68,7 +68,7 @@ import Layout from '#/layouts/Base.astro';
     }
   }
 
-  function refreshSelectedTabBounds(bounds: Rectangle | null) {
+  function refreshSelectedTabBounds(bounds: Rectangle | null, color: string | null) {
     if (!bounds) {
       selectedTab.classList.add('hidden');
       return;
@@ -79,5 +79,6 @@ import Layout from '#/layouts/Base.astro';
     selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
     selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
     selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
+    selectedTab.style.borderColor = color || 'yellow';
   }
 </script>

@@ -80,7 +80,6 @@
               ),
               style: 'app-region: no-drag;',
               onclick: () => abDesktops.select(winId, desktop.id),
-              ondblclick: () => abModal.open(winId, 'rename-desktop'),
               oncontextmenu: () =>
                 abMenu.contextMenu(winId, 'desktop', {
                   desktopId: desktop.id,

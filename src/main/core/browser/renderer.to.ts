@@ -94,6 +94,7 @@ export class BrowserToRenderer {
       areaMaximized: window.areaMaximized,
       hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
+      selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
     };
     window.webContents.send('window:refresh-layout-data', data);
   }
