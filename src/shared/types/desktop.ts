@@ -6,17 +6,11 @@ export interface ITheme {
   degrees: number;
 }
 
-export interface IVisibleDesktop {
+export interface IDesktop {
   id: TDesktopId;
   name: string | null;
   selected: boolean;
   requireAttention: boolean;
   hasTabs: boolean;
   hasActiveTabs: boolean;
-}
-
-export interface IVisibleDesktops {
-  hasLess: boolean;
-  hasMore: boolean;
-  desktops: IVisibleDesktop[];
 }
