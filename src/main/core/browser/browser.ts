@@ -549,7 +549,7 @@ export class Browser {
    * @param id - The ID of the tab to close
    * @returns true if the tab was found and closed, false otherwise
    */
-  async closeTab(id: TTabId): Promise<boolean> {
+  async closeTab(id: TTabId, props: { emit?: boolean } = { emit: true }): Promise<boolean> {
     const result = this.getTab(id);
     if (!result) {
       return false;
@@ -576,7 +576,9 @@ export class Browser {
       closedHistory.addTab(tab.title, tab.url);
     }
 
-    this.eventsChannel.emit('window:tab-did-close', window);
+    if (props.emit) {
+      this.eventsChannel.emit('window:tab-did-close', window);
+    }
 
     return true;
   }
