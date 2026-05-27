@@ -16,7 +16,7 @@ import type {
   IDownloads,
   ITabSwitcherTab,
   IExtensions,
-  IVisibleDesktops,
+  IDesktop,
   IDebugWebContent,
   TWindowId,
   IAbout,
@@ -363,19 +363,15 @@ export class BrowserRenderer {
     }));
   }
 
-  visibleDesktops(window: Window) {
-    const result: IVisibleDesktops = {
-      hasLess: window.hasLessDesktops,
-      hasMore: window.hasMoreDesktops,
-      desktops: window.visibleDesktops.map((desk) => ({
-        id: desk.id,
-        name: desk.name,
-        selected: desk.id === window.selectedDesktop.id,
-        requireAttention: desk.requireAttention,
-        hasTabs: desk.hasTabs,
-        hasActiveTabs: desk.hasActiveTabs,
-      })),
-    };
+  desktops(window: Window) {
+    const result: IDesktop[] = window.desktops.map((desk) => ({
+      id: desk.id,
+      name: desk.name,
+      selected: desk.id === window.selectedDesktop.id,
+      requireAttention: desk.requireAttention,
+      hasTabs: desk.hasTabs,
+      hasActiveTabs: desk.hasActiveTabs,
+    }));
     return result;
   }
 

@@ -21,7 +21,7 @@ import type {
   TDesktopId,
   TTabPreviewAction,
   ILayoutData,
-  IVisibleDesktops,
+  IDesktop,
   TPermissions,
   TShortcutMapId,
   TShortcutId,
@@ -69,7 +69,7 @@ const abCommands = {
 
 //--------------------------------------------------------------------------------------
 const abDesktops = {
-  onRefresh: (callback: (event: IpcRendererEvent, visibleDesktops: IVisibleDesktops) => void) => {
+  onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktop[]) => void) => {
     ipcRenderer.on('desktops:refresh-visible', callback);
   },
   select: (winId: TWindowId, desktopId: string) => {
@@ -84,8 +84,8 @@ const abDesktops = {
   onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => {
     ipcRenderer.on('desktops:refresh-selected', callback);
   },
-  getVisible: async (winId: TWindowId) => {
-    return await ipcRenderer.invoke('desktops:get-visible', { winId });
+  all: async (winId: TWindowId) => {
+    return await ipcRenderer.invoke('desktops:all', { winId });
   },
 };
 

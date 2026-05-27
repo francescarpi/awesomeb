@@ -18,7 +18,7 @@ import type {
   TExtensionId,
   TTabPreviewAction,
   ILayoutData,
-  IVisibleDesktops,
+  IDesktop,
   TPermissions,
   IShortcutMap,
   TShortcutMapId,
@@ -56,14 +56,12 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abDesktops: {
-    onRefresh: (
-      callback: (event: IpcRendererEvent, visibleDesktops: IVisibleDesktops) => void,
-    ) => void;
+    onRefresh: (callback: (event: IpcRendererEvent, desktops: IDesktop[]) => void) => void;
     onRefreshSelected: (callback: (event: IpcRendererEvent, desktopId: TDesktopId) => void) => void;
     select: (winId: TWindowId, desktopId: TDesktopId) => void;
     getTheme: (winId: TWindowId) => Promise<ITheme>;
     onThemeRefresh: (callback: (event: IpcRendererEvent, theme: ITheme) => void) => void;
-    getVisible: (winId: TWindowId) => Promise<IVisibleDesktops>;
+    all: (winId: TWindowId) => Promise<IDesktop[]>;
   };
 
   //--------------------------------------------------------------------------------------
