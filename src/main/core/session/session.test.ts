@@ -80,7 +80,6 @@ describe('Session', () => {
         ],
         selectedDesktopId: 1,
         sidebarCollapsed: false,
-        visibleDesktopsRange: [1, 5],
       },
     ]);
   });
@@ -112,7 +111,6 @@ describe('Session', () => {
             id: 'invalid-id',
             bounds: { x: 0, y: 0, width: 800, height: 600 },
             selectedDesktop: { id: 1 },
-            visibleDesktopsRange: [1, 5],
             sidebarCollapsed: false,
             areaMaximized: false,
             desktops: [],
@@ -133,7 +131,6 @@ describe('Session', () => {
             id: 'invalid-id',
             bounds: { x: 0, y: 0, width: 800, height: 600 },
             selectedDesktop: { id: 1 },
-            visibleDesktopsRange: [1, 5],
             sidebarCollapsed: false,
             areaMaximized: false,
             desktops: [],

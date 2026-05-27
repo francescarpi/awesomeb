@@ -42,7 +42,6 @@ const validSessionWindow = {
   id: 1,
   bounds: validRectangle,
   selectedDesktopId: 1,
-  visibleDesktopsRange: [1, 5] as [number, number],
   sidebarCollapsed: false,
   areaMaximized: false,
   desktops: [validSessionDesktop],
@@ -124,13 +123,6 @@ describe('SessionDesktopScheme', () => {
 describe('SessionWindowScheme', () => {
   test('valid session window parses', () => {
     expect(SessionWindowScheme.parse(validSessionWindow)).toEqual(validSessionWindow);
-  });
-
-  test('without visibleDesktopsRange is valid', () => {
-    const window = { ...validSessionWindow };
-    delete (window as Record<string, unknown>).visibleDesktopsRange;
-    const result = SessionWindowScheme.parse(window);
-    expect(result.visibleDesktopsRange).toBeUndefined();
   });
 
   test('missing required field throws', () => {

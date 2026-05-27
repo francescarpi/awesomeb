@@ -42,7 +42,6 @@ export const SessionWindowScheme = z
     id: z.number(),
     bounds: RectangleScheme,
     selectedDesktopId: z.number(),
-    visibleDesktopsRange: z.tuple([z.number(), z.number()]).optional(),
     sidebarCollapsed: z.boolean(),
     areaMaximized: z.boolean(),
     desktops: z.array(SessionDesktopScheme),

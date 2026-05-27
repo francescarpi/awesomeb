@@ -5,47 +5,28 @@
 <div id="desktops"></div>
 
 <script>
-  import { type IVisibleDesktops } from '~/types';
+  import { type IDesktop } from '~/types';
   import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
-  import Left from '#/icons/left.svg?raw';
-  import Right from '#/icons/right.svg?raw';
 
   const { winId } = getSearchParams();
 
   // Load and render desktops on initialization
-  const desktops = await abDesktops.getVisible(winId);
+  const desktops = await abDesktops.all(winId);
   const renderer = new Renderer(renderDesktops(desktops)).render('desktops');
 
   // Subscribe to desktop updates
   abDesktops.onRefresh((_event, desktops) => renderer.update(renderDesktops(desktops)));
 
-  // Navigate desktops on horizontal scroll (throttled)
-  let lastScroll = 0;
-  document.getElementById('desktops')!.addEventListener('wheel', (e) => {
-    const now = Date.now();
-    if (now - lastScroll < 300) return;
-    if (e.deltaX > 0) {
-      lastScroll = now;
-      abCommands.perform(winId, 'next-desktop');
-    } else if (e.deltaX < 0) {
-      lastScroll = now;
-      abCommands.perform(winId, 'previous-desktop');
-    }
-  });
-
   /**
    * Renders the list of desktops in the UI
    * @param desktops - Array of desktop entities to render
    */
-  function renderDesktops(visibleDesktops: IVisibleDesktops): VNode {
+  function renderDesktops(desktops: IDesktop[]): VNode {
     return h(
       'div',
-      { class: c('flex', 'items-center', 'justify-between', 'gap-2') },
-      ...visibleDesktops.desktops.map((desktop, index) => {
-        const isFirst = index === 0;
-        const isLast = index === visibleDesktops.desktops.length - 1;
-
-        return h(
+      { class: c('grid', 'grid-cols-1', 'sidebar:grid-cols-5', 'items-center', 'gap-2') },
+      ...desktops.map((desktop) =>
+        h(
           'div',
           {
             class: c(
@@ -76,6 +57,7 @@
                 'justify-center',
                 'flex',
                 'select-none',
+                'overflow-hidden',
                 desktop.selected && 'bg-white/20',
               ),
               style: 'app-region: no-drag;',
@@ -85,48 +67,10 @@
                   desktopId: desktop.id,
                 }),
             },
-            desktop.id,
             h(
-              'div',
-              {
-                class: c(
-                  'absolute',
-                  'left-0',
-                  'inset-y-0',
-                  'sidebar:flex',
-                  'hidden',
-                  'items-center',
-                  'w-4',
-                  'text-white',
-                  'pointer-events-none',
-                  '[&>svg]:w-full',
-                  '[&>svg]:h-full',
-                  !(isFirst && visibleDesktops.hasLess) && 'sidebar:hidden',
-                ),
-                innerHTML: Left,
-              },
-              '',
-            ),
-            h(
-              'div',
-              {
-                class: c(
-                  'absolute',
-                  'right-0',
-                  'inset-y-0',
-                  'sidebar:flex',
-                  'hidden',
-                  'items-center',
-                  'w-4',
-                  'text-white',
-                  'pointer-events-none',
-                  '[&>svg]:w-full',
-                  '[&>svg]:h-full',
-                  !(isLast && visibleDesktops.hasMore) && 'sidebar:hidden',
-                ),
-                innerHTML: Right,
-              },
-              '',
+              'span',
+              { class: c(desktop.selected && 'hidden', 'sidebar:group-hover:hidden') },
+              desktop.id,
             ),
             h(
               'div',
@@ -167,26 +111,26 @@
                 desktop.requireAttention ? 'block' : 'hidden',
               ),
             }),
+            h(
+              'div',
+              {
+                class: c(
+                  'text-[8px]',
+                  'sidebar:text-[10px]',
+                  'absolute',
+                  'whitespace-nowrap',
+                  'left-1/2',
+                  '-translate-x-1/2',
+                  'sidebar:hidden',
+                  'sidebar:group-[.selected]:block',
+                  'sidebar:group-hover:block',
+                ),
+              },
+              desktop.name || '',
+            ),
           ),
-          h(
-            'div',
-            {
-              class: c(
-                'text-[10px]',
-                'absolute',
-                'mt-1',
-                'whitespace-nowrap',
-                'left-1/2',
-                '-translate-x-1/2',
-                'sidebar:hidden',
-                'sidebar:group-[.selected]:block',
-                'sidebar:group-hover:block',
-              ),
-            },
-            desktop.name || '',
-          ),
-        );
-      }),
+        ),
+      ),
     );
   }
 </script>
