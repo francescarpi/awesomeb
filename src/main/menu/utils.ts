@@ -14,6 +14,7 @@ export enum EIcon {
   Folder = 'folder.png',
   Forward = 'forward.png',
   Horizontal = 'horizontal.png',
+  Info = 'info.png',
   Logo = 'logo.png',
   Maximize = 'maximize.png',
   Move = 'move.png',

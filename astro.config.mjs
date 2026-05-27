@@ -73,7 +73,10 @@ const electronPreloadConfig = {
   },
 };
 
-// Configuration for the Electron preload
+// Renderer plugin: no custom resolve keys needed.
+// Node built-ins are NOT shimmed (patched out via pnpm patch)
+// because they cause require-is-not-defined in Astro SSR dev.
+// Only "electron" itself is intercepted by the plugin.
 const electronRendererConfig = {};
 
 export default defineConfig({

@@ -7,7 +7,7 @@ import {
   closedHistory,
   getShortcut,
 } from '@/core';
-import { MenuItemConstructorOptions, Menu, NativeImage } from 'electron';
+import { MenuItemConstructorOptions, Menu, NativeImage, app } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark } from '~/types';
@@ -46,7 +46,15 @@ function appMenu(
     role: 'appMenu',
     icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
     submenu: [
-      { role: 'about' },
+      {
+        label: `About ${app.getName()}`,
+        icon: getIcon(EIcon.Info),
+        click: () => {
+          if (window) {
+            window.modal.open('about');
+          }
+        },
+      },
       { type: 'separator' },
       {
         label: preferences.label,

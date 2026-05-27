@@ -29,8 +29,10 @@ import type {
   TFindUrlResult,
   ITabMediaSessionInfo,
   TMediaSessionAction,
+  IAbout,
 } from '~/types';
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
+import type { IpcRendererEvent } from 'electron';
 
 //--------------------------------------------------------------------------------------
 const abModal = {
@@ -355,6 +357,13 @@ const abDebug = {
 };
 
 //--------------------------------------------------------------------------------------
+const abBrowser = {
+  about: (winId: TWindowId): Promise<IAbout> => {
+    return ipcRenderer.invoke('about:get', { winId });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -377,3 +386,4 @@ contextBridge.exposeInMainWorld('abPrompts', abPrompts);
 contextBridge.exposeInMainWorld('abPermissions', abPermissions);
 contextBridge.exposeInMainWorld('abShortcuts', abShortcuts);
 contextBridge.exposeInMainWorld('abDebug', abDebug);
+contextBridge.exposeInMainWorld('abBrowser', abBrowser);

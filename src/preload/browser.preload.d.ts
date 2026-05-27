@@ -28,6 +28,7 @@ import type {
   ITabMediaSessionInfo,
   TMediaSessionAction,
   IDebugWebContent,
+  IAbout,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -218,5 +219,10 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abDebug: {
     webContents: () => Promise<IDebugWebContent[]>;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abBrowser: {
+    about: (winId: TWindowId) => Promise<IAbout>;
   };
 }

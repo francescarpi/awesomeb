@@ -1,0 +1,37 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import logo from '../assets/icon.png';
+---
+
+<Modal width="400px" height="300px">
+  <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
+    <img src={logo.src} alt="AwesomeB" width="64" height="64" />
+    <b>AwesomeB(rowser)</b>
+    <p class="text-sm">Developed by Francesc Arpi Roca <i>(francesc.arpi@gmail.com)</i></p>
+    <div id="content"></div>
+  </div>
+</Modal>
+
+<script>
+  import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
+
+  const { winId } = getSearchParams();
+  const renderer = new Renderer(h('div', null)).render('content');
+  const data = await abBrowser.about(winId);
+
+  const [btns, registerBtnsEvents] = confirmButtons({
+    onConfirm: () => {
+      abModal.close(winId);
+    },
+  });
+
+  renderer.update(
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-4') },
+      h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+      ...btns,
+    ),
+    { onUpdated: registerBtnsEvents },
+  );
+</script>

@@ -40,3 +40,7 @@ export interface IWinDes {
   window: Window;
   desktop: Desktop;
 }
+
+export interface IAbout {
+  version: string;
+}

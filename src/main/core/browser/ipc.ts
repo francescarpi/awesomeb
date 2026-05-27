@@ -55,4 +55,9 @@ export function setupBrowserIPC(browser: Browser) {
       return browser.renderer.debugWebContents();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{}>('about:get', 'handle', browser, [windowChecker, modalChecker], async ({}) => {
+    return browser.renderer.about();
+  });
 }
