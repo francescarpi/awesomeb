@@ -341,4 +341,135 @@ describe('Browser', () => {
       });
     });
   });
+
+  describe('Tab Index', () => {
+    test('getTab returns indexed result after openURL', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const lookup = browser.getTab(result!.tab.id);
+      expect(lookup).not.toBeNull();
+      expect(lookup!.tab.id).toBe(result!.tab.id);
+      expect(lookup!.window.id).toBe(result!.window.id);
+      expect(lookup!.desktop.id).toBe(result!.desktop.id);
+      expect(lookup!.tabContainer.id).toBe(result!.tabContainer.id);
+    });
+
+    test('getTab returns null for unknown tab id', () => {
+      expect(browser.getTab(99999 as any)).toBeNull();
+    });
+
+    test('getTab unindexes after closeTab', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+      expect(browser.getTab(tabId)).not.toBeNull();
+
+      await browser.closeTab(tabId);
+      expect(browser.getTab(tabId)).toBeNull();
+    });
+
+    test('getTab unindexes multiple tabs correctly', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result1 = await browser.openURL('http://example1.com');
+      const result2 = await browser.openURL('http://example2.com');
+
+      await browser.closeTab(result1!.tab.id);
+      expect(browser.getTab(result1!.tab.id)).toBeNull();
+      expect(browser.getTab(result2!.tab.id)).not.toBeNull();
+    });
+
+    test('getTabByWebContentsId finds tab by its webContentsId', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const wcId = result!.tab.webContentsId;
+      const lookup = browser.getTabByWebContentsId(wcId);
+      expect(lookup).not.toBeNull();
+      expect(lookup!.tab.id).toBe(result!.tab.id);
+    });
+
+    test('getTabByWebContentsId returns null for unknown id', () => {
+      expect(browser.getTabByWebContentsId(99999)).toBeNull();
+    });
+
+    test('getTabContainer returns indexed result after openURL', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const lookup = browser.getTabContainer(result!.tabContainer.id);
+      expect(lookup).not.toBeNull();
+      expect(lookup!.tabContainer.id).toBe(result!.tabContainer.id);
+      expect(lookup!.window.id).toBe(result!.window.id);
+      expect(lookup!.desktop.id).toBe(result!.desktop.id);
+    });
+
+    test('getTabContainer returns null for unknown id', () => {
+      expect(browser.getTabContainer(99999 as any)).toBeNull();
+    });
+
+    test('getTabContainer unindexes when container closes after last tab', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tcId = result!.tabContainer.id;
+      expect(browser.getTabContainer(tcId)).not.toBeNull();
+
+      await browser.closeTab(result!.tab.id);
+      expect(browser.getTabContainer(tcId)).toBeNull();
+    });
+
+    test('removeWindow cleans up tab and tabContainer indexes', async () => {
+      const w1 = browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+
+      const tabId = result!.tab.id;
+      const tcId = result!.tabContainer.id;
+
+      expect(browser.getTab(tabId)).not.toBeNull();
+      expect(browser.getTabContainer(tcId)).not.toBeNull();
+
+      browser.removeWindow(w1.id);
+
+      expect(browser.getTab(tabId)).toBeNull();
+      expect(browser.getTabContainer(tcId)).toBeNull();
+    });
+
+    test('moveTab updates indexes to target window/desktop', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+
+      browser.moveTab(tabId, 'desktop-2');
+
+      const lookup = browser.getTab(tabId);
+      expect(lookup).not.toBeNull();
+      expect(lookup!.desktop.id).toBe(2);
+    });
+
+    test('index cleanup does not affect other windows', async () => {
+      const w1 = browser.createWindow(1, { withDesktops: true });
+      const result1 = await browser.openURL('http://example1.com');
+
+      browser.createWindow(2, { withDesktops: true });
+      const result2 = await browser.openURL('http://example2.com');
+
+      const tab1Id = result1!.tab.id;
+      const tab2Id = result2!.tab.id;
+
+      browser.removeWindow(w1.id);
+
+      expect(browser.getTab(tab1Id)).toBeNull();
+      expect(browser.getTab(tab2Id)).not.toBeNull();
+      expect(browser.getTab(tab2Id)!.tab.id).toBe(tab2Id);
+    });
+  });
 });

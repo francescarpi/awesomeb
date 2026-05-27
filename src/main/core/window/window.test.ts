@@ -1,6 +1,6 @@
 import { expect, test, describe, vi, beforeEach } from 'vitest';
 import type { TDesktopId } from '~/types';
-import { Browser, getCommand, partitions, TabContainer, Window } from '@/core';
+import { Browser, getCommand, partitions, Window } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 
 describe('Window', () => {
@@ -607,22 +607,13 @@ describe('Window Close Tab', () => {
   });
 
   test('should not close tab container when it has remaining tabs', async () => {
-    const desktop = window.selectedDesktop;
-
-    // Create a tab container with multiple tabs
-    const tabContainer = new TabContainer(browser, 1 as any);
-
-    const tab1 = tabContainer.createTab(1, {
-      partition: partitions.default,
-      url: 'http://example1.com',
+    const result1 = await browser.openURL('http://example.com', {
+      selectTab: true,
     });
+    const { tab: tab1, tabContainer, desktop } = result1!;
 
-    const tab2 = tabContainer.createTab(2, {
-      partition: partitions.default,
-      url: 'http://example2.com',
-    });
-
-    desktop.addTabContainer(tabContainer);
+    const result2 = await browser.openURL('http://example.com', { targetId: 'split-tab' });
+    const { tab: tab2 } = result2!;
 
     expect(tabContainer.tabs.length).toBe(2);
     expect(desktop.tabContainers.length).toBe(1);

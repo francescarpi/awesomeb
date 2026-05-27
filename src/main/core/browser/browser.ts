@@ -10,6 +10,9 @@ import {
   Extensions,
   partitions,
 } from '@/core';
+import { Desktop } from '@/core/desktop/desktop';
+import { TabContainer } from '@/core/tab/tab-container';
+import { Tab } from '@/core/tab/tab';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
 import { mainMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
@@ -30,6 +33,10 @@ const scopeLog = log.scope('Browser');
 export class Browser {
   private readonly _windows: Map<TWindowId, Window> = new Map();
   private _activeWindowId: TWindowId | null = null;
+  private readonly _tabIndex: Map<TTabId, IWinDesConTab> = new Map();
+  private readonly _webContentsIndex: Map<number, TTabId> = new Map();
+  private readonly _tabContainerIndex: Map<TTabContainerId, IWinDesCon> = new Map();
+
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
   public readonly toRenderer = new BrowserToRenderer(this);
@@ -69,19 +76,23 @@ export class Browser {
             divider: tabConStore.divider,
           });
 
+          this._indexTabContainer(newWindow, desktop, tabContainer);
+
           for (const tabStore of tabConStore.tabs) {
             const partition =
               tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
                 ? partitions.internal
                 : partitions.get(tabStore.partitionId) || partitions.default;
 
-            tabContainer.createTab(tabStore.id, {
+            const tab = tabContainer.createTab(tabStore.id, {
               partition,
               title: tabStore.title,
               customTitle: tabStore.customTitle,
               url: tabStore.url,
               favicon: tabStore.favicon,
             });
+
+            this._indexTab(newWindow, desktop, tabContainer, tab);
           }
         }
       }
@@ -112,10 +123,27 @@ export class Browser {
   }
 
   removeWindow(id: TWindowId) {
+    const w = this._windows.get(id);
+    if (!w) {
+      scopeLog.warn(`No window found with id ${id}`);
+      return;
+    }
+
+    for (const desktop of w.desktops) {
+      for (const tabContainer of desktop.tabContainers) {
+        this._tabContainerIndex.delete(tabContainer.id);
+        for (const tab of tabContainer.tabs) {
+          this._unindexTab(tab.id);
+        }
+      }
+    }
+
     this._windows.delete(id);
+
     scopeLog.info(
       `Removed window with id ${id} ` + `(Total windows: ${BrowserWindow.getAllWindows().length})`,
     );
+
     if (this._activeWindowId === id) {
       this._activeWindowId = null;
     }
@@ -214,6 +242,8 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
+    this._indexTabContainer(window, desktop, tabContainer);
+
     const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? partitions.internal : null;
 
     const tab = tabContainer.createTab(this.idGenerator.nextTabId, {
@@ -221,6 +251,8 @@ export class Browser {
       suspended: false,
       url,
     });
+
+    this._indexTab(window, desktop, tabContainer, tab);
 
     if (props?.selectTab) {
       tabContainer.selectTab(tab.id);
@@ -255,12 +287,21 @@ export class Browser {
       return;
     }
 
+    this._indexTabContainer(targetData.window, targetData.desktop, targetData.tabContainer);
+
     if (targetId === 'split-tab') {
       targetData.tabContainer.addTab(sourceData.tab);
+      this._indexTab(
+        targetData.window,
+        targetData.desktop,
+        targetData.tabContainer,
+        sourceData.tab,
+      );
       if (props?.selectTab) {
         targetData.tabContainer.selectTab(sourceData.tab.id);
       }
 
+      this._unindexTabContainer(sourceData.tabContainer.id);
       sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
       sourceData.window.renderViews();
 
@@ -283,8 +324,16 @@ export class Browser {
       return;
     }
 
+    this._unindexTabContainer(sourceData.tabContainer.id);
+
     sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
     targetData.desktop.addTabContainer(sourceData.tabContainer);
+
+    this._indexTabContainer(targetData.window, targetData.desktop, sourceData.tabContainer);
+
+    for (const tab of sourceData.tabContainer.tabs) {
+      this._indexTab(targetData.window, targetData.desktop, sourceData.tabContainer, tab);
+    }
 
     if (sourceData.window.id !== targetData.window.id) {
       scopeLog.info(
@@ -313,59 +362,64 @@ export class Browser {
     );
   }
 
-  getTab(id: TTabId): IWinDesConTab | null {
-    for (const window of this._windows.values()) {
-      const desConTab = window.getTab(id);
-      if (desConTab) {
-        return {
-          window,
-          desktop: desConTab.desktop,
-          tabContainer: desConTab.tabContainer,
-          tab: desConTab.tab,
-        };
-      }
+  private _indexTab(window: Window, desktop: Desktop, tabContainer: TabContainer, tab: Tab): void {
+    this._tabIndex.set(tab.id, { window, desktop, tabContainer, tab });
+    if (!tab.isDestroyed) {
+      this._webContentsIndex.set(tab.webContentsId, tab.id);
     }
-    return null;
   }
 
-  getTabByWebcontentsId(id: number): IWinDesConTab | null {
-    for (const window of this._windows.values()) {
-      for (const tab of window.tabs) {
-        if (tab.tab.id === id) {
-          return {
-            window,
-            desktop: tab.desktop,
-            tabContainer: tab.tabContainer,
-            tab: tab.tab,
-          };
-        }
+  private _unindexTab(tabId: TTabId): void {
+    const entry = this._tabIndex.get(tabId);
+    if (entry) {
+      if (!entry.tab.isDestroyed) {
+        this._webContentsIndex.delete(entry.tab.webContentsId);
       }
+      this._tabIndex.delete(tabId);
     }
-    return null;
+  }
+
+  private _indexTabContainer(window: Window, desktop: Desktop, tabContainer: TabContainer): void {
+    this._tabContainerIndex.set(tabContainer.id, { window, desktop, tabContainer });
+  }
+
+  private _unindexTabContainer(tabContainerId: TTabContainerId): void {
+    this._tabContainerIndex.delete(tabContainerId);
+  }
+
+  reindexWebContents(tab: Tab): void {
+    if (!tab.isDestroyed) {
+      this._webContentsIndex.set(tab.webContentsId, tab.id);
+    }
+  }
+
+  removeWebContentsIndex(webContentsId: number): void {
+    this._webContentsIndex.delete(webContentsId);
+  }
+
+  getTab(id: TTabId): IWinDesConTab | null {
+    return this._tabIndex.get(id) || null;
   }
 
   getTabByWebContentsId(webContentsId: number): IWinDesConTab | null {
-    for (const tabInfo of this.tabs) {
-      if (tabInfo.tab.webContentsId === webContentsId) {
-        return tabInfo;
-      }
+    const tabId = this._webContentsIndex.get(webContentsId);
+    if (!tabId) {
+      return null;
     }
-    return null;
+    return this._tabIndex.get(tabId) || null;
   }
 
   get selectedTab(): IWinDesConTab | null {
-    for (const window of this._windows.values()) {
-      const selectedTab = window.selectedTab;
-      if (selectedTab) {
-        return {
-          window,
-          desktop: selectedTab.desktop,
-          tabContainer: selectedTab.tabContainer,
-          tab: selectedTab.tab,
-        };
-      }
-    }
-    return null;
+    const activeWindow = this.activeWindow;
+    if (!activeWindow) return null;
+    const selected = activeWindow.selectedTab;
+    if (!selected) return null;
+    return {
+      window: activeWindow,
+      desktop: selected.desktop,
+      tabContainer: selected.tabContainer,
+      tab: selected.tab,
+    };
   }
 
   get selectedDesktop(): IWinDes | null {
@@ -377,30 +431,11 @@ export class Browser {
   }
 
   getTabContainer(id: TTabContainerId): IWinDesCon | null {
-    for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          if (tabContainer.id === id) {
-            return { window, desktop, tabContainer };
-          }
-        }
-      }
-    }
-    return null;
+    return this._tabContainerIndex.get(id) || null;
   }
 
   get tabs(): IWinDesConTab[] {
-    const result: IWinDesConTab[] = [];
-    for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          for (const tab of tabContainer.tabs) {
-            result.push({ window, desktop, tabContainer, tab });
-          }
-        }
-      }
-    }
-    return result;
+    return Array.from(this._tabIndex.values());
   }
 
   closeTabPreview(tabId: TTabId) {
@@ -444,7 +479,10 @@ export class Browser {
     const tabContainer = parentTabData.desktop.createTabContainer(
       this.idGenerator.nextTabContainerId,
     );
+    this._indexTabContainer(parentTabData.window, parentTabData.desktop, tabContainer);
+
     tabContainer.addTab(tabPreview.tab);
+    this._indexTab(parentTabData.window, parentTabData.desktop, tabContainer, tabPreview.tab);
     tabContainer.selectTab(tabPreview.tab.id);
     parentTabData.desktop.selectTabContainer(tabContainer.id);
 
@@ -474,6 +512,12 @@ export class Browser {
     }
 
     parentTabData.tabContainer.addTab(tabPreview.tab);
+    this._indexTab(
+      parentTabData.window,
+      parentTabData.desktop,
+      parentTabData.tabContainer,
+      tabPreview.tab,
+    );
     parentTabData.tabContainer.selectTab(tabPreview.tab.id);
     parentTabData.desktop.selectTabContainer(parentTabData.tabContainer.id);
 
@@ -505,7 +549,7 @@ export class Browser {
    * @param id - The ID of the tab to close
    * @returns true if the tab was found and closed, false otherwise
    */
-  async closeTab(id: TTabId): Promise<boolean> {
+  async closeTab(id: TTabId, props: { emit?: boolean } = { emit: true }): Promise<boolean> {
     const result = this.getTab(id);
     if (!result) {
       return false;
@@ -513,9 +557,12 @@ export class Browser {
 
     const { tabContainer, desktop, tab, window } = result;
 
+    this._unindexTab(tab.id);
+
     tabContainer.closeTab(tab.id);
 
     if (tabContainer.tabs.length === 0) {
+      this._unindexTabContainer(tabContainer.id);
       desktop.closeTabContainer(tabContainer.id);
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
@@ -529,7 +576,9 @@ export class Browser {
       closedHistory.addTab(tab.title, tab.url);
     }
 
-    this.eventsChannel.emit('window:tab-did-close', window);
+    if (props.emit) {
+      this.eventsChannel.emit('window:tab-did-close', window);
+    }
 
     return true;
   }
@@ -554,10 +603,15 @@ export class Browser {
       return;
     }
 
+    this._unindexTab(lastTab.id);
+
     const newTabContainer = desktop.createTabContainer(this.idGenerator.nextTabContainerId, {
       justAfter: tabContainer.id,
     });
+    this._indexTabContainer(window, desktop, newTabContainer);
+
     newTabContainer.addTab(lastTab);
+    this._indexTab(window, desktop, newTabContainer, lastTab);
 
     window.renderViews();
     window.selectTab(lastTab.id);

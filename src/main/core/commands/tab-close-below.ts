@@ -26,8 +26,8 @@ export const Command: ICommand<ICommandParams> = {
     const tabInfo = window.getTab(tabToClose.id)!;
     const tabsBelow = tabInfo.desktop.getTabsBelow(tabToClose.id);
 
-    for (const tabData of tabsBelow) {
-      await browser.closeTab(tabData.tab.id);
-    }
+    const promises = tabsBelow.map((tb) => browser.closeTab(tb.tab.id, { emit: false }));
+    await Promise.all(promises);
+    browser.eventsChannel.emit('window:tab-did-close', window);
   },
 };

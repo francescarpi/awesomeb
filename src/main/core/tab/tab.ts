@@ -293,6 +293,8 @@ export class Tab extends UIView {
       this.refreshWebContentsView();
     }
 
+    this.browser.reindexWebContents(this);
+
     registerTabEvents(this.browser, this);
 
     this._suspended = false;
@@ -332,6 +334,10 @@ export class Tab extends UIView {
   suspend() {
     if (this._suspended) {
       return;
+    }
+
+    if (!this.isDestroyed) {
+      this.browser.removeWebContentsIndex(this.webContentsId);
     }
 
     this._loading = false;
