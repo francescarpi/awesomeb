@@ -19,6 +19,7 @@ import type {
   IVisibleDesktops,
   IDebugWebContent,
   TWindowId,
+  IAbout,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -37,7 +38,7 @@ import {
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
-import { type WebContentsView, type WebContents } from 'electron';
+import { type WebContentsView, type WebContents, app } from 'electron';
 import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
 
 export class BrowserRenderer {
@@ -402,5 +403,11 @@ export class BrowserRenderer {
       partition: getPartitionInfo(row.wc.session),
       ...webContentsMemoryAndCPU(row.wc),
     }));
+  }
+
+  about(): IAbout {
+    return {
+      version: app.getVersion(),
+    };
   }
 }
