@@ -382,21 +382,6 @@ describe('Browser', () => {
       expect(browser.getTab(result2!.tab.id)).not.toBeNull();
     });
 
-    test('getTab lazy fallback finds tabs created outside Browser', () => {
-      browser.createWindow(1, { withDesktops: true });
-      const desktop = browser.activeWindow!.selectedDesktop;
-      const tc = desktop.createTabContainer(100);
-      tc.createTab(200, {
-        partition: partitions.default,
-        url: 'http://example.com',
-      });
-
-      const lookup = browser.getTab(200);
-      expect(lookup).not.toBeNull();
-      expect(lookup!.tab.id).toBe(200);
-      expect(lookup!.tabContainer.id).toBe(100);
-    });
-
     test('getTabByWebContentsId finds tab by its webContentsId', async () => {
       browser.createWindow(1, { withDesktops: true });
       const result = await browser.openURL('http://example.com');

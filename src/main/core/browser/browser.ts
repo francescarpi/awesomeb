@@ -36,6 +36,7 @@ export class Browser {
   private readonly _tabIndex: Map<TTabId, IWinDesConTab> = new Map();
   private readonly _webContentsIndex: Map<number, TTabId> = new Map();
   private readonly _tabContainerIndex: Map<TTabContainerId, IWinDesCon> = new Map();
+
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
   public readonly toRenderer = new BrowserToRenderer(this);
@@ -123,20 +124,26 @@ export class Browser {
 
   removeWindow(id: TWindowId) {
     const w = this._windows.get(id);
-    if (w) {
-      for (const desktop of w.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          this._tabContainerIndex.delete(tabContainer.id);
-          for (const tab of tabContainer.tabs) {
-            this._unindexTab(tab.id);
-          }
+    if (!w) {
+      scopeLog.warn(`No window found with id ${id}`);
+      return;
+    }
+
+    for (const desktop of w.desktops) {
+      for (const tabContainer of desktop.tabContainers) {
+        this._tabContainerIndex.delete(tabContainer.id);
+        for (const tab of tabContainer.tabs) {
+          this._unindexTab(tab.id);
         }
       }
     }
+
     this._windows.delete(id);
+
     scopeLog.info(
       `Removed window with id ${id} ` + `(Total windows: ${BrowserWindow.getAllWindows().length})`,
     );
+
     if (this._activeWindowId === id) {
       this._activeWindowId = null;
     }
@@ -318,8 +325,10 @@ export class Browser {
     }
 
     this._unindexTabContainer(sourceData.tabContainer.id);
+
     sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
     targetData.desktop.addTabContainer(sourceData.tabContainer);
+
     this._indexTabContainer(targetData.window, targetData.desktop, sourceData.tabContainer);
 
     for (const tab of sourceData.tabContainer.tabs) {
@@ -389,43 +398,15 @@ export class Browser {
   }
 
   getTab(id: TTabId): IWinDesConTab | null {
-    const indexed = this._tabIndex.get(id);
-    if (indexed) return indexed;
-
-    for (const window of this._windows.values()) {
-      const desConTab = window.getTab(id);
-      if (desConTab) {
-        const result: IWinDesConTab = {
-          window,
-          desktop: desConTab.desktop,
-          tabContainer: desConTab.tabContainer,
-          tab: desConTab.tab,
-        };
-        this._tabIndex.set(id, result);
-        if (!desConTab.tab.isDestroyed) {
-          this._webContentsIndex.set(desConTab.tab.webContentsId, id);
-        }
-        return result;
-      }
-    }
-    return null;
+    return this._tabIndex.get(id) || null;
   }
 
   getTabByWebContentsId(webContentsId: number): IWinDesConTab | null {
     const tabId = this._webContentsIndex.get(webContentsId);
-    if (tabId !== undefined) {
-      const indexed = this._tabIndex.get(tabId);
-      if (indexed) return indexed;
+    if (!tabId) {
+      return null;
     }
-
-    for (const tabInfo of this.tabs) {
-      if (tabInfo.tab.webContentsId === webContentsId) {
-        this._tabIndex.set(tabInfo.tab.id, tabInfo);
-        this._webContentsIndex.set(webContentsId, tabInfo.tab.id);
-        return tabInfo;
-      }
-    }
-    return null;
+    return this._tabIndex.get(tabId) || null;
   }
 
   get selectedTab(): IWinDesConTab | null {
@@ -450,35 +431,11 @@ export class Browser {
   }
 
   getTabContainer(id: TTabContainerId): IWinDesCon | null {
-    const indexed = this._tabContainerIndex.get(id);
-    if (indexed) return indexed;
-
-    for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          if (tabContainer.id === id) {
-            const result = { window, desktop, tabContainer };
-            this._tabContainerIndex.set(id, result);
-            return result;
-          }
-        }
-      }
-    }
-    return null;
+    return this._tabContainerIndex.get(id) || null;
   }
 
   get tabs(): IWinDesConTab[] {
-    const result: IWinDesConTab[] = [];
-    for (const window of this._windows.values()) {
-      for (const desktop of window.desktops) {
-        for (const tabContainer of desktop.tabContainers) {
-          for (const tab of tabContainer.tabs) {
-            result.push({ window, desktop, tabContainer, tab });
-          }
-        }
-      }
-    }
-    return result;
+    return Array.from(this._tabIndex.values());
   }
 
   closeTabPreview(tabId: TTabId) {
