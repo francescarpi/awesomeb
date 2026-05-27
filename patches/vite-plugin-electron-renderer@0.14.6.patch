@@ -1,0 +1,82 @@
+diff --git a/dist/index.js b/dist/index.js
+index 8173cec147a91af7c42f277cd3f0b8629b8093ac..3a68ad37fad5a35a0df1dd834c4838f41407fd49 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -303,10 +303,13 @@ function renderer(options = {}) {
+         }
+         resolveKeys.push(key);
+       }
++      // Only intercept "electron" — Node.js built-ins resolve natively
++      // and should NOT be shimmed (they cause require-is-not-defined errors
++      // in ESM contexts like Astro SSR dev, and are unnecessary since
++      // AwesomeB uses nodeIntegration:false).
+       const aliases = [{
+-        find: new RegExp(`^(?:node:)?(${["electron", ...builtins].join("|")})$`),
+-        // https://github.com/rollup/plugins/blob/alias-v5.0.0/packages/alias/src/index.ts#L90
+-        replacement: "$1",
++        find: /^electron$/,
++        replacement: "electron",
+         async customResolver(source) {
+           let id = moduleCache.get(source);
+           if (!id) {
+@@ -314,9 +317,8 @@ function renderer(options = {}) {
+             if (!fs.existsSync(id)) {
+               ensureDir(path.dirname(id));
+               fs.writeFileSync(
+-                // lazy build
+                 id,
+-                source === "electron" ? electron : getSnippets({ import: source, export: source })
++                electron
+               );
+             }
+             moduleCache.set(source, id);
+@@ -443,7 +445,7 @@ function getSnippets(module2) {
+     /* not await import */
+     require$1(module2.import)
+   ) });
+-  return `const avoid_parse_require = require; const _M_ = avoid_parse_require("${module2.export}");
++  return `import { createRequire as __cr } from "node:module";const avoid_parse_require = typeof require !== "undefined" ? require : __cr(import.meta.url); const _M_ = avoid_parse_require("${module2.export}");
+ ${exports2}`;
+ }
+ async function getPreBundleSnippets(options) {
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 999ae2b35d56602a3d1681d220de3dd41317b337..5b4a93e207fc900f329cb11188eb317b45057a32 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -300,10 +300,13 @@ function renderer(options = {}) {
+         }
+         resolveKeys.push(key);
+       }
++      // Only intercept "electron" — Node.js built-ins resolve natively
++      // and should NOT be shimmed (they cause require-is-not-defined errors
++      // in ESM contexts like Astro SSR dev, and are unnecessary since
++      // AwesomeB uses nodeIntegration:false).
+       const aliases = [{
+-        find: new RegExp(`^(?:node:)?(${["electron", ...builtins].join("|")})$`),
+-        // https://github.com/rollup/plugins/blob/alias-v5.0.0/packages/alias/src/index.ts#L90
+-        replacement: "$1",
++        find: /^electron$/,
++        replacement: "electron",
+         async customResolver(source) {
+           let id = moduleCache.get(source);
+           if (!id) {
+@@ -311,9 +314,8 @@ function renderer(options = {}) {
+             if (!fs.existsSync(id)) {
+               ensureDir(path.dirname(id));
+               fs.writeFileSync(
+-                // lazy build
+                 id,
+-                source === "electron" ? electron : getSnippets({ import: source, export: source })
++                electron
+               );
+             }
+             moduleCache.set(source, id);
+@@ -440,7 +442,7 @@ function getSnippets(module) {
+     /* not await import */
+     require2(module.import)
+   ) });
+-  return `const avoid_parse_require = require; const _M_ = avoid_parse_require("${module.export}");
++  return `import { createRequire as __cr } from "node:module";const avoid_parse_require = typeof require !== "undefined" ? require : __cr(import.meta.url); const _M_ = avoid_parse_require("${module.export}");
+ ${exports}`;
+ }
+ async function getPreBundleSnippets(options) {
