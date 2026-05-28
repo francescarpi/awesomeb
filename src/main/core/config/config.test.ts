@@ -33,8 +33,7 @@ describe('Config', () => {
     expect(config.getProperty('shortcutMap')).toBe('generic-iso');
   });
 
-  test('constructor with corrupted disk config throws ZodError', () => {
-    // Write an invalid config directly to the file
+  test('constructor with corrupted disk config falls back to defaults', () => {
     const configPath = getConfigFilePath();
     fs.mkdirSync(path.dirname(configPath), { recursive: true });
     fs.writeFileSync(
@@ -50,7 +49,9 @@ describe('Config', () => {
       }),
     );
 
-    expect(() => new Config()).toThrow(ZodError);
+    const config = new Config();
+    expect(config).toBeDefined();
+    expect(config.getProperty('shortcutMap')).toBe('generic-iso');
   });
 
   test('getProperty validates on read', () => {

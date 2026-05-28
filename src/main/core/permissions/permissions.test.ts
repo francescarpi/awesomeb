@@ -1,6 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { Permissions } from './permissions';
-import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
@@ -33,7 +32,7 @@ describe('Permissions', () => {
     expect(permissions.all).toEqual({});
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getPermissionsFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -43,7 +42,9 @@ describe('Permissions', () => {
       }),
     );
 
-    expect(() => new Permissions()).toThrow(ZodError);
+    const permissions = new Permissions();
+    expect(permissions).toBeDefined();
+    expect(permissions.all).toEqual({});
   });
 
   test('set() persists permission', () => {

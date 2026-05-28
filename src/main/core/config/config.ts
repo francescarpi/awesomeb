@@ -5,6 +5,7 @@ import os from 'os';
 import { EPermissionConfigType } from '~/types';
 import { ConfigScheme, type IConfig, type IConfigSearchEngine } from './schemes';
 import { DEFAULT_UI_THEME } from '~/constants';
+import { validateStore } from '@/core/validation';
 
 export class Config extends Store<IConfig> {
   constructor() {
@@ -60,8 +61,8 @@ export class Config extends Store<IConfig> {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    ConfigScheme.parse(this.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this.store = validateStore(ConfigScheme, this.store, 'Config', defaults);
   }
 
   getProperty<K extends keyof IConfig>(key: K): IConfig[K] {

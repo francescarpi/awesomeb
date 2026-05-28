@@ -1,6 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { TabMarks } from './TabMarks';
-import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
@@ -43,7 +42,7 @@ describe('TabMarks', () => {
     expect(tabMarks.all).toEqual([]);
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getMarksFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -53,7 +52,9 @@ describe('TabMarks', () => {
       }),
     );
 
-    expect(() => new TabMarks()).toThrow(ZodError);
+    const tabMarks = new TabMarks();
+    expect(tabMarks).toBeDefined();
+    expect(tabMarks.all).toEqual([]);
   });
 
   test('add() persists valid mark', () => {

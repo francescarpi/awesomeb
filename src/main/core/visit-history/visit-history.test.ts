@@ -1,6 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { VisitHistory } from './visit-history';
-import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
@@ -33,7 +32,7 @@ describe('VisitHistory', () => {
     expect(vh.getAll()).toEqual([]);
   });
 
-  test('constructor with corrupted disk JSON throws ZodError', () => {
+  test('constructor with corrupted disk JSON falls back to defaults', () => {
     const filePath = getVisitHistoryFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -43,7 +42,9 @@ describe('VisitHistory', () => {
       }),
     );
 
-    expect(() => new VisitHistory()).toThrow(ZodError);
+    const vh = new VisitHistory();
+    expect(vh).toBeDefined();
+    expect(vh.getAll()).toEqual([]);
   });
 
   test('addUrl() creates new HistoryItem', () => {
@@ -234,7 +235,7 @@ describe('VisitHistory', () => {
     expect(all[0].title).toBe('Example');
   });
 
-  test('invalid write throws ZodError', () => {
+  test('invalid on-disk data falls back to defaults', () => {
     const vh = new VisitHistory();
     vh.addUrl({ url: 'https://example.com' });
 
@@ -253,7 +254,9 @@ describe('VisitHistory', () => {
       }),
     );
 
-    expect(() => new VisitHistory()).toThrow(ZodError);
+    const vh2 = new VisitHistory();
+    expect(vh2).toBeDefined();
+    expect(vh2.getAll()).toEqual([]);
   });
 
   test('cleanup removes entries older than retention days', () => {

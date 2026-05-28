@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { MarksStoreScheme, type ITabMark, type IMarksStore } from './schemes';
 import type { TTabId } from '~/types';
+import { validateStore } from '@/core/validation';
 
 export class TabMarks {
   private readonly _store: Store<IMarksStore>;
@@ -18,8 +19,8 @@ export class TabMarks {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    MarksStoreScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(MarksStoreScheme, this._store.store, 'TabMarks', defaults);
   }
 
   add(trigger: string, tabId: TTabId, title: string) {

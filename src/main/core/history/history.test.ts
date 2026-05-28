@@ -1,6 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { History } from './history';
-import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import path from 'path';
 import fs from 'fs';
@@ -32,7 +31,7 @@ describe('History', () => {
     expect(history).toBeDefined();
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getHistoryFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -42,7 +41,9 @@ describe('History', () => {
       }),
     );
 
-    expect(() => new History()).toThrow(ZodError);
+    const history = new History();
+    expect(history).toBeDefined();
+    expect(history.get(999)).toBeNull();
   });
 
   test('get() returns null for non-existent tab', () => {
@@ -89,7 +90,7 @@ describe('History', () => {
     expect(history.get(1)).toBeNull();
   });
 
-  test('_store.set() rejects invalid data', () => {
+  test('_store with invalid data falls back to defaults', () => {
     const filePath = getHistoryFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -99,6 +100,8 @@ describe('History', () => {
       }),
     );
 
-    expect(() => new History()).toThrow(ZodError);
+    const history = new History();
+    expect(history).toBeDefined();
+    expect(history.get(1)).toBeNull();
   });
 });

@@ -16,6 +16,7 @@ import {
 } from './types';
 import { bestMatchWithRange } from './helpers';
 import { randomUUID } from 'crypto';
+import { validateStore } from '@/core/validation';
 
 export class VisitHistory {
   private readonly _store: Store<IVisitHistory>;
@@ -32,8 +33,13 @@ export class VisitHistory {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    VisitHistoryStoreScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(
+      VisitHistoryStoreScheme,
+      this._store.store,
+      'VisitHistory',
+      defaults,
+    );
   }
 
   get all(): IHistoryItem[] {

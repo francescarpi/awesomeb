@@ -1,6 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { ClosedHistory } from './closed-history';
-import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
@@ -33,7 +32,7 @@ describe('ClosedHistory', () => {
     expect(history.tabs).toEqual([]);
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getClosedHistoryFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -43,7 +42,9 @@ describe('ClosedHistory', () => {
       }),
     );
 
-    expect(() => new ClosedHistory()).toThrow(ZodError);
+    const history = new ClosedHistory();
+    expect(history).toBeDefined();
+    expect(history.tabs).toEqual([]);
   });
 
   test('tabs getter validates on read', () => {

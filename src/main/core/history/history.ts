@@ -4,6 +4,7 @@ import { userDataPath } from '@/paths';
 import { Tab } from '@/core';
 import { TTabId } from '~/types';
 import { NavigationEntry, WebContents } from 'electron';
+import { validateStore } from '@/core/validation';
 
 export class History {
   private readonly _store: Store<ISessionHistory>;
@@ -22,8 +23,8 @@ export class History {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    SessionHistoryScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(SessionHistoryScheme, this._store.store, 'History', defaults);
   }
 
   save(tab: Tab) {

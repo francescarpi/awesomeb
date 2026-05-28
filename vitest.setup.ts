@@ -146,5 +146,8 @@ vi.mock('electron', () => {
       buildFromTemplate: vi.fn(),
       setApplicationMenu: vi.fn(),
     },
+    dialog: {
+      showErrorBox: vi.fn(),
+    },
   };
 });
