@@ -5,12 +5,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 <BlackBgWithTitle title="Debug">
   <div>
     <div id="webcontents"></div>
+    <div id="tabindex"></div>
   </div>
 </BlackBgWithTitle>
 
 <script>
   import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
-  import type { IDebugWebContent } from '~/types';
+  import type { IDebugWebContent, IDebugTabIndex } from '~/types';
 
   document.title = 'Debug page';
 
@@ -22,6 +23,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     searchQuery: '',
     lastUpdated: 0,
     error: null as string | null,
+    tabIndexData: [] as IDebugTabIndex[],
   };
 
   let intervalId: number | null = null;
@@ -30,9 +32,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   async function fetchData() {
     try {
       const wcs = await abDebug.webContents();
+      const tabIndexData = await abDebug.tabIndex();
       state.rawWcs = wcs;
       state.error = null;
       state.lastUpdated = Date.now();
+      state.tabIndexData = tabIndexData;
       updateSelectOptions();
       render();
     } catch (err) {
@@ -255,8 +259,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     );
   }
 
-  const renderer = new Renderer(renderWCs());
-  renderer.render('webcontents');
+  const wcRenderer = new Renderer(renderWCs());
+  wcRenderer.render('webcontents');
+  const tiRenderer = new Renderer(renderTabIndex());
+  tiRenderer.render('tabindex');
 
   const placeholder = document.getElementById('select-placeholder');
   if (placeholder) {
@@ -287,7 +293,8 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   }
 
   function render() {
-    renderer.update(renderWCs());
+    wcRenderer.update(renderWCs());
+    tiRenderer.update(renderTabIndex());
   }
 
   startInterval();
@@ -302,4 +309,55 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   window.addEventListener('pagehide', stopInterval);
   window.addEventListener('beforeunload', stopInterval);
+
+  function renderTabIndex(): VNode {
+    console.log(state.tabIndexData);
+    return h(
+      'div',
+      { class: c('mt-3') },
+      h(
+        'p',
+        { class: c('text-sm', 'mb-2') },
+        'Tab index data for all tabs in all windows/desktops.',
+      ),
+      h(
+        'div',
+        { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
+        h(
+          'table',
+          { class: c('table', 'table-sm') },
+          h(
+            'thead',
+            null,
+            h(
+              'tr',
+              null,
+              h('th', null, 'Idx Tab Id'),
+              h('th', null, 'Window'),
+              h('th', null, 'Desktop'),
+              h('th', null, 'Tab Container'),
+              h('th', null, 'Tab Id'),
+              h('th', null, 'Tab Title'),
+            ),
+          ),
+          h(
+            'tbody',
+            null,
+            ...state.tabIndexData.map((entry) =>
+              h(
+                'tr',
+                null,
+                h('td', null, entry.indexTabId),
+                h('td', null, entry.winId),
+                h('td', null, entry.desktopId),
+                h('td', null, entry.tabContainerID),
+                h('td', null, entry.tab.id),
+                h('td', null, entry.tab.title),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 </script>

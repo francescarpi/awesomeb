@@ -29,6 +29,7 @@ import type {
   TMediaSessionAction,
   IDebugWebContent,
   IAbout,
+  IDebugTabIndex,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -217,6 +218,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abDebug: {
     webContents: () => Promise<IDebugWebContent[]>;
+    tabIndex: () => Promise<IDebugTabIndex[]>;
   };
 
   //--------------------------------------------------------------------------------------

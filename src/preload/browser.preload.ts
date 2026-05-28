@@ -354,6 +354,9 @@ const abDebug = {
   webContents: () => {
     return ipcRenderer.invoke('debug:webcontents', {});
   },
+  tabIndex: () => {
+    return ipcRenderer.invoke('debug:tabindex', {});
+  },
 };
 
 //--------------------------------------------------------------------------------------

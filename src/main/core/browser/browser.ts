@@ -616,4 +616,8 @@ export class Browser {
 
     this.eventsChannel.emit('tabcontainer:did-unsplit', window, desktop);
   }
+
+  get tabIndex(): Map<TTabId, IWinDesConTab> {
+    return this._tabIndex;
+  }
 }
