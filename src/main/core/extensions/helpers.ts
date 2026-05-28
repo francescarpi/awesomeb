@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import log from 'electron-log';
 import { Session } from 'electron';
+import { sessionName } from '@/core';
 
 const scopeLog = log.scope('ExtensionsHelper');
 
@@ -130,6 +131,9 @@ export function loadIcon(
  * @param extensionPath The file system path to the extension's manifest directory.
  */
 export async function loadExtensionToSession(ses: Session, extension: IExtension) {
+  scopeLog.debug(
+    `Attempting to load extension ${extension.id} (${extension.manifest.version}), path ${extension.manifestPath} to session ${sessionName(ses)}`,
+  );
   const sessionExtension = ses.extensions.getExtension(extension.id);
   if (sessionExtension) {
     scopeLog.info(`Extension ${extension.id} already loaded in this session`);
@@ -141,6 +145,24 @@ export async function loadExtensionToSession(ses: Session, extension: IExtension
     scopeLog.error(`Failed to load extension ${extension.id} from path ${extension.manifestPath}`);
     return;
   }
+
+  ses.extensions.on('extension-unloaded', (_event, unloadedExtension) => {
+    if (unloadedExtension.id === extension.id) {
+      scopeLog.debug(`Extension ${extension.id} was unloaded from session ${sessionName(ses)}`);
+    }
+  });
+
+  ses.extensions.on('extension-ready', (_event, readyExtension) => {
+    if (readyExtension.id === extension.id) {
+      scopeLog.debug(`Extension ${extension.id} is ready in session ${sessionName(ses)}`);
+    }
+  });
+
+  ses.extensions.on('extension-loaded', (_event, loadedExt) => {
+    if (loadedExt.id === extension.id) {
+      scopeLog.debug(`Extension ${extension.id} has been loaded in session ${sessionName(ses)}`);
+    }
+  });
 }
 
 export function unloadExtensionFromSession(ses: Session, extensionId: TExtensionId) {

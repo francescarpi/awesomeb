@@ -23,6 +23,7 @@ export function radioBtn(
         name,
         id,
         onChange,
+        onClick: onChange,
       },
       '',
     ),
