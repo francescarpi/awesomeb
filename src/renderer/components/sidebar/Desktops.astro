@@ -59,6 +59,7 @@
                 'select-none',
                 'overflow-hidden',
                 desktop.selected && 'bg-white/20',
+                desktop.requireAttention && 'bg-red-500/20 border-error',
               ),
               style: 'app-region: no-drag;',
               onclick: () => abDesktops.select(winId, desktop.id),
@@ -89,28 +90,6 @@
               },
               '',
             ),
-            h('div', {
-              class: c(
-                'status',
-                'status-error',
-                'status-lg',
-                'animate-ping',
-                'absolute',
-                '-right-0.5',
-                '-top-0.5',
-                desktop.requireAttention ? 'block' : 'hidden',
-              ),
-            }),
-            h('div', {
-              class: c(
-                'status',
-                'status-error',
-                'absolute',
-                'right-0',
-                'top-0',
-                desktop.requireAttention ? 'block' : 'hidden',
-              ),
-            }),
             h(
               'div',
               {
