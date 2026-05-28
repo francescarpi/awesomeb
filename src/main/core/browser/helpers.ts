@@ -6,6 +6,7 @@ import {
   Partition,
   getNextPreviousBounds,
   partitions,
+  Window,
 } from '@/core';
 import {
   HandlerDetails,
@@ -86,26 +87,7 @@ export function parseTarget(
     window = targetWindow;
   }
 
-  if (targetId === 'new-window') {
-    const newBounds = window.bounds;
-    newBounds.x += 30;
-    newBounds.y += 30;
-
-    window = browser.createWindow(browser.idGenerator.nextWindowId, {
-      bounds: newBounds,
-      withDesktops: true,
-    });
-
-    scopeLog.info(
-      `Created new window with id ${window.id}, default desktop is ${window.selectedDesktop.id}`,
-    );
-  } else if (targetId === 'new-window-left') {
-    const bounds = getNextPreviousBounds(browser, 'previous') || undefined;
-    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
-  } else if (targetId === 'new-window-right') {
-    const bounds = getNextPreviousBounds(browser, 'next') || undefined;
-    window = browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
-  }
+  window = createWindowByTarget(browser, window, targetId);
 
   let desktop = window.selectedDesktop;
   if (targetId.startsWith('desktop-')) {
@@ -146,6 +128,35 @@ export function parseTarget(
   }
 
   return { window, desktop, tabContainer, partition };
+}
+
+export function createWindowByTarget(
+  browser: Browser,
+  activeWindow: Window,
+  targetId: string,
+): Window {
+  if (targetId === 'new-window') {
+    const newBounds = activeWindow.bounds;
+    newBounds.x += 30;
+    newBounds.y += 30;
+
+    return browser.createWindow(browser.idGenerator.nextWindowId, {
+      bounds: newBounds,
+      withDesktops: true,
+    });
+  }
+
+  if (targetId === 'new-window-left') {
+    const bounds = getNextPreviousBounds(browser, 'previous') || undefined;
+    return browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
+  }
+
+  if (targetId === 'new-window-right') {
+    const bounds = getNextPreviousBounds(browser, 'next') || undefined;
+    return browser.createWindow(browser.idGenerator.nextWindowId, { bounds, withDesktops: true });
+  }
+
+  return activeWindow;
 }
 
 export function windowOpenHadler(
