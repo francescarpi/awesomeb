@@ -70,7 +70,12 @@
             },
             h(
               'span',
-              { class: c(desktop.selected && 'hidden', 'sidebar:group-hover:hidden') },
+              {
+                class: c(
+                  desktop.selected && desktop.name && desktop.name.trim() !== '' && 'hidden',
+                  desktop.name && desktop.name.trim() !== '' ? 'sidebar:group-hover:hidden' : '',
+                ),
+              },
               desktop.id,
             ),
             h(
@@ -101,8 +106,9 @@
                   'left-1/2',
                   '-translate-x-1/2',
                   'sidebar:hidden',
-                  'sidebar:group-[.selected]:block',
-                  'sidebar:group-hover:block',
+                  desktop.name && desktop.name.trim() !== ''
+                    ? 'sidebar:group-[.selected]:block sidebar:group-hover:block'
+                    : '',
                 ),
               },
               desktop.name || '',

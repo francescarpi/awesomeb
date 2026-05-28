@@ -1,9 +1,6 @@
 import type { ICommand } from './types';
 import type { TEntityType } from '~/types';
-import { parseTarget, Window } from '@/core';
-import log from 'electron-log';
-
-const scopeLog = log.scope('NewWindowCommand');
+import { createWindowByTarget, Window } from '@/core';
 
 export interface ICommandParams {
   target: TEntityType;
@@ -18,13 +15,9 @@ export const Command: ICommand<ICommandParams, { window: Window | null }> = {
   modal: {
     page: 'new-window',
   },
-  async handler({ params, browser }) {
-    const result = parseTarget(browser, { targetId: params.target });
-    if (!result) {
-      scopeLog.error('Failed to parse target', { params });
-      return { window: null };
-    }
-    return { window: result.window };
+  async handler({ params, browser, window }) {
+    const newWindow = createWindowByTarget(browser, window, params.target);
+    return { window: newWindow };
   },
   onPerformed({ window }) {
     if (window) {
