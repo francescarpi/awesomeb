@@ -13,6 +13,7 @@ import { Browser, partitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
 import path from 'path';
+import { validateStore } from '@/core/validation';
 
 const scopeLog = log.scope('Extensions');
 
@@ -36,8 +37,13 @@ export class Extensions {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    ExtensionsStoreScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(
+      ExtensionsStoreScheme,
+      this._store.store,
+      'Extensions',
+      defaults,
+    );
   }
 
   refresh() {

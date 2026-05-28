@@ -56,7 +56,7 @@ describe('Bookmarks', () => {
     expect(bookmarks.all).toEqual([]);
   });
 
-  test('constructor with corrupted disk JSON throws ZodError', () => {
+  test('constructor with corrupted disk JSON falls back to defaults', () => {
     const filePath = getBookmarksFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -66,7 +66,9 @@ describe('Bookmarks', () => {
       }),
     );
 
-    expect(() => new Bookmarks()).toThrow(ZodError);
+    const bookmarks = new Bookmarks();
+    expect(bookmarks).toBeDefined();
+    expect(bookmarks.all).toEqual([]);
   });
 
   test('all getter validates on read', () => {
@@ -100,12 +102,10 @@ describe('Bookmarks', () => {
     }
   });
 
-  test('add() rejects if resulting structure is invalid', () => {
+  test('add() falls back to defaults when on-disk data is invalid', () => {
     const bookmarks = new Bookmarks();
-    // Seed with valid data first
     bookmarks.update([createTestUrlBookmark()]);
 
-    // Manually corrupt the file on disk to simulate invalid state
     const filePath = getBookmarksFilePath();
     fs.writeFileSync(
       filePath,
@@ -114,9 +114,9 @@ describe('Bookmarks', () => {
       }),
     );
 
-    // Creating a new instance should throw because the on-disk data is invalid
-    // (missing dateAdded on the bookmark)
-    expect(() => new Bookmarks()).toThrow(ZodError);
+    const newBookmarks = new Bookmarks();
+    expect(newBookmarks).toBeDefined();
+    expect(newBookmarks.all).toEqual([]);
   });
 
   test('update() persists valid array', () => {

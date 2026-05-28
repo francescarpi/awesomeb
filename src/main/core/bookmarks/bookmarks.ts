@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { EBookmarkType, IPlainBookmark, type IBookmark } from '~/types';
 import { BookmarksStoreScheme, type IBookmarks } from './schemes';
+import { validateStore } from '@/core/validation';
 
 export class Bookmarks {
   private readonly _store: Store<IBookmarks>;
@@ -18,8 +19,13 @@ export class Bookmarks {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    BookmarksStoreScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(
+      BookmarksStoreScheme,
+      this._store.store,
+      'Bookmarks',
+      defaults,
+    );
   }
 
   get all(): IBookmark[] {

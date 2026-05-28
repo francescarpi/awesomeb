@@ -20,3 +20,4 @@ export * from './prompts';
 export * from './webauth';
 export * from './shortcuts';
 export * from './visit-history';
+export { validateStore } from './validation';

@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { MAX_CLOSED_TABS } from './constants';
 import { ClosedHistoryScheme, type IClosedTab, type IClosedHistory } from './schemes';
+import { validateStore } from '@/core/validation';
 
 export class ClosedHistory extends Store<IClosedHistory> {
   constructor() {
@@ -18,8 +19,8 @@ export class ClosedHistory extends Store<IClosedHistory> {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    ClosedHistoryScheme.parse(this.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this.store = validateStore(ClosedHistoryScheme, this.store, 'ClosedHistory', defaults);
   }
 
   addTab(title: string, url: string) {

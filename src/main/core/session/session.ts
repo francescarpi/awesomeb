@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { SessionStoreScheme, type ISessionStore, type ISessionWindow } from './schemes';
 import { Browser } from '@/core';
+import { validateStore } from '@/core/validation';
 import log from 'electron-log';
 
 const scopeLog = log.scope('Session');
@@ -21,8 +22,8 @@ export class Session extends Store<ISessionStore> {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    SessionStoreScheme.parse(this.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this.store = validateStore(SessionStoreScheme, this.store, 'Session', defaults);
   }
 
   get windows(): ISessionWindow[] {
