@@ -1,7 +1,6 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { Extensions } from './extensions';
 import { Browser } from '@/core';
-import { ZodError } from 'zod';
 import { userDataPath, extensionsPath } from '@/paths';
 import path from 'path';
 import fs from 'fs';
@@ -69,7 +68,7 @@ describe('Extensions', () => {
     expect(extensions.all).toEqual([]);
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getExtensionsFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -79,7 +78,9 @@ describe('Extensions', () => {
       }),
     );
 
-    expect(() => new Extensions(browser)).toThrow(ZodError);
+    const extensions = new Extensions(browser);
+    expect(extensions).toBeDefined();
+    expect(extensions.all).toEqual([]);
   });
 
   test('all getter validates on read', () => {

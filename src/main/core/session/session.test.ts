@@ -90,7 +90,7 @@ describe('Session', () => {
     expect(session.windows).toEqual([]);
   });
 
-  test('constructor with corrupted disk throws ZodError', () => {
+  test('constructor with corrupted disk falls back to defaults', () => {
     const filePath = getSessionFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(
@@ -100,7 +100,9 @@ describe('Session', () => {
       }),
     );
 
-    expect(() => new Session(browser)).toThrow(ZodError);
+    const session = new Session(browser);
+    expect(session).toBeDefined();
+    expect(session.windows).toEqual([]);
   });
 
   test('sessionToStore() validates on read', () => {

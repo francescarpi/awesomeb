@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { PermissionsStoreScheme, type IPermissionsStore } from './schemes';
 import type { THost, TPermission } from '~/types';
+import { validateStore } from '@/core/validation';
 
 import log from 'electron-log';
 const scopeLog = log.scope('Permissions');
@@ -23,8 +24,13 @@ export class Permissions {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk
-    PermissionsStoreScheme.parse(this._store.store);
+    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
+    this._store.store = validateStore(
+      PermissionsStoreScheme,
+      this._store.store,
+      'Permissions',
+      defaults,
+    );
   }
 
   get(host: THost, permission: TPermission): boolean | null {
