@@ -1,4 +1,4 @@
-import { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
+import type { TSearchEngineCode, ITarget, TPartitionId, TTabContainerId } from '~/types';
 import {
   config,
   Browser,
@@ -67,7 +67,12 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
 
 export function parseTarget(
   browser: Browser,
-  props?: { targetId?: string; partitionId?: TPartitionId; tabContainer?: TabContainer },
+  props?: {
+    targetId?: string;
+    partitionId?: TPartitionId;
+    tabContainer?: TabContainer;
+    afterTabContainerId?: TTabContainerId;
+  },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
   const partitionId = props?.partitionId;
@@ -115,7 +120,9 @@ export function parseTarget(
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
   } else {
-    tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
+      justAfter: props?.afterTabContainerId,
+    });
   }
 
   let partition: Partition;
