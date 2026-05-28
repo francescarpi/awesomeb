@@ -86,6 +86,13 @@ function openOptions(
       },
     },
     {
+      label: 'Open link in following tab',
+      icon: getIcon(EIcon.Open),
+      click: () => {
+        browser.openURL(url, { selectTab: true, afterTabContainerId: tabData.tabContainer.id });
+      },
+    },
+    {
       label: 'Open link in new background tab',
       icon: getIcon(EIcon.Open),
       click: () => {
