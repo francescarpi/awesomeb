@@ -231,6 +231,7 @@ export class Browser {
     const result = parseTarget(this, {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
+      afterTabContainerId: props?.afterTabContainerId,
     });
 
     if (!result) {
