@@ -20,6 +20,7 @@ import type {
   IDebugWebContent,
   TWindowId,
   IAbout,
+  IDebugTabIndex,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -399,6 +400,25 @@ export class BrowserRenderer {
       partition: getPartitionInfo(row.wc.session),
       ...webContentsMemoryAndCPU(row.wc),
     }));
+  }
+
+  debugTabIndex(): IDebugTabIndex[] {
+    const response: IDebugTabIndex[] = [];
+
+    for (const [idxTabId, tabData] of this._browser.tabIndex.entries()) {
+      response.push({
+        indexTabId: idxTabId,
+        winId: tabData.window.id,
+        desktopId: tabData.desktop.id,
+        tabContainerID: tabData.tabContainer.id,
+        tab: {
+          id: tabData.tab.id,
+          title: tabData.tab.title,
+        },
+      });
+    }
+
+    return response;
   }
 
   about(): IAbout {

@@ -57,6 +57,17 @@ export function setupBrowserIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
+  createHandler<{}>(
+    'debug:tabindex',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'debug')],
+    async ({}) => {
+      return browser.renderer.debugTabIndex();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
   createHandler<{}>('about:get', 'handle', browser, [windowChecker, modalChecker], async ({}) => {
     return browser.renderer.about();
   });
