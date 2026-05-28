@@ -132,6 +132,10 @@ export class BrowserRenderer {
         label: 'New tab',
       },
       {
+        id: 'after-current',
+        label: 'New following tab',
+      },
+      {
         id: 'split-tab',
         label: 'Split into selected tab',
       },

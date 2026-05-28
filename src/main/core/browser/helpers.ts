@@ -1,4 +1,4 @@
-import type { TSearchEngineCode, ITarget, TPartitionId, TTabContainerId } from '~/types';
+import type { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
 import {
   config,
   Browser,
@@ -71,7 +71,6 @@ export function parseTarget(
     targetId?: string;
     partitionId?: TPartitionId;
     tabContainer?: TabContainer;
-    afterTabContainerId?: TTabContainerId;
   },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
@@ -121,7 +120,7 @@ export function parseTarget(
     tabContainer = props.tabContainer;
   } else {
     tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
-      justAfter: props?.afterTabContainerId,
+      justAfter: targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined,
     });
   }
 

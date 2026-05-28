@@ -89,7 +89,7 @@ function openOptions(
       label: 'Open link in following tab',
       icon: getIcon(EIcon.Open),
       click: () => {
-        browser.openURL(url, { selectTab: true, afterTabContainerId: tabData.tabContainer.id });
+        browser.openURL(url, { selectTab: true, targetId: 'after-current' });
       },
     },
     {
