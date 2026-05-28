@@ -4,7 +4,7 @@ const searchParams = new URLSearchParams(window.location.search);
 
 contextBridge.executeInMainWorld({
   func: (
-    isExtension: () => boolean,
+    isExtension: boolean,
     iniPopup: (width: number, height: number) => void,
     crxMessage: <T>(extensionId: string, method: string, ...args: unknown[]) => Promise<T>,
     crxEvent: <T>(
@@ -12,7 +12,7 @@ contextBridge.executeInMainWorld({
       callback: (event: IpcRendererEvent, params: T) => void,
     ) => void,
   ) => {
-    if (!isExtension()) {
+    if (!isExtension) {
       return;
     }
 
@@ -183,9 +183,8 @@ contextBridge.executeInMainWorld({
     }
   },
   args: [
-    () => {
-      return location.href.startsWith('chrome-extension://');
-    },
+    location.href.startsWith('chrome-extension://') ||
+      location.href.includes('/extension-popup-failed?'),
     (width: number, height: number) => {
       return ipcRenderer.send('extensions:ini-popup', {
         winId: parseInt(searchParams.get('winId')!, 10),
