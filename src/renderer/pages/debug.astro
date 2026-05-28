@@ -311,7 +311,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   window.addEventListener('beforeunload', stopInterval);
 
   function renderTabIndex(): VNode {
-    console.log(state.tabIndexData);
     return h(
       'div',
       { class: c('mt-3') },
