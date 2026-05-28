@@ -121,28 +121,31 @@ const { isPage = false } = Astro.props;
       case EDownloadStatus.InProgress:
         return h(
           'div',
-          { class: c('flex', 'gap-1') },
+          { class: c('flex', 'gap-1', 'items-center') },
           btnIcon(Pause, {
-            classNames: ['text-warning'],
+            classNames: ['text-warning', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'pause', winId),
           }),
           btnIcon(Cancel, {
-            classNames: ['text-error'],
+            classNames: ['text-error', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
           }),
         );
       case EDownloadStatus.Completed:
-        return btnIcon(Search, { onClick: () => abDownloads.action(item.savePath, 'open', winId) });
+        return btnIcon(Search, {
+          classNames: ['w-5', 'h-5', 'text-base-content'],
+          onClick: () => abDownloads.action(item.savePath, 'open', winId),
+        });
       case EDownloadStatus.Paused:
         return h(
           'div',
           { class: c('flex', 'gap-1') },
           btnIcon(Resume, {
-            classNames: ['text-base-content'],
+            classNames: ['text-base-content', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'resume', winId),
           }),
           btnIcon(Cancel, {
-            classNames: ['text-error'],
+            classNames: ['text-error', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'cancel', winId),
           }),
         );
