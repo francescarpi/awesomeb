@@ -1,27 +1,14 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import type { IMediaSessionInfo, TMediaSessionAction } from '~/types';
+import { debounce } from '~/utils/debounce';
 
 export function iniMedia() {
   contextBridge.executeInMainWorld({
     func: (
+      debounce,
       setMediaSession: (info: IMediaSessionInfo | null) => void,
       onAction: (callback: (event: IpcRendererEvent, action: TMediaSessionAction) => void) => void,
     ) => {
-      function debounce<T extends (...args: any[]) => any>(
-        func: T,
-        wait: number,
-      ): (...args: Parameters<T>) => void {
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        return function (...args: Parameters<T>) {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
-          timeoutId = setTimeout(() => {
-            func(...args);
-            timeoutId = null;
-          }, wait);
-        };
-      }
       const updatePlaybackState = (volume: number) => {
         const { metadata, playbackState } = navigator.mediaSession;
         setMediaSession(
@@ -52,9 +39,12 @@ export function iniMedia() {
             updatePlaybackState(video.volume);
           });
 
-          const handleVolumeChange = debounce((e: Event) => {
-            const volume = (e.target as HTMLVideoElement).volume;
-            updatePlaybackState(volume);
+          const handleVolumeChange = debounce((_e: Event) => {
+            const vid = document.querySelector('video');
+            if (vid) {
+              const volume = (vid as HTMLVideoElement).volume;
+              updatePlaybackState(volume);
+            }
           }, 300);
 
           video.addEventListener('volumechange', handleVolumeChange);
@@ -80,6 +70,7 @@ export function iniMedia() {
       });
     },
     args: [
+      debounce,
       (info: IMediaSessionInfo | null) => {
         ipcRenderer.send('window:media-session-changed', { info });
       },
