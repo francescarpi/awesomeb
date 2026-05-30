@@ -39,9 +39,12 @@ export function registerBrowserEvents(browser: Browser) {
       browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
-      browser.toRenderer.refreshLayoutData(window);
 
       window.renderViews();
+
+      // Important to keep this after renderViews
+      browser.toRenderer.refreshLayoutData(window);
+
       browser.refreshMainMenu();
     },
   );
