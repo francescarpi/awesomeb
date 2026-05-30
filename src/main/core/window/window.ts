@@ -293,7 +293,7 @@ export class Window extends UIWindow {
     }
   }
 
-  async suspendTab(id: TTabId): Promise<boolean> {
+  async suspendTab(id: TTabId, props?: { emit?: boolean }): Promise<boolean> {
     const result = this.getTab(id);
     if (!result) {
       return false;
@@ -321,7 +321,9 @@ export class Window extends UIWindow {
       `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
     );
 
-    this.browser.eventsChannel.emit('window:tab-did-suspend', this, tab);
+    if (props?.emit ?? true) {
+      this.browser.eventsChannel.emit('window:tab-did-suspend', this);
+    }
 
     return true;
   }

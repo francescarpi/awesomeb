@@ -202,7 +202,7 @@ describe('Window Suspend Tab', () => {
 
     await window.suspendTab(tab.id);
 
-    expect(eventSpy).toHaveBeenCalledWith(window, tab);
+    expect(eventSpy).toHaveBeenCalledWith(window);
   });
 
   test('should suspend all tabs in the tab container', async () => {
