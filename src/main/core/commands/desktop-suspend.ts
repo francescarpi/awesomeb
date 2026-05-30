@@ -18,15 +18,19 @@ export const Command: ICommand<ICommandParams> = {
     page: TRIGGER,
   },
   visibility: ({ window }) => !!window,
-  async handler({ params, window }) {
+  async handler({ params, window, browser }) {
     const desktop = window.getDesktop(params.desktopId);
     if (!desktop) {
       scopeLog.error(`Desktop with id ${params.desktopId} not found`);
       return;
     }
 
-    for (const tabResult of desktop.tabs) {
-      window.suspendTab(tabResult.tab.id);
-    }
+    const promises = desktop.tabs.map((tabResult) =>
+      window.suspendTab(tabResult.tab.id, { emit: false }),
+    );
+
+    await Promise.all(promises);
+
+    browser.eventsChannel.emit('window:tab-did-suspend', window);
   },
 };
