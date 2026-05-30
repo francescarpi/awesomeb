@@ -13,6 +13,7 @@
   import Minus from '#/icons/minus.svg?raw';
   import Close from '#/icons/close.svg?raw';
   import Warning from '#/icons/warning.svg?raw';
+  import favicon from '#/assets/favicon.svg';
 
   const { winId } = getSearchParams();
 
@@ -32,8 +33,6 @@
   abDesktops.onRefreshSelected((_event, desktopId) => {
     refreshSelectedDesktop(desktopId);
   });
-
-  // const favicon = await abFavicons.get(winId, this._tab.id);
 
   // ----------------------------------------------------------------------
   function refreshSelectedDesktop(id: TDesktopId) {
@@ -119,6 +118,7 @@
                   'img', // Favicon
                   {
                     src: t.favicon || Favicon.src,
+                    onerror: `this.onerror=null;this.src="${favicon.src}";`,
                     class: c(
                       'w-5',
                       'h-5',
