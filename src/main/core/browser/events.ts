@@ -135,7 +135,7 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:tab-did-suspend', async (window: Window, _tab: Tab) => {
+  browser.eventsChannel.on('window:tab-did-suspend', async (window: Window) => {
     browser.toRenderer.refreshTabSwitcher(window);
     browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
