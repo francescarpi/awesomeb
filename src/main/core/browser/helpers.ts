@@ -47,6 +47,10 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
     return { valid: false, url };
   }
 
+  if (url.startsWith('localhost') || url.startsWith('127.0.0.1')) {
+    url = `http://${url}`;
+  }
+
   // If url does not start with http or https, we are going to add it, but only if seems to be a real url.
   // It means, the url ends with .com, .net, .org, etc.
   if (
