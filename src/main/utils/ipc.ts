@@ -1,6 +1,6 @@
 import { type IpcMainInvokeEvent, ipcMain } from 'electron';
 import log from 'electron-log';
-import { Browser, FindInPage, Window } from '@/core';
+import { Browser, FindInPage, Window, WelcomeWindow } from '@/core';
 import { UIPageView } from '@/ui';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import type { IWinDesConTab, TWindowId, TExtensionId, IExtension, TTabId } from '~/types';
@@ -340,4 +340,32 @@ export function conditionalChecker(
   args: Record<string, unknown>,
 ): CheckerFn[] {
   return criteriaFn(args) ? checker1 : checker2;
+}
+
+//--------------------------------------------------------------------------------
+export function welcomeWindowChecker(
+  browser: Browser,
+  event: IpcMainInvokeEvent,
+  _args: Record<string, unknown>,
+): { win: WelcomeWindow } | null {
+  if (!event.sender.getURL().endsWith('/welcome?')) {
+    scopeLog.warn(
+      `[WelcomeWindowChecker] WebContents URL ${event.sender.getURL()} does not match expected welcome page URL ending`,
+    );
+    return null;
+  }
+
+  if (!browser.welcomeWindow) {
+    scopeLog.warn(`[WelcomeWindowChecker] No welcome window instance found in browser`);
+    return null;
+  }
+
+  if (browser.welcomeWindow.webContentsID !== event.sender.id) {
+    scopeLog.warn(
+      `[WelcomeWindowChecker] WebContents ID ${event.sender.id} does not match welcome window WebContents ID ${browser.welcomeWindow.webContentsID}`,
+    );
+    return null;
+  }
+
+  return { win: browser.welcomeWindow };
 }

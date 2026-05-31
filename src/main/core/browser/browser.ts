@@ -9,6 +9,7 @@ import {
   closedHistory,
   Extensions,
   partitions,
+  WelcomeWindow,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -35,6 +36,7 @@ export class Browser {
   private readonly _tabIndex: Map<TTabId, IWinDesConTab> = new Map();
   private readonly _webContentsIndex: Map<number, TTabId> = new Map();
   private readonly _tabContainerIndex: Map<TTabContainerId, IWinDesCon> = new Map();
+  private _welcomeWindow: WelcomeWindow | null = null;
 
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
@@ -619,5 +621,13 @@ export class Browser {
 
   get tabIndex(): Map<TTabId, IWinDesConTab> {
     return this._tabIndex;
+  }
+
+  showWelcome() {
+    this._welcomeWindow = new WelcomeWindow(this);
+  }
+
+  get welcomeWindow(): WelcomeWindow | null {
+    return this._welcomeWindow;
   }
 }
