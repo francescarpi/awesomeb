@@ -15,7 +15,7 @@ import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
 import { Tab } from '@/core/tab/tab';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
-import { mainMenu } from '@/menu';
+import { mainMenu, minimumMenu } from '@/menu';
 import { Menu, BrowserWindow } from 'electron';
 import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';
@@ -624,6 +624,7 @@ export class Browser {
   }
 
   showWelcome() {
+    Menu.setApplicationMenu(minimumMenu());
     this._welcomeWindow = new WelcomeWindow(this);
   }
 
