@@ -10,6 +10,7 @@ import {
   Extensions,
   partitions,
   WelcomeWindow,
+  TabPreview,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -630,5 +631,27 @@ export class Browser {
 
   get welcomeWindow(): WelcomeWindow | null {
     return this._welcomeWindow;
+  }
+
+  openTabPreview(win: Window, parent: Tab, url: string) {
+    const previewTab = new Tab(this, this.idGenerator.nextTabId, {
+      partition: parent.partition,
+      suspended: false,
+      parent,
+    });
+
+    previewTab.setVisible(true);
+    previewTab.loadURL(url);
+
+    const tabPreview = new TabPreview(parent, previewTab);
+    parent.setTabPreview(tabPreview);
+
+    win.addView(tabPreview);
+    win.addView(tabPreview.tab);
+
+    win.renderViews();
+
+    this.toRenderer.refreshTabContainers(win);
+    this.refreshMainMenu();
   }
 }

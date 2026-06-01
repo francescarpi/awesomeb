@@ -198,9 +198,8 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
     menu: (actions, params, browserWindow, dictionarySuggestions) => {
       const tabData = browser.getTab(tab.id);
       if (!tabData) {
-        throw new Error(
-          `Failed to find Tab with ID ${tab.id} for context menu. Aborting context menu creation.`,
-        );
+        scopeLog.warn(`Context menu: No tab data found for Tab ID ${tab.id}`);
+        return [];
       }
 
       return tabWebContentsMenu(

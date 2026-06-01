@@ -11,8 +11,6 @@ import {
 import { FindInPageOptions, Certificate, type IpcMainInvokeEvent } from 'electron';
 import type { IWinDesConTab, TFindInPageAction, TTabPreviewAction } from '~/types';
 import log from 'electron-log';
-import { Tab } from './tab';
-import { TabPreview } from './tab-preview';
 import { CertificateError } from '@/core/tab/certificate-error';
 
 const scopeLog = log.scope('TabIPC');
@@ -188,25 +186,7 @@ export function setupTabIPC(browser: Browser) {
     browser,
     [tabChecker],
     async ({ tab, url }) => {
-      const previewTab = new Tab(browser, browser.idGenerator.nextTabId, {
-        partition: tab.tab.partition,
-        suspended: false,
-        parent: tab.tab,
-      });
-
-      previewTab.setVisible(true);
-      previewTab.loadURL(url);
-
-      const tabPreview = new TabPreview(tab.tab, previewTab);
-      tab.tab.setTabPreview(tabPreview);
-
-      tab.window.addView(tabPreview);
-      tab.window.addView(tabPreview.tab);
-
-      tab.window.renderViews();
-
-      browser.toRenderer.refreshTabContainers(tab.window);
-      browser.refreshMainMenu();
+      browser.openTabPreview(tab.window, tab.tab, url);
     },
   );
 

@@ -25,18 +25,21 @@ export class IdGenerator {
   }
 
   get nextTabId(): TTabId {
-    let maxId = 0;
+    const tabIds: number[] = [];
     for (const window of this._browser.windows.values()) {
       for (const desktop of window.desktops) {
         for (const tabContainer of desktop.tabContainers) {
           for (const tab of tabContainer.tabs) {
-            if (tab.id > maxId) {
-              maxId = tab.id;
+            tabIds.push(tab.id);
+            if (tab.tabPreview) {
+              tabIds.push(tab.tabPreview.tab.id);
             }
           }
         }
       }
     }
+
+    const maxId = Math.max(0, ...tabIds);
     return (maxId + 1) as TTabId;
   }
 }
