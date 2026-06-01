@@ -1,5 +1,5 @@
 import { Browser, partitions } from '@/core';
-import { loadPage } from '@/ui';
+import { loadPage, openDevTools } from '@/ui';
 import { BrowserWindow, app } from 'electron';
 
 export class WelcomeWindow {
@@ -29,6 +29,8 @@ export class WelcomeWindow {
     });
 
     loadPage(this.bw.webContents, 'welcome', {});
+
+    openDevTools(this.bw.webContents, 'welcome');
   }
 
   show() {

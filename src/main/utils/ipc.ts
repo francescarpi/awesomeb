@@ -348,9 +348,10 @@ export function welcomeWindowChecker(
   event: IpcMainInvokeEvent,
   _args: Record<string, unknown>,
 ): { win: WelcomeWindow } | null {
-  if (!event.sender.getURL().endsWith('/welcome?')) {
+  const url = event.sender.getURL();
+  if (!url.endsWith('/welcome?') && !url.endsWith('/welcome/index.html')) {
     scopeLog.warn(
-      `[WelcomeWindowChecker] WebContents URL ${event.sender.getURL()} does not match expected welcome page URL ending`,
+      `[WelcomeWindowChecker] WebContents URL ${url} does not match expected welcome page URL ending`,
     );
     return null;
   }
