@@ -225,4 +225,10 @@ declare global {
   const abBrowser: {
     about: (winId: TWindowId) => Promise<IAbout>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abWelcome: {
+    ready: () => void;
+    addSearchEnginedAndInitiate: (name: string, url: string) => void;
+  };
 }

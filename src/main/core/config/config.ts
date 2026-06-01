@@ -10,38 +10,7 @@ import { validateStore } from '@/core/validation';
 export class Config extends Store<IConfig> {
   constructor() {
     const defaults: IConfig = {
-      searchEngines: [
-        {
-          code: 'google',
-          label: 'Google',
-          url: 'https://www.google.com/search?q={query}',
-        },
-        {
-          code: 'bing',
-          label: 'Bing',
-          url: 'https://www.bing.com/search?q={query}',
-        },
-        {
-          code: 'duckduckgo',
-          label: 'DuckDuckGo',
-          url: 'https://duckduckgo.com/?q={query}',
-        },
-        {
-          code: 'ecosia',
-          label: 'Ecosia',
-          url: 'https://www.ecosia.org/search?q={query}',
-        },
-        {
-          code: 'perplexity',
-          label: 'Perplexity',
-          url: 'https://www.perplexity.ai/search/{query}',
-        },
-        {
-          code: 'wikipedia',
-          label: 'Wikipedia',
-          url: 'https://en.wikipedia.org/wiki/{query}',
-        },
-      ],
+      searchEngines: [],
       partitions: [],
       downloadsFolder: path.join(os.homedir(), 'Downloads'),
       themes: [],
@@ -90,5 +59,9 @@ export class Config extends Store<IConfig> {
     // Validate before persisting
     ConfigScheme.parse(config);
     this.store = { ...config };
+  }
+
+  get wasConfigured(): boolean {
+    return this.getProperty('searchEngines').length > 0;
   }
 }

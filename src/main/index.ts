@@ -23,6 +23,8 @@ import {
   setupPermissionsIPC,
   setupShortcutsIPC,
   setupVisitHistoryIPC,
+  config,
+  setupWelcomeIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -76,6 +78,11 @@ app.whenReady().then(async () => {
   setupWebauthIpc(browser);
   setupPermissionsIPC(browser);
   setupShortcutsIPC(browser);
+  setupWelcomeIPC(browser);
 
-  await browser.loadSession();
+  if (config.wasConfigured) {
+    await browser.loadSession();
+  } else {
+    browser.showWelcome();
+  }
 });

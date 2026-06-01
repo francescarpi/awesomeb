@@ -59,7 +59,7 @@ describe('Config', () => {
 
     // getProperty should work normally with valid data
     const searchEngines = config.getProperty('searchEngines');
-    expect(searchEngines.length).toBeGreaterThan(0);
+    expect(searchEngines.length).toBe(0);
   });
 
   test('config getter validates on read', () => {
@@ -119,12 +119,6 @@ describe('Config', () => {
     };
 
     expect(() => config.save(invalidConfig as unknown as typeof config.config)).toThrow(ZodError);
-  });
-
-  test('defaultSearchEngine returns first search engine', () => {
-    const config = new Config();
-    const defaultEngine = config.defaultSearchEngine;
-    expect(defaultEngine.code).toBe('google');
   });
 
   test('isStandardPermissions returns correct boolean', () => {

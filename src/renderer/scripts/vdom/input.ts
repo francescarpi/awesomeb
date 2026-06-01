@@ -12,13 +12,15 @@ export function input(
     visible?: boolean;
     autofocus?: boolean;
     select?: boolean;
-    onInput?: (value: string) => void;
+    onInput?: (value: string, target: HTMLInputElement) => void;
+    type?: string;
+    required?: boolean;
   },
 ): VNode {
   const visible = opts?.visible ?? true;
   const onInput = opts?.onInput
     ? (e: Event) => {
-        opts.onInput!((e.target as HTMLInputElement).value);
+        opts.onInput!((e.target as HTMLInputElement).value, e.target as HTMLInputElement);
       }
     : undefined;
   const onFocus = opts?.select
@@ -26,6 +28,8 @@ export function input(
         (e.target as HTMLInputElement).select();
       }
     : undefined;
+  const required = opts?.required ? 'required' : undefined;
+
   return h(
     'label',
     {
@@ -48,6 +52,8 @@ export function input(
         onInput,
         onFocus,
         class: c('text-base-content'),
+        type: opts?.type || 'text',
+        required,
       },
       '',
     ),
