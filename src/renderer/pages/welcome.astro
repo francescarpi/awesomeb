@@ -1,0 +1,235 @@
+---
+import Layout from '#/layouts/Base.astro';
+---
+
+<Layout>
+  <div id="container"></div>
+</Layout>
+
+<script>
+  import { Renderer, h, c, input } from '#/scripts';
+  import logo from '#/assets/icon.png';
+
+  abWelcome.ready();
+
+  const renderer = new Renderer(
+    h(
+      'div',
+      {
+        class: c(
+          'bg-black',
+          'fixed',
+          'inset-0',
+          'flex',
+          'flex-col',
+          'justify-center',
+          'items-center',
+        ),
+      },
+      h('div', { class: c('aurora'), 'aria-hidden': 'true' }),
+      h('img', { src: logo.src, alt: 'AwesomeB' }),
+      h(
+        'p',
+        { class: c('text-white', 'text-2xl', 'mt-4', 'absolute', 'font-mono', 'welcome') },
+        'Welcome to ',
+        h('b', null, 'AwesomeB(rowser)'),
+      ),
+      h(
+        'button',
+        { class: c('btn', 'btn-sm', 'absolute', 'initial'), onclick: handleSetup },
+        'Initial Setup',
+      ),
+    ),
+  ).render('container');
+
+  function handleSetup() {
+    renderer.update(
+      h(
+        'div',
+        {
+          class: c(
+            'bg-black',
+            'fixed',
+            'inset-0',
+            'text-white',
+            'flex',
+            'flex-col',
+            'justify-center',
+            'items-center',
+            'gap-4',
+          ),
+        },
+        h('div', { class: c('aurora') }),
+        h(
+          'p',
+          { class: c('px-4', 'text-center') },
+          'For AwesomeB to function correctly, a search engine must be configured as a minimum prerequisite. Please provide the URL for your desired search engine:',
+        ),
+        h(
+          'div',
+          { class: c('flex', 'flex-col') },
+          h('p', { class: c('px-4', 'text-center') }, 'Example:'),
+          h('code', {
+            class: c('px-4', 'text-center', 'text-xs'),
+            innerHTML: 'Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}',
+          }),
+        ),
+        h(
+          'div',
+          { class: c('w-100', 'flex', 'flex-col', 'gap-2') },
+          input('searchEngineName', 'Name', '', {
+            autofocus: true,
+            required: true,
+            onInput: () => checkInputsValids(),
+          }),
+          input('searchEngine', 'URL', '', {
+            required: true,
+            type: 'url',
+            onInput: () => checkInputsValids(),
+          }),
+        ),
+        h(
+          'small',
+          { class: c('px-4', 'text-center') },
+          'Note: The search engines can be modified at a later point within the main configuration settings.',
+        ),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'mt-4'),
+            disabled: true,
+            onclick: () => {
+              const nameInput = document.getElementById('searchEngineName') as HTMLInputElement;
+              const urlInput = document.getElementById('searchEngine') as HTMLInputElement;
+              abWelcome.addSearchEnginedAndInitiate(nameInput.value, urlInput.value);
+            },
+          },
+          'Save and start using AwesomeB',
+        ),
+      ),
+    );
+  }
+
+  function checkInputsValids() {
+    const nameInput = document.getElementById('searchEngineName') as HTMLInputElement;
+    const urlInput = document.getElementById('searchEngine') as HTMLInputElement;
+    const saveButton = document.querySelector('button') as HTMLButtonElement;
+
+    const isNameValid = nameInput.validity.valid;
+    const isUrlValid = urlInput.validity.valid && urlInput.value.includes('{query}');
+
+    saveButton.disabled = !(isNameValid && isUrlValid);
+  }
+</script>
+
+<style is:global>
+  img {
+    width: 100%;
+    height: auto;
+    animation: imgAnimation 2s ease-in-out forwards;
+  }
+
+  p.welcome {
+    animation: pAnimation 4s ease-in-out forwards;
+  }
+
+  button.initial {
+    animation: btnAnimation 4s ease-in-out forwards;
+  }
+
+  .aurora {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .aurora::before,
+  .aurora::after {
+    content: '';
+    position: absolute;
+    width: 70vmax;
+    height: 70vmax;
+    border-radius: 50%;
+    filter: blur(80px);
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+
+  .aurora::before {
+    background: radial-gradient(circle, rgba(0, 255, 157, 0.35), transparent 60%);
+    top: -25%;
+    left: -20%;
+    animation: auroraDrift1 18s ease-in-out infinite;
+  }
+
+  .aurora::after {
+    background: radial-gradient(circle, rgba(157, 77, 255, 0.3), transparent 60%);
+    bottom: -25%;
+    right: -20%;
+    animation: auroraDrift2 22s ease-in-out infinite;
+  }
+
+  @keyframes auroraDrift1 {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(40vw, 15vh) scale(1.25);
+    }
+  }
+
+  @keyframes auroraDrift2 {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-30vw, -10vh) scale(1.15);
+    }
+  }
+
+  @keyframes imgAnimation {
+    0% {
+      filter: grayscale(1) blur(6px);
+      transform: scale(1);
+    }
+    30% {
+      filter: grayscale(0) blur(0);
+      transform: scale(1);
+    }
+    100% {
+      transform: translate(0, -100px) scale(0.1);
+    }
+  }
+
+  @keyframes pAnimation {
+    0% {
+      filter: opacity(0);
+      transform: translateY(0);
+    }
+    55% {
+      filter: opacity(0);
+      transform: translateY(0);
+    }
+    100% {
+      filter: opacity(1);
+      transform: translateY(-50%);
+    }
+  }
+  @keyframes btnAnimation {
+    0% {
+      filter: opacity(0);
+      transform: translateY(0%);
+    }
+    75% {
+      filter: opacity(0);
+      transform: translateY(0%);
+    }
+    100% {
+      filter: opacity(1);
+      transform: translateY(120%);
+    }
+  }
+</style>

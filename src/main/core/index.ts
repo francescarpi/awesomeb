@@ -20,4 +20,5 @@ export * from './prompts';
 export * from './webauth';
 export * from './shortcuts';
 export * from './visit-history';
+export * from './welcome';
 export { validateStore } from './validation';

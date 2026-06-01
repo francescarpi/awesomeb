@@ -367,6 +367,16 @@ const abBrowser = {
 };
 
 //--------------------------------------------------------------------------------------
+const abWelcome = {
+  ready: (): void => {
+    ipcRenderer.send('welcome:ready', {});
+  },
+  addSearchEnginedAndInitiate: (name: string, url: string): void => {
+    ipcRenderer.send('welcome:add-search-engine-and-initiate', { name, url });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -390,3 +400,4 @@ contextBridge.exposeInMainWorld('abPermissions', abPermissions);
 contextBridge.exposeInMainWorld('abShortcuts', abShortcuts);
 contextBridge.exposeInMainWorld('abDebug', abDebug);
 contextBridge.exposeInMainWorld('abBrowser', abBrowser);
+contextBridge.exposeInMainWorld('abWelcome', abWelcome);
