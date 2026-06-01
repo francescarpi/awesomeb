@@ -80,12 +80,7 @@ export class Tab extends UIView {
       }
     }
 
-    if (!visibleTabs.includes(this.id)) {
-      this.setVisible(false);
-      return;
-    }
-
-    this.setVisible(true);
+    this.setVisible(visibleTabs.includes(this.id));
   }
 
   refreshBounds(window: Window) {
