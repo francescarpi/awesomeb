@@ -55,7 +55,18 @@ jobs:
       # path.txt and crashes with ENOENT if it is not present. Run the install
       # script explicitly so the binary and path.txt are in place before tests.
       - name: Ensure Electron binary is downloaded
-        run: node node_modules/electron/install.js
+        run: |
+          echo "--- before install ---"
+          ls -la node_modules/electron/ 2>&1 || true
+          ls -la node_modules/electron/dist/ 2>&1 || true
+          cat node_modules/electron/dist/version 2>&1 || echo "NO version file"
+          cat node_modules/electron/path.txt 2>&1 || echo "NO path.txt"
+          echo "--- running install.js ---"
+          node node_modules/electron/install.js
+          echo "--- exit code: $? ---"
+          echo "--- after install ---"
+          ls -la node_modules/electron/ 2>&1
+          cat node_modules/electron/path.txt 2>&1 || echo "STILL NO path.txt"
 
       - name: Astro Check
         run: pnpm astro check
