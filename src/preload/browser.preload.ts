@@ -371,6 +371,9 @@ const abWelcome = {
   ready: (): void => {
     ipcRenderer.send('welcome:ready', {});
   },
+  addSearchEnginedAndInitiate: (name: string, url: string): void => {
+    ipcRenderer.send('welcome:add-search-engine-and-initiate', { name, url });
+  },
 };
 
 //--------------------------------------------------------------------------------------

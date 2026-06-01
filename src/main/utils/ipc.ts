@@ -93,7 +93,7 @@ export function internalPageChecker(
 //--------------------------------------------------------------------------------
 export function windowChecker(
   browser: Browser,
-  event: IpcMainInvokeEvent,
+  _event: IpcMainInvokeEvent,
   args: Record<string, unknown>,
 ): { win: Window } | null {
   const { winId } = args as { winId?: TWindowId };
@@ -105,13 +105,6 @@ export function windowChecker(
   const win = browser.getWindow(winId);
   if (!win) {
     scopeLog.warn(`[WindowChecker] No window found with ID ${winId}`);
-    return null;
-  }
-
-  if (win.bw.webContents.id !== event.sender.id) {
-    scopeLog.warn(
-      `[WindowChecker] WebContents ID ${event.sender.id} does not match window WebContents ID ${win.bw.webContents.id} for window ${winId}`,
-    );
     return null;
   }
 

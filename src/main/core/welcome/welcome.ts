@@ -40,4 +40,8 @@ export class WelcomeWindow {
   get webContentsID(): number {
     return this.bw.webContents.id;
   }
+
+  close() {
+    this.bw.close();
+  }
 }

@@ -36,7 +36,7 @@ import Layout from '#/layouts/Base.astro';
       ),
       h(
         'button',
-        { class: c('btn', 'absolute', 'initial'), onclick: handleSetup },
+        { class: c('btn', 'btn-sm', 'absolute', 'initial'), onclick: handleSetup },
         'Initial Setup',
       ),
     ),
@@ -65,20 +65,27 @@ import Layout from '#/layouts/Base.astro';
           { class: c('px-4', 'text-center') },
           'For AwesomeB to function correctly, a search engine must be configured as a minimum prerequisite. Please provide the URL for your desired search engine:',
         ),
-        h('p', { class: c('px-4', 'text-center') }, 'Example:'),
-        h('code', { class: c('px-4', 'text-center') }, 'https://www.moogle.com/search?q={query}'),
         h(
           'div',
-          { class: c('w-100') },
-          input('searchEngine', 'Search Engine URL', '', {
+          { class: c('flex', 'flex-col') },
+          h('p', { class: c('px-4', 'text-center') }, 'Example:'),
+          h('code', {
+            class: c('px-4', 'text-center', 'text-xs'),
+            innerHTML: 'Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}',
+          }),
+        ),
+        h(
+          'div',
+          { class: c('w-100', 'flex', 'flex-col', 'gap-2') },
+          input('searchEngineName', 'Name', '', {
             autofocus: true,
             required: true,
+            onInput: () => checkInputsValids(),
+          }),
+          input('searchEngine', 'URL', '', {
+            required: true,
             type: 'url',
-            onInput: (value, target) => {
-              const isValid = target.validity.valid;
-              const hasQuery = value.includes('{query}');
-              document.querySelector('button')!.disabled = !(isValid && hasQuery);
-            },
+            onInput: () => checkInputsValids(),
           }),
         ),
         h(
@@ -86,9 +93,32 @@ import Layout from '#/layouts/Base.astro';
           { class: c('px-4', 'text-center') },
           'Note: The search engines can be modified at a later point within the main configuration settings.',
         ),
-        h('button', { class: c('btn', 'mt-4'), disabled: true }, 'Save and start using AwesomeB'),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-sm', 'mt-4'),
+            disabled: true,
+            onclick: () => {
+              const nameInput = document.getElementById('searchEngineName') as HTMLInputElement;
+              const urlInput = document.getElementById('searchEngine') as HTMLInputElement;
+              abWelcome.addSearchEnginedAndInitiate(nameInput.value, urlInput.value);
+            },
+          },
+          'Save and start using AwesomeB',
+        ),
       ),
     );
+  }
+
+  function checkInputsValids() {
+    const nameInput = document.getElementById('searchEngineName') as HTMLInputElement;
+    const urlInput = document.getElementById('searchEngine') as HTMLInputElement;
+    const saveButton = document.querySelector('button') as HTMLButtonElement;
+
+    const isNameValid = nameInput.validity.valid;
+    const isUrlValid = urlInput.validity.valid && urlInput.value.includes('{query}');
+
+    saveButton.disabled = !(isNameValid && isUrlValid);
   }
 </script>
 

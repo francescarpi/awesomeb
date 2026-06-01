@@ -80,7 +80,7 @@ app.whenReady().then(async () => {
   setupShortcutsIPC(browser);
   setupWelcomeIPC(browser);
 
-  if (!config.wasConfigured) {
+  if (config.wasConfigured) {
     await browser.loadSession();
   } else {
     browser.showWelcome();

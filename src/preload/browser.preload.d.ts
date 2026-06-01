@@ -229,5 +229,6 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abWelcome: {
     ready: () => void;
+    addSearchEnginedAndInitiate: (name: string, url: string) => void;
   };
 }
