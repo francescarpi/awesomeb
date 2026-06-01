@@ -1,5 +1,8 @@
 import { vi } from 'vitest';
 
+// Marker used to verify this mock is the one being loaded
+export const __ELECTRON_MOCK_VERSION__ = 'awesomeb-mock-v1';
+
 let webContentsIdCounter = 1;
 
 const createWebContents = () => ({
