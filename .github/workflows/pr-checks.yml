@@ -49,6 +49,24 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      # Electron 42.x does not run its postinstall script during `pnpm install`
+      # under pnpm 10, so the binary (and node_modules/electron/path.txt) is
+      # missing. The real `electron` module executes top-level code that reads
+      # path.txt and crashes with ENOENT if it is not present. Run the install
+      # script explicitly so the binary and path.txt are in place before tests.
+      # Electron 42.x does not run its postinstall script during `pnpm install`
+      # under pnpm 10, and when run explicitly the install script sometimes
+      # does not write node_modules/electron/path.txt. The real `electron`
+      # module executes top-level code that reads path.txt and crashes with
+      # ENOENT if absent. Run install.js and create path.txt as a fallback so
+      # the binary and marker file are in place before tests.
+      - name: Ensure Electron binary is downloaded
+        run: |
+          node node_modules/electron/install.js
+          if [ ! -f node_modules/electron/path.txt ]; then
+            echo "electron" > node_modules/electron/path.txt
+          fi
+
       - name: Astro Check
         run: pnpm astro check
 
