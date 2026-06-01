@@ -56,17 +56,20 @@ jobs:
       # script explicitly so the binary and path.txt are in place before tests.
       - name: Ensure Electron binary is downloaded
         run: |
-          echo "--- before install ---"
-          ls -la node_modules/electron/ 2>&1 || true
-          ls -la node_modules/electron/dist/ 2>&1 || true
-          cat node_modules/electron/dist/version 2>&1 || echo "NO version file"
-          cat node_modules/electron/path.txt 2>&1 || echo "NO path.txt"
-          echo "--- running install.js ---"
+          set -x
           node node_modules/electron/install.js
-          echo "--- exit code: $? ---"
-          echo "--- after install ---"
+          echo "--- after install.js ---"
           ls -la node_modules/electron/ 2>&1
-          cat node_modules/electron/path.txt 2>&1 || echo "STILL NO path.txt"
+          ls -la node_modules/electron/dist/ 2>&1 | head -20
+          cat node_modules/electron/path.txt 2>&1 || echo "NO path.txt (will create manually)"
+          # Workaround: install.js sometimes fails to write path.txt on Linux CI.
+          # Create it manually if missing — the module only needs the file to exist.
+          if [ ! -f node_modules/electron/path.txt ]; then
+            echo "electron" > node_modules/electron/path.txt
+            echo "Manually created path.txt with content 'electron'"
+          fi
+          echo "--- final state ---"
+          cat node_modules/electron/path.txt
 
       - name: Astro Check
         run: pnpm astro check
