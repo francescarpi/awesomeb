@@ -1,10 +1,13 @@
 import { z } from 'zod';
+import { NavigationEntryScheme } from '@/core/history/schemes';
 
 export const ClosedTabScheme = z
   .object({
     title: z.string(),
     url: z.string(),
     timestamp: z.number(),
+    index: z.number(),
+    entries: z.array(NavigationEntryScheme),
   })
   .strict();
 

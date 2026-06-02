@@ -157,17 +157,16 @@ export class Window extends UIWindow {
   }
 
   getTab(id: TTabId): IDesConTab | null {
-    for (const desktop of this._desktops.values()) {
-      const conTab = desktop.getTab(id);
-      if (conTab) {
-        return {
-          desktop,
-          tabContainer: conTab.tabContainer,
-          tab: conTab.tab,
-        };
-      }
+    const tab = this.browser.getTab(id);
+    if (!tab || tab.window.id !== this.id) {
+      return null;
     }
-    return null;
+
+    return {
+      desktop: tab.desktop,
+      tabContainer: tab.tabContainer,
+      tab: tab.tab,
+    };
   }
 
   getNextOrPreviousTabOfActiveDesktop(

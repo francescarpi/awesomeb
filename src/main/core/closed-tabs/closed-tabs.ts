@@ -3,6 +3,8 @@ import { userDataPath } from '@/paths';
 import { MAX_CLOSED_TABS } from './constants';
 import { ClosedTabsScheme, type IClosedTab, type IClosedTabs } from './schemes';
 import { validateStore } from '@/core/validation';
+import { type WebContents } from 'electron';
+import { sanitizeHistory } from '@/core/history';
 
 export class ClosedTabs extends Store<IClosedTabs> {
   constructor() {
@@ -23,8 +25,11 @@ export class ClosedTabs extends Store<IClosedTabs> {
     this.store = validateStore(ClosedTabsScheme, this.store, 'ClosedTabs', defaults);
   }
 
-  addTab(title: string, url: string) {
+  addTab(wc: WebContents) {
     const tabs = this.get('tabs');
+    const title = wc.getTitle();
+    const url = wc.getURL();
+    const { index, entries } = sanitizeHistory(wc);
 
     // Avoid adding duplicate entries for the same URL if it was closed multiple times
     if (tabs.some((tab) => tab.url === url)) {
@@ -36,6 +41,8 @@ export class ClosedTabs extends Store<IClosedTabs> {
         title,
         url,
         timestamp: Date.now(),
+        index,
+        entries,
       },
       ...tabs,
     ];

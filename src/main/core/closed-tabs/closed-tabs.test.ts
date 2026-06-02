@@ -1,20 +1,30 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
+import type { WebContents, NavigationEntry } from 'electron';
 import { ClosedTabs } from './closed-tabs';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
 
-// Helper to get the closed-tabs file path (must match electron-store's naming)
 function getClosedTabsFilePath() {
   return path.join(userDataPath(), 'closed-tabs.json');
 }
 
-// Helper to clean up closed-tabs file between tests
 function cleanClosedTabsFile() {
   const filePath = getClosedTabsFilePath();
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
+}
+
+function fakeWebContents(title: string, url: string, entries: NavigationEntry[] = []): WebContents {
+  return {
+    getTitle: () => title,
+    getURL: () => url,
+    navigationHistory: {
+      getAllEntries: () => entries,
+      getActiveIndex: () => Math.max(entries.length - 1, 0),
+    },
+  } as unknown as WebContents;
 }
 
 describe('ClosedTabs', () => {
@@ -55,7 +65,7 @@ describe('ClosedTabs', () => {
 
   test('addTab adds valid tab', () => {
     const tabs = new ClosedTabs();
-    tabs.addTab('Google', 'https://google.com');
+    tabs.addTab(fakeWebContents('Google', 'https://google.com'));
     expect(tabs.tabs.length).toBe(1);
     expect(tabs.tabs[0].title).toBe('Google');
     expect(tabs.tabs[0].url).toBe('https://google.com');
@@ -63,16 +73,16 @@ describe('ClosedTabs', () => {
 
   test('addTab avoids duplicate URLs', () => {
     const tabs = new ClosedTabs();
-    tabs.addTab('Google', 'https://google.com');
-    tabs.addTab('Google Again', 'https://google.com');
+    tabs.addTab(fakeWebContents('Google', 'https://google.com'));
+    tabs.addTab(fakeWebContents('Google Again', 'https://google.com'));
     expect(tabs.tabs.length).toBe(1);
     expect(tabs.tabs[0].title).toBe('Google');
   });
 
   test('mostRecentTab returns latest', () => {
     const tabs = new ClosedTabs();
-    tabs.addTab('First', 'https://first.com');
-    tabs.addTab('Second', 'https://second.com');
+    tabs.addTab(fakeWebContents('First', 'https://first.com'));
+    tabs.addTab(fakeWebContents('Second', 'https://second.com'));
 
     const mostRecent = tabs.mostRecentTab;
     expect(mostRecent).not.toBeNull();
@@ -82,7 +92,7 @@ describe('ClosedTabs', () => {
 
   test('clear empties store', () => {
     const tabs = new ClosedTabs();
-    tabs.addTab('Test', 'https://test.com');
+    tabs.addTab(fakeWebContents('Test', 'https://test.com'));
     expect(tabs.tabs.length).toBe(1);
 
     tabs.clear();
@@ -91,8 +101,8 @@ describe('ClosedTabs', () => {
 
   test('addTab with duplicate URL is ignored', () => {
     const tabs = new ClosedTabs();
-    tabs.addTab('Original', 'https://example.com');
-    tabs.addTab('Duplicate', 'https://example.com');
+    tabs.addTab(fakeWebContents('Original', 'https://example.com'));
+    tabs.addTab(fakeWebContents('Duplicate', 'https://example.com'));
     expect(tabs.tabs.length).toBe(1);
     expect(tabs.tabs[0].title).toBe('Original');
   });

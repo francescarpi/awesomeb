@@ -6,6 +6,8 @@ const validClosedTab = {
   title: 'Example',
   url: 'https://example.com',
   timestamp: 1234567890,
+  index: 0,
+  entries: [],
 };
 
 const validStore = {

@@ -574,7 +574,7 @@ export class Browser {
     window.renderViews();
 
     if (!tab.partition.private && tab.url) {
-      closedTabs.addTab(tab.title, tab.url);
+      closedTabs.addTab(tab.webContents);
     }
 
     if (props.emit) {
