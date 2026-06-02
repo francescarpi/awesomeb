@@ -1,5 +1,5 @@
 import { Browser, Window, Desktop, Tab, partitions, config } from '@/core';
-import { Sidebar, TabSwitcher, URLBar } from '@/ui';
+import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
@@ -83,8 +83,8 @@ export class BrowserToRenderer {
   }
 
   refreshTabSwitcher(window: Window) {
-    const urlbar = window.getView<TabSwitcher>('tab-switcher')!;
-    urlbar.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
+    const tabSwitcher = window.getView<TabSwitcher>('tab-switcher')!;
+    tabSwitcher.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
 
   refreshLayoutData(window: Window) {
@@ -132,6 +132,12 @@ export class BrowserToRenderer {
   refreshConfig() {
     for (const window of this._browser.windows) {
       window.webContents.send('config:refresh', config.config);
+
+      const tabSwitcher = window.getView<TabSwitcher>('tab-switcher')!;
+      tabSwitcher.webContents.send('config:refresh', config.config);
+
+      const tabMarks = window.getView<TabMarks>('tab-marks')!;
+      tabMarks.webContents.send('config:refresh', config.config);
     }
   }
 
