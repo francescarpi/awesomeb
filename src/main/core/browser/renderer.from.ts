@@ -33,7 +33,7 @@ import {
   TabContainer,
   Window,
   bookmarks,
-  closedHistory,
+  closedTabs,
   partitions,
   Layouts,
 } from '@/core';
@@ -343,7 +343,7 @@ export class BrowserRenderer {
   }
 
   closedTabsEntities(): IEntity[] {
-    return closedHistory.tabs.map((tab) => ({
+    return closedTabs.tabs.map((tab) => ({
       id: tab.url,
       label: tab.title,
       extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),

@@ -6,7 +6,7 @@ import {
   IWindowProps,
   getTheme,
   Downloads,
-  closedHistory,
+  closedTabs,
   Extensions,
   partitions,
   WelcomeWindow,
@@ -574,7 +574,7 @@ export class Browser {
     window.renderViews();
 
     if (!tab.partition.private && tab.url) {
-      closedHistory.addTab(tab.title, tab.url);
+      closedTabs.addTab(tab.title, tab.url);
     }
 
     if (props.emit) {

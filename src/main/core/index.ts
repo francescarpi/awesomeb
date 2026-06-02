@@ -14,7 +14,7 @@ export * from './favicons';
 export * from './tab-marks';
 export * from './certificates';
 export * from './permissions';
-export * from './closed-history';
+export * from './closed-tabs';
 export * from './extensions';
 export * from './prompts';
 export * from './webauth';

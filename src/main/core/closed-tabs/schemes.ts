@@ -8,11 +8,11 @@ export const ClosedTabScheme = z
   })
   .strict();
 
-export const ClosedHistoryScheme = z
+export const ClosedTabsScheme = z
   .object({
     tabs: z.array(ClosedTabScheme),
   })
   .strict();
 
 export type IClosedTab = z.infer<typeof ClosedTabScheme>;
-export type IClosedHistory = z.infer<typeof ClosedHistoryScheme>;
+export type IClosedTabs = z.infer<typeof ClosedTabsScheme>;

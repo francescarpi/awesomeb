@@ -1,12 +1,4 @@
-import {
-  Browser,
-  Tab,
-  Window,
-  bookmarks,
-  getCachedFavicon,
-  closedHistory,
-  getShortcut,
-} from '@/core';
+import { Browser, Tab, Window, bookmarks, getCachedFavicon, closedTabs, getShortcut } from '@/core';
 import { MenuItemConstructorOptions, Menu, NativeImage, app } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -139,10 +131,10 @@ function fileMenu(
       {
         label: openRecentlyClosed.label,
         accelerator: openRecentlyClosed.key,
-        enabled: closedHistory.tabs.length > 0,
+        enabled: closedTabs.tabs.length > 0,
         icon: getIcon(EIcon.Open),
         click: async () => {
-          const tab = closedHistory.mostRecentTab;
+          const tab = closedTabs.mostRecentTab;
           if (window && tab) {
             await browser.performCommand(window, 'open-closed', { url: tab.url });
           }

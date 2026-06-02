@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'vitest';
-import { ClosedTabScheme, ClosedHistoryScheme } from './schemes';
+import { ClosedTabScheme, ClosedTabsScheme } from './schemes';
 import { ZodError } from 'zod';
 
 const validClosedTab = {
@@ -37,15 +37,15 @@ describe('ClosedTabScheme', () => {
   });
 });
 
-describe('ClosedHistoryScheme', () => {
+describe('ClosedTabsScheme', () => {
   test('valid store with empty tabs parses', () => {
     const store = { tabs: [] };
-    const result = ClosedHistoryScheme.parse(store);
+    const result = ClosedTabsScheme.parse(store);
     expect(result.tabs).toEqual([]);
   });
 
   test('valid store with tabs parses', () => {
-    expect(ClosedHistoryScheme.parse(validStore)).toEqual(validStore);
+    expect(ClosedTabsScheme.parse(validStore)).toEqual(validStore);
   });
 
   test('invalid child throws', () => {
@@ -53,12 +53,12 @@ describe('ClosedHistoryScheme', () => {
       tabs: [{ title: 'Bad', url: 'https://bad.com' }],
     };
 
-    expect(() => ClosedHistoryScheme.parse(invalid)).toThrow(ZodError);
+    expect(() => ClosedTabsScheme.parse(invalid)).toThrow(ZodError);
   });
 
   test('extra property throws', () => {
     const invalid = { ...validStore, extra: true };
 
-    expect(() => ClosedHistoryScheme.parse(invalid)).toThrow(ZodError);
+    expect(() => ClosedTabsScheme.parse(invalid)).toThrow(ZodError);
   });
 });

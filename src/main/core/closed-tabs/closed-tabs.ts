@@ -1,26 +1,26 @@
 import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import { MAX_CLOSED_TABS } from './constants';
-import { ClosedHistoryScheme, type IClosedTab, type IClosedHistory } from './schemes';
+import { ClosedTabsScheme, type IClosedTab, type IClosedTabs } from './schemes';
 import { validateStore } from '@/core/validation';
 
-export class ClosedHistory extends Store<IClosedHistory> {
+export class ClosedTabs extends Store<IClosedTabs> {
   constructor() {
-    const defaults: IClosedHistory = {
+    const defaults: IClosedTabs = {
       tabs: [],
     };
 
     // Validate defaults before passing to electron-store
-    ClosedHistoryScheme.parse(defaults);
+    ClosedTabsScheme.parse(defaults);
 
     super({
-      name: 'closed-history',
+      name: 'closed-tabs',
       cwd: userDataPath(),
       defaults,
     });
 
     // Validate what electron-store loaded from disk, fall back to defaults if corrupted
-    this.store = validateStore(ClosedHistoryScheme, this.store, 'ClosedHistory', defaults);
+    this.store = validateStore(ClosedTabsScheme, this.store, 'ClosedTabs', defaults);
   }
 
   addTab(title: string, url: string) {
@@ -41,26 +41,26 @@ export class ClosedHistory extends Store<IClosedHistory> {
     ];
 
     // Validate before persisting
-    ClosedHistoryScheme.parse({ tabs: updatedTabs.slice(0, MAX_CLOSED_TABS) });
+    ClosedTabsScheme.parse({ tabs: updatedTabs.slice(0, MAX_CLOSED_TABS) });
     this.set('tabs', updatedTabs.slice(0, MAX_CLOSED_TABS));
   }
 
   get mostRecentTab(): IClosedTab | null {
     // Validate the full store on read
-    ClosedHistoryScheme.parse(this.store);
+    ClosedTabsScheme.parse(this.store);
     const tabs = this.get('tabs');
     return tabs.length > 0 ? tabs[0] : null;
   }
 
   get tabs(): IClosedTab[] {
     // Validate the full store on read
-    ClosedHistoryScheme.parse(this.store);
+    ClosedTabsScheme.parse(this.store);
     return this.get('tabs');
   }
 
   clear() {
     // Validate before persisting
-    ClosedHistoryScheme.parse({ tabs: [] });
+    ClosedTabsScheme.parse({ tabs: [] });
     this.set('tabs', []);
   }
 }
