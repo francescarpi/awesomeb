@@ -1,4 +1,4 @@
-import { Browser, Desktop, Tab, TabContainer, Window } from '@/core';
+import { type Browser, Desktop, Tab, TabContainer, Window } from '@/core';
 import { IModalProps } from '@/ui';
 import { TPage } from '~/types';
 
@@ -12,6 +12,7 @@ export interface ICommand<T, R = void> {
     desktop: Desktop | null;
     tabContainer: TabContainer | null;
     tab: Tab | null;
+    browser: Browser;
   }) => boolean;
   handler: (params: {
     browser: Browser;

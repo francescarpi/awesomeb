@@ -91,6 +91,7 @@ export class Browser {
               customTitle: tabStore.customTitle,
               url: tabStore.url,
               favicon: tabStore.favicon,
+              closedAt: tabStore.closedAt,
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
@@ -456,7 +457,7 @@ export class Browser {
 
     parentTabData.tab.setTabPreview(null);
 
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.window.renderViews();
 
@@ -489,7 +490,7 @@ export class Browser {
     tabPreview.tab.clearParent();
 
     parentTabData.window.removeView(tabPreview.viewId);
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.tab.setTabPreview(null);
 
@@ -524,7 +525,7 @@ export class Browser {
     tabPreview.tab.clearParent();
 
     parentTabData.window.removeView(tabPreview.viewId);
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.tab.setTabPreview(null);
 
@@ -534,17 +535,8 @@ export class Browser {
   }
 
   /**
-   * Closes a tab by its ID
-   *
-   * This method:
-   * 1. Finds and closes the specified tab
-   * 2. If the tab container becomes empty, it also closes the container
-   * 3. Deselects the container if it was selected
-   * 4. Refreshes the visible tab view
-   * 5. Emits 'window:tab-did-close' event
-   *
-   * Note: This method does not automatically select another tab.
-   * The caller is responsible for selecting a new tab if needed.
+   * Mark tab as closed and remove its webContents from the index.
+   * The tab will be removed from the UI on the next render cycle, allowing any close animations to play smoothly.
    *
    * @param id - The ID of the tab to close
    * @returns true if the tab was found and closed, false otherwise
@@ -555,27 +547,27 @@ export class Browser {
       return false;
     }
 
-    const { tabContainer, desktop, tab, window } = result;
+    const { tab, window, tabContainer, desktop } = result;
 
-    this._unindexTab(tab.id);
+    // TODO If partition is private, remove completly from the system
+    // TODO if tab is closed, check if tabcontainer has more tabs, if not
+    // if (tabContainer.tabs.length === 0) {
+    // this._unindexTabContainer(tabContainer.id);
+    // desktop.closeTabContainer(tabContainer.id);
+    // if (desktop.selectedTabContainer?.id === tabContainer.id) {
+    //   desktop.selectTabContainer(null);
+    // }
 
-    tabContainer.closeTab(tab.id);
+    tab.closeWebContents();
+    tab.markAsClosed();
 
-    if (tabContainer.tabs.length === 0) {
-      this._unindexTabContainer(tabContainer.id);
-      desktop.closeTabContainer(tabContainer.id);
-      if (desktop.selectedTabContainer?.id === tabContainer.id) {
-        desktop.selectTabContainer(null);
-      }
+    if (tabContainer.isClosed) {
+      desktop.selectTabContainer(null);
+      tabContainer.selectTab(null);
     }
 
     window.removeAllTabViews(tab.id);
     window.renderViews();
-
-    // TODO
-    // if (!tab.partition.private && tab.url) {
-    //   closedTabs.addTab(tab.webContents);
-    // }
 
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);
@@ -653,5 +645,28 @@ export class Browser {
 
     this.toRenderer.refreshTabContainers(win);
     this.refreshMainMenu();
+  }
+
+  get closedTabs(): IWinDesConTab[] {
+    return this.tabs.filter((t) => t.tab.isClosed);
+  }
+
+  get hasClosedTabs(): boolean {
+    return this.tabs.some((t) => t.tab.isClosed);
+  }
+
+  get mostRecentlyClosedTab(): IWinDesConTab | null {
+    const closedTabs = this.closedTabs;
+    if (closedTabs.length === 0) {
+      return null;
+    }
+
+    closedTabs.sort((a, b) => {
+      const aClosedAt = a.tab.closedAt || 0;
+      const bClosedAt = b.tab.closedAt || 0;
+      return bClosedAt - aClosedAt;
+    });
+
+    return closedTabs[0];
   }
 }

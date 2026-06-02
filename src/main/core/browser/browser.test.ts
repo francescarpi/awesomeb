@@ -360,7 +360,7 @@ describe('Browser', () => {
       expect(browser.getTab(99999 as any)).toBeNull();
     });
 
-    test('getTab unindexes after closeTab', async () => {
+    test('getTab indexes after closeTab', async () => {
       browser.createWindow(1, { withDesktops: true });
       const result = await browser.openURL('http://example.com');
       expect(result).not.toBeNull();
@@ -369,16 +369,16 @@ describe('Browser', () => {
       expect(browser.getTab(tabId)).not.toBeNull();
 
       await browser.closeTab(tabId);
-      expect(browser.getTab(tabId)).toBeNull();
+      expect(browser.getTab(tabId)).not.toBeNull();
     });
 
-    test('getTab unindexes multiple tabs correctly', async () => {
+    test('getTab indexes multiple tabs correctly', async () => {
       browser.createWindow(1, { withDesktops: true });
       const result1 = await browser.openURL('http://example1.com');
       const result2 = await browser.openURL('http://example2.com');
 
       await browser.closeTab(result1!.tab.id);
-      expect(browser.getTab(result1!.tab.id)).toBeNull();
+      expect(browser.getTab(result1!.tab.id)).not.toBeNull();
       expect(browser.getTab(result2!.tab.id)).not.toBeNull();
     });
 
@@ -413,7 +413,7 @@ describe('Browser', () => {
       expect(browser.getTabContainer(99999 as any)).toBeNull();
     });
 
-    test('getTabContainer unindexes when container closes after last tab', async () => {
+    test('getTabContainer stil indexed after close last tab', async () => {
       browser.createWindow(1, { withDesktops: true });
       const result = await browser.openURL('http://example.com');
       expect(result).not.toBeNull();
@@ -422,7 +422,7 @@ describe('Browser', () => {
       expect(browser.getTabContainer(tcId)).not.toBeNull();
 
       await browser.closeTab(result!.tab.id);
-      expect(browser.getTabContainer(tcId)).toBeNull();
+      expect(browser.getTabContainer(tcId)).not.toBeNull();
     });
 
     test('removeWindow cleans up tab and tabContainer indexes', async () => {

@@ -147,7 +147,8 @@ export function getCommands(browser: Browser): ICommand<any, any>[] {
 
   return Object.values(COMMANDS)
     .filter(
-      (c) => c.visibility === undefined || c.visibility({ window, desktop, tabContainer, tab }),
+      (c) =>
+        c.visibility === undefined || c.visibility({ browser, window, desktop, tabContainer, tab }),
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 }

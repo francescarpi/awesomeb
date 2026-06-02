@@ -42,6 +42,7 @@ export class Tab extends UIView {
   private static readonly MIN_ZOOM_STEP = -5;
   private static readonly MAX_ZOOM_STEP = 9;
   private _mediaSessionInfo: IMediaSessionInfo | null = null;
+  private _closedAt: number | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -62,6 +63,7 @@ export class Tab extends UIView {
     this._suspended = props.suspended ?? true;
     this._parent = props.parent ?? null;
     this._favicon = props.favicon ?? null;
+    this._closedAt = props.closedAt ?? null;
 
     registerTabEvents(browser, this);
   }
@@ -337,15 +339,16 @@ export class Tab extends UIView {
 
     this._loading = false;
     this.clearFailLoad();
-    this.close();
+    this.closeWebContents();
     this._suspended = true;
     this._eventsRegistered = false;
     this.setMediaSessionInfo(null);
   }
 
-  close() {
-    super.close();
-    history.delete(this.id);
+  markAsClosed() {
+    this.closeWebContents();
+    this.clearFailLoad();
+    this._closedAt = Date.now();
   }
 
   updateLastAccessed() {
@@ -381,7 +384,7 @@ export class Tab extends UIView {
     }
 
     const view = this._findInPage;
-    this._findInPage.close();
+    this._findInPage.closeWebContents();
     this._findInPage = null;
     this.browser.eventsChannel.emit('tab:find-in-page-visibility-did-change', this, false, view);
   }
@@ -535,5 +538,22 @@ export class Tab extends UIView {
   setMediaSessionInfo(info: IMediaSessionInfo | null) {
     this._mediaSessionInfo = info;
     this.browser.eventsChannel.emit('tab:media-session-info-did-change', this);
+  }
+
+  get closedAt(): number | null {
+    return this._closedAt;
+  }
+
+  get isClosed(): boolean {
+    return this._closedAt !== null;
+  }
+
+  openClosedTab() {
+    if (!this.isClosed) {
+      scopeLog.warn(`Attempted to open a tab that is not closed (Tab ID: ${this.id})`);
+      return;
+    }
+
+    this._closedAt = null;
   }
 }

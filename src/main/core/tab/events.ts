@@ -169,7 +169,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
     for (const view of tabData.window.views) {
       if (view.viewId.endsWith('#url-info')) {
-        view.close();
+        view.closeWebContents();
         tabData.window.removeView(view.viewId);
       }
     }

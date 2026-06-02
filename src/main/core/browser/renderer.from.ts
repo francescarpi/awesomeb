@@ -36,7 +36,7 @@ import {
   partitions,
   Layouts,
 } from '@/core';
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
 import { type WebContentsView, type WebContents, app } from 'electron';
 import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
@@ -160,15 +160,24 @@ export class BrowserRenderer {
 
   tabContainers(window: Window): ITabContainer[] {
     const tabContainers: ITabContainer[] = [];
+    let shortcutCounter = 0;
+
     for (const desktop of window.desktops) {
       const selectedTabContainer = desktop.selectedTabContainer;
-      for (const [idx, tc] of desktop.tabContainers.entries()) {
+      for (const tc of desktop.tabContainers) {
+        let shortcut: number | null = null;
+        if (shortcutCounter < 9 && !tc.isClosed) {
+          shortcutCounter++;
+          shortcut = shortcutCounter;
+        }
+
         tabContainers.push({
           id: tc.id,
-          shortcut: idx < 9 ? idx + 1 : null,
+          shortcut,
           desktopId: desktop.id,
           selected: selectedTabContainer?.id === tc.id,
           divider: tc.divider,
+          isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
         });
       }
@@ -195,6 +204,7 @@ export class BrowserRenderer {
       requireAttention: tab.requireAttention,
       isMuted: tab.isMuted,
       favicon: tab.favicon,
+      isClosed: tab.isClosed,
     };
   }
 
@@ -342,12 +352,11 @@ export class BrowserRenderer {
   }
 
   closedTabsEntities(): IEntity[] {
-    // return closedTabs.tabs.map((tab) => ({
-    //   id: tab.id,
-    //   label: tab.title,
-    //   extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
-    // }));
-    return [];
+    return this._browser.closedTabs.map((tab) => ({
+      id: tab.tab.id.toString(),
+      label: tab.tab.title,
+      extra: dayjs(tab.tab.closedAt).format('YYYY-MM-DD HH:mm:ss'),
+    }));
   }
 
   extensions(active = false): IExtensions {

@@ -144,7 +144,7 @@ export class UIView {
     throw new Error('Not implemented render for UIView');
   }
 
-  close() {
+  closeWebContents() {
     if (this.webContents !== undefined) {
       this.webContents.stop();
       this.webContents.close();

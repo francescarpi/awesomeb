@@ -77,12 +77,11 @@ export class TabContainer {
   }
 
   closeTab(id: TTabId): boolean {
+    // TODO check if this method is necessary
     const tab = this._tabs.get(id);
     if (!tab) {
       return false;
     }
-
-    tab.clearFailLoad();
 
     this._tabs.delete(id);
 
@@ -90,7 +89,7 @@ export class TabContainer {
       this._selectedTabId = null;
     }
 
-    tab.close();
+    tab.closeWebContents();
 
     return true;
   }
@@ -166,5 +165,9 @@ export class TabContainer {
       }
     }
     return null;
+  }
+
+  get isClosed(): boolean {
+    return this.tabs.every((tab) => tab.isClosed);
   }
 }
