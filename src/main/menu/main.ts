@@ -1,4 +1,4 @@
-import { Browser, Tab, Window, bookmarks, getCachedFavicon, closedTabs, getShortcut } from '@/core';
+import { Browser, Tab, Window, bookmarks, getCachedFavicon, getShortcut } from '@/core';
 import { MenuItemConstructorOptions, Menu, NativeImage, app } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -80,7 +80,7 @@ function fileMenu(
   const newTab = getShortcut('newTab');
   const newWindow = getShortcut('newWindow');
   const pasteAndGo = getShortcut('pasteAndGo');
-  const openRecentlyClosed = getShortcut('openRecentlyClosed');
+  // const openRecentlyClosed = getShortcut('openRecentlyClosed');
 
   return {
     label: 'File',
@@ -128,18 +128,18 @@ function fileMenu(
           }
         },
       },
-      {
-        label: openRecentlyClosed.label,
-        accelerator: openRecentlyClosed.key,
-        enabled: closedTabs.tabs.length > 0,
-        icon: getIcon(EIcon.Open),
-        click: async () => {
-          const tab = closedTabs.mostRecentTab;
-          if (window && tab) {
-            await browser.performCommand(window, 'open-closed', { url: tab.url });
-          }
-        },
-      },
+      // {
+      //   label: openRecentlyClosed.label,
+      //   accelerator: openRecentlyClosed.key,
+      //   enabled: closedTabs.tabs.length > 0,
+      //   icon: getIcon(EIcon.Open),
+      //   click: async () => {
+      //     const tab = closedTabs.mostRecentTab;
+      //     if (window && tab) {
+      //       await browser.performCommand(window, 'open-closed', { id: tab.id });
+      //     }
+      //   },
+      // },
     ],
   };
 }

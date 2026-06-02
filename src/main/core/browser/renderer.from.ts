@@ -33,11 +33,10 @@ import {
   TabContainer,
   Window,
   bookmarks,
-  closedTabs,
   partitions,
   Layouts,
 } from '@/core';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
 import { type WebContentsView, type WebContents, app } from 'electron';
 import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
@@ -343,11 +342,12 @@ export class BrowserRenderer {
   }
 
   closedTabsEntities(): IEntity[] {
-    return closedTabs.tabs.map((tab) => ({
-      id: tab.url,
-      label: tab.title,
-      extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
-    }));
+    // return closedTabs.tabs.map((tab) => ({
+    //   id: tab.id,
+    //   label: tab.title,
+    //   extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+    // }));
+    return [];
   }
 
   extensions(active = false): IExtensions {

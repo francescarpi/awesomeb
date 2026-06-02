@@ -6,7 +6,6 @@ import {
   IWindowProps,
   getTheme,
   Downloads,
-  closedTabs,
   Extensions,
   partitions,
   WelcomeWindow,
@@ -573,9 +572,10 @@ export class Browser {
     window.removeAllTabViews(tab.id);
     window.renderViews();
 
-    if (!tab.partition.private && tab.url) {
-      closedTabs.addTab(tab.webContents);
-    }
+    // TODO
+    // if (!tab.partition.private && tab.url) {
+    //   closedTabs.addTab(tab.webContents);
+    // }
 
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);

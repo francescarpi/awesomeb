@@ -1,8 +1,10 @@
 import { ICommand } from './types';
-import { closedTabs } from '@/core';
+// import log from 'electron-log';
+//
+// const scopeLog = log.scope('OpenClosedCommand');
 
 export interface ICommandParams {
-  url: string;
+  id: string;
 }
 
 export const TRIGGER = 'open-closed';
@@ -14,8 +16,15 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'open-closed',
   },
-  visibility: ({}) => closedTabs.tabs.length > 0, // Only show if there are closed tabs
-  async handler({ params, browser }) {
-    await browser.openURL(params.url, { selectTab: true });
+  // visibility: ({}) => closedTabs.tabs.length > 0, // Only show if there are closed tabs
+  async handler({}) {
+    // const tab = closedTabs.getTab(params.id);
+    // if (!tab) {
+    //   scopeLog.warn(`No closed tab found with id: ${params.id}`);
+    //   return;
+    // }
+    //
+    // console.log(tab);
+    // await browser.openURL(params.url, { selectTab: true });
   },
 };
