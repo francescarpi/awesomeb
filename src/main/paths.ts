@@ -10,7 +10,7 @@ export const EXTENSION_PRELOAD = path.join(PRELOAD_FOLDER, 'extension.preload.js
 
 export const RENDERER_FOLDER = path.join(__dirname, '..', 'renderer');
 
-const APP_CONFIG_FOLDER = '.awesomeb.v2';
+const APP_CONFIG_FOLDER = process.env.VITE_DEV_SERVER_URL ? '.awesomeb.dev' : '.awesomeb';
 
 export function userDataPath(): string {
   // Use process.pid to isolate test stores per Vitest worker/process

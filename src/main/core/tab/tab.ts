@@ -212,6 +212,13 @@ export class Tab extends UIView {
     return this._loading;
   }
 
+  get webContentsLoading(): boolean {
+    if (this.isDestroyed) {
+      return false;
+    }
+    return this.webContents.isLoading();
+  }
+
   setLoading(loading: boolean) {
     if (this._loading === loading) {
       return;

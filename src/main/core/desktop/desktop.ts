@@ -165,7 +165,7 @@ export class Desktop {
     return null;
   }
 
-  closeTabContainer(id: TTabContainerId): boolean {
+  deleteTabContainer(id: TTabContainerId): boolean {
     const tabContainer = this._tabContainers.get(id);
     if (!tabContainer) {
       return false;

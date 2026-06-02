@@ -767,6 +767,35 @@ describe('Window Close Tab', () => {
     expect(window.getDesktop(2)!.tabContainers.length).toBe(1);
     expect(window.getDesktop(3)!.tabContainers.length).toBe(1);
   });
+
+  test('Close private tabs should remove completly the tab from the interface', async () => {
+    const result1 = await browser.openURL('http://example.com', {
+      partitionId: partitions.private.id,
+      selectTab: true,
+    });
+
+    const { window, desktop, tabContainer } = result1!;
+
+    expect(window.selectedTab).not.toBeNull();
+
+    const result2 = await browser.openURL('http://example.com', {
+      partitionId: partitions.private.id,
+      targetId: 'split-tab',
+    });
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(tabContainer.tabs.length).toBe(2);
+
+    // Close the first tab
+    await browser.closeTab(result1!.tab.id);
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(tabContainer.tabs.length).toBe(1);
+
+    // Close the second tab
+    await browser.closeTab(result2!.tab.id);
+    expect(desktop.tabContainers.length).toBe(0);
+  });
 });
 
 describe('Window Move Desktop', () => {

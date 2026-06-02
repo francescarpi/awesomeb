@@ -303,7 +303,7 @@ export class Browser {
       }
 
       this._unindexTabContainer(sourceData.tabContainer.id);
-      sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+      sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
       sourceData.window.renderViews();
 
       this.eventsChannel.emit(
@@ -327,7 +327,7 @@ export class Browser {
 
     this._unindexTabContainer(sourceData.tabContainer.id);
 
-    sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+    sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
     targetData.desktop.addTabContainer(sourceData.tabContainer);
 
     this._indexTabContainer(targetData.window, targetData.desktop, sourceData.tabContainer);
@@ -534,6 +534,19 @@ export class Browser {
     this.eventsChannel.emit('tabpreview:split', parentTabData.window, tabPreview.tab);
   }
 
+  permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
+    this._unindexTab(tabId);
+    tabContainer.deleteTab(tabId);
+
+    if (tabContainer.tabs.length === 0) {
+      this._unindexTabContainer(tabContainer.id);
+      desktop.deleteTabContainer(tabContainer.id);
+      if (desktop.selectedTabContainer?.id === tabContainer.id) {
+        desktop.selectTabContainer(null);
+      }
+    }
+  }
+
   /**
    * Mark tab as closed and remove its webContents from the index.
    * The tab will be removed from the UI on the next render cycle, allowing any close animations to play smoothly.
@@ -549,17 +562,13 @@ export class Browser {
 
     const { tab, window, tabContainer, desktop } = result;
 
-    // TODO If partition is private, remove completly from the system
-    // TODO if tab is closed, check if tabcontainer has more tabs, if not
-    // if (tabContainer.tabs.length === 0) {
-    // this._unindexTabContainer(tabContainer.id);
-    // desktop.closeTabContainer(tabContainer.id);
-    // if (desktop.selectedTabContainer?.id === tabContainer.id) {
-    //   desktop.selectTabContainer(null);
-    // }
+    if (tab.partition.private) {
+      this.permanentlyCloseTab(desktop, tabContainer, tab.id);
+    } else {
+      tab.markAsClosed();
+    }
 
     tab.closeWebContents();
-    tab.markAsClosed();
 
     if (tabContainer.isClosed) {
       desktop.selectTabContainer(null);

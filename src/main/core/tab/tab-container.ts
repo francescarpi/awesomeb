@@ -76,8 +76,7 @@ export class TabContainer {
     return tab;
   }
 
-  closeTab(id: TTabId): boolean {
-    // TODO check if this method is necessary
+  deleteTab(id: TTabId): boolean {
     const tab = this._tabs.get(id);
     if (!tab) {
       return false;
@@ -88,8 +87,6 @@ export class TabContainer {
     if (this._selectedTabId === id) {
       this._selectedTabId = null;
     }
-
-    tab.closeWebContents();
 
     return true;
   }
