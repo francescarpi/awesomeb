@@ -179,7 +179,7 @@ export class BrowserRenderer {
           divider: tc.divider,
           isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
-          isSplit: tc.isSplit,
+          isSplit: tc.hasSplitTabs,
         });
       }
     }
