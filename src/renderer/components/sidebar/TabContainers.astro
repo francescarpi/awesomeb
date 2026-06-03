@@ -57,6 +57,7 @@
               'hidden',
               `group-[.desktop-${tc.desktopId}]:flex`,
               tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
+              tc.isClosed && 'hidden',
             ),
           },
           h(
@@ -93,6 +94,7 @@
                     'sidebar:rounded-bl',
                     t.selected && 'bg-white/20',
                     t.suspended ? 'group/suspended opacity-50' : 'group/active',
+                    t.isClosed && 'hidden',
                   ),
                   onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
                   oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: t.id }),

@@ -23,6 +23,7 @@ const validSessionTab = {
   customTitle: null,
   url: 'https://example.com',
   favicon: null,
+  closedAt: null,
 };
 
 const validSessionTabContainer = {

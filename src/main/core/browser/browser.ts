@@ -6,11 +6,11 @@ import {
   IWindowProps,
   getTheme,
   Downloads,
-  closedHistory,
   Extensions,
   partitions,
   WelcomeWindow,
   TabPreview,
+  history,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -92,6 +92,7 @@ export class Browser {
               customTitle: tabStore.customTitle,
               url: tabStore.url,
               favicon: tabStore.favicon,
+              closedAt: tabStore.closedAt,
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
@@ -303,7 +304,7 @@ export class Browser {
       }
 
       this._unindexTabContainer(sourceData.tabContainer.id);
-      sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+      sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
       sourceData.window.renderViews();
 
       this.eventsChannel.emit(
@@ -327,7 +328,7 @@ export class Browser {
 
     this._unindexTabContainer(sourceData.tabContainer.id);
 
-    sourceData.desktop.closeTabContainer(sourceData.tabContainer.id);
+    sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
     targetData.desktop.addTabContainer(sourceData.tabContainer);
 
     this._indexTabContainer(targetData.window, targetData.desktop, sourceData.tabContainer);
@@ -457,7 +458,7 @@ export class Browser {
 
     parentTabData.tab.setTabPreview(null);
 
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.window.renderViews();
 
@@ -490,7 +491,7 @@ export class Browser {
     tabPreview.tab.clearParent();
 
     parentTabData.window.removeView(tabPreview.viewId);
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.tab.setTabPreview(null);
 
@@ -525,7 +526,7 @@ export class Browser {
     tabPreview.tab.clearParent();
 
     parentTabData.window.removeView(tabPreview.viewId);
-    tabPreview.close();
+    tabPreview.closeWebContents();
 
     parentTabData.tab.setTabPreview(null);
 
@@ -534,18 +535,23 @@ export class Browser {
     this.eventsChannel.emit('tabpreview:split', parentTabData.window, tabPreview.tab);
   }
 
+  permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
+    this._unindexTab(tabId);
+    tabContainer.deleteTab(tabId);
+    history.delete(tabId);
+
+    if (tabContainer.tabs.length === 0) {
+      this._unindexTabContainer(tabContainer.id);
+      desktop.deleteTabContainer(tabContainer.id);
+      if (desktop.selectedTabContainer?.id === tabContainer.id) {
+        desktop.selectTabContainer(null);
+      }
+    }
+  }
+
   /**
-   * Closes a tab by its ID
-   *
-   * This method:
-   * 1. Finds and closes the specified tab
-   * 2. If the tab container becomes empty, it also closes the container
-   * 3. Deselects the container if it was selected
-   * 4. Refreshes the visible tab view
-   * 5. Emits 'window:tab-did-close' event
-   *
-   * Note: This method does not automatically select another tab.
-   * The caller is responsible for selecting a new tab if needed.
+   * Mark tab as closed and remove its webContents from the index.
+   * The tab will be removed from the UI on the next render cycle, allowing any close animations to play smoothly.
    *
    * @param id - The ID of the tab to close
    * @returns true if the tab was found and closed, false otherwise
@@ -556,26 +562,23 @@ export class Browser {
       return false;
     }
 
-    const { tabContainer, desktop, tab, window } = result;
+    const { tab, window, tabContainer, desktop } = result;
 
-    this._unindexTab(tab.id);
+    if (tab.partition.private) {
+      this.permanentlyCloseTab(desktop, tabContainer, tab.id);
+    } else {
+      tab.markAsClosed();
+    }
 
-    tabContainer.closeTab(tab.id);
+    tab.closeWebContents();
 
-    if (tabContainer.tabs.length === 0) {
-      this._unindexTabContainer(tabContainer.id);
-      desktop.closeTabContainer(tabContainer.id);
-      if (desktop.selectedTabContainer?.id === tabContainer.id) {
-        desktop.selectTabContainer(null);
-      }
+    if (tabContainer.isClosed) {
+      desktop.selectTabContainer(null);
+      tabContainer.selectTab(null);
     }
 
     window.removeAllTabViews(tab.id);
     window.renderViews();
-
-    if (!tab.partition.private && tab.url) {
-      closedHistory.addTab(tab.title, tab.url);
-    }
 
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);
@@ -653,5 +656,28 @@ export class Browser {
 
     this.toRenderer.refreshTabContainers(win);
     this.refreshMainMenu();
+  }
+
+  get closedTabs(): IWinDesConTab[] {
+    return this.tabs.filter((t) => t.tab.isClosed);
+  }
+
+  get hasClosedTabs(): boolean {
+    return this.tabs.some((t) => t.tab.isClosed);
+  }
+
+  get mostRecentlyClosedTab(): IWinDesConTab | null {
+    const closedTabs = this.closedTabs;
+    if (closedTabs.length === 0) {
+      return null;
+    }
+
+    closedTabs.sort((a, b) => {
+      const aClosedAt = a.tab.closedAt || 0;
+      const bClosedAt = b.tab.closedAt || 0;
+      return bClosedAt - aClosedAt;
+    });
+
+    return closedTabs[0];
   }
 }

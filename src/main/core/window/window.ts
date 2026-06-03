@@ -157,17 +157,16 @@ export class Window extends UIWindow {
   }
 
   getTab(id: TTabId): IDesConTab | null {
-    for (const desktop of this._desktops.values()) {
-      const conTab = desktop.getTab(id);
-      if (conTab) {
-        return {
-          desktop,
-          tabContainer: conTab.tabContainer,
-          tab: conTab.tab,
-        };
-      }
+    const tab = this.browser.getTab(id);
+    if (!tab || tab.window.id !== this.id) {
+      return null;
     }
-    return null;
+
+    return {
+      desktop: tab.desktop,
+      tabContainer: tab.tabContainer,
+      tab: tab.tab,
+    };
   }
 
   getNextOrPreviousTabOfActiveDesktop(
@@ -287,7 +286,7 @@ export class Window extends UIWindow {
   removeAllTabViews(tabId: TTabId) {
     for (const view of this.views) {
       if (view.viewId.startsWith(`tab-${tabId}#`)) {
-        view.close();
+        view.closeWebContents();
         this.removeView(view.viewId);
       }
     }
@@ -329,7 +328,7 @@ export class Window extends UIWindow {
   }
 
   private get tabsOrderedByLastAccessed(): IDesConTab[] {
-    const tabs = this.tabs.filter((t) => !t.tab.suspended);
+    const tabs = this.tabs.filter((t) => !t.tab.suspended && !t.tab.isClosed);
     tabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
     return tabs;
   }

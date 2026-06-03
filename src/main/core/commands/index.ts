@@ -68,6 +68,7 @@ import * as tabZoomReset from './tab-zoom-reset';
 import * as visitHistoryPage from './visit-history-page';
 import * as debugPage from './debug-page';
 import * as windowNew from './window-new';
+import * as tabClearClosed from './tab-clear-closed';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -135,6 +136,7 @@ const COMMANDS = {
   [visitHistoryPage.TRIGGER]: visitHistoryPage.Command,
   [debugPage.TRIGGER]: debugPage.Command,
   [windowNew.TRIGGER]: windowNew.Command,
+  [tabClearClosed.TRIGGER]: tabClearClosed.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
@@ -147,7 +149,8 @@ export function getCommands(browser: Browser): ICommand<any, any>[] {
 
   return Object.values(COMMANDS)
     .filter(
-      (c) => c.visibility === undefined || c.visibility({ window, desktop, tabContainer, tab }),
+      (c) =>
+        c.visibility === undefined || c.visibility({ browser, window, desktop, tabContainer, tab }),
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 }

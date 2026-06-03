@@ -267,3 +267,25 @@ export function getPartitionInfo(ses: Session): { persistent: boolean; name: str
     name: path.basename(p),
   };
 }
+
+export function clearExpiredClosedTabs(browser: Browser) {
+  const now = Date.now();
+  const closedTabs = browser.closedTabs;
+  let totalTabsClosed = 0;
+
+  for (const closedTab of closedTabs) {
+    if (!closedTab.tab.closedAt) {
+      continue;
+    }
+    const closedTime = new Date(closedTab.tab.closedAt).getTime();
+    const ageInDays = (now - closedTime) / (1000 * 60 * 60 * 24);
+    if (ageInDays > config.getProperty('closedTabsRetentionDays')) {
+      browser.permanentlyCloseTab(closedTab.desktop, closedTab.tabContainer, closedTab.tab.id);
+      totalTabsClosed++;
+    }
+  }
+
+  scopeLog.info(
+    `Cleared ${totalTabsClosed} expired closed tabs. Total closed tabs remaining: ${browser.closedTabs.length}`,
+  );
+}

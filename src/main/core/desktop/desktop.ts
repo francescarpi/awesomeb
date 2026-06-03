@@ -165,7 +165,7 @@ export class Desktop {
     return null;
   }
 
-  closeTabContainer(id: TTabContainerId): boolean {
+  deleteTabContainer(id: TTabContainerId): boolean {
     const tabContainer = this._tabContainers.get(id);
     if (!tabContainer) {
       return false;
@@ -241,5 +241,15 @@ export class Desktop {
       }
     }
     return tabsBelow;
+  }
+
+  getTabContainerByIndex(idx: number): TabContainer | null {
+    const tabContainers = this.tabContainers;
+    const openTabContainers = tabContainers.filter((tc) => !tc.isClosed);
+
+    if (idx < 0 || idx >= openTabContainers.length) {
+      return null;
+    }
+    return openTabContainers[idx];
   }
 }
