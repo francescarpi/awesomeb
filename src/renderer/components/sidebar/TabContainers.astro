@@ -55,9 +55,8 @@
               'items-center',
               'gap-1',
               'hidden',
-              `group-[.desktop-${tc.desktopId}]:flex`,
               tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
-              tc.isClosed && 'hidden',
+              tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
             ),
           },
           h(
