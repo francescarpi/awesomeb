@@ -7,23 +7,68 @@ export class LayoutVertical extends LayoutBase {
   public readonly label: string = 'Vertical';
   public readonly icon: string = getIcon(EIcon.Vertical);
 
-  calculateBounds(availableArea: Rectangle, tabNumber: number, percentSize: number): Rectangle {
-    const totalWidth = availableArea.width;
+  calculateBounds(
+    availableArea: Rectangle,
+    totalTabs: number,
+    tabNumber: number,
+    percentSize: number,
+  ): Rectangle {
+    const { x: ax, y: ay, width: totalWidth, height: totalHeight } = availableArea;
+    const halfHeight = Math.round(totalHeight / 2);
+    const primaryWidth = Math.round((totalWidth * percentSize) / 100);
 
-    const pos1Width = Math.round((totalWidth * percentSize) / 100);
-    const splitPos = pos1Width;
+    if (totalTabs === 1) {
+      return {
+        x: ax,
+        y: ay,
+        width: totalWidth - this.MARGIN,
+        height: totalHeight,
+      };
+    }
 
-    const x = tabNumber === 1 ? 0 : splitPos + this.MARGIN;
-    const y = availableArea.y;
+    if (totalTabs === 2) {
+      if (tabNumber === 1) {
+        return { x: ax, y: ay, width: primaryWidth - this.MARGIN, height: totalHeight };
+      }
+      return {
+        x: ax + primaryWidth + this.MARGIN,
+        y: ay,
+        width: totalWidth - primaryWidth - this.MARGIN,
+        height: totalHeight,
+      };
+    }
 
-    const width = tabNumber === 1 ? splitPos - this.MARGIN : totalWidth - splitPos - this.MARGIN;
-    const height = availableArea.height;
+    if (totalTabs === 3) {
+      if (tabNumber === 1) {
+        return {
+          x: ax,
+          y: ay,
+          width: primaryWidth - this.MARGIN,
+          height: halfHeight - this.MARGIN,
+        };
+      }
+      if (tabNumber === 2) {
+        return {
+          x: ax + primaryWidth + this.MARGIN,
+          y: ay,
+          width: totalWidth - primaryWidth - this.MARGIN,
+          height: halfHeight - this.MARGIN,
+        };
+      }
+      return {
+        x: ax,
+        y: ay + halfHeight + this.MARGIN,
+        width: totalWidth - this.MARGIN,
+        height: totalHeight - halfHeight - this.MARGIN,
+      };
+    }
 
+    const tabHeight = Math.round(totalHeight / totalTabs);
     return {
-      x: availableArea.x + x,
-      y,
-      width,
-      height,
+      x: ax,
+      y: ay + (tabNumber - 1) * tabHeight,
+      width: totalWidth - this.MARGIN,
+      height: tabHeight - this.MARGIN,
     };
   }
 }

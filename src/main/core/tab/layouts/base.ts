@@ -8,7 +8,12 @@ export class LayoutBase {
 
   protected readonly MARGIN = 2;
 
-  calculateBounds(_availableArea: Rectangle, _tabNumber: number, _percentSize: number): Rectangle {
+  calculateBounds(
+    _availableArea: Rectangle,
+    _totalTabs: number,
+    _tabNumber: number,
+    _percentSize: number,
+  ): Rectangle {
     return {
       x: 0,
       y: 0,
