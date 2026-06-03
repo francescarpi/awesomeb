@@ -160,9 +160,9 @@ export class BrowserRenderer {
 
   tabContainers(window: Window): ITabContainer[] {
     const tabContainers: ITabContainer[] = [];
-    let shortcutCounter = 0;
 
     for (const desktop of window.desktops) {
+      let shortcutCounter = 0;
       const selectedTabContainer = desktop.selectedTabContainer;
       for (const tc of desktop.tabContainers) {
         let shortcut: number | null = null;
@@ -179,6 +179,7 @@ export class BrowserRenderer {
           divider: tc.divider,
           isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+          isSplit: tc.isSplit,
         });
       }
     }
