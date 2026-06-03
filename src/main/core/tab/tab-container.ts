@@ -96,7 +96,7 @@ export class TabContainer {
   }
 
   get visibleTabs(): Tab[] {
-    return this.tabs.filter((t) => t.visible);
+    return this.tabs.filter((t) => t.visible && !t.isClosed);
   }
 
   get isSplit(): boolean {
