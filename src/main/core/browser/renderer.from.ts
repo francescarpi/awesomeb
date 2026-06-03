@@ -160,9 +160,9 @@ export class BrowserRenderer {
 
   tabContainers(window: Window): ITabContainer[] {
     const tabContainers: ITabContainer[] = [];
-    let shortcutCounter = 0;
 
     for (const desktop of window.desktops) {
+      let shortcutCounter = 0;
       const selectedTabContainer = desktop.selectedTabContainer;
       for (const tc of desktop.tabContainers) {
         let shortcut: number | null = null;
