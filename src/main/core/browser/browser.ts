@@ -10,6 +10,7 @@ import {
   partitions,
   WelcomeWindow,
   TabPreview,
+  history,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -537,6 +538,7 @@ export class Browser {
   permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
     this._unindexTab(tabId);
     tabContainer.deleteTab(tabId);
+    history.delete(tabId);
 
     if (tabContainer.tabs.length === 0) {
       this._unindexTabContainer(tabContainer.id);
