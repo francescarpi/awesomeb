@@ -44,7 +44,7 @@
     return h(
       'div', // Container
       {
-        class: c('flex', 'flex-col', 'gap-1.5'),
+        class: c('flex', 'flex-col', 'gap-1.5', 'select-none'),
         style: 'app-region: no-drag;',
       },
       ...tabContainers.map((tc) =>
@@ -89,7 +89,6 @@
                     'grid',
                     'grid-cols-1',
                     'sidebar:grid-cols-[24px_auto_25px]',
-                    'select-none',
                     'sidebar:rounded-tl',
                     'sidebar:rounded-bl',
                     t.selected && 'bg-white/20',
