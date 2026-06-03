@@ -233,18 +233,20 @@ export class BrowserRenderer {
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 
-    return tabs.map((item) => ({
-      id: item.tab.id.toString(),
-      label: item.tab.title,
-      selected: selectedTab?.id === item.tab.id,
-      url: item.tab.url,
-      partitionId: item.tab.partition.id,
-      partitionColor: item.tab.partition.color,
-      lastAccessed: item.tab.lastAccessed,
-      suspended: item.tab.suspended,
-      extra: `Desktop: ${item.desktop.label}`,
-      isDimmed: item.tab.suspended,
-    }));
+    return tabs
+      .filter((t) => !t.tab.isClosed)
+      .map((item) => ({
+        id: item.tab.id.toString(),
+        label: item.tab.title,
+        selected: selectedTab?.id === item.tab.id,
+        url: item.tab.url,
+        partitionId: item.tab.partition.id,
+        partitionColor: item.tab.partition.color,
+        lastAccessed: item.tab.lastAccessed,
+        suspended: item.tab.suspended,
+        extra: `Desktop: ${item.desktop.label}`,
+        isDimmed: item.tab.suspended,
+      }));
   }
 
   findInPageResult(tab: Tab, requestId: TFindInPageId): IFindInPageResult | null {
