@@ -126,7 +126,7 @@ describe('Browser', () => {
         expect(tabContainer.isSplit).toBe(true);
       });
 
-      test('should not allow more than 2 tabs in a tab container', async () => {
+      test('should not allow more than 3 tabs in a tab container', async () => {
         const w = browser.createWindow(1, { withDesktops: true });
         const desktop = w.selectedDesktop;
 
@@ -146,9 +146,15 @@ describe('Browser', () => {
           targetId: 'split-tab',
         });
         expect(result3).not.toBeNull();
+        expect(tabContainer.tabs.length).toBe(3);
 
-        expect(result3!.tabContainer).not.toBe(tabContainer);
-        expect(tabContainer.tabs.length).toBe(2);
+        const result4 = await browser.openURL('http://example3.com', {
+          targetId: 'split-tab',
+        });
+
+        expect(result4!.tabContainer).not.toBe(tabContainer);
+        expect(tabContainer.tabs.length).toBe(3);
+
         expect(desktop.tabContainers.length).toBe(2);
       });
     });
