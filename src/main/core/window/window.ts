@@ -328,7 +328,7 @@ export class Window extends UIWindow {
   }
 
   private get tabsOrderedByLastAccessed(): IDesConTab[] {
-    const tabs = this.tabs.filter((t) => !t.tab.suspended);
+    const tabs = this.tabs.filter((t) => !t.tab.suspended && !t.tab.isClosed);
     tabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
     return tabs;
   }
