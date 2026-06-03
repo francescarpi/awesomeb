@@ -122,14 +122,13 @@ export class Tab extends UIView {
 
     // Split tabs calculation
     if (selectedTab?.tabContainer.isSplit) {
-      const firstTab = selectedTab.tabContainer.visibleTabs[0];
-      const tabIdToCompare = this.isPreview ? this.parentTab!.id : this.id;
-      const tabNum = firstTab.id === tabIdToCompare ? 1 : 2;
-
+      const tabNum = selectedTab.tabContainer.getVisibleTabPosition(this.id);
+      const totalTabs = selectedTab.tabContainer.visibleTabs.length;
       const percentSize = selectedTab.tabContainer.layoutSize;
 
       const positon = selectedTab.tabContainer.layout.calculateBounds(
         { x, y, width, height },
+        totalTabs,
         tabNum,
         percentSize,
       );
