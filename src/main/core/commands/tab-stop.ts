@@ -15,7 +15,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: 'Stop loading tab',
   description: 'Stop loading the current tab or a specified tab',
-  visibility: ({ tab }) => !!tab && tab.webContents.isLoading(),
+  visibility: ({ tab }) => !!tab && tab.webContentsLoading,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {

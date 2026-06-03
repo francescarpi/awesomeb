@@ -16,6 +16,7 @@ const validConfig = {
   shortcutMap: 'generic-iso',
   shortcutsOverrides: { 'tab-next': 'Ctrl+Tab' },
   historyRetentionDays: 7,
+  closedTabsRetentionDays: 7,
   uiTheme: 'cupcake',
 };
 

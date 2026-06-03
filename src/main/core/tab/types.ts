@@ -16,6 +16,7 @@ export interface ITabProps {
   suspended?: boolean;
   parent?: Tab;
   favicon?: string | null;
+  closedAt?: number | null;
 }
 
 export type TBasicAuthCallback = (username?: string, password?: string) => void;

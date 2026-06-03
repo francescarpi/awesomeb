@@ -5,7 +5,6 @@ import { vi } from 'vitest';
 // pattern in vi.mock factories, which does not get applied to transitive
 // imports of dependencies in the test environment.
 const mockElectron = vi.hoisted(() => {
-  const fn = (): undefined => undefined;
   const noopFn = (): void => {};
   const webContents = {
     openDevTools: noopFn,

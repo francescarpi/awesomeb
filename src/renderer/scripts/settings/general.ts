@@ -4,6 +4,7 @@ import { box } from './common';
 import slugify from 'slugify';
 import Delete from '#/icons/delete.svg?raw';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { RETENTION_OPTIONS } from './constants';
 
 //-----------------------------------------------------------------------------
 export async function renderGeneralPage(config: IConfig): Promise<{
@@ -41,7 +42,12 @@ function buildGeneralBody(
     { class: c('flex', 'flex-col', 'gap-2') },
     renderSearchEngines(engines, callbacks.onAdd, callbacks.onDelete),
     renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation),
-    renderHistoryRetention(config),
+    h(
+      'div',
+      { class: c('flex', 'gap-2') },
+      renderHistoryRetention(config),
+      renderClosedTabsRetention(config),
+    ),
     h(
       'div',
       { class: c('flex', 'justify-end') },
@@ -170,7 +176,6 @@ function renderDownloadLocation(
 
 //-----------------------------------------------------------------------------
 function renderHistoryRetention(config: IConfig): VNode {
-  const options = [7, 15, 30, 60, 90];
   const currentValue = config.historyRetentionDays ?? 7;
 
   return box(
@@ -185,7 +190,7 @@ function renderHistoryRetention(config: IConfig): VNode {
           id: 'history-retention-days',
           class: c('select', 'select-sm', 'select-bordered', 'w-32'),
         },
-        ...options.map((days) =>
+        ...RETENTION_OPTIONS.map((days) =>
           h(
             'option',
             {
@@ -210,6 +215,37 @@ function renderHistoryRetention(config: IConfig): VNode {
 }
 
 //-----------------------------------------------------------------------------
+function renderClosedTabsRetention(config: IConfig): VNode {
+  const currentValue = config.closedTabsRetentionDays ?? 7;
+
+  return box(
+    'Closed Tabs Retention',
+    'Number of days to keep closed tabs history.',
+    h(
+      'div',
+      { class: c('flex', 'gap-2') },
+      h(
+        'select',
+        {
+          id: 'closed-tabs-retention-days',
+          class: c('select', 'select-sm', 'select-bordered', 'w-32'),
+        },
+        ...RETENTION_OPTIONS.map((days) =>
+          h(
+            'option',
+            {
+              value: String(days),
+              selected: days === currentValue,
+            },
+            `${days} days`,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+//-----------------------------------------------------------------------------
 async function saveChanges(config: IConfig) {
   // Search engines
   const searchEngines = getTableSearchEngines();
@@ -222,7 +258,19 @@ async function saveChanges(config: IConfig) {
   const retentionSelect = document.getElementById('history-retention-days') as HTMLSelectElement;
   const historyRetentionDays = parseInt(retentionSelect.value, 10);
 
-  const newConfig = { ...config, searchEngines, downloadsFolder, historyRetentionDays };
+  // Closed tabs retention
+  const closedTabsRetentionSelect = document.getElementById(
+    'closed-tabs-retention-days',
+  ) as HTMLSelectElement;
+  const closedTabsRetentionDays = parseInt(closedTabsRetentionSelect.value, 10);
+
+  const newConfig = {
+    ...config,
+    searchEngines,
+    downloadsFolder,
+    historyRetentionDays,
+    closedTabsRetentionDays,
+  };
   await abConfig.save(newConfig);
 }
 

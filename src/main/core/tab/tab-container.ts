@@ -76,21 +76,17 @@ export class TabContainer {
     return tab;
   }
 
-  closeTab(id: TTabId): boolean {
+  deleteTab(id: TTabId): boolean {
     const tab = this._tabs.get(id);
     if (!tab) {
       return false;
     }
-
-    tab.clearFailLoad();
 
     this._tabs.delete(id);
 
     if (this._selectedTabId === id) {
       this._selectedTabId = null;
     }
-
-    tab.close();
 
     return true;
   }
@@ -166,5 +162,9 @@ export class TabContainer {
       }
     }
     return null;
+  }
+
+  get isClosed(): boolean {
+    return this.tabs.every((tab) => tab.isClosed);
   }
 }

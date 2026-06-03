@@ -393,6 +393,7 @@ describe('Commands', () => {
       vi.spyOn(window.bw, 'isMinimized').mockReturnValue(false);
 
       const visibility = windowMinimize.Command.visibility!({
+        browser,
         window,
         desktop: window.selectedDesktop,
         tabContainer: window.selectedDesktop?.selectedTabContainer || null,
@@ -407,6 +408,7 @@ describe('Commands', () => {
       vi.spyOn(window.bw, 'isMinimized').mockReturnValue(true);
 
       const visibility = windowMinimize.Command.visibility!({
+        browser,
         window,
         desktop: window.selectedDesktop,
         tabContainer: window.selectedDesktop?.selectedTabContainer || null,
@@ -430,6 +432,7 @@ describe('Commands', () => {
       await window.selectTab(tab.id);
 
       const visibility = tabClose.Command.visibility!({
+        browser,
         window,
         desktop,
         tabContainer: desktop.selectedTabContainer || null,
@@ -443,6 +446,7 @@ describe('Commands', () => {
       const window = browser.activeWindow!;
 
       const visibility = tabClose.Command.visibility!({
+        browser,
         window,
         desktop: window.selectedDesktop,
         tabContainer: null,

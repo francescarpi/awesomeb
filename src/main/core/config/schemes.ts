@@ -35,6 +35,7 @@ export const ConfigScheme = z
     shortcutMap: z.string(),
     shortcutsOverrides: z.record(z.string(), z.string()),
     historyRetentionDays: z.number().default(7),
+    closedTabsRetentionDays: z.number().default(7),
     uiTheme: z.enum(UI_THEMES).default(DEFAULT_UI_THEME),
   })
   .strict();

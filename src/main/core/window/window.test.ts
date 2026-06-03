@@ -558,7 +558,7 @@ describe('Window Close Tab', () => {
     const closed = await browser.closeTab(tab.id);
 
     expect(closed).toBe(true);
-    expect(tabContainer.tabs.length).toBe(0);
+    expect(tabContainer.tabs.length).toBe(1);
   });
 
   test('should return false when tab does not exist', async () => {
@@ -578,7 +578,7 @@ describe('Window Close Tab', () => {
     expect(eventSpy).toHaveBeenCalledWith(window);
   });
 
-  test('should close tab container when it becomes empty', async () => {
+  test("shouldn't close tab container if all tabs are mark as closed", async () => {
     const result = await browser.openURL('http://example.com');
     expect(result).not.toBeNull();
     const { tab, tabContainer, desktop } = result!;
@@ -588,7 +588,7 @@ describe('Window Close Tab', () => {
 
     await browser.closeTab(tab.id);
 
-    expect(desktop.tabContainers.length).toBe(0);
+    expect(desktop.tabContainers.length).toBe(1);
   });
 
   test('should deselect tab container when closed tab container was selected', async () => {
@@ -622,9 +622,13 @@ describe('Window Close Tab', () => {
     await browser.closeTab(tab1.id);
 
     // Tab container should still exist with one tab
-    expect(tabContainer.tabs.length).toBe(1);
+    expect(tabContainer.tabs.length).toBe(2);
     expect(desktop.tabContainers.length).toBe(1);
+
+    expect(tabContainer.getTab(tab1.id)).toBe(tab1);
+    expect(tabContainer.getTab(tab1.id)?.isClosed).toBeTruthy();
     expect(tabContainer.getTab(tab2.id)).toBe(tab2);
+    expect(tabContainer.getTab(tab2.id)?.isClosed).toBeFalsy();
   });
 
   test('should handle closing tab from different desktop', async () => {
@@ -655,7 +659,8 @@ describe('Window Close Tab', () => {
 
     // Verify tab is removed from desktop 1
     const tabAfterClose = desktop1.getTab(result1!.tab.id);
-    expect(tabAfterClose).toBeNull();
+    expect(tabAfterClose).not.toBeNull();
+    expect(tabAfterClose!.tab.isClosed).toBeTruthy();
 
     // Verify result2 tab still exists
     expect(window.getTab(result2!.tab.id)).not.toBeNull();
@@ -668,14 +673,22 @@ describe('Window Close Tab', () => {
 
     expect(window.tabs.length).toBe(3);
 
+    for (const tabInfo of window.tabs) {
+      expect(tabInfo.tab.isClosed).toBeFalsy();
+    }
+
     await browser.closeTab(result1!.tab.id);
-    expect(window.tabs.length).toBe(2);
+    expect(window.tabs.length).toBe(3);
 
     await browser.closeTab(result2!.tab.id);
-    expect(window.tabs.length).toBe(1);
+    expect(window.tabs.length).toBe(3);
 
     await browser.closeTab(result3!.tab.id);
-    expect(window.tabs.length).toBe(0);
+    expect(window.tabs.length).toBe(3);
+
+    for (const tabInfo of window.tabs) {
+      expect(tabInfo.tab.isClosed).toBeTruthy();
+    }
   });
 
   test('should handle closing currently selected tab', async () => {
@@ -725,10 +738,11 @@ describe('Window Close Tab', () => {
     const closed = await browser.closeTab(tab.id);
 
     expect(closed).toBe(true);
-    expect(tabContainer.tabs.length).toBe(0);
+    expect(tabContainer.tabs.length).toBe(1);
+    expect(tabContainer.tabs[0].isClosed).toBe(true);
   });
 
-  test('should handle closing all tabs across all desktops', async () => {
+  test('Multiple closed tabs persist in the interface even when they have been set with a closed status', async () => {
     // Open tabs on multiple desktops
     const result1 = await browser.openURL('http://example1.com');
     window.selectDesktop(2);
@@ -743,10 +757,44 @@ describe('Window Close Tab', () => {
     await browser.closeTab(result2!.tab.id);
     await browser.closeTab(result3!.tab.id);
 
-    expect(window.tabs.length).toBe(0);
-    expect(window.getDesktop(1)!.tabContainers.length).toBe(0);
-    expect(window.getDesktop(2)!.tabContainers.length).toBe(0);
-    expect(window.getDesktop(3)!.tabContainers.length).toBe(0);
+    expect(window.tabs.length).toBe(3);
+
+    for (const tabInfo of window.tabs) {
+      expect(tabInfo.tab.isClosed).toBe(true);
+    }
+
+    expect(window.getDesktop(1)!.tabContainers.length).toBe(1);
+    expect(window.getDesktop(2)!.tabContainers.length).toBe(1);
+    expect(window.getDesktop(3)!.tabContainers.length).toBe(1);
+  });
+
+  test('Close private tabs should remove completly the tab from the interface', async () => {
+    const result1 = await browser.openURL('http://example.com', {
+      partitionId: partitions.private.id,
+      selectTab: true,
+    });
+
+    const { window, desktop, tabContainer } = result1!;
+
+    expect(window.selectedTab).not.toBeNull();
+
+    const result2 = await browser.openURL('http://example.com', {
+      partitionId: partitions.private.id,
+      targetId: 'split-tab',
+    });
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(tabContainer.tabs.length).toBe(2);
+
+    // Close the first tab
+    await browser.closeTab(result1!.tab.id);
+
+    expect(desktop.tabContainers.length).toBe(1);
+    expect(tabContainer.tabs.length).toBe(1);
+
+    // Close the second tab
+    await browser.closeTab(result2!.tab.id);
+    expect(desktop.tabContainers.length).toBe(0);
   });
 });
 
@@ -1014,7 +1062,7 @@ describe('Window Close Desktop', () => {
       expect(command).not.toBeNull();
       expect(command!.visibility).toBeDefined();
 
-      const visibilityArgs = { window, desktop: null, tabContainer: null, tab: null };
+      const visibilityArgs = { browser, window, desktop: null, tabContainer: null, tab: null };
 
       expect(command!.visibility!(visibilityArgs)).toBe(true);
 

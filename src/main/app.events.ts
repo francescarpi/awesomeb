@@ -22,9 +22,10 @@ export function registerAppEvents(browser: Browser) {
     session.save();
 
     for (const result of browser.tabs) {
-      if (!result.tab.suspended) {
-        result.tab.saveHistory();
+      if (result.tab.suspended || result.tab.partition.private) {
+        continue;
       }
+      result.tab.saveHistory();
     }
 
     const extensions = browser.extensions.active;

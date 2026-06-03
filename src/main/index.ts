@@ -25,6 +25,7 @@ import {
   setupVisitHistoryIPC,
   config,
   setupWelcomeIPC,
+  clearExpiredClosedTabs,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -85,4 +86,6 @@ app.whenReady().then(async () => {
   } else {
     browser.showWelcome();
   }
+
+  setTimeout(() => clearExpiredClosedTabs(browser), 5000);
 });

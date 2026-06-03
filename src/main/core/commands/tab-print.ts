@@ -3,7 +3,7 @@ import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
 
-const scopeLog = log.scope('PrintTabCo');
+const scopeLog = log.scope('PrintTabCommand');
 
 export interface ICommandParams {
   tabId?: TTabId;

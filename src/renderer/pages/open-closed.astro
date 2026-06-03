@@ -17,7 +17,7 @@ import Title from '#/components/common/Title.astro';
   listWithSearchManager('list', {
     entity: 'closedTabs',
     onAccept: (item) => {
-      abCommands.perform(winId, 'open-closed', { url: item.id });
+      abCommands.perform(winId, 'open-closed', { id: item.id });
     },
     onEscape: () => {
       abModal.close(winId);

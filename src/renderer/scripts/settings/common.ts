@@ -3,7 +3,7 @@ import { h, type VNode, c } from '#/scripts';
 export function box(title: string, desc: string, ...content: VNode[]): VNode {
   return h(
     'div',
-    { class: c('border', 'rounded-[var(--radius-box)]', 'p-2', 'relative', 'mb-6') },
+    { class: c('border', 'rounded-[var(--radius-box)]', 'p-2', 'relative', 'mb-6', 'w-full') },
     h(
       'span',
       {

@@ -11,3 +11,5 @@ export const settingsMenuItems = [
   { name: 'Permissions', hash: ['#/permissions'], rendererFnc: renderPermissionsPage },
   { name: 'Shortcuts', hash: ['#/shortcuts'], rendererFnc: renderShortcutsPage },
 ];
+
+export const RETENTION_OPTIONS = [7, 15, 30, 60, 90];

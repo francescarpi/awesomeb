@@ -18,6 +18,7 @@ export class Config extends Store<IConfig> {
       shortcutMap: 'generic-iso',
       shortcutsOverrides: {},
       historyRetentionDays: 7,
+      closedTabsRetentionDays: 7,
       uiTheme: DEFAULT_UI_THEME,
     };
 

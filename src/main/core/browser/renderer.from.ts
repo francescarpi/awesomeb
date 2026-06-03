@@ -33,7 +33,6 @@ import {
   TabContainer,
   Window,
   bookmarks,
-  closedHistory,
   partitions,
   Layouts,
 } from '@/core';
@@ -161,15 +160,24 @@ export class BrowserRenderer {
 
   tabContainers(window: Window): ITabContainer[] {
     const tabContainers: ITabContainer[] = [];
+    let shortcutCounter = 0;
+
     for (const desktop of window.desktops) {
       const selectedTabContainer = desktop.selectedTabContainer;
-      for (const [idx, tc] of desktop.tabContainers.entries()) {
+      for (const tc of desktop.tabContainers) {
+        let shortcut: number | null = null;
+        if (shortcutCounter < 9 && !tc.isClosed) {
+          shortcutCounter++;
+          shortcut = shortcutCounter;
+        }
+
         tabContainers.push({
           id: tc.id,
-          shortcut: idx < 9 ? idx + 1 : null,
+          shortcut,
           desktopId: desktop.id,
           selected: selectedTabContainer?.id === tc.id,
           divider: tc.divider,
+          isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
         });
       }
@@ -196,6 +204,7 @@ export class BrowserRenderer {
       requireAttention: tab.requireAttention,
       isMuted: tab.isMuted,
       favicon: tab.favicon,
+      isClosed: tab.isClosed,
     };
   }
 
@@ -224,18 +233,20 @@ export class BrowserRenderer {
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 
-    return tabs.map((item) => ({
-      id: item.tab.id.toString(),
-      label: item.tab.title,
-      selected: selectedTab?.id === item.tab.id,
-      url: item.tab.url,
-      partitionId: item.tab.partition.id,
-      partitionColor: item.tab.partition.color,
-      lastAccessed: item.tab.lastAccessed,
-      suspended: item.tab.suspended,
-      extra: `Desktop: ${item.desktop.label}`,
-      isDimmed: item.tab.suspended,
-    }));
+    return tabs
+      .filter((t) => !t.tab.isClosed)
+      .map((item) => ({
+        id: item.tab.id.toString(),
+        label: item.tab.title,
+        selected: selectedTab?.id === item.tab.id,
+        url: item.tab.url,
+        partitionId: item.tab.partition.id,
+        partitionColor: item.tab.partition.color,
+        lastAccessed: item.tab.lastAccessed,
+        suspended: item.tab.suspended,
+        extra: `Desktop: ${item.desktop.label}`,
+        isDimmed: item.tab.suspended,
+      }));
   }
 
   findInPageResult(tab: Tab, requestId: TFindInPageId): IFindInPageResult | null {
@@ -343,10 +354,10 @@ export class BrowserRenderer {
   }
 
   closedTabsEntities(): IEntity[] {
-    return closedHistory.tabs.map((tab) => ({
-      id: tab.url,
-      label: tab.title,
-      extra: dayjs(tab.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+    return this._browser.closedTabs.map((tab) => ({
+      id: tab.tab.id.toString(),
+      label: tab.tab.title,
+      extra: dayjs(tab.tab.closedAt).format('YYYY-MM-DD HH:mm:ss'),
     }));
   }
 

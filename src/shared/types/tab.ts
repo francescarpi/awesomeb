@@ -11,6 +11,7 @@ export interface ITabContainer {
   divider: boolean;
   tabs: ITab[];
   desktopId: TDesktopId;
+  isClosed: boolean;
 }
 
 export interface ITab {
@@ -27,6 +28,7 @@ export interface ITab {
   requireAttention: boolean;
   isMuted: boolean;
   favicon: string | null;
+  isClosed: boolean;
 }
 
 export interface ITabPartition {
