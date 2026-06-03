@@ -2,7 +2,7 @@
 import Layout from '#/layouts/Base.astro';
 ---
 
-<Layout backgroundColor="#000" borderRadius="12px">
+<Layout>
   <div id="container"></div>
 </Layout>
 
@@ -31,12 +31,25 @@ import Layout from '#/layouts/Base.astro';
   function render(result?: IFindInPageResult | null): VNode {
     return h(
       'div',
-      { class: c('flex', 'items-center', 'gap-2', 'p-2') },
-      btnIcon(Close, { classNames: ['text-white'], onClick: () => abTabs.closeFindInTab(tabId) }),
+      {
+        class: c(
+          'flex',
+          'items-center',
+          'gap-2',
+          'p-2',
+          'bg-base-200',
+          'rounded-xl',
+          'text-base-content',
+        ),
+      },
+      btnIcon(Close, {
+        classNames: ['text-base-content'],
+        onClick: () => abTabs.closeFindInTab(tabId),
+      }),
       h(
         'input',
         {
-          class: c('input', 'input-xs', 'text-black', 'rounded-full'),
+          class: c('input', 'input-xs', 'text-base-content', 'rounded-full'),
           placeholder: 'Find in page...',
           autofocus: true,
           onfocus: (event) => (event.target as HTMLInputElement).select(),
@@ -45,11 +58,11 @@ import Layout from '#/layouts/Base.astro';
         '',
       ),
       btnIcon(Previous, {
-        classNames: ['text-white'],
+        classNames: ['text-base-content'],
         onClick: () => abTabs.findInPageAction(tabId, 'previous', inputEl.value),
       }),
       btnIcon(Next, {
-        classNames: ['text-white'],
+        classNames: ['text-base-content'],
         onClick: () => abTabs.findInPageAction(tabId, 'next', inputEl.value),
       }),
       result
