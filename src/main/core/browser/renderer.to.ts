@@ -141,22 +141,14 @@ export class BrowserToRenderer {
     }
   }
 
-  refreshMediaSession(win: Window, session: IMediaSessionState | null) {
-    const sidebar = win.getView<Sidebar>('sidebar')!;
-    if (!session || !session.data) {
-      sidebar.send('media:session-update', null);
-      return;
+  mediaSessionData(session: IMediaSessionState): IMediaSession {
+    if (!session.data) {
+      throw new Error('Trying to get media session data for a session that has no data');
     }
 
-    const tabData = this._browser.getTab(session.tabId);
-    if (!tabData) {
-      sidebar.send('media:session-update', null);
-      return;
-    }
-
-    const data: IMediaSession = {
+    return {
       tabId: session.tabId,
-      favicon: tabData.tab.favicon,
+      favicon: session.favicon,
       startedAt: session.startedAt,
       playbackState: session.data.playbackState,
       title: session.data.title,
@@ -164,7 +156,14 @@ export class BrowserToRenderer {
       album: session.data.album,
       muted: session.wc.isAudioMuted(),
     };
+  }
 
-    sidebar.send('media:session-update', data);
+  refreshMediaSession(win: Window, session: IMediaSessionState | null) {
+    const sidebar = win.getView<Sidebar>('sidebar')!;
+    if (!session || !session.data) {
+      sidebar.send('media:session-update', null);
+      return;
+    }
+    sidebar.send('media:session-update', this.mediaSessionData(session));
   }
 }
