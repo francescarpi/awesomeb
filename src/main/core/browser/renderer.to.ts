@@ -158,7 +158,8 @@ export class BrowserToRenderer {
     };
   }
 
-  refreshMediaSession(win: Window, session: IMediaSessionState | null) {
+  refreshMediaSession(win: Window) {
+    const session = this._browser.mediaManager.lastSession;
     const sidebar = win.getView<Sidebar>('sidebar')!;
     if (!session || !session.data) {
       sidebar.send('media:session-update', null);
