@@ -3,6 +3,7 @@ import type { TTabId } from '~/types';
 
 export interface IMediaSessionState {
   tabId: TTabId;
+  favicon: string | null;
   wc: WebContents;
   startedAt: number;
   data?: {
