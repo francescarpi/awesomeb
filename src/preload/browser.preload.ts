@@ -136,8 +136,8 @@ const abTabs = {
   login: (winId: TWindowId, tabId: TTabId, data: { username: string; password: string } | null) => {
     ipcRenderer.send('tabs:login', { winId, tabId, data });
   },
-  clientCertificate: (winId: TWindowId, tabId: TTabId, fingeprint: string | null) => {
-    ipcRenderer.send('tabs:client-certificate', { winId, tabId, fingeprint });
+  clientCertificate: (winId: TWindowId, tabId: TTabId, fingerprint: string | null) => {
+    ipcRenderer.send('tabs:client-certificate', { winId, tabId, fingerprint });
   },
   trustCertificateError: (tabId: TTabId) => {
     ipcRenderer.send('tabs:trust-certificate-error', { tabId });
