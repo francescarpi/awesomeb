@@ -143,7 +143,7 @@ export class BrowserToRenderer {
 
   refreshMediaSession(win: Window, session: IMediaSessionState | null) {
     const sidebar = win.getView<Sidebar>('sidebar')!;
-    if (session === null) {
+    if (!session || !session.data) {
       sidebar.send('media:session-update', null);
       return;
     }
@@ -158,10 +158,10 @@ export class BrowserToRenderer {
       tabId: session.tabId,
       favicon: tabData.tab.favicon,
       startedAt: session.startedAt,
-      playbackState: session.data!.playbackState,
-      title: session.data!.title,
-      artist: session.data!.artist,
-      album: session.data!.album,
+      playbackState: session.data.playbackState,
+      title: session.data.title,
+      artist: session.data.artist,
+      album: session.data.album,
       muted: session.wc.isAudioMuted(),
     };
 
