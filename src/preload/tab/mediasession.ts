@@ -1,13 +1,36 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { TMediaAction } from '~/types';
+import type { TMediaAction, TTabId } from '~/types';
+
+interface IInfoToSend {
+  playbackState: MediaSessionPlaybackState;
+  tabId: TTabId;
+  title: string;
+  artist: string;
+  album: string;
+}
 
 export function iniMedia() {
   contextBridge.executeInMainWorld({
     func: (
       onPerformAction: (callback: (action: TMediaAction) => void) => void,
-      registerGiveMeInfo: () => void,
+      registerGiveMeInfo: (
+        callback: (tabId: TTabId, playbackState: MediaSessionPlaybackState) => IInfoToSend | null,
+      ) => void,
     ) => {
-      registerGiveMeInfo();
+      registerGiveMeInfo((tabId, playbackState) => {
+        if (!document.querySelector('video')) {
+          return null;
+        }
+
+        return {
+          playbackState,
+          tabId,
+          title: navigator.mediaSession.metadata?.title || '',
+          artist: navigator.mediaSession.metadata?.artist || '',
+          album: navigator.mediaSession.metadata?.album || '',
+        };
+      });
+
       onPerformAction((action) => {
         const video = document.querySelector('video');
         if (!video) {
@@ -30,17 +53,16 @@ export function iniMedia() {
           callback(params.action);
         });
       },
-      () => {
+      (
+        callback: (tabId: TTabId, playbackState: MediaSessionPlaybackState) => IInfoToSend | null,
+      ) => {
         ipcRenderer.on(
           'media:give-me-info',
           (_event, params: { tabId: number; status: MediaSessionPlaybackState }) => {
-            ipcRenderer.send('media:receive-info', {
-              playbackState: params.status,
-              tabId: params.tabId,
-              title: navigator.mediaSession.metadata?.title || '',
-              artist: navigator.mediaSession.metadata?.artist || '',
-              album: navigator.mediaSession.metadata?.album || '',
-            });
+            const data = callback(params.tabId, params.status);
+            if (data) {
+              ipcRenderer.send('media:receive-info', data);
+            }
           },
         );
       },
