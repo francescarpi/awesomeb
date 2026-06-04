@@ -53,7 +53,6 @@ export function setupMediaIPC(browser: Browser) {
 
       if (action === 'toggleMute') {
         tabData.tab.toggleMute();
-        browser.toRenderer.refreshMediaSession(tabData.window, session);
       } else {
         session.wc.send('media:perform-action', { action });
       }

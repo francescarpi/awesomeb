@@ -82,12 +82,12 @@
           onClick: () => abMedia.action(winId, tabInfo.tabId, 'play'),
         }),
         btnIcon(Unmuted, {
-          classNames: ['text-white', tabInfo.muted ? '' : 'hidden'],
+          classNames: ['text-white', !tabInfo.muted ? '' : 'hidden'],
           size: 5,
           onClick: () => abMedia.action(winId, tabInfo.tabId, 'toggleMute'),
         }),
         btnIcon(Muted, {
-          classNames: ['text-white', !tabInfo.muted ? '' : 'hidden'],
+          classNames: ['text-white', tabInfo.muted ? '' : 'hidden'],
           size: 5,
           onClick: () => abMedia.action(winId, tabInfo.tabId, 'toggleMute'),
         }),

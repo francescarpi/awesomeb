@@ -363,6 +363,7 @@ export function registerBrowserEvents(browser: Browser) {
       return;
     }
     browser.toRenderer.refreshTabContainers(result.window);
+    browser.toRenderer.refreshMediaSession(result.window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -425,9 +426,8 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('media:session-updated', async () => {
-    const session = browser.mediaManager.lastSession;
     for (const win of browser.windows) {
-      browser.toRenderer.refreshMediaSession(win, session);
+      browser.toRenderer.refreshMediaSession(win);
     }
   });
 }
