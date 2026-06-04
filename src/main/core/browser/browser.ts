@@ -582,6 +582,8 @@ export class Browser {
     window.removeAllTabViews(tab.id);
     window.renderViews();
 
+    this.mediaManager.removeSession(tab.id);
+
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);
     }

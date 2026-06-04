@@ -315,6 +315,8 @@ export class Window extends UIWindow {
     this.removeAllTabViews(tab.id);
     this.renderViews();
 
+    this.browser.mediaManager.removeSession(id);
+
     scopeLog.debug(
       `Suspended tab ${id}. Total views in window: ${this.bw.contentView.children.length}`,
     );

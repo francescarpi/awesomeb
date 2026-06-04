@@ -19,6 +19,7 @@ export class MediaManager {
   removeSession(tabId: TTabId) {
     this.sessions.delete(tabId);
     scopeLog.info(`Removed media session for tab ${tabId}`);
+    this.browser.eventsChannel.emit('media:session-updated');
   }
 
   requestInfo(tabId: TTabId, status: MediaSessionPlaybackState = 'none') {

@@ -144,13 +144,13 @@ export class BrowserToRenderer {
   refreshMediaSession(win: Window, session: IMediaSessionState | null) {
     const sidebar = win.getView<Sidebar>('sidebar')!;
     if (session === null) {
-      sidebar.send('media:session-clear', null);
+      sidebar.send('media:session-update', null);
       return;
     }
 
     const tabData = this._browser.getTab(session.tabId);
     if (!tabData) {
-      sidebar.send('media:session-clear', null);
+      sidebar.send('media:session-update', null);
       return;
     }
 
