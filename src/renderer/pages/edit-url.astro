@@ -92,8 +92,6 @@ import Title from '#/components/common/Title.astro';
     if (isUpdating) return;
     isUpdating = true;
 
-    syncStateFromDOM();
-
     const parts: UrlParts = {
       protocol: urlState.protocol,
       hostname: urlState.hostname,
@@ -138,8 +136,8 @@ import Title from '#/components/common/Title.astro';
     isUpdating = false;
   };
 
-  const buildVDOM = (state: typeof urlState) =>
-    h(
+  const buildVDOM = (state: typeof urlState) => {
+    return h(
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
       h(
@@ -159,11 +157,36 @@ import Title from '#/components/common/Title.astro';
           'div',
           { class: c('flex', 'flex-col', 'gap-2', 'mt-3') },
           h('h1', null, 'Modify URL parts'),
-          input('protocol', 'Protocol', state.protocol, { onInput: updateFullURL }),
-          input('hostname', 'Hostname', state.hostname, { onInput: updateFullURL }),
-          input('port', 'Port', state.port, { onInput: updateFullURL }),
-          input('pathname', 'Pathname', state.pathname, { onInput: updateFullURL }),
-          input('hash', 'Hash', state.hash, { onInput: updateFullURL }),
+          input('protocol', 'Protocol', state.protocol, {
+            onInput: () => {
+              syncStateFromDOM();
+              updateFullURL();
+            },
+          }),
+          input('hostname', 'Hostname', state.hostname, {
+            onInput: () => {
+              syncStateFromDOM();
+              updateFullURL();
+            },
+          }),
+          input('port', 'Port', state.port, {
+            onInput: () => {
+              syncStateFromDOM();
+              updateFullURL();
+            },
+          }),
+          input('pathname', 'Pathname', state.pathname, {
+            onInput: () => {
+              syncStateFromDOM();
+              updateFullURL();
+            },
+          }),
+          input('hash', 'Hash', state.hash, {
+            onInput: () => {
+              syncStateFromDOM();
+              updateFullURL();
+            },
+          }),
           h('h2', { class: c('text-sm') }, 'Query Parameters'),
           h(
             'div',
@@ -186,7 +209,6 @@ import Title from '#/components/common/Title.astro';
                   ? btnIcon(deleteIcon, {
                       doubleConfirmation: true,
                       onClick: () => {
-                        syncStateFromDOM();
                         state.queryParams.splice(index, 1);
                         updateFullURL();
                         renderer.update(buildVDOM(urlState));
@@ -204,7 +226,6 @@ import Title from '#/components/common/Title.astro';
               {
                 class: c('btn', 'btn-sm', 'btn-ghost'),
                 onClick: () => {
-                  syncStateFromDOM();
                   state.queryParams.push({ key: '', value: '' });
                   updateFullURL();
                   renderer.update(buildVDOM(urlState));
@@ -217,6 +238,7 @@ import Title from '#/components/common/Title.astro';
       ),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     );
+  };
 
   const renderer = new Renderer(buildVDOM(urlState));
 
