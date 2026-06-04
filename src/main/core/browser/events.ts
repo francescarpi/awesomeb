@@ -39,6 +39,7 @@ export function registerBrowserEvents(browser: Browser) {
       browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
       browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshMediaSession(window);
 
       window.renderViews();
 
@@ -108,6 +109,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshShowSplitMenu(window);
     browser.toRenderer.refreshLayoutData(window);
     browser.toRenderer.refreshTabNavigation(window, tab);
+    browser.toRenderer.refreshMediaSession(window);
 
     const result = browser.getTab(tab.id)!;
     browser.toRenderer.refreshThemes(window, result.desktop);

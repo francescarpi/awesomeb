@@ -159,9 +159,10 @@ export class BrowserToRenderer {
   }
 
   refreshMediaSession(win: Window) {
+    const selectedTab = win.selectedTab;
     const session = this._browser.mediaManager.lastSession;
     const sidebar = win.getView<Sidebar>('sidebar')!;
-    if (!session || !session.data) {
+    if (!session || !session.data || (selectedTab && selectedTab.tab.id === session.tabId)) {
       sidebar.send('media:session-update', null);
       return;
     }
