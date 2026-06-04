@@ -83,6 +83,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
     checkIfRequireAttention(browser, tab);
     browser.mediaManager.addSession(tab.id, {
       tabId: tab.id,
+      favicon: tab.favicon,
       wc: tab.webContents,
       startedAt: Date.now(),
     });

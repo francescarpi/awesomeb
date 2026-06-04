@@ -27,7 +27,8 @@ export function setupMediaIPC(browser: Browser) {
     browser,
     [windowChecker, viewChecker.bind(null, ['sidebar'])],
     async ({}) => {
-      return browser.mediaManager.lastSession;
+      const session = browser.mediaManager.lastSession;
+      return session ? browser.toRenderer.mediaSessionData(session) : null;
     },
   );
 
