@@ -11,6 +11,7 @@ import {
   WelcomeWindow,
   TabPreview,
   history,
+  MediaManager,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -45,6 +46,7 @@ export class Browser {
   public readonly idGenerator = new IdGenerator(this);
   public readonly downloads = new Downloads(this);
   public readonly extensions = new Extensions(this);
+  public readonly mediaManager = new MediaManager(this);
 
   constructor() {
     registerBrowserEvents(this);

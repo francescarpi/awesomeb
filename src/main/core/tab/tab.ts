@@ -5,7 +5,7 @@ import {
   TCertificateCallback,
   TPermissionRequestCallback,
 } from './types';
-import { TTabId, IMediaSessionInfo } from '~/types';
+import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
 import { FindInPage } from './find-in-page';
@@ -41,7 +41,6 @@ export class Tab extends UIView {
   private _zoomStep: number = 0;
   private static readonly MIN_ZOOM_STEP = -5;
   private static readonly MAX_ZOOM_STEP = 9;
-  private _mediaSessionInfo: IMediaSessionInfo | null = null;
   private _closedAt: number | null = null;
 
   constructor(
@@ -348,7 +347,6 @@ export class Tab extends UIView {
     this.closeWebContents();
     this._suspended = true;
     this._eventsRegistered = false;
-    this.setMediaSessionInfo(null);
   }
 
   markAsClosed() {
@@ -535,15 +533,6 @@ export class Tab extends UIView {
         break;
     }
     this.webContents.setZoomFactor((100 + this._zoomStep * 10) / 100);
-  }
-
-  get mediaSessionInfo(): IMediaSessionInfo | null {
-    return this._mediaSessionInfo;
-  }
-
-  setMediaSessionInfo(info: IMediaSessionInfo | null) {
-    this._mediaSessionInfo = info;
-    this.browser.eventsChannel.emit('tab:media-session-info-did-change', this);
   }
 
   get closedAt(): number | null {

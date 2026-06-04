@@ -10,7 +10,6 @@ import {
   TPage,
   TTabId,
   TWindowId,
-  ITabMediaSessionInfo,
 } from '~/types';
 import log from 'electron-log';
 import { registerWindowEvents } from './events';
@@ -415,24 +414,5 @@ export class Window extends UIWindow {
 
   setWhoInitiateRequireAttention(id: TTabId | null) {
     this._whoInitiateRequireAttention = id;
-  }
-
-  get mediaSession(): ITabMediaSessionInfo | null {
-    const selectedTab = this.selectedTab;
-    if (!selectedTab) {
-      return null;
-    }
-
-    for (const tab of this.tabs) {
-      if (tab.tab.mediaSessionInfo && selectedTab.tab.id !== tab.tab.id) {
-        return {
-          tabId: tab.tab.id,
-          tabTitle: tab.tab.title,
-          favicon: tab.tab.favicon,
-          ...tab.tab.mediaSessionInfo,
-        };
-      }
-    }
-    return null;
   }
 }

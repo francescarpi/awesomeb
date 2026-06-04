@@ -81,6 +81,16 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('media-started-playing', async () => {
     checkIfRequireAttention(browser, tab);
+    browser.mediaManager.addSession(tab.id, {
+      tabId: tab.id,
+      wc: tab.webContents,
+      startedAt: Date.now(),
+    });
+  });
+
+  // ----------------------------------------------------------------------------------------------- //
+  tab.webContents.on('media-paused', async () => {
+    browser.mediaManager.requestInfo(tab.id, 'paused');
   });
 
   // ----------------------------------------------------------------------------------------------- //

@@ -10,7 +10,7 @@
   import Muted from '#/icons/muted.svg?raw';
   import Unmuted from '#/icons/unmuted.svg?raw';
   import Play from '#/icons/play.svg?raw';
-  import type { ITabMediaSessionInfo } from '~/types';
+  import type { IMediaSession } from '~/types';
 
   const { winId } = getSearchParams();
   let cleanupAnimation: (() => void) | null = null;
@@ -26,17 +26,17 @@
     }
   };
 
-  const data = await abWindow.getMediaSession(winId);
+  const data = await abMedia.get(winId);
 
   const renderer = new Renderer(renderMediaSession(data)).render('mediasession-content', {
     onRendered: animateTitle,
   });
 
-  abWindow.onRefreshMediaSession((_event, tabInfo) => {
-    renderer.update(renderMediaSession(tabInfo), { onUpdated: animateTitle });
+  abMedia.onRefresh((_event, data) => {
+    renderer.update(renderMediaSession(data), { onUpdated: animateTitle });
   });
 
-  function renderMediaSession(tabInfo: ITabMediaSessionInfo | null): VNode {
+  function renderMediaSession(tabInfo: IMediaSession | null): VNode {
     if (!tabInfo) {
       return h('div', null);
     }
@@ -72,24 +72,24 @@
           },
         }),
         btnIcon(Pause, {
-          classNames: ['text-white', tabInfo.state === 'playing' ? '' : 'hidden'],
+          classNames: ['text-white', tabInfo.playbackState === 'playing' ? '' : 'hidden'],
           size: 5,
-          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'pause'),
+          onClick: () => abMedia.action(winId, tabInfo.tabId, 'pause'),
         }),
         btnIcon(Play, {
-          classNames: ['text-white', tabInfo.state === 'paused' ? '' : 'hidden'],
+          classNames: ['text-white', tabInfo.playbackState === 'paused' ? '' : 'hidden'],
           size: 5,
-          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'play'),
+          onClick: () => abMedia.action(winId, tabInfo.tabId, 'play'),
         }),
         btnIcon(Unmuted, {
-          classNames: ['text-white', tabInfo.volume > 0 ? '' : 'hidden'],
+          classNames: ['text-white', tabInfo.muted ? '' : 'hidden'],
           size: 5,
-          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'mute'),
+          onClick: () => abMedia.action(winId, tabInfo.tabId, 'toggleMute'),
         }),
         btnIcon(Muted, {
-          classNames: ['text-white', tabInfo.volume === 0 ? '' : 'hidden'],
+          classNames: ['text-white', !tabInfo.muted ? '' : 'hidden'],
           size: 5,
-          onClick: () => abWindow.mediaSessionAction(winId, tabInfo.tabId, 'unmute'),
+          onClick: () => abMedia.action(winId, tabInfo.tabId, 'toggleMute'),
         }),
       ),
       h(
