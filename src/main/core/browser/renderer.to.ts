@@ -1,9 +1,9 @@
-import { Browser, Window, Desktop, Tab, partitions, config } from '@/core';
+import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionState } from '@/core';
 import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import type { ITheme, TFindInPageId, ILayoutData, TMediaSessionAction } from '~/types';
+import type { ITheme, TFindInPageId, ILayoutData, IMediaSession } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -141,12 +141,30 @@ export class BrowserToRenderer {
     }
   }
 
-  mediaSessionAction(tab: Tab, action: TMediaSessionAction) {
-    tab.webContents.send('media-session-action', action);
-  }
+  refreshMediaSession(win: Window, session: IMediaSessionState | null) {
+    const sidebar = win.getView<Sidebar>('sidebar')!;
+    if (session === null) {
+      sidebar.send('media:session-update', null);
+      return;
+    }
 
-  refreshMediaSession(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('window:refresh-media-session', window.mediaSession);
+    const tabData = this._browser.getTab(session.tabId);
+    if (!tabData) {
+      sidebar.send('media:session-update', null);
+      return;
+    }
+
+    const data: IMediaSession = {
+      tabId: session.tabId,
+      favicon: tabData.tab.favicon,
+      startedAt: session.startedAt,
+      playbackState: session.data!.playbackState,
+      title: session.data!.title,
+      artist: session.data!.artist,
+      album: session.data!.album,
+      muted: session.wc.isAudioMuted(),
+    };
+
+    sidebar.send('media:session-update', data);
   }
 }

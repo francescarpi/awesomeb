@@ -27,9 +27,9 @@ import type {
   TShortcutId,
   IVisitHistoryResponse,
   TFindUrlResult,
-  ITabMediaSessionInfo,
-  TMediaSessionAction,
   IAbout,
+  IMediaSession,
+  TMediaAction,
 } from '~/types';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
@@ -96,17 +96,6 @@ const abWindow = {
   },
   onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => {
     ipcRenderer.on('window:refresh-layout-data', callback);
-  },
-  onRefreshMediaSession: (
-    callback: (event: IpcRendererEvent, data: ITabMediaSessionInfo | null) => void,
-  ) => {
-    ipcRenderer.on('window:refresh-media-session', callback);
-  },
-  mediaSessionAction: (winId: TWindowId, tabId: TTabId, action: TMediaSessionAction) => {
-    ipcRenderer.send('window:media-session-action', { winId, tabId, action });
-  },
-  getMediaSession: async (winId: TWindowId) => {
-    return await ipcRenderer.invoke('window:get-media-session', { winId });
   },
 };
 
@@ -377,6 +366,19 @@ const abWelcome = {
 };
 
 //--------------------------------------------------------------------------------------
+const abMedia = {
+  onRefresh: (callback: (event: IpcRendererEvent, session: IMediaSession | null) => void) => {
+    ipcRenderer.on('media:session-update', callback);
+  },
+  get: (winId: TWindowId) => {
+    return ipcRenderer.invoke('media:get', { winId });
+  },
+  action: (winId: TWindowId, tabId: TTabId, action: TMediaAction) => {
+    ipcRenderer.send('media:action', { winId, tabId, action });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -401,3 +403,4 @@ contextBridge.exposeInMainWorld('abShortcuts', abShortcuts);
 contextBridge.exposeInMainWorld('abDebug', abDebug);
 contextBridge.exposeInMainWorld('abBrowser', abBrowser);
 contextBridge.exposeInMainWorld('abWelcome', abWelcome);
+contextBridge.exposeInMainWorld('abMedia', abMedia);
