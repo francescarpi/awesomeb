@@ -1,83 +1,72 @@
 ---
-import ButtonIcon from '#/components/common/ButtonIcon.astro';
+
 ---
 
-<div class="relative">
-  <ButtonIcon icon="downloads" />
-  <span
-    id="download-badge"
-    class="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold rounded-full min-w-4 w-fit h-4 px-0.75 items-center justify-center hidden"
-  ></span>
-</div>
+<div id="downloads-content"></div>
 
 <script>
-  import { getSearchParams, onClick } from '#/scripts';
+  import { Renderer, h, btnIcon, getSearchParams, c } from '#/scripts';
+  import IdleIcon from '#/icons/downloads.svg?raw';
+  import AnimatedIcon from '#/icons/downloads-animated.svg?raw';
 
   const { winId } = getSearchParams();
-  const downloads = document.getElementById('downloads')!;
-  const badge = document.getElementById('download-badge')!;
-  let prevCount = 0;
-  let bounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const renderer = new Renderer(h('div', null)).render('downloads-content');
+
+  renderIcon(false);
 
   abDownloads.onRefresh((_event, data) => {
-    const newCount = data.items.length;
-
-    if (newCount !== prevCount) {
-      if (bounceTimer) clearTimeout(bounceTimer);
-      downloads.classList.remove('spring-pop');
-      void downloads.offsetWidth;
-      downloads.classList.add('spring-pop');
-      bounceTimer = setTimeout(() => downloads.classList.remove('spring-pop'), 800);
-    }
-
-    prevCount = newCount;
-
-    const pendingCount = data.items.filter(
-      (i) => i.status === 'in_progress' || i.status === 'paused',
-    ).length;
-
-    if (pendingCount > 0) {
-      badge.textContent = pendingCount > 9 ? '9+' : String(pendingCount);
-      badge.classList.remove('hidden');
-      badge.classList.add('flex');
-    } else {
-      badge.classList.add('hidden');
-    }
+    renderIcon(data.downloading, data.items.length);
   });
 
-  onClick('downloads', (btn) => {
-    const bounds = btn.getBoundingClientRect();
-    abModal.openContextual(winId, 'contextual-downloads-modal', {
-      bounds: {
-        x: bounds.x,
-        y: bounds.y,
-        width: bounds.width,
-        height: bounds.height,
-      },
-      anchor: 'bottom-left',
-    });
-  });
+  function renderIcon(downloading: boolean, itemsCount = 0) {
+    renderer.update(
+      h(
+        'div',
+        {
+          style: 'app-region: no-drag;',
+          class: c('relative'),
+        },
+        h(
+          'span',
+          {
+            class: c(
+              itemsCount === 0 && 'hidden',
+              'bg-error',
+              'w-3',
+              'h-3',
+              'text-[9px]',
+              'rounded-full',
+              'flex',
+              'items-center',
+              'justify-center',
+              'absolute',
+              '-top-2',
+              '-right-1.5',
+            ),
+          },
+          itemsCount,
+        ),
+        btnIcon(downloading ? AnimatedIcon : IdleIcon, {
+          classNames: ['text-white'],
+          size: 5,
+          id: 'downloads-icon',
+          onClick: () => {
+            const bounds = (
+              document.getElementById('downloads-icon') as HTMLButtonElement
+            ).getBoundingClientRect();
+            abModal.openContextual(winId, 'contextual-downloads-modal', {
+              bounds: {
+                x: bounds.x,
+                y: bounds.y,
+                width: bounds.width,
+                height: bounds.height,
+              },
+              anchor: 'bottom-left',
+            });
+          },
+        }),
+      ),
+    );
+  }
 </script>
-
-<style is:global>
-  @keyframes spring-pop {
-    0% {
-      transform: scale(1);
-    }
-    35% {
-      transform: scale(2);
-    }
-    60% {
-      transform: scale(0.92);
-    }
-    80% {
-      transform: scale(1.04);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  .spring-pop {
-    animation: spring-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-</style>

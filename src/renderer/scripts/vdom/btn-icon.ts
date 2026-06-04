@@ -9,6 +9,7 @@ export function btnIcon(
     classNames?: string[];
     doubleConfirmation?: boolean;
     size?: number;
+    id?: string;
   },
 ): VNode {
   const { onClick, classNames, doubleConfirmation, size } = props || { size: 5.5 };
@@ -32,6 +33,7 @@ export function btnIcon(
         `h-${size}`,
         ...(classNames || []),
       ),
+      id: props?.id,
       innerHTML: icon,
       onClick: (e: Event) => {
         e.stopPropagation();
