@@ -25,11 +25,11 @@ import type {
   TShortcutId,
   IHistoryItem,
   IVisitHistoryResponse,
-  ITabMediaSessionInfo,
-  TMediaSessionAction,
   IDebugWebContent,
   IAbout,
   IDebugTabIndex,
+  IMediaSession,
+  TMediaAction,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -69,11 +69,6 @@ declare global {
   const abWindow: {
     readyToShow: (winId: TWindowId) => void;
     onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => void;
-    onRefreshMediaSession: (
-      callback: (event: IpcRendererEvent, data: ITabMediaSessionInfo | null) => void,
-    ) => void;
-    mediaSessionAction: (winId: TWindowId, tabId: TTabId, action: TMediaSessionAction) => void;
-    getMediaSession: (winId) => Promise<ITabMediaSessionInfo | null>;
   };
 
   //--------------------------------------------------------------------------------------
@@ -230,5 +225,12 @@ declare global {
   const abWelcome: {
     ready: () => void;
     addSearchEnginedAndInitiate: (name: string, url: string) => void;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abMedia: {
+    onRefresh: (callback: (event, session: IMediaSession | null) => void) => void;
+    get: (winId: TWindowId) => Promise<IMediaSession | null>;
+    action: (winId: TWindowId, tabId: TTabId, action: TMediaAction) => void;
   };
 }

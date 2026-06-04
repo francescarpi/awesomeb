@@ -108,7 +108,6 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshShowSplitMenu(window);
     browser.toRenderer.refreshLayoutData(window);
     browser.toRenderer.refreshTabNavigation(window, tab);
-    browser.toRenderer.refreshMediaSession(window);
 
     const result = browser.getTab(tab.id)!;
     browser.toRenderer.refreshThemes(window, result.desktop);
@@ -126,12 +125,6 @@ export function registerBrowserEvents(browser: Browser) {
         window.checkViewsNeedTheFocus();
       }
     });
-  });
-
-  //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('tab:media-session-info-did-change', async (tab: Tab) => {
-    const result = browser.getTab(tab.id)!;
-    browser.toRenderer.refreshMediaSession(result.window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -428,5 +421,13 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('window:window-did-resize', async (win: Window) => {
     win.renderViews();
     browser.toRenderer.refreshLayoutData(win);
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('media:session-updated', async () => {
+    const session = browser.mediaManager.lastSession;
+    for (const win of browser.windows) {
+      browser.toRenderer.refreshMediaSession(win, session);
+    }
   });
 }
