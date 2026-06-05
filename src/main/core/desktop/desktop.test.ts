@@ -50,6 +50,45 @@ describe('Desktop', () => {
     expect(d.tabContainers.map((tc) => tc.id)).toEqual([tc1.id, tc3.id, tc2.id]);
   });
 
+  test('move tabcontainers having closed tabs works has expected', async () => {
+    const d = window.selectedDesktop;
+
+    const t1 = await browser.openURL('http://example1.com');
+    const t2 = await browser.openURL('http://example2.com');
+    const t3 = await browser.openURL('http://example3.com');
+
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([
+      t1!.tabContainer.id,
+      t2!.tabContainer.id,
+      t3!.tabContainer.id,
+    ]);
+
+    browser.closeTab(t2!.tab.id);
+    expect(t2?.tabContainer.isClosed).toBeTruthy();
+
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([
+      t1!.tabContainer.id,
+      t2!.tabContainer.id,
+      t3!.tabContainer.id,
+    ]);
+
+    d.moveTabContainer(t3!.tabContainer.id, 'up');
+
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([
+      t3!.tabContainer.id,
+      t1!.tabContainer.id,
+      t2!.tabContainer.id,
+    ]);
+
+    d.moveTabContainer(t3!.tabContainer.id, 'down');
+
+    expect(d.tabContainers.map((tc) => tc.id)).toEqual([
+      t1!.tabContainer.id,
+      t3!.tabContainer.id,
+      t2!.tabContainer.id,
+    ]);
+  });
+
   test('getTabsBelow returns correct tabs', async () => {
     const d = window.selectedDesktop;
 
