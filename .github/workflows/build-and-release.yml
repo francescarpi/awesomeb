@@ -47,6 +47,9 @@ jobs:
         run: pnpm run build:mac -p always
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
