@@ -169,7 +169,7 @@ export class TabContainer {
   }
 
   get isClosed(): boolean {
-    return this.tabs.every((tab) => tab.isClosed);
+    return this.tabs.length > 0 && this.tabs.every((tab) => tab.isClosed);
   }
 
   getVisibleTabPosition(tabId: TTabId): number {
