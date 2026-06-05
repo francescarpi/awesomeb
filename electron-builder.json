@@ -17,7 +17,7 @@
   "mac": {
     "category": "public.app-category.utilities",
     "entitlementsInherit": "./build/entitlements.mac.plist",
-    "notarize": false
+    "notarize": true
   },
   "dmg": {
     "artifactName": "${name}-${version}-${arch}.${ext}"
