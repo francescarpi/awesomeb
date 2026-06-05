@@ -206,7 +206,12 @@ export class Desktop {
       return;
     }
 
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const step = direction === 'up' ? -1 : 1;
+    let newIndex = index + step;
+    while (newIndex >= 0 && newIndex < tabContainers.length && tabContainers[newIndex].isClosed) {
+      newIndex += step;
+    }
+
     if (newIndex < 0 || newIndex >= tabContainers.length) {
       return;
     }
@@ -214,7 +219,6 @@ export class Desktop {
     const [movedTabContainer] = tabContainers.splice(index, 1);
     tabContainers.splice(newIndex, 0, movedTabContainer);
 
-    // Update the internal map to reflect the new order
     this._tabContainers.clear();
     for (const tc of tabContainers) {
       this._tabContainers.set(tc.id, tc);
