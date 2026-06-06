@@ -432,4 +432,11 @@ export function registerBrowserEvents(browser: Browser) {
       browser.toRenderer.refreshMediaSession(win);
     }
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('appupdater:version-available', async (version) => {
+    for (const win of browser.windows) {
+      browser.toRenderer.refreshVersionAvailable(win, version);
+    }
+  });
 }
