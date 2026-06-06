@@ -12,6 +12,7 @@ import {
   TabPreview,
   history,
   MediaManager,
+  AppUpdater,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -47,6 +48,7 @@ export class Browser {
   public readonly downloads = new Downloads(this);
   public readonly extensions = new Extensions(this);
   public readonly mediaManager = new MediaManager(this);
+  public readonly appUpdater = new AppUpdater(this);
 
   constructor() {
     registerBrowserEvents(this);

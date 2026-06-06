@@ -7,6 +7,7 @@ import TabContainers from '#/components/sidebar/TabContainers.astro';
 import Downloads from '#/components/sidebar/Downloads.astro';
 import WindowId from '#/components/sidebar/WindowId.astro';
 import MediaSession from '#/components/sidebar/MediaSession.astro';
+import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 ---
 
 <Layout borderRadius="10px 0 0 10px">
@@ -14,8 +15,9 @@ import MediaSession from '#/components/sidebar/MediaSession.astro';
     <section class="pl-2 pt-2 hidden sidebar:block">
       <WindowActions />
     </section>
-    <section class="px-2 mt-2 sidebar:mt-0">
+    <section class="px-2 mt-2 sidebar:mt-0 flex justify-between items-center">
       <ButtonIcon icon="sidebar" />
+      <AppUpdater />
     </section>
     <section class="py-1 flex justify-center sidebar:block sidebar:px-2">
       <Desktops />

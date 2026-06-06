@@ -21,4 +21,5 @@ export * from './shortcuts';
 export * from './visit-history';
 export * from './welcome';
 export * from './media';
+export * from './appupdater';
 export { validateStore } from './validation';

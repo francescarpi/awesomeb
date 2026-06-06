@@ -1,0 +1,47 @@
+---
+
+---
+
+<div id="app-updater-container" class="hidden sidebar:block"></div>
+
+<script>
+  import { Renderer, h, c, getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  const renderer = new Renderer(h('div', null)).render('app-updater-container');
+
+  abAppUpdater.onRefreshVersionAvailable((version) => {
+    renderButton(version);
+  });
+
+  const version = await abAppUpdater.versionAvailable(winId);
+  if (version) {
+    renderButton(version);
+  }
+
+  function renderButton(version: string) {
+    renderer.update(
+      h(
+        'div',
+        {
+          class: c(
+            'bg-black',
+            'hover:bg-black/60',
+            'text-white',
+            'text-xs',
+            'px-2',
+            'py-1',
+            'rounded-xl',
+            'cursor-pointer',
+          ),
+          style: 'app-region: no-drag;',
+          onclick: () => {
+            abAppUpdater.install(winId);
+          },
+        },
+        `Update to ${version}`,
+      ),
+    );
+  }
+</script>

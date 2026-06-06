@@ -379,6 +379,19 @@ const abMedia = {
 };
 
 //--------------------------------------------------------------------------------------
+const abAppUpdater = {
+  onRefreshVersionAvailable: (callback: (event: IpcRendererEvent, version: string) => void) => {
+    ipcRenderer.on('appupdater:version-available', callback);
+  },
+  versionAvailable: (winId: TWindowId) => {
+    return ipcRenderer.invoke('appupdater:version-available', { winId });
+  },
+  install: (winId: TWindowId) => {
+    ipcRenderer.send('appupdater:install', { winId });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -404,3 +417,4 @@ contextBridge.exposeInMainWorld('abDebug', abDebug);
 contextBridge.exposeInMainWorld('abBrowser', abBrowser);
 contextBridge.exposeInMainWorld('abWelcome', abWelcome);
 contextBridge.exposeInMainWorld('abMedia', abMedia);
+contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
