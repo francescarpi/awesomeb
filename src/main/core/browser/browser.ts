@@ -236,6 +236,12 @@ export class Browser {
       return null;
     }
 
+    const selectedTab = this.selectedTab;
+    if (selectedTab && props?.targetId === 'current-tab') {
+      selectedTab.tab.loadURL(url);
+      return selectedTab;
+    }
+
     const result = parseTarget(this, {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
