@@ -60,7 +60,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
