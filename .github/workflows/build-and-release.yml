@@ -44,6 +44,13 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      - name: Import macOS Code Signing Certificate
+        if: matrix.os == 'macos-latest'
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          p12-password: ${{ secrets.MAC_CERT_PASSWORD }}
+
       - name: Build for Mac
         if: matrix.os == 'macos-latest'
         run: pnpm run build:mac -p always
@@ -52,6 +59,8 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
