@@ -27,6 +27,7 @@ import {
   setupWelcomeIPC,
   clearExpiredClosedTabs,
   setupMediaIPC,
+  setupAppUpdaterIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
@@ -82,6 +83,7 @@ app.whenReady().then(async () => {
   setupShortcutsIPC(browser);
   setupWelcomeIPC(browser);
   setupMediaIPC(browser);
+  setupAppUpdaterIPC(browser);
 
   if (config.wasConfigured) {
     await browser.loadSession();

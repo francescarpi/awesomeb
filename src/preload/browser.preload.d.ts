@@ -233,4 +233,11 @@ declare global {
     get: (winId: TWindowId) => Promise<IMediaSession | null>;
     action: (winId: TWindowId, tabId: TTabId, action: TMediaAction) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abAppUpdater: {
+    onRefreshVersionAvailable: (callback: (event, version: string) => void) => void;
+    versionAvailable: (winId: TWindowId) => Promise<string | null>;
+    install: (winId: TWindowId) => void;
+  };
 }

@@ -168,4 +168,9 @@ export class BrowserToRenderer {
     }
     sidebar.send('media:session-update', this.mediaSessionData(session));
   }
+
+  refreshVersionAvailable(win: Window, version: string) {
+    const sidebar = win.getView<Sidebar>('sidebar')!;
+    sidebar.send('appupdater:version-available', version);
+  }
 }

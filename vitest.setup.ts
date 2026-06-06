@@ -399,9 +399,31 @@ const mockElectronContextMenu = vi.hoisted(() => ({
   dispose: (): void => {},
 }));
 
+const mockElectronUpdater = vi.hoisted(() => {
+  const handlers = new Map<string, (...args: unknown[]) => void>();
+  return {
+    autoUpdater: {
+      logger: null,
+      forceDevUpdateConfig: false,
+      checkForUpdates: vi.fn(),
+      quitAndInstall: vi.fn(),
+      on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
+        handlers.set(event, handler);
+      }),
+      emit: (event: string, ...args: unknown[]): void => {
+        const handler = handlers.get(event);
+        if (handler) {
+          handler(...args);
+        }
+      },
+    },
+  };
+});
+
 vi.mock('electron', () => mockElectron);
 vi.mock('electron-log', () => mockElectronLog);
 vi.mock('electron-context-menu', () => mockElectronContextMenu);
+vi.mock('electron-updater', () => mockElectronUpdater);
 
 process.env.TEST = 'true';
 
