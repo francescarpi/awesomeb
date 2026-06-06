@@ -105,6 +105,7 @@ export class BrowserRenderer {
 
   targetsEntities(window: Window, props?: { onlyNewWindow?: boolean }): IEntity[] {
     const onlyNewWindow = props?.onlyNewWindow ?? false;
+    const selectedTab = window.selectedTab;
 
     const newWindowOption = [
       {
@@ -125,7 +126,17 @@ export class BrowserRenderer {
       return newWindowOption;
     }
 
-    const result = [
+    let result: IEntity[] = [];
+
+    if (selectedTab) {
+      result.push({
+        id: 'current-tab',
+        label: 'Current tab',
+      });
+    }
+
+    result = [
+      ...result,
       {
         id: 'current-desktop-window',
         label: 'New tab',
