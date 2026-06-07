@@ -24,6 +24,7 @@ export enum EIcon {
   Open = 'open.png',
   Partition = 'partition.png',
   Previous = 'previous.png',
+  PreviousVisited = 'previous-visited.png',
   Reload = 'reload.png',
   RotateLeft = 'rotate-left.png',
   RotateRight = 'rotate-right.png',
