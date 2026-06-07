@@ -59,6 +59,11 @@ export const SHORTCUTS_MAP: IShortcutMap = {
     nextTab: { key: 'CmdOrCtrl+[', label: 'Next tab', group: EShortcutGroup.TabNavigation },
     findTab: { key: 'CmdOrCtrl+.', label: 'Find tab', group: EShortcutGroup.TabNavigation },
     tabSwitcher: { key: 'Control+Tab', label: 'Tab switcher', group: EShortcutGroup.TabNavigation },
+    previousVisited: {
+      key: "CmdOrCtrl+'",
+      label: 'Previous visited tab',
+      group: EShortcutGroup.TabNavigation,
+    },
     tabMarks: { key: 'CmdOrCtrl+;', label: 'Marks', group: EShortcutGroup.TabNavigation },
     selectTabAttention: {
       key: 'CmdOrCtrl+U',

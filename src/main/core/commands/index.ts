@@ -69,6 +69,7 @@ import * as visitHistoryPage from './visit-history-page';
 import * as debugPage from './debug-page';
 import * as windowNew from './window-new';
 import * as tabClearClosed from './tab-clear-closed';
+import * as tabPreviousVisited from './tab-previous-visited';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -137,6 +138,7 @@ const COMMANDS = {
   [debugPage.TRIGGER]: debugPage.Command,
   [windowNew.TRIGGER]: windowNew.Command,
   [tabClearClosed.TRIGGER]: tabClearClosed.Command,
+  [tabPreviousVisited.TRIGGER]: tabPreviousVisited.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

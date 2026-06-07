@@ -337,6 +337,7 @@ function tabsMenu(
   const nextTab = getShortcut('nextTab');
   const selectTabAttention = getShortcut('selectTabAttention');
   const tabSwitcher = getShortcut('tabSwitcher');
+  const previousVisited = getShortcut('previousVisited');
   const tabMarks = getShortcut('tabMarks');
   const moveTabUp = getShortcut('moveTabUp');
   const moveTabDown = getShortcut('moveTabDown');
@@ -429,12 +430,22 @@ function tabsMenu(
         },
       },
       {
-        label: 'Tab switcher...',
+        label: tabSwitcher.label,
         accelerator: tabSwitcher.key,
         icon: getIcon(EIcon.Tab),
         click: async () => {
           if (window && !window.isTabSwitcherVisible) {
             window.showTabSwitcher();
+          }
+        },
+      },
+      {
+        label: previousVisited.label,
+        accelerator: previousVisited.key,
+        icon: getIcon(EIcon.PreviousVisited),
+        click: async () => {
+          if (window && !window.isTabSwitcherVisible) {
+            await browser.performCommand(window, 'previous-visited-tab');
           }
         },
       },
