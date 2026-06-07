@@ -63,10 +63,6 @@ import Base from '../layouts/Base.astro';
                     'cursor-pointer',
                     idx === selectedIndex ? 'menu-active rounded' : '',
                   ),
-                  onmouseenter: () => {
-                    selectedIndex = idx;
-                    renderer.update(renderTabs());
-                  },
                 },
                 h('img', { class: c('w-5', 'h-5') }, ''),
                 h(
