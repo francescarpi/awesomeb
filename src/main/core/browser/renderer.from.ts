@@ -126,7 +126,12 @@ export class BrowserRenderer {
       return newWindowOption;
     }
 
-    let result: IEntity[] = [];
+    let result: IEntity[] = [
+      {
+        id: 'current-desktop-window',
+        label: 'New tab',
+      },
+    ];
 
     if (selectedTab) {
       result.push({
@@ -137,10 +142,6 @@ export class BrowserRenderer {
 
     result = [
       ...result,
-      {
-        id: 'current-desktop-window',
-        label: 'New tab',
-      },
       {
         id: 'after-current',
         label: 'New following tab',
