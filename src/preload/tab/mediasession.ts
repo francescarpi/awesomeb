@@ -18,7 +18,7 @@ export function iniMedia() {
       ) => void,
     ) => {
       registerGiveMeInfo((tabId, playbackState) => {
-        if (!document.querySelector('video')) {
+        if (!document.querySelector('video') || navigator.mediaSession.metadata === null) {
           return null;
         }
 
