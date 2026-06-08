@@ -32,8 +32,8 @@ export class UIWindow {
     this.bw = new BrowserWindow({
       ...windowBounds,
       title: app.name,
-      minWidth: 800,
-      minHeight: 400,
+      minWidth: 900,
+      minHeight: 800,
       frame: false,
       visualEffectState: 'followWindow',
       transparent: false,
