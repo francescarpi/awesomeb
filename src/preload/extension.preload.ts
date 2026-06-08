@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 
-if (window) {
+if (typeof window !== 'undefined') {
   const searchParams = new URLSearchParams(window.location.search);
 
   contextBridge.executeInMainWorld({
