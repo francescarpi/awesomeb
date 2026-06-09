@@ -164,6 +164,7 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabNavigation(window);
     browser.toRenderer.refreshExtensions(window);
     browser.toRenderer.refreshLayoutData(window);
+    browser.toRenderer.refreshTabSwitcher(window);
     browser.refreshMainMenu();
   });
 
