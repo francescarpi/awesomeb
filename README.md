@@ -19,7 +19,7 @@ If you are a developer and want to get the project running quickly, you will nee
 - node >= 24
 - pnpm >= 10
 
-## Installation & Setup
+### Installation & Setup
 
 Install dependencies and configure husky:
 
@@ -41,3 +41,11 @@ pnpm build:mac
 ```
 
 _(Note: Windows and Linux builds are available but have not been tested yet.)_
+
+## Screenshots
+
+![Blank browser](./docs/assets/sc1.png)
+![Perform a command](./docs/assets/sc2.png)
+![Split tabs](./docs/assets/sc3.png)
+![Tab preview](./docs/assets/sc4.png)
+![Profiles configuration](./docs/assets/sc5.png)
