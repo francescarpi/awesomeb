@@ -348,7 +348,7 @@ export class BrowserRenderer {
 
   tabSwitcherData(window: Window): ITabSwitcherTab[] {
     const sortedTabs = window.tabs
-      .filter((tab) => !tab.tab.suspended)
+      .filter((tab) => !tab.tab.suspended && !tab.tab.isClosed)
       .sort((a, b) => a.tab.lastAccessed - b.tab.lastAccessed)
       .reverse();
 
