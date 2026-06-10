@@ -108,7 +108,10 @@ const { isPage = false } = Astro.props;
           'button',
           {
             class: c('btn', 'btn-sm', 'btn-outline', !hasDownloads && 'hidden'),
-            onclick: () => abDownloads.clearCompleted(),
+            onclick: () => {
+              abDownloads.clearCompleted();
+              abModal.closeContextual(winId);
+            },
           },
           'Clear Completed',
         ),
