@@ -18,22 +18,28 @@ export function registerAppEvents(browser: Browser) {
   app.on('before-quit', async (event) => {
     event.preventDefault();
 
-    const session = new Session(browser);
-    session.save();
+    for (const window of browser.windows) {
+      window.modal.open('quitting');
+    }
 
-    for (const result of browser.tabs) {
-      if (result.tab.suspended || result.tab.partition.private) {
-        continue;
+    setTimeout(async () => {
+      const session = new Session(browser);
+      session.save();
+
+      for (const result of browser.tabs) {
+        if (result.tab.suspended || result.tab.partition.private) {
+          continue;
+        }
+        result.tab.saveHistory();
       }
-      result.tab.saveHistory();
-    }
 
-    const extensions = browser.extensions.active;
-    for (const extension of extensions) {
-      await browser.extensions.loadUnloadExtensionToAllSessions(extension.id, 'unload');
-    }
+      const extensions = browser.extensions.active;
+      for (const extension of extensions) {
+        await browser.extensions.loadUnloadExtensionToAllSessions(extension.id, 'unload');
+      }
 
-    app.exit(0);
+      app.exit(0);
+    }, 200);
   });
 
   // ----------------------------------------------------------------------------------------------- //
