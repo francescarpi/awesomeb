@@ -162,6 +162,16 @@ export class UIView {
       this.webContents.print();
     }
   }
+
+  preventLostFocusWhenVisible() {
+    this.webContents.on('blur', () => {
+      if (this.visible) {
+        setTimeout(() => {
+          this.focus();
+        });
+      }
+    });
+  }
 }
 
 export class UIPageView extends UIView {

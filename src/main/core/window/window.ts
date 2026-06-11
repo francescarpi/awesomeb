@@ -188,7 +188,9 @@ export class Window extends UIWindow {
     }
 
     const selectedTab = tabContainer.selectedTab;
-    const tabs = sameDesktop ? desktop.tabs.map((t) => ({ ...t, desktop })) : this.tabs;
+    const tabs = sameDesktop
+      ? desktop.tabs.filter((t) => !t.tab.isClosed).map((t) => ({ ...t, desktop }))
+      : this.tabs;
     const currentIndex = tabs.findIndex(
       (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
     );
