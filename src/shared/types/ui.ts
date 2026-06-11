@@ -4,5 +4,5 @@ export type TPage = string;
 
 export interface IContextualModalParams {
   bounds: Rectangle;
-  anchor: 'bottom-left';
+  anchor: 'top-left' | 'bottom-left';
 }

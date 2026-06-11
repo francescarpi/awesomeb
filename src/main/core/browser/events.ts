@@ -1,4 +1,4 @@
-import { TFindInPageId, TTabId, TWindowId } from '~/types';
+import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo } from '~/types';
 import { Browser, Window, Desktop, Tab, TabContainer, notification } from '@/core';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
@@ -434,9 +434,9 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('appupdater:version-available', async (version) => {
+  browser.eventsChannel.on('appupdater:version-available', async (data: IAppUpdaterInfo) => {
     for (const win of browser.windows) {
-      browser.toRenderer.refreshVersionAvailable(win, version);
+      browser.toRenderer.refreshVersionAvailable(win, data);
     }
   });
 }

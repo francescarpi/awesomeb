@@ -3,10 +3,7 @@
   "version": "0.0.3-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/francescarpi/awesomeb.git"
-  },
+  "repository": "https://github.com/francescarpi/awesomeb.git",
   "scripts": {
     "dev": "pnpm astro dev",
     "build": "astro build && electron-builder",
