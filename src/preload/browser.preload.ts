@@ -30,6 +30,7 @@ import type {
   IAbout,
   IMediaSession,
   TMediaAction,
+  IAppUpdaterInfo,
 } from '~/types';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
@@ -380,7 +381,9 @@ const abMedia = {
 
 //--------------------------------------------------------------------------------------
 const abAppUpdater = {
-  onRefreshVersionAvailable: (callback: (event: IpcRendererEvent, version: string) => void) => {
+  onRefreshVersionAvailable: (
+    callback: (event: IpcRendererEvent, data: IAppUpdaterInfo) => void,
+  ) => {
     ipcRenderer.on('appupdater:version-available', callback);
   },
   versionAvailable: (winId: TWindowId) => {
@@ -388,6 +391,9 @@ const abAppUpdater = {
   },
   install: (winId: TWindowId) => {
     ipcRenderer.send('appupdater:install', { winId });
+  },
+  download: (winId: TWindowId) => {
+    ipcRenderer.send('appupdater:download', { winId });
   },
 };
 

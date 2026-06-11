@@ -30,6 +30,7 @@ import type {
   IDebugTabIndex,
   IMediaSession,
   TMediaAction,
+  IAppUpdaterInfo,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -236,8 +237,9 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abAppUpdater: {
-    onRefreshVersionAvailable: (callback: (event, version: string) => void) => void;
-    versionAvailable: (winId: TWindowId) => Promise<string | null>;
+    onRefreshVersionAvailable: (callback: (event, data: IAppUpdaterInfo) => void) => void;
+    versionAvailable: (winId: TWindowId) => Promise<IAppUpdaterInfo | null>;
     install: (winId: TWindowId) => void;
+    download: (winId: TWindowId) => void;
   };
 }

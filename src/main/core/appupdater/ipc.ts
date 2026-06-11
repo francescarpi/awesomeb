@@ -1,6 +1,5 @@
-import { Browser } from '@/core';
+import { Browser, Window } from '@/core';
 import { createHandler, windowChecker, viewChecker } from '@/utils';
-import { autoUpdater } from 'electron-updater';
 
 export function setupAppUpdaterIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -8,7 +7,7 @@ export function setupAppUpdaterIPC(browser: Browser) {
     'appupdater:version-available',
     'handle',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker, viewChecker.bind(null, ['sidebar', 'contextual-modal'])],
     async ({}) => {
       return browser.appUpdater.versionAvailable;
     },
@@ -21,8 +20,20 @@ export function setupAppUpdaterIPC(browser: Browser) {
     browser,
     [windowChecker, viewChecker.bind(null, ['sidebar'])],
     async ({}) => {
+      browser.appUpdater.quitAndInstall();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'appupdater:download',
+    'on',
+    browser,
+    [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+    async ({ win }) => {
+      win.closeContextualModal();
       if (browser.appUpdater.versionAvailable) {
-        autoUpdater.quitAndInstall();
+        browser.appUpdater.downloadUpdate();
       }
     },
   );

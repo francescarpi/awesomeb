@@ -3,7 +3,7 @@ import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import type { ITheme, TFindInPageId, ILayoutData, IMediaSession } from '~/types';
+import type { ITheme, TFindInPageId, ILayoutData, IMediaSession, IAppUpdaterInfo } from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -169,8 +169,8 @@ export class BrowserToRenderer {
     sidebar.send('media:session-update', this.mediaSessionData(session));
   }
 
-  refreshVersionAvailable(win: Window, version: string) {
+  refreshVersionAvailable(win: Window, data: IAppUpdaterInfo) {
     const sidebar = win.getView<Sidebar>('sidebar')!;
-    sidebar.send('appupdater:version-available', version);
+    sidebar.send('appupdater:version-available', data);
   }
 }
