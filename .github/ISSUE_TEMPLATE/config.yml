@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/francescarpi/awesomeb/discussions
+    about: Ask questions, share ideas, or discuss features informally
+  - name: Sponsor the project
+    url: https://github.com/sponsors/francescarpi
+    about: Support AwesomeB development
