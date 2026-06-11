@@ -40,6 +40,11 @@ const { width = 'w-87.5' } = Astro.props;
         wrapper.style.left = `${x}px`;
         break;
       }
+      case 'top-left': {
+        wrapper.style.top = `${y + 30}px`;
+        wrapper.style.left = `${x}px`;
+        break;
+      }
     }
 
     wrapper.classList.remove('hidden');
