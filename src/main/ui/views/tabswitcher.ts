@@ -8,6 +8,8 @@ export class TabSwitcher extends UIPageView {
       query: { winId: winId.toString() },
       visible: false,
     });
+
+    this.preventLostFocusWhenVisible();
   }
 
   refreshBounds(window: Window) {
