@@ -124,7 +124,6 @@ export function registerBrowserEvents(browser: Browser) {
         browser.toRenderer.refreshShowSplitMenu(window);
         browser.toRenderer.refreshTabNavigation(window, tab);
         browser.toRenderer.refreshURLBar(window, tab);
-        window.checkViewsNeedTheFocus();
       }
     });
   });
