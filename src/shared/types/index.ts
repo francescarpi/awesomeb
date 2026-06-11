@@ -18,3 +18,4 @@ export * from './shortcuts';
 export * from './visit-history';
 export * from './debug';
 export * from './media';
+export * from './appupdater';

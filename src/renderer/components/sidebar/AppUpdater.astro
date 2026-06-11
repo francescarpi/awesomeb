@@ -6,41 +6,82 @@
 
 <script>
   import { Renderer, h, c, getSearchParams } from '#/scripts';
+  import type { IAppUpdaterInfo } from '~/types';
 
   const { winId } = getSearchParams();
 
   const renderer = new Renderer(h('div', null)).render('app-updater-container');
 
-  abAppUpdater.onRefreshVersionAvailable((version) => {
-    renderButton(version);
+  abAppUpdater.onRefreshVersionAvailable((_event, data) => {
+    renderButton(data);
   });
 
-  const version = await abAppUpdater.versionAvailable(winId);
-  if (version) {
-    renderButton(version);
+  const data = await abAppUpdater.versionAvailable(winId);
+  if (data) {
+    renderButton(data);
   }
 
-  function renderButton(version: string) {
+  function renderButton(data: IAppUpdaterInfo) {
     renderer.update(
       h(
         'div',
-        {
-          class: c(
-            'bg-black',
-            'hover:bg-black/60',
-            'text-white',
-            'text-xs',
-            'px-2',
-            'py-1',
-            'rounded-xl',
-            'cursor-pointer',
-          ),
-          style: 'app-region: no-drag;',
-          onclick: () => {
-            abAppUpdater.install(winId);
+        null,
+        h(
+          'button',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              data.status === 'available' ? 'inline-flex' : 'hidden',
+            ),
+            style: 'app-region: no-drag;',
+            id: 'appupdater-info-btn',
+            onclick: () => {
+              const bounds = (
+                document.getElementById('appupdater-info-btn') as HTMLButtonElement
+              ).getBoundingClientRect();
+              abModal.openContextual(winId, 'contextual-app-updater', {
+                bounds: {
+                  x: bounds.x,
+                  y: bounds.y,
+                  width: bounds.width,
+                  height: bounds.height,
+                },
+                anchor: 'top-left',
+              });
+            },
           },
-        },
-        `Update to ${version}`,
+          'Update available',
+        ),
+        h(
+          'span',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              data.status === 'downloading' ? 'inline-flex' : 'hidden',
+            ),
+          },
+          `Progress ${data.progress.toFixed(0)}%`,
+        ),
+        h(
+          'button',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              data.status === 'downloaded' ? 'inline-flex' : 'hidden',
+            ),
+            style: 'app-region: no-drag;',
+            onclick: () => {
+              abAppUpdater.install(winId);
+            },
+          },
+          'Quit & Install',
+        ),
       ),
     );
   }
