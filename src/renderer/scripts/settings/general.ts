@@ -12,7 +12,7 @@ export async function renderGeneralPage(config: IConfig): Promise<{
   callback: () => void;
 }> {
   const renderer = new Renderer(
-    buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
+    await buildGeneralBody(config.searchEngines, config.downloadsFolder, config, {
       onSave: () => saveChanges(config),
       onAdd: () => addSearchEngine(renderer, config),
       onDelete: (code) => deleteSearchEngine(code, renderer, config),
@@ -26,7 +26,7 @@ export async function renderGeneralPage(config: IConfig): Promise<{
 }
 
 //-----------------------------------------------------------------------------
-function buildGeneralBody(
+async function buildGeneralBody(
   engines: IConfigSearchEngine[],
   downloadLocation: string | null,
   config: IConfig,
@@ -36,10 +36,11 @@ function buildGeneralBody(
     onDelete: (code: string) => void;
     onSelectDownloadLocation: () => void;
   },
-): VNode {
+): Promise<VNode> {
   return h(
     'div',
     { class: c('flex', 'flex-col', 'gap-2') },
+    await renderConfigFolder(),
     renderSearchEngines(engines, callbacks.onAdd, callbacks.onDelete),
     renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation),
     h(
@@ -68,6 +69,36 @@ function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
     onDelete: (code: string) => deleteSearchEngine(code, renderer, config),
     onSelectDownloadLocation: () => selectDownloadLocation(renderer, config),
   };
+}
+
+//-----------------------------------------------------------------------------
+async function renderConfigFolder(): Promise<VNode> {
+  const info = await abConfig.getConfigInfo();
+  return box(
+    'Information',
+    'Here you can view information about the application version and the file path where configuration, session, history, etc., are stored.',
+    h(
+      'div',
+      { class: c('text-md', 'flex', 'gap-16') },
+      h(
+        'div',
+        { class: c('flex', 'gap-2') },
+        h('span', null, 'App version:'),
+        h('span', { class: c('font-bold') }, info.version),
+      ),
+      h(
+        'div',
+        { class: c('flex', 'gap-2', 'items-center') },
+        h('span', null, 'Config folder:'),
+        h('span', { class: c('font-bold') }, info.configPath),
+        h(
+          'button',
+          { class: c('btn', 'btn-xs'), onclick: () => abConfig.openConfigFolder() },
+          'Open folder',
+        ),
+      ),
+    ),
+  );
 }
 
 //-----------------------------------------------------------------------------
@@ -275,7 +306,7 @@ async function saveChanges(config: IConfig) {
 }
 
 //-----------------------------------------------------------------------------
-function addSearchEngine(renderer: Renderer, config: IConfig) {
+async function addSearchEngine(renderer: Renderer, config: IConfig) {
   const engines = getTableSearchEngines();
   if (engines.some((engine) => engine.code === 'new-engine')) {
     return;
@@ -287,7 +318,7 @@ function addSearchEngine(renderer: Renderer, config: IConfig) {
   ];
 
   renderer.update(
-    buildGeneralBody(
+    await buildGeneralBody(
       newEngines,
       config.downloadsFolder,
       config,
@@ -297,10 +328,10 @@ function addSearchEngine(renderer: Renderer, config: IConfig) {
 }
 
 //-----------------------------------------------------------------------------
-function deleteSearchEngine(code: string, renderer: Renderer, config: IConfig) {
+async function deleteSearchEngine(code: string, renderer: Renderer, config: IConfig) {
   const engines = getTableSearchEngines().filter((engine) => engine.code !== code);
   renderer.update(
-    buildGeneralBody(
+    await buildGeneralBody(
       engines,
       config.downloadsFolder,
       config,
@@ -314,7 +345,7 @@ async function selectDownloadLocation(renderer: Renderer, config: IConfig) {
   const folder = await abConfig.selectDownloadFolder();
   if (folder) {
     renderer.update(
-      buildGeneralBody(
+      await buildGeneralBody(
         config.searchEngines,
         folder,
         config,

@@ -7,3 +7,8 @@ export type {
   IConfigTheme,
   TSearchEngineCode,
 } from '@/core/config/schemes';
+
+export interface IConfigInfo {
+  version: string;
+  configPath: string;
+}

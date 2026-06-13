@@ -269,6 +269,12 @@ const abConfig = {
   get: (winId?: TWindowId) => {
     return ipcRenderer.invoke('config:get', { winId });
   },
+  getConfigInfo: () => {
+    return ipcRenderer.invoke('config:get-config-folder', {});
+  },
+  openConfigFolder: () => {
+    return ipcRenderer.send('config:open-config-folder', {});
+  },
   save: (config: IConfig) => {
     return ipcRenderer.invoke('config:save', { config });
   },

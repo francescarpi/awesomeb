@@ -6,8 +6,9 @@ import {
   windowChecker,
   conditionalChecker,
 } from '@/utils';
-import type { IConfig, IWinDesConTab } from '~/types';
-import { dialog } from 'electron';
+import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
+import { dialog, app, shell } from 'electron';
+import { userDataPath } from '@/paths';
 
 export function setupConfigIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -64,6 +65,32 @@ export function setupConfigIPC(browser: Browser) {
       });
 
       return result.canceled ? null : result.filePaths[0];
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{}>(
+    'config:get-config-folder',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, 'settings')],
+    async ({}) => {
+      const data: IConfigInfo = {
+        version: app.getVersion(),
+        configPath: userDataPath(),
+      };
+      return data;
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{}>(
+    'config:open-config-folder',
+    'on',
+    browser,
+    [internalPageChecker.bind(null, 'settings')],
+    async ({}) => {
+      shell.showItemInFolder(userDataPath());
     },
   );
 }
