@@ -31,6 +31,7 @@ import type {
   IMediaSession,
   TMediaAction,
   IAppUpdaterInfo,
+  IConfigInfo,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -173,6 +174,8 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abConfig: {
     get: (winId?: TWindowId) => Promise<IConfig>;
+    getConfigInfo: () => Promise<IConfigInfo>;
+    openConfigFolder: () => Promise<void>;
     save: (config: IConfig) => Promise<IConfig>;
     selectDownloadFolder: () => Promise<string | null>;
     refresh: (callback: (event: IpcRendererEvent, config: IConfig) => void) => void;
