@@ -1,6 +1,7 @@
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import { app } from 'electron';
 
 export const PRELOAD_FOLDER = path.join(__dirname, '..', 'preload');
 
@@ -45,4 +46,20 @@ export function extensionsPath(): string {
   }
 
   return extPath;
+}
+
+let _repoUrl: string | null = null;
+
+export function getRepoUrl(): string {
+  if (_repoUrl !== null) return _repoUrl;
+  try {
+    const pkgPath = path.join(app.getAppPath(), 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    _repoUrl = String(pkg.repository ?? '')
+      .replace(/^git\+/, '')
+      .replace(/\.git$/, '');
+  } catch {
+    _repoUrl = '';
+  }
+  return _repoUrl;
 }

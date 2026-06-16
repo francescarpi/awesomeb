@@ -11,4 +11,6 @@ export type {
 export interface IConfigInfo {
   version: string;
   configPath: string;
+  chromeVersion: string;
+  repoUrl: string;
 }
