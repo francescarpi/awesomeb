@@ -129,9 +129,19 @@ export class UIWindow {
   }
 
   focus() {
-    if (!this.bw.isDestroyed()) {
-      this.bw.focus();
+    if (this.bw.isDestroyed()) {
+      return;
     }
+
+    if (process.platform === 'darwin') {
+      app.focus({ steal: true });
+    }
+
+    if (this.bw.isMinimized()) {
+      this.bw.restore();
+    }
+
+    this.bw.focus();
   }
 
   show() {

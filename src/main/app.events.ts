@@ -65,6 +65,7 @@ export function registerAppEvents(browser: Browser) {
 
   // ----------------------------------------------------------------------------------------------- //
   app.on('open-url', async (_event, url) => {
-    await browser.openURL(url, { selectTab: true });
+    const result = await browser.openURL(url, { selectTab: true });
+    result?.window.focus();
   });
 }
