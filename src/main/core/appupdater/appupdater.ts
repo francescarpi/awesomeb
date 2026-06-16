@@ -1,9 +1,11 @@
 import { autoUpdater } from 'electron-updater';
+import { autoUpdater as electronAutoUpdater } from 'electron';
 import log from 'electron-log';
 import { app } from 'electron';
 import { Browser } from '@/core';
 import { IAppUpdaterInfo } from '~/types';
 import { removeAllAnchors } from './helpers';
+import { quitAndSave } from '../../app.events';
 
 const scopeLog = log.scope('AppUpdater');
 
@@ -40,6 +42,13 @@ export class AppUpdater {
         this.data.status = 'downloaded';
         this.emit();
       }
+    });
+
+    // `before-quit-for-update` fires on `electron.autoUpdater` (built-in),
+    // emitted by electron-updater's BaseUpdater BEFORE windows close on quitAndInstall.
+    // We persist the session here so a restart after update restores tabs.
+    electronAutoUpdater.on('before-quit-for-update', async () => {
+      await quitAndSave(this.browser);
     });
 
     setTimeout(() => {
