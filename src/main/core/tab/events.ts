@@ -23,6 +23,27 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   tab.eventsRegistered = true;
 
   //--------------------------------------------------------------------------------------
+  // Capture Ctrl+Tab at the webContents level (before the page sees the event) so the
+  // tab switcher works even on pages like Excalidraw that call preventDefault() on keydown
+  // and would otherwise block the Menu accelerator.
+  tab.webContents.on('before-input-event', (event, input) => {
+    if (
+      input.type === 'keyDown' &&
+      input.key === 'Tab' &&
+      input.control &&
+      !input.meta &&
+      !input.alt &&
+      !input.shift
+    ) {
+      const result = browser.getTab(tab.id);
+      if (result && !result.window.isTabSwitcherVisible) {
+        event.preventDefault();
+        result.window.showTabSwitcher();
+      }
+    }
+  });
+
+  //--------------------------------------------------------------------------------------
   tab.webContents.on('did-start-loading', () => {
     tab.setLoading(true);
   });
