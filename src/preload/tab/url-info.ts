@@ -15,7 +15,7 @@ export function iniUrlInfo() {
       function animateString(el: HTMLElement, tmout = 2000): () => void {
         const elContainer = el.parentElement;
         if (!elContainer) {
-          throw new Error('No element container found');
+          return () => {};
         }
 
         let cancelled = false;

@@ -179,8 +179,10 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
     }
 
     if (url) {
-      tabData.tab.webContents.send('tab:url-info-show', { url });
-    } else {
+      if (!tabData.tab.webContents.isDestroyed()) {
+        tabData.tab.webContents.send('tab:url-info-show', { url });
+      }
+    } else if (!tabData.tab.webContents.isDestroyed()) {
       tabData.tab.webContents.send('tab:url-info-hide');
     }
   });
