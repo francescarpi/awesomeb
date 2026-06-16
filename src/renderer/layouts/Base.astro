@@ -23,6 +23,13 @@ const { backgroundColor, borderRadius, noDrag } = Astro.props;
     <meta http-equiv="Last-Modified" content="0" />
     <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
+    <script is:inline>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const theme = params.get('theme');
+        if (theme) document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
   <body style={noDrag ? 'app-region: no-drag' : ''}>
     <div class="rootContainer fixed inset-0 text-white">
