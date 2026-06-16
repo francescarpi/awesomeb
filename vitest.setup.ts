@@ -296,6 +296,14 @@ const mockElectron = vi.hoisted(() => {
       dipToScreenRect: noopFn,
     },
     desktopCapturer: { getSources: (): Promise<unknown[]> => Promise.resolve([]) },
+    autoUpdater: {
+      logger: null,
+      forceDevUpdateConfig: false,
+      checkForUpdates: vi.fn(),
+      quitAndInstall: vi.fn(),
+      on: noopFn,
+      emit: noopFn,
+    },
     session: {
       fromPartition: (): unknown => ({
         registerPreloadScript: noopFn,
