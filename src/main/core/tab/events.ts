@@ -3,7 +3,7 @@ import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { HandlerDetails, WebContents, Certificate } from 'electron';
-import { windowOpenHadler, Browser, parseFavicon, URLInfoView } from '@/core';
+import { windowOpenHadler, Browser, parseFavicon } from '@/core';
 
 const scopeLog = log.scope('TabEvents');
 
@@ -178,17 +178,10 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
       return;
     }
 
-    for (const view of tabData.window.views) {
-      if (view.viewId.endsWith('#url-info')) {
-        view.closeWebContents();
-        tabData.window.removeView(view.viewId);
-      }
-    }
-
     if (url) {
-      const view = new URLInfoView(tabData.tab, url);
-      tabData.window.addView(view);
-      tabData.window.renderViews();
+      tabData.tab.webContents.send('tab:url-info-show', { url });
+    } else {
+      tabData.tab.webContents.send('tab:url-info-hide');
     }
   });
 

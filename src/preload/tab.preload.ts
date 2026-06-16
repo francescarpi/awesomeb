@@ -1,6 +1,7 @@
-import { iniPrompts, iniAnchors, iniWebAuth, iniMedia } from './tab/';
+import { iniPrompts, iniAnchors, iniWebAuth, iniMedia, iniUrlInfo } from './tab/';
 
 iniAnchors();
 iniPrompts();
 iniWebAuth();
 iniMedia();
+iniUrlInfo();
