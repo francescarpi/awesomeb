@@ -1,4 +1,4 @@
-import { Browser } from '@/core';
+import { Browser, type Window } from '@/core';
 import { createHandler, tabChecker, windowChecker, viewChecker } from '@/utils';
 import type { IWinDesConTab, TTabId, TMediaAction } from '~/types';
 
@@ -21,14 +21,17 @@ export function setupMediaIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{}>(
+  createHandler<{ win: Window }>(
     'media:get',
     'handle',
     browser,
     [windowChecker, viewChecker.bind(null, ['sidebar'])],
-    async ({}) => {
+    async ({ win }) => {
       const session = browser.mediaManager.lastSession;
-      return session ? browser.toRenderer.mediaSessionData(session) : null;
+      if (!session) return null;
+      const selectedTab = win.selectedTab;
+      if (selectedTab && selectedTab.tab.id === session.tabId) return null;
+      return browser.toRenderer.mediaSessionData(session);
     },
   );
 
