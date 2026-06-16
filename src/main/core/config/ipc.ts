@@ -8,7 +8,7 @@ import {
 } from '@/utils';
 import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
 import { dialog, app, shell } from 'electron';
-import { userDataPath } from '@/paths';
+import { userDataPath, getRepoUrl } from '@/paths';
 
 export function setupConfigIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -78,6 +78,8 @@ export function setupConfigIPC(browser: Browser) {
       const data: IConfigInfo = {
         version: app.getVersion(),
         configPath: userDataPath(),
+        chromeVersion: process.versions.chrome,
+        repoUrl: getRepoUrl(),
       };
       return data;
     },

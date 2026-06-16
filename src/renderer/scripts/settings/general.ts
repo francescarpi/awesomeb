@@ -76,15 +76,21 @@ async function renderConfigFolder(): Promise<VNode> {
   const info = await abConfig.getConfigInfo();
   return box(
     'Information',
-    'Here you can view information about the application version and the file path where configuration, session, history, etc., are stored.',
+    'Here you can view information about the application version, the file path where configuration, session, history, etc., are stored, the underlying Chromium version, and the project repository.',
     h(
       'div',
-      { class: c('text-md', 'flex', 'gap-16') },
+      { class: c('text-md', 'flex', 'flex-col', 'gap-2') },
       h(
         'div',
         { class: c('flex', 'gap-2') },
         h('span', null, 'App version:'),
         h('span', { class: c('font-bold') }, info.version),
+      ),
+      h(
+        'div',
+        { class: c('flex', 'gap-2') },
+        h('span', null, 'Chrome version:'),
+        h('span', { class: c('font-bold') }, info.chromeVersion),
       ),
       h(
         'div',
@@ -97,6 +103,23 @@ async function renderConfigFolder(): Promise<VNode> {
           'Open folder',
         ),
       ),
+      info.repoUrl
+        ? h(
+            'div',
+            { class: c('flex', 'gap-2', 'items-center') },
+            h('span', null, 'GitHub repository:'),
+            h(
+              'a',
+              {
+                href: info.repoUrl,
+                class: c('font-bold', 'link', 'link-hover'),
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              },
+              info.repoUrl,
+            ),
+          )
+        : null,
     ),
   );
 }
