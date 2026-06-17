@@ -1,5 +1,5 @@
 import { ICommand } from './types';
-import { Session, notification } from '@/core';
+import { notification } from '@/core';
 
 export interface ICommandParams {}
 
@@ -10,8 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Save Session',
   description: 'Saves the current session to disk.',
   async handler({ browser }) {
-    const session = new Session(browser);
-    session.save();
+    browser.saveSession();
     notification('Session Save', 'Session saved successfully');
   },
 };
