@@ -692,4 +692,21 @@ export class Browser {
 
     return closedTabs[0];
   }
+
+  saveSession() {
+    if (this.windows.length === 0) {
+      scopeLog.warn('No windows to save in session');
+      return;
+    }
+
+    const session = new Session(this);
+    session.save();
+
+    for (const result of this.tabs) {
+      if (result.tab.suspended || result.tab.partition.private) {
+        continue;
+      }
+      result.tab.saveHistory();
+    }
+  }
 }
