@@ -173,4 +173,10 @@ export class BrowserToRenderer {
     const sidebar = win.getView<Sidebar>('sidebar')!;
     sidebar.send('appupdater:version-available', data);
   }
+
+  broadcast(channel: string, ...args: unknown[]) {
+    for (const window of this._browser.windows) {
+      window.webContents.send(channel, ...args);
+    }
+  }
 }

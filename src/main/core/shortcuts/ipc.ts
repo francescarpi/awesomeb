@@ -1,6 +1,7 @@
-import { Browser, config, notification } from '@/core';
-import { createHandler, internalPageChecker } from '@/utils';
+import { Browser, config, notification, type Window } from '@/core';
+import { createHandler, internalPageChecker, viewChecker, windowChecker } from '@/utils';
 import { SHORTCUTS_MAPS } from './index';
+import { getActiveMap } from './helpers';
 import type { TShortcutMapId, TShortcutId } from '~/types';
 
 export function setupShortcutsIPC(browser: Browser) {
@@ -35,8 +36,26 @@ export function setupShortcutsIPC(browser: Browser) {
       config.save(currentConfig);
 
       await browser.refreshMainMenu();
+      browser.toRenderer.broadcast('shortcuts:changed', { shortcutId, key });
 
       notification(`Shortcut "${map.shortcuts[shortcutId].label}" updated`, `New key: ${key}`);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'shortcuts:active',
+    'handle',
+    browser,
+    [
+      [
+        windowChecker,
+        viewChecker.bind(null, ['window']),
+        internalPageChecker.bind(null, 'settings'),
+      ],
+    ],
+    async ({}) => {
+      return getActiveMap();
     },
   );
 }
