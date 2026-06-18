@@ -52,7 +52,7 @@
     "astro-icon": "1.1.5",
     "concurrently": "10.0.3",
     "daisyui": "5.5.23",
-    "electron": "42.4.0",
+    "electron": "42.4.1",
     "electron-builder": "26.15.3",
     "electron-vite": "5.0.0",
     "eslint": "10.5.0",
