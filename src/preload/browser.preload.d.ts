@@ -212,6 +212,13 @@ declare global {
   const abShortcuts: {
     maps: () => Promise<Record<TShortcutMapId, IShortcutMap>>;
     override: (mapId: TShortcutMapId, shortcutId: TShortcutId, key: string) => Promise<void>;
+    active: (winId: TWindowId) => Promise<IShortcutMap>;
+    onChange: (
+      callback: (
+        event: IpcRendererEvent,
+        payload: { shortcutId: TShortcutId; key: string },
+      ) => void,
+    ) => void;
   };
 
   //--------------------------------------------------------------------------------------

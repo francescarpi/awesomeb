@@ -90,5 +90,10 @@ describe('acceleratorToDisplay', () => {
       expect(acceleratorToDisplay('CmdOrCtrl+9', 'mac')).toBe('\u23189');
       expect(acceleratorToDisplay('Shift+CmdOrCtrl+1', 'mac')).toBe('\u21E7\u23181');
     });
+
+    it('returns empty string for empty accelerator', () => {
+      expect(acceleratorToDisplay('', 'mac')).toBe('');
+      expect(acceleratorToDisplay('', 'win')).toBe('');
+    });
   });
 });

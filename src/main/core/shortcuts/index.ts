@@ -5,5 +5,5 @@ export const SHORTCUTS_MAPS: Record<TShortcutMapId, IShortcutMap> = {
   [SHORTCUTS_MAP_GENERIC_ISO.id]: SHORTCUTS_MAP_GENERIC_ISO,
 };
 
-export { getShortcut } from './helpers';
+export { getShortcut, getActiveMap } from './helpers';
 export { setupShortcutsIPC } from './ipc';

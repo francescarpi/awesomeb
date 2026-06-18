@@ -343,6 +343,14 @@ const abShortcuts = {
   override: (mapId: TShortcutMapId, shortcutId: TShortcutId, key: string) => {
     return ipcRenderer.invoke('shortcuts:override', { mapId, shortcutId, key });
   },
+  active: (winId: TWindowId) => {
+    return ipcRenderer.invoke('shortcuts:active', { winId });
+  },
+  onChange: (
+    callback: (event: IpcRendererEvent, payload: { shortcutId: TShortcutId; key: string }) => void,
+  ) => {
+    ipcRenderer.on('shortcuts:changed', callback);
+  },
 };
 
 //--------------------------------------------------------------------------------------
