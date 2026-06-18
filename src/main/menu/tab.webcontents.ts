@@ -26,6 +26,8 @@ export function tabWebContentsMenu(
     { type: 'separator' },
     actions.copy({}),
     actions.copyLink({}),
+    actions.paste({}),
+    actions.cut({}),
     actions.separator(),
     actions.copyImage({}),
     actions.copyImageAddress({}),
