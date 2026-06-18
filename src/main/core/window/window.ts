@@ -211,6 +211,22 @@ export class Window extends UIWindow {
     return null;
   }
 
+  openClosedTab(tabId: TTabId) {
+    const tab = this.getTab(tabId);
+    if (!tab) {
+      scopeLog.warn(`No tab found with id: ${tabId}`);
+      return;
+    }
+
+    tab.tab.resume();
+
+    this.addView(tab.tab);
+
+    this.selectTab(tab.tab.id);
+
+    this.browser.eventsChannel.emit('window:tab-did-resume', this, tab.tab);
+  }
+
   async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {
     this.renderViews();
 

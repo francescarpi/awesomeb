@@ -1,4 +1,4 @@
-import { expect, test, describe, beforeEach } from 'vitest';
+import { expect, test, describe, beforeEach, vi } from 'vitest';
 import { Browser, partitions } from '@/core';
 
 describe('Tab.setZoom', () => {
@@ -53,5 +53,78 @@ describe('Tab.setZoom', () => {
     const tab = await openTab();
     for (let i = 0; i < 10; i++) tab.setZoom('out');
     expect(tab.webContents.setZoomFactor).toHaveBeenLastCalledWith(0.5);
+  });
+});
+
+describe('Tab.resume', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  async function openTab() {
+    const result = await browser.openURL('http://example.com');
+    return result!.tab;
+  }
+
+  test('should set suspended = false', async () => {
+    const tab = await openTab();
+    tab.activate();
+    tab.suspend();
+    expect(tab.suspended).toBe(true);
+
+    tab.resume();
+
+    expect(tab.suspended).toBe(false);
+  });
+
+  test('should clear closedAt when called on a closed tab', async () => {
+    const tab = await openTab();
+    tab.markAsClosed();
+    expect(tab.isClosed).toBe(true);
+    expect(tab.closedAt).not.toBeNull();
+
+    tab.resume();
+
+    expect(tab.isClosed).toBe(false);
+    expect(tab.closedAt).toBeNull();
+  });
+
+  test('should reindex webContents in the browser', async () => {
+    const tab = await openTab();
+    const reindexSpy = vi.spyOn(browser, 'reindexWebContents');
+
+    tab.resume();
+
+    expect(reindexSpy).toHaveBeenCalledWith(tab);
+  });
+
+  test('should be safe to call multiple times (idempotent)', async () => {
+    const tab = await openTab();
+    tab.activate();
+
+    expect(() => {
+      tab.resume();
+      tab.resume();
+      tab.resume();
+    }).not.toThrow();
+
+    expect(tab.suspended).toBe(false);
+  });
+
+  test('should refresh webContentsView when destroyed', async () => {
+    const tab = await openTab();
+    tab.activate();
+    tab.webContents.isDestroyed = (): boolean => true;
+
+    const refreshSpy = vi.spyOn(tab, 'refreshWebContentsView');
+
+    tab.resume();
+
+    expect(refreshSpy).toHaveBeenCalled();
+    expect(tab.suspended).toBe(false);
   });
 });

@@ -1074,3 +1074,115 @@ describe('Window Close Desktop', () => {
     });
   });
 });
+
+describe('Window Open Closed Tab', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('should reopen a closed tab and mark it as not closed', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+
+    await browser.closeTab(tab.id);
+    expect(tab.isClosed).toBe(true);
+
+    window.openClosedTab(tab.id);
+
+    expect(tab.isClosed).toBe(false);
+  });
+
+  test('should resume a closed tab (suspended = false)', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+
+    await browser.closeTab(tab.id);
+    window.openClosedTab(tab.id);
+
+    expect(tab.suspended).toBe(false);
+  });
+
+  test('should add the view back to the window after reopen', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+
+    await browser.closeTab(tab.id);
+
+    const viewsAfterClose = window.views.filter((v) => v.viewId.startsWith(`tab-${tab.id}#`));
+    expect(viewsAfterClose.length).toBe(0);
+
+    window.openClosedTab(tab.id);
+
+    const viewsAfterReopen = window.views.filter((v) => v.viewId.startsWith(`tab-${tab.id}#`));
+    expect(viewsAfterReopen.length).toBeGreaterThan(0);
+  });
+
+  test('should select the reopened tab', async () => {
+    const result2 = await browser.openURL('http://example2.com');
+    await window.selectTab(result2!.tab.id);
+
+    await browser.closeTab(result2!.tab.id);
+    window.openClosedTab(result2!.tab.id);
+
+    expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(result2!.tab.id);
+  });
+
+  test('should emit window:tab-did-resume event on reopen', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+
+    await browser.closeTab(tab.id);
+
+    const eventSpy = vi.fn();
+    window.eventsChannel.on('window:tab-did-resume', eventSpy);
+
+    window.openClosedTab(tab.id);
+
+    expect(eventSpy).toHaveBeenCalledWith(window, tab);
+  });
+
+  test('should return silently when reopening a non-existent tab', async () => {
+    const initialDesktop = window.selectedDesktop.id;
+
+    expect(() => window.openClosedTab(9999 as any)).not.toThrow();
+
+    expect(window.selectedDesktop.id).toBe(initialDesktop);
+  });
+
+  test('should switch to the tab desktop when reopening from a different desktop', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+
+    await browser.closeTab(tab.id);
+    window.selectDesktop(2);
+    expect(window.selectedDesktop.id).toBe(2);
+
+    window.openClosedTab(tab.id);
+
+    expect(window.selectedDesktop.id).toBe(1);
+  });
+
+  test('should handle reopen of a suspended tab (regression: unifies closed and suspended paths)', async () => {
+    const result = await browser.openURL('http://example.com');
+    const { tab } = result!;
+    await window.selectTab(tab.id);
+    await window.suspendTab(tab.id);
+    expect(tab.suspended).toBe(true);
+
+    window.openClosedTab(tab.id);
+
+    expect(tab.suspended).toBe(false);
+    expect(tab.isClosed).toBe(false);
+  });
+});

@@ -23,7 +23,6 @@ export const Command: ICommand<ICommandParams> = {
       scopeLog.warn(`No tab found with id: ${params.id}`);
       return;
     }
-    tab.tab.openClosedTab();
-    tab.window.selectTab(tab.tab.id);
+    tab.window.openClosedTab(tab.tab.id);
   },
 };

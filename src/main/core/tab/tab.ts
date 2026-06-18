@@ -286,12 +286,8 @@ export class Tab extends UIView {
   }
 
   resume() {
-    if (!this._suspended) {
-      return;
-    }
-
     if (this.isDestroyed) {
-      scopeLog.debug('Cannot resume tab because its view is destroyed');
+      scopeLog.debug('Tab is destroyed, refreshing web contents view');
       this.refreshWebContentsView();
     }
 
@@ -300,6 +296,7 @@ export class Tab extends UIView {
     registerTabEvents(this.browser, this);
 
     this._suspended = false;
+    this._closedAt = null;
   }
 
   async loadHistoryOrURL() {
@@ -350,8 +347,6 @@ export class Tab extends UIView {
   }
 
   markAsClosed() {
-    this.closeWebContents();
-    this.clearFailLoad();
     this._closedAt = Date.now();
   }
 
@@ -541,14 +536,5 @@ export class Tab extends UIView {
 
   get isClosed(): boolean {
     return this._closedAt !== null;
-  }
-
-  openClosedTab() {
-    if (!this.isClosed) {
-      scopeLog.warn(`Attempted to open a tab that is not closed (Tab ID: ${this.id})`);
-      return;
-    }
-
-    this._closedAt = null;
   }
 }
