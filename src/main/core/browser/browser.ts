@@ -581,6 +581,7 @@ export class Browser {
     }
 
     tab.closeWebContents();
+    tab.clearFailLoad();
 
     if (tabContainer.isClosed) {
       desktop.selectTabContainer(null);
