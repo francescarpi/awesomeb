@@ -7,9 +7,10 @@ import Layout from '#/layouts/Base.astro';
     <div id="selectedTab" class="border-2 border-dotted absolute rounded-[14px]"></div>
     <div
       id="no-tabs-info"
-      class="bg-white/20 rounded-xl text-white opacity-50 flex justify-center items-center absolute right-1 bottom-1 select-none"
+      class="bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm"
     >
-      <p id="helpCommandsTool">Cmd/Ctrl + P to open the commands tool</p>
+      <p id="helpNewTab" class="hidden"></p>
+      <p id="helpCommandsTool" class="hidden"></p>
     </div>
   </div>
 </Layout>
@@ -17,6 +18,7 @@ import Layout from '#/layouts/Base.astro';
 <script>
   import { getSearchParams } from '#/scripts';
   import { Rectangle } from 'electron';
+  import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
   document.title = 'Window';
 
@@ -24,6 +26,7 @@ import Layout from '#/layouts/Base.astro';
 
   const { winId, searchParams } = getSearchParams();
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
+  const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
   const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
   const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
 
@@ -43,14 +46,38 @@ import Layout from '#/layouts/Base.astro';
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
   });
 
+  function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffix: string) {
+    if (!key) {
+      el.classList.add('hidden');
+      el.textContent = '';
+      return;
+    }
+    const platform = isMacPlatform() ? 'mac' : 'win';
+    el.textContent = `${acceleratorToDisplay(key, platform)} ${suffix}`;
+    el.classList.remove('hidden');
+  }
+
+  async function refreshShortcutsHelp() {
+    try {
+      const map = await abShortcuts.active(winId);
+      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, 'open a new tab');
+      setHelpLine(helpCommandsTool, map.shortcuts.performCommand?.key, 'open the commands palette');
+    } catch (err) {
+      console.error('Failed to load active shortcuts', err);
+    }
+  }
+
+  refreshShortcutsHelp();
+  abShortcuts.onChange(() => {
+    refreshShortcutsHelp();
+  });
+
   abWindow.onRefreshLayoutData((_e, data) => {
     refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
 
-    if (data.hasVisibleTabs) {
-      helpCommandsTool.classList.add('hidden');
-    } else {
-      helpCommandsTool.classList.remove('hidden');
-    }
+    const visibilityClass = data.hasVisibleTabs ? 'add' : 'remove';
+    helpNewTab.classList[visibilityClass]('hidden');
+    helpCommandsTool.classList[visibilityClass]('hidden');
 
     refreshSelectedTabBounds(data.selectedTabBounds, data.selectedTabPartitionColor);
   });

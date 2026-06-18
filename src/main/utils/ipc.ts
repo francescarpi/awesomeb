@@ -342,7 +342,8 @@ export function welcomeWindowChecker(
   _args: Record<string, unknown>,
 ): { win: WelcomeWindow } | null {
   const url = event.sender.getURL();
-  if (!url.endsWith('/welcome?') && !url.endsWith('/welcome/index.html')) {
+  const urlParsed = new URL(url);
+  if (!urlParsed.pathname.endsWith('/welcome') && !url.endsWith('/welcome/index.html')) {
     scopeLog.warn(
       `[WelcomeWindowChecker] WebContents URL ${url} does not match expected welcome page URL ending`,
     );
