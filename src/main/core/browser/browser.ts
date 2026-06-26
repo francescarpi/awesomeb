@@ -642,7 +642,12 @@ export class Browser {
 
   showWelcome() {
     Menu.setApplicationMenu(minimumMenu());
+    scopeLog.info('Showing welcome window');
     this._welcomeWindow = new WelcomeWindow(this);
+  }
+
+  setWelcomeWindow(win: WelcomeWindow | null) {
+    this._welcomeWindow = win;
   }
 
   get welcomeWindow(): WelcomeWindow | null {
