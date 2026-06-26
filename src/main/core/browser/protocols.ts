@@ -32,12 +32,12 @@ export function registerProtocols() {
       return new Response('', { status: 404 });
     }
 
-    if (process.env.VITE_DEV_SERVER_URL) {
+    if (process.env.ELECTRON_RENDERER_URL) {
       let devServer: string;
       if (url.pathname === '/') {
-        devServer = `${process.env.VITE_DEV_SERVER_URL}${page}`;
+        devServer = `${process.env.ELECTRON_RENDERER_URL}${page}`;
       } else {
-        devServer = `${process.env.VITE_DEV_SERVER_URL}${url.pathname.substring(1)}${url.search}`;
+        devServer = `${process.env.ELECTRON_RENDERER_URL}${url.pathname.substring(1)}${url.search}`;
       }
       return fetch(devServer);
     }

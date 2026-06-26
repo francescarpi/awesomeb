@@ -33,4 +33,11 @@ export default defineConfig([
       '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
+  {
+    files: ['scripts/**/*.{js,mjs,ts}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: { ...globals.node },
+    },
+  },
 ]);
