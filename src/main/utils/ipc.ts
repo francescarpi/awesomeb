@@ -336,16 +336,27 @@ export function conditionalChecker(
 }
 
 //--------------------------------------------------------------------------------
+// Suffixes that mark a URL as the welcome page. The pathname of the welcome
+// webContents can legitimately end in any of these depending on how it was
+// loaded:
+//   /welcome             -> dev, Astro returns a path without trailing slash
+//                           (e.g. http://localhost:4321/welcome?theme=...)
+//   /welcome/            -> dev, hypothetical trailing-slash form
+//   /welcome/index.html  -> production, loadFile() builds a file:// URL
+//                           with the full path on disk
+const WELCOME_PATH_SUFFIXES = ['/welcome', '/welcome/', '/welcome/index.html'] as const;
+
 export function welcomeWindowChecker(
   browser: Browser,
   event: IpcMainInvokeEvent,
   _args: Record<string, unknown>,
 ): { win: WelcomeWindow } | null {
   const url = event.sender.getURL();
-  const urlParsed = new URL(url);
-  if (!urlParsed.pathname.endsWith('/welcome') && !url.endsWith('/welcome/index.html')) {
+  const pathname = new URL(url).pathname;
+
+  if (!WELCOME_PATH_SUFFIXES.some((suffix) => pathname.endsWith(suffix))) {
     scopeLog.warn(
-      `[WelcomeWindowChecker] WebContents URL ${url} does not match expected welcome page URL ending`,
+      `[WelcomeWindowChecker] WebContents URL ${url} (pathname "${pathname}") is not the welcome page`,
     );
     return null;
   }

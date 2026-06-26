@@ -646,6 +646,10 @@ export class Browser {
     this._welcomeWindow = new WelcomeWindow(this);
   }
 
+  setWelcomeWindow(win: WelcomeWindow | null) {
+    this._welcomeWindow = win;
+  }
+
   get welcomeWindow(): WelcomeWindow | null {
     return this._welcomeWindow;
   }
