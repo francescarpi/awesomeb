@@ -290,8 +290,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   function saveActiveBookmark(bookmarks: IBookmark[]) {
     const titleInput = bookmarkDetails.querySelector('input:nth-child(1)') as HTMLInputElement;
     const urlInput = bookmarkDetails.querySelector('input:nth-child(2)') as
-      | HTMLInputElement
-      | undefined;
+      HTMLInputElement | undefined;
     const idInput = bookmarkDetails.querySelector('input:nth-child(3)') as HTMLInputElement;
 
     const newBookmarks = updateBookmarkInList(

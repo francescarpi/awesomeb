@@ -95,8 +95,7 @@ import Base from '../layouts/Base.astro';
       event.preventDefault();
 
       const selected = document.querySelectorAll('.ab-tab')[selectedIndex] as
-        | HTMLDivElement
-        | undefined;
+        HTMLDivElement | undefined;
 
       if (selected) {
         const tabId = parseInt(selected.dataset.tabId!, 10);
