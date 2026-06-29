@@ -4,13 +4,7 @@
 
 export type VNodeProps = {
   [key: string]:
-    | string
-    | number
-    | boolean
-    | EventListener
-    | null
-    | undefined
-    | Partial<CSSStyleDeclaration>;
+    string | number | boolean | EventListener | null | undefined | Partial<CSSStyleDeclaration>;
 };
 
 export type VNodeChild = VNode | string | number | null | undefined | false;
