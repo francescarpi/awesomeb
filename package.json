@@ -6,6 +6,7 @@
   "repository": "https://github.com/francescarpi/awesomeb.git",
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "postinstall": "node node_modules/electron/install.js",
     "build": "astro build && electron-vite build && electron-builder",
     "build:mac": "astro build && electron-vite build && electron-builder --mac",
     "build:win": "astro build && electron-vite build && electron-builder --win",
@@ -52,7 +53,7 @@
     "astro-icon": "1.1.5",
     "concurrently": "10.0.3",
     "daisyui": "5.6.6",
-    "electron": "42.5.0",
+    "electron": "42.5.1",
     "electron-builder": "26.15.3",
     "electron-vite": "6.0.0-beta.1",
     "eslint": "10.6.0",
