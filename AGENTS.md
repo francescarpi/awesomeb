@@ -1042,6 +1042,59 @@ export default defineConfig({
 });
 ```
 
+#### Issue: "Electron uninstall" al hacer `pnpm dev` (especialmente tras upgrade de Electron)
+
+```bash
+error during start dev server and electron app:
+Error: Electron uninstall
+    at getElectronPath (.../electron-vite/dist/chunks/lib-...js:155:19)
+```
+
+**Causa**: `electron-vite` busca `node_modules/electron/path.txt` para localizar el
+binario. Ese archivo lo escribe `install.js` del paquete `electron` (línea 94 de
+`node_modules/electron/install.js`). **Pnpm 10 NO auto-ejecuta `install.js`** (rompió
+la convención de npm), y `electron` no define `scripts.postinstall` en su
+`package.json`, así que el binario nunca se descarga durante `pnpm install`.
+
+**Solución permanente** (ya aplicada en este repo): `package.json` declara un
+`postinstall` explícito y `.npmrc` (raíz del proyecto, NO el global) tiene
+`ignore-scripts=false`:
+
+```json
+// package.json
+"scripts": {
+  "postinstall": "node node_modules/electron/install.js"
+}
+```
+
+```ini
+# .npmrc (raíz del proyecto, NO el global)
+ignore-scripts=false
+```
+
+**Por qué el `.npmrc` global no alcanza**: muchos setups (incluido el autor de este
+proyecto) tienen `ignore-scripts=true` en `~/.npmrc` por seguridad. Eso bloquea
+TODOS los scripts, incluido el `postinstall` que acabamos de declarar. El
+`.npmrc` local del proyecto sobreescribe el global para este repo específicamente
+— pnpm lee la config en orden: proyecto > workspace > user > global.
+
+**Workaround manual** si el binario falta por algún motivo:
+
+```bash
+node node_modules/electron/install.js
+```
+
+**Cómo verificar si el postinstall corrió** (en macOS):
+
+```bash
+ls ~/Library/Caches/electron/ | grep "<version>"
+# Debe aparecer electron-v<version>-darwin-arm64.zip
+```
+
+Si la versión objetivo (ej. `electron-v42.5.1-darwin-arm64.zip`) NO está en la
+caché, el postinstall no corrió y vas a ver el error "Electron uninstall" al
+arrancar.
+
 ### Performance Optimization
 
 #### Main Process Optimization
