@@ -329,6 +329,7 @@ export class Window extends UIWindow {
     }
 
     tab.setVisible(false);
+    tab.stopFindInPage();
 
     this.removeAllTabViews(tab.id);
     this.renderViews();
