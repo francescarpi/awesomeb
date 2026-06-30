@@ -1,4 +1,5 @@
 import { Browser, Tab, Window, bookmarks, getCachedFavicon, getShortcut } from '@/core';
+import { truncate } from '@/utils';
 import { MenuItemConstructorOptions, Menu, NativeImage, app } from 'electron';
 import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
@@ -643,7 +644,7 @@ async function bookmarkSubMenu(
       if (bookmark.type === EBookmarkType.Url) {
         const icon = await getCachedFavicon(bookmark.url, { format: 'native12' });
         return {
-          label: bookmark.title,
+          label: truncate(bookmark.title),
           icon: icon ? (icon as NativeImage) : undefined,
           click: () => {
             browser.openURL(bookmark.url, { selectTab: true });
@@ -652,7 +653,7 @@ async function bookmarkSubMenu(
       }
 
       return {
-        label: bookmark.title,
+        label: truncate(bookmark.title),
         submenu: await bookmarkSubMenu(browser, window, bookmark.children),
         icon: getIcon(EIcon.Folder),
       };
