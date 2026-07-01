@@ -25,7 +25,8 @@ describe('Renderer', () => {
         requireAttention: false,
         hasTabs: false,
         hasActiveTabs: false,
-        name: null,
+        shortName: null,
+        longName: null,
       },
       {
         id: '2',
@@ -34,7 +35,8 @@ describe('Renderer', () => {
         requireAttention: false,
         hasTabs: false,
         hasActiveTabs: false,
-        name: null,
+        shortName: null,
+        longName: null,
       },
       {
         id: '3',
@@ -43,7 +45,8 @@ describe('Renderer', () => {
         requireAttention: false,
         hasTabs: false,
         hasActiveTabs: false,
-        name: null,
+        shortName: null,
+        longName: null,
       },
       {
         id: '4',
@@ -52,7 +55,8 @@ describe('Renderer', () => {
         requireAttention: false,
         hasTabs: false,
         hasActiveTabs: false,
-        name: null,
+        shortName: null,
+        longName: null,
       },
       {
         id: '5',
@@ -61,8 +65,22 @@ describe('Renderer', () => {
         requireAttention: false,
         hasTabs: false,
         hasActiveTabs: false,
-        name: null,
+        shortName: null,
+        longName: null,
       },
     ]);
+  });
+
+  test('tabSwitcherData: exposes desktop longName as desktopName', async () => {
+    const desktop = window.getDesktop(1)!;
+    desktop.setName('W', 'My Work');
+
+    const result = await browser.openURL('http://example.com');
+    const tabId = result!.tab.id;
+
+    const data = browser.renderer.tabSwitcherData(window);
+    const tabEntry = data.find((t) => t.id === tabId);
+    expect(tabEntry).toBeDefined();
+    expect(tabEntry!.desktopName).toBe('My Work');
   });
 });

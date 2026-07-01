@@ -888,8 +888,8 @@ describe('Window Move Desktop', () => {
     const d1 = window.getDesktop(1)!;
     const d2 = window.getDesktop(2)!;
 
-    d1.setName('Work');
-    d2.setName('Personal');
+    d1.setName('Wrk', 'Work');
+    d2.setName('Pers', 'Personal');
 
     window.moveDesktop(2, 'left');
 
@@ -1017,12 +1017,13 @@ describe('Window Close Desktop', () => {
     window.createDesktop(6);
     window.createDesktop(7);
 
-    window.getDesktop(5)!.setName('Five');
+    window.getDesktop(5)!.setName('Fve', 'Five');
 
     window.closeDesktop(3);
 
     const d = window.getDesktop(4)!;
-    expect(d.name).toBe('Five');
+    expect(d.shortName).toBe('Fve');
+    expect(d.longName).toBe('Five');
     expect(d.id).toBe(4);
   });
 

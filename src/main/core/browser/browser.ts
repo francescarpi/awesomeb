@@ -72,9 +72,9 @@ export class Browser {
 
       for (const deskStore of winStore.desktops) {
         const theme = getTheme(deskStore.theme);
-        const { name } = deskStore;
+        const { shortName, longName } = deskStore;
 
-        const desktop = newWindow.createDesktop(deskStore.id, { theme, name });
+        const desktop = newWindow.createDesktop(deskStore.id, { theme, shortName, longName });
         if (!desktop) continue;
 
         for (const tabConStore of deskStore.tabContainers) {

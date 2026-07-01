@@ -2,5 +2,6 @@ import { Theme } from '@/core';
 
 export interface IProps {
   theme?: Theme;
-  name?: string | null;
+  shortName?: string | null;
+  longName?: string | null;
 }
