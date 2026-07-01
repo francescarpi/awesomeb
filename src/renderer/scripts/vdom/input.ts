@@ -15,6 +15,7 @@ export function input(
     onInput?: (value: string, target: HTMLInputElement) => void;
     type?: string;
     required?: boolean;
+    maxLength?: number;
   },
 ): VNode {
   const visible = opts?.visible ?? true;
@@ -54,6 +55,7 @@ export function input(
         class: c('text-base-content'),
         type: opts?.type || 'text',
         required,
+        maxLength: opts?.maxLength,
       },
       '',
     ),

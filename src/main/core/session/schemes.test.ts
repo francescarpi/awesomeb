@@ -34,7 +34,8 @@ const validSessionTabContainer = {
 
 const validSessionDesktop = {
   id: 1,
-  name: null,
+  shortName: null,
+  longName: null,
   theme: 'blue',
   tabContainers: [validSessionTabContainer],
 };
@@ -106,7 +107,8 @@ describe('SessionTabContainerScheme', () => {
 
 describe('SessionDesktopScheme', () => {
   test('valid session desktop parses', () => {
-    expect(SessionDesktopScheme.parse(validSessionDesktop)).toEqual(validSessionDesktop);
+    const result = SessionDesktopScheme.parse(validSessionDesktop);
+    expect(result).toEqual(validSessionDesktop);
   });
 
   test('empty tabContainers array is valid', () => {
@@ -115,9 +117,82 @@ describe('SessionDesktopScheme', () => {
     expect(result.tabContainers).toEqual([]);
   });
 
-  test('extra property throws', () => {
-    const invalid = { ...validSessionDesktop, extra: true };
-    expect(() => SessionDesktopScheme.parse(invalid)).toThrow(ZodError);
+  test('legacy "name" field migrates to shortName and longName', () => {
+    const legacy = { ...validSessionDesktop, name: 'Work' };
+    delete (legacy as Record<string, unknown>).shortName;
+    delete (legacy as Record<string, unknown>).longName;
+    const result = SessionDesktopScheme.parse(legacy);
+    expect(result.shortName).toBe('Work');
+    expect(result.longName).toBe('Work');
+    expect((result as Record<string, unknown>).name).toBeUndefined();
+  });
+
+  test('legacy "name: null" migrates to both fields null', () => {
+    const legacy = { ...validSessionDesktop, name: null };
+    delete (legacy as Record<string, unknown>).shortName;
+    delete (legacy as Record<string, unknown>).longName;
+    const result = SessionDesktopScheme.parse(legacy);
+    expect(result.shortName).toBeNull();
+    expect(result.longName).toBeNull();
+    expect((result as Record<string, unknown>).name).toBeUndefined();
+  });
+
+  test('new shortName/longName takes precedence over legacy name', () => {
+    const mixed = { ...validSessionDesktop, name: 'Old', shortName: 'New', longName: 'Full Name' };
+    const result = SessionDesktopScheme.parse(mixed);
+    expect(result.shortName).toBe('New');
+    expect(result.longName).toBe('Full Name');
+    expect((result as Record<string, unknown>).name).toBeUndefined();
+  });
+
+  test('new shortName only: longName falls back to null when no legacy name', () => {
+    const partial = { ...validSessionDesktop, shortName: 'W' };
+    delete (partial as Record<string, unknown>).longName;
+    delete (partial as Record<string, unknown>).name;
+    const result = SessionDesktopScheme.parse(partial);
+    expect(result.shortName).toBe('W');
+    expect(result.longName).toBeNull();
+  });
+
+  test('new longName only: shortName falls back to null when no legacy name', () => {
+    const partial = { ...validSessionDesktop, longName: 'Full Name' };
+    delete (partial as Record<string, unknown>).shortName;
+    delete (partial as Record<string, unknown>).name;
+    const result = SessionDesktopScheme.parse(partial);
+    expect(result.shortName).toBeNull();
+    expect(result.longName).toBe('Full Name');
+  });
+
+  test('new shortName + legacy name: longName uses legacy name as fallback', () => {
+    const mixed = { ...validSessionDesktop, name: 'Old', shortName: 'New' };
+    delete (mixed as Record<string, unknown>).longName;
+    const result = SessionDesktopScheme.parse(mixed);
+    expect(result.shortName).toBe('New');
+    expect(result.longName).toBe('Old');
+  });
+
+  test('new longName + legacy name: shortName uses legacy name as fallback', () => {
+    const mixed = { ...validSessionDesktop, name: 'Old', longName: 'Full Name' };
+    delete (mixed as Record<string, unknown>).shortName;
+    const result = SessionDesktopScheme.parse(mixed);
+    expect(result.shortName).toBe('Old');
+    expect(result.longName).toBe('Full Name');
+  });
+
+  test('empty string shortName falls back to legacy name (parity with Desktop.setName)', () => {
+    const mixed = { ...validSessionDesktop, name: 'Work', shortName: '' };
+    delete (mixed as Record<string, unknown>).longName;
+    const result = SessionDesktopScheme.parse(mixed);
+    expect(result.shortName).toBe('Work');
+    expect(result.longName).toBe('Work');
+  });
+
+  test('empty string longName falls back to legacy name (parity with Desktop.setName)', () => {
+    const mixed = { ...validSessionDesktop, name: 'Work', longName: '' };
+    delete (mixed as Record<string, unknown>).shortName;
+    const result = SessionDesktopScheme.parse(mixed);
+    expect(result.shortName).toBe('Work');
+    expect(result.longName).toBe('Work');
   });
 });
 

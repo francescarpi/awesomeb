@@ -60,7 +60,8 @@ export class BrowserRenderer {
       requireAttention: desk.requireAttention,
       hasTabs: desk.hasTabs,
       hasActiveTabs: desk.hasActiveTabs,
-      name: desk.name,
+      shortName: desk.shortName,
+      longName: desk.longName,
     }));
   }
 
@@ -362,7 +363,7 @@ export class BrowserRenderer {
       id: tab.tab.id,
       title: tab.tab.title,
       partitionColor: tab.tab.partition.color,
-      desktopName: tab.desktop.name,
+      desktopName: tab.desktop.longName,
     }));
   }
 
@@ -395,7 +396,8 @@ export class BrowserRenderer {
   desktops(window: Window) {
     const result: IDesktop[] = window.desktops.map((desk) => ({
       id: desk.id,
-      name: desk.name,
+      shortName: desk.shortName,
+      longName: desk.longName,
       selected: desk.id === window.selectedDesktop.id,
       requireAttention: desk.requireAttention,
       hasTabs: desk.hasTabs,
