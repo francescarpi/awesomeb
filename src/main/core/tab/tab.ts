@@ -172,7 +172,10 @@ export class Tab extends UIView {
       return false;
     }
 
-    this._title = title;
+    const sanitizedTitle = title.trim();
+
+    this._title = sanitizedTitle === '' ? null : sanitizedTitle;
+
     this.browser.eventsChannel.emit('tab:title-did-change', this);
 
     return true;

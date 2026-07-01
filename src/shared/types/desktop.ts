@@ -8,7 +8,8 @@ export interface ITheme {
 
 export interface IDesktop {
   id: TDesktopId;
-  name: string | null;
+  shortName: string | null;
+  longName: string | null;
   selected: boolean;
   requireAttention: boolean;
   hasTabs: boolean;

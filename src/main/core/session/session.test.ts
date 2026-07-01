@@ -49,31 +49,36 @@ describe('Session', () => {
         desktops: [
           {
             id: 1,
-            name: null,
+            shortName: null,
+            longName: null,
             tabContainers: [],
             theme: 'blue',
           },
           {
             id: 2,
-            name: null,
+            shortName: null,
+            longName: null,
             tabContainers: [],
             theme: 'blue',
           },
           {
             id: 3,
-            name: null,
+            shortName: null,
+            longName: null,
             tabContainers: [],
             theme: 'blue',
           },
           {
             id: 4,
-            name: null,
+            shortName: null,
+            longName: null,
             tabContainers: [],
             theme: 'blue',
           },
           {
             id: 5,
-            name: null,
+            shortName: null,
+            longName: null,
             tabContainers: [],
             theme: 'blue',
           },
@@ -149,5 +154,139 @@ describe('Session', () => {
     const session = new Session(browser);
     // After construction with a real browser, the store defaults are empty
     expect(session.windows).toEqual([]);
+  });
+
+  describe('legacy "name" field migration', () => {
+    function writeLegacySessionFile(desktops: unknown[]) {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      const legacyData = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops,
+          },
+        ],
+      };
+      fs.writeFileSync(filePath, JSON.stringify(legacyData));
+    }
+
+    test('migrates legacy "name" to both shortName and longName on load', () => {
+      writeLegacySessionFile([
+        {
+          id: 1,
+          name: 'Work',
+          theme: 'blue',
+          tabContainers: [],
+        },
+        {
+          id: 2,
+          name: 'Personal',
+          theme: 'purple',
+          tabContainers: [],
+        },
+      ]);
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0]).toEqual({
+        id: 1,
+        shortName: 'Work',
+        longName: 'Work',
+        theme: 'blue',
+        tabContainers: [],
+      });
+      expect(session.windows[0].desktops[1]).toEqual({
+        id: 2,
+        shortName: 'Personal',
+        longName: 'Personal',
+        theme: 'purple',
+        tabContainers: [],
+      });
+    });
+
+    test('migrates legacy "name: null" to both fields null', () => {
+      writeLegacySessionFile([
+        {
+          id: 1,
+          name: null,
+          theme: 'blue',
+          tabContainers: [],
+        },
+      ]);
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].shortName).toBeNull();
+      expect(session.windows[0].desktops[0].longName).toBeNull();
+    });
+
+    test('loads new shortName/longName fields as-is (no legacy name)', () => {
+      writeLegacySessionFile([
+        {
+          id: 1,
+          shortName: 'W',
+          longName: 'Work Space',
+          theme: 'blue',
+          tabContainers: [],
+        },
+      ]);
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].shortName).toBe('W');
+      expect(session.windows[0].desktops[0].longName).toBe('Work Space');
+    });
+
+    test('handles mixed legacy and new fields in same session', () => {
+      writeLegacySessionFile([
+        {
+          id: 1,
+          name: 'Legacy',
+          theme: 'blue',
+          tabContainers: [],
+        },
+        {
+          id: 2,
+          shortName: 'W',
+          longName: 'New Desktop',
+          theme: 'purple',
+          tabContainers: [],
+        },
+      ]);
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].shortName).toBe('Legacy');
+      expect(session.windows[0].desktops[0].longName).toBe('Legacy');
+      expect(session.windows[0].desktops[1].shortName).toBe('W');
+      expect(session.windows[0].desktops[1].longName).toBe('New Desktop');
+    });
+
+    test('save() output uses the new field names (no legacy "name" key)', async () => {
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const desktop = persisted.windows[0].desktops[0];
+      expect(desktop).toHaveProperty('shortName');
+      expect(desktop).toHaveProperty('longName');
+      expect(desktop).not.toHaveProperty('name');
+    });
+
+    test('save() persists shortName/longName values to disk', async () => {
+      const session = new Session(browser);
+      browser.activeWindow!.getDesktop(1)!.setName('W', 'Work Space');
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const desktop = persisted.windows[0].desktops[0];
+      expect(desktop.shortName).toBe('W');
+      expect(desktop.longName).toBe('Work Space');
+    });
   });
 });

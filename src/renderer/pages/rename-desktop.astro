@@ -17,15 +17,14 @@ import Title from '#/components/common/Title.astro';
 
   const [btns, registerBtnsEvents] = confirmButtons({
     onConfirm: () => {
-      const nameField = document.getElementById('name') as HTMLInputElement;
-      const nameValue = nameField.value.trim();
+      const shortNameField = document.getElementById('shortName') as HTMLInputElement;
+      const longNameField = document.getElementById('longName') as HTMLInputElement;
 
-      if (nameValue) {
-        abCommands.perform(winId, 'rename-desktop', {
-          desktopId: parseInt(selectedDesktop.id, 10),
-          name: nameValue,
-        });
-      }
+      abCommands.perform(winId, 'rename-desktop', {
+        desktopId: parseInt(selectedDesktop.id, 10),
+        shortName: shortNameField.value,
+        longName: longNameField.value,
+      });
     },
     onCancel: () => {
       abModal.close(winId);
@@ -41,14 +40,15 @@ import Title from '#/components/common/Title.astro';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
-      input('name', 'Desktop name', selectedDesktop.name || ''),
+      input('shortName', 'Short name', selectedDesktop.shortName || '', { maxLength: 4 }),
+      input('longName', 'Long name', selectedDesktop.longName || '', { maxLength: 30 }),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
   ).render('content', {
     onRendered: () => {
-      const name = document.getElementById('name') as HTMLInputElement;
-      name.focus();
-      name.select();
+      const shortName = document.getElementById('shortName') as HTMLInputElement;
+      shortName.focus();
+      shortName.select();
       registerBtnsEvents();
     },
   });

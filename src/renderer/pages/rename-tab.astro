@@ -18,14 +18,11 @@ import Title from '#/components/common/Title.astro';
   const [btns, registerBtnsEvents] = confirmButtons({
     onConfirm: () => {
       const nameField = document.getElementById('name') as HTMLInputElement;
-      const nameValue = nameField.value.trim();
 
-      if (nameValue) {
-        abCommands.perform(winId, 'rename-tab', {
-          tabId: parseInt(selectedTab.id, 10),
-          name: nameValue,
-        });
-      }
+      abCommands.perform(winId, 'rename-tab', {
+        tabId: parseInt(selectedTab.id, 10),
+        name: nameField.value,
+      });
     },
     onCancel: () => {
       abModal.close(winId);
@@ -41,7 +38,7 @@ import Title from '#/components/common/Title.astro';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
-      input('name', 'Tab name', selectedTab.label || ''),
+      input('name', 'Tab name', selectedTab.label || '', { maxLength: 20 }),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
   ).render('content', {

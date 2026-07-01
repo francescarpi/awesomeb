@@ -3,7 +3,8 @@ import { defaultTheme, Theme, Window, TabContainer, ITabContainerProps, Browser 
 import { IProps } from './types';
 
 export class Desktop {
-  private _name: string | null = null;
+  private _shortName: string | null = null;
+  private _longName: string | null = null;
   private _theme: Theme;
   private _id: TDesktopId;
 
@@ -18,7 +19,8 @@ export class Desktop {
   ) {
     this._id = id;
     this._theme = props?.theme || defaultTheme;
-    this._name = props?.name || null;
+    this._shortName = props?.shortName || null;
+    this._longName = props?.longName || null;
   }
 
   get id(): TDesktopId {
@@ -33,22 +35,38 @@ export class Desktop {
     this._id = newId;
   }
 
-  setName(name: string) {
-    if (name === this._name) {
+  // setName treats both fields as a single unit: if either is empty
+  // (after trim), both reset to null. This is intentional UX — when
+  // the user clears one input in the rename modal, both names go.
+  setName(shortName: string, longName: string) {
+    if (shortName === this._shortName && longName === this._longName) {
       return;
     }
 
-    this._name = name.trim() === '' ? null : name;
+    const sanitizedShortName = shortName.trim();
+    const sanitizedLongName = longName.trim();
+
+    if (sanitizedShortName === '' || sanitizedLongName === '') {
+      this._shortName = null;
+      this._longName = null;
+    } else {
+      this._shortName = sanitizedShortName;
+      this._longName = sanitizedLongName;
+    }
 
     this.browser.eventsChannel.emit('desktop:name-did-change', this.window, this);
   }
 
-  get name(): string | null {
-    return this._name;
+  get shortName(): string | null {
+    return this._shortName;
+  }
+
+  get longName(): string | null {
+    return this._longName;
   }
 
   get label(): string {
-    return `${this.id}: ${this.name || 'Unnamed'}`;
+    return `${this.id}: ${this.longName || 'Unnamed'}`;
   }
 
   get requireAttention(): boolean {

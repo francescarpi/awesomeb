@@ -72,8 +72,13 @@
               'span',
               {
                 class: c(
-                  desktop.selected && desktop.name && desktop.name.trim() !== '' && 'hidden',
-                  desktop.name && desktop.name.trim() !== '' ? 'sidebar:group-hover:hidden' : '',
+                  desktop.selected &&
+                    desktop.shortName &&
+                    desktop.shortName.trim() !== '' &&
+                    'hidden',
+                  desktop.shortName && desktop.shortName.trim() !== ''
+                    ? 'sidebar:group-hover:hidden'
+                    : '',
                 ),
               },
               desktop.id,
@@ -106,12 +111,12 @@
                   'left-1/2',
                   '-translate-x-1/2',
                   'sidebar:hidden',
-                  desktop.name && desktop.name.trim() !== ''
+                  desktop.shortName && desktop.shortName.trim() !== ''
                     ? 'sidebar:group-[.selected]:block sidebar:group-hover:block'
                     : '',
                 ),
               },
-              desktop.name || '',
+              desktop.shortName || '',
             ),
           ),
         ),

@@ -70,7 +70,8 @@ export class Session extends Store<ISessionStore> {
 
         return {
           id: desktop.id,
-          name: desktop.name,
+          shortName: desktop.shortName,
+          longName: desktop.longName,
           theme: desktop.theme.name,
           tabContainers: tabContainers,
         };
