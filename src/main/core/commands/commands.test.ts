@@ -129,14 +129,16 @@ describe('Commands', () => {
       const window = browser.activeWindow!;
       const desktop = window.desktops[0];
       const setNameSpy = vi.spyOn(desktop, 'setName');
-      const newName = 'New Desktop Name';
+      const shortName = 'Work';
+      const longName = 'Work Space';
 
       await browser.performCommand(window, desktopRename.TRIGGER, {
         desktopId: desktop.id,
-        name: newName,
+        shortName,
+        longName,
       });
 
-      expect(setNameSpy).toHaveBeenCalledWith(newName);
+      expect(setNameSpy).toHaveBeenCalledWith(shortName, longName);
     });
 
     test('desktop-rename: should handle non-existent desktop gracefully', async () => {

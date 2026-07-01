@@ -128,3 +128,44 @@ describe('Tab.resume', () => {
     expect(tab.suspended).toBe(false);
   });
 });
+
+describe('Tab.setTitle', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  async function openTab() {
+    const result = await browser.openURL('http://example.com');
+    return result!.tab;
+  }
+
+  test('sets title from non-empty string', async () => {
+    const tab = await openTab();
+    tab.setTitle('Hello World');
+    expect(tab.rawTitle).toBe('Hello World');
+  });
+
+  test('trims whitespace and sets title', async () => {
+    const tab = await openTab();
+    tab.setTitle('  Hello World  ');
+    expect(tab.rawTitle).toBe('Hello World');
+  });
+
+  test('empty string sets title to null', async () => {
+    const tab = await openTab();
+    tab.setTitle('Hello World');
+    tab.setTitle('');
+    expect(tab.rawTitle).toBe('Untitled');
+  });
+
+  test('whitespace-only string sets title to null', async () => {
+    const tab = await openTab();
+    tab.setTitle('Hello World');
+    tab.setTitle('   ');
+    expect(tab.rawTitle).toBe('Untitled');
+  });
+});

@@ -32,11 +32,27 @@ export const SessionTabContainerScheme = z
 export const SessionDesktopScheme = z
   .object({
     id: z.number(),
-    name: z.string().nullable(),
+    shortName: z.string().nullable().optional(),
+    longName: z.string().nullable().optional(),
+    name: z.string().nullable().optional(), // legacy: kept for read-time migration only, never emitted by new sessions
     theme: z.string(),
     tabContainers: z.array(SessionTabContainerScheme),
   })
-  .strict();
+  // Migration policy: legacy `name` field is copied to BOTH `shortName`
+  // and `longName` to preserve info. New sessions only emit the dual
+  // representation. Falsy values (empty string, etc.) fall back to the
+  // legacy `name` to keep parity with Desktop.setName which normalizes
+  // empty inputs to null.
+  .transform((data) => {
+    const { name, ...rest } = data;
+    return {
+      id: rest.id,
+      theme: rest.theme,
+      tabContainers: rest.tabContainers,
+      shortName: rest.shortName || name || null,
+      longName: rest.longName || name || null,
+    };
+  });
 
 export const SessionWindowScheme = z
   .object({

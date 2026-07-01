@@ -1,4 +1,4 @@
-import { expect, test, describe, beforeEach } from 'vitest';
+import { expect, test, describe, beforeEach, vi } from 'vitest';
 import type { TTabContainerId } from '~/types';
 import { Browser, partitions, Window } from '@/core';
 
@@ -17,8 +17,55 @@ describe('Desktop', () => {
     const d = window.getDesktop(2)!;
     expect(d.label).toBe('2: Unnamed');
 
-    d.setName('Work');
+    d.setName('Wrk', 'Work');
     expect(d.label).toBe('2: Work');
+  });
+
+  test('setName: trims whitespace from both fields', () => {
+    const d = window.getDesktop(2)!;
+    d.setName('  Wrk  ', '  Work  ');
+    expect(d.shortName).toBe('Wrk');
+    expect(d.longName).toBe('Work');
+  });
+
+  test('setName: clearing shortName also clears longName (intentional UX)', () => {
+    const d = window.getDesktop(2)!;
+    d.setName('Wrk', 'Work');
+    d.setName('', 'Work');
+    expect(d.shortName).toBeNull();
+    expect(d.longName).toBeNull();
+  });
+
+  test('setName: clearing longName also clears shortName (intentional UX)', () => {
+    const d = window.getDesktop(2)!;
+    d.setName('Wrk', 'Work');
+    d.setName('Wrk', '');
+    expect(d.shortName).toBeNull();
+    expect(d.longName).toBeNull();
+  });
+
+  test('setName: clearing both sets both to null', () => {
+    const d = window.getDesktop(2)!;
+    d.setName('Wrk', 'Work');
+    d.setName('', '');
+    expect(d.shortName).toBeNull();
+    expect(d.longName).toBeNull();
+  });
+
+  test('setName: same value twice emits event only once (no-op second call)', () => {
+    const d = window.getDesktop(2)!;
+    const emitSpy = vi.spyOn(d.browser.eventsChannel, 'emit');
+    d.setName('Wrk', 'Work');
+    emitSpy.mockClear();
+    d.setName('Wrk', 'Work');
+    expect(emitSpy).not.toHaveBeenCalledWith('desktop:name-did-change', expect.anything(), d);
+  });
+
+  test('setName: emits desktop:name-did-change event', () => {
+    const d = window.getDesktop(2)!;
+    const emitSpy = vi.spyOn(d.browser.eventsChannel, 'emit');
+    d.setName('Wrk', 'Work');
+    expect(emitSpy).toHaveBeenCalledWith('desktop:name-did-change', d.window, d);
   });
 
   test('move tabcontainer up and down works correctly', () => {

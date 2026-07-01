@@ -21,7 +21,8 @@ export interface IEntity {
 }
 
 export interface IDesktopEntity extends IEntity {
-  name: string | null;
+  shortName: string | null;
+  longName: string | null;
   requireAttention: boolean;
   hasTabs: boolean;
   hasActiveTabs: boolean;
