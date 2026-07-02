@@ -500,6 +500,7 @@ export class Browser {
     parentTabData.desktop.selectTabContainer(tabContainer.id);
 
     tabPreview.tab.clearParent();
+    tabPreview.tab.setIsTabPreview(false);
 
     parentTabData.window.removeView(tabPreview.viewId);
     tabPreview.closeWebContents();
@@ -535,6 +536,7 @@ export class Browser {
     parentTabData.desktop.selectTabContainer(parentTabData.tabContainer.id);
 
     tabPreview.tab.clearParent();
+    tabPreview.tab.setIsTabPreview(false);
 
     parentTabData.window.removeView(tabPreview.viewId);
     tabPreview.closeWebContents();
@@ -661,6 +663,7 @@ export class Browser {
       suspended: false,
       parent,
     });
+    previewTab.setIsTabPreview(true);
 
     previewTab.setVisible(true);
     previewTab.loadURL(url);

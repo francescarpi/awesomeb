@@ -43,6 +43,7 @@ export class Tab extends UIView {
   private static readonly MAX_ZOOM_STEP = 9;
   private _closedAt: number | null = null;
   private _openTabsAsChild: boolean = false;
+  private _isTabPreview: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -140,7 +141,7 @@ export class Tab extends UIView {
       height = positon.height;
     }
 
-    if (this.isPreview) {
+    if (this.isTabPreview) {
       // Adjust position inside the preview layout
       x += 16;
       y += 16;
@@ -491,8 +492,12 @@ export class Tab extends UIView {
     return this._preview;
   }
 
-  get isPreview(): boolean {
-    return this._parent !== null;
+  get isTabPreview(): boolean {
+    return this._isTabPreview;
+  }
+
+  setIsTabPreview(value: boolean) {
+    this._isTabPreview = value;
   }
 
   clearParent() {
