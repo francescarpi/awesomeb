@@ -78,11 +78,11 @@
           'items-start',
           'gap-1',
           'hidden',
-          depth > 0 && 'mr-[-4px]',
+          depth > 0 && 'sidebar:mr-[-4px]',
+          depth > 0 && 'hidden sidebar:pl-2',
           tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
           tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
         ),
-        style: depth > 0 ? `padding-left: ${depth}px` : '',
       },
       tc.shortcut !== null
         ? h(
