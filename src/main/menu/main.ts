@@ -352,7 +352,8 @@ function tabsMenu(
   const zoomReset = getShortcut('zoomReset');
 
   const tabs: MenuItemConstructorOptions[] = [];
-  const totalContainers = window?.selectedDesktop?.tabContainers.length || 0;
+  const totalContainers =
+    window?.selectedDesktop?.tabContainers.filter((tc) => tc.parentTab === null).length || 0;
 
   const tabShortcuts = [
     'selectTab1',

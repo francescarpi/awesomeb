@@ -266,12 +266,13 @@ export class Desktop {
   }
 
   getTabContainerByIndex(idx: number): TabContainer | null {
-    const tabContainers = this.tabContainers;
-    const openTabContainers = tabContainers.filter((tc) => !tc.isClosed);
+    const topLevelOpenContainers = this.tabContainers.filter(
+      (tc) => tc.parentTab === null && !tc.isClosed,
+    );
 
-    if (idx < 0 || idx >= openTabContainers.length) {
+    if (idx < 0 || idx >= topLevelOpenContainers.length) {
       return null;
     }
-    return openTabContainers[idx];
+    return topLevelOpenContainers[idx];
   }
 }

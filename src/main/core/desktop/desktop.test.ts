@@ -188,4 +188,50 @@ describe('Desktop', () => {
       tc6.id,
     ]);
   });
+
+  describe('getTabContainerByIndex (top-level only)', () => {
+    test('returns top-level containers by index, skipping child containers', async () => {
+      const d = window.getDesktop(2)!;
+      const tc1 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+      const tc2 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+      const tc3 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+      const tc4 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child1.com');
+      await browser.openURL('http://child2.com');
+
+      expect(d.getTabContainerByIndex(0)).toBe(tc1);
+      expect(d.getTabContainerByIndex(1)).toBe(tc2);
+      expect(d.getTabContainerByIndex(2)).toBe(tc3);
+      expect(d.getTabContainerByIndex(3)).toBe(tc4);
+      expect(d.getTabContainerByIndex(4)).toBeNull();
+    });
+
+    test('returns null for indices out of range', () => {
+      const d = window.getDesktop(2)!;
+      d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+      expect(d.getTabContainerByIndex(-1)).toBeNull();
+      expect(d.getTabContainerByIndex(1)).toBeNull();
+      expect(d.getTabContainerByIndex(99)).toBeNull();
+    });
+
+    test('skips closed child containers too (only top-level + open)', async () => {
+      const d = window.getDesktop(2)!;
+      const tc1 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+      const tc2 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+
+      child.tabContainer.tabs[0].markAsClosed();
+
+      expect(d.getTabContainerByIndex(0)).toBe(tc1);
+      expect(d.getTabContainerByIndex(1)).toBe(tc2);
+      expect(d.getTabContainerByIndex(2)).toBeNull();
+    });
+  });
 });

@@ -84,13 +84,23 @@
         ),
         style: depth > 0 ? `padding-left: ${depth}px` : '',
       },
-      h(
-        'span', // Tab container shortcut (is a number between 1 and 9)
-        {
-          class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5', 'mt-2'),
-        },
-        tc.shortcut?.toString(),
-      ),
+      tc.shortcut !== null
+        ? h(
+            'span', // Tab container shortcut (is a number between 1 and 9)
+            {
+              class: c(
+                'text-xs',
+                'pl-1',
+                'text-white/20',
+                'hidden',
+                'sidebar:block',
+                'w-1.5',
+                'mt-2',
+              ),
+            },
+            tc.shortcut.toString(),
+          )
+        : null,
       h(
         'div', // Tab container's tabs list (in vertical)
         {
