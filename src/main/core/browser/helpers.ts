@@ -172,6 +172,7 @@ export function createWindowByTarget(
 export function windowOpenHadler(
   browser: Browser,
   details: HandlerDetails,
+  options?: { skipParent?: boolean },
 ): WindowOpenHandlerResponse {
   const { url, disposition, features } = details;
 
@@ -187,18 +188,20 @@ export function windowOpenHadler(
     return { action: 'allow' };
   }
 
+  const skipParent = options?.skipParent;
+
   if (disposition === 'foreground-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window', selectTab: true });
+    browser.openURL(url, { targetId: 'current-desktop-window', selectTab: true, skipParent });
     return { action: 'deny' };
   }
 
   if (disposition === 'background-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window' });
+    browser.openURL(url, { targetId: 'current-desktop-window', skipParent });
     return { action: 'deny' };
   }
 
   if (disposition === 'new-window') {
-    browser.openURL(url, { targetId: 'new-window' });
+    browser.openURL(url, { targetId: 'new-window', skipParent });
     return { action: 'deny' };
   }
 

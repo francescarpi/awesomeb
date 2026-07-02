@@ -25,6 +25,7 @@ const validSessionTab = {
   favicon: null,
   closedAt: null,
   openTabsAsChild: false,
+  parentTabId: null,
 };
 
 const validSessionTabContainer = {

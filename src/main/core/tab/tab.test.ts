@@ -206,3 +206,51 @@ describe('Tab.isTabPreview', () => {
     expect(preview.isTabPreview).toBe(true);
   });
 });
+
+describe('Tab.setParent', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  test('defaults parentTab to null on a newly opened tab', async () => {
+    const result = await browser.openURL('http://example.com');
+    expect(result!.tab.parentTab).toBeNull();
+  });
+
+  test('setParent assigns a parent reference', async () => {
+    const parent = (await browser.openURL('http://parent.com'))!;
+    const child = (await browser.openURL('http://child.com'))!;
+
+    expect(child.tab.parentTab).toBeNull();
+
+    child.tab.setParent(parent.tab);
+    expect(child.tab.parentTab).toBe(parent.tab);
+  });
+
+  test('setParent(null) clears the parent reference', async () => {
+    const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+    parent.tab.setOpenTabsAsChild(true);
+    const child = (await browser.openURL('http://child.com'))!;
+
+    expect(child.tab.parentTab).toBe(parent.tab);
+
+    child.tab.setParent(null);
+    expect(child.tab.parentTab).toBeNull();
+  });
+
+  test('setParent can reassign to a different parent', async () => {
+    const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+    const parent2 = (await browser.openURL('http://parent2.com'))!;
+    parent1.tab.setOpenTabsAsChild(true);
+    const child = (await browser.openURL('http://child.com'))!;
+
+    expect(child.tab.parentTab).toBe(parent1.tab);
+
+    child.tab.setParent(parent2.tab);
+    expect(child.tab.parentTab).toBe(parent2.tab);
+  });
+});

@@ -218,6 +218,153 @@ describe('Session', () => {
     });
   });
 
+  describe('parentTabId persistence', () => {
+    test('round-trips parentTabId through save and reload', async () => {
+      const parent = (await browser.openURL('http://parent.example.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.example.com'))!;
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const allTabStores = persisted.windows[0].desktops[0].tabContainers.flatMap(
+        (tc: { tabs: { id: number; parentTabId: number | null }[] }) => tc.tabs,
+      );
+      const parentStore = allTabStores.find((t) => t.id === parent.tab.id);
+      const childStore = allTabStores.find((t) => t.id === child.tab.id);
+      expect(parentStore).toBeDefined();
+      expect(childStore).toBeDefined();
+      expect(parentStore!.parentTabId).toBeNull();
+      expect(childStore!.parentTabId).toBe(parent.tab.id);
+    });
+
+    test('restores _parent reference when loadSession is called', async () => {
+      const parent = (await browser.openURL('http://parent.example.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.example.com'))!;
+      const childId = child.tab.id;
+      const parentId = parent.tab.id;
+
+      const session = new Session(browser);
+      await session.save();
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+      const restoredChild = freshBrowser.getTab(childId);
+      const restoredParent = freshBrowser.getTab(parentId);
+
+      expect(restoredChild).not.toBeNull();
+      expect(restoredParent).not.toBeNull();
+      expect(restoredChild!.tab.parentTab).toBe(restoredParent!.tab);
+    });
+
+    test('treats missing parent as orphan (logs warning, sets parent to null)', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://child.example.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          parentTabId: 999,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+      const loaded = freshBrowser.getTab(1);
+
+      expect(loaded).not.toBeNull();
+      expect(loaded!.tab.parentTab).toBeNull();
+    });
+
+    test('defaults to null when the field is missing in session.json (legacy)', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+      const loaded = freshBrowser.getTab(1);
+
+      expect(loaded).not.toBeNull();
+      expect(loaded!.tab.parentTab).toBeNull();
+    });
+  });
+
   describe('legacy "name" field migration', () => {
     function writeLegacySessionFile(desktops: unknown[]) {
       const filePath = getSessionFilePath();

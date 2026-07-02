@@ -504,6 +504,10 @@ export class Tab extends UIView {
     this._parent = null;
   }
 
+  setParent(parent: Tab | null) {
+    this._parent = parent;
+  }
+
   toggleMute() {
     const muted = this.isMuted;
     this.webContents.setAudioMuted(!muted);

@@ -65,6 +65,8 @@ export class Browser {
       return;
     }
 
+    const pendingParents: { tab: Tab; parentTabId: number }[] = [];
+
     for (const winStore of session.windows) {
       const newWindow = this.createWindow(winStore.id, {
         bounds: winStore.bounds,
@@ -101,11 +103,26 @@ export class Browser {
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
+
+            if (tabStore.parentTabId !== null) {
+              pendingParents.push({ tab, parentTabId: tabStore.parentTabId });
+            }
           }
         }
       }
 
       newWindow.selectDesktop(winStore.selectedDesktopId);
+    }
+
+    for (const { tab, parentTabId } of pendingParents) {
+      const parentResult = this.getTab(parentTabId);
+      if (parentResult) {
+        tab.setParent(parentResult.tab);
+      } else {
+        scopeLog.warn(
+          `Tab ${tab.id} references non-existent parent tab ${parentTabId}; treating as orphan`,
+        );
+      }
     }
 
     await this.refreshMainMenu();
@@ -253,6 +270,16 @@ export class Browser {
       return null;
     }
 
+    let parent: Tab | undefined;
+    if (
+      !props?.skipParent &&
+      selectedTab &&
+      selectedTab.tab.openTabsAsChild &&
+      result.desktop === selectedTab.desktop
+    ) {
+      parent = selectedTab.tab;
+    }
+
     const { window, desktop, tabContainer, partition } = result;
 
     this._indexTabContainer(window, desktop, tabContainer);
@@ -263,6 +290,7 @@ export class Browser {
       partition: intPartition || partition,
       suspended: false,
       url,
+      parent,
     });
 
     this._indexTab(window, desktop, tabContainer, tab);
@@ -394,6 +422,18 @@ export class Browser {
 
   private _indexTabContainer(window: Window, desktop: Desktop, tabContainer: TabContainer): void {
     this._tabContainerIndex.set(tabContainer.id, { window, desktop, tabContainer });
+  }
+
+  private _findDescendants(root: Tab): Tab[] {
+    const allTabs = this.tabs.map((r) => r.tab);
+    const result: Tab[] = [];
+    const stack = allTabs.filter((t) => t.parentTab === root);
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      result.push(current);
+      stack.push(...allTabs.filter((t) => t.parentTab === current));
+    }
+    return result;
   }
 
   private _unindexTabContainer(tabContainerId: TTabContainerId): void {
@@ -575,7 +615,17 @@ export class Browser {
       return false;
     }
 
-    const { tab, window, tabContainer, desktop } = result;
+    const { tab } = result;
+
+    if (tab.isClosed) {
+      return false;
+    }
+
+    for (const descendant of this._findDescendants(tab)) {
+      await this.closeTab(descendant.id, props);
+    }
+
+    const { window, tabContainer, desktop } = result;
 
     if (tab.partition.private) {
       this.permanentlyCloseTab(desktop, tabContainer, tab.id);

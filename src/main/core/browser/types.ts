@@ -5,6 +5,7 @@ export interface IOpenUrlProps {
   searchEngineCode?: TSearchEngineCode;
   targetId?: string;
   selectTab?: boolean;
+  skipParent?: boolean;
 }
 
 export interface IMoveTabProps {

@@ -478,4 +478,162 @@ describe('Browser', () => {
       expect(browser.getTab(tab2Id)!.tab.id).toBe(tab2Id);
     });
   });
+
+  describe('Cascade close on parent', () => {
+    test('closing parent closes all direct children', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child1.com');
+      await browser.openURL('http://child2.com');
+
+      const childIds = browser.tabs
+        .map((r) => r.tab)
+        .filter((t) => t.parentTab === parent.tab)
+        .map((t) => t.id);
+
+      expect(childIds.length).toBe(2);
+
+      await browser.closeTab(parent.tab.id);
+
+      expect(parent.tab.isClosed).toBe(true);
+      for (const childId of childIds) {
+        const child = browser.getTab(childId);
+        expect(child).not.toBeNull();
+        expect(child!.tab.isClosed).toBe(true);
+      }
+    });
+
+    test('closing parent closes entire subtree (grandchildren too)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const grandparent = (await browser.openURL('http://gp.com', { selectTab: true }))!;
+      grandparent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com', { selectTab: true }))!;
+      child.tab.setOpenTabsAsChild(true);
+      const grandchild = (await browser.openURL('http://grandchild.com'))!;
+
+      await browser.closeTab(grandparent.tab.id);
+
+      expect(grandparent.tab.isClosed).toBe(true);
+      expect(child.tab.isClosed).toBe(true);
+      expect(grandchild.tab.isClosed).toBe(true);
+    });
+
+    test('closing a non-parent tab does not cascade', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const unrelated1 = (await browser.openURL('http://u1.com'))!;
+      const unrelated2 = (await browser.openURL('http://u2.com'))!;
+
+      await browser.closeTab(unrelated1.tab.id);
+
+      expect(unrelated1.tab.isClosed).toBe(true);
+      expect(unrelated2.tab.isClosed).toBe(false);
+    });
+
+    test('closing a child does not close its parent (cascade is downward only)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+
+      await browser.closeTab(child.tab.id);
+
+      expect(child.tab.isClosed).toBe(true);
+      expect(parent.tab.isClosed).toBe(false);
+    });
+
+    test('closing an already-closed tab is a no-op (idempotent)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const tab = (await browser.openURL('http://example.com'))!;
+
+      await browser.closeTab(tab.tab.id);
+      expect(tab.tab.isClosed).toBe(true);
+
+      const result = await browser.closeTab(tab.tab.id);
+      expect(result).toBe(false);
+    });
+
+    test('closing a tab whose parent is already closed just closes the orphan', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+
+      await browser.closeTab(parent.tab.id);
+      expect(parent.tab.isClosed).toBe(true);
+      expect(child.tab.isClosed).toBe(true);
+    });
+  });
+
+  describe('openURL parent auto-detection', () => {
+    test('selectedTab.openTabsAsChild=true: new tab has _parent = selectedTab', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const jira = (await browser.openURL('http://jira.com'))!;
+      jira.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(jira.tab.id);
+
+      const newTab = await browser.openURL('http://ticket.com');
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.parentTab).toBe(jira.tab);
+    });
+
+    test('selectedTab.openTabsAsChild=false: new tab has no parent', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      await browser.openURL('http://jira.com');
+
+      const newTab = await browser.openURL('http://ticket.com');
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.parentTab).toBeNull();
+    });
+
+    test('skipParent: true prevents auto-detection (popup use case)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const jira = (await browser.openURL('http://jira.com'))!;
+      jira.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(jira.tab.id);
+
+      const newTab = await browser.openURL('http://ticket.com', { skipParent: true });
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.parentTab).toBeNull();
+    });
+
+    test('targetId=new-window: no parent (different window = different context)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const jira = (await browser.openURL('http://jira.com'))!;
+      jira.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(jira.tab.id);
+
+      const newTab = await browser.openURL('http://ticket.com', { targetId: 'new-window' });
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.parentTab).toBeNull();
+    });
+
+    test('context menu case: openURL called directly (no disposition) still respects the flag', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const jira = (await browser.openURL('http://jira.com'))!;
+      jira.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(jira.tab.id);
+
+      const newTab = await browser.openURL('http://ticket.com', { selectTab: true });
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.parentTab).toBe(jira.tab);
+    });
+
+    test('child tab.openTabsAsChild remains false regardless of parent flag', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const jira = (await browser.openURL('http://jira.com'))!;
+      jira.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(jira.tab.id);
+
+      const newTab = await browser.openURL('http://ticket.com');
+
+      expect(newTab).not.toBeNull();
+      expect(newTab!.tab.openTabsAsChild).toBe(false);
+    });
+  });
 });

@@ -19,6 +19,7 @@ export const SessionTabScheme = z
     favicon: z.string().nullable(),
     closedAt: z.number().nullable(),
     openTabsAsChild: z.boolean().default(false),
+    parentTabId: z.number().nullable().default(null),
   })
   .strict();
 

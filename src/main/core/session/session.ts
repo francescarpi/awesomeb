@@ -65,6 +65,7 @@ export class Session extends Store<ISessionStore> {
                 favicon: tab.favicon,
                 closedAt: tab.closedAt,
                 openTabsAsChild: tab.openTabsAsChild,
+                parentTabId: tab.parentTab?.id ?? null,
               })),
           }))
           .filter((tabContainer) => tabContainer.tabs.length > 0);

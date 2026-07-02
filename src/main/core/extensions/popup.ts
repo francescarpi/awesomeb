@@ -41,7 +41,7 @@ export class ExtensionPopup extends UIView {
       );
 
       this.webContents.setWindowOpenHandler((details: HandlerDetails) => {
-        return windowOpenHadler(browser, details);
+        return windowOpenHadler(browser, details, { skipParent: true });
       });
     });
 
