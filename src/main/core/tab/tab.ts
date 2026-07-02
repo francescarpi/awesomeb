@@ -42,6 +42,7 @@ export class Tab extends UIView {
   private static readonly MIN_ZOOM_STEP = -5;
   private static readonly MAX_ZOOM_STEP = 9;
   private _closedAt: number | null = null;
+  private _openTabsAsChild: boolean = false;
 
   constructor(
     public readonly browser: Browser,
@@ -63,6 +64,7 @@ export class Tab extends UIView {
     this._parent = props.parent ?? null;
     this._favicon = props.favicon ?? null;
     this._closedAt = props.closedAt ?? null;
+    this._openTabsAsChild = props.openTabsAsChild ?? false;
 
     registerTabEvents(browser, this);
   }
@@ -539,5 +541,13 @@ export class Tab extends UIView {
 
   get isClosed(): boolean {
     return this._closedAt !== null;
+  }
+
+  get openTabsAsChild(): boolean {
+    return this._openTabsAsChild;
+  }
+
+  setOpenTabsAsChild(value: boolean) {
+    this._openTabsAsChild = value;
   }
 }

@@ -17,6 +17,7 @@ import * as tabSuspend from './tab-suspend';
 import * as tabContainerSelectByIndex from './tabcontainer-select-by-index';
 import * as tabSelect from './tab-select';
 import * as tabClose from './tab-close';
+import * as tabToggleOpenTabsAsChild from './tab-toggle-open-tabs-as-child';
 
 describe('Commands', () => {
   let browser: Browser;
@@ -337,6 +338,43 @@ describe('Commands', () => {
       });
 
       // Should not throw an error
+      expect(true).toBe(true);
+    });
+
+    test('tab-toggle-open-tabs-as-child: should flip the flag from false to true on the active tab', async () => {
+      const window = browser.activeWindow!;
+      const result = await browser.openURL('http://example.com');
+      const tab = result!.tab;
+      await window.selectTab(tab.id);
+
+      expect(tab.openTabsAsChild).toBe(false);
+
+      await browser.performCommand(window, tabToggleOpenTabsAsChild.TRIGGER);
+
+      expect(tab.openTabsAsChild).toBe(true);
+    });
+
+    test('tab-toggle-open-tabs-as-child: should flip the flag from true to false on a specific tab', async () => {
+      const window = browser.activeWindow!;
+      const result = await browser.openURL('http://example.com');
+      const tab = result!.tab;
+      tab.setOpenTabsAsChild(true);
+
+      await browser.performCommand(window, tabToggleOpenTabsAsChild.TRIGGER, {
+        tabId: tab.id,
+      });
+
+      expect(tab.openTabsAsChild).toBe(false);
+    });
+
+    test('tab-toggle-open-tabs-as-child: should handle non-existent tab gracefully', async () => {
+      const window = browser.activeWindow!;
+      await browser.openURL('http://example.com');
+
+      await browser.performCommand(window, tabToggleOpenTabsAsChild.TRIGGER, {
+        tabId: 999,
+      });
+
       expect(true).toBe(true);
     });
   });

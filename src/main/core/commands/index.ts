@@ -70,6 +70,7 @@ import * as debugPage from './debug-page';
 import * as windowNew from './window-new';
 import * as tabClearClosed from './tab-clear-closed';
 import * as tabPreviousVisited from './tab-previous-visited';
+import * as tabToggleOpenTabsAsChild from './tab-toggle-open-tabs-as-child';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -139,6 +140,7 @@ const COMMANDS = {
   [windowNew.TRIGGER]: windowNew.Command,
   [tabClearClosed.TRIGGER]: tabClearClosed.Command,
   [tabPreviousVisited.TRIGGER]: tabPreviousVisited.Command,
+  [tabToggleOpenTabsAsChild.TRIGGER]: tabToggleOpenTabsAsChild.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
