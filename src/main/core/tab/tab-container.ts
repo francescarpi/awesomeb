@@ -10,6 +10,7 @@ export class TabContainer {
   private _selectedTabId: TTabId | null = null;
   private _layout: LayoutBase = Layouts['vertical'];
   private _layoutSize: number = 50;
+  private _parentTab: Tab | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -175,5 +176,13 @@ export class TabContainer {
   getVisibleTabPosition(tabId: TTabId): number {
     const tabsArray = this.visibleTabs;
     return tabsArray.findIndex((tab) => tab.id === tabId) + 1;
+  }
+
+  get parentTab(): Tab | null {
+    return this._parentTab;
+  }
+
+  setParentTab(parent: Tab | null) {
+    this._parentTab = parent;
   }
 }

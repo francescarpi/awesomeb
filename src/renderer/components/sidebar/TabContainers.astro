@@ -6,7 +6,7 @@
 
 <script>
   import { getSearchParams, h, type VNode, c, Renderer, btnIcon } from '#/scripts';
-  import type { ITabContainer, IDesktopEntity, TDesktopId } from '~/types';
+  import type { ITabContainer, ITab, IDesktopEntity, TDesktopId, TTabId } from '~/types';
   import TabPreview from '#/icons/tab-preview.svg?raw';
   import Muted from '#/icons/muted.svg?raw';
   import Favicon from '#/icons/favicon.svg';
@@ -41,153 +41,199 @@
 
   // ----------------------------------------------------------------------
   function renderTabContainers(tabContainers: ITabContainer[]): VNode {
+    const childrenByParentTab = new Map<number, ITabContainer[]>();
+    for (const tc of tabContainers) {
+      if (tc.parentTabId !== null) {
+        const arr = childrenByParentTab.get(tc.parentTabId) ?? [];
+        arr.push(tc);
+        childrenByParentTab.set(tc.parentTabId, arr);
+      }
+    }
+    const allTabIds = new Set(tabContainers.flatMap((tc) => tc.tabs.map((t) => t.id)));
+    const topLevelOrOrphans = tabContainers.filter(
+      (tc) => tc.parentTabId === null || !allTabIds.has(tc.parentTabId),
+    );
+
     return h(
       'div', // Container
       {
         class: c('flex', 'flex-col', 'gap-1.5', 'select-none'),
         style: 'app-region: no-drag;',
       },
-      ...tabContainers.map((tc) =>
+      ...topLevelOrOrphans.map((tc) => renderContainer(tc, tabContainers, 0, childrenByParentTab)),
+    );
+  }
+
+  // ----------------------------------------------------------------------
+  function renderContainer(
+    tc: ITabContainer,
+    allContainers: ITabContainer[],
+    depth: number,
+    childrenByParentTab: Map<number, ITabContainer[]>,
+  ): VNode {
+    return h(
+      'div', // Tab container
+      {
+        class: c(
+          'items-start',
+          'gap-1',
+          'hidden',
+          depth > 0 && 'mr-[-4px]',
+          tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
+          tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
+        ),
+        style: depth > 0 ? `padding-left: ${depth}px` : '',
+      },
+      h(
+        'span', // Tab container shortcut (is a number between 1 and 9)
+        {
+          class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5', 'mt-2'),
+        },
+        tc.shortcut?.toString(),
+      ),
+      h(
+        'div', // Tab container's tabs list (in vertical)
+        {
+          class: c(
+            'flex',
+            'flex-col',
+            'w-full',
+            'mx-1',
+            tc.isSplit && 'border border-white/20 border-dashed rounded',
+          ),
+        },
+        ...tc.tabs.flatMap((t) =>
+          renderTabWithChildContainers(t, depth, allContainers, childrenByParentTab),
+        ),
+      ),
+    );
+  }
+
+  // ----------------------------------------------------------------------
+  function renderTabWithChildContainers(
+    tab: ITab,
+    depth: number,
+    allContainers: ITabContainer[],
+    childrenByParentTab: Map<number, ITabContainer[]>,
+  ): VNode[] {
+    const childContainers = childrenByParentTab.get(tab.id) ?? [];
+    return [
+      renderTab(tab),
+      ...childContainers.flatMap((childTc) => [
+        renderContainer(childTc, allContainers, depth + 1, childrenByParentTab),
+      ]),
+    ];
+  }
+
+  // ----------------------------------------------------------------------
+  function renderTab(tab: ITab): VNode {
+    return h(
+      'div', // Tab
+      {
+        class: c(
+          'py-1.5',
+          'cursor-pointer',
+          'gap-1',
+          'items-start',
+          'grid',
+          'grid-cols-1',
+          'sidebar:grid-cols-[24px_auto_25px]',
+          'sidebar:rounded-tl',
+          'sidebar:rounded-bl',
+          tab.selected ? 'bg-white/20' : 'hover:bg-white/10',
+          tab.suspended ? 'group/suspended opacity-50' : 'group/active',
+          tab.isClosed && 'hidden',
+        ),
+        onclick: () => abCommands.perform(winId, 'select-tab', { tabId: tab.id }),
+        oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: tab.id }),
+      },
+      h(
+        'span', // Loading spinner
+        {
+          class: c(
+            'loading',
+            'loading-spinner',
+            'loading-xs',
+            'ml-auto',
+            'mr-auto',
+            'sidebar:ml-1',
+            'sidebar:mr-0',
+            'mt-0.5',
+            tab.loading ? 'block' : 'hidden',
+          ),
+        },
+        '',
+      ),
+      h(
+        'img', // Favicon
+        {
+          src: tab.favicon || Favicon.src,
+          onerror: `this.onerror=null;this.src="${favicon.src}";`,
+          class: c(
+            'w-5',
+            'h-5',
+            'sidebar:w-[16px]',
+            'sidebar:h-[16px]',
+            'mt-0.5',
+            'ml-auto',
+            'mr-auto',
+            'sidebar:ml-1',
+            'sidebar:mr-0',
+            'text-white',
+            tab.loading ? 'hidden' : 'block',
+          ),
+        },
+        '',
+      ),
+      h(
+        'div', // Title + indicators container
+        {
+          class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0'),
+        },
         h(
-          'div', // Tab container
+          'span', // Title
+          { class: c('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
+          tab.title,
+        ),
+        h(
+          'div', // Indicators container
+          { class: c('flex', 'gap-1') },
+          highlightIcon(TabPreview, tab.hasTabPreview, 'text-white'),
+          highlightIcon(Muted, tab.isMuted, 'text-white'),
+          highlightIcon(Warning, tab.requireAttention, 'text-red-500'),
+        ),
+      ),
+      h(
+        'div', // Partition and actions container
+        { class: c('hidden', 'sidebar:flex', 'justify-end') },
+        h(
+          'div', // Partition/Profile color
           {
             class: c(
-              'items-center',
-              'gap-1',
-              'hidden',
-              tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
-              tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
+              'w-1',
+              'h-5',
+              'mr-1',
+              'group-hover/suspended:hidden',
+              'group-hover/active:hidden',
             ),
+            style: { backgroundColor: tab.partition.color },
           },
-          h(
-            'span', // Tab container shortcut (is a number between 1 and 9)
-            { class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5') },
-            tc.shortcut?.toString(),
-          ),
-          h(
-            'div', // Tab container's tabs list (in vertical)
-            {
-              class: c(
-                'flex',
-                'flex-col',
-                'w-full',
-                'mx-1',
-                tc.isSplit && 'border border-white/20 border-dashed rounded',
-              ),
-            },
-            ...tc.tabs.map((t) =>
-              h(
-                'div', // Tab
-                {
-                  class: c(
-                    'py-1.5',
-                    'cursor-pointer',
-                    'gap-1',
-                    'items-start',
-                    'grid',
-                    'grid-cols-1',
-                    'sidebar:grid-cols-[24px_auto_25px]',
-                    'sidebar:rounded-tl',
-                    'sidebar:rounded-bl',
-                    t.selected ? 'bg-white/20' : 'hover:bg-white/10',
-                    t.suspended ? 'group/suspended opacity-50' : 'group/active',
-                    t.isClosed && 'hidden',
-                  ),
-                  onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
-                  oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: t.id }),
-                },
-                h(
-                  'span', // Loading spinner
-                  {
-                    class: c(
-                      'loading',
-                      'loading-spinner',
-                      'loading-xs',
-                      'ml-auto',
-                      'mr-auto',
-                      'sidebar:ml-1',
-                      'sidebar:mr-0',
-                      'mt-0.5',
-                      t.loading ? 'block' : 'hidden',
-                    ),
-                  },
-                  '',
-                ),
-                h(
-                  'img', // Favicon
-                  {
-                    src: t.favicon || Favicon.src,
-                    onerror: `this.onerror=null;this.src="${favicon.src}";`,
-                    class: c(
-                      'w-5',
-                      'h-5',
-                      'sidebar:w-[16px]',
-                      'sidebar:h-[16px]',
-                      'mt-0.5',
-                      'ml-auto',
-                      'mr-auto',
-                      'sidebar:ml-1',
-                      'sidebar:mr-0',
-                      'text-white',
-                      t.loading ? 'hidden' : 'block',
-                    ),
-                  },
-                  '',
-                ),
-                h(
-                  'div', // Title + indicators container
-                  {
-                    class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0'),
-                  },
-                  h(
-                    'span', // Title
-                    { class: c('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
-                    t.title,
-                  ),
-                  h(
-                    'div', // Indicators container
-                    { class: c('flex', 'gap-1') },
-                    highlightIcon(TabPreview, t.hasTabPreview, 'text-white'),
-                    highlightIcon(Muted, t.isMuted, 'text-white'),
-                    highlightIcon(Warning, t.requireAttention, 'text-red-500'),
-                  ),
-                ),
-                h(
-                  'div', // Partition and actions container
-                  { class: c('hidden', 'sidebar:flex', 'justify-end') },
-                  h(
-                    'div', // Partition/Profile color
-                    {
-                      class: c(
-                        'w-1',
-                        'h-5',
-                        'mr-1',
-                        'group-hover/suspended:hidden',
-                        'group-hover/active:hidden',
-                      ),
-                      style: { backgroundColor: t.partition.color },
-                    },
-                    '',
-                  ),
-                  btnIcon(Close, {
-                    classNames: ['text-white', 'hidden', 'group-hover/suspended:block'],
-                    size: 5,
-                    onClick: () => {
-                      abCommands.perform(winId, 'close-tab', { tabId: t.id });
-                    },
-                  }),
-                  btnIcon(Minus, {
-                    classNames: ['text-white', 'hidden', 'group-hover/active:block'],
-                    size: 5,
-                    onClick: () => {
-                      abCommands.perform(winId, 'suspend-tab', { tabId: t.id });
-                    },
-                  }),
-                ),
-              ),
-            ),
-          ),
+          '',
         ),
+        btnIcon(Close, {
+          classNames: ['text-white', 'hidden', 'group-hover/suspended:block'],
+          size: 5,
+          onClick: () => {
+            abCommands.perform(winId, 'close-tab', { tabId: tab.id });
+          },
+        }),
+        btnIcon(Minus, {
+          classNames: ['text-white', 'hidden', 'group-hover/active:block'],
+          size: 5,
+          onClick: () => {
+            abCommands.perform(winId, 'suspend-tab', { tabId: tab.id });
+          },
+        }),
       ),
     );
   }

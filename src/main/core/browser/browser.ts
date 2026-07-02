@@ -65,7 +65,7 @@ export class Browser {
       return;
     }
 
-    const pendingParents: { tab: Tab; parentTabId: number }[] = [];
+    const pendingContainerParents: { tabContainer: TabContainer; parentTabId: number }[] = [];
 
     for (const winStore of session.windows) {
       const newWindow = this.createWindow(winStore.id, {
@@ -103,10 +103,10 @@ export class Browser {
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
+          }
 
-            if (tabStore.parentTabId !== null) {
-              pendingParents.push({ tab, parentTabId: tabStore.parentTabId });
-            }
+          if (tabConStore.parentTabId !== null) {
+            pendingContainerParents.push({ tabContainer, parentTabId: tabConStore.parentTabId });
           }
         }
       }
@@ -114,13 +114,13 @@ export class Browser {
       newWindow.selectDesktop(winStore.selectedDesktopId);
     }
 
-    for (const { tab, parentTabId } of pendingParents) {
+    for (const { tabContainer, parentTabId } of pendingContainerParents) {
       const parentResult = this.getTab(parentTabId);
       if (parentResult) {
-        tab.setParent(parentResult.tab);
+        tabContainer.setParentTab(parentResult.tab);
       } else {
         scopeLog.warn(
-          `Tab ${tab.id} references non-existent parent tab ${parentTabId}; treating as orphan`,
+          `TabContainer ${tabContainer.id} references non-existent parent tab ${parentTabId}; treating as orphan`,
         );
       }
     }
@@ -260,24 +260,21 @@ export class Browser {
       return selectedTab;
     }
 
+    const shouldSetParent = !props?.skipParent && selectedTab && selectedTab.tab.openTabsAsChild;
+
     const result = parseTarget(this, {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
+      parentTab: undefined,
     });
+
+    if (shouldSetParent && result && result.desktop === selectedTab!.desktop) {
+      result.tabContainer.setParentTab(selectedTab!.tab);
+    }
 
     if (!result) {
       scopeLog.error('Invalid target for opening URL');
       return null;
-    }
-
-    let parent: Tab | undefined;
-    if (
-      !props?.skipParent &&
-      selectedTab &&
-      selectedTab.tab.openTabsAsChild &&
-      result.desktop === selectedTab.desktop
-    ) {
-      parent = selectedTab.tab;
     }
 
     const { window, desktop, tabContainer, partition } = result;
@@ -290,7 +287,6 @@ export class Browser {
       partition: intPartition || partition,
       suspended: false,
       url,
-      parent,
     });
 
     this._indexTab(window, desktop, tabContainer, tab);
@@ -424,14 +420,19 @@ export class Browser {
     this._tabContainerIndex.set(tabContainer.id, { window, desktop, tabContainer });
   }
 
-  private _findDescendants(root: Tab): Tab[] {
-    const allTabs = this.tabs.map((r) => r.tab);
-    const result: Tab[] = [];
-    const stack = allTabs.filter((t) => t.parentTab === root);
+  private _findDescendantContainers(root: Tab): TabContainer[] {
+    const allContainers: TabContainer[] = this.windows.flatMap((w) =>
+      w.desktops.flatMap((d) => d.tabContainers),
+    );
+    const result: TabContainer[] = [];
+    const stack = allContainers.filter((tc) => tc.parentTab === root);
     while (stack.length > 0) {
       const current = stack.pop()!;
       result.push(current);
-      stack.push(...allTabs.filter((t) => t.parentTab === current));
+      const tabIds = new Set(current.tabs.map((t) => t.id));
+      stack.push(
+        ...allContainers.filter((tc) => tc.parentTab !== null && tabIds.has(tc.parentTab.id)),
+      );
     }
     return result;
   }
@@ -621,8 +622,12 @@ export class Browser {
       return false;
     }
 
-    for (const descendant of this._findDescendants(tab)) {
-      await this.closeTab(descendant.id, props);
+    for (const descendant of this._findDescendantContainers(tab)) {
+      for (const t of descendant.tabs) {
+        if (!t.isClosed) {
+          await this.closeTab(t.id, props);
+        }
+      }
     }
 
     const { window, tabContainer, desktop } = result;

@@ -232,9 +232,9 @@ describe('Tab.setParent', () => {
   });
 
   test('setParent(null) clears the parent reference', async () => {
-    const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
-    parent.tab.setOpenTabsAsChild(true);
+    const parent = (await browser.openURL('http://parent.com'))!;
     const child = (await browser.openURL('http://child.com'))!;
+    child.tab.setParent(parent.tab);
 
     expect(child.tab.parentTab).toBe(parent.tab);
 
@@ -243,10 +243,10 @@ describe('Tab.setParent', () => {
   });
 
   test('setParent can reassign to a different parent', async () => {
-    const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+    const parent1 = (await browser.openURL('http://parent1.com'))!;
     const parent2 = (await browser.openURL('http://parent2.com'))!;
-    parent1.tab.setOpenTabsAsChild(true);
     const child = (await browser.openURL('http://child.com'))!;
+    child.tab.setParent(parent1.tab);
 
     expect(child.tab.parentTab).toBe(parent1.tab);
 

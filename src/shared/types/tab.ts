@@ -13,6 +13,7 @@ export interface ITabContainer {
   desktopId: TDesktopId;
   isClosed: boolean;
   isSplit: boolean;
+  parentTabId: number | null;
 }
 
 export interface ITab {

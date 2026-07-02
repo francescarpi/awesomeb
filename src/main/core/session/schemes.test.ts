@@ -25,12 +25,12 @@ const validSessionTab = {
   favicon: null,
   closedAt: null,
   openTabsAsChild: false,
-  parentTabId: null,
 };
 
 const validSessionTabContainer = {
   id: 1,
   divider: false,
+  parentTabId: null,
   tabs: [validSessionTab],
 };
 

@@ -2,6 +2,7 @@ import type { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
 import {
   config,
   Browser,
+  Tab,
   TabContainer,
   Partition,
   getNextPreviousBounds,
@@ -75,10 +76,12 @@ export function parseTarget(
     targetId?: string;
     partitionId?: TPartitionId;
     tabContainer?: TabContainer;
+    parentTab?: Tab;
   },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
   const partitionId = props?.partitionId;
+  const parentTab = props?.parentTab;
 
   let window = browser.activeWindow;
   if (!window) {
@@ -126,6 +129,9 @@ export function parseTarget(
     tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
       justAfter: targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined,
     });
+    if (parentTab) {
+      tabContainer.setParentTab(parentTab);
+    }
   }
 
   let partition: Partition;

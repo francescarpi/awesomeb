@@ -228,22 +228,23 @@ describe('Session', () => {
       await session.save();
 
       const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
-      const allTabStores = persisted.windows[0].desktops[0].tabContainers.flatMap(
-        (tc: { tabs: { id: number; parentTabId: number | null }[] }) => tc.tabs,
-      );
-      const parentStore = allTabStores.find((t) => t.id === parent.tab.id);
-      const childStore = allTabStores.find((t) => t.id === child.tab.id);
-      expect(parentStore).toBeDefined();
-      expect(childStore).toBeDefined();
-      expect(parentStore!.parentTabId).toBeNull();
-      expect(childStore!.parentTabId).toBe(parent.tab.id);
+      const allTabContainers = persisted.windows[0].desktops[0].tabContainers as {
+        id: number;
+        parentTabId: number | null;
+      }[];
+      const parentTcStore = allTabContainers.find((tc) => tc.id === parent.tabContainer.id);
+      const childTcStore = allTabContainers.find((tc) => tc.id === child.tabContainer.id);
+      expect(parentTcStore).toBeDefined();
+      expect(childTcStore).toBeDefined();
+      expect(parentTcStore!.parentTabId).toBeNull();
+      expect(childTcStore!.parentTabId).toBe(parent.tab.id);
     });
 
     test('restores _parent reference when loadSession is called', async () => {
       const parent = (await browser.openURL('http://parent.example.com', { selectTab: true }))!;
       parent.tab.setOpenTabsAsChild(true);
       const child = (await browser.openURL('http://child.example.com'))!;
-      const childId = child.tab.id;
+      const childContainerId = child.tabContainer.id;
       const parentId = parent.tab.id;
 
       const session = new Session(browser);
@@ -251,12 +252,14 @@ describe('Session', () => {
 
       const freshBrowser = new Browser();
       await freshBrowser.loadSession();
-      const restoredChild = freshBrowser.getTab(childId);
+      const restoredChildContainer = freshBrowser.tabs
+        .map((r) => r.tabContainer)
+        .find((tc) => tc.id === childContainerId);
       const restoredParent = freshBrowser.getTab(parentId);
 
-      expect(restoredChild).not.toBeNull();
+      expect(restoredChildContainer).toBeDefined();
       expect(restoredParent).not.toBeNull();
-      expect(restoredChild!.tab.parentTab).toBe(restoredParent!.tab);
+      expect(restoredChildContainer!.parentTab).toBe(restoredParent!.tab);
     });
 
     test('treats missing parent as orphan (logs warning, sets parent to null)', async () => {
@@ -282,6 +285,7 @@ describe('Session', () => {
                     {
                       id: 1,
                       divider: false,
+                      parentTabId: 999,
                       tabs: [
                         {
                           id: 1,
@@ -292,7 +296,6 @@ describe('Session', () => {
                           favicon: null,
                           closedAt: null,
                           openTabsAsChild: false,
-                          parentTabId: 999,
                         },
                       ],
                     },
@@ -306,10 +309,12 @@ describe('Session', () => {
 
       const freshBrowser = new Browser();
       await freshBrowser.loadSession();
-      const loaded = freshBrowser.getTab(1);
+      const restoredContainer = freshBrowser.tabs
+        .map((r) => r.tabContainer)
+        .find((tc) => tc.id === 1);
 
-      expect(loaded).not.toBeNull();
-      expect(loaded!.tab.parentTab).toBeNull();
+      expect(restoredContainer).toBeDefined();
+      expect(restoredContainer!.parentTab).toBeNull();
     });
 
     test('defaults to null when the field is missing in session.json (legacy)', async () => {

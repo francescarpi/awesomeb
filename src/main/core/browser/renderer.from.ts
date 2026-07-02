@@ -193,6 +193,7 @@ export class BrowserRenderer {
           isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
           isSplit: tc.hasSplitTabs,
+          parentTabId: tc.parentTab?.id ?? null,
         });
       }
     }

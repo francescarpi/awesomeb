@@ -487,20 +487,23 @@ describe('Browser', () => {
       await browser.openURL('http://child1.com');
       await browser.openURL('http://child2.com');
 
-      const childIds = browser.tabs
-        .map((r) => r.tab)
-        .filter((t) => t.parentTab === parent.tab)
-        .map((t) => t.id);
+      const childContainerIds = browser.tabs
+        .map((r) => r.tabContainer)
+        .filter((tc) => tc.parentTab === parent.tab)
+        .map((tc) => tc.id);
 
-      expect(childIds.length).toBe(2);
+      expect(childContainerIds.length).toBe(2);
 
       await browser.closeTab(parent.tab.id);
 
       expect(parent.tab.isClosed).toBe(true);
-      for (const childId of childIds) {
-        const child = browser.getTab(childId);
-        expect(child).not.toBeNull();
-        expect(child!.tab.isClosed).toBe(true);
+      for (const childContainerId of childContainerIds) {
+        const childTabs = browser.tabs
+          .filter((r) => r.tabContainer.id === childContainerId)
+          .map((r) => r.tab);
+        for (const childTab of childTabs) {
+          expect(childTab.isClosed).toBe(true);
+        }
       }
     });
 
@@ -566,7 +569,7 @@ describe('Browser', () => {
   });
 
   describe('openURL parent auto-detection', () => {
-    test('selectedTab.openTabsAsChild=true: new tab has _parent = selectedTab', async () => {
+    test('selectedTab.openTabsAsChild=true: new container has parentTab = selectedTab', async () => {
       browser.createWindow(1, { withDesktops: true });
       const jira = (await browser.openURL('http://jira.com'))!;
       jira.tab.setOpenTabsAsChild(true);
@@ -575,17 +578,17 @@ describe('Browser', () => {
       const newTab = await browser.openURL('http://ticket.com');
 
       expect(newTab).not.toBeNull();
-      expect(newTab!.tab.parentTab).toBe(jira.tab);
+      expect(newTab!.tabContainer.parentTab).toBe(jira.tab);
     });
 
-    test('selectedTab.openTabsAsChild=false: new tab has no parent', async () => {
+    test('selectedTab.openTabsAsChild=false: new container has no parent', async () => {
       browser.createWindow(1, { withDesktops: true });
       await browser.openURL('http://jira.com');
 
       const newTab = await browser.openURL('http://ticket.com');
 
       expect(newTab).not.toBeNull();
-      expect(newTab!.tab.parentTab).toBeNull();
+      expect(newTab!.tabContainer.parentTab).toBeNull();
     });
 
     test('skipParent: true prevents auto-detection (popup use case)', async () => {
@@ -597,7 +600,7 @@ describe('Browser', () => {
       const newTab = await browser.openURL('http://ticket.com', { skipParent: true });
 
       expect(newTab).not.toBeNull();
-      expect(newTab!.tab.parentTab).toBeNull();
+      expect(newTab!.tabContainer.parentTab).toBeNull();
     });
 
     test('targetId=new-window: no parent (different window = different context)', async () => {
@@ -609,7 +612,7 @@ describe('Browser', () => {
       const newTab = await browser.openURL('http://ticket.com', { targetId: 'new-window' });
 
       expect(newTab).not.toBeNull();
-      expect(newTab!.tab.parentTab).toBeNull();
+      expect(newTab!.tabContainer.parentTab).toBeNull();
     });
 
     test('context menu case: openURL called directly (no disposition) still respects the flag', async () => {
@@ -621,7 +624,7 @@ describe('Browser', () => {
       const newTab = await browser.openURL('http://ticket.com', { selectTab: true });
 
       expect(newTab).not.toBeNull();
-      expect(newTab!.tab.parentTab).toBe(jira.tab);
+      expect(newTab!.tabContainer.parentTab).toBe(jira.tab);
     });
 
     test('child tab.openTabsAsChild remains false regardless of parent flag', async () => {
