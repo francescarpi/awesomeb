@@ -1,5 +1,13 @@
 import { IConTab, TDesktopId, TTabContainerId, TTabId } from '~/types';
-import { defaultTheme, Theme, Window, TabContainer, ITabContainerProps, Browser } from '@/core';
+import {
+  defaultTheme,
+  Theme,
+  Window,
+  TabContainer,
+  ITabContainerProps,
+  Browser,
+  OrderIndex,
+} from '@/core';
 import { IProps } from './types';
 
 export class Desktop {
@@ -9,6 +17,7 @@ export class Desktop {
   private _id: TDesktopId;
 
   private readonly _tabContainers: Map<TTabContainerId, TabContainer> = new Map();
+  private _tabContainerOrder: OrderIndex<TTabContainerId> = new OrderIndex<TTabContainerId>();
   private _selectedTabContainerId: TTabContainerId | null = null;
 
   constructor(
@@ -35,9 +44,6 @@ export class Desktop {
     this._id = newId;
   }
 
-  // setName treats both fields as a single unit: if either is empty
-  // (after trim), both reset to null. This is intentional UX — when
-  // the user clears one input in the rename modal, both names go.
   setName(shortName: string, longName: string) {
     if (shortName === this._shortName && longName === this._longName) {
       return;
@@ -114,25 +120,14 @@ export class Desktop {
   }
 
   get tabContainers(): TabContainer[] {
-    return Array.from(this._tabContainers.values());
+    return this._tabContainerOrder
+      .toArray({ includeExcluded: true })
+      .map((id) => this._tabContainers.get(id)!);
   }
 
   addTabContainer(tabContainer: TabContainer, justAfter?: TTabContainerId) {
-    if (justAfter && this._tabContainers.has(justAfter)) {
-      const tabContainers = this.tabContainers;
-      const index = tabContainers.findIndex((tc) => tc.id === justAfter);
-      if (index !== -1) {
-        tabContainers.splice(index + 1, 0, tabContainer);
-        // Update the internal map to reflect the new order
-        this._tabContainers.clear();
-        for (const tc of tabContainers) {
-          this._tabContainers.set(tc.id, tc);
-        }
-        return;
-      }
-    } else {
-      this._tabContainers.set(tabContainer.id, tabContainer);
-    }
+    this._tabContainers.set(tabContainer.id, tabContainer);
+    this._tabContainerOrder.add(tabContainer.id, justAfter);
   }
 
   selectTabContainer(id: TTabContainerId | null) {
@@ -190,6 +185,7 @@ export class Desktop {
     }
 
     this._tabContainers.delete(id);
+    this._tabContainerOrder.remove(id);
 
     if (this._selectedTabContainerId === id) {
       this._selectedTabContainerId = null;
@@ -218,30 +214,10 @@ export class Desktop {
   }
 
   moveTabContainer(id: TTabContainerId, direction: 'up' | 'down') {
-    const tabContainers = this.tabContainers;
-    const index = tabContainers.findIndex((tc) => tc.id === id);
-    if (index === -1) {
+    if (!this._tabContainers.has(id)) {
       return;
     }
-
-    const step = direction === 'up' ? -1 : 1;
-    let newIndex = index + step;
-    while (newIndex >= 0 && newIndex < tabContainers.length && tabContainers[newIndex].isClosed) {
-      newIndex += step;
-    }
-
-    if (newIndex < 0 || newIndex >= tabContainers.length) {
-      return;
-    }
-
-    const [movedTabContainer] = tabContainers.splice(index, 1);
-    tabContainers.splice(newIndex, 0, movedTabContainer);
-
-    this._tabContainers.clear();
-    for (const tc of tabContainers) {
-      this._tabContainers.set(tc.id, tc);
-    }
-
+    this._tabContainerOrder.move(id, direction, { skipExcluded: true });
     this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
   }
 
@@ -274,5 +250,23 @@ export class Desktop {
       return null;
     }
     return topLevelOpenContainers[idx];
+  }
+
+  getNextTabContainer(id: TTabContainerId): TabContainer | null {
+    const nextId = this._tabContainerOrder.getNext(id, { skipExcluded: true });
+    return nextId !== null ? this._tabContainers.get(nextId) || null : null;
+  }
+
+  getPrevTabContainer(id: TTabContainerId): TabContainer | null {
+    const prevId = this._tabContainerOrder.getPrev(id, { skipExcluded: true });
+    return prevId !== null ? this._tabContainers.get(prevId) || null : null;
+  }
+
+  excludeTabContainerFromOrder(id: TTabContainerId): void {
+    this._tabContainerOrder.exclude(id);
+  }
+
+  includeTabContainerInOrder(id: TTabContainerId): void {
+    this._tabContainerOrder.include(id);
   }
 }

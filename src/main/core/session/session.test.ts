@@ -503,4 +503,152 @@ describe('Session', () => {
       expect(desktop.longName).toBe('Work Space');
     });
   });
+
+  describe('position persistence', () => {
+    test('round-trips tab container and tab positions through save and reload', async () => {
+      await browser.openURL('http://example1.com');
+      await browser.openURL('http://example2.com');
+      await browser.openURL('http://example3.com');
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const tabContainers = persisted.windows[0].desktops[0].tabContainers as {
+        id: number;
+        position: number;
+        tabs: { id: number; position: number }[];
+      }[];
+
+      expect(tabContainers.length).toBe(3);
+      expect(tabContainers[0].position).toBe(0);
+      expect(tabContainers[1].position).toBe(1);
+      expect(tabContainers[2].position).toBe(2);
+
+      tabContainers.forEach((tc) => {
+        expect(tc.tabs.length).toBe(1);
+        expect(tc.tabs[0].position).toBe(0);
+      });
+    });
+
+    test('preserves custom order after moveTabContainer and reload', async () => {
+      const t1 = await browser.openURL('http://example1.com');
+      const t2 = await browser.openURL('http://example2.com');
+      const t3 = await browser.openURL('http://example3.com');
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      desktop.moveTabContainer(t3!.tabContainer.id, 'up');
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const tabContainers = persisted.windows[0].desktops[0].tabContainers as {
+        id: number;
+        position: number;
+      }[];
+
+      const tc3Pos = tabContainers.find((tc) => tc.id === t3!.tabContainer.id)!.position;
+      const tc1Pos = tabContainers.find((tc) => tc.id === t1!.tabContainer.id)!.position;
+      const tc2Pos = tabContainers.find((tc) => tc.id === t2!.tabContainer.id)!.position;
+
+      expect(tc1Pos).toBe(0);
+      expect(tc3Pos).toBe(1);
+      expect(tc2Pos).toBe(2);
+    });
+
+    test('legacy session.json without position field loads with incremental positions', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      parentTabId: null,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example1.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                        },
+                      ],
+                    },
+                    {
+                      id: 2,
+                      divider: false,
+                      parentTabId: null,
+                      tabs: [
+                        {
+                          id: 2,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example2.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const tc1 = freshBrowser.tabs.find((r) => r.tabContainer.id === 1)!.tabContainer;
+      const tc2 = freshBrowser.tabs.find((r) => r.tabContainer.id === 2)!.tabContainer;
+      const desktop = freshBrowser.activeWindow!.getDesktop(1)!;
+      const positions = desktop.tabContainers.map((tc) => tc.id);
+      expect(positions).toEqual([tc1.id, tc2.id]);
+    });
+
+    test('position is preserved when reloading a freshly-saved session', async () => {
+      await browser.openURL('http://example1.com');
+      await browser.openURL('http://example2.com');
+
+      const firstSession = new Session(browser);
+      await firstSession.save();
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const desktop = freshBrowser.activeWindow!.getDesktop(1)!;
+      const tcs = desktop.tabContainers;
+      expect(tcs.length).toBe(2);
+      expect(tcs[0].id).not.toBe(tcs[1].id);
+
+      const freshSession = new Session(freshBrowser);
+      const data = freshSession.sessionToStore();
+      const persistedTcs = data[0].desktops[0].tabContainers;
+      expect(persistedTcs[0].position).toBe(0);
+      expect(persistedTcs[1].position).toBe(1);
+    });
+  });
 });

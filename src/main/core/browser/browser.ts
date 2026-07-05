@@ -79,14 +79,19 @@ export class Browser {
         const desktop = newWindow.createDesktop(deskStore.id, { theme, shortName, longName });
         if (!desktop) continue;
 
-        for (const tabConStore of deskStore.tabContainers) {
+        for (let i = 0; i < deskStore.tabContainers.length; i++) {
+          const tabConStore = deskStore.tabContainers[i];
+          const position = typeof tabConStore.position === 'number' ? tabConStore.position : i;
           const tabContainer = desktop.createTabContainer(tabConStore.id, {
             divider: tabConStore.divider,
+            justAfter: position > 0 ? deskStore.tabContainers[position - 1]?.id : undefined,
           });
 
           this._indexTabContainer(newWindow, desktop, tabContainer);
 
-          for (const tabStore of tabConStore.tabs) {
+          for (let j = 0; j < tabConStore.tabs.length; j++) {
+            const tabStore = tabConStore.tabs[j];
+            const tabPosition = typeof tabStore.position === 'number' ? tabStore.position : j;
             const partition =
               tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
                 ? partitions.internal
@@ -101,6 +106,10 @@ export class Browser {
               closedAt: tabStore.closedAt,
               openTabsAsChild: tabStore.openTabsAsChild,
             });
+            tabContainer.addTab(
+              tab,
+              tabPosition > 0 ? tabConStore.tabs[tabPosition - 1]?.id : undefined,
+            );
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
           }
@@ -636,6 +645,10 @@ export class Browser {
       this.permanentlyCloseTab(desktop, tabContainer, tab.id);
     } else {
       tab.markAsClosed();
+      tabContainer.excludeTabFromOrder(tab.id);
+      if (tabContainer.isClosed) {
+        desktop.excludeTabContainerFromOrder(tabContainer.id);
+      }
     }
 
     tab.closeWebContents();

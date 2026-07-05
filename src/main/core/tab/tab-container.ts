@@ -1,12 +1,13 @@
 import { TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
 import { ITabContainerProps, ITabProps } from './types';
-import { Browser } from '@/core';
+import { Browser, OrderIndex } from '@/core';
 import { Layouts, LayoutBase } from './layouts';
 
 export class TabContainer {
   private _divider: boolean;
   private readonly _tabs: Map<TTabId, Tab> = new Map();
+  private _tabOrder: OrderIndex<TTabId> = new OrderIndex<TTabId>();
   private _selectedTabId: TTabId | null = null;
   private _layout: LayoutBase = Layouts['vertical'];
   private _layoutSize: number = 50;
@@ -21,7 +22,7 @@ export class TabContainer {
   }
 
   get tabs(): Tab[] {
-    return Array.from(this._tabs.values());
+    return this._tabOrder.toArray({ includeExcluded: true }).map((tabId) => this._tabs.get(tabId)!);
   }
 
   createTab(id: TTabId, props: ITabProps): Tab {
@@ -32,8 +33,9 @@ export class TabContainer {
     return tab;
   }
 
-  addTab(tab: Tab) {
+  addTab(tab: Tab, justAfter?: TTabId) {
     this._tabs.set(tab.id, tab);
+    this._tabOrder.add(tab.id, justAfter);
   }
 
   get divider(): boolean {
@@ -84,6 +86,7 @@ export class TabContainer {
     }
 
     this._tabs.delete(id);
+    this._tabOrder.remove(id);
 
     if (this._selectedTabId === id) {
       this._selectedTabId = null;
@@ -121,28 +124,29 @@ export class TabContainer {
       return;
     }
 
-    const tabsArray = this.tabs;
-    const rotatedTabs = clockwise
-      ? [tabsArray[tabsArray.length - 1], ...tabsArray.slice(0, tabsArray.length - 1)]
-      : [...tabsArray.slice(1), tabsArray[0]];
+    const orderArray = this._tabOrder.toArray({ includeExcluded: true });
+    const rotated = clockwise
+      ? [orderArray[orderArray.length - 1], ...orderArray.slice(0, orderArray.length - 1)]
+      : [...orderArray.slice(1), orderArray[0]];
 
-    // Update the order of tabs in the container
-    this._tabs.clear();
-    for (const tab of rotatedTabs) {
-      this._tabs.set(tab.id, tab);
+    this._tabOrder.clear();
+    for (const tabId of rotated) {
+      this._tabOrder.add(tabId);
     }
 
     this.browser.eventsChannel.emit('tabcontainer:tabs-rotated', this);
   }
 
   popTab(): Tab | null {
-    const tabsArray = this.tabs;
-    if (tabsArray.length === 0) {
+    const orderArray = this._tabOrder.toArray({ includeExcluded: true });
+    if (orderArray.length === 0) {
       return null;
     }
-    const poppedTab = tabsArray[tabsArray.length - 1];
-    this._tabs.delete(poppedTab.id);
-    if (this._selectedTabId === poppedTab.id) {
+    const poppedTabId = orderArray[orderArray.length - 1];
+    const poppedTab = this._tabs.get(poppedTabId) || null;
+    this._tabOrder.remove(poppedTabId);
+    this._tabs.delete(poppedTabId);
+    if (this._selectedTabId === poppedTabId) {
       this._selectedTabId = null;
     }
     return poppedTab;
@@ -170,12 +174,13 @@ export class TabContainer {
   }
 
   get isClosed(): boolean {
-    return this.tabs.length > 0 && this.tabs.every((tab) => tab.isClosed);
+    const all = this.tabs;
+    return all.length > 0 && all.every((tab) => tab.isClosed);
   }
 
   getVisibleTabPosition(tabId: TTabId): number {
-    const tabsArray = this.visibleTabs;
-    return tabsArray.findIndex((tab) => tab.id === tabId) + 1;
+    const visible = this.visibleTabs;
+    return visible.findIndex((tab) => tab.id === tabId) + 1;
   }
 
   get parentTab(): Tab | null {
@@ -184,5 +189,23 @@ export class TabContainer {
 
   setParentTab(parent: Tab | null) {
     this._parentTab = parent;
+  }
+
+  getNextTab(id: TTabId): Tab | null {
+    const nextId = this._tabOrder.getNext(id);
+    return nextId !== null ? this._tabs.get(nextId) || null : null;
+  }
+
+  getPrevTab(id: TTabId): Tab | null {
+    const prevId = this._tabOrder.getPrev(id);
+    return prevId !== null ? this._tabs.get(prevId) || null : null;
+  }
+
+  excludeTabFromOrder(id: TTabId): void {
+    this._tabOrder.exclude(id);
+  }
+
+  includeTabInOrder(id: TTabId): void {
+    this._tabOrder.include(id);
   }
 }

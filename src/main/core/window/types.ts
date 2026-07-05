@@ -7,7 +7,3 @@ export interface IProps {
   selectedDesktopId?: number;
   bounds?: Rectangle;
 }
-
-export interface ISelectTabProps {
-  sameDesktop?: boolean;
-}

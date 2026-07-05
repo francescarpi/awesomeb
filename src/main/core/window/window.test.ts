@@ -537,6 +537,140 @@ describe('Window Selecdt Tab', () => {
   });
 });
 
+describe('Window Navigation parent-child hierarchy', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('next from parent tab jumps to first child tab, not next top-level container', async () => {
+    const parent = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    parent.tab.setOpenTabsAsChild(true);
+    const child1a = (await browser.openURL('http://wikipedia.com/es'))!;
+    await browser.openURL('http://wikipedia.com/en');
+
+    const afterUoc = (await browser.openURL('http://uoc.com', { selectTab: true }))!;
+
+    await window.selectTab(parent.tab.id);
+
+    await window.selectTab('next');
+
+    const selected = window.selectedTab;
+    expect(selected).not.toBeNull();
+    expect(selected!.tab.id).toBe(child1a.tab.id);
+    expect(selected!.tabContainer.id).toBe(child1a.tabContainer.id);
+
+    expect(afterUoc.tab).toBeDefined();
+  });
+
+  test('next navigates through all child tabs before moving to next top-level', async () => {
+    const parent = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    parent.tab.setOpenTabsAsChild(true);
+    const child1a = (await browser.openURL('http://wikipedia.com/es'))!;
+    const child1b = (await browser.openURL('http://wikipedia.com/en', { selectTab: true }))!;
+    await browser.openURL('http://uoc.com');
+
+    await window.selectTab(parent.tab.id);
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(child1a.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(child1b.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBeDefined();
+  });
+
+  test('prev from first child tab jumps back to parent tab', async () => {
+    const parent = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    parent.tab.setOpenTabsAsChild(true);
+    const child1a = (await browser.openURL('http://wikipedia.com/es'))!;
+    await browser.openURL('http://uoc.com');
+
+    await window.selectTab(child1a.tab.id);
+    expect(window.selectedTab!.tab.id).toBe(child1a.tab.id);
+
+    await window.selectTab('prev');
+    expect(window.selectedTab!.tab.id).toBe(parent.tab.id);
+  });
+
+  test('next from middle child tab does not jump to parent', async () => {
+    const parent = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    parent.tab.setOpenTabsAsChild(true);
+    const child1a = (await browser.openURL('http://wikipedia.com/es'))!;
+    const child1b = (await browser.openURL('http://wikipedia.com/en'))!;
+
+    await window.selectTab(child1a.tab.id);
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(child1b.tab.id);
+  });
+
+  test('next through all child tabs reaches next top-level container (UOC, not back to parent)', async () => {
+    const wiki = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    wiki.tab.setOpenTabsAsChild(true);
+    const child1a = (await browser.openURL('http://wikipedia.com/es'))!;
+    const child1b = (await browser.openURL('http://wikipedia.com/en'))!;
+    const uoc = (await browser.openURL('http://uoc.com', { selectTab: true }))!;
+
+    await window.selectTab(wiki.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(child1a.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(child1b.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(uoc.tab.id);
+    expect(window.selectedTab!.tab.id).not.toBe(wiki.tab.id);
+  });
+
+  test('next from parent with multiple children traverses them in order', async () => {
+    const wiki = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    wiki.tab.setOpenTabsAsChild(true);
+    const c1 = (await browser.openURL('http://wikipedia.com/c1'))!;
+    const c2 = (await browser.openURL('http://wikipedia.com/c2'))!;
+    const c3 = (await browser.openURL('http://wikipedia.com/c3'))!;
+    await browser.openURL('http://uoc.com');
+
+    await window.selectTab(wiki.tab.id);
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(c1.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(c2.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(c3.tab.id);
+  });
+
+  test('next from last child of multi-child parent advances to next top-level container', async () => {
+    const wiki = (await browser.openURL('http://wikipedia.com', { selectTab: true }))!;
+    wiki.tab.setOpenTabsAsChild(true);
+    await browser.openURL('http://wikipedia.com/c1');
+    await browser.openURL('http://wikipedia.com/c2');
+    await browser.openURL('http://wikipedia.com/c3');
+    const uoc = (await browser.openURL('http://uoc.com', { selectTab: true }))!;
+    await browser.openURL('http://apsl.com');
+
+    await window.selectTab(wiki.tab.id);
+    await window.selectTab('next');
+    await window.selectTab('next');
+    await window.selectTab('next');
+    const beforeUoc = window.selectedTab!.tab.id;
+    expect(beforeUoc).not.toBe(uoc.tab.id);
+    expect(beforeUoc).not.toBe(wiki.tab.id);
+
+    await window.selectTab('next');
+    expect(window.selectedTab!.tab.id).toBe(uoc.tab.id);
+  });
+});
+
 describe('Window Close Tab', () => {
   let browser: Browser;
   let window: Window;

@@ -19,6 +19,7 @@ export const SessionTabScheme = z
     favicon: z.string().nullable(),
     closedAt: z.number().nullable(),
     openTabsAsChild: z.boolean().default(false),
+    position: z.number().default(0),
   })
   .strict();
 
@@ -27,6 +28,7 @@ export const SessionTabContainerScheme = z
     id: z.number(),
     divider: z.boolean(),
     parentTabId: z.number().nullable().default(null),
+    position: z.number().default(0),
     tabs: z.array(SessionTabScheme),
   })
   .strict();

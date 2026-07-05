@@ -54,7 +54,7 @@ export class Session extends Store<ISessionStore> {
             id: tabContainer.id,
             divider: tabContainer.divider,
             parentTabId: tabContainer.parentTab?.id ?? null,
-            // layout: tabContainer.layout,
+            position: 0,
             tabs: tabContainer.tabs
               .filter((tab) => !tab.partition.private)
               .map((tab) => ({
@@ -66,9 +66,15 @@ export class Session extends Store<ISessionStore> {
                 favicon: tab.favicon,
                 closedAt: tab.closedAt,
                 openTabsAsChild: tab.openTabsAsChild,
+                position: 0,
               })),
           }))
-          .filter((tabContainer) => tabContainer.tabs.length > 0);
+          .filter((tabContainer) => tabContainer.tabs.length > 0)
+          .map((tabContainer, idx) => ({
+            ...tabContainer,
+            position: idx,
+            tabs: tabContainer.tabs.map((tab, tabIdx) => ({ ...tab, position: tabIdx })),
+          }));
 
         return {
           id: desktop.id,

@@ -1,6 +1,6 @@
 import { UIWindow } from '@/ui';
-import type { IProps, ISelectTabProps } from './types';
-import { Desktop, IDesktopProps, Browser, PromptsManager } from '@/core';
+import type { IProps } from './types';
+import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 import {
   IContextualModalParams,
@@ -168,47 +168,186 @@ export class Window extends UIWindow {
     };
   }
 
-  getNextOrPreviousTabOfActiveDesktop(
-    direction: 'next' | 'prev',
-    opts?: ISelectTabProps,
-  ): IDesConTab | null {
+  getNextOrPreviousTabOfActiveDesktop(direction: 'next' | 'prev'): IDesConTab | null {
     const desktop = this.selectedDesktop;
     const tabContainer = desktop.selectedTabContainer;
-    const sameDesktop = opts?.sameDesktop ?? false;
 
-    if (!tabContainer) {
-      if (direction === 'next') {
-        const firstTab = desktop.tabContainers[0]?.tabs[0];
-        return firstTab ? { desktop, tabContainer: desktop.tabContainers[0], tab: firstTab } : null;
-      } else {
-        const lastTabContainer = desktop.tabContainers[desktop.tabContainers.length - 1];
-        const lastTab = lastTabContainer?.tabs[lastTabContainer.tabs.length - 1];
-        return lastTab ? { desktop, tabContainer: lastTabContainer, tab: lastTab } : null;
-      }
+    if (!tabContainer || !tabContainer.selectedTab) {
+      return this._firstOrLastTabOfDesktop(desktop, direction);
     }
 
     const selectedTab = tabContainer.selectedTab;
-    const tabs = sameDesktop
-      ? desktop.tabs.filter((t) => !t.tab.isClosed).map((t) => ({ ...t, desktop }))
-      : this.tabs;
-    const currentIndex = tabs.findIndex(
-      (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
-    );
 
-    let newIndex: number;
+    const nextTabInContainer =
+      direction === 'next'
+        ? tabContainer.getNextTab(selectedTab.id)
+        : tabContainer.getPrevTab(selectedTab.id);
+    if (nextTabInContainer) {
+      return { desktop, tabContainer, tab: nextTabInContainer };
+    }
 
     if (direction === 'next') {
-      newIndex = (currentIndex + 1) % tabs.length;
+      const childJump = this._firstTabOfChildOf(desktop, selectedTab.id);
+      if (childJump) {
+        return childJump;
+      }
+      const siblingJump = this._nextSiblingContainerOf(tabContainer, desktop);
+      if (siblingJump) {
+        return siblingJump;
+      }
     } else {
-      newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      const parentJump = this._parentTabOf(tabContainer, desktop);
+      if (parentJump) {
+        return parentJump;
+      }
+      const siblingJump = this._prevSiblingContainerOf(tabContainer, desktop);
+      if (siblingJump) {
+        return siblingJump;
+      }
     }
 
-    const result = tabs[newIndex];
-    if (result) {
-      return result;
-    }
+    return this._wrapAroundTopLevel(desktop, tabContainer, direction);
+  }
 
+  private _firstTabOfChildOf(desktop: Desktop, parentTabId: TTabId): IDesConTab | null {
+    const childContainers = desktop.tabContainers.filter(
+      (tc) =>
+        tc.parentTab !== null &&
+        tc.parentTab.id === parentTabId &&
+        !tc.isClosed &&
+        tc.tabs.length > 0,
+    );
+    if (childContainers.length === 0) {
+      return null;
+    }
+    const firstChild = childContainers[0];
+    return { desktop, tabContainer: firstChild, tab: firstChild.tabs[0] };
+  }
+
+  private _nextSiblingContainerOf(tabContainer: TabContainer, desktop: Desktop): IDesConTab | null {
+    const parentTab = tabContainer.parentTab;
+    if (parentTab === null) {
+      return null;
+    }
+    const siblings = desktop.tabContainers.filter(
+      (tc) =>
+        tc.parentTab !== null &&
+        tc.parentTab.id === parentTab.id &&
+        !tc.isClosed &&
+        tc.tabs.length > 0,
+    );
+    const currentIdx = siblings.findIndex((tc) => tc.id === tabContainer.id);
+    if (currentIdx === -1 || currentIdx + 1 >= siblings.length) {
+      return null;
+    }
+    const nextSibling = siblings[currentIdx + 1];
+    return { desktop, tabContainer: nextSibling, tab: nextSibling.tabs[0] };
+  }
+
+  private _prevSiblingContainerOf(tabContainer: TabContainer, desktop: Desktop): IDesConTab | null {
+    const parentTab = tabContainer.parentTab;
+    if (parentTab === null) {
+      return null;
+    }
+    const siblings = desktop.tabContainers.filter(
+      (tc) =>
+        tc.parentTab !== null &&
+        tc.parentTab.id === parentTab.id &&
+        !tc.isClosed &&
+        tc.tabs.length > 0,
+    );
+    const currentIdx = siblings.findIndex((tc) => tc.id === tabContainer.id);
+    if (currentIdx <= 0) {
+      return null;
+    }
+    const prevSibling = siblings[currentIdx - 1];
+    return {
+      desktop,
+      tabContainer: prevSibling,
+      tab: prevSibling.tabs[prevSibling.tabs.length - 1],
+    };
+  }
+
+  private _parentTabOf(tabContainer: TabContainer, desktop: Desktop): IDesConTab | null {
+    const parentTab = tabContainer.parentTab;
+    if (parentTab === null) {
+      return null;
+    }
+    for (const tc of desktop.tabContainers) {
+      const t = tc.getTab(parentTab.id);
+      if (t) {
+        return { desktop, tabContainer: tc, tab: t };
+      }
+    }
     return null;
+  }
+
+  private _wrapAroundTopLevel(
+    desktop: Desktop,
+    tabContainer: TabContainer,
+    direction: 'next' | 'prev',
+  ): IDesConTab | null {
+    const topLevelContainers = desktop.tabContainers.filter(
+      (tc) => tc.parentTab === null && !tc.isClosed && tc.tabs.length > 0,
+    );
+    if (topLevelContainers.length === 0) {
+      return null;
+    }
+
+    let contextTc: TabContainer | null = tabContainer;
+    while (contextTc.parentTab !== null) {
+      const parentId = contextTc.parentTab.id;
+      let found: TabContainer | null = null;
+      for (const tc of desktop.tabContainers) {
+        if (tc.tabs.some((t) => t.id === parentId)) {
+          found = tc;
+          break;
+        }
+      }
+      if (found === null) {
+        break;
+      }
+      contextTc = found;
+    }
+
+    const currentIdx = topLevelContainers.findIndex((tc) => tc.id === contextTc!.id);
+    if (currentIdx === -1) {
+      return null;
+    }
+
+    const step = direction === 'next' ? 1 : -1;
+    for (let i = 1; i <= topLevelContainers.length; i++) {
+      const idx = (currentIdx + step * i + topLevelContainers.length) % topLevelContainers.length;
+      const candidate = topLevelContainers[idx];
+      const targetTab =
+        direction === 'next' ? candidate.tabs[0] : candidate.tabs[candidate.tabs.length - 1];
+      if (targetTab) {
+        return { desktop, tabContainer: candidate, tab: targetTab };
+      }
+    }
+    return null;
+  }
+
+  private _firstOrLastTabOfDesktop(
+    desktop: Desktop,
+    direction: 'next' | 'prev',
+  ): IDesConTab | null {
+    const containers = desktop.tabContainers.filter(
+      (tc) => tc.parentTab === null && !tc.isClosed && tc.tabs.length > 0,
+    );
+    if (containers.length === 0) {
+      return null;
+    }
+    const targetContainer =
+      direction === 'next' ? containers[0] : containers[containers.length - 1];
+    const targetTab =
+      direction === 'next'
+        ? targetContainer.tabs[0]
+        : targetContainer.tabs[targetContainer.tabs.length - 1];
+    if (!targetTab) {
+      return null;
+    }
+    return { desktop, tabContainer: targetContainer, tab: targetTab };
   }
 
   openClosedTab(tabId: TTabId) {
@@ -219,6 +358,10 @@ export class Window extends UIWindow {
     }
 
     tab.tab.resume();
+    tab.tabContainer.includeTabInOrder(tab.tab.id);
+    if (!tab.tabContainer.isClosed) {
+      tab.desktop.includeTabContainerInOrder(tab.tabContainer.id);
+    }
 
     this.addView(tab.tab);
 
@@ -227,11 +370,11 @@ export class Window extends UIWindow {
     this.browser.eventsChannel.emit('window:tab-did-resume', this, tab.tab);
   }
 
-  async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {
+  async selectTab(target: 'next' | 'prev' | TTabId) {
     this.renderViews();
 
     if (target === 'next' || target === 'prev') {
-      const conTab = this.getNextOrPreviousTabOfActiveDesktop(target, opts);
+      const conTab = this.getNextOrPreviousTabOfActiveDesktop(target);
       if (conTab) {
         await this.selectTab(conTab.tab.id);
       }

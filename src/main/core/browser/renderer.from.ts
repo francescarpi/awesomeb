@@ -177,6 +177,7 @@ export class BrowserRenderer {
     for (const desktop of window.desktops) {
       let shortcutCounter = 0;
       const selectedTabContainer = desktop.selectedTabContainer;
+      let position = 0;
       for (const tc of desktop.tabContainers) {
         let shortcut: number | null = null;
         if (tc.parentTab === null && shortcutCounter < 9 && !tc.isClosed) {
@@ -191,16 +192,25 @@ export class BrowserRenderer {
           selected: selectedTabContainer?.id === tc.id,
           divider: tc.divider,
           isClosed: tc.isClosed,
-          tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+          tabs: tc.tabs.map((tab, tabIndex) =>
+            this.tab(window, desktop, selectedTabContainer, tab, tabIndex),
+          ),
           isSplit: tc.hasSplitTabs,
           parentTabId: tc.parentTab?.id ?? null,
+          position: position++,
         });
       }
     }
     return tabContainers;
   }
 
-  tab(window: Window, desktop: Desktop, selectedTabContainer: TabContainer | null, tab: Tab): ITab {
+  tab(
+    window: Window,
+    desktop: Desktop,
+    selectedTabContainer: TabContainer | null,
+    tab: Tab,
+    position = 0,
+  ): ITab {
     return {
       id: tab.id,
       desktopId: desktop.id,
@@ -220,6 +230,7 @@ export class BrowserRenderer {
       isMuted: tab.isMuted,
       favicon: tab.favicon,
       isClosed: tab.isClosed,
+      position,
     };
   }
 

@@ -10,6 +10,6 @@ export const Command: ICommand<ICommandParams> = {
   description: 'Switch to the next tab in the current window',
   visibility: ({ window }) => !!window,
   async handler({ window }) {
-    window.selectTab('next', { sameDesktop: true });
+    window.selectTab('next');
   },
 };

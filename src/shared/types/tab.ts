@@ -14,6 +14,7 @@ export interface ITabContainer {
   isClosed: boolean;
   isSplit: boolean;
   parentTabId: number | null;
+  position: number;
 }
 
 export interface ITab {
@@ -31,6 +32,7 @@ export interface ITab {
   isMuted: boolean;
   favicon: string | null;
   isClosed: boolean;
+  position: number;
 }
 
 export interface ITabPartition {
