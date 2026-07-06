@@ -169,8 +169,18 @@ export class OrderIndex<TId extends number | string> {
     if (id === targetId || !this._nodes.has(id) || !this._nodes.has(targetId)) {
       return;
     }
+    const targetNode = this._nodes.get(targetId)!;
+    const nextOfTarget = targetNode.next;
     this.remove(id);
-    this.add(id, targetId);
+    this._nodes.set(id, { prev: targetId, next: nextOfTarget });
+    this._nodes.get(targetId)!.next = id;
+    if (nextOfTarget !== null) {
+      this._nodes.get(nextOfTarget)!.prev = id;
+    } else {
+      this._tail = id;
+    }
+    this._firstActive = this._nextNonExcluded(this._head);
+    this._lastActive = this._prevNonExcluded(this._tail);
   }
 
   moveBefore(id: TId, targetId: TId): void {
@@ -188,8 +198,12 @@ export class OrderIndex<TId extends number | string> {
         this._firstActive = id;
       }
     } else {
-      this.add(id, prevOfTarget);
+      this._nodes.set(id, { prev: prevOfTarget, next: targetId });
+      this._nodes.get(prevOfTarget)!.next = id;
+      this._nodes.get(targetId)!.prev = id;
     }
+    this._firstActive = this._nextNonExcluded(this._head);
+    this._lastActive = this._prevNonExcluded(this._tail);
   }
 
   move(id: TId, direction: 'up' | 'down', opts?: { skipExcluded?: boolean }): void {

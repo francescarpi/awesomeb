@@ -328,6 +328,34 @@ describe('OrderIndex', () => {
       expect(idx.first).toBe(3);
     });
 
+    test('moveBefore places id immediately before target even when its predecessor is excluded', () => {
+      const idx = new OrderIndex<number>();
+      idx.add(1);
+      idx.add(2);
+      idx.add(3);
+      idx.add(4);
+      idx.exclude(2);
+      // Move 4 before 3. 2 (predecessor of 3) is excluded — the move must
+      // still place 4 between 2 and 3, not append it to the tail.
+      idx.moveBefore(4, 3);
+      expect(idx.toArray({ includeExcluded: true })).toEqual([1, 2, 4, 3]);
+      expect(idx.toArray()).toEqual([1, 4, 3]);
+    });
+
+    test('moveAfter places id immediately after target even when its successor is excluded', () => {
+      const idx = new OrderIndex<number>();
+      idx.add(1);
+      idx.add(2);
+      idx.add(3);
+      idx.add(4);
+      idx.exclude(3);
+      // Move 1 after 2. 3 (successor of 2) is excluded — the move must
+      // still place 1 between 2 and 3, not append it to the tail.
+      idx.moveAfter(1, 2);
+      expect(idx.toArray({ includeExcluded: true })).toEqual([2, 1, 3, 4]);
+      expect(idx.toArray()).toEqual([2, 1, 4]);
+    });
+
     test('moveAfter when target is last moves id to the very end', () => {
       const idx = new OrderIndex<number>();
       idx.add(1);
