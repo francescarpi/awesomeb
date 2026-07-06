@@ -19,6 +19,16 @@ describe('OrderIndex', () => {
     expect(idx.toArray()).toEqual([1, 4, 2, 3]);
   });
 
+  test('add with justAfter in the middle keeps last pointing at the actual tail', () => {
+    const idx = new OrderIndex<number>();
+    idx.add(1);
+    idx.add(2);
+    idx.add(3);
+    idx.add(4, 1);
+    expect(idx.last).toBe(3);
+    expect(idx.first).toBe(1);
+  });
+
   test('add with justAfter at the end appends after last', () => {
     const idx = new OrderIndex<number>();
     idx.add(1);

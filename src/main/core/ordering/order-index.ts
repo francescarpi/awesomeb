@@ -39,7 +39,9 @@ export class OrderIndex<TId extends number | string> {
     if (this._firstActive === null) {
       this._firstActive = id;
     }
-    this._lastActive = id;
+    if (this._tail === id) {
+      this._lastActive = id;
+    }
   }
 
   remove(id: TId): void {

@@ -650,5 +650,140 @@ describe('Session', () => {
       expect(persistedTcs[0].position).toBe(0);
       expect(persistedTcs[1].position).toBe(1);
     });
+
+    test('restores tab containers and tabs in position order even if persisted array is unsorted', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 30,
+                      divider: false,
+                      parentTabId: null,
+                      position: 2,
+                      tabs: [
+                        {
+                          id: 304,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc3-tab-c.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 1,
+                        },
+                        {
+                          id: 301,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc3-tab-a.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                    {
+                      id: 10,
+                      divider: false,
+                      parentTabId: null,
+                      position: 0,
+                      tabs: [
+                        {
+                          id: 103,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc1-tab-c.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 2,
+                        },
+                        {
+                          id: 101,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc1-tab-a.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                        {
+                          id: 102,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc1-tab-b.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 1,
+                        },
+                      ],
+                    },
+                    {
+                      id: 20,
+                      divider: false,
+                      parentTabId: null,
+                      position: 1,
+                      tabs: [
+                        {
+                          id: 201,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://tc2-tab-a.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const desktop = freshBrowser.activeWindow!.getDesktop(1)!;
+      const restoredTcIds = desktop.tabContainers.map((tc) => tc.id);
+      expect(restoredTcIds).toEqual([10, 20, 30]);
+
+      const tc1 = desktop.tabContainers[0];
+      expect(tc1.tabs.map((t) => t.id)).toEqual([101, 102, 103]);
+
+      const tc2 = desktop.tabContainers[1];
+      expect(tc2.tabs.map((t) => t.id)).toEqual([201]);
+
+      const tc3 = desktop.tabContainers[2];
+      expect(tc3.tabs.map((t) => t.id)).toEqual([301, 304]);
+    });
   });
 });

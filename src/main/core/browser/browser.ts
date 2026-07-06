@@ -79,19 +79,30 @@ export class Browser {
         const desktop = newWindow.createDesktop(deskStore.id, { theme, shortName, longName });
         if (!desktop) continue;
 
-        for (let i = 0; i < deskStore.tabContainers.length; i++) {
-          const tabConStore = deskStore.tabContainers[i];
+        const sortedContainers = [...deskStore.tabContainers].sort((a, b) => {
+          const ap = typeof a.position === 'number' ? a.position : 0;
+          const bp = typeof b.position === 'number' ? b.position : 0;
+          return ap - bp;
+        });
+
+        for (let i = 0; i < sortedContainers.length; i++) {
+          const tabConStore = sortedContainers[i];
           const position = typeof tabConStore.position === 'number' ? tabConStore.position : i;
           const tabContainer = desktop.createTabContainer(tabConStore.id, {
             divider: tabConStore.divider,
-            justAfter: position > 0 ? deskStore.tabContainers[position - 1]?.id : undefined,
+            justAfter: position > 0 ? sortedContainers[position - 1]?.id : undefined,
           });
 
           this._indexTabContainer(newWindow, desktop, tabContainer);
 
-          for (let j = 0; j < tabConStore.tabs.length; j++) {
-            const tabStore = tabConStore.tabs[j];
-            const tabPosition = typeof tabStore.position === 'number' ? tabStore.position : j;
+          const sortedTabs = [...tabConStore.tabs].sort((a, b) => {
+            const ap = typeof a.position === 'number' ? a.position : 0;
+            const bp = typeof b.position === 'number' ? b.position : 0;
+            return ap - bp;
+          });
+
+          for (let j = 0; j < sortedTabs.length; j++) {
+            const tabStore = sortedTabs[j];
             const partition =
               tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
                 ? partitions.internal
@@ -106,10 +117,6 @@ export class Browser {
               closedAt: tabStore.closedAt,
               openTabsAsChild: tabStore.openTabsAsChild,
             });
-            tabContainer.addTab(
-              tab,
-              tabPosition > 0 ? tabConStore.tabs[tabPosition - 1]?.id : undefined,
-            );
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
           }
