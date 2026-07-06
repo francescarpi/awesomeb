@@ -131,6 +131,7 @@ export function parseTarget(
     });
     if (parentTab) {
       tabContainer.setParentTab(parentTab);
+      desktop.excludeTabContainerFromOrder(tabContainer.id);
     }
   }
 

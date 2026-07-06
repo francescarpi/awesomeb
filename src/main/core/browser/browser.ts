@@ -65,7 +65,11 @@ export class Browser {
       return;
     }
 
-    const pendingContainerParents: { tabContainer: TabContainer; parentTabId: number }[] = [];
+    const pendingContainerParents: {
+      tabContainer: TabContainer;
+      parentTabId: number;
+      desktop: Desktop;
+    }[] = [];
 
     for (const winStore of session.windows) {
       const newWindow = this.createWindow(winStore.id, {
@@ -122,7 +126,11 @@ export class Browser {
           }
 
           if (tabConStore.parentTabId !== null) {
-            pendingContainerParents.push({ tabContainer, parentTabId: tabConStore.parentTabId });
+            pendingContainerParents.push({
+              tabContainer,
+              parentTabId: tabConStore.parentTabId,
+              desktop,
+            });
           }
         }
       }
@@ -130,10 +138,11 @@ export class Browser {
       newWindow.selectDesktop(winStore.selectedDesktopId);
     }
 
-    for (const { tabContainer, parentTabId } of pendingContainerParents) {
+    for (const { tabContainer, parentTabId, desktop } of pendingContainerParents) {
       const parentResult = this.getTab(parentTabId);
       if (parentResult) {
         tabContainer.setParentTab(parentResult.tab);
+        desktop.excludeTabContainerFromOrder(tabContainer.id);
       } else {
         scopeLog.warn(
           `TabContainer ${tabContainer.id} references non-existent parent tab ${parentTabId}; treating as orphan`,
@@ -286,6 +295,7 @@ export class Browser {
 
     if (shouldSetParent && result && result.desktop === selectedTab!.desktop) {
       result.tabContainer.setParentTab(selectedTab!.tab);
+      result.desktop.excludeTabContainerFromOrder(result.tabContainer.id);
     }
 
     if (!result) {

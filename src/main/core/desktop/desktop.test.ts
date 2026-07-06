@@ -234,4 +234,176 @@ describe('Desktop', () => {
       expect(d.getTabContainerByIndex(2)).toBeNull();
     });
   });
+
+  describe('moveTabContainer with parent/child hierarchy', () => {
+    test('moving a top-level container up swaps with adjacent top-level only, ignoring children of neighbours', async () => {
+      window.selectDesktop(2);
+      const d = window.getDesktop(2)!;
+      const tc1 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+      const tc2 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+      const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+      parent1.tab.setOpenTabsAsChild(true);
+      const child1 = (await browser.openURL('http://child1.com'))!;
+      const child2 = (await browser.openURL('http://child2.com'))!;
+
+      // skipParent so opening parent2 doesn't auto-become a child of parent1
+      const parent2 = (await browser.openURL('http://parent2.com', {
+        selectTab: true,
+        skipParent: true,
+      }))!;
+      parent2.tab.setOpenTabsAsChild(true);
+
+      const tcParent1 = parent1.tabContainer;
+      const tcParent2 = parent2.tabContainer;
+      const tcChild1 = child1.tabContainer;
+      const tcChild2 = child2.tabContainer;
+
+      d.moveTabContainer(tcParent2.id, 'up');
+
+      // tcParent2 swaps with tcParent1; children stay attached to tcParent1
+      const topLevelIds = d.tabContainers.filter((tc) => tc.parentTab === null).map((tc) => tc.id);
+      expect(topLevelIds).toEqual([tc1.id, tc2.id, tcParent2.id, tcParent1.id]);
+
+      // Children still belong to parent1 and remain in their original sibling order
+      const child1Container = d.tabContainers.find((tc) => tc.id === tcChild1.id)!;
+      const child2Container = d.tabContainers.find((tc) => tc.id === tcChild2.id)!;
+      expect(child1Container.parentTab).toBe(parent1.tab);
+      expect(child2Container.parentTab).toBe(parent1.tab);
+    });
+
+    test('moving a child container up swaps with its previous sibling only', async () => {
+      window.selectDesktop(2);
+
+      const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+      parent1.tab.setOpenTabsAsChild(true);
+      const child1 = (await browser.openURL('http://child1-a.com'))!;
+      const child2 = (await browser.openURL('http://child1-b.com'))!;
+
+      const parent2 = (await browser.openURL('http://parent2.com', {
+        selectTab: true,
+        skipParent: true,
+      }))!;
+      parent2.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child2-a.com');
+
+      const tcChild1 = child1.tabContainer;
+      const tcChild2 = child2.tabContainer;
+      const tcParent1 = parent1.tabContainer;
+      const tcParent2 = parent2.tabContainer;
+
+      const d = window.getDesktop(2)!;
+      d.moveTabContainer(tcChild2.id, 'up');
+
+      const tcChild1After = d.tabContainers.find((tc) => tc.id === tcChild1.id)!;
+      const tcChild2After = d.tabContainers.find((tc) => tc.id === tcChild2.id)!;
+
+      // Child2 is now first sibling of parent1
+      expect(tcChild2After.parentTab).toBe(parent1.tab);
+      expect(tcChild1After.parentTab).toBe(parent1.tab);
+
+      // Verify by walking parent1's children in order via desktop.tabContainers
+      const siblingsOfParent1 = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent1.tab.id,
+      );
+      expect(siblingsOfParent1.map((tc) => tc.id)).toEqual([tcChild2.id, tcChild1.id]);
+
+      // Top-level containers untouched
+      const topLevelIds = d.tabContainers.filter((tc) => tc.parentTab === null).map((tc) => tc.id);
+      expect(topLevelIds).toEqual([tcParent1.id, tcParent2.id]);
+    });
+
+    test('moving a child container down swaps with its next sibling only', async () => {
+      window.selectDesktop(2);
+
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child1 = (await browser.openURL('http://child-a.com'))!;
+      const child2 = (await browser.openURL('http://child-b.com'))!;
+
+      const tcChild1 = child1.tabContainer;
+      const tcChild2 = child2.tabContainer;
+
+      const d = window.getDesktop(2)!;
+      d.moveTabContainer(tcChild1.id, 'down');
+
+      const siblings = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent.tab.id,
+      );
+      expect(siblings.map((tc) => tc.id)).toEqual([tcChild2.id, tcChild1.id]);
+    });
+
+    test('moving a child at the top up is a no-op (stays in place)', async () => {
+      window.selectDesktop(2);
+
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child1 = (await browser.openURL('http://child-a.com'))!;
+      await browser.openURL('http://child-b.com');
+
+      const tcChild1 = child1.tabContainer;
+
+      const d = window.getDesktop(2)!;
+      // Move child1 up: should be no-op since it's the first sibling
+      d.moveTabContainer(tcChild1.id, 'up');
+
+      const siblings = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent.tab.id,
+      );
+      expect(siblings.map((tc) => tc.id)[0]).toBe(tcChild1.id);
+    });
+
+    test('moving a child at the bottom down is a no-op (stays in place)', async () => {
+      window.selectDesktop(2);
+
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child-a.com');
+      const child2 = (await browser.openURL('http://child-b.com'))!;
+
+      const tcChild2 = child2.tabContainer;
+
+      const d = window.getDesktop(2)!;
+      d.moveTabContainer(tcChild2.id, 'down');
+
+      const siblings = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent.tab.id,
+      );
+      expect(siblings.map((tc) => tc.id).at(-1)).toBe(tcChild2.id);
+    });
+
+    test('moving a child does not cross into another parent', async () => {
+      window.selectDesktop(2);
+
+      const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+      parent1.tab.setOpenTabsAsChild(true);
+      const child1of1 = (await browser.openURL('http://child1of1.com'))!;
+
+      const parent2 = (await browser.openURL('http://parent2.com', {
+        selectTab: true,
+        skipParent: true,
+      }))!;
+      parent2.tab.setOpenTabsAsChild(true);
+      const child1of2 = (await browser.openURL('http://child1of2.com'))!;
+
+      const tcChild1of2 = child1of2.tabContainer;
+
+      const d = window.getDesktop(2)!;
+      d.moveTabContainer(tcChild1of2.id, 'up');
+
+      // child1of2 must still be a child of parent2, not of parent1
+      const tcChild1of2After = d.tabContainers.find((tc) => tc.id === tcChild1of2.id)!;
+      expect(tcChild1of2After.parentTab).toBe(parent2.tab);
+
+      const siblingsOfParent2 = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent2.tab.id,
+      );
+      expect(siblingsOfParent2.map((tc) => tc.id)).toEqual([tcChild1of2.id]);
+
+      const siblingsOfParent1 = d.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent1.tab.id,
+      );
+      expect(siblingsOfParent1.map((tc) => tc.id)).toEqual([child1of1.tabContainer.id]);
+    });
+  });
 });

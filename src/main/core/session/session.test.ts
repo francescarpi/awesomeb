@@ -785,5 +785,56 @@ describe('Session', () => {
       const tc3 = desktop.tabContainers[2];
       expect(tc3.tabs.map((t) => t.id)).toEqual([301, 304]);
     });
+
+    test('moveTabContainer preserves top-level order around children across save+reload', async () => {
+      browser.getWindow(1)!.selectDesktop(2);
+
+      // First top-level: openURL with skipParent so it lands as a top-level tab
+      const tc1Result = (await browser.openURL('http://tc1.com', { selectTab: true }))!;
+
+      const parent1 = (await browser.openURL('http://parent1.com', { selectTab: true }))!;
+      parent1.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child1a.com');
+      await browser.openURL('http://child1b.com');
+
+      const parent2 = (await browser.openURL('http://parent2.com', {
+        selectTab: true,
+        skipParent: true,
+      }))!;
+      parent2.tab.setOpenTabsAsChild(true);
+      await browser.openURL('http://child2a.com');
+
+      const desktop = browser.getWindow(1)!.getDesktop(2)!;
+      const tc1 = tc1Result.tabContainer;
+      const tcParent1 = parent1.tabContainer;
+      const tcParent2 = parent2.tabContainer;
+
+      // Top-level currently: [tc1, tcParent1, tcParent2]
+      desktop.moveTabContainer(tcParent2.id, 'up');
+      // Top-level now: [tc1, tcParent2, tcParent1]
+
+      const session = new Session(browser);
+      await session.save();
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const restoredDesktop = freshBrowser.getWindow(1)!.getDesktop(2)!;
+      const topLevelIds = restoredDesktop.tabContainers
+        .filter((tc) => tc.parentTab === null)
+        .map((tc) => tc.id);
+      expect(topLevelIds).toEqual([tc1.id, tcParent2.id, tcParent1.id]);
+
+      // Each parent still owns its original children
+      const childrenOfParent1 = restoredDesktop.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent1.tab.id,
+      );
+      expect(childrenOfParent1.length).toBe(2);
+
+      const childrenOfParent2 = restoredDesktop.tabContainers.filter(
+        (tc) => tc.parentTab !== null && tc.parentTab.id === parent2.tab.id,
+      );
+      expect(childrenOfParent2.length).toBe(1);
+    });
   });
 });

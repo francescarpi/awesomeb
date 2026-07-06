@@ -214,10 +214,34 @@ export class Desktop {
   }
 
   moveTabContainer(id: TTabContainerId, direction: 'up' | 'down') {
-    if (!this._tabContainers.has(id)) {
+    const tc = this._tabContainers.get(id);
+    if (!tc) {
       return;
     }
-    this._tabContainerOrder.move(id, direction, { skipExcluded: true });
+
+    if (tc.parentTab === null) {
+      this._tabContainerOrder.move(id, direction, { skipExcluded: true });
+    } else {
+      const parentId = tc.parentTab.id;
+      const siblings = this.tabContainers.filter(
+        (other) => other.parentTab !== null && other.parentTab.id === parentId,
+      );
+      const currentIdx = siblings.findIndex((s) => s.id === id);
+      if (currentIdx === -1) {
+        return;
+      }
+      const targetIdx = direction === 'up' ? currentIdx - 1 : currentIdx + 1;
+      if (targetIdx < 0 || targetIdx >= siblings.length) {
+        return;
+      }
+      const target = siblings[targetIdx];
+      if (direction === 'up') {
+        this._tabContainerOrder.moveBefore(id, target.id);
+      } else {
+        this._tabContainerOrder.moveAfter(id, target.id);
+      }
+    }
+
     this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
   }
 
