@@ -507,21 +507,6 @@ describe('Browser', () => {
       }
     });
 
-    test('closing parent closes entire subtree (grandchildren too)', async () => {
-      browser.createWindow(1, { withDesktops: true });
-      const grandparent = (await browser.openURL('http://gp.com', { selectTab: true }))!;
-      grandparent.tab.setOpenTabsAsChild(true);
-      const child = (await browser.openURL('http://child.com', { selectTab: true }))!;
-      child.tab.setOpenTabsAsChild(true);
-      const grandchild = (await browser.openURL('http://grandchild.com'))!;
-
-      await browser.closeTab(grandparent.tab.id);
-
-      expect(grandparent.tab.isClosed).toBe(true);
-      expect(child.tab.isClosed).toBe(true);
-      expect(grandchild.tab.isClosed).toBe(true);
-    });
-
     test('closing a non-parent tab does not cascade', async () => {
       browser.createWindow(1, { withDesktops: true });
       const unrelated1 = (await browser.openURL('http://u1.com'))!;
@@ -637,6 +622,24 @@ describe('Browser', () => {
 
       expect(newTab).not.toBeNull();
       expect(newTab!.tab.openTabsAsChild).toBe(false);
+    });
+
+    test('child tab with openTabsAsChild=true does not produce a grandchild', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+
+      // Force the degenerate state described in the issue: even if a child
+      // somehow has openTabsAsChild=true, opening a tab from it must not
+      // turn that tab into a grandchild.
+      child.tab.setOpenTabsAsChild(true);
+      await browser.activeWindow!.selectTab(child.tab.id);
+
+      const grandchildAttempt = await browser.openURL('http://grandchild.com');
+
+      expect(grandchildAttempt).not.toBeNull();
+      expect(grandchildAttempt!.tabContainer.parentTab).toBeNull();
     });
   });
 

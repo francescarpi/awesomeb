@@ -169,6 +169,7 @@ export class OrderIndex<TId extends number | string> {
     if (id === targetId || !this._nodes.has(id) || !this._nodes.has(targetId)) {
       return;
     }
+    const wasExcluded = this._excluded.has(id);
     const targetNode = this._nodes.get(targetId)!;
     const nextOfTarget = targetNode.next;
     this.remove(id);
@@ -179,6 +180,9 @@ export class OrderIndex<TId extends number | string> {
     } else {
       this._tail = id;
     }
+    if (wasExcluded) {
+      this._excluded.add(id);
+    }
     this._firstActive = this._nextNonExcluded(this._head);
     this._lastActive = this._prevNonExcluded(this._tail);
   }
@@ -187,20 +191,30 @@ export class OrderIndex<TId extends number | string> {
     if (id === targetId || !this._nodes.has(id) || !this._nodes.has(targetId)) {
       return;
     }
+    const wasExcluded = this._excluded.has(id);
     const targetNode = this._nodes.get(targetId)!;
     const prevOfTarget = targetNode.prev;
+    // Degenerate: id is already the physical predecessor of targetId, so
+    // the move is a no-op. Bail out before remove() to avoid corrupting
+    // the linked list.
+    if (prevOfTarget === id) {
+      return;
+    }
     this.remove(id);
     if (prevOfTarget === null) {
       this._nodes.set(id, { prev: null, next: targetId });
       this._nodes.get(targetId)!.prev = id;
       this._head = id;
-      if (!this._excluded.has(id)) {
+      if (!wasExcluded) {
         this._firstActive = id;
       }
     } else {
       this._nodes.set(id, { prev: prevOfTarget, next: targetId });
       this._nodes.get(prevOfTarget)!.next = id;
       this._nodes.get(targetId)!.prev = id;
+    }
+    if (wasExcluded) {
+      this._excluded.add(id);
     }
     this._firstActive = this._nextNonExcluded(this._head);
     this._lastActive = this._prevNonExcluded(this._tail);

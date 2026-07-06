@@ -292,7 +292,11 @@ export class Browser {
       return selectedTab;
     }
 
-    const shouldSetParent = !props?.skipParent && selectedTab && selectedTab.tab.openTabsAsChild;
+    const shouldSetParent =
+      !props?.skipParent &&
+      selectedTab &&
+      selectedTab.tab.openTabsAsChild &&
+      selectedTab.tabContainer.parentTab === null;
 
     const result = parseTarget(this, {
       targetId: props?.targetId,

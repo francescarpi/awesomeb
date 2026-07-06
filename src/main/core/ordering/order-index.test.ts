@@ -356,6 +356,36 @@ describe('OrderIndex', () => {
       expect(idx.toArray()).toEqual([2, 1, 4]);
     });
 
+    test('moveBefore preserves excluded state of the moved id', () => {
+      const idx = new OrderIndex<number>();
+      idx.add(1);
+      idx.add(2);
+      idx.add(3);
+      idx.add(4);
+      idx.exclude(2);
+      // Move 2 before 4. 2 is excluded; the move must place it physically
+      // before 4 (not append at the tail) AND keep it excluded.
+      idx.moveBefore(2, 4);
+      expect(idx.isExcluded(2)).toBe(true);
+      expect(idx.toArray({ includeExcluded: true })).toEqual([1, 3, 2, 4]);
+      expect(idx.toArray()).toEqual([1, 3, 4]);
+    });
+
+    test('moveAfter preserves excluded state of the moved id', () => {
+      const idx = new OrderIndex<number>();
+      idx.add(1);
+      idx.add(2);
+      idx.add(3);
+      idx.add(4);
+      idx.exclude(3);
+      // Move 3 after 1. 3 is excluded; the move must place it physically
+      // after 1 (not at the tail) AND keep it excluded.
+      idx.moveAfter(3, 1);
+      expect(idx.isExcluded(3)).toBe(true);
+      expect(idx.toArray({ includeExcluded: true })).toEqual([1, 3, 2, 4]);
+      expect(idx.toArray()).toEqual([1, 2, 4]);
+    });
+
     test('moveAfter when target is last moves id to the very end', () => {
       const idx = new OrderIndex<number>();
       idx.add(1);

@@ -377,6 +377,35 @@ describe('Commands', () => {
 
       expect(true).toBe(true);
     });
+
+    test('tab-toggle-open-tabs-as-child: is not visible on a child tab', async () => {
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+      expect(child.tabContainer.parentTab).toBe(parent.tab);
+
+      const visibility = tabToggleOpenTabsAsChild.Command.visibility!({
+        tab: child,
+        tabContainer: child.tabContainer,
+      } as never);
+      expect(visibility).toBe(false);
+    });
+
+    test('tab-toggle-open-tabs-as-child: handler is a no-op on a child tab', async () => {
+      const window = browser.activeWindow!;
+      const parent = (await browser.openURL('http://parent.com', { selectTab: true }))!;
+      parent.tab.setOpenTabsAsChild(true);
+      const child = (await browser.openURL('http://child.com'))!;
+
+      // Force the flag on to simulate the degenerate state — the handler
+      // must still refuse to flip it from a child tab.
+      child.tab.setOpenTabsAsChild(true);
+      await window.selectTab(child.tab.id);
+
+      await browser.performCommand(window, tabToggleOpenTabsAsChild.TRIGGER);
+
+      expect(child.tab.openTabsAsChild).toBe(true);
+    });
   });
 
   describe('Tab Container Commands', () => {
