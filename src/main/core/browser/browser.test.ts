@@ -639,4 +639,34 @@ describe('Browser', () => {
       expect(newTab!.tab.openTabsAsChild).toBe(false);
     });
   });
+
+  describe('TabContainer.getNextTab / getPrevTab skip excluded (closed) tabs', () => {
+    test('getNextTab skips closed tabs', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const t1 = (await browser.openURL('http://t1.com', { selectTab: true }))!;
+      const t2 = (await browser.openURL('http://t2.com', { targetId: 'split-tab' }))!;
+      const t3 = (await browser.openURL('http://t3.com', { targetId: 'split-tab' }))!;
+
+      const tc = t1.tabContainer;
+      expect(tc.tabs.map((t) => t.id)).toEqual([t1.tab.id, t2.tab.id, t3.tab.id]);
+
+      // Close t2 — should be excluded from order, not returned by getNextTab
+      await browser.closeTab(t2.tab.id);
+
+      expect(tc.getNextTab(t1.tab.id)?.id).toBe(t3.tab.id);
+    });
+
+    test('getPrevTab skips closed tabs', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const t1 = (await browser.openURL('http://t1.com', { selectTab: true }))!;
+      const t2 = (await browser.openURL('http://t2.com', { targetId: 'split-tab' }))!;
+      const t3 = (await browser.openURL('http://t3.com', { targetId: 'split-tab' }))!;
+
+      const tc = t1.tabContainer;
+
+      await browser.closeTab(t2.tab.id);
+
+      expect(tc.getPrevTab(t3.tab.id)?.id).toBe(t1.tab.id);
+    });
+  });
 });

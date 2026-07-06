@@ -192,12 +192,12 @@ export class TabContainer {
   }
 
   getNextTab(id: TTabId): Tab | null {
-    const nextId = this._tabOrder.getNext(id);
+    const nextId = this._tabOrder.getNext(id, { skipExcluded: true });
     return nextId !== null ? this._tabs.get(nextId) || null : null;
   }
 
   getPrevTab(id: TTabId): Tab | null {
-    const prevId = this._tabOrder.getPrev(id);
+    const prevId = this._tabOrder.getPrev(id, { skipExcluded: true });
     return prevId !== null ? this._tabs.get(prevId) || null : null;
   }
 

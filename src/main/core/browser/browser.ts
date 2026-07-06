@@ -91,10 +91,9 @@ export class Browser {
 
         for (let i = 0; i < sortedContainers.length; i++) {
           const tabConStore = sortedContainers[i];
-          const position = typeof tabConStore.position === 'number' ? tabConStore.position : i;
           const tabContainer = desktop.createTabContainer(tabConStore.id, {
             divider: tabConStore.divider,
-            justAfter: position > 0 ? sortedContainers[position - 1]?.id : undefined,
+            justAfter: i > 0 ? sortedContainers[i - 1]?.id : undefined,
           });
 
           this._indexTabContainer(newWindow, desktop, tabContainer);
@@ -123,6 +122,14 @@ export class Browser {
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);
+
+            if (tab.isClosed) {
+              tabContainer.excludeTabFromOrder(tab.id);
+            }
+          }
+
+          if (tabContainer.isClosed) {
+            desktop.excludeTabContainerFromOrder(tabContainer.id);
           }
 
           if (tabConStore.parentTabId !== null) {

@@ -836,5 +836,200 @@ describe('Session', () => {
       );
       expect(childrenOfParent2.length).toBe(1);
     });
+
+    test('restores order correctly when position is sparse (non-contiguous)', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 10,
+                      divider: false,
+                      parentTabId: null,
+                      position: 5,
+                      tabs: [
+                        {
+                          id: 101,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://a.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                    {
+                      id: 20,
+                      divider: false,
+                      parentTabId: null,
+                      position: 0,
+                      tabs: [
+                        {
+                          id: 201,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://b.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                    {
+                      id: 30,
+                      divider: false,
+                      parentTabId: null,
+                      position: 3,
+                      tabs: [
+                        {
+                          id: 301,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://c.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const desktop = freshBrowser.activeWindow!.getDesktop(1)!;
+      const topLevelIds = desktop.tabContainers
+        .filter((tc) => tc.parentTab === null)
+        .map((tc) => tc.id);
+      // Order must follow the sorted position (0, 3, 5) -> [20, 30, 10],
+      // NOT the literal position value used as an index.
+      expect(topLevelIds).toEqual([20, 30, 10]);
+    });
+
+    test('restores closed tabs and fully-closed containers as excluded from OrderIndex', async () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      parentTabId: null,
+                      position: 0,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://open1.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                        {
+                          id: 2,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://closed1.com',
+                          favicon: null,
+                          closedAt: 1700000000000,
+                          openTabsAsChild: false,
+                          position: 1,
+                        },
+                      ],
+                    },
+                    {
+                      id: 2,
+                      divider: false,
+                      parentTabId: null,
+                      position: 1,
+                      tabs: [
+                        {
+                          id: 3,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://all-closed.com',
+                          favicon: null,
+                          closedAt: 1700000000000,
+                          openTabsAsChild: false,
+                          position: 0,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const freshBrowser = new Browser();
+      await freshBrowser.loadSession();
+
+      const desktop = freshBrowser.activeWindow!.getDesktop(1)!;
+      const tc1 = desktop.tabContainers.find((tc) => tc.id === 1)!;
+      const tc2 = desktop.tabContainers.find((tc) => tc.id === 2)!;
+
+      const tab1 = tc1.tabs.find((t) => t.id === 1)!;
+      const tab2 = tc1.tabs.find((t) => t.id === 2)!;
+
+      // Closed tab is skipped in getNextTab / getPrevTab
+      expect(tab2.isClosed).toBe(true);
+      expect(tc1.getNextTab(tab1.id)).toBeNull();
+      expect(tc1.getPrevTab(tab1.id)).toBeNull();
+
+      // Fully-closed container is not counted by getTabContainerByIndex
+      expect(tc2.isClosed).toBe(true);
+      expect(desktop.getTabContainerByIndex(0)).toBe(tc1);
+      expect(desktop.getTabContainerByIndex(1)).toBeNull();
+    });
   });
 });

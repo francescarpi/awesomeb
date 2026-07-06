@@ -145,9 +145,7 @@ export class OrderIndex<TId extends number | string> {
     }
 
     this._excluded.delete(id);
-    if (this._firstActive === null) {
-      this._firstActive = this._nextNonExcluded(this._head);
-    }
+    this._firstActive = this._nextNonExcluded(this._head);
     this._lastActive = this._prevNonExcluded(this._tail);
   }
 

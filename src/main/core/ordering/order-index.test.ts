@@ -246,6 +246,20 @@ describe('OrderIndex', () => {
       expect(idx.toArray()).toEqual([1, 2, 3]);
     });
 
+    test('re-include of the head element restores first pointing at the head', () => {
+      const idx = new OrderIndex<number>();
+      idx.add(1);
+      idx.add(2);
+      idx.add(3);
+      // Exclude the head: first should now point at 2
+      idx.exclude(1);
+      expect(idx.first).toBe(2);
+      // Re-include the head: first must now point at 1 again
+      idx.include(1);
+      expect(idx.first).toBe(1);
+      expect(idx.toArray()).toEqual([1, 2, 3]);
+    });
+
     test('include with justAfter inserts at specified position', () => {
       const idx = new OrderIndex<number>();
       idx.add(1);
