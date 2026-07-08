@@ -12,4 +12,4 @@ export const settingsMenuItems = [
   { name: 'Shortcuts', hash: ['#/shortcuts'], rendererFnc: renderShortcutsPage },
 ];
 
-export const RETENTION_OPTIONS = [7, 15, 30, 60, 90];
+export const RETENTION_OPTIONS = [1, 2, 3, 7, 15, 30, 60, 90];
