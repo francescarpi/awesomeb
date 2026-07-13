@@ -97,6 +97,7 @@ export class Browser {
               url: tabStore.url,
               favicon: tabStore.favicon,
               closedAt: tabStore.closedAt,
+              openTabsAsChild: tabStore.openTabsAsChild,
             });
 
             this._indexTab(newWindow, desktop, tabContainer, tab);

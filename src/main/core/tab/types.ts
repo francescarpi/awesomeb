@@ -17,6 +17,7 @@ export interface ITabProps {
   parent?: Tab;
   favicon?: string | null;
   closedAt?: number | null;
+  openTabsAsChild?: boolean;
 }
 
 export type TBasicAuthCallback = (username?: string, password?: string) => void;

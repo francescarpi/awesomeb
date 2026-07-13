@@ -157,9 +157,9 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       {
         label: 'Open all tabs as a child of...',
         type: 'checkbox',
-        // checked: tab.openTabsAsChild,
+        checked: tab.openTabsAsChild,
         click: async () => {
-          // await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
+          await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
         },
       },
     ];

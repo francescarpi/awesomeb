@@ -18,6 +18,7 @@ export const SessionTabScheme = z
     url: z.string().nullable(),
     favicon: z.string().nullable(),
     closedAt: z.number().nullable(),
+    openTabsAsChild: z.boolean().default(false),
   })
   .strict();
 

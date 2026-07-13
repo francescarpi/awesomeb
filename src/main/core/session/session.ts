@@ -53,7 +53,6 @@ export class Session extends Store<ISessionStore> {
           .map((tabContainer) => ({
             id: tabContainer.id,
             divider: tabContainer.divider,
-            // layout: tabContainer.layout,
             tabs: tabContainer.tabs
               .filter((tab) => !tab.partition.private)
               .map((tab) => ({
@@ -64,6 +63,7 @@ export class Session extends Store<ISessionStore> {
                 url: tab.url,
                 favicon: tab.favicon,
                 closedAt: tab.closedAt,
+                openTabsAsChild: tab.openTabsAsChild,
               })),
           }))
           .filter((tabContainer) => tabContainer.tabs.length > 0);

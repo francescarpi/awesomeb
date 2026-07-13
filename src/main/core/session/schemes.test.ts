@@ -24,6 +24,7 @@ const validSessionTab = {
   url: 'https://example.com',
   favicon: null,
   closedAt: null,
+  openTabsAsChild: false,
 };
 
 const validSessionTabContainer = {
