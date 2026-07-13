@@ -7,7 +7,7 @@ import { createColorImage } from '@/utils';
 export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   const { tab, window, tabContainer, desktop } = tabInfo;
 
-  const menu = Menu.buildFromTemplate([
+  let menu: MenuItemConstructorOptions[] = [
     {
       label: 'Reload',
       enabled: !tab.loading && !tab.suspended,
@@ -148,9 +148,24 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         browser.performCommand(window, 'remove-all-dividers', { desktopId: desktop.id });
       },
     },
-  ]);
+  ];
 
-  return menu;
+  if (tabContainer.parent === null) {
+    menu = [
+      ...menu,
+      { type: 'separator' },
+      {
+        label: 'Open all tabs as a child of...',
+        type: 'checkbox',
+        // checked: tab.openTabsAsChild,
+        click: async () => {
+          // await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
+        },
+      },
+    ];
+  }
+
+  return Menu.buildFromTemplate(menu);
 }
 
 function bookmarkFolderOptions(

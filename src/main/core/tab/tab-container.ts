@@ -11,6 +11,9 @@ export class TabContainer {
   private _layout: LayoutBase = Layouts['vertical'];
   private _layoutSize: number = 50;
 
+  private readonly _children: Map<TTabContainerId, TabContainer> = new Map();
+  private _parent: TabContainer | null = null;
+
   constructor(
     public readonly browser: Browser,
     public readonly id: TTabContainerId,
@@ -175,5 +178,21 @@ export class TabContainer {
   getVisibleTabPosition(tabId: TTabId): number {
     const tabsArray = this.visibleTabs;
     return tabsArray.findIndex((tab) => tab.id === tabId) + 1;
+  }
+
+  get children(): TabContainer[] {
+    return Array.from(this._children.values());
+  }
+
+  addChild(tabContainer: TabContainer) {
+    this._children.set(tabContainer.id, tabContainer);
+  }
+
+  setParent(tabContainer: TabContainer | null) {
+    this._parent = tabContainer;
+  }
+
+  get parent(): TabContainer | null {
+    return this._parent;
   }
 }
