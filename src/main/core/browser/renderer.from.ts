@@ -193,6 +193,14 @@ export class BrowserRenderer {
           isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
           isSplit: tc.hasSplitTabs,
+          children: tc.children.map((tcc) => ({
+            id: tcc.id,
+            selected: selectedTabContainer?.id === tcc.id,
+            tabs: tcc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+            desktopId: desktop.id,
+            isClosed: tcc.isClosed,
+            isSplit: tcc.hasSplitTabs,
+          })),
         });
       }
     }

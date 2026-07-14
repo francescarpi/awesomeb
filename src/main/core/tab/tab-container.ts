@@ -184,6 +184,10 @@ export class TabContainer {
     return Array.from(this._children.values());
   }
 
+  removeChild(tabContainerId: TTabContainerId) {
+    this._children.delete(tabContainerId);
+  }
+
   addChild(tabContainer: TabContainer) {
     this._children.set(tabContainer.id, tabContainer);
   }

@@ -172,10 +172,14 @@ export function createWindowByTarget(
 export function windowOpenHadler(
   browser: Browser,
   details: HandlerDetails,
+  parentTabContainer?: TabContainer,
 ): WindowOpenHandlerResponse {
   const { url, disposition, features } = details;
 
-  scopeLog.info(`Url open handler for tab. URL: "${url}", Disposition: "${disposition}"`);
+  scopeLog.info(
+    `Url open handler for tab. URL: "${url}" | Disposition: "${disposition} ` +
+      `| Tab container parent: "${parentTabContainer?.id || 'None'}"`,
+  );
 
   const isPopup =
     disposition === 'new-window' && (features.includes('width=') || features.includes('height='));
@@ -188,12 +192,16 @@ export function windowOpenHadler(
   }
 
   if (disposition === 'foreground-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window', selectTab: true });
+    browser.openURL(url, {
+      targetId: 'current-desktop-window',
+      selectTab: true,
+      parentTabContainer,
+    });
     return { action: 'deny' };
   }
 
   if (disposition === 'background-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window' });
+    browser.openURL(url, { targetId: 'current-desktop-window', parentTabContainer });
     return { action: 'deny' };
   }
 

@@ -156,6 +156,100 @@ describe('TabContainer.addChild / TabContainer.children', () => {
   });
 });
 
+describe('TabContainer.removeChild', () => {
+  let browser: Browser;
+  let window: Window;
+  let desktop: Desktop;
+  let tc: TabContainer;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+    desktop = window.selectedDesktop;
+    tc = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  });
+
+  test('removes the matching child from the parent children list', () => {
+    const other = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    tc.addChild(other);
+    expect(tc.children).toContain(other);
+
+    tc.removeChild(other.id);
+
+    expect(tc.children).not.toContain(other);
+    expect(tc.children).toEqual([]);
+  });
+
+  test('calling removeChild twice with the same id is a no-op the second time', () => {
+    const other = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    tc.addChild(other);
+
+    tc.removeChild(other.id);
+    expect(tc.children.length).toBe(0);
+
+    expect(() => tc.removeChild(other.id)).not.toThrow();
+    expect(tc.children.length).toBe(0);
+  });
+
+  test('removeChild with a non-existent id is a no-op (does not throw, does not mutate)', () => {
+    const other = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    tc.addChild(other);
+
+    expect(() => tc.removeChild(99999 as any)).not.toThrow();
+    expect(tc.children.length).toBe(1);
+    expect(tc.children[0]).toBe(other);
+  });
+
+  test('removeChild does NOT clear the parent reference on the removed child (decoupled contract)', () => {
+    const parent = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+    parent.addChild(child);
+    child.setParent(parent);
+
+    expect(child.parent).toBe(parent);
+
+    parent.removeChild(child.id);
+
+    expect(parent.children).not.toContain(child);
+    expect(child.parent).toBe(parent);
+  });
+
+  test('removeChild does not affect siblings', () => {
+    const first = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const second = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const third = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+    tc.addChild(first);
+    tc.addChild(second);
+    tc.addChild(third);
+
+    tc.removeChild(second.id);
+
+    expect(tc.children).toEqual([first, third]);
+    expect(tc.children).toContain(first);
+    expect(tc.children).toContain(third);
+    expect(tc.children).not.toContain(second);
+  });
+
+  test('removeChild does not emit any event on the browser eventsChannel', () => {
+    const other = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    tc.addChild(other);
+
+    const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+
+    tc.removeChild(other.id);
+
+    const tabcontainerEvents = emitSpy.mock.calls.filter((call) => {
+      const channel = call[0];
+      return typeof channel === 'string' && channel.startsWith('tabcontainer:');
+    });
+    expect(tabcontainerEvents).toEqual([]);
+  });
+});
+
 describe('TabContainer tree (parent + children together)', () => {
   let browser: Browser;
   let window: Window;

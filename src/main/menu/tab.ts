@@ -155,7 +155,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       ...menu,
       { type: 'separator' },
       {
-        label: 'Open all tabs as a child of...',
+        label: 'Open target blank links as a child...',
         type: 'checkbox',
         checked: tab.openTabsAsChild,
         click: async () => {

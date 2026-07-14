@@ -255,6 +255,11 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
+    if (props?.parentTabContainer) {
+      tabContainer.setParent(props.parentTabContainer);
+      props.parentTabContainer.addChild(tabContainer);
+    }
+
     this._indexTabContainer(window, desktop, tabContainer);
 
     const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? partitions.internal : null;
@@ -571,7 +576,7 @@ export class Browser {
    */
   async closeTab(id: TTabId, props: { emit?: boolean } = { emit: true }): Promise<boolean> {
     const result = this.getTab(id);
-    if (!result) {
+    if (!result || result.tab.isClosed) {
       return false;
     }
 
@@ -595,6 +600,17 @@ export class Browser {
     window.renderViews();
 
     this.mediaManager.removeSession(tab.id);
+
+    // Parent/children management
+    if (tabContainer.parent) {
+      tabContainer.parent.removeChild(tabContainer.id);
+    }
+
+    for (const tc of tabContainer.children) {
+      for (const tab of tc.tabs) {
+        this.closeTab(tab.id);
+      }
+    }
 
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);

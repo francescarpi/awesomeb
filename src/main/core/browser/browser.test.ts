@@ -1,6 +1,7 @@
-import { expect, test, describe, beforeEach } from 'vitest';
-import { Browser, partitions } from '@/core';
+import { expect, test, describe, beforeEach, vi } from 'vitest';
+import { Browser, partitions, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
+import type { HandlerDetails } from 'electron';
 
 describe('Browser', () => {
   let browser: Browser;
@@ -345,6 +346,453 @@ describe('Browser', () => {
 
         expect(result2!.tabContainer.selectedTab?.id).toBe(result2!.tab.id);
       });
+    });
+  });
+
+  describe('Browser.openURL with parentTabContainer', () => {
+    test('new tabContainer has its parent set to the provided parentTabContainer', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      expect(parent).not.toBeNull();
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      expect(child).not.toBeNull();
+      expect(child!.tabContainer.parent).toBe(parent!.tabContainer);
+    });
+
+    test('new tabContainer is added to parentTabContainer.children', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      expect(parent!.tabContainer.children).toContain(child!.tabContainer);
+      expect(parent!.tabContainer.children.length).toBe(1);
+    });
+
+    test('new tabContainer is still indexed normally (getTabContainer + desktop.tabContainers)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+      const parent = await browser.openURL('http://parent.com');
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const lookup = browser.getTabContainer(child!.tabContainer.id);
+      expect(lookup).not.toBeNull();
+      expect(lookup!.tabContainer.id).toBe(child!.tabContainer.id);
+
+      const desktop = w.selectedDesktop;
+      expect(desktop.tabContainers).toContain(child!.tabContainer);
+    });
+
+    test('parent tabContainer remains indexed and visible after attaching a child', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+      const parent = await browser.openURL('http://parent.com');
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const parentLookup = browser.getTabContainer(parent!.tabContainer.id);
+      expect(parentLookup).not.toBeNull();
+      expect(w.selectedDesktop.tabContainers).toContain(parent!.tabContainer);
+      expect(w.selectedDesktop.tabContainers).toContain(child!.tabContainer);
+    });
+
+    test('without parentTabContainer, the new tabContainer has parent === null (regression)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const first = await browser.openURL('http://first.com');
+      expect(first).not.toBeNull();
+      expect(first!.tabContainer.parent).toBeNull();
+      expect(first!.tabContainer.children).toEqual([]);
+    });
+
+    test('the tab inside the new child tabContainer is created normally and can be closed', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const childTabId = child!.tab.id;
+      expect(childTabId).toBeDefined();
+      expect(child!.tabContainer.tabs.length).toBe(1);
+
+      const closed = await browser.closeTab(childTabId);
+      expect(closed).toBe(true);
+    });
+  });
+
+  describe('Browser.closeTab cascade (parent/children)', () => {
+    async function createParentWithChildren(childCount: number) {
+      const parent = await browser.openURL('http://parent.com');
+      expect(parent).not.toBeNull();
+      const children: NonNullable<Awaited<ReturnType<typeof browser.openURL>>>[] = [];
+      for (let i = 0; i < childCount; i++) {
+        const child = await browser.openURL(`http://child${i}.com`, {
+          parentTabContainer: parent!.tabContainer,
+        });
+        expect(child).not.toBeNull();
+        children.push(child!);
+      }
+      return { parent: parent!, children };
+    }
+
+    test('closing the parent tab marks all child tabs as closed (soft close, non-private)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(2);
+
+      const closed = await browser.closeTab(parent.tab.id);
+      expect(closed).toBe(true);
+
+      for (const child of children) {
+        for (const tab of child.tabContainer.tabs) {
+          expect(tab.isClosed).toBe(true);
+        }
+      }
+    });
+
+    test('closing the parent tab removes every child from parent.children', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(2);
+
+      await browser.closeTab(parent.tab.id);
+
+      for (const child of children) {
+        expect(parent.tabContainer.children).not.toContain(child.tabContainer);
+      }
+      expect(parent.tabContainer.children).toEqual([]);
+    });
+
+    test('cascade closes tabs across multiple children (2+ children)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(3);
+
+      await browser.closeTab(parent.tab.id);
+
+      const totalChildTabs = children.reduce((sum, c) => sum + c.tabContainer.tabs.length, 0);
+      expect(totalChildTabs).toBe(3);
+
+      const allClosed = children.every((c) => c.tabContainer.tabs.every((t) => t.isClosed));
+      expect(allClosed).toBe(true);
+    });
+
+    test('3-level cascade: closing root closes mid and leaf', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const root = await browser.openURL('http://root.com');
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      const leaf = await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+
+      await browser.closeTab(root!.tab.id);
+
+      for (const tab of mid!.tabContainer.tabs) {
+        expect(tab.isClosed).toBe(true);
+      }
+      for (const tab of leaf!.tabContainer.tabs) {
+        expect(tab.isClosed).toBe(true);
+      }
+      expect(mid!.tabContainer.children).not.toContain(leaf!.tabContainer);
+    });
+
+    test('closing a child tab removes the child container from parent.children', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(2);
+      const targetChild = children[0];
+
+      const closed = await browser.closeTab(targetChild.tab.id);
+      expect(closed).toBe(true);
+
+      expect(parent.tabContainer.children).not.toContain(targetChild.tabContainer);
+      expect(parent.tabContainer.children).toContain(children[1].tabContainer);
+    });
+
+    test('closing a child tab does NOT affect its siblings', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(2);
+      const sibling = children[1];
+
+      await browser.closeTab(children[0].tab.id);
+
+      for (const tab of sibling.tabContainer.tabs) {
+        expect(tab.isClosed).toBe(false);
+      }
+      expect(parent.tabContainer.children).toContain(sibling.tabContainer);
+    });
+
+    test('closing a child tab DOES cascade to its own children (grandchildren)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const root = await browser.openURL('http://root.com');
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      const leaf = await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+
+      await browser.closeTab(mid!.tab.id);
+
+      for (const tab of leaf!.tabContainer.tabs) {
+        expect(tab.isClosed).toBe(true);
+      }
+      expect(mid!.tabContainer.children).not.toContain(leaf!.tabContainer);
+    });
+
+    test('closeTab on an already-closed tab returns false and does not re-mutate parent.children', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const { parent, children } = await createParentWithChildren(1);
+      const child = children[0];
+
+      const first = await browser.closeTab(child.tab.id);
+      expect(first).toBe(true);
+      expect(parent.tabContainer.children).not.toContain(child.tabContainer);
+
+      const second = await browser.closeTab(child.tab.id);
+      expect(second).toBe(false);
+      expect(parent.tabContainer.children).not.toContain(child.tabContainer);
+      expect(parent.tabContainer.children.length).toBe(0);
+    });
+
+    test('container with no parent and no children: closing its tab is a no-op for relationships', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const lone = await browser.openURL('http://lone.com');
+      expect(lone!.tabContainer.parent).toBeNull();
+      expect(lone!.tabContainer.children).toEqual([]);
+
+      const closed = await browser.closeTab(lone!.tab.id);
+      expect(closed).toBe(true);
+      expect(lone!.tab.isClosed).toBe(true);
+      expect(lone!.tabContainer.parent).toBeNull();
+      expect(lone!.tabContainer.children).toEqual([]);
+    });
+
+    test('closing every tab in a child one-by-one: child ends with all isClosed and persists in desktop.tabContainers', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+      const desktop = w.selectedDesktop;
+
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childTc = child!.tabContainer;
+      const firstChildTab = child!.tab;
+
+      expect(childTc.tabs.length).toBe(1);
+
+      const secondTab = await browser.openURL('http://second.com', {
+        targetId: 'split-tab',
+      });
+      expect(secondTab).not.toBeNull();
+      expect(childTc.tabs.length).toBe(2);
+
+      await browser.closeTab(firstChildTab.id);
+      await browser.closeTab(secondTab!.tab.id);
+
+      expect(childTc.tabs.every((t) => t.isClosed)).toBe(true);
+      expect(desktop.tabContainers).toContain(childTc);
+    });
+
+    test('private partition child: cascade removes child from desktop.tabContainers and from index', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+      const desktop = w.selectedDesktop;
+
+      const parent = await browser.openURL('http://parent.com');
+      const privateChild = await browser.openURL('http://private.com', {
+        parentTabContainer: parent!.tabContainer,
+        partitionId: partitions.private.id,
+      });
+      expect(privateChild!.tab.partition.private).toBe(true);
+
+      expect(desktop.tabContainers).toContain(privateChild!.tabContainer);
+      expect(browser.getTab(privateChild!.tab.id)).not.toBeNull();
+
+      await browser.closeTab(parent!.tab.id);
+
+      expect(desktop.tabContainers).not.toContain(privateChild!.tabContainer);
+      expect(browser.getTabContainer(privateChild!.tabContainer.id)).toBeNull();
+      expect(browser.getTab(privateChild!.tab.id)).toBeNull();
+      expect(parent!.tabContainer.children).not.toContain(privateChild!.tabContainer);
+    });
+
+    test('mixed partition child: private tab unindexed, non-private tab soft-closed, child persists', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+      const desktop = w.selectedDesktop;
+
+      const parent = await browser.openURL('http://parent.com');
+      const mixedChild = await browser.openURL('http://non-private.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childTc = mixedChild!.tabContainer;
+
+      const privateTabResult = await browser.openURL('http://private.com', {
+        targetId: 'split-tab',
+        partitionId: partitions.private.id,
+      });
+      expect(privateTabResult).not.toBeNull();
+      expect(privateTabResult!.tabContainer).toBe(childTc);
+      expect(privateTabResult!.tab.partition.private).toBe(true);
+
+      const nonPrivateTab = mixedChild!.tab;
+      const privateTab = privateTabResult!.tab;
+
+      expect(childTc.tabs.length).toBe(2);
+      expect(childTc.tabs).toContain(nonPrivateTab);
+      expect(childTc.tabs).toContain(privateTab);
+
+      await browser.closeTab(parent!.tab.id);
+
+      const nonPrivateLookup = browser.getTab(nonPrivateTab.id);
+      const privateLookup = browser.getTab(privateTab.id);
+
+      expect(privateLookup).toBeNull();
+      expect(nonPrivateLookup).not.toBeNull();
+      expect(nonPrivateLookup!.tab.isClosed).toBe(true);
+
+      expect(desktop.tabContainers).toContain(childTc);
+      expect(parent!.tabContainer.children).not.toContain(childTc);
+    });
+  });
+
+  describe('windowOpenHadler (parentTabContainer)', () => {
+    function makeDetails(overrides: Partial<HandlerDetails> = {}): HandlerDetails {
+      return {
+        url: 'http://example.com',
+        frameName: '',
+        features: '',
+        disposition: 'foreground-tab',
+        ...overrides,
+      } as HandlerDetails;
+    }
+
+    test('foreground-tab calls openURL with selectTab: true and the parentTabContainer', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({ url: 'http://child.com', disposition: 'foreground-tab' }),
+        parent!.tabContainer,
+      );
+
+      expect(response).toEqual({ action: 'deny' });
+      expect(openURLSpy).toHaveBeenCalledWith('http://child.com', {
+        targetId: 'current-desktop-window',
+        selectTab: true,
+        parentTabContainer: parent!.tabContainer,
+      });
+    });
+
+    test('background-tab calls openURL with parentTabContainer but NOT selectTab', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({ url: 'http://child.com', disposition: 'background-tab' }),
+        parent!.tabContainer,
+      );
+
+      expect(response).toEqual({ action: 'deny' });
+      expect(openURLSpy).toHaveBeenCalledWith('http://child.com', {
+        targetId: 'current-desktop-window',
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const passedProps = openURLSpy.mock.calls[0][1] as Record<string, unknown>;
+      expect(passedProps).not.toHaveProperty('selectTab');
+    });
+
+    test('new-window with popup features (width=/height=) returns action: allow and does NOT call openURL', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({
+          url: 'http://popup.com',
+          disposition: 'new-window',
+          features: 'width=600,height=400',
+        }),
+        parent!.tabContainer,
+      );
+
+      expect(response).toEqual({ action: 'allow' });
+      expect(openURLSpy).not.toHaveBeenCalled();
+    });
+
+    test('new-window WITHOUT popup features (no width=/height=) calls openURL with targetId: new-window and does NOT pass parentTabContainer', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({
+          url: 'http://newwin.com',
+          disposition: 'new-window',
+          features: '',
+        }),
+        parent!.tabContainer,
+      );
+
+      expect(response).toEqual({ action: 'deny' });
+      expect(openURLSpy).toHaveBeenCalledWith('http://newwin.com', {
+        targetId: 'new-window',
+      });
+    });
+
+    test('without parentTabContainer (undefined) still works and passes undefined through to openURL', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({ url: 'http://x.com', disposition: 'foreground-tab' }),
+      );
+
+      expect(response).toEqual({ action: 'deny' });
+      expect(openURLSpy).toHaveBeenCalledWith('http://x.com', {
+        targetId: 'current-desktop-window',
+        selectTab: true,
+        parentTabContainer: undefined,
+      });
+    });
+
+    test('unknown disposition returns action: deny and does NOT call openURL', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com');
+      const openURLSpy = vi.spyOn(browser, 'openURL').mockResolvedValue(null);
+
+      const response = windowOpenHadler(
+        browser,
+        makeDetails({
+          url: 'http://x.com',
+          disposition: 'other' as HandlerDetails['disposition'],
+        }),
+        parent!.tabContainer,
+      );
+
+      expect(response).toEqual({ action: 'deny' });
+      expect(openURLSpy).not.toHaveBeenCalled();
     });
   });
 
