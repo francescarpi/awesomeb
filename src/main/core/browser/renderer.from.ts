@@ -177,7 +177,7 @@ export class BrowserRenderer {
     for (const desktop of window.desktops) {
       let shortcutCounter = 0;
       const selectedTabContainer = desktop.selectedTabContainer;
-      for (const tc of desktop.tabContainers) {
+      for (const tc of desktop.tabContainers.filter((tc) => tc.parent === null)) {
         let shortcut: number | null = null;
         if (shortcutCounter < 9 && !tc.isClosed) {
           shortcutCounter++;
