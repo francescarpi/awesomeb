@@ -75,6 +75,7 @@ export function parseTarget(
     targetId?: string;
     partitionId?: TPartitionId;
     tabContainer?: TabContainer;
+    parentTabContainer?: TabContainer;
   },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
@@ -123,9 +124,15 @@ export function parseTarget(
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
   } else {
+    const justAfter = targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined;
     tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
-      justAfter: targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined,
+      justAfter,
     });
+  }
+
+  if (props?.parentTabContainer) {
+    tabContainer.setParent(props.parentTabContainer);
+    props.parentTabContainer.addChild(tabContainer);
   }
 
   let partition: Partition;

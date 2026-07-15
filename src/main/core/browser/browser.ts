@@ -246,6 +246,7 @@ export class Browser {
     const result = parseTarget(this, {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
+      parentTabContainer: props?.parentTabContainer,
     });
 
     if (!result) {
@@ -254,11 +255,6 @@ export class Browser {
     }
 
     const { window, desktop, tabContainer, partition } = result;
-
-    if (props?.parentTabContainer) {
-      tabContainer.setParent(props.parentTabContainer);
-      props.parentTabContainer.addChild(tabContainer);
-    }
 
     this._indexTabContainer(window, desktop, tabContainer);
 
