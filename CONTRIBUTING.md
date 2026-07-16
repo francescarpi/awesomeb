@@ -30,14 +30,11 @@ git switch -c chore/v0.0.3-alpha
 
 On this new branch, update the version field in _package.json_. Once updated, create a Pull Request (PR) and merge it into _main_.
 
-3. Tag the release
+3. Tag the release (automatic)
 
-After merging, ensure your local main branch is up to date with the remote. Then, create and push the release tag:
+Once the version-bump PR merges into `main`, the **tag on version change** workflow takes over. It compares the `version` field before and after the merge, validates it matches a semver-like pattern (`X.Y.Z` or `X.Y.Z-prerelease`), and creates a tag of the form `v{version}` (e.g. `v0.5.2-alpha`) pointing at the merge commit. Pushing that tag in turn triggers the **build & release app** workflow.
 
-```bash
-git tag v0.0.3-alpha
-git push origin v0.0.3-alpha
-```
+You no longer need to tag manually. If the tag already exists, the workflow fails loudly rather than overwriting it — this is intentional, to protect releases that may already have been built and published.
 
 4. Wait for CI/CD completion
 
