@@ -18,6 +18,10 @@ import * as tabContainerSelectByIndex from './tabcontainer-select-by-index';
 import * as tabSelect from './tab-select';
 import * as tabClose from './tab-close';
 import * as tabDuplicate from './tab-duplicate';
+import * as tabReload from './tab-reload';
+import * as tabHistoryBack from './tab-history-back';
+import * as tabHistoryForward from './tab-history-forward';
+import * as urlEdit from './url-edit';
 
 describe('Commands', () => {
   let browser: Browser;
@@ -416,6 +420,146 @@ describe('Commands', () => {
     });
   });
 
+  describe('Navigation Commands', () => {
+    const setupTab = (browserInstance: Browser) => {
+      const window = browserInstance.activeWindow!;
+      const result = browserInstance.openURL('https://example.com');
+      expect(result).not.toBeNull();
+      const tab = window.selectedDesktop!.tabContainers[0].tabs[0];
+      return { window, tab };
+    };
+
+    test('edit-url: should call clearFailLoad, cleanCertificateError, setLoading(false), loadURL in correct order (issue #201)', async () => {
+      const { window, tab } = setupTab(browser);
+
+      const clearFailLoadSpy = vi.spyOn(tab, 'clearFailLoad');
+      const cleanCertSpy = vi.spyOn(tab, 'cleanCertificateError');
+      const setLoadingSpy = vi.spyOn(tab, 'setLoading');
+      const loadURLSpy = vi.spyOn(tab, 'loadURL');
+
+      await browser.performCommand(window, urlEdit.TRIGGER, {
+        tabId: tab.id,
+        url: 'https://google.com',
+      });
+
+      expect(clearFailLoadSpy).toHaveBeenCalledTimes(1);
+      expect(cleanCertSpy).toHaveBeenCalledTimes(1);
+      expect(setLoadingSpy).toHaveBeenCalledTimes(1);
+      expect(setLoadingSpy).toHaveBeenCalledWith(false);
+      expect(loadURLSpy).toHaveBeenCalledTimes(1);
+      expect(loadURLSpy).toHaveBeenCalledWith('https://google.com');
+
+      expect(clearFailLoadSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        cleanCertSpy.mock.invocationCallOrder[0],
+      );
+      expect(cleanCertSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        setLoadingSpy.mock.invocationCallOrder[0],
+      );
+      expect(setLoadingSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        loadURLSpy.mock.invocationCallOrder[0],
+      );
+    });
+
+    test('edit-url: should handle non-existent tab gracefully', async () => {
+      const window = browser.activeWindow!;
+
+      await browser.performCommand(window, urlEdit.TRIGGER, {
+        tabId: 999,
+        url: 'https://google.com',
+      });
+
+      expect(true).toBe(true);
+    });
+
+    test('reload-tab: should call clearFailLoad, cleanCertificateError, setLoading(false), reload in correct order', async () => {
+      const { window, tab } = setupTab(browser);
+
+      const clearFailLoadSpy = vi.spyOn(tab, 'clearFailLoad');
+      const cleanCertSpy = vi.spyOn(tab, 'cleanCertificateError');
+      const setLoadingSpy = vi.spyOn(tab, 'setLoading');
+      const reloadSpy = vi.spyOn(tab, 'reload');
+
+      await browser.performCommand(window, tabReload.TRIGGER, { tabId: tab.id });
+
+      expect(clearFailLoadSpy).toHaveBeenCalledTimes(1);
+      expect(cleanCertSpy).toHaveBeenCalledTimes(1);
+      expect(setLoadingSpy).toHaveBeenCalledTimes(1);
+      expect(setLoadingSpy).toHaveBeenCalledWith(false);
+      expect(reloadSpy).toHaveBeenCalledTimes(1);
+
+      expect(clearFailLoadSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        cleanCertSpy.mock.invocationCallOrder[0],
+      );
+      expect(cleanCertSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        setLoadingSpy.mock.invocationCallOrder[0],
+      );
+      expect(setLoadingSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        reloadSpy.mock.invocationCallOrder[0],
+      );
+    });
+
+    test('reload-tab: should reload the active tab when no tabId is provided', async () => {
+      const { window, tab } = setupTab(browser);
+      await window.selectTab(tab.id);
+
+      const reloadSpy = vi.spyOn(tab, 'reload');
+
+      await browser.performCommand(window, tabReload.TRIGGER, {});
+
+      expect(reloadSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('reload-tab: should handle non-existent tab gracefully', async () => {
+      const window = browser.activeWindow!;
+
+      await browser.performCommand(window, tabReload.TRIGGER, { tabId: 999 });
+
+      expect(true).toBe(true);
+    });
+
+    test('go-back: should call clearFailLoad, cleanCertificateError, goBack in correct order', async () => {
+      const { window, tab } = setupTab(browser);
+
+      const clearFailLoadSpy = vi.spyOn(tab, 'clearFailLoad');
+      const cleanCertSpy = vi.spyOn(tab, 'cleanCertificateError');
+      const goBackSpy = vi.spyOn(tab, 'goBack');
+
+      await browser.performCommand(window, tabHistoryBack.TRIGGER, { tabId: tab.id });
+
+      expect(clearFailLoadSpy).toHaveBeenCalledTimes(1);
+      expect(cleanCertSpy).toHaveBeenCalledTimes(1);
+      expect(goBackSpy).toHaveBeenCalledTimes(1);
+
+      expect(clearFailLoadSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        cleanCertSpy.mock.invocationCallOrder[0],
+      );
+      expect(cleanCertSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        goBackSpy.mock.invocationCallOrder[0],
+      );
+    });
+
+    test('go-forward: should call clearFailLoad, cleanCertificateError, goForward in correct order', async () => {
+      const { window, tab } = setupTab(browser);
+
+      const clearFailLoadSpy = vi.spyOn(tab, 'clearFailLoad');
+      const cleanCertSpy = vi.spyOn(tab, 'cleanCertificateError');
+      const goForwardSpy = vi.spyOn(tab, 'goForward');
+
+      await browser.performCommand(window, tabHistoryForward.TRIGGER, { tabId: tab.id });
+
+      expect(clearFailLoadSpy).toHaveBeenCalledTimes(1);
+      expect(cleanCertSpy).toHaveBeenCalledTimes(1);
+      expect(goForwardSpy).toHaveBeenCalledTimes(1);
+
+      expect(clearFailLoadSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        cleanCertSpy.mock.invocationCallOrder[0],
+      );
+      expect(cleanCertSpy.mock.invocationCallOrder[0]).toBeLessThan(
+        goForwardSpy.mock.invocationCallOrder[0],
+      );
+    });
+  });
+
   describe('Command Visibility', () => {
     test('window-minimize: should be visible when window is not minimized', () => {
       const window = browser.activeWindow!;
@@ -506,6 +650,10 @@ describe('Commands', () => {
         tabContainerSelectByIndex.Command,
         tabSelect.Command,
         tabClose.Command,
+        tabReload.Command,
+        tabHistoryBack.Command,
+        tabHistoryForward.Command,
+        urlEdit.Command,
       ];
 
       commands.forEach((command) => {

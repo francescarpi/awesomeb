@@ -28,6 +28,7 @@ export const Command: ICommand<ICommandParams> = {
     }
 
     result.tab.clearFailLoad();
+    result.tab.cleanCertificateError();
     result.tab.setLoading(false);
     result.tab.loadURL(url);
   },
