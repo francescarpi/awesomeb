@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **See also**: `AGENTS.md` is the canonical, tool-agnostic doc for any AI coding
+> assistant working in this repo. It contains the full architecture overview and
+> the mandatory `🤖 AI Agent Rules` (no auto-commit, PR title format). The
+> shortcuts below are duplicated here so Claude Code has them at hand without
+> loading the 1400-line AGENTS.md on every session.
+
 ## Commands
 
 ```bash
