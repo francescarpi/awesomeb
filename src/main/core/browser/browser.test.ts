@@ -80,6 +80,26 @@ describe('Browser', () => {
     expect(duplicateResult!.tab.partition.id).toBe(partitions.private.id);
   });
 
+  test('duplicate a tab to a new window preserves the source tab partition (issue #200)', async () => {
+    browser.createWindow(1, { withDesktops: true });
+    const result = await browser.openURL('http://example.com', {
+      partitionId: partitions.private.id,
+    });
+    expect(result).not.toBeNull();
+    const sourceTab = result!.tab;
+
+    expect(browser.windows.length).toBe(1);
+
+    const duplicateResult = await browser.duplicateTab(sourceTab.id, {
+      targetId: 'new-window-left',
+      partitionId: sourceTab.partition.id,
+    });
+
+    expect(duplicateResult).not.toBeNull();
+    expect(duplicateResult!.tab.partition.id).toBe(partitions.private.id);
+    expect(browser.windows.length).toBe(2);
+  });
+
   test('move tab to split-tab within same desktop', async () => {
     const w = browser.createWindow(1, { withDesktops: true });
     const desktop = w.selectedDesktop;

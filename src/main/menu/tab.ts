@@ -70,6 +70,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
           await browser.performCommand(window, 'duplicate-tab', {
             tabId: tab.id,
             targetId: target.id,
+            partitionId: tab.partition.id,
           });
         },
       })),

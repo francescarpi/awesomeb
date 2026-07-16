@@ -1,5 +1,40 @@
 # AGENTS.md - AwesomeB Astro Project
 
+## 🤖 AI Agent Rules
+
+These rules apply to any AI coding assistant operating in this repository. Tool-specific entry points (`CLAUDE.md` for Claude Code, etc.) should point back here — this file is the source of truth.
+
+### Never auto-commit
+
+Do **not** stage, commit, or push changes unless the user explicitly asks you to. The user reviews every commit manually before it lands in history. When the user asks for a code change, do the work, summarize it, and stop — wait for an explicit "commit" or "haz commit" before running `git add` / `git commit`. Pushing is never implicit; the user always says so.
+
+### Pull Request title format
+
+This repo validates PR titles in `.github/workflows/pr-checks.yml` (`lint-pr-title` job). The title ends up in the user-facing changelog, so it must be a plain-English description a human can understand.
+
+Rules enforced by CI (the PR will be rejected if violated):
+
+- Must start with an **uppercase** letter.
+- Must **not** use the Conventional Commits prefix (`feat:`, `fix:`, `chore:`, `refactor:`, etc. with or without a scope). The `fix(menu): ...` style is reserved for **commit** messages, validated separately by commitlint — do not confuse the two.
+
+Recommended style:
+
+- Use an imperative-mood sentence that describes the user-visible change.
+- Keep it short (one line, ideally under ~80 chars).
+- Reference the issue number in the description body if you want, but the **title** stays human-readable.
+
+Good examples:
+
+- `Preserve source tab partition when duplicating from the context menu`
+- `Add lower retention options to history cleanup`
+- `Improve sidebar update button contrast in dark themes`
+
+Bad examples (will fail CI):
+
+- `fix(menu): preserve source tab partition when duplicating`
+- `Feat: add new command palette shortcut`
+- `chore: bump electron version`
+
 ## 🎯 Project Overview
 
 **AwesomeB** is a custom desktop browser/navigator application built with **Electron** and **Astro**. It provides advanced tab organization through customizable "desktops", sophisticated session management, and a powerful command system for enhanced browsing workflows.
