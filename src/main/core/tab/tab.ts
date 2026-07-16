@@ -555,4 +555,8 @@ export class Tab extends UIView {
   setOpenTabsAsChild(value: boolean) {
     this._openTabsAsChild = value;
   }
+
+  get isExtension(): boolean {
+    return this.webContents?.getURL().startsWith('chrome-extension://');
+  }
 }

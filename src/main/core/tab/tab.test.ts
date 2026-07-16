@@ -206,3 +206,45 @@ describe('Tab.isTabPreview', () => {
     expect(preview.isTabPreview).toBe(true);
   });
 });
+
+describe('Tab.isExtension', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  async function openTab() {
+    const result = await browser.openURL('http://example.com');
+    return result!.tab;
+  }
+
+  test('returns false for http URL', async () => {
+    const tab = await openTab();
+    expect(tab.isExtension).toBe(false);
+  });
+
+  test('returns true for chrome-extension:// URL', async () => {
+    const tab = await openTab();
+    vi.spyOn(tab.webContents, 'getURL').mockReturnValue(
+      'chrome-extension://abcdefghijklmnop/popup.html',
+    );
+    expect(tab.isExtension).toBe(true);
+  });
+
+  test('returns false for empty URL', async () => {
+    const tab = await openTab();
+    vi.spyOn(tab.webContents, 'getURL').mockReturnValue('');
+    expect(tab.isExtension).toBe(false);
+  });
+
+  test('returns false when URL contains but does not start with chrome-extension', async () => {
+    const tab = await openTab();
+    vi.spyOn(tab.webContents, 'getURL').mockReturnValue(
+      'https://example.com/chrome-extension.html',
+    );
+    expect(tab.isExtension).toBe(false);
+  });
+});

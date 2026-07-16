@@ -578,7 +578,7 @@ export class Browser {
 
     const { tab, window, tabContainer, desktop } = result;
 
-    if (tab.partition.private) {
+    if (tab.partition.private || tab.isExtension) {
       this.permanentlyCloseTab(desktop, tabContainer, tab.id);
     } else {
       tab.markAsClosed();
