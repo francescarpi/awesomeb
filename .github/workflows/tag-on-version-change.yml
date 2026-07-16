@@ -1,0 +1,71 @@
+name: Tag on version change
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: tag-on-version-change
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Read versions
+        id: versions
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          read_version() {
+            git show "$1:package.json" 2>/dev/null \
+              | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).version" \
+              2>/dev/null || echo ""
+          }
+          BEFORE="$(read_version "$BEFORE_SHA")"
+          AFTER="$(node -pe "require('./package.json').version")"
+          echo "before=$BEFORE"
+          echo "after=$AFTER"
+          {
+            echo "before=$BEFORE"
+            echo "after=$AFTER"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Skip if version unchanged
+        if: steps.versions.outputs.before == steps.versions.outputs.after
+        run: |
+          echo "package.json version unchanged (${{ steps.versions.outputs.after }}). Skipping tag."
+
+      - name: Validate and create tag
+        if: steps.versions.outputs.before != steps.versions.outputs.after
+        env:
+          AFTER: ${{ steps.versions.outputs.after }}
+          SHA:   ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          TAG="v${AFTER}"
+          if ! echo "$TAG" | grep -qP '^v\d+\.\d+\.\d+(-[\w.]+)?$'; then
+            echo "::error::Invalid version '$AFTER' in package.json. Aborting."
+            exit 1
+          fi
+          if gh api -H "Accept: application/vnd.github+json" \
+                "/repos/${{ github.repository }}/git/refs/tags/${TAG}" \
+                >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG} already exists. Refusing to overwrite."
+            exit 1
+          fi
+          gh api --method POST \
+                -H "Accept: application/vnd.github+json" \
+                "/repos/${{ github.repository }}/git/refs" \
+                -f ref="refs/tags/${TAG}" \
+                -f sha="$SHA"
+          echo "Created tag ${TAG} at ${SHA}"
