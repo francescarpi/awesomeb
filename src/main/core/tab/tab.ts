@@ -540,4 +540,8 @@ export class Tab extends UIView {
   get isClosed(): boolean {
     return this._closedAt !== null;
   }
+
+  get isExtension(): boolean {
+    return this.webContents?.getURL().startsWith('chrome-extension://');
+  }
 }

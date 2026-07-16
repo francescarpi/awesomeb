@@ -1,4 +1,4 @@
-import { expect, test, describe, beforeEach } from 'vitest';
+import { expect, test, describe, beforeEach, vi } from 'vitest';
 import { Browser, partitions } from '@/core';
 import { Layouts } from '../tab/layouts';
 
@@ -476,6 +476,73 @@ describe('Browser', () => {
       expect(browser.getTab(tab1Id)).toBeNull();
       expect(browser.getTab(tab2Id)).not.toBeNull();
       expect(browser.getTab(tab2Id)!.tab.id).toBe(tab2Id);
+    });
+  });
+
+  describe('closeTab', () => {
+    test('regular tab stays indexed after close (markAsClosed path)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+      expect(browser.getTab(tabId)).not.toBeNull();
+
+      await browser.closeTab(tabId);
+
+      expect(browser.getTab(tabId)).not.toBeNull();
+    });
+
+    test('extension tab is permanently removed from index', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+      vi.spyOn(result!.tab.webContents, 'getURL').mockReturnValue(
+        'chrome-extension://abcdefghijklmnop/popup.html',
+      );
+
+      await browser.closeTab(tabId);
+
+      expect(browser.getTab(tabId)).toBeNull();
+    });
+
+    test('private tab is permanently removed from index', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com', {
+        partitionId: partitions.private.id,
+      });
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+      await browser.closeTab(tabId);
+
+      expect(browser.getTab(tabId)).toBeNull();
+    });
+
+    test('closing the only extension tab also unindexes the tabContainer', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabId = result!.tab.id;
+      const tcId = result!.tabContainer.id;
+      const desktop = result!.desktop;
+
+      vi.spyOn(result!.tab.webContents, 'getURL').mockReturnValue(
+        'chrome-extension://abcdefghijklmnop/popup.html',
+      );
+
+      expect(browser.getTab(tabId)).not.toBeNull();
+      expect(browser.getTabContainer(tcId)).not.toBeNull();
+      expect(desktop.tabContainers.length).toBe(1);
+
+      await browser.closeTab(tabId);
+
+      expect(browser.getTab(tabId)).toBeNull();
+      expect(browser.getTabContainer(tcId)).toBeNull();
+      expect(desktop.tabContainers.length).toBe(0);
     });
   });
 });
