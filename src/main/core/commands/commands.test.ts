@@ -17,6 +17,7 @@ import * as tabSuspend from './tab-suspend';
 import * as tabContainerSelectByIndex from './tabcontainer-select-by-index';
 import * as tabSelect from './tab-select';
 import * as tabClose from './tab-close';
+import * as tabDuplicate from './tab-duplicate';
 
 describe('Commands', () => {
   let browser: Browser;
@@ -290,6 +291,32 @@ describe('Commands', () => {
 
       // Should not throw an error
       expect(true).toBe(true);
+    });
+
+    test('tab-duplicate: should forward partitionId to duplicateTab (issue #200)', async () => {
+      const window = browser.activeWindow!;
+      const result = browser.openURL('http://example.com', {
+        partitionId: partitions.private.id,
+      });
+      expect(result).not.toBeNull();
+      const sourceTab = window.selectedDesktop!.tabContainers[0].tabs[0];
+
+      const duplicateSpy = vi.spyOn(browser, 'duplicateTab');
+
+      await browser.performCommand(window, tabDuplicate.TRIGGER, {
+        tabId: sourceTab.id,
+        targetId: 'current-desktop-window',
+        partitionId: sourceTab.partition.id,
+      });
+
+      expect(duplicateSpy).toHaveBeenCalledWith(
+        sourceTab.id,
+        expect.objectContaining({
+          partitionId: partitions.private.id,
+          targetId: 'current-desktop-window',
+          selectTab: true,
+        }),
+      );
     });
 
     test('tab-suspend: should suspend the active tab', async () => {
