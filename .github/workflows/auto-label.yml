@@ -1,0 +1,34 @@
+name: Auto-label PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply label based on branch prefix
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const map = [
+              { re: /^(feat|feature)\//, label: 'feature' },
+              { re: /^(fix|bugfix|hotfix)\//, label: 'fix' },
+            ];
+            const match = map.find(m => m.re.test(branch));
+            if (!match) {
+              core.info(`Branch '${branch}' did not match any auto-label rule. Skipping.`);
+              return;
+            }
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: [match.label],
+            });
+            core.info(`Applied label '${match.label}' to PR #${context.payload.pull_request.number} (branch: ${branch}).`);
