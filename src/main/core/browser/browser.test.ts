@@ -449,6 +449,77 @@ describe('Browser', () => {
       const closed = await browser.closeTab(childTabId);
       expect(closed).toBe(true);
     });
+
+    test('adding a 2nd child keeps sibling contiguity: [parent, c1, c2, unrelated]', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+
+      const parent = await browser.openURL('http://parent.com');
+      const c1 = await browser.openURL('http://c1.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      const unrelated = await browser.openURL('http://unrelated.com');
+      const c2 = await browser.openURL('http://c2.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
+        parent!.tabContainer.id,
+        c1!.tabContainer.id,
+        c2!.tabContainer.id,
+        unrelated!.tabContainer.id,
+      ]);
+    });
+
+    test('3 levels (root -> mid -> leaf) keep contiguity in the sidebar: [root, mid, leaf]', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+
+      const root = await browser.openURL('http://root.com');
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      const leaf = await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+
+      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
+        root!.tabContainer.id,
+        mid!.tabContainer.id,
+        leaf!.tabContainer.id,
+      ]);
+    });
+
+    test('closing the middle child soft-closes it and its leaf, preserving the rest of the order', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const w = browser.activeWindow!;
+
+      const root = await browser.openURL('http://root.com');
+      const c1 = await browser.openURL('http://c1.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      const leaf = await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+      const unrelated = await browser.openURL('http://unrelated.com');
+
+      await browser.closeTab(mid!.tab.id);
+
+      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
+        root!.tabContainer.id,
+        c1!.tabContainer.id,
+        mid!.tabContainer.id,
+        leaf!.tabContainer.id,
+        unrelated!.tabContainer.id,
+      ]);
+      expect(mid!.tabContainer.isClosed).toBe(true);
+      expect(leaf!.tabContainer.isClosed).toBe(true);
+      expect(c1!.tabContainer.isClosed).toBe(false);
+      expect(unrelated!.tabContainer.isClosed).toBe(false);
+    });
   });
 
   describe('Browser.closeTab cascade (parent/children)', () => {

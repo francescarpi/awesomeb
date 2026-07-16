@@ -1,4 +1,4 @@
-import type { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
+import type { TSearchEngineCode, ITarget, TPartitionId, TTabContainerId } from '~/types';
 import {
   config,
   Browser,
@@ -69,6 +69,21 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
   }
 }
 
+function computeJustAfterId(
+  targetId: string | undefined,
+  selectedTabContainerId: TTabContainerId | undefined,
+  parentTabContainer: TabContainer | undefined,
+): TTabContainerId | undefined {
+  if (parentTabContainer) {
+    const siblings = parentTabContainer.children;
+    return siblings.length === 0 ? parentTabContainer.id : siblings[siblings.length - 1].id;
+  }
+  if (targetId === 'after-current') {
+    return selectedTabContainerId;
+  }
+  return undefined;
+}
+
 export function parseTarget(
   browser: Browser,
   props?: {
@@ -124,7 +139,12 @@ export function parseTarget(
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
   } else {
-    const justAfter = targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined;
+    const justAfter = computeJustAfterId(
+      targetId,
+      selectedTab?.tabContainer.id,
+      props?.parentTabContainer,
+    );
+
     tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
       justAfter,
     });
