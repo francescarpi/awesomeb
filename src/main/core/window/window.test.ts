@@ -455,6 +455,166 @@ describe('Window Selecdt Tab', () => {
     expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(result2!.tab.id);
   });
 
+  describe('selectTab next/prev with parent/child hierarchy', () => {
+    test('next from a parent enters the first child when one exists', async () => {
+      const p1 = await browser.openURL('http://p1.com', { selectTab: true });
+      const p2 = await browser.openURL('http://p2.com', { selectTab: true });
+      const c1 = await browser.openURL('http://c1.com', {
+        parentTabContainer: p2!.tabContainer,
+        selectTab: true,
+      });
+
+      // Currently c1 is selected. Going prev should reach p2.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+
+      // Going prev from p2 should reach p1.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p1!.tab.id);
+
+      // From p1 going next should go to p2 (parent tabs first, then children).
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+
+      // From p2 going next should go to c1.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(c1!.tab.id);
+    });
+
+    test('next traverses multiple children in DFS pre-order with wrap-around', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const c1 = await browser.openURL('http://c1.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const c2 = await browser.openURL('http://c2.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      // c2 is currently selected. Sequence: [parent.tab, c1.tab, c2.tab].
+
+      // prev → c1.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(c1!.tab.id);
+
+      // prev → parent.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(parent!.tab.id);
+
+      // next → c1.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(c1!.tab.id);
+
+      // next → c2.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(c2!.tab.id);
+
+      // next from c2 wraps around to parent.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(parent!.tab.id);
+    });
+
+    test('next from the last child jumps to the next parent', async () => {
+      const p1 = await browser.openURL('http://p1.com', { selectTab: true });
+      const lastChildTab = await browser.openURL('http://lastChild.com', {
+        parentTabContainer: p1!.tabContainer,
+        selectTab: true,
+      });
+      const p2 = await browser.openURL('http://p2.com', { selectTab: true });
+
+      // From p2 (selected), prev → wraps to last visible tab: lastChildTab.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(
+        lastChildTab!.tab.id,
+      );
+
+      // From lastChildTab, next → p2.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+    });
+
+    test('prev from first tab of a child moves to the parent last tab', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+
+      // Currently child selected. prev → parent.
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(parent!.tab.id);
+      expect(child!.tab.isClosed).toBe(false);
+    });
+
+    test('closed tabs inside children are skipped during navigation', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const closedChildTab = await browser.openURL('http://closedChild.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const openChildTab = await browser.openURL('http://openChild.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      await browser.closeTab(closedChildTab!.tab.id);
+
+      // closeTab of a soft-closed container sets desktop.selectedTabContainer
+      // to null as a side effect (pre-existing behavior, not in scope here).
+      // Re-select openChildTab to continue the navigation test.
+      window.selectedDesktop!.selectTabContainer(openChildTab!.tabContainer.id);
+      openChildTab!.tabContainer.selectTab(openChildTab!.tab.id);
+
+      // openChildTab is currently selected. With closedChildTab filtered out
+      // the visible sequence is [parent.tab, openChildTab.tab].
+      expect(closedChildTab!.tab.isClosed).toBe(true);
+      expect(openChildTab!.tab.isClosed).toBe(false);
+
+      // prev → parent (closedChildTab is skipped).
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(parent!.tab.id);
+
+      // next skips closedChildTab and lands on openChildTab.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(
+        openChildTab!.tab.id,
+      );
+    });
+
+    test('navigation wraps around the full desktop (parent + child + parent)', async () => {
+      const p1 = await browser.openURL('http://p1.com', { selectTab: true });
+      const lastChildTab = await browser.openURL('http://lastChild.com', {
+        parentTabContainer: p1!.tabContainer,
+        selectTab: true,
+      });
+      const p2 = await browser.openURL('http://p2.com', { selectTab: true });
+      // p2 is currently selected. Sequence: [p1.tab, lastChildTab.tab, p2.tab].
+
+      // prev from p2 (index 2) → lastChildTab (index 1).
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(
+        lastChildTab!.tab.id,
+      );
+
+      // prev from lastChildTab (index 1) → p1 (index 0).
+      await window.selectTab('prev');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p1!.tab.id);
+
+      // next → lastChildTab.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(
+        lastChildTab!.tab.id,
+      );
+
+      // next → p2.
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+
+      // next from p2 (last) wraps around to p1 (first).
+      await window.selectTab('next');
+      expect(window.selectedDesktop.selectedTabContainer?.selectedTab?.id).toBe(p1!.tab.id);
+    });
+  });
+
   test('should switch desktops when selecting a tab from different desktop', async () => {
     // Open tab on desktop 1
     const result1 = await browser.openURL('http://example1.com');
