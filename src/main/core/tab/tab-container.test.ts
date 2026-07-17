@@ -370,3 +370,82 @@ describe('TabContainer.moveChild', () => {
     expect(moved).toBe(false);
   });
 });
+
+describe('TabContainer.hasChildren', () => {
+  let browser: Browser;
+  let window: Window;
+  let desktop: Desktop;
+  let parent: TabContainer;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+    desktop = window.selectedDesktop;
+    parent = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  });
+
+  function makeChildContainer(): TabContainer {
+    return parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+  }
+
+  function makeChildWithTab(): TabContainer {
+    const child = makeChildContainer();
+    child.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://example.com',
+    });
+    return child;
+  }
+
+  test('returns false on a new container with no children', () => {
+    expect(parent.hasChildren).toBe(false);
+  });
+
+  test('returns true when at least one child has non-closed tabs', () => {
+    makeChildWithTab();
+    expect(parent.hasChildren).toBe(true);
+  });
+
+  test('returns true when at least one child has no tabs yet (empty container is not closed)', () => {
+    makeChildContainer();
+    expect(parent.hasChildren).toBe(true);
+  });
+
+  test('returns false when all children are closed', () => {
+    const child = makeChildWithTab();
+    for (const tab of child.tabs) {
+      tab.markAsClosed();
+    }
+    expect(child.isClosed).toBe(true);
+    expect(parent.hasChildren).toBe(false);
+  });
+
+  test('returns true when some children are closed and some are open', () => {
+    const closed = makeChildWithTab();
+    for (const tab of closed.tabs) {
+      tab.markAsClosed();
+    }
+    makeChildWithTab();
+    expect(parent.hasChildren).toBe(true);
+  });
+
+  test('returns false after all open children are closed', () => {
+    const child = makeChildWithTab();
+    expect(parent.hasChildren).toBe(true);
+
+    for (const tab of child.tabs) {
+      tab.markAsClosed();
+    }
+    expect(parent.hasChildren).toBe(false);
+  });
+
+  test('returns false after the last open child is removed', () => {
+    const child = makeChildWithTab();
+    expect(parent.hasChildren).toBe(true);
+
+    parent.removeChild(child.id);
+    expect(parent.hasChildren).toBe(false);
+  });
+});

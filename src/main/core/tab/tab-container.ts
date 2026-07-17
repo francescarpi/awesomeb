@@ -175,6 +175,10 @@ export class TabContainer {
     return this.tabs.length > 0 && this.tabs.every((tab) => tab.isClosed);
   }
 
+  get hasChildren(): boolean {
+    return this.children.some((child) => !child.isClosed);
+  }
+
   getVisibleTabPosition(tabId: TTabId): number {
     const tabsArray = this.visibleTabs;
     return tabsArray.findIndex((tab) => tab.id === tabId) + 1;

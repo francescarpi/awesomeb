@@ -166,6 +166,21 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     ];
   }
 
+  if (tabContainer.hasChildren) {
+    menu = [
+      ...menu,
+      {
+        label: 'Close Children',
+        icon: getIcon(EIcon.Close),
+        click: async () => {
+          await browser.performCommand(window, 'close-tab-children', {
+            tabContainerId: tabContainer.id,
+          });
+        },
+      },
+    ];
+  }
+
   return Menu.buildFromTemplate(menu);
 }
 
