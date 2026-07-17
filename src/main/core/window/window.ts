@@ -284,9 +284,9 @@ export class Window extends UIWindow {
   get tabs(): IDesConTab[] {
     const allTabs: IDesConTab[] = [];
     for (const desktop of this._desktops.values()) {
-      for (const tabContainer of desktop.tabContainers) {
-        for (const tab of tabContainer.tabs) {
-          allTabs.push({ desktop, tabContainer, tab });
+      for (const tc of desktop.tabContainers) {
+        for (const entry of tc.ownAndChildTabs) {
+          allTabs.push({ desktop, ...entry });
         }
       }
     }

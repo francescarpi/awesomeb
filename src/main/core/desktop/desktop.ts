@@ -230,13 +230,8 @@ export class Desktop {
 
   get tabs(): IConTab[] {
     const tabs: IConTab[] = [];
-    for (const tabContainer of this._tabContainers.values()) {
-      for (const tab of tabContainer.tabs) {
-        tabs.push({
-          tabContainer,
-          tab,
-        });
-      }
+    for (const tc of this._tabContainers.values()) {
+      tabs.push(...tc.ownAndChildTabs);
     }
     return tabs;
   }
@@ -283,16 +278,13 @@ export class Desktop {
     const tabsBelow: IConTab[] = [];
     let found = false;
     for (const tc of this.tabContainers) {
-      for (const t of tc.tabs) {
-        if (t.id === tabId) {
+      for (const entry of tc.ownAndChildTabs) {
+        if (entry.tab.id === tabId) {
           found = true;
           continue;
         }
         if (found) {
-          tabsBelow.push({
-            tabContainer: tc,
-            tab: t,
-          });
+          tabsBelow.push(entry);
         }
       }
     }

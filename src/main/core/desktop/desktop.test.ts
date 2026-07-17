@@ -188,6 +188,98 @@ describe('Desktop', () => {
       tc6.id,
     ]);
   });
+  test('tabs includes child container tabs', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+
+    const tabIds = d.tabs.map((t) => t.tab.id);
+
+    expect(tabIds).toContain(parent!.tab.id);
+    expect(tabIds).toContain(child!.tab.id);
+    expect(d.tabs.length).toBe(2);
+  });
+
+  test('tabs includes tabs from multiple child containers under the same parent', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const c1 = await browser.openURL('http://c1.com', { parentTabContainer: parent!.tabContainer });
+    const c2 = await browser.openURL('http://c2.com', { parentTabContainer: parent!.tabContainer });
+
+    const tabIds = d.tabs.map((t) => t.tab.id);
+
+    expect(tabIds).toContain(parent!.tab.id);
+    expect(tabIds).toContain(c1!.tab.id);
+    expect(tabIds).toContain(c2!.tab.id);
+    expect(d.tabs.length).toBe(3);
+  });
+
+  test('tabs: child container tabs reference the child as tabContainer, not the parent', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+
+    const childEntry = d.tabs.find((t) => t.tab.id === child!.tab.id);
+
+    expect(childEntry).toBeDefined();
+    expect(childEntry!.tabContainer.id).toBe(child!.tabContainer.id);
+    expect(childEntry!.tabContainer.parent).toBe(parent!.tabContainer);
+  });
+
+  test('getTabsBelow includes child container tabs in DFS pre-order', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+    const nextParent = await browser.openURL('http://next.com');
+
+    // DFS pre-order: parent.tab → child.tab → nextParent.tab
+    const belowParent = d.getTabsBelow(parent!.tab.id);
+    expect(belowParent.map((t) => t.tab.id)).toEqual([child!.tab.id, nextParent!.tab.id]);
+  });
+
+  test('getTabsBelow from a child tab sees tabs in subsequent children and next parent', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const c1 = await browser.openURL('http://c1.com', { parentTabContainer: parent!.tabContainer });
+    const c2 = await browser.openURL('http://c2.com', { parentTabContainer: parent!.tabContainer });
+    const nextParent = await browser.openURL('http://next.com');
+
+    // DFS pre-order: parent.tab → c1.tab → c2.tab → nextParent.tab
+    const belowC1 = d.getTabsBelow(c1!.tab.id);
+    expect(belowC1.map((t) => t.tab.id)).toEqual([c2!.tab.id, nextParent!.tab.id]);
+  });
+
+  test('getTabsBelow from the last child returns nothing when there is no next parent', async () => {
+    const d = window.selectedDesktop;
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+
+    const belowChild = d.getTabsBelow(child!.tab.id);
+    expect(belowChild).toEqual([]);
+  });
+
+  test('tabs: top-level container with no parent or children works as before (regression)', () => {
+    const d = window.selectedDesktop;
+    const tc = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const tab = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://example.com',
+    });
+
+    const result = d.tabs;
+
+    expect(result.length).toBe(1);
+    expect(result[0].tab.id).toBe(tab.id);
+    expect(result[0].tabContainer.id).toBe(tc.id);
+  });
 });
 
 describe('Desktop.selectTabContainer (children reachable)', () => {

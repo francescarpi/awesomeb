@@ -449,3 +449,88 @@ describe('TabContainer.hasChildren', () => {
     expect(parent.hasChildren).toBe(false);
   });
 });
+
+describe('TabContainer.ownAndChildTabs', () => {
+  let browser: Browser;
+  let window: Window;
+  let desktop: Desktop;
+  let tc: TabContainer;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+    desktop = window.selectedDesktop;
+    tc = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  });
+
+  test('returns only own tabs when there are no children', () => {
+    const tab = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://example.com',
+    });
+
+    const result = tc.ownAndChildTabs;
+
+    expect(result.length).toBe(1);
+    expect(result[0].tab.id).toBe(tab.id);
+    expect(result[0].tabContainer).toBe(tc);
+  });
+
+  test('returns own tabs first, then child tabs in insertion order', () => {
+    const ownTab = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://own.com',
+    });
+    const c1 = tc.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c1Tab = c1.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://c1.com',
+    });
+    const c2 = tc.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c2Tab = c2.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://c2.com',
+    });
+
+    const result = tc.ownAndChildTabs;
+
+    expect(result.map((e) => e.tab.id)).toEqual([ownTab.id, c1Tab.id, c2Tab.id]);
+  });
+
+  test('child tab entries reference the child as tabContainer', () => {
+    tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://own.com',
+    });
+    const child = tc.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const childTab = child.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://child.com',
+    });
+
+    const childEntry = tc.ownAndChildTabs.find((e) => e.tab.id === childTab.id);
+
+    expect(childEntry).toBeDefined();
+    expect(childEntry!.tabContainer.id).toBe(child.id);
+  });
+
+  test('container with no own tabs but children: returns only child tabs', () => {
+    const child = tc.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const childTab = child.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://child.com',
+    });
+
+    const result = tc.ownAndChildTabs;
+
+    expect(result.length).toBe(1);
+    expect(result[0].tab.id).toBe(childTab.id);
+    expect(result[0].tabContainer.id).toBe(child.id);
+  });
+
+  test('empty container with no tabs or children returns empty array', () => {
+    expect(tc.ownAndChildTabs).toEqual([]);
+  });
+});

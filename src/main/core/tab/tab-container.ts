@@ -1,4 +1,4 @@
-import { TTabContainerId, TTabId } from '~/types';
+import { IConTab, TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
 import { ITabContainerProps, ITabProps } from './types';
 import { Browser } from '@/core';
@@ -173,6 +173,19 @@ export class TabContainer {
 
   get isClosed(): boolean {
     return this.tabs.length > 0 && this.tabs.every((tab) => tab.isClosed);
+  }
+
+  get ownAndChildTabs(): IConTab[] {
+    const entries: IConTab[] = [];
+    for (const tab of this.tabs) {
+      entries.push({ tabContainer: this, tab });
+    }
+    for (const child of this.children) {
+      for (const tab of child.tabs) {
+        entries.push({ tabContainer: child, tab });
+      }
+    }
+    return entries;
   }
 
   get hasChildren(): boolean {

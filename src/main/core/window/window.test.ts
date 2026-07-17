@@ -1346,4 +1346,49 @@ describe('Window Open Closed Tab', () => {
     expect(tab.suspended).toBe(false);
     expect(tab.isClosed).toBe(false);
   });
+
+  test('window.tabs includes child container tabs', async () => {
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+
+    const tabIds = window.tabs.map((t) => t.tab.id);
+
+    expect(tabIds).toContain(parent!.tab.id);
+    expect(tabIds).toContain(child!.tab.id);
+    expect(window.tabs.length).toBe(2);
+  });
+
+  test('window.tabs: child container tabs reference the child as tabContainer', async () => {
+    const parent = await browser.openURL('http://parent.com');
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent!.tabContainer,
+    });
+
+    const childEntry = window.tabs.find((t) => t.tab.id === child!.tab.id);
+
+    expect(childEntry).toBeDefined();
+    expect(childEntry!.tabContainer.id).toBe(child!.tabContainer.id);
+  });
+
+  test('window.tabs: tabs from multiple child containers across desktops', async () => {
+    const d2 = window.getDesktop(2)!;
+
+    const p1 = await browser.openURL('http://p1.com');
+    await browser.openURL('http://c1.com', { parentTabContainer: p1!.tabContainer });
+
+    d2.selectTabContainer(null);
+    window.selectDesktop(2);
+    const p2 = await browser.openURL('http://p2.com');
+    await browser.openURL('http://c2.com', { parentTabContainer: p2!.tabContainer });
+
+    // Switch back so both desktops are iterated
+    window.selectDesktop(1);
+
+    const allTabIds = window.tabs.map((t) => t.tab.id);
+    expect(allTabIds).toContain(p1!.tab.id);
+    expect(allTabIds).toContain(p2!.tab.id);
+    expect(window.tabs.length).toBe(4);
+  });
 });
