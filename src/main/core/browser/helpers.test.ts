@@ -26,7 +26,7 @@ describe('parseTarget - justAfter positioning', () => {
     expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([selectedId, second!.tabContainer.id]);
   });
 
-  test('parentTabContainer with no children places new tabContainer right after the parent', async () => {
+  test('parentTabContainer attaches the new container as a child of the given parent', async () => {
     browser.createWindow(1, { withDesktops: true });
     const desktop = browser.activeWindow!.selectedDesktop;
 
@@ -38,43 +38,31 @@ describe('parseTarget - justAfter positioning', () => {
     });
     expect(child).not.toBeNull();
 
-    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
-      parent!.tabContainer.id,
-      child!.tabContainer.id,
-    ]);
+    expect(child!.tabContainer.parent).toBe(parent!.tabContainer);
+    expect(parent!.tabContainer.children).toContain(child!.tabContainer);
+    expect(desktop.tabContainers).toContain(parent!.tabContainer);
+    expect(desktop.tabContainers).not.toContain(child!.tabContainer);
   });
 
-  test('parentTabContainer with existing children places new sibling right after the last child, not at the end', async () => {
+  test('parentTabContainer with 2 children preserves sibling order in parent.children', async () => {
     browser.createWindow(1, { withDesktops: true });
-    const desktop = browser.activeWindow!.selectedDesktop;
 
     const parent = await browser.openURL('http://parent.com');
-    expect(parent).not.toBeNull();
-
     const firstChild = await browser.openURL('http://child1.com', {
       parentTabContainer: parent!.tabContainer,
     });
-    expect(firstChild).not.toBeNull();
-
-    const intruder = await browser.openURL('http://intruder.com');
-    expect(intruder).not.toBeNull();
-
     const secondChild = await browser.openURL('http://child2.com', {
       parentTabContainer: parent!.tabContainer,
     });
-    expect(secondChild).not.toBeNull();
 
-    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
-      parent!.tabContainer.id,
+    expect(parent!.tabContainer.children.map((tc) => tc.id)).toEqual([
       firstChild!.tabContainer.id,
       secondChild!.tabContainer.id,
-      intruder!.tabContainer.id,
     ]);
   });
 
-  test('parentTabContainer with 2+ existing children appends the new one after the last sibling', async () => {
+  test('parentTabContainer with 3+ children keeps insertion order in parent.children', async () => {
     browser.createWindow(1, { withDesktops: true });
-    const desktop = browser.activeWindow!.selectedDesktop;
 
     const parent = await browser.openURL('http://parent.com');
     const c1 = await browser.openURL('http://c1.com', {
@@ -87,8 +75,7 @@ describe('parseTarget - justAfter positioning', () => {
       parentTabContainer: parent!.tabContainer,
     });
 
-    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
-      parent!.tabContainer.id,
+    expect(parent!.tabContainer.children.map((tc) => tc.id)).toEqual([
       c1!.tabContainer.id,
       c2!.tabContainer.id,
       c3!.tabContainer.id,
@@ -126,11 +113,8 @@ describe('parseTarget - justAfter positioning', () => {
     });
     expect(newChild).not.toBeNull();
 
-    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
-      parent!.tabContainer.id,
-      newChild!.tabContainer.id,
-      existing!.tabContainer.id,
-    ]);
     expect(newChild!.tabContainer.parent).toBe(parent!.tabContainer);
+    expect(parent!.tabContainer.children).toContain(newChild!.tabContainer);
+    expect(desktop.tabContainers).not.toContain(newChild!.tabContainer);
   });
 });

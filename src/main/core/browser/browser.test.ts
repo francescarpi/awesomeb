@@ -394,9 +394,23 @@ describe('Browser', () => {
       expect(parent!.tabContainer.children.length).toBe(1);
     });
 
-    test('new tabContainer is still indexed normally (getTabContainer + desktop.tabContainers)', async () => {
+    test('child is registered in parent.children but NOT in desktop.tabContainers', async () => {
       browser.createWindow(1, { withDesktops: true });
       const w = browser.activeWindow!;
+      const parent = await browser.openURL('http://parent.com');
+
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      expect(child!.tabContainer.parent).toBe(parent!.tabContainer);
+      expect(parent!.tabContainer.children).toContain(child!.tabContainer);
+      expect(w.selectedDesktop.tabContainers).toContain(parent!.tabContainer);
+      expect(w.selectedDesktop.tabContainers).not.toContain(child!.tabContainer);
+    });
+
+    test('child is findable via browser.getTabContainer (indexed independently of desktop)', async () => {
+      browser.createWindow(1, { withDesktops: true });
       const parent = await browser.openURL('http://parent.com');
 
       const child = await browser.openURL('http://child.com', {
@@ -406,24 +420,6 @@ describe('Browser', () => {
       const lookup = browser.getTabContainer(child!.tabContainer.id);
       expect(lookup).not.toBeNull();
       expect(lookup!.tabContainer.id).toBe(child!.tabContainer.id);
-
-      const desktop = w.selectedDesktop;
-      expect(desktop.tabContainers).toContain(child!.tabContainer);
-    });
-
-    test('parent tabContainer remains indexed and visible after attaching a child', async () => {
-      browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
-      const parent = await browser.openURL('http://parent.com');
-
-      const child = await browser.openURL('http://child.com', {
-        parentTabContainer: parent!.tabContainer,
-      });
-
-      const parentLookup = browser.getTabContainer(parent!.tabContainer.id);
-      expect(parentLookup).not.toBeNull();
-      expect(w.selectedDesktop.tabContainers).toContain(parent!.tabContainer);
-      expect(w.selectedDesktop.tabContainers).toContain(child!.tabContainer);
     });
 
     test('without parentTabContainer, the new tabContainer has parent === null (regression)', async () => {
@@ -450,28 +446,24 @@ describe('Browser', () => {
       expect(closed).toBe(true);
     });
 
-    test('adding a 2nd child keeps sibling contiguity: [parent, c1, c2, unrelated]', async () => {
+    test('2nd child is appended to parent.children in insertion order', async () => {
       browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
 
       const parent = await browser.openURL('http://parent.com');
       const c1 = await browser.openURL('http://c1.com', {
         parentTabContainer: parent!.tabContainer,
       });
-      const unrelated = await browser.openURL('http://unrelated.com');
       const c2 = await browser.openURL('http://c2.com', {
         parentTabContainer: parent!.tabContainer,
       });
 
-      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
-        parent!.tabContainer.id,
+      expect(parent!.tabContainer.children.map((tc) => tc.id)).toEqual([
         c1!.tabContainer.id,
         c2!.tabContainer.id,
-        unrelated!.tabContainer.id,
       ]);
     });
 
-    test('3 levels (root -> mid -> leaf) keep contiguity in the sidebar: [root, mid, leaf]', async () => {
+    test('3-level hierarchy lives entirely in parent.children chain (not in desktop.tabContainers)', async () => {
       browser.createWindow(1, { withDesktops: true });
       const w = browser.activeWindow!;
 
@@ -483,42 +475,23 @@ describe('Browser', () => {
         parentTabContainer: mid!.tabContainer,
       });
 
-      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
-        root!.tabContainer.id,
-        mid!.tabContainer.id,
-        leaf!.tabContainer.id,
-      ]);
+      expect(root!.tabContainer.children.map((tc) => tc.id)).toEqual([mid!.tabContainer.id]);
+      expect(mid!.tabContainer.children.map((tc) => tc.id)).toEqual([leaf!.tabContainer.id]);
+      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([root!.tabContainer.id]);
     });
 
-    test('closing the middle child soft-closes it and its leaf, preserving the rest of the order', async () => {
+    test('closing a child tab removes the child from parent.children (cascade simmetry)', async () => {
       browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
+      const parent = await browser.openURL('http://parent.com');
 
-      const root = await browser.openURL('http://root.com');
-      const c1 = await browser.openURL('http://c1.com', {
-        parentTabContainer: root!.tabContainer,
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
       });
-      const mid = await browser.openURL('http://mid.com', {
-        parentTabContainer: root!.tabContainer,
-      });
-      const leaf = await browser.openURL('http://leaf.com', {
-        parentTabContainer: mid!.tabContainer,
-      });
-      const unrelated = await browser.openURL('http://unrelated.com');
+      expect(parent!.tabContainer.children).toContain(child!.tabContainer);
 
-      await browser.closeTab(mid!.tab.id);
-
-      expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([
-        root!.tabContainer.id,
-        c1!.tabContainer.id,
-        mid!.tabContainer.id,
-        leaf!.tabContainer.id,
-        unrelated!.tabContainer.id,
-      ]);
-      expect(mid!.tabContainer.isClosed).toBe(true);
-      expect(leaf!.tabContainer.isClosed).toBe(true);
-      expect(c1!.tabContainer.isClosed).toBe(false);
-      expect(unrelated!.tabContainer.isClosed).toBe(false);
+      const closed = await browser.closeTab(child!.tab.id);
+      expect(closed).toBe(true);
+      expect(parent!.tabContainer.children).not.toContain(child!.tabContainer);
     });
   });
 
@@ -668,11 +641,8 @@ describe('Browser', () => {
       expect(lone!.tabContainer.children).toEqual([]);
     });
 
-    test('closing every tab in a child one-by-one: child ends with all isClosed and persists in desktop.tabContainers', async () => {
+    test('closing every tab in a child one-by-one: child ends with all isClosed and is removed from parent.children by cascade', async () => {
       browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
-      const desktop = w.selectedDesktop;
-
       const parent = await browser.openURL('http://parent.com');
       const child = await browser.openURL('http://child.com', {
         parentTabContainer: parent!.tabContainer,
@@ -682,6 +652,7 @@ describe('Browser', () => {
       const firstChildTab = child!.tab;
 
       expect(childTc.tabs.length).toBe(1);
+      expect(parent!.tabContainer.children).toContain(childTc);
 
       const secondTab = await browser.openURL('http://second.com', {
         targetId: 'split-tab',
@@ -693,13 +664,12 @@ describe('Browser', () => {
       await browser.closeTab(secondTab!.tab.id);
 
       expect(childTc.tabs.every((t) => t.isClosed)).toBe(true);
-      expect(desktop.tabContainers).toContain(childTc);
+      expect(childTc.isClosed).toBe(true);
+      expect(parent!.tabContainer.children).not.toContain(childTc);
     });
 
-    test('private partition child: cascade removes child from desktop.tabContainers and from index', async () => {
+    test('private partition child: cascade removes child from parent.children and from index', async () => {
       browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
-      const desktop = w.selectedDesktop;
 
       const parent = await browser.openURL('http://parent.com');
       const privateChild = await browser.openURL('http://private.com', {
@@ -708,21 +678,18 @@ describe('Browser', () => {
       });
       expect(privateChild!.tab.partition.private).toBe(true);
 
-      expect(desktop.tabContainers).toContain(privateChild!.tabContainer);
+      expect(parent!.tabContainer.children).toContain(privateChild!.tabContainer);
       expect(browser.getTab(privateChild!.tab.id)).not.toBeNull();
 
       await browser.closeTab(parent!.tab.id);
 
-      expect(desktop.tabContainers).not.toContain(privateChild!.tabContainer);
       expect(browser.getTabContainer(privateChild!.tabContainer.id)).toBeNull();
       expect(browser.getTab(privateChild!.tab.id)).toBeNull();
       expect(parent!.tabContainer.children).not.toContain(privateChild!.tabContainer);
     });
 
-    test('mixed partition child: private tab unindexed, non-private tab soft-closed, child persists', async () => {
+    test('mixed partition child: private tab unindexed, non-private tab soft-closed, child removed from parent', async () => {
       browser.createWindow(1, { withDesktops: true });
-      const w = browser.activeWindow!;
-      const desktop = w.selectedDesktop;
 
       const parent = await browser.openURL('http://parent.com');
       const mixedChild = await browser.openURL('http://non-private.com', {
@@ -755,7 +722,6 @@ describe('Browser', () => {
       expect(nonPrivateLookup).not.toBeNull();
       expect(nonPrivateLookup!.tab.isClosed).toBe(true);
 
-      expect(desktop.tabContainers).toContain(childTc);
       expect(parent!.tabContainer.children).not.toContain(childTc);
     });
   });
