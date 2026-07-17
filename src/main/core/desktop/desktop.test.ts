@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, vi } from 'vitest';
 import type { TTabContainerId } from '~/types';
-import { Browser, partitions, Window } from '@/core';
+import { Browser, partitions, Window, TabContainer } from '@/core';
 
 describe('Desktop', () => {
   let browser: Browser;
@@ -187,5 +187,82 @@ describe('Desktop', () => {
       tc5.id,
       tc6.id,
     ]);
+  });
+});
+
+describe('Desktop.selectTabContainer (children reachable)', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('selectTabContainer with a top-level id sets and exposes it', () => {
+    const d = window.selectedDesktop;
+    const tc = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.selectTabContainer(tc.id);
+
+    expect(d.selectedTabContainer).toBe(tc);
+  });
+
+  test('selectTabContainer with a direct child id sets and exposes it', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.selectTabContainer(child.id);
+
+    expect(d.selectedTabContainer).toBe(child);
+  });
+
+  test('selectTabContainer with a grandchild id (3-level tree) sets and exposes it', () => {
+    const d = window.selectedDesktop;
+    const root = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const mid = root.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const leaf = mid.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.selectTabContainer(leaf.id);
+
+    expect(d.selectedTabContainer).toBe(leaf);
+  });
+
+  test('selectTabContainer with a non-existent id is a no-op (previous selection is preserved)', () => {
+    const d = window.selectedDesktop;
+    const tc = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    d.selectTabContainer(tc.id);
+
+    d.selectTabContainer(99999 as TTabContainerId);
+
+    expect(d.selectedTabContainer).toBe(tc);
+  });
+
+  test('selectTabContainer(null) clears the selection even when a child exists', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.selectTabContainer(child.id);
+    expect(d.selectedTabContainer).toBe(child);
+
+    d.selectTabContainer(null);
+    expect(d.selectedTabContainer).toBeNull();
+  });
+
+  test('selectedTabContainer resolves a previously-set child id (not just top-level)', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.selectTabContainer(child.id);
+    const resolved = d.selectedTabContainer;
+
+    expect(resolved).toBeInstanceOf(TabContainer);
+    expect(resolved?.id).toBe(child.id);
+    expect(resolved?.parent).toBe(parent);
   });
 });

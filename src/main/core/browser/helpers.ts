@@ -72,12 +72,7 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
 function computeJustAfterId(
   targetId: string | undefined,
   selectedTabContainerId: TTabContainerId | undefined,
-  parentTabContainer: TabContainer | undefined,
 ): TTabContainerId | undefined {
-  if (parentTabContainer) {
-    const siblings = parentTabContainer.children;
-    return siblings.length === 0 ? parentTabContainer.id : siblings[siblings.length - 1].id;
-  }
   if (targetId === 'after-current') {
     return selectedTabContainerId;
   }
@@ -139,20 +134,16 @@ export function parseTarget(
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
   } else {
-    const justAfter = computeJustAfterId(
-      targetId,
-      selectedTab?.tabContainer.id,
-      props?.parentTabContainer,
-    );
-
-    tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
-      justAfter,
-    });
-  }
-
-  if (props?.parentTabContainer) {
-    tabContainer.setParent(props.parentTabContainer);
-    props.parentTabContainer.addChild(tabContainer);
+    if (props?.parentTabContainer) {
+      tabContainer = props.parentTabContainer.createChildTabContainer(
+        browser.idGenerator.nextTabContainerId,
+      );
+    } else {
+      const justAfter = computeJustAfterId(targetId, selectedTab?.tabContainer.id);
+      tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
+        justAfter,
+      });
+    }
   }
 
   let partition: Partition;

@@ -192,6 +192,13 @@ export class TabContainer {
     this._children.set(tabContainer.id, tabContainer);
   }
 
+  createChildTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {
+    const tabContainer = new TabContainer(this.browser, id, props);
+    tabContainer.setParent(this);
+    this.addChild(tabContainer);
+    return tabContainer;
+  }
+
   setParent(tabContainer: TabContainer | null) {
     this._parent = tabContainer;
   }

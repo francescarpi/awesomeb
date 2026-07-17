@@ -141,7 +141,7 @@ export class Desktop {
       return;
     }
 
-    if (!this._tabContainers.has(id)) {
+    if (!this._findTabContainer(id)) {
       return;
     }
 
@@ -152,7 +152,31 @@ export class Desktop {
     if (this._selectedTabContainerId === null) {
       return null;
     }
-    return this._tabContainers.get(this._selectedTabContainerId) || null;
+    return this._findTabContainer(this._selectedTabContainerId);
+  }
+
+  private _findTabContainer(id: TTabContainerId): TabContainer | null {
+    const walk = (tc: TabContainer): TabContainer | null => {
+      if (tc.id === id) {
+        return tc;
+      }
+      for (const child of tc.children) {
+        const found = walk(child);
+        if (found) {
+          return found;
+        }
+      }
+      return null;
+    };
+
+    for (const top of this._tabContainers.values()) {
+      const found = walk(top);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
   }
 
   get selectedTab(): IConTab | null {
