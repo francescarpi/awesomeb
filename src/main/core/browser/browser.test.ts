@@ -123,6 +123,119 @@ describe('Browser', () => {
     });
   });
 
+  describe('Browser.duplicateTab (parent/children regression)', () => {
+    test('duplicating a child tab to another desktop does NOT touch parent.children', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // desktop 1: parent (P) with a child container (C) holding a tab.
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const parentId = parent!.tabContainer.id;
+      const childId = child!.tabContainer.id;
+
+      // Sanity.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parentId);
+
+      // Duplicate the child tab to desktop 2.
+      const duplicate = await browser.duplicateTab(child!.tab.id, { targetId: 'desktop-2' });
+      expect(duplicate).not.toBeNull();
+
+      // Source parent/children graph is untouched.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parentId);
+      expect(child!.tabContainer.tabs.length).toBe(1);
+
+      // The duplicate lives in a brand new top-level container in desktop 2.
+      const desktop2 = w.getDesktop(2);
+      expect(desktop2?.tabContainers.length).toBe(1);
+      const dupContainer = desktop2!.tabContainers[0];
+      expect(dupContainer.id).not.toBe(childId);
+      expect(dupContainer.parent).toBeNull();
+      expect(dupContainer.tabs.length).toBe(1);
+    });
+
+    test('duplicating a child tab via split-tab does NOT detach it from its parent', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      // desktop 1: parent (P) with a child container (C) holding a tab.
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childId = child!.tabContainer.id;
+
+      // Sanity.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+
+      // Duplicate the child tab into split-tab (same desktop). The duplicate
+      // lands in the same child container (C), giving C two tabs.
+      const duplicate = await browser.duplicateTab(child!.tab.id, { targetId: 'split-tab' });
+      expect(duplicate).not.toBeNull();
+
+      // The source child is still a child of P (parent/children graph intact)
+      // and now holds both the original tab and the duplicate.
+      expect(child!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.tabs.length).toBe(2);
+    });
+
+    test('duplicating a top-level tab to another desktop does NOT move the source', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // desktop 1: a top-level container with one tab.
+      const top = await browser.openURL('http://top.com', { selectTab: true });
+      const topId = top!.tabContainer.id;
+      expect(top!.tabContainer.parent).toBeNull();
+
+      // Duplicate it to desktop 2.
+      const duplicate = await browser.duplicateTab(top!.tab.id, { targetId: 'desktop-2' });
+      expect(duplicate).not.toBeNull();
+
+      // Source desktop still owns the original top-level container with its tab.
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([topId]);
+      expect(w.getDesktop(1)?.tabContainers[0].tabs.length).toBe(1);
+      expect(w.getDesktop(1)?.tabContainers[0].parent).toBeNull();
+
+      // The duplicate is a separate top-level container in desktop 2.
+      const desktop2 = w.getDesktop(2);
+      expect(desktop2?.tabContainers.length).toBe(1);
+      expect(desktop2?.tabContainers[0].id).not.toBe(topId);
+      expect(desktop2?.tabContainers[0].parent).toBeNull();
+    });
+
+    test('duplicating with an explicit parentTabContainer puts the duplicate in a new child, leaving the source intact', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // Source: top-level A with a tab.
+      const sourceA = await browser.openURL('http://a.com', { selectTab: true });
+      // Target parent: top-level B (no children yet).
+      const targetB = await browser.openURL('http://b.com', { selectTab: true });
+
+      // Duplicate A's tab, explicitly parenting the duplicate under B.
+      const duplicate = await browser.duplicateTab(sourceA!.tab.id, {
+        parentTabContainer: targetB!.tabContainer,
+      });
+      expect(duplicate).not.toBeNull();
+
+      // Source A: untouched, still top-level, still has its one tab.
+      expect(w.getDesktop(1)?.tabContainers[0].id).toBe(sourceA!.tabContainer.id);
+      expect(w.getDesktop(1)?.tabContainers[0].parent).toBeNull();
+      expect(sourceA!.tabContainer.tabs.length).toBe(1);
+
+      // B: gained a new child container holding the duplicate tab.
+      expect(targetB!.tabContainer.children.length).toBe(1);
+      const newChild = targetB!.tabContainer.children[0];
+      expect(newChild.parent?.id).toBe(targetB!.tabContainer.id);
+      expect(newChild.tabs.length).toBe(1);
+    });
+  });
+
   test('duplicate a tab in the same desktop', async () => {
     const w = browser.createWindow(1, { withDesktops: true });
     const result = await browser.openURL('http://example.com');
