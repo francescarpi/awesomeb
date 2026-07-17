@@ -50,7 +50,11 @@
         h(
           'div', // Tab Container
           {
-            class: c(tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`, 'flex-col'),
+            class: c(
+              'hidden',
+              tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
+              'flex-col',
+            ),
           },
           h(
             'div',
