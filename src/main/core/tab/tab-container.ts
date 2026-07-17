@@ -188,6 +188,31 @@ export class TabContainer {
     this._children.delete(tabContainerId);
   }
 
+  moveChild(id: TTabContainerId, direction: 'up' | 'down'): boolean {
+    const children = this.children;
+    const index = children.findIndex((c) => c.id === id);
+    if (index === -1) return false;
+
+    const step = direction === 'up' ? -1 : 1;
+    let newIndex = index + step;
+    while (newIndex >= 0 && newIndex < children.length && children[newIndex].isClosed) {
+      newIndex += step;
+    }
+
+    if (newIndex < 0 || newIndex >= children.length) return false;
+    if (newIndex === index) return false;
+
+    const [moved] = children.splice(index, 1);
+    children.splice(newIndex, 0, moved);
+
+    this._children.clear();
+    for (const c of children) {
+      this._children.set(c.id, c);
+    }
+
+    return true;
+  }
+
   addChild(tabContainer: TabContainer) {
     this._children.set(tabContainer.id, tabContainer);
   }

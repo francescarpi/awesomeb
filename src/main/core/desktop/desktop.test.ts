@@ -266,3 +266,86 @@ describe('Desktop.selectTabContainer (children reachable)', () => {
     expect(resolved?.parent).toBe(parent);
   });
 });
+
+describe('Desktop.moveTabContainer (children)', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('moveTabContainer with a child id moves it within parent.children', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const c1 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c2 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c3 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.moveTabContainer(c2.id, 'up');
+
+    expect(parent.children.map((c) => c.id)).toEqual([c2.id, c1.id, c3.id]);
+  });
+
+  test('moveTabContainer with a child id does not change desktop.tabContainers', () => {
+    const d = window.selectedDesktop;
+    const t1 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const t2 = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = t1.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    const before = d.tabContainers.map((tc) => tc.id);
+    d.moveTabContainer(child.id, 'down');
+    const after = d.tabContainers.map((tc) => tc.id);
+
+    expect(after).toEqual(before);
+    expect(after).toEqual([t1.id, t2.id]);
+    expect(t1.children[0].id).toBe(child.id);
+  });
+
+  test('moveTabContainer with a child at first position is a no-op', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const c1 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c2 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.moveTabContainer(c1.id, 'up');
+
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id]);
+  });
+
+  test('moveTabContainer with a child at last position is a no-op', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const c1 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c2 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    d.moveTabContainer(c2.id, 'down');
+
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id]);
+  });
+
+  test('moveTabContainer emits desktop:tabcontainers-order-did-change only when a child move was effective', () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const c2 = parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+
+    const emitSpy = vi.spyOn(d.browser.eventsChannel, 'emit');
+
+    // Effective move: c2 up → swap with c1. Event fires.
+    d.moveTabContainer(c2.id, 'up');
+    expect(emitSpy).toHaveBeenCalledWith('desktop:tabcontainers-order-did-change', d.window, d);
+
+    // No-op move: c2 is now at first position, "up" does nothing. Event does NOT fire.
+    emitSpy.mockClear();
+    d.moveTabContainer(c2.id, 'up');
+    expect(emitSpy).not.toHaveBeenCalledWith(
+      'desktop:tabcontainers-order-did-change',
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+});

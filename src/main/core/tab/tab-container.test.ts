@@ -307,3 +307,66 @@ describe('TabContainer tree (parent + children together)', () => {
     // the relationship should be set on both sides in a single call.
   });
 });
+
+describe('TabContainer.moveChild', () => {
+  let browser: Browser;
+  let desktop: Desktop;
+  let parent: TabContainer;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    const window = browser.createWindow(1);
+    window.createDefaultDesktops();
+    desktop = window.selectedDesktop;
+    parent = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  });
+
+  function makeChild(): TabContainer {
+    return parent.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+  }
+
+  test('moveChild up reorders children within parent.children', () => {
+    const c1 = makeChild();
+    const c2 = makeChild();
+    const c3 = makeChild();
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id, c3.id]);
+
+    const moved = parent.moveChild(c2.id, 'up');
+    expect(moved).toBe(true);
+    expect(parent.children.map((c) => c.id)).toEqual([c2.id, c1.id, c3.id]);
+  });
+
+  test('moveChild down reorders children within parent.children', () => {
+    const c1 = makeChild();
+    const c2 = makeChild();
+    const c3 = makeChild();
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id, c3.id]);
+
+    const moved = parent.moveChild(c2.id, 'down');
+    expect(moved).toBe(true);
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c3.id, c2.id]);
+  });
+
+  test('moveChild up at first position returns false (no-op)', () => {
+    const c1 = makeChild();
+    const c2 = makeChild();
+    const moved = parent.moveChild(c1.id, 'up');
+    expect(moved).toBe(false);
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id]);
+  });
+
+  test('moveChild down at last position returns false (no-op)', () => {
+    const c1 = makeChild();
+    const c2 = makeChild();
+    const moved = parent.moveChild(c2.id, 'down');
+    expect(moved).toBe(false);
+    expect(parent.children.map((c) => c.id)).toEqual([c1.id, c2.id]);
+  });
+
+  test('moveChild with unknown id returns false (no-op)', () => {
+    makeChild();
+    const moved = parent.moveChild(99999 as never, 'up');
+    expect(moved).toBe(false);
+  });
+});

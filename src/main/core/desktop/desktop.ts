@@ -242,11 +242,22 @@ export class Desktop {
   }
 
   moveTabContainer(id: TTabContainerId, direction: 'up' | 'down') {
+    const tc = this._findTabContainer(id);
+    if (!tc) return;
+
+    const moved = tc.parent
+      ? tc.parent.moveChild(id, direction)
+      : this._moveTopLevelTabContainer(id, direction);
+
+    if (moved) {
+      this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
+    }
+  }
+
+  private _moveTopLevelTabContainer(id: TTabContainerId, direction: 'up' | 'down'): boolean {
     const tabContainers = this.tabContainers;
     const index = tabContainers.findIndex((tc) => tc.id === id);
-    if (index === -1) {
-      return;
-    }
+    if (index === -1) return false;
 
     const step = direction === 'up' ? -1 : 1;
     let newIndex = index + step;
@@ -254,9 +265,8 @@ export class Desktop {
       newIndex += step;
     }
 
-    if (newIndex < 0 || newIndex >= tabContainers.length) {
-      return;
-    }
+    if (newIndex < 0 || newIndex >= tabContainers.length) return false;
+    if (newIndex === index) return false;
 
     const [movedTabContainer] = tabContainers.splice(index, 1);
     tabContainers.splice(newIndex, 0, movedTabContainer);
@@ -266,7 +276,7 @@ export class Desktop {
       this._tabContainers.set(tc.id, tc);
     }
 
-    this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
+    return true;
   }
 
   getTabsBelow(tabId: TTabId): IConTab[] {
