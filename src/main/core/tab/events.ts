@@ -210,7 +210,9 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
 
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.setWindowOpenHandler((details: HandlerDetails) => {
-    return windowOpenHadler(browser, details);
+    const tabData = browser.getTab(tab.id);
+    const parentTabContainer = tabData && tab.openTabsAsChild ? tabData.tabContainer : undefined;
+    return windowOpenHadler(browser, details, parentTabContainer);
   });
 
   //--------------------------------------------------------------------------------------

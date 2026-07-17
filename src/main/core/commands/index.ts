@@ -70,6 +70,8 @@ import * as debugPage from './debug-page';
 import * as windowNew from './window-new';
 import * as tabClearClosed from './tab-clear-closed';
 import * as tabPreviousVisited from './tab-previous-visited';
+import * as tabToggleOpenTabsAschild from './tab-toggle-open-tabs-as-child';
+import * as tabCloseChildren from './tab-close-children';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -94,6 +96,7 @@ const COMMANDS = {
   [tabContainerSelectByIndex.TRIGGER]: tabContainerSelectByIndex.Command,
   [tabSelect.TRIGGER]: tabSelect.Command,
   [tabClose.TRIGGER]: tabClose.Command,
+  [tabCloseChildren.TRIGGER]: tabCloseChildren.Command,
   [tabReload.TRIGGER]: tabReload.Command,
   [tabHistoryBack.TRIGGER]: tabHistoryBack.Command,
   [tabHistoryForward.TRIGGER]: tabHistoryForward.Command,
@@ -139,6 +142,7 @@ const COMMANDS = {
   [windowNew.TRIGGER]: windowNew.Command,
   [tabClearClosed.TRIGGER]: tabClearClosed.Command,
   [tabPreviousVisited.TRIGGER]: tabPreviousVisited.Command,
+  [tabToggleOpenTabsAschild.TRIGGER]: tabToggleOpenTabsAschild.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

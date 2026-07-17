@@ -4,15 +4,19 @@ import { TWindowId } from './window';
 export type TTabId = number;
 export type TTabContainerId = number;
 
-export interface ITabContainer {
+export interface ISimpleTabContainer {
   id: TTabContainerId;
-  shortcut: number | null;
   selected: boolean;
-  divider: boolean;
   tabs: ITab[];
   desktopId: TDesktopId;
   isClosed: boolean;
   isSplit: boolean;
+}
+
+export interface ITabContainer extends ISimpleTabContainer {
+  shortcut: number | null;
+  divider: boolean;
+  children: ISimpleTabContainer[];
 }
 
 export interface ITab {

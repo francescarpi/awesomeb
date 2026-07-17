@@ -141,7 +141,7 @@ export class Desktop {
       return;
     }
 
-    if (!this._tabContainers.has(id)) {
+    if (!this._findTabContainer(id)) {
       return;
     }
 
@@ -152,7 +152,31 @@ export class Desktop {
     if (this._selectedTabContainerId === null) {
       return null;
     }
-    return this._tabContainers.get(this._selectedTabContainerId) || null;
+    return this._findTabContainer(this._selectedTabContainerId);
+  }
+
+  private _findTabContainer(id: TTabContainerId): TabContainer | null {
+    const walk = (tc: TabContainer): TabContainer | null => {
+      if (tc.id === id) {
+        return tc;
+      }
+      for (const child of tc.children) {
+        const found = walk(child);
+        if (found) {
+          return found;
+        }
+      }
+      return null;
+    };
+
+    for (const top of this._tabContainers.values()) {
+      const found = walk(top);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
   }
 
   get selectedTab(): IConTab | null {
@@ -206,23 +230,29 @@ export class Desktop {
 
   get tabs(): IConTab[] {
     const tabs: IConTab[] = [];
-    for (const tabContainer of this._tabContainers.values()) {
-      for (const tab of tabContainer.tabs) {
-        tabs.push({
-          tabContainer,
-          tab,
-        });
-      }
+    for (const tc of this._tabContainers.values()) {
+      tabs.push(...tc.ownAndChildTabs);
     }
     return tabs;
   }
 
   moveTabContainer(id: TTabContainerId, direction: 'up' | 'down') {
+    const tc = this._findTabContainer(id);
+    if (!tc) return;
+
+    const moved = tc.parent
+      ? tc.parent.moveChild(id, direction)
+      : this._moveTopLevelTabContainer(id, direction);
+
+    if (moved) {
+      this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
+    }
+  }
+
+  private _moveTopLevelTabContainer(id: TTabContainerId, direction: 'up' | 'down'): boolean {
     const tabContainers = this.tabContainers;
     const index = tabContainers.findIndex((tc) => tc.id === id);
-    if (index === -1) {
-      return;
-    }
+    if (index === -1) return false;
 
     const step = direction === 'up' ? -1 : 1;
     let newIndex = index + step;
@@ -230,9 +260,8 @@ export class Desktop {
       newIndex += step;
     }
 
-    if (newIndex < 0 || newIndex >= tabContainers.length) {
-      return;
-    }
+    if (newIndex < 0 || newIndex >= tabContainers.length) return false;
+    if (newIndex === index) return false;
 
     const [movedTabContainer] = tabContainers.splice(index, 1);
     tabContainers.splice(newIndex, 0, movedTabContainer);
@@ -242,23 +271,20 @@ export class Desktop {
       this._tabContainers.set(tc.id, tc);
     }
 
-    this.browser.eventsChannel.emit('desktop:tabcontainers-order-did-change', this.window, this);
+    return true;
   }
 
   getTabsBelow(tabId: TTabId): IConTab[] {
     const tabsBelow: IConTab[] = [];
     let found = false;
     for (const tc of this.tabContainers) {
-      for (const t of tc.tabs) {
-        if (t.id === tabId) {
+      for (const entry of tc.ownAndChildTabs) {
+        if (entry.tab.id === tabId) {
           found = true;
           continue;
         }
         if (found) {
-          tabsBelow.push({
-            tabContainer: tc,
-            tab: t,
-          });
+          tabsBelow.push(entry);
         }
       }
     }

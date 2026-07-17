@@ -170,6 +170,43 @@ describe('Tab.setTitle', () => {
   });
 });
 
+describe('Tab.isTabPreview', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  test('defaults to false on a newly opened tab', async () => {
+    const result = await browser.openURL('http://example.com');
+    expect(result!.tab.isTabPreview).toBe(false);
+  });
+
+  test('can be toggled via setIsTabPreview', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tab = result!.tab;
+
+    tab.setIsTabPreview(true);
+    expect(tab.isTabPreview).toBe(true);
+
+    tab.setIsTabPreview(false);
+    expect(tab.isTabPreview).toBe(false);
+  });
+
+  test('passing parent to openTabPreview sets isTabPreview to true', async () => {
+    const window = browser.activeWindow!;
+    const result = await browser.openURL('http://parent.example.com');
+    const parentTab = result!.tab;
+
+    browser.openTabPreview(window, parentTab, 'http://preview.example.com');
+
+    const preview = parentTab.tabPreview!.tab;
+    expect(preview.isTabPreview).toBe(true);
+  });
+});
+
 describe('Tab.isExtension', () => {
   let browser: Browser;
 
