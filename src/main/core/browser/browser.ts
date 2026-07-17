@@ -29,6 +29,7 @@ import { BrowserToRenderer } from './renderer.to';
 import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
+import type { ISessionTab, ISessionTabContainer } from '@/core/session/schemes';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('Browser');
@@ -78,30 +79,7 @@ export class Browser {
         if (!desktop) continue;
 
         for (const tabConStore of deskStore.tabContainers) {
-          const tabContainer = desktop.createTabContainer(tabConStore.id, {
-            divider: tabConStore.divider,
-          });
-
-          this._indexTabContainer(newWindow, desktop, tabContainer);
-
-          for (const tabStore of tabConStore.tabs) {
-            const partition =
-              tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
-                ? partitions.internal
-                : partitions.get(tabStore.partitionId) || partitions.default;
-
-            const tab = tabContainer.createTab(tabStore.id, {
-              partition,
-              title: tabStore.title,
-              customTitle: tabStore.customTitle,
-              url: tabStore.url,
-              favicon: tabStore.favicon,
-              closedAt: tabStore.closedAt,
-              openTabsAsChild: tabStore.openTabsAsChild,
-            });
-
-            this._indexTab(newWindow, desktop, tabContainer, tab);
-          }
+          this._loadTabContainer(newWindow, desktop, null, tabConStore);
         }
       }
 
@@ -401,6 +379,52 @@ export class Browser {
     this._tabContainerIndex.delete(tabContainerId);
   }
 
+  private _loadTabIntoContainer(
+    newWindow: Window,
+    desktop: Desktop,
+    tabContainer: TabContainer,
+    tabStore: ISessionTab,
+  ): void {
+    const partition =
+      tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
+        ? partitions.internal
+        : partitions.get(tabStore.partitionId) || partitions.default;
+
+    const tab = tabContainer.createTab(tabStore.id, {
+      partition,
+      title: tabStore.title,
+      customTitle: tabStore.customTitle,
+      url: tabStore.url,
+      favicon: tabStore.favicon,
+      closedAt: tabStore.closedAt,
+      openTabsAsChild: tabStore.openTabsAsChild,
+    });
+
+    this._indexTab(newWindow, desktop, tabContainer, tab);
+  }
+
+  private _loadTabContainer(
+    newWindow: Window,
+    desktop: Desktop,
+    parent: TabContainer | null,
+    tcStore: ISessionTabContainer,
+  ): void {
+    const tabContainer =
+      parent !== null
+        ? parent.createChildTabContainer(tcStore.id, { divider: tcStore.divider })
+        : desktop.createTabContainer(tcStore.id, { divider: tcStore.divider });
+
+    this._indexTabContainer(newWindow, desktop, tabContainer);
+
+    for (const tabStore of tcStore.tabs) {
+      this._loadTabIntoContainer(newWindow, desktop, tabContainer, tabStore);
+    }
+
+    for (const childStore of tcStore.children) {
+      this._loadTabContainer(newWindow, desktop, tabContainer, childStore);
+    }
+  }
+
   reindexWebContents(tab: Tab): void {
     if (!tab.isDestroyed) {
       this._webContentsIndex.set(tab.webContentsId, tab.id);
@@ -560,6 +584,11 @@ export class Browser {
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
       }
+      // When a child empties out (e.g. last tab was private/extension),
+      // detach it from its parent so the tree stays consistent.
+      if (tabContainer.parent) {
+        tabContainer.parent.removeChild(tabContainer.id);
+      }
     }
   }
 
@@ -597,11 +626,9 @@ export class Browser {
 
     this.mediaManager.removeSession(tab.id);
 
-    // Parent/children management
-    if (tabContainer.parent) {
-      tabContainer.parent.removeChild(tabContainer.id);
-    }
-
+    // Soft-close keeps the container in parent.children (it just goes
+    // isClosed). The container is only detached from its parent when
+    // permanentlyCloseTab empties it (private/extension tabs).
     for (const tc of tabContainer.children) {
       for (const tab of tc.tabs) {
         this.closeTab(tab.id);

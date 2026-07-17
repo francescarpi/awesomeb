@@ -351,4 +351,103 @@ describe('Session', () => {
       expect(desktop.longName).toBe('Work Space');
     });
   });
+
+  describe('parent/child hierarchy persistence', () => {
+    test('sessionToStore: 2-level hierarchy persists children nested under parent', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].id).toBeGreaterThan(rootTc.id);
+      expect(rootTc.children[0].tabs).toHaveLength(1);
+    });
+
+    test('sessionToStore: 3-level hierarchy persists the full chain', async () => {
+      const root = await browser.openURL('http://root.com');
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].children).toHaveLength(1);
+      expect(rootTc.children[0].children[0].children).toEqual([]);
+    });
+
+    test('sessionToStore: child with only private tabs is dropped from the persisted tree', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const privateChild = await browser.openURL('http://private.com', {
+        parentTabContainer: parent!.tabContainer,
+        partitionId: partitions.private.id,
+      });
+      expect(privateChild!.tab.partition.private).toBe(true);
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toEqual([]);
+    });
+
+    test('sessionToStore: top-level with no own tabs but a child with tabs IS persisted', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+    });
+
+    test('sessionToStore: soft-closed child (all tabs closed) IS persisted', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      await browser.closeTab(child!.tab.id);
+      expect(child!.tabContainer.isClosed).toBe(true);
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].tabs).toHaveLength(1);
+      expect(rootTc.children[0].tabs[0].closedAt).not.toBeNull();
+    });
+
+    test('save + reload: roundtrip restores the hierarchy on disk', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const rootTc = persisted.windows[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].id).toBe(child!.tabContainer.id);
+    });
+  });
 });

@@ -1,7 +1,10 @@
-import { expect, test, describe, beforeEach, vi } from 'vitest';
+import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
 import { Browser, partitions, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
 import type { HandlerDetails } from 'electron';
+import fs from 'fs';
+import path from 'path';
+import { userDataPath } from '@/paths';
 
 describe('Browser', () => {
   let browser: Browser;
@@ -480,7 +483,7 @@ describe('Browser', () => {
       expect(w.selectedDesktop.tabContainers.map((tc) => tc.id)).toEqual([root!.tabContainer.id]);
     });
 
-    test('closing a child tab removes the child from parent.children (cascade simmetry)', async () => {
+    test('closing a child tab soft-closes it and keeps it in parent.children', async () => {
       browser.createWindow(1, { withDesktops: true });
       const parent = await browser.openURL('http://parent.com');
 
@@ -491,7 +494,8 @@ describe('Browser', () => {
 
       const closed = await browser.closeTab(child!.tab.id);
       expect(closed).toBe(true);
-      expect(parent!.tabContainer.children).not.toContain(child!.tabContainer);
+      expect(child!.tab.isClosed).toBe(true);
+      expect(parent!.tabContainer.children).toContain(child!.tabContainer);
     });
   });
 
@@ -524,16 +528,18 @@ describe('Browser', () => {
       }
     });
 
-    test('closing the parent tab removes every child from parent.children', async () => {
+    test('closing the parent tab soft-closes every child (children remain in parent.children)', async () => {
       browser.createWindow(1, { withDesktops: true });
       const { parent, children } = await createParentWithChildren(2);
 
       await browser.closeTab(parent.tab.id);
 
       for (const child of children) {
-        expect(parent.tabContainer.children).not.toContain(child.tabContainer);
+        expect(parent.tabContainer.children).toContain(child.tabContainer);
+        for (const tab of child.tabContainer.tabs) {
+          expect(tab.isClosed).toBe(true);
+        }
       }
-      expect(parent.tabContainer.children).toEqual([]);
     });
 
     test('cascade closes tabs across multiple children (2+ children)', async () => {
@@ -549,7 +555,7 @@ describe('Browser', () => {
       expect(allClosed).toBe(true);
     });
 
-    test('3-level cascade: closing root closes mid and leaf', async () => {
+    test('3-level cascade: closing root closes mid and leaf (children stay in the tree)', async () => {
       browser.createWindow(1, { withDesktops: true });
       const root = await browser.openURL('http://root.com');
       const mid = await browser.openURL('http://mid.com', {
@@ -567,10 +573,11 @@ describe('Browser', () => {
       for (const tab of leaf!.tabContainer.tabs) {
         expect(tab.isClosed).toBe(true);
       }
-      expect(mid!.tabContainer.children).not.toContain(leaf!.tabContainer);
+      expect(mid!.tabContainer.children).toContain(leaf!.tabContainer);
+      expect(root!.tabContainer.children).toContain(mid!.tabContainer);
     });
 
-    test('closing a child tab removes the child container from parent.children', async () => {
+    test('closing a child tab soft-closes it but keeps it in parent.children', async () => {
       browser.createWindow(1, { withDesktops: true });
       const { parent, children } = await createParentWithChildren(2);
       const targetChild = children[0];
@@ -578,7 +585,8 @@ describe('Browser', () => {
       const closed = await browser.closeTab(targetChild.tab.id);
       expect(closed).toBe(true);
 
-      expect(parent.tabContainer.children).not.toContain(targetChild.tabContainer);
+      expect(targetChild.tab.isClosed).toBe(true);
+      expect(parent.tabContainer.children).toContain(targetChild.tabContainer);
       expect(parent.tabContainer.children).toContain(children[1].tabContainer);
     });
 
@@ -595,7 +603,7 @@ describe('Browser', () => {
       expect(parent.tabContainer.children).toContain(sibling.tabContainer);
     });
 
-    test('closing a child tab DOES cascade to its own children (grandchildren)', async () => {
+    test('closing a child tab DOES cascade to its own children (grandchildren stay in tree)', async () => {
       browser.createWindow(1, { withDesktops: true });
       const root = await browser.openURL('http://root.com');
       const mid = await browser.openURL('http://mid.com', {
@@ -610,22 +618,22 @@ describe('Browser', () => {
       for (const tab of leaf!.tabContainer.tabs) {
         expect(tab.isClosed).toBe(true);
       }
-      expect(mid!.tabContainer.children).not.toContain(leaf!.tabContainer);
+      expect(mid!.tabContainer.children).toContain(leaf!.tabContainer);
     });
 
-    test('closeTab on an already-closed tab returns false and does not re-mutate parent.children', async () => {
+    test('closeTab on an already-closed tab returns false and leaves parent.children untouched', async () => {
       browser.createWindow(1, { withDesktops: true });
       const { parent, children } = await createParentWithChildren(1);
       const child = children[0];
 
       const first = await browser.closeTab(child.tab.id);
       expect(first).toBe(true);
-      expect(parent.tabContainer.children).not.toContain(child.tabContainer);
+      expect(parent.tabContainer.children).toContain(child.tabContainer);
 
       const second = await browser.closeTab(child.tab.id);
       expect(second).toBe(false);
-      expect(parent.tabContainer.children).not.toContain(child.tabContainer);
-      expect(parent.tabContainer.children.length).toBe(0);
+      expect(parent.tabContainer.children).toContain(child.tabContainer);
+      expect(parent.tabContainer.children.length).toBe(1);
     });
 
     test('container with no parent and no children: closing its tab is a no-op for relationships', async () => {
@@ -641,7 +649,7 @@ describe('Browser', () => {
       expect(lone!.tabContainer.children).toEqual([]);
     });
 
-    test('closing every tab in a child one-by-one: child ends with all isClosed and is removed from parent.children by cascade', async () => {
+    test('closing every tab in a child one-by-one: child ends with all isClosed and persists in parent.children', async () => {
       browser.createWindow(1, { withDesktops: true });
       const parent = await browser.openURL('http://parent.com');
       const child = await browser.openURL('http://child.com', {
@@ -665,7 +673,7 @@ describe('Browser', () => {
 
       expect(childTc.tabs.every((t) => t.isClosed)).toBe(true);
       expect(childTc.isClosed).toBe(true);
-      expect(parent!.tabContainer.children).not.toContain(childTc);
+      expect(parent!.tabContainer.children).toContain(childTc);
     });
 
     test('private partition child: cascade removes child from parent.children and from index', async () => {
@@ -688,7 +696,7 @@ describe('Browser', () => {
       expect(parent!.tabContainer.children).not.toContain(privateChild!.tabContainer);
     });
 
-    test('mixed partition child: private tab unindexed, non-private tab soft-closed, child removed from parent', async () => {
+    test('mixed partition child: private tab unindexed, non-private tab soft-closed, child stays in parent', async () => {
       browser.createWindow(1, { withDesktops: true });
 
       const parent = await browser.openURL('http://parent.com');
@@ -722,7 +730,10 @@ describe('Browser', () => {
       expect(nonPrivateLookup).not.toBeNull();
       expect(nonPrivateLookup!.tab.isClosed).toBe(true);
 
-      expect(parent!.tabContainer.children).not.toContain(childTc);
+      // The child still has the soft-closed non-private tab, so it stays
+      // in parent.children. Only when a container is fully emptied does
+      // permanentlyCloseTab detach it from its parent.
+      expect(parent!.tabContainer.children).toContain(childTc);
     });
   });
 
@@ -1048,6 +1059,256 @@ describe('Browser', () => {
       expect(browser.getTab(tabId)).toBeNull();
       expect(browser.getTabContainer(tcId)).toBeNull();
       expect(desktop.tabContainers.length).toBe(0);
+    });
+  });
+
+  describe('Browser.loadSession - parent/child hierarchy', () => {
+    function writeSessionFile(data: unknown) {
+      const filePath = path.join(userDataPath(), 'session.json');
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify(data));
+    }
+
+    function cleanSessionFile() {
+      const filePath = path.join(userDataPath(), 'session.json');
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    afterEach(() => {
+      cleanSessionFile();
+    });
+
+    test('restores a 2-level hierarchy: parent.children contains the child, child.parent is the parent', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: false,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Parent',
+                        customTitle: null,
+                        url: 'http://parent.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [
+                      {
+                        id: 2,
+                        divider: false,
+                        tabs: [
+                          {
+                            id: 20,
+                            partitionId: 'default',
+                            title: 'Child',
+                            customTitle: null,
+                            url: 'http://child.com',
+                            favicon: null,
+                            closedAt: null,
+                            openTabsAsChild: false,
+                          },
+                        ],
+                        children: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      const parentTc = desktop.tabContainers[0];
+      expect(parentTc.id).toBe(1);
+      expect(parentTc.children).toHaveLength(1);
+      expect(parentTc.children[0].id).toBe(2);
+      expect(parentTc.children[0].parent).toBe(parentTc);
+      expect(parentTc.children[0].tabs).toHaveLength(1);
+      expect(parentTc.children[0].tabs[0].id).toBe(20);
+    });
+
+    test('restores a 3-level hierarchy: root -> mid -> leaf', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: false,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Root',
+                        customTitle: null,
+                        url: 'http://root.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [
+                      {
+                        id: 2,
+                        divider: false,
+                        tabs: [
+                          {
+                            id: 20,
+                            partitionId: 'default',
+                            title: 'Mid',
+                            customTitle: null,
+                            url: 'http://mid.com',
+                            favicon: null,
+                            closedAt: null,
+                            openTabsAsChild: false,
+                          },
+                        ],
+                        children: [
+                          {
+                            id: 3,
+                            divider: false,
+                            tabs: [
+                              {
+                                id: 30,
+                                partitionId: 'default',
+                                title: 'Leaf',
+                                customTitle: null,
+                                url: 'http://leaf.com',
+                                favicon: null,
+                                closedAt: null,
+                                openTabsAsChild: false,
+                              },
+                            ],
+                            children: [],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      const root = desktop.tabContainers[0];
+      const mid = root.children[0];
+      const leaf = mid.children[0];
+
+      expect(root.id).toBe(1);
+      expect(mid.id).toBe(2);
+      expect(leaf.id).toBe(3);
+      expect(mid.parent).toBe(root);
+      expect(leaf.parent).toBe(mid);
+      expect(leaf.children).toEqual([]);
+    });
+
+    test('restores tab state: closedAt and openTabsAsChild survive the roundtrip', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: true,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Open',
+                        customTitle: null,
+                        url: 'http://open.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: true,
+                      },
+                      {
+                        id: 11,
+                        partitionId: 'default',
+                        title: 'Closed',
+                        customTitle: null,
+                        url: 'http://closed.com',
+                        favicon: null,
+                        closedAt: 1700000000000,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      const tc = desktop.tabContainers[0];
+
+      expect(tc.divider).toBe(true);
+      expect(tc.tabs).toHaveLength(2);
+
+      const openTab = tc.tabs.find((t) => t.id === 10);
+      expect(openTab?.isClosed).toBe(false);
+      expect(openTab?.openTabsAsChild).toBe(true);
+
+      const closedTab = tc.tabs.find((t) => t.id === 11);
+      expect(closedTab?.isClosed).toBe(true);
+      expect(closedTab?.closedAt).toBe(1700000000000);
     });
   });
 });

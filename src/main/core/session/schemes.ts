@@ -22,13 +22,25 @@ export const SessionTabScheme = z
   })
   .strict();
 
-export const SessionTabContainerScheme = z
-  .object({
-    id: z.number(),
-    divider: z.boolean(),
-    tabs: z.array(SessionTabScheme),
-  })
-  .strict();
+export type ISessionTab = z.infer<typeof SessionTabScheme>;
+
+export type ISessionTabContainer = {
+  id: number;
+  divider: boolean;
+  tabs: z.infer<typeof SessionTabScheme>[];
+  children: ISessionTabContainer[];
+};
+
+export const SessionTabContainerScheme: z.ZodType<ISessionTabContainer> = z.lazy(() =>
+  z
+    .object({
+      id: z.number(),
+      divider: z.boolean(),
+      tabs: z.array(SessionTabScheme),
+      children: z.array(SessionTabContainerScheme).default([]),
+    })
+    .strict(),
+);
 
 export const SessionDesktopScheme = z
   .object({
