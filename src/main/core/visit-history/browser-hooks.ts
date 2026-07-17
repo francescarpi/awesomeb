@@ -5,7 +5,7 @@ import type { TransitionType } from './schemes';
 
 function shouldRecord(tab: Tab): boolean {
   if (tab.partition.private) return false;
-  if (tab.isPreview) return false;
+  if (tab.isTabPreview) return false;
   if (!tab.url) return false;
   if (tab.url === 'about:blank') return false;
   if (tab.url.startsWith(`${INTERNAL_PROTOCOL}://`)) return false;

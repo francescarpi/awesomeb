@@ -22,6 +22,8 @@ import * as tabReload from './tab-reload';
 import * as tabHistoryBack from './tab-history-back';
 import * as tabHistoryForward from './tab-history-forward';
 import * as urlEdit from './url-edit';
+import * as tabcontainerMoveUp from './tabcontainer-move-up';
+import * as tabcontainerMoveDown from './tabcontainer-move-down';
 
 describe('Commands', () => {
   let browser: Browser;
@@ -224,6 +226,40 @@ describe('Commands', () => {
       expect(selectSpy).toHaveBeenCalledWith('prev', { sameDesktop: true });
     });
 
+    test('tab-next: navigates into child tab containers in DFS pre-order', async () => {
+      const window = browser.activeWindow!;
+      const p1 = await browser.openURL('http://p1.com', { selectTab: true });
+      const p2 = await browser.openURL('http://p2.com', { selectTab: true });
+      const c1 = await browser.openURL('http://c1.com', {
+        parentTabContainer: p2!.tabContainer,
+        selectTab: true,
+      });
+
+      // Currently c1 is selected. Reset selection to p1 to start the navigation
+      // from the first parent, then go next twice and verify we reach p2 and c1.
+      window.selectedDesktop!.selectTabContainer(p1!.tabContainer.id);
+      p1!.tabContainer.selectTab(p1!.tab.id);
+
+      await browser.performCommand(window, tabNext.TRIGGER);
+      expect(window.selectedDesktop!.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+
+      await browser.performCommand(window, tabNext.TRIGGER);
+      expect(window.selectedDesktop!.selectedTabContainer?.selectedTab?.id).toBe(c1!.tab.id);
+    });
+
+    test('tab-prev: navigates from child back to parent', async () => {
+      const window = browser.activeWindow!;
+      const p2 = await browser.openURL('http://p2.com', { selectTab: true });
+      await browser.openURL('http://c1.com', {
+        parentTabContainer: p2!.tabContainer,
+        selectTab: true,
+      });
+
+      // Currently c1 (child) is selected. Go prev once and verify we land on p2.
+      await browser.performCommand(window, tabPrev.TRIGGER);
+      expect(window.selectedDesktop!.selectedTabContainer?.selectedTab?.id).toBe(p2!.tab.id);
+    });
+
     test('tab-select: should select a specific tab', async () => {
       const window = browser.activeWindow!;
       browser.openURL('https://example.com');
@@ -417,6 +453,48 @@ describe('Commands', () => {
 
       // Should not throw an error
       expect(true).toBe(true);
+    });
+
+    test('move-tab-container-up: reorders the selected tab container up in the list', async () => {
+      const window = browser.activeWindow!;
+      const a = await browser.openURL('https://a.com', { selectTab: true });
+      const b = await browser.openURL('https://b.com', { selectTab: true });
+      const desktop = window.selectedDesktop!;
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        a!.tabContainer.id,
+        b!.tabContainer.id,
+      ]);
+
+      await browser.performCommand(window, tabcontainerMoveUp.TRIGGER, {});
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        b!.tabContainer.id,
+        a!.tabContainer.id,
+      ]);
+    });
+
+    test('move-tab-container-down: reorders the selected tab container down in the list', async () => {
+      const window = browser.activeWindow!;
+      const a = await browser.openURL('https://a.com', { selectTab: true });
+      const b = await browser.openURL('https://b.com', { selectTab: true });
+      const desktop = window.selectedDesktop!;
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        a!.tabContainer.id,
+        b!.tabContainer.id,
+      ]);
+
+      // After both opens, b is the selected one (at the bottom). Move it down
+      // → it's already at the bottom, so it's a no-op. Re-select a, then move
+      // it down.
+      desktop.selectTabContainer(a!.tabContainer.id);
+      await browser.performCommand(window, tabcontainerMoveDown.TRIGGER, {});
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        b!.tabContainer.id,
+        a!.tabContainer.id,
+      ]);
     });
   });
 

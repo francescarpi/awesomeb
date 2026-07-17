@@ -29,6 +29,7 @@ import { BrowserToRenderer } from './renderer.to';
 import { IMoveTabProps, IOpenUrlProps } from './types';
 import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
+import type { ISessionTab, ISessionTabContainer } from '@/core/session/schemes';
 import { INTERNAL_PROTOCOL } from '~/constants';
 
 const scopeLog = log.scope('Browser');
@@ -78,29 +79,7 @@ export class Browser {
         if (!desktop) continue;
 
         for (const tabConStore of deskStore.tabContainers) {
-          const tabContainer = desktop.createTabContainer(tabConStore.id, {
-            divider: tabConStore.divider,
-          });
-
-          this._indexTabContainer(newWindow, desktop, tabContainer);
-
-          for (const tabStore of tabConStore.tabs) {
-            const partition =
-              tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
-                ? partitions.internal
-                : partitions.get(tabStore.partitionId) || partitions.default;
-
-            const tab = tabContainer.createTab(tabStore.id, {
-              partition,
-              title: tabStore.title,
-              customTitle: tabStore.customTitle,
-              url: tabStore.url,
-              favicon: tabStore.favicon,
-              closedAt: tabStore.closedAt,
-            });
-
-            this._indexTab(newWindow, desktop, tabContainer, tab);
-          }
+          this._loadTabContainer(newWindow, desktop, null, tabConStore);
         }
       }
 
@@ -245,6 +224,7 @@ export class Browser {
     const result = parseTarget(this, {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
+      parentTabContainer: props?.parentTabContainer,
     });
 
     if (!result) {
@@ -300,6 +280,14 @@ export class Browser {
     }
 
     this._indexTabContainer(targetData.window, targetData.desktop, targetData.tabContainer);
+
+    // If the source tabContainer is a child of another container, detach it
+    // before moving it. Otherwise the old parent keeps a stale reference in
+    // its children map and the child still claims the old parent.
+    if (sourceData.tabContainer.parent) {
+      sourceData.tabContainer.parent.removeChild(sourceData.tabContainer.id);
+      sourceData.tabContainer.setParent(null);
+    }
 
     if (targetId === 'split-tab') {
       targetData.tabContainer.addTab(sourceData.tab);
@@ -397,6 +385,52 @@ export class Browser {
 
   private _unindexTabContainer(tabContainerId: TTabContainerId): void {
     this._tabContainerIndex.delete(tabContainerId);
+  }
+
+  private _loadTabIntoContainer(
+    newWindow: Window,
+    desktop: Desktop,
+    tabContainer: TabContainer,
+    tabStore: ISessionTab,
+  ): void {
+    const partition =
+      tabStore.url && tabStore.url.startsWith(`${INTERNAL_PROTOCOL}://`)
+        ? partitions.internal
+        : partitions.get(tabStore.partitionId) || partitions.default;
+
+    const tab = tabContainer.createTab(tabStore.id, {
+      partition,
+      title: tabStore.title,
+      customTitle: tabStore.customTitle,
+      url: tabStore.url,
+      favicon: tabStore.favicon,
+      closedAt: tabStore.closedAt,
+      openTabsAsChild: tabStore.openTabsAsChild,
+    });
+
+    this._indexTab(newWindow, desktop, tabContainer, tab);
+  }
+
+  private _loadTabContainer(
+    newWindow: Window,
+    desktop: Desktop,
+    parent: TabContainer | null,
+    tcStore: ISessionTabContainer,
+  ): void {
+    const tabContainer =
+      parent !== null
+        ? parent.createChildTabContainer(tcStore.id, { divider: tcStore.divider })
+        : desktop.createTabContainer(tcStore.id, { divider: tcStore.divider });
+
+    this._indexTabContainer(newWindow, desktop, tabContainer);
+
+    for (const tabStore of tcStore.tabs) {
+      this._loadTabIntoContainer(newWindow, desktop, tabContainer, tabStore);
+    }
+
+    for (const childStore of tcStore.children) {
+      this._loadTabContainer(newWindow, desktop, tabContainer, childStore);
+    }
   }
 
   reindexWebContents(tab: Tab): void {
@@ -499,6 +533,7 @@ export class Browser {
     parentTabData.desktop.selectTabContainer(tabContainer.id);
 
     tabPreview.tab.clearParent();
+    tabPreview.tab.setIsTabPreview(false);
 
     parentTabData.window.removeView(tabPreview.viewId);
     tabPreview.closeWebContents();
@@ -534,6 +569,7 @@ export class Browser {
     parentTabData.desktop.selectTabContainer(parentTabData.tabContainer.id);
 
     tabPreview.tab.clearParent();
+    tabPreview.tab.setIsTabPreview(false);
 
     parentTabData.window.removeView(tabPreview.viewId);
     tabPreview.closeWebContents();
@@ -556,6 +592,11 @@ export class Browser {
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
       }
+      // When a child empties out (e.g. last tab was private/extension),
+      // detach it from its parent so the tree stays consistent.
+      if (tabContainer.parent) {
+        tabContainer.parent.removeChild(tabContainer.id);
+      }
     }
   }
 
@@ -568,7 +609,7 @@ export class Browser {
    */
   async closeTab(id: TTabId, props: { emit?: boolean } = { emit: true }): Promise<boolean> {
     const result = this.getTab(id);
-    if (!result) {
+    if (!result || result.tab.isClosed) {
       return false;
     }
 
@@ -592,6 +633,15 @@ export class Browser {
     window.renderViews();
 
     this.mediaManager.removeSession(tab.id);
+
+    // Soft-close keeps the container in parent.children (it just goes
+    // isClosed). The container is only detached from its parent when
+    // permanentlyCloseTab empties it (private/extension tabs).
+    for (const tc of tabContainer.children) {
+      for (const tab of tc.tabs) {
+        this.closeTab(tab.id);
+      }
+    }
 
     if (props.emit) {
       this.eventsChannel.emit('window:tab-did-close', window);
@@ -661,6 +711,7 @@ export class Browser {
       parent,
     });
 
+    previewTab.setIsTabPreview(true);
     previewTab.setVisible(true);
     previewTab.loadURL(url);
 
