@@ -24,12 +24,14 @@ const validSessionTab = {
   url: 'https://example.com',
   favicon: null,
   closedAt: null,
+  openTabsAsChild: false,
 };
 
 const validSessionTabContainer = {
   id: 1,
   divider: false,
   tabs: [validSessionTab],
+  children: [],
 };
 
 const validSessionDesktop = {
@@ -97,6 +99,45 @@ describe('SessionTabContainerScheme', () => {
     const container = { ...validSessionTabContainer, tabs: [] };
     const result = SessionTabContainerScheme.parse(container);
     expect(result.tabs).toEqual([]);
+  });
+
+  test('parses 2-level hierarchy (root.children: [child])', () => {
+    const childContainer = { ...validSessionTabContainer, id: 2, tabs: [validSessionTab] };
+    const rootContainer = { ...validSessionTabContainer, children: [childContainer] };
+    const result = SessionTabContainerScheme.parse(rootContainer);
+
+    expect(result.children).toHaveLength(1);
+    expect(result.children[0].id).toBe(2);
+    expect(result.children[0].children).toEqual([]);
+  });
+
+  test('omitted children field defaults to [] (legacy session files)', () => {
+    const legacy = { id: 1, divider: false, tabs: [validSessionTab] };
+    const result = SessionTabContainerScheme.parse(legacy);
+    expect(result.children).toEqual([]);
+  });
+
+  test('parses 3-level hierarchy (root -> mid -> leaf)', () => {
+    const leaf = { ...validSessionTabContainer, id: 3, tabs: [] };
+    const mid = { ...validSessionTabContainer, id: 2, children: [leaf] };
+    const root = { ...validSessionTabContainer, id: 1, children: [mid] };
+    const result = SessionTabContainerScheme.parse(root);
+
+    expect(result.id).toBe(1);
+    expect(result.children[0].id).toBe(2);
+    expect(result.children[0].children[0].id).toBe(3);
+    expect(result.children[0].children[0].children).toEqual([]);
+  });
+
+  test('rejects container with children: null', () => {
+    const invalid = { ...validSessionTabContainer, children: null };
+    expect(() => SessionTabContainerScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('rejects child with extra property', () => {
+    const invalidChild = { ...validSessionTabContainer, id: 2, parentId: 1 };
+    const container = { ...validSessionTabContainer, children: [invalidChild] };
+    expect(() => SessionTabContainerScheme.parse(container)).toThrow(ZodError);
   });
 
   test('extra property throws', () => {

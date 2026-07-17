@@ -1,4 +1,4 @@
-import type { TSearchEngineCode, ITarget, TPartitionId } from '~/types';
+import type { TSearchEngineCode, ITarget, TPartitionId, TTabContainerId } from '~/types';
 import {
   config,
   Browser,
@@ -69,12 +69,23 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
   }
 }
 
+function computeJustAfterId(
+  targetId: string | undefined,
+  selectedTabContainerId: TTabContainerId | undefined,
+): TTabContainerId | undefined {
+  if (targetId === 'after-current') {
+    return selectedTabContainerId;
+  }
+  return undefined;
+}
+
 export function parseTarget(
   browser: Browser,
   props?: {
     targetId?: string;
     partitionId?: TPartitionId;
     tabContainer?: TabContainer;
+    parentTabContainer?: TabContainer;
   },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
@@ -123,9 +134,16 @@ export function parseTarget(
   } else if (props?.tabContainer) {
     tabContainer = props.tabContainer;
   } else {
-    tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
-      justAfter: targetId === 'after-current' ? selectedTab?.tabContainer.id : undefined,
-    });
+    if (props?.parentTabContainer) {
+      tabContainer = props.parentTabContainer.createChildTabContainer(
+        browser.idGenerator.nextTabContainerId,
+      );
+    } else {
+      const justAfter = computeJustAfterId(targetId, selectedTab?.tabContainer.id);
+      tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
+        justAfter,
+      });
+    }
   }
 
   let partition: Partition;
@@ -172,10 +190,14 @@ export function createWindowByTarget(
 export function windowOpenHadler(
   browser: Browser,
   details: HandlerDetails,
+  parentTabContainer?: TabContainer,
 ): WindowOpenHandlerResponse {
   const { url, disposition, features } = details;
 
-  scopeLog.info(`Url open handler for tab. URL: "${url}", Disposition: "${disposition}"`);
+  scopeLog.info(
+    `Url open handler for tab. URL: "${url}" | Disposition: "${disposition} ` +
+      `| Tab container parent: "${parentTabContainer?.id || 'None'}"`,
+  );
 
   const isPopup =
     disposition === 'new-window' && (features.includes('width=') || features.includes('height='));
@@ -188,12 +210,16 @@ export function windowOpenHadler(
   }
 
   if (disposition === 'foreground-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window', selectTab: true });
+    browser.openURL(url, {
+      targetId: 'current-desktop-window',
+      selectTab: true,
+      parentTabContainer,
+    });
     return { action: 'deny' };
   }
 
   if (disposition === 'background-tab') {
-    browser.openURL(url, { targetId: 'current-desktop-window' });
+    browser.openURL(url, { targetId: 'current-desktop-window', parentTabContainer });
     return { action: 'deny' };
   }
 

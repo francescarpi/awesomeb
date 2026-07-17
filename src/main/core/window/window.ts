@@ -1,6 +1,6 @@
 import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
-import { Desktop, IDesktopProps, Browser, PromptsManager } from '@/core';
+import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 import {
   IContextualModalParams,
@@ -175,40 +175,52 @@ export class Window extends UIWindow {
     const desktop = this.selectedDesktop;
     const tabContainer = desktop.selectedTabContainer;
     const sameDesktop = opts?.sameDesktop ?? false;
+    const sequence = this._buildTabSequence(sameDesktop ? [desktop] : this.desktops);
+
+    if (sequence.length === 0) {
+      return null;
+    }
 
     if (!tabContainer) {
-      if (direction === 'next') {
-        const firstTab = desktop.tabContainers[0]?.tabs[0];
-        return firstTab ? { desktop, tabContainer: desktop.tabContainers[0], tab: firstTab } : null;
-      } else {
-        const lastTabContainer = desktop.tabContainers[desktop.tabContainers.length - 1];
-        const lastTab = lastTabContainer?.tabs[lastTabContainer.tabs.length - 1];
-        return lastTab ? { desktop, tabContainer: lastTabContainer, tab: lastTab } : null;
-      }
+      return sequence[direction === 'next' ? 0 : sequence.length - 1];
     }
 
     const selectedTab = tabContainer.selectedTab;
-    const tabs = sameDesktop
-      ? desktop.tabs.filter((t) => !t.tab.isClosed).map((t) => ({ ...t, desktop }))
-      : this.tabs;
-    const currentIndex = tabs.findIndex(
-      (conTab) => conTab.tab.id === selectedTab?.id && conTab.tabContainer.id === tabContainer.id,
-    );
+    const currentIndex = selectedTab
+      ? sequence.findIndex(
+          (c) => c.tab.id === selectedTab.id && c.tabContainer.id === tabContainer.id,
+        )
+      : -1;
 
-    let newIndex: number;
-
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % tabs.length;
-    } else {
-      newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    if (currentIndex === -1) {
+      return sequence[direction === 'next' ? 0 : sequence.length - 1];
     }
 
-    const result = tabs[newIndex];
-    if (result) {
-      return result;
-    }
+    const newIndex =
+      direction === 'next'
+        ? (currentIndex + 1) % sequence.length
+        : (currentIndex - 1 + sequence.length) % sequence.length;
 
-    return null;
+    return sequence[newIndex] ?? null;
+  }
+
+  private _buildTabSequence(desktops: Desktop[]): IDesConTab[] {
+    const result: IDesConTab[] = [];
+    const walk = (desktop: Desktop, tc: TabContainer) => {
+      for (const tab of tc.tabs) {
+        if (tab.isClosed) continue;
+        result.push({ desktop, tabContainer: tc, tab });
+      }
+      for (const child of tc.children) {
+        walk(desktop, child);
+      }
+    };
+    for (const desktop of desktops) {
+      for (const tc of desktop.tabContainers) {
+        walk(desktop, tc);
+      }
+    }
+    return result;
   }
 
   openClosedTab(tabId: TTabId) {
@@ -272,9 +284,9 @@ export class Window extends UIWindow {
   get tabs(): IDesConTab[] {
     const allTabs: IDesConTab[] = [];
     for (const desktop of this._desktops.values()) {
-      for (const tabContainer of desktop.tabContainers) {
-        for (const tab of tabContainer.tabs) {
-          allTabs.push({ desktop, tabContainer, tab });
+      for (const tc of desktop.tabContainers) {
+        for (const entry of tc.ownAndChildTabs) {
+          allTabs.push({ desktop, ...entry });
         }
       }
     }

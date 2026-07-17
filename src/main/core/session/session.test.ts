@@ -156,6 +156,68 @@ describe('Session', () => {
     expect(session.windows).toEqual([]);
   });
 
+  describe('openTabsAsChild persistence', () => {
+    test('round-trips true through save and reload', async () => {
+      const result = await browser.openURL('http://example.com');
+      result!.tab.setOpenTabsAsChild(true);
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const tab = persisted.windows[0].desktops[0].tabContainers[0].tabs[0];
+      expect(tab.openTabsAsChild).toBe(true);
+    });
+
+    test('defaults to false when the field is missing in session.json (legacy)', () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example.com',
+                          favicon: null,
+                          closedAt: null,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].tabContainers[0].tabs[0].openTabsAsChild).toBe(false);
+    });
+  });
+
   describe('legacy "name" field migration', () => {
     function writeLegacySessionFile(desktops: unknown[]) {
       const filePath = getSessionFilePath();
@@ -287,6 +349,105 @@ describe('Session', () => {
       const desktop = persisted.windows[0].desktops[0];
       expect(desktop.shortName).toBe('W');
       expect(desktop.longName).toBe('Work Space');
+    });
+  });
+
+  describe('parent/child hierarchy persistence', () => {
+    test('sessionToStore: 2-level hierarchy persists children nested under parent', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].id).toBeGreaterThan(rootTc.id);
+      expect(rootTc.children[0].tabs).toHaveLength(1);
+    });
+
+    test('sessionToStore: 3-level hierarchy persists the full chain', async () => {
+      const root = await browser.openURL('http://root.com');
+      const mid = await browser.openURL('http://mid.com', {
+        parentTabContainer: root!.tabContainer,
+      });
+      await browser.openURL('http://leaf.com', {
+        parentTabContainer: mid!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].children).toHaveLength(1);
+      expect(rootTc.children[0].children[0].children).toEqual([]);
+    });
+
+    test('sessionToStore: child with only private tabs is dropped from the persisted tree', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const privateChild = await browser.openURL('http://private.com', {
+        parentTabContainer: parent!.tabContainer,
+        partitionId: partitions.private.id,
+      });
+      expect(privateChild!.tab.partition.private).toBe(true);
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toEqual([]);
+    });
+
+    test('sessionToStore: top-level with no own tabs but a child with tabs IS persisted', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+    });
+
+    test('sessionToStore: soft-closed child (all tabs closed) IS persisted', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      await browser.closeTab(child!.tab.id);
+      expect(child!.tabContainer.isClosed).toBe(true);
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const rootTc = data[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].tabs).toHaveLength(1);
+      expect(rootTc.children[0].tabs[0].closedAt).not.toBeNull();
+    });
+
+    test('save + reload: roundtrip restores the hierarchy on disk', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const rootTc = persisted.windows[0].desktops[0].tabContainers[0];
+
+      expect(rootTc.id).toBe(parent!.tabContainer.id);
+      expect(rootTc.children).toHaveLength(1);
+      expect(rootTc.children[0].id).toBe(child!.tabContainer.id);
     });
   });
 });

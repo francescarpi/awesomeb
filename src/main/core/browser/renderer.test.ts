@@ -83,4 +83,107 @@ describe('Renderer', () => {
     expect(tabEntry).toBeDefined();
     expect(tabEntry!.desktopName).toBe('My Work');
   });
+
+  describe('Renderer.tabContainers - children', () => {
+    test('a tabContainer without children has children: []', async () => {
+      await browser.openURL('http://example.com');
+
+      const rendered = browser.renderer.tabContainers(window);
+      const tc = rendered[0];
+
+      expect(tc.children).toEqual([]);
+    });
+
+    test('a child container is serialized without shortcut or divider keys (ISimpleTabContainer shape)', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((t) => t.id === parent!.tabContainer.id);
+      expect(parentRendered).toBeDefined();
+      expect(parentRendered!.children.length).toBe(1);
+
+      const childRendered = parentRendered!.children[0];
+      expect(childRendered.id).toBe(child!.tabContainer.id);
+
+      const childKeys = Object.keys(childRendered).sort();
+      expect(childKeys).not.toContain('shortcut');
+      expect(childKeys).not.toContain('divider');
+      expect(childKeys).toEqual(
+        expect.arrayContaining(['id', 'selected', 'tabs', 'desktopId', 'isClosed', 'isSplit']),
+      );
+    });
+
+    test('child selected flag mirrors desktop.selectedTabContainer', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((t) => t.id === parent!.tabContainer.id);
+      const childRendered = parentRendered!.children.find((c) => c.id === child!.tabContainer.id);
+
+      expect(childRendered).toBeDefined();
+      expect(childRendered!.selected).toBe(true);
+    });
+
+    test('a non-selected child has selected: false', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((t) => t.id === parent!.tabContainer.id);
+      const childRendered = parentRendered!.children.find((c) => c.id === child!.tabContainer.id);
+
+      expect(childRendered).toBeDefined();
+      expect(childRendered!.selected).toBe(false);
+    });
+
+    test('child isSplit reflects the CHILD hasSplitTabs, not the parent', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      await browser.openURL('http://second.com', { targetId: 'split-tab' });
+
+      const childTc = child!.tabContainer;
+      expect(childTc.tabs.length).toBe(2);
+      expect(childTc.hasSplitTabs).toBe(true);
+      expect(parent!.tabContainer.hasSplitTabs).toBe(false);
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((t) => t.id === parent!.tabContainer.id);
+      const childRendered = parentRendered!.children.find((c) => c.id === childTc.id);
+
+      expect(childRendered).toBeDefined();
+      expect(childRendered!.isSplit).toBe(true);
+      expect(parentRendered!.isSplit).toBe(false);
+    });
+
+    test('child tabs are serialized completely (id, title, url, etc.)', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((t) => t.id === parent!.tabContainer.id);
+      const childRendered = parentRendered!.children[0];
+
+      expect(childRendered.tabs.length).toBe(1);
+      const childTab = childRendered.tabs[0];
+      expect(childTab.id).toBe(child!.tab.id);
+      expect(childTab.url).toBe('http://child.com/');
+      expect(typeof childTab.title).toBe('string');
+      expect(childTab.desktopId).toBeDefined();
+      expect(childTab.windowId).toBeDefined();
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { TTabContainerId, TTabId } from '~/types';
+import { IConTab, TTabContainerId, TTabId } from '~/types';
 import { Tab } from './tab';
 import { ITabContainerProps, ITabProps } from './types';
 import { Browser } from '@/core';
@@ -10,6 +10,9 @@ export class TabContainer {
   private _selectedTabId: TTabId | null = null;
   private _layout: LayoutBase = Layouts['vertical'];
   private _layoutSize: number = 50;
+
+  private readonly _children: Map<TTabContainerId, TabContainer> = new Map();
+  private _parent: TabContainer | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -172,8 +175,77 @@ export class TabContainer {
     return this.tabs.length > 0 && this.tabs.every((tab) => tab.isClosed);
   }
 
+  get ownAndChildTabs(): IConTab[] {
+    const entries: IConTab[] = [];
+    for (const tab of this.tabs) {
+      entries.push({ tabContainer: this, tab });
+    }
+    for (const child of this.children) {
+      for (const tab of child.tabs) {
+        entries.push({ tabContainer: child, tab });
+      }
+    }
+    return entries;
+  }
+
+  get hasChildren(): boolean {
+    return this.children.some((child) => !child.isClosed);
+  }
+
   getVisibleTabPosition(tabId: TTabId): number {
     const tabsArray = this.visibleTabs;
     return tabsArray.findIndex((tab) => tab.id === tabId) + 1;
+  }
+
+  get children(): TabContainer[] {
+    return Array.from(this._children.values());
+  }
+
+  removeChild(tabContainerId: TTabContainerId) {
+    this._children.delete(tabContainerId);
+  }
+
+  moveChild(id: TTabContainerId, direction: 'up' | 'down'): boolean {
+    const children = this.children;
+    const index = children.findIndex((c) => c.id === id);
+    if (index === -1) return false;
+
+    const step = direction === 'up' ? -1 : 1;
+    let newIndex = index + step;
+    while (newIndex >= 0 && newIndex < children.length && children[newIndex].isClosed) {
+      newIndex += step;
+    }
+
+    if (newIndex < 0 || newIndex >= children.length) return false;
+    if (newIndex === index) return false;
+
+    const [moved] = children.splice(index, 1);
+    children.splice(newIndex, 0, moved);
+
+    this._children.clear();
+    for (const c of children) {
+      this._children.set(c.id, c);
+    }
+
+    return true;
+  }
+
+  addChild(tabContainer: TabContainer) {
+    this._children.set(tabContainer.id, tabContainer);
+  }
+
+  createChildTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {
+    const tabContainer = new TabContainer(this.browser, id, props);
+    tabContainer.setParent(this);
+    this.addChild(tabContainer);
+    return tabContainer;
+  }
+
+  setParent(tabContainer: TabContainer | null) {
+    this._parent = tabContainer;
+  }
+
+  get parent(): TabContainer | null {
+    return this._parent;
   }
 }
