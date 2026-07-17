@@ -281,6 +281,14 @@ export class Browser {
 
     this._indexTabContainer(targetData.window, targetData.desktop, targetData.tabContainer);
 
+    // If the source tabContainer is a child of another container, detach it
+    // before moving it. Otherwise the old parent keeps a stale reference in
+    // its children map and the child still claims the old parent.
+    if (sourceData.tabContainer.parent) {
+      sourceData.tabContainer.parent.removeChild(sourceData.tabContainer.id);
+      sourceData.tabContainer.setParent(null);
+    }
+
     if (targetId === 'split-tab') {
       targetData.tabContainer.addTab(sourceData.tab);
       this._indexTab(

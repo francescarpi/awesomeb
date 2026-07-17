@@ -56,6 +56,73 @@ describe('Browser', () => {
     expect(w.getDesktop(2)?.tabContainers.length).toBe(1);
   });
 
+  describe('Browser.moveTab (parent/children)', () => {
+    test('moving a child tab container to another desktop detaches it from its parent', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // desktop 1: parent (P) with a child container (C) holding a tab.
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const parentId = parent!.tabContainer.id;
+      const childId = child!.tabContainer.id;
+
+      // Sanity: C is a child of P.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parentId);
+
+      // Move the child to desktop 2.
+      browser.moveTab(child!.tab.id, 'desktop-2');
+
+      // C is no longer in the source parent.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([]);
+      // C no longer claims P as its parent.
+      expect(child!.tabContainer.parent).toBeNull();
+      // C is now a top-level container in desktop 2.
+      expect(w.getDesktop(2)?.tabContainers.map((tc) => tc.id)).toEqual([childId]);
+    });
+
+    test('moving a child tab to split-tab detaches the source child from its parent', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      // desktop 1: parent (P) with a child container (C) holding a tab.
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childId = child!.tabContainer.id;
+
+      // Sanity: C is a child of P.
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+
+      // Move the tab inside C to split-tab in the same desktop.
+      browser.moveTab(child!.tab.id, 'split-tab');
+
+      // C is no longer a child of P (the source container is gone).
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([]);
+    });
+
+    test('moving a top-level tab container does not affect any parent (regression)', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // A top-level container in desktop 1 (no parent).
+      const top = await browser.openURL('http://top.com', { selectTab: true });
+      expect(top!.tabContainer.parent).toBeNull();
+
+      // Move it to desktop 2.
+      browser.moveTab(top!.tab.id, 'desktop-2');
+
+      // No parent/children bookkeeping was touched (the container had none).
+      expect(top!.tabContainer.parent).toBeNull();
+      expect(w.getDesktop(1)?.tabContainers.length).toBe(0);
+      expect(w.getDesktop(2)?.tabContainers.map((tc) => tc.id)).toEqual([top!.tabContainer.id]);
+    });
+  });
+
   test('duplicate a tab in the same desktop', async () => {
     const w = browser.createWindow(1, { withDesktops: true });
     const result = await browser.openURL('http://example.com');
