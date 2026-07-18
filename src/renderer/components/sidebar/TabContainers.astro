@@ -53,18 +53,14 @@
             class: c(
               'hidden',
               tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
+              tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
               'flex-col',
             ),
           },
           h(
             'div',
             {
-              class: c(
-                'items-center',
-                'gap-1',
-                tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
-                'flex',
-              ),
+              class: c('items-center', 'gap-1', 'flex'),
             },
             h(
               'span', // Tab container shortcut (is a number between 1 and 9)
