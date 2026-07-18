@@ -50,6 +50,7 @@ jobs:
         env:
           AFTER: ${{ steps.versions.outputs.after }}
           SHA:   ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG="v${AFTER}"
