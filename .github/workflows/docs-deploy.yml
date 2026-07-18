@@ -25,6 +25,9 @@ jobs:
         working-directory: ./docs
     steps:
       - uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: docs
+          sparse-checkout-cone-mode: true
 
       - uses: actions/setup-node@v4
         with:
@@ -35,10 +38,14 @@ jobs:
           version: 10.28.0
 
       - name: Install docs dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: |
+          ls -lah
+          ls -lah node_modules
+          pnpm build
 
       - uses: actions/configure-pages@v5
 
