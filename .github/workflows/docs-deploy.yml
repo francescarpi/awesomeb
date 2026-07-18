@@ -20,38 +20,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./docs
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7
+      - uses: withastro/action@v6
         with:
-          sparse-checkout: docs
-          sparse-checkout-cone-mode: true
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.0
-
-      - name: Install docs dependencies
-        run: |
-          pnpm install --frozen-lockfile
-
-      - name: Build
-        run: |
-          ls -lah
-          ls -lah node_modules
-          pnpm build
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: ./docs/dist
+          path: ./docs
 
   deploy:
     needs: build
@@ -61,4 +34,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

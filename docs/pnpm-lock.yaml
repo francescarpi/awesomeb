@@ -11,6 +11,9 @@ importers:
       '@astrojs/starlight':
         specifier: ^0.41.3
         version: 0.41.3(@astrojs/markdown-remark@7.2.1)(astro@7.1.1(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.3))
+      '@electron-toolkit/tsconfig':
+        specifier: 2.0.0
+        version: 2.0.0(@types/node@24.13.3)
       astro:
         specifier: ^7.0.2
         version: 7.1.1(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.3)
@@ -197,6 +200,11 @@ packages:
   '@ctrl/tinycolor@4.2.0':
     resolution: {integrity: sha512-kzyuwOAQnXJNLS9PSyrk0CWk35nWJW/zl/6KvnTBMFK65gm7U1/Z5BqjxeapjZCIhQcM/DsrEmcbRwDyXyXK4A==}
     engines: {node: '>=14'}
+
+  '@electron-toolkit/tsconfig@2.0.0':
+    resolution: {integrity: sha512-AdPsP770WhW7b260h13SHMdmjEEHJL6xFtgi3jwgdsSQbJOkJLeNnnpZW9qxTPCvmRI6vmdzWz5K3gibFS6SNg==}
+    peerDependencies:
+      '@types/node': '*'
 
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
@@ -2152,6 +2160,10 @@ snapshots:
       sisteransi: 1.0.5
 
   '@ctrl/tinycolor@4.2.0': {}
+
+  '@electron-toolkit/tsconfig@2.0.0(@types/node@24.13.3)':
+    dependencies:
+      '@types/node': 24.13.3
 
   '@emnapi/core@1.11.1':
     dependencies:
