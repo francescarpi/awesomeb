@@ -22,7 +22,11 @@ export default defineConfig({
         {
           label: 'Start here',
           translations: { 'ca': 'Comença aquí', 'es': 'Empieza aquí' },
-          items: [{ label: 'Overview', translations: { 'ca': 'Visió general', 'es': 'Visión general' }, slug: 'overview' }]
+          items: [
+            { label: 'Overview', translations: { 'ca': 'Visió general', 'es': 'Visión general' }, slug: 'overview' },
+            { label: 'About me', translations: { 'ca': 'Sobre mi', 'es': 'Sobre mi' }, slug: 'aboutme' },
+            { label: 'Install', translations: { 'ca': 'Instal·lar', 'es': 'Instalar' }, slug: 'install' }
+          ]
         }
       ],
     }),
