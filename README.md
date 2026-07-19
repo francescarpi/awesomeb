@@ -44,11 +44,11 @@ _(Note: Windows and Linux builds are available but have not been tested yet.)_
 
 ## Screenshots
 
-![Blank browser](./docs/assets/sc1.png)
-![Perform a command](./docs/assets/sc2.png)
-![Split tabs](./docs/assets/sc3.png)
-![Tab preview](./docs/assets/sc4.png)
-![Profiles configuration](./docs/assets/sc5.png)
+![Blank browser](./images/sc1.png)
+![Perform a command](./images/sc2.png)
+![Split tabs](./images/sc3.png)
+![Tab preview](./images/sc4.png)
+![Profiles configuration](./images/sc5.png)
 
 ## Troubleshooting
 

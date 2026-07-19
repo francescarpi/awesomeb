@@ -19,6 +19,7 @@ jobs:
             const map = [
               { re: /^(feat|feature)\//, label: 'feature' },
               { re: /^(fix|bugfix|hotfix)\//, label: 'fix' },
+              { re: /^docs\//, label: 'documentation' },
             ];
             const match = map.find(m => m.re.test(branch));
             if (!match) {
