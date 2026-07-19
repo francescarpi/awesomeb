@@ -7,6 +7,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'AwesomeB',
+      logo: {
+        src: './src/assets/logo.png'
+      },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/francescarpi/awesomeb' }],
       favicon: '/public/favicon.png',
       defaultLocale: 'root',
