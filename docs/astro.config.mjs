@@ -21,6 +21,24 @@ export default defineConfig({
       customCss: [
         './src/styles/custom.css',
       ],
+      head: [
+        {
+          tag: 'script',
+          attrs: {
+            src: 'https://www.googletagmanager.com/gtag/js?id=G-NM14L4ZQSH',
+            async: true,
+          },
+        },
+        {
+          tag: 'script',
+          content: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-NM14L4ZQSH');
+      `,
+        },
+      ],
       sidebar: [
         {
           label: 'Start here',
