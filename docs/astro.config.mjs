@@ -47,7 +47,14 @@ export default defineConfig({
             { label: 'Overview', translations: { 'ca': 'Visió general', 'es': 'Visión general' }, slug: 'overview' },
             { label: 'About me', translations: { 'ca': 'Sobre mi', 'es': 'Sobre mi' }, slug: 'aboutme' },
             { label: 'Install', translations: { 'ca': 'Instal·lar', 'es': 'Instalar' }, slug: 'install' },
-            { label: 'First steps', translations: { 'ca': 'Primeres passes', 'es': 'Primeros pasos' }, slug: 'firststeps' }
+            { label: 'First steps', translations: { 'ca': 'Primeres passes', 'es': 'Primeros pasos' }, slug: 'firststeps' },
+          ]
+        },
+        {
+          label: 'Configuration',
+          translations: { 'ca': 'Configuració', 'es': 'Configuración' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'config/general' },
           ]
         }
       ],
