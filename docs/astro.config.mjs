@@ -55,6 +55,7 @@ export default defineConfig({
           translations: { 'ca': 'Configuració', 'es': 'Configuración' },
           items: [
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'config/general' },
+            { label: 'Profiles', translations: { 'ca': 'Perfils', 'es': 'Perfils' }, slug: 'config/profiles' },
           ]
         }
       ],
