@@ -57,6 +57,7 @@ export default defineConfig({
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'config/general' },
             { label: 'Profiles', translations: { 'ca': 'Perfils', 'es': 'Perfils' }, slug: 'config/profiles' },
             { label: 'Themes', translations: { 'ca': 'Temes', 'es': 'Temas' }, slug: 'config/themes' },
+            { label: 'Permissions', translations: { 'ca': 'Permisos', 'es': 'Permisos' }, slug: 'config/permissions' },
           ]
         }
       ],
