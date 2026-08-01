@@ -58,6 +58,7 @@ export default defineConfig({
             { label: 'Profiles', translations: { 'ca': 'Perfils', 'es': 'Perfils' }, slug: 'config/profiles' },
             { label: 'Themes', translations: { 'ca': 'Temes', 'es': 'Temas' }, slug: 'config/themes' },
             { label: 'Permissions', translations: { 'ca': 'Permisos', 'es': 'Permisos' }, slug: 'config/permissions' },
+            { label: 'Shortcuts', translations: { 'ca': 'Dreceres', 'es': 'Atajos' }, slug: 'config/shortcuts' },
           ]
         }
       ],
