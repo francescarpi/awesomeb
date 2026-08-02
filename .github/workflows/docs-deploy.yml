@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            docs
+          sparse-checkout-cone-mode: false
+
       - uses: withastro/action@v6
         with:
           path: ./docs
