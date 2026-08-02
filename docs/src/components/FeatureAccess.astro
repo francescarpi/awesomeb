@@ -1,0 +1,61 @@
+---
+const { locale } = Astro.locals.starlightRoute;
+
+const trans: Record<string, Record<string, string>> = {
+  titles: {
+    root: 'You can access <b>$</b> through:',
+    ca: 'Pots accedir a <b>$</b> a través de:',
+    es: 'Puedes acceder a <b>$</b> a través de:',
+  },
+  menu: {
+    root: 'Main menu',
+    ca: 'Menú principal',
+    es: 'Menú principal',
+  },
+  shortcut: {
+    root: 'Shortcut',
+    ca: 'Accés directe',
+    es: 'Acceso directo',
+  },
+};
+
+interface Props {
+  entity: string;
+  menu: string[];
+  macOS: string;
+}
+
+const { entity, menu } = Astro.props as Props;
+
+const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
+const txtMenu = trans.menu[locale || 'root'] || trans.menu.root;
+const txtShortcut = trans.shortcut[locale || 'root'] || trans.shortcut.root;
+---
+
+<div class="feature-access">
+  <div set:html={txtTitle.replace('$', entity)} />
+  <ul class="feature-access-list">
+    <li><b>{txtMenu}</b>: {menu.join(' → ')}</li>
+    <li>
+      <b>{txtShortcut}</b>:
+      <ul class="feature-access-list">
+        <li>macOS: <code dir="auto">{Astro.props.macOS}</code></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<style>
+  .feature-access {
+    background-color: var(--sl-color-blue-low);
+    padding: 1rem;
+  }
+
+  .feature-access-list {
+    margin: 0;
+  }
+
+  .feature-access-list li {
+    margin-top: 0;
+  }
+</style>
