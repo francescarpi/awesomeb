@@ -21,13 +21,13 @@
     "husky:install": "husky"
   },
   "lint-staged": {
-    "!(*lock*).{ts,astro,js}": [
+    "src/**/*.{ts,astro,js}": [
       "pnpm astro check",
       "bash -c 'pnpm tscheck'",
       "bash -c 'pnpm test run'",
       "pnpm lint"
     ],
-    "!(*lock*).{ts,js,json,css,md,astro}": [
+    "src/**/*.{ts,js,json,css,md,astro}": [
       "pnpm exec prettier --write src"
     ]
   },
