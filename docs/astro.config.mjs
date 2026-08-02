@@ -60,8 +60,9 @@ export default defineConfig({
             { label: 'Permissions', translations: { 'ca': 'Permisos', 'es': 'Permisos' }, slug: 'config/permissions' },
             { label: 'Shortcuts', translations: { 'ca': 'Dreceres', 'es': 'Atajos' }, slug: 'config/shortcuts' },
           ]
-        }
-      ],
+        },
+        { label: 'Commands', translations: { 'ca': 'Comandes', 'es': 'Comandos' }, slug: 'commands' },
+      ]
     }),
   ],
 });
