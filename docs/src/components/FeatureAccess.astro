@@ -17,25 +17,45 @@ const trans: Record<string, Record<string, string>> = {
     ca: 'Accés directe',
     es: 'Acceso directo',
   },
+  command: {
+    root: 'Command',
+    ca: 'Comanda',
+    es: 'Comando',
+  },
 };
 
 interface Props {
   entity: string;
-  menu: string[];
+  menu?: string[];
+  command?: string;
   macOS: string;
 }
 
-const { entity, menu } = Astro.props as Props;
+const { entity, menu, command } = Astro.props as Props;
 
 const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
 const txtMenu = trans.menu[locale || 'root'] || trans.menu.root;
 const txtShortcut = trans.shortcut[locale || 'root'] || trans.shortcut.root;
+const txtCommand = trans.command[locale || 'root'] || trans.command.root;
 ---
 
 <div class="feature-access">
   <div set:html={txtTitle.replace('$', entity)} />
   <ul class="feature-access-list">
-    <li><b>{txtMenu}</b>: {menu.join(' → ')}</li>
+    {
+      menu && (
+        <li>
+          <b>{txtMenu}</b>: {menu.join(' → ')}
+        </li>
+      )
+    }
+    {
+      command && (
+        <li>
+          <b>{txtCommand}</b>: {command}
+        </li>
+      )
+    }
     <li>
       <b>{txtShortcut}</b>:
       <ul class="feature-access-list">
