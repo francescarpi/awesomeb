@@ -67,6 +67,7 @@ export default defineConfig({
           translations: { 'ca': 'Pestanyes', 'es': 'Pestaña' },
           items: [
             { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'tabs/new' },
+            { label: 'Close', translations: { 'ca': 'Tancar', 'es': 'Cerrar' }, slug: 'tabs/close' },
           ]
         },
       ]
