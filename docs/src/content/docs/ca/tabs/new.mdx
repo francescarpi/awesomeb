@@ -1,0 +1,76 @@
+---
+title: Nova pestanya
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+<FeatureAccess entity="nova pestanya" macOS="Cmd+t" command="New Tab" />
+
+Veuràs un modal com aquest:
+
+![Modal nova pestanya](../../../../assets/new-tab-1.png)
+
+On:
+
+1. És un camp de text on podràs introduir:
+    * Qualsevol cadena de text per cercar-la a través d'un dels cercadors configurats.
+    * Un domini vàlid.
+    * Cercar a l'historial de navegació.
+2. Indicador de pàgines:
+    * Pàgina 1: Cercar.
+    * Pàgina 2: Selecció de perfil.
+    * Pàgina 3: Selecció del target.
+3. Llistat amb:
+    * Selecció de cercadors configurats.
+    * Selecció d'un element de l'historial de navegació.
+
+## Utilitzar un cercador
+
+Per a utilitzar un dels cercadors [configurats](/ca/config/general/), hauràs d'introduir el text que vols cercar (1), seleccionar el cercador desitjat i prémer enter.
+
+:::note
+Si vols navegar a l'anterior o següent element de la llista ràpidament, podràs utilitzar les combinacions: **Shift+j** / **Shift+k** / **Arrow Up** / **Arrow Down**.
+:::
+
+![Utilitzar un cercador](../../../../assets/new-tab-2.png)
+
+## Introduir un domini vàlid
+
+També podràs introduir un domini vàlid (no cal afegir el protocol) i prémer enter.
+
+![Utilitzar un domini](../../../../assets/new-tab-3.png)
+
+## Utilitzar l'historial
+
+Quan escriguis una cadena de text, **AwesomeB** cercarà també a l'historial i mostrarà els resultats a la llista. Podràs seleccionar-ne un i prémer enter.
+
+![Utilitzar l'historial](../../../../assets/new-tab-4.png)
+
+## Seleccionar un perfil
+
+Com has vist a la [configuració](/ca/config/profiles/) és possible tenir diversos perfils. Per a obrir una nova pestanya amb un altre perfil que no sigui el **default**, hauràs de prémer la tecla **Tab** per a passar a la següent pàgina. Allà podràs seleccionar el perfil desitjat.
+
+![Selecció de perfil](../../../../assets/new-tab-5.png)
+
+## Selecció del target
+
+Finalment, si ho desitges, tornant a prémer **Tab** podràs accedir a la tercera pàgina, la qual et permetrà seleccionar on vols obrir la nova pestanya:
+
+![Selecció del target](../../../../assets/new-tab-6.png)
+
+Les opcions disponibles són:
+
+* **New tab**: Obra el lloc web a una nova pestanya al final del llistat de pestanyes.
+* **New following tab**: Si ja tens una altra pestanya prèvia seleccionada, obre el nou lloc web immediatament després d'aquesta.
+* **Split into selected tab**: Obre el nou lloc web en una pantalla dividida juntament amb el lloc web previ que tinguessis seleccionat.
+* **New window**: Obra el lloc web a una nova finestra.
+* **New left window**: Útil si tens una pantalla a l'esquerra. Obrirà el nou lloc web a una nova finestra situada a la pantalla de l'esquerra.
+* **New right window**: Útil si tens una pantalla a la dreta. Obrirà el nou lloc web a una nova finestra situada a la pantalla de la dreta.
+* **Window 1**: Obre el nou lloc web a una pestanya a la finestra 1. Aquest element és dinàmic. Això vol dir que si tinguessis dues finestres, veuries les opcions "Window 1" i "Window 2".
+* **Desktop 1, 2, ...**: Obra el nou lloc web a l'escriptori indicat.
+
+## Un cop oberta la nova pestanya
+
+![Nova pestanya](../../../../assets/new-tab-7.png)
+
+Un cop hagis obert la nova pestanya, la veuràs al llistat del sidebar de l'esquerra, on hi trobaràs el *favicon* i el títol (1) i un indicador amb el color del perfil amb el qual s'ha obert (2).
