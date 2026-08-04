@@ -1,0 +1,43 @@
+---
+title: Close a tab
+---
+
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
+**AwesomeB** introduces a new way to manage tabs: before closing them, it goes through the **suspend** state. And why is that? Because, after all, desktops are a way to organize tabs however suits you, and the tab suspension feature lets you keep them around and access the website again in the future.
+
+![Tab state](../../../assets/close-tab-1.png)
+
+In the screenshot above, you can see a suspended tab (1) and two active ones (2 and 3).
+
+There are several ways to close or suspend a tab:
+
+## Suspend
+
+<FeatureAccess entity="suspend a tab" macOS="Cmd+Shift+s" command="Suspend Tab" menu={['Tabs', 'Suspend tab']} />
+
+Also, when a website is active and you hover over it, a button with a minus sign will appear, which means **suspend it**.
+
+![Suspend a website](../../../assets/close-tab-2.png)
+
+## Close
+
+<FeatureAccess entity="close a tab" macOS="Cmd+w" command="Close Tab" menu={['Tabs', 'Close tab']} />
+
+Also, when a website is suspended and you hover over it, an X button appears, which means close it.
+
+![Close a website](../../../assets/close-tab-3.png)
+
+:::note
+Keep in mind that when a tab is closed, it remains hidden for a few days ([see the configuration](/config/general/#closed-tabs-retention)) and can be recovered.
+:::
+
+:::note
+Tabs opened with the **private** profile, when closed, disappear permanently. They cannot be reopened.
+:::
+
+## Context menu
+
+Using the context menu on a tab, in addition to letting you suspend it or close it directly, you can also close all tabs below the current one.
+
+![Context menu](../../../assets/close-tab-4.png)
