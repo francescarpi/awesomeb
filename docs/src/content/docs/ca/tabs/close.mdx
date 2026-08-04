@@ -1,0 +1,43 @@
+---
+title: Tancar una pestanya
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+**AwesomeB** introdueix una nova manera de gestionar les pestanyes: abans de tancar-les, passa per l'estat de **suspendre-les**. I això, per què? Perquè, al final, els escriptoris són una manera d'organitzar les pestanyes segons com et convingui, i la funcionalitat de suspendre les pestanyes et permet continuar-les tenint allà i tornar a accedir al lloc web en el futur.
+
+![Estat de les pestanyes](../../../../assets/close-tab-1.png)
+
+En la captura anterior podem veure una pestanya suspesa (1) i dues actives (2 i 3).
+
+Hi ha diverses maneres de tancar o suspendre una pestanya:
+
+## Suspendre
+
+<FeatureAccess entity="suspendre una pestanya" macOS="Cmd+Shift+s" command="Suspend Tab" menu={['Tabs', 'Suspend tab']} />
+
+També, quan un lloc web està actiu i passes el ratolí per sobre, apareixerà un botó amb el signe menys que significa **suspendre'l**.
+
+![Suspendre un lloc web](../../../../assets/close-tab-2.png)
+
+## Tancar
+
+<FeatureAccess entity="tancar una pestanya" macOS="Cmd+w" command="Close Tab" menu={['Tabs', 'Close tab']} />
+
+També, quan un lloc web està suspès i passes el ratolí per sobre, apareix el botó d'una X, que significa tancar-lo.
+
+![Tancar un lloc web](../../../../assets/close-tab-3.png)
+
+:::note
+Tingues en compte que quan es tanca una pestanya, roman oculta durant uns dies ([mira la configuració](/ca/config/general/#retenci%C3%B3-de-les-pestanyes-tancades)) i és possible recuperar-la.
+:::
+
+:::note
+Les pestanyes que s'obren amb el perfil **privat**, en tancar-les, desapareixen permanentment. No és possible reobrir-les.
+:::
+
+## Menú contextual
+
+Utilitzant el menú contextual a sobre d'una pestanya, a banda de permetre suspendre-la o tancar-la directament, també et permet tancar totes les pestanyes per sota de l'actual.
+
+![Menú contextual](../../../../assets/close-tab-4.png)

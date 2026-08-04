@@ -1,0 +1,43 @@
+---
+title: Cerrar una pestaña
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+**AwesomeB** introduce una nueva manera de gestionar las pestañas: antes de cerrarlas, pasa por el estado de **suspenderlas**. ¿Y por qué? Porque, al final, los escritorios son una forma de organizar las pestañas según te convenga, y la funcionalidad de suspender pestañas te permite seguir teniéndolas ahí y volver a acceder al sitio web en el futuro.
+
+![Estado de las pestañas](../../../../assets/close-tab-1.png)
+
+En la captura anterior podemos ver una pestaña suspendida (1) y dos activas (2 y 3).
+
+Hay varias formas de cerrar o suspender una pestaña:
+
+## Suspender
+
+<FeatureAccess entity="suspender una pestaña" macOS="Cmd+Shift+s" command="Suspend Tab" menu={['Tabs', 'Suspend tab']} />
+
+También, cuando un sitio web está activo y pasas el ratón por encima, aparecerá un botón con el signo menos que significa **suspenderlo**.
+
+![Suspender un sitio web](../../../../assets/close-tab-2.png)
+
+## Cerrar
+
+<FeatureAccess entity="cerrar una pestaña" macOS="Cmd+w" command="Close Tab" menu={['Tabs', 'Close tab']} />
+
+También, cuando un sitio web está suspendido y pasas el ratón por encima, aparece el botón de una X, que significa cerrarlo.
+
+![Cerrar un sitio web](../../../../assets/close-tab-3.png)
+
+:::note
+Ten en cuenta que cuando se cierra una pestaña, permanece oculta durante unos días ([mira la configuración](/es/config/general/#retenci%C3%B3n-de-las-pesta%C3%B1as-cerradas)) y es posible recuperarla.
+:::
+
+:::note
+Las pestañas que se abren con el perfil **privado**, al cerrarlas, desaparecen permanentemente. No es posible reabrirlas.
+:::
+
+## Menú contextual
+
+Utilizando el menú contextual encima de una pestaña, además de permitir suspenderla o cerrarla directamente, también te permite cerrar todas las pestañas por debajo de la actual.
+
+![Menú contextual](../../../../assets/close-tab-4.png)
