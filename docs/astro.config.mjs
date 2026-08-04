@@ -62,6 +62,13 @@ export default defineConfig({
           ]
         },
         { label: 'Commands', translations: { 'ca': 'Comandes', 'es': 'Comandos' }, slug: 'commands' },
+        {
+          label: 'Tabs',
+          translations: { 'ca': 'Pestanyes', 'es': 'Pestaña' },
+          items: [
+            { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'tabs/new' },
+          ]
+        },
       ]
     }),
   ],
