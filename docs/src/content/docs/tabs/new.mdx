@@ -1,0 +1,76 @@
+---
+title: New Tab
+---
+
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
+<FeatureAccess entity="new tab" macOS="Cmd+t" command="New Tab" />
+
+You'll see a modal like this:
+
+![New tab modal](../../../assets/new-tab-1.png)
+
+Where:
+
+1. It's a text field where you can enter:
+    * Any text string to search it through one of the configured search engines.
+    * A valid domain.
+    * Search the browsing history.
+2. Pages indicator:
+    * Page 1: Search.
+    * Page 2: Profile selection.
+    * Page 3: Target selection.
+3. List with:
+    * Selection of configured search engines.
+    * Selection of an element from the browsing history.
+
+## Using a search engine
+
+To use one of the [configured search engines](/config/general/), you'll need to enter the text you want to search (1), select the desired search engine and press enter.
+
+:::note
+If you want to quickly navigate to the previous or next item in the list, you can use the following combinations: **Shift+j** / **Shift+k** / **Arrow Up** / **Arrow Down**.
+:::
+
+![Using a search engine](../../../assets/new-tab-2.png)
+
+## Enter a valid domain
+
+You can also enter a valid domain (no need to add the protocol) and press enter.
+
+![Using a domain](../../../assets/new-tab-3.png)
+
+## Using the history
+
+When you type a text string, **AwesomeB** will also search the history and show the results in the list. You can select one and press enter.
+
+![Using the history](../../../assets/new-tab-4.png)
+
+## Selecting a profile
+
+As you've seen in [configuration](/config/profiles/), you can have multiple profiles. To open a new tab with a profile other than **default**, you'll need to press the **Tab** key to move to the next page. There you can select the desired profile.
+
+![Profile selection](../../../assets/new-tab-5.png)
+
+## Target selection
+
+Finally, if you wish, pressing **Tab** again will let you access the third page, which will allow you to select where you want to open the new tab:
+
+![Target selection](../../../assets/new-tab-6.png)
+
+The available options are:
+
+* **New tab**: Opens the website in a new tab at the end of the tabs list.
+* **New following tab**: If you already have another previous tab selected, opens the new website right after it.
+* **Split into selected tab**: Opens the new website in a split screen together with the previous website you had selected.
+* **New window**: Opens the website in a new window.
+* **New left window**: Useful if you have a screen on the left. Will open the new website in a new window located on the left screen.
+* **New right window**: Useful if you have a screen on the right. Will open the new website in a new window located on the right screen.
+* **Window 1**: Opens the new website in a tab in window 1. This item is dynamic. This means that if you had two windows, you would see the "Window 1" and "Window 2" options.
+* **Desktop 1, 2, ...**: Opens the new website in the indicated desktop.
+
+## Once the new tab is open
+
+![New tab](../../../assets/new-tab-7.png)
+
+Once you've opened the new tab, you'll see it in the left sidebar list, where you'll find the *favicon* and the title (1) and an indicator with the color of the profile it was opened with (2).
