@@ -77,6 +77,7 @@ export default defineConfig({
             { label: 'Duplicate', translations: { 'ca': 'Duplicar', 'es': 'Duplicar' }, slug: 'tabs/duplicate' },
             { label: 'Change profile', translations: { 'ca': 'Canviar perfil', 'es': 'Cambiar perfil' }, slug: 'tabs/change-profile' },
             { label: 'Preview', translations: { 'ca': 'Previsualitzar', 'es': 'Previsualizar' }, slug: 'tabs/preview' },
+            { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
           ]
         },
       ]
