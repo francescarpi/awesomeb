@@ -76,6 +76,7 @@ export default defineConfig({
             { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'tabs/move' },
             { label: 'Duplicate', translations: { 'ca': 'Duplicar', 'es': 'Duplicar' }, slug: 'tabs/duplicate' },
             { label: 'Change profile', translations: { 'ca': 'Canviar perfil', 'es': 'Cambiar perfil' }, slug: 'tabs/change-profile' },
+            { label: 'Preview', translations: { 'ca': 'Previsualitzar', 'es': 'Previsualizar' }, slug: 'tabs/preview' },
           ]
         },
       ]
