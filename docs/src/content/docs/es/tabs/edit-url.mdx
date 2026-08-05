@@ -1,0 +1,20 @@
+---
+title: Editar la URL
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+<FeatureAccess entity="editar la URL" macOS="Cmd+e" command="Edit URL" menu={['Edit', 'Edit URL']}/>
+
+También podrás editarla haciendo clic sobre la barra de direcciones. Sé que el comportamiento no es el esperado, ya que normalmente esperarías un campo de texto libre.
+
+Verás un modal con dos opciones de modificación:
+
+![Modal de edición de la URL](../../../../assets/tab-edit-url.png)
+
+1. **Modificación simple**: cambias o pegas la nueva URL.
+2. **Modificación compleja**: la URL está dividida en partes, permitiéndote modificar solo la parte que desees. También puedes añadir o modificar los *queryparams*.
+
+## Pegar y ir
+
+<FeatureAccess entity="pegar y ir" command="Paste & Go" menu={['File', 'Paste and go']}/>
