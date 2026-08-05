@@ -74,6 +74,7 @@ export default defineConfig({
             { label: 'Copy URL', translations: { 'ca': 'Copiar la URL', 'es': 'Copiar la URL' }, slug: 'tabs/copy-url' },
             { label: 'Edit URL', translations: { 'ca': 'Editar la URL', 'es': 'Editar la URL' }, slug: 'tabs/edit-url' },
             { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'tabs/move' },
+            { label: 'Duplicate', translations: { 'ca': 'Duplicar', 'es': 'Duplicar' }, slug: 'tabs/duplicate' },
           ]
         },
       ]
