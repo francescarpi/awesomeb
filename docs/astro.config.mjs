@@ -68,6 +68,7 @@ export default defineConfig({
           items: [
             { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'tabs/new' },
             { label: 'Close', translations: { 'ca': 'Tancar', 'es': 'Cerrar' }, slug: 'tabs/close' },
+            { label: 'Reopen', translations: { 'ca': 'Reobrir', 'es': 'Reabrir' }, slug: 'tabs/closed' },
           ]
         },
       ]
