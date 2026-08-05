@@ -1,0 +1,17 @@
+---
+title: Mover una pestaña
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+<FeatureAccess entity="mover una pestaña arriba/abajo" macOS="Cmd+Opt+[ o Cmd+Opt+]" command="Move Tab Container Up/Down" menu={['Tabs', 'Move tab up/down']}/>
+
+:::note
+Recuerda que cuando se mueve arriba o abajo, no estás moviendo únicamente una pestaña, sino el *tab container*.
+:::
+
+Por otra parte, también es posible mover una pestaña a un nuevo escritorio o a una nueva ventana.
+
+<FeatureAccess entity="mover una pestaña a un target" command="Move Tab" contextMenu="Move..." />
+
+Los *targets* se explican [aquí](/es/tabs/new/#selecci%C3%B3n-del-target).
