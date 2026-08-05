@@ -22,6 +22,11 @@ const trans: Record<string, Record<string, string>> = {
     ca: 'Comanda',
     es: 'Comando',
   },
+  contextMenu: {
+    root: 'Context menu',
+    ca: 'Menú contextual',
+    es: 'Menú contextual',
+  },
 };
 
 interface Props {
@@ -29,14 +34,16 @@ interface Props {
   menu?: string[];
   command?: string;
   macOS: string;
+  contextMenu?: string;
 }
 
-const { entity, menu, command } = Astro.props as Props;
+const { entity, menu, command, contextMenu } = Astro.props as Props;
 
 const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
 const txtMenu = trans.menu[locale || 'root'] || trans.menu.root;
 const txtShortcut = trans.shortcut[locale || 'root'] || trans.shortcut.root;
 const txtCommand = trans.command[locale || 'root'] || trans.command.root;
+const txtContextMenu = trans.contextMenu[locale || 'root'] || trans.contextMenu.root;
 ---
 
 <div class="feature-access">
@@ -56,12 +63,25 @@ const txtCommand = trans.command[locale || 'root'] || trans.command.root;
         </li>
       )
     }
-    <li>
-      <b>{txtShortcut}</b>:
-      <ul class="feature-access-list">
-        <li>macOS: <code dir="auto">{Astro.props.macOS}</code></li>
-      </ul>
-    </li>
+    {
+      contextMenu && (
+        <li>
+          <b>{txtContextMenu}</b>: {contextMenu}
+        </li>
+      )
+    }
+    {
+      Astro.props.macOS && (
+        <li>
+          <b>{txtShortcut}</b>:
+          <ul class="feature-access-list">
+            <li>
+              macOS: <code dir="auto">{Astro.props.macOS}</code>
+            </li>
+          </ul>
+        </li>
+      )
+    }
   </ul>
 </div>
 
