@@ -70,6 +70,7 @@ export default defineConfig({
             { label: 'Close', translations: { 'ca': 'Tancar', 'es': 'Cerrar' }, slug: 'tabs/close' },
             { label: 'Reopen', translations: { 'ca': 'Reobrir', 'es': 'Reabrir' }, slug: 'tabs/closed' },
             { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'tabs/navigate' },
+            { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'tabs/rename' },
           ]
         },
       ]
