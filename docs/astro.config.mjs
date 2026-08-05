@@ -75,6 +75,7 @@ export default defineConfig({
             { label: 'Edit URL', translations: { 'ca': 'Editar la URL', 'es': 'Editar la URL' }, slug: 'tabs/edit-url' },
             { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'tabs/move' },
             { label: 'Duplicate', translations: { 'ca': 'Duplicar', 'es': 'Duplicar' }, slug: 'tabs/duplicate' },
+            { label: 'Change profile', translations: { 'ca': 'Canviar perfil', 'es': 'Cambiar perfil' }, slug: 'tabs/change-profile' },
           ]
         },
       ]
