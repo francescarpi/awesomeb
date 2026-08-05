@@ -71,6 +71,7 @@ export default defineConfig({
             { label: 'Reopen', translations: { 'ca': 'Reobrir', 'es': 'Reabrir' }, slug: 'tabs/closed' },
             { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'tabs/navigate' },
             { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'tabs/rename' },
+            { label: 'Copy URL', translations: { 'ca': 'Copiar la URL', 'es': 'Copiar la URL' }, slug: 'tabs/copy-url' },
           ]
         },
       ]
