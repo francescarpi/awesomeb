@@ -81,6 +81,13 @@ export default defineConfig({
             { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
           ]
         },
+        {
+          label: 'Desktops',
+          translations: { 'ca': 'Escriptoris', 'es': 'Escritorios' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'desktops/general' },
+          ],
+        }
       ]
     }),
   ],
