@@ -11,7 +11,7 @@ export default defineConfig({
         src: './src/assets/logo.png'
       },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/francescarpi/awesomeb' }],
-      favicon: '/public/favicon.png',
+      favicon: '/favicon.png',
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },
@@ -82,6 +82,7 @@ export default defineConfig({
             { label: 'Dividers', translations: { 'ca': 'Separadors', 'es': 'Separadores' }, slug: 'tabs/dividers' },
             { label: 'Media widget', translations: { 'ca': 'Widget de media', 'es': 'Widget de media' }, slug: 'tabs/media-widget' },
             { label: 'Children tabs widget', translations: { 'ca': 'Pestanyes filles', 'es': 'Pestañas hijas' }, slug: 'tabs/children' },
+            { label: 'Find in page', translations: { 'ca': 'Cercar dins una pàgina', 'es': 'Buscar dentro una página' }, slug: 'tabs/find-in-page' },
           ]
         },
         {
