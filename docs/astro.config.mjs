@@ -103,7 +103,8 @@ export default defineConfig({
             { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'windows/new' },
             { label: 'Downloads', translations: { 'ca': 'Descàrregues', 'es': 'Descargas' }, slug: 'windows/downloads' },
           ],
-        }
+        },
+        { label: 'History', translations: { 'ca': 'Historial', 'es': 'Historial' }, slug: 'history' },
       ]
     }),
   ],
