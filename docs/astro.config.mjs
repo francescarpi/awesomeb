@@ -90,6 +90,7 @@ export default defineConfig({
             { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'desktops/navigate' },
             { label: 'Theme', translations: { 'ca': 'Tema', 'es': 'Tema' }, slug: 'desktops/theme' },
             { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'desktops/rename' },
+            { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'desktops/move' },
           ],
         }
       ]
