@@ -79,6 +79,7 @@ export default defineConfig({
             { label: 'Preview', translations: { 'ca': 'Previsualitzar', 'es': 'Previsualizar' }, slug: 'tabs/preview' },
             { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
             { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
+            { label: 'Dividers', translations: { 'ca': 'Separadors', 'es': 'Separadores' }, slug: 'tabs/dividers' },
           ]
         },
         {
