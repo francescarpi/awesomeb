@@ -79,8 +79,22 @@ export default defineConfig({
             { label: 'Preview', translations: { 'ca': 'Previsualitzar', 'es': 'Previsualizar' }, slug: 'tabs/preview' },
             { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
             { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
+            { label: 'Dividers', translations: { 'ca': 'Separadors', 'es': 'Separadores' }, slug: 'tabs/dividers' },
           ]
         },
+        {
+          label: 'Desktops',
+          translations: { 'ca': 'Escriptoris', 'es': 'Escritorios' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'desktops/general' },
+            { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'desktops/navigate' },
+            { label: 'Theme', translations: { 'ca': 'Tema', 'es': 'Tema' }, slug: 'desktops/theme' },
+            { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'desktops/rename' },
+            { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'desktops/move' },
+            { label: 'Add', translations: { 'ca': 'Afegir', 'es': 'Añadir' }, slug: 'desktops/add' },
+            { label: 'Suspend', translations: { 'ca': 'Suspendre', 'es': 'Suspender' }, slug: 'desktops/suspend' },
+          ],
+        }
       ]
     }),
   ],
