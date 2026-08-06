@@ -1,0 +1,51 @@
+---
+title: Bookmarks
+---
+
+import FeatureAccess from '../../components/FeatureAccess.astro'
+
+As you know from other browsers, the bookmarks feature lets you store websites in a structured way so you can access them on future occasions.
+
+## Add a bookmark
+
+It's only possible using the context menu when a tab is active:
+
+![Bookmarks in the context menu](../../assets/bookmarks-1.png)
+
+### Add here
+
+It lets you save the website in the selected folder. Initially, since there is none, they are saved in the *root*.
+
+![Save here](../../assets/bookmarks-2.png)
+
+### Create folder and add
+
+It lets you create a new folder inside the folder you're in (the first time is *root*) and save the website directly there.
+
+![Create folder and save](../../assets/bookmarks-3.png)
+
+With this example you'll clearly see the why of *Add here...* and *Create folder here and add...*. If you access the add bookmark option again, you'll see the new folder created in the example, and you can save the next website in *root* or inside *Utils* or whatever folders you have.
+
+![Created folder](../../assets/bookmarks-4.png)
+
+## Access a bookmark
+
+### From the menu
+
+The bookmarks structure is accessible directly from the main menu.
+
+![Access from menu](../../assets/bookmarks-5.png)
+
+### From the bookmark search
+
+<FeatureAccess entity="search a bookmark" macOS="Cmd+b" menu={['Bookmarks', 'Open bookmark']} />
+
+![Search bookmark](../../assets/bookmarks-6.png)
+
+## Manage bookmarks
+
+<FeatureAccess entity="manage bookmarks" menu={['Bookmarks', 'Manage bookmarks']} />
+
+Currently there is a quite minimalist version of the bookmarks management page. It lets you modify, delete and move a bookmark. And not much else. It will evolve in the future.
+
+![Manage bookmarks](../../assets/bookmarks-7.png)

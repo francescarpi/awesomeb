@@ -105,6 +105,7 @@ export default defineConfig({
           ],
         },
         { label: 'History', translations: { 'ca': 'Historial', 'es': 'Historial' }, slug: 'history' },
+        { label: 'Bookmarks', translations: { 'ca': 'Preferits', 'es': 'Favoritos' }, slug: 'bookmarks' },
       ]
     }),
   ],
