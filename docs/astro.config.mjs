@@ -78,6 +78,7 @@ export default defineConfig({
             { label: 'Change profile', translations: { 'ca': 'Canviar perfil', 'es': 'Cambiar perfil' }, slug: 'tabs/change-profile' },
             { label: 'Preview', translations: { 'ca': 'Previsualitzar', 'es': 'Previsualizar' }, slug: 'tabs/preview' },
             { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
+            { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
           ]
         },
       ]
