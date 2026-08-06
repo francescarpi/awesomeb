@@ -80,6 +80,7 @@ export default defineConfig({
             { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
             { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
             { label: 'Dividers', translations: { 'ca': 'Separadors', 'es': 'Separadores' }, slug: 'tabs/dividers' },
+            { label: 'Media widget', translations: { 'ca': 'Widget de media', 'es': 'Widget de media' }, slug: 'tabs/media-widget' },
           ]
         },
         {
@@ -94,7 +95,18 @@ export default defineConfig({
             { label: 'Add', translations: { 'ca': 'Afegir', 'es': 'Añadir' }, slug: 'desktops/add' },
             { label: 'Suspend', translations: { 'ca': 'Suspendre', 'es': 'Suspender' }, slug: 'desktops/suspend' },
           ],
-        }
+        },
+        {
+          label: 'Windows',
+          translations: { 'ca': 'Finestres', 'es': 'Ventanas' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'windows/general' },
+            { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'windows/new' },
+            { label: 'Downloads', translations: { 'ca': 'Descàrregues', 'es': 'Descargas' }, slug: 'windows/downloads' },
+          ],
+        },
+        { label: 'History', translations: { 'ca': 'Historial', 'es': 'Historial' }, slug: 'history' },
+        { label: 'Bookmarks', translations: { 'ca': 'Preferits', 'es': 'Favoritos' }, slug: 'bookmarks' },
       ]
     }),
   ],
