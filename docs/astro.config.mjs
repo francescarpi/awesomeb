@@ -89,6 +89,7 @@ export default defineConfig({
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'desktops/general' },
             { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'desktops/navigate' },
             { label: 'Theme', translations: { 'ca': 'Tema', 'es': 'Tema' }, slug: 'desktops/theme' },
+            { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'desktops/rename' },
           ],
         }
       ]
