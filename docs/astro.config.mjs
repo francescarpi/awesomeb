@@ -91,6 +91,7 @@ export default defineConfig({
             { label: 'Theme', translations: { 'ca': 'Tema', 'es': 'Tema' }, slug: 'desktops/theme' },
             { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'desktops/rename' },
             { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'desktops/move' },
+            { label: 'Add', translations: { 'ca': 'Afegir', 'es': 'Añadir' }, slug: 'desktops/add' },
           ],
         }
       ]
