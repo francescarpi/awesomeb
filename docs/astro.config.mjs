@@ -94,6 +94,13 @@ export default defineConfig({
             { label: 'Add', translations: { 'ca': 'Afegir', 'es': 'Añadir' }, slug: 'desktops/add' },
             { label: 'Suspend', translations: { 'ca': 'Suspendre', 'es': 'Suspender' }, slug: 'desktops/suspend' },
           ],
+        },
+        {
+          label: 'Windows',
+          translations: { 'ca': 'Finestres', 'es': 'Ventanas' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'windows/general' },
+          ],
         }
       ]
     }),
