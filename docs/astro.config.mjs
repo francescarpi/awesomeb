@@ -92,6 +92,7 @@ export default defineConfig({
             { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'desktops/rename' },
             { label: 'Move', translations: { 'ca': 'Moure', 'es': 'Mover' }, slug: 'desktops/move' },
             { label: 'Add', translations: { 'ca': 'Afegir', 'es': 'Añadir' }, slug: 'desktops/add' },
+            { label: 'Suspend', translations: { 'ca': 'Suspendre', 'es': 'Suspender' }, slug: 'desktops/suspend' },
           ],
         }
       ]
