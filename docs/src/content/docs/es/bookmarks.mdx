@@ -1,0 +1,51 @@
+---
+title: Favoritos
+---
+
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
+Como sabrás de otros navegadores, la funcionalidad de favoritos te permite almacenar de forma estructurada sitios web para poder acceder a ellos en futuras ocasiones.
+
+## Añadir un favorito
+
+Solo es posible utilizando el menú contextual cuando una pestaña está activa:
+
+![Favoritos en el menú contextual](../../../assets/bookmarks-1.png)
+
+### Añadir aquí
+
+Te permite guardar el sitio web en la carpeta seleccionada. Inicialmente, como no hay ninguna, se guardan en el *root*.
+
+![Guardar aquí](../../../assets/bookmarks-2.png)
+
+### Crear carpeta y añadir
+
+Te permite crear una nueva carpeta dentro de la carpeta donde estés (la primera vez es *root*) y guardar el sitio web directamente allí.
+
+![Crear carpeta y guardar](../../../assets/bookmarks-3.png)
+
+Con este ejemplo verás claramente el porqué del *Add here...* y *Create folder here and add...*. Si vuelves a acceder a la opción de añadir favorito verás la nueva carpeta creada en el ejemplo, y el siguiente sitio web lo puedes guardar en *root* o dentro de *Utils* o las carpetas que tengas.
+
+![Carpeta creada](../../../assets/bookmarks-4.png)
+
+## Acceder a un favorito
+
+### Desde el menú
+
+La estructura de favoritos es accesible directamente desde el menú principal.
+
+![Acceder desde el menú](../../../assets/bookmarks-5.png)
+
+### Desde el buscador de favoritos
+
+<FeatureAccess entity="buscar un favorito" macOS="Cmd+b" menu={['Bookmarks', 'Open bookmark']} />
+
+![Buscar favorito](../../../assets/bookmarks-6.png)
+
+## Gestionar favoritos
+
+<FeatureAccess entity="gestionar favoritos" menu={['Bookmarks', 'Manage bookmarks']} />
+
+Actualmente hay una versión bastante minimalista de la página de gestión de favoritos. Te permite modificar, borrar y mover un favorito. Y poco más. Irá evolucionando en un futuro.
+
+![Gestionar favoritos](../../../assets/bookmarks-7.png)
