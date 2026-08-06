@@ -80,6 +80,7 @@ export default defineConfig({
             { label: 'Split', translations: { 'ca': 'Dividir', 'es': 'Dividir' }, slug: 'tabs/split' },
             { label: 'Mute', translations: { 'ca': 'Mutejar', 'es': 'Mutear' }, slug: 'tabs/mute' },
             { label: 'Dividers', translations: { 'ca': 'Separadors', 'es': 'Separadores' }, slug: 'tabs/dividers' },
+            { label: 'Media widget', translations: { 'ca': 'Widget de media', 'es': 'Widget de media' }, slug: 'tabs/media-widget' },
           ]
         },
         {
