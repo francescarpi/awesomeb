@@ -100,6 +100,7 @@ export default defineConfig({
           translations: { 'ca': 'Finestres', 'es': 'Ventanas' },
           items: [
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'windows/general' },
+            { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'windows/new' },
           ],
         }
       ]
