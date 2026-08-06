@@ -87,6 +87,7 @@ export default defineConfig({
           translations: { 'ca': 'Escriptoris', 'es': 'Escritorios' },
           items: [
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'desktops/general' },
+            { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'desktops/navigate' },
           ],
         }
       ]
