@@ -101,6 +101,7 @@ export default defineConfig({
           items: [
             { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'windows/general' },
             { label: 'New', translations: { 'ca': 'Nova', 'es': 'Nueva' }, slug: 'windows/new' },
+            { label: 'Downloads', translations: { 'ca': 'Descàrregues', 'es': 'Descargas' }, slug: 'windows/downloads' },
           ],
         }
       ]
