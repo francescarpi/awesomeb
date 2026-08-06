@@ -11,7 +11,7 @@ export default defineConfig({
         src: './src/assets/logo.png'
       },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/francescarpi/awesomeb' }],
-      favicon: '/public/favicon.png',
+      favicon: '/favicon.png',
       defaultLocale: 'root',
       locales: {
         root: { label: 'English', lang: 'en' },
