@@ -35,6 +35,7 @@ import {
   bookmarks,
   partitions,
   Layouts,
+  LAYOUT_SIZES,
 } from '@/core';
 import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
@@ -388,6 +389,16 @@ export class BrowserRenderer {
       path: extensionsPath(),
       extensions: active ? this._browser.extensions.active : this._browser.extensions.all,
     };
+  }
+
+  layoutSizes(): IEntity[] {
+    const selectedTab = this._browser.selectedTab;
+
+    return LAYOUT_SIZES.map((size) => ({
+      id: size.toString(),
+      label: `${size}%`,
+      selected: selectedTab !== null && selectedTab.tabContainer.layoutSize === size,
+    }));
   }
 
   layoutsEntities(): IEntity[] {
