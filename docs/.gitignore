@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# generated at build time by scripts/fetch-latest-release.mjs
+src/data/latest-release.json
+
 # dependencies
 node_modules/
 

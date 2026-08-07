@@ -34,7 +34,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['scripts/**/*.{js,mjs,ts}'],
+    files: ['scripts/**/*.{js,mjs,ts}', 'docs/scripts/**/*.{js,mjs,ts}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: { ...globals.node },
