@@ -16,7 +16,10 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
       <WindowActions />
     </section>
     <section class="px-2 mt-2 sidebar:mt-0 flex justify-between items-center">
-      <ButtonIcon icon="sidebar" />
+      <div class="flex gap-2">
+        <ButtonIcon icon="sidebar" />
+        <ButtonIcon icon="add" />
+      </div>
       <AppUpdater />
     </section>
     <section class="py-1 flex justify-center sidebar:block sidebar:px-2">
@@ -56,6 +59,8 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
   }
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
+
+  onClick('add', () => abModal.open(winId, 'new-tab'));
 
   abSidebar.onChangeDrag((_event, isDragable) => {
     const sidebar = document.getElementById('sidebarContainer')!;
