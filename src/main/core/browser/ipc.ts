@@ -41,6 +41,8 @@ export function setupBrowserIPC(browser: Browser) {
           return browser.renderer.closedTabsEntities();
         case 'layouts':
           return browser.renderer.layoutsEntities();
+        case 'layoutSizes':
+          return browser.renderer.layoutSizes();
       }
     },
   );
