@@ -14,6 +14,9 @@ export const Command: ICommand<ICommandParams> = {
   name: 'Change layout size',
   description: 'Change the size of the split layout',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
+  modal: {
+    page: 'layout-size',
+  },
   async handler({ tabContainer, params }) {
     if (!tabContainer) {
       scopeLog.warn(`No tab container found for ${TRIGGER} command`);

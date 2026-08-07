@@ -10,7 +10,8 @@ export type TEntityType =
   | 'tabContainers'
   | 'bookmarks'
   | 'closedTabs'
-  | 'layouts';
+  | 'layouts'
+  | 'layoutSizes';
 
 export interface IEntity {
   id: string;
