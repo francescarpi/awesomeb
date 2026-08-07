@@ -1,0 +1,27 @@
+---
+title: Instal·lar
+---
+
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
+Com que no hi ha una integració (encara) amb el *Chrome Store*, les extensions s'han d'instal·lar manualment.
+
+<FeatureAccess entity="extensions" command="Manage Extensions" />
+
+La primera vegada que accedeixis a la pàgina de gestió d'extensions només hi veuràs això:
+
+![Gestionar les extensions](../../../../assets/extensions-1.jpeg)
+
+Veuràs que el text d'ajuda t'indica la ruta de la teva carpeta de configuració, on han d'anar les extensions.
+
+El que has de fer és baixar-te l'extensió amb el navegador *Chrome*, localitzar la carpeta i copiar-la a la ruta on t'indica **AwesomeB**. Després només has de prémer el botó **Refresh Extensions**.
+
+![Llistat d'extensions](../../../../assets/extensions-2.png)
+
+Per defecte les noves extensions apareixen desactivades. Activa les que necessitis i al moment d'**obrir una pestanya** les veuràs a la barra superior.
+
+![Extensions actives](../../../../assets/extensions-3.png)
+
+:::note
+Tingues en compte que les extensions van per **perfil**. Això vol dir que si una extensió desa algun setting al local storage i treballes amb múltiples perfils, hauràs d'accedir a l'extensió i configurar-la per a cadascun d'ells.
+:::
