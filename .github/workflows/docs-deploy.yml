@@ -1,6 +1,9 @@
 name: Deploy Docs
 
 on:
+  workflow_run:
+    workflows: ['Build & Release App']
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -14,13 +17,20 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
           sparse-checkout: |
             docs
           sparse-checkout-cone-mode: false
+
+      - name: Fetch latest release metadata
+        working-directory: docs
+        run: node scripts/fetch-latest-release.mjs
 
       - uses: withastro/action@v6
         with:

@@ -1,0 +1,254 @@
+---
+import latestReleaseRaw from '../data/latest-release.json';
+
+interface AssetInfo {
+  url: string;
+  filename: string;
+  size_mb: number;
+}
+
+interface LatestRelease {
+  version: string;
+  tag: string;
+  html_url: string;
+  fetched_at: string | null;
+  error: string | null;
+  mac: AssetInfo | null;
+  linux: AssetInfo | null;
+  windows: AssetInfo | null;
+}
+
+const latestRelease = latestReleaseRaw as LatestRelease;
+
+const { locale } = Astro.locals.starlightRoute;
+
+interface Props {
+  /** Override the link to the full releases page. */
+  releasesHref?: string;
+}
+
+const { releasesHref = 'https://github.com/francescarpi/awesomeb/releases' } = Astro.props as Props;
+
+const loc = locale || 'root';
+
+const trans: Record<string, Record<string, string>> = {
+  download: {
+    root: 'Download for',
+    ca: 'Descarrega per a',
+    es: 'Descarga para',
+  },
+  version: {
+    root: 'Version',
+    ca: 'Versió',
+    es: 'Versión',
+  },
+  unknown: {
+    root: 'We could not detect your platform. Pick the one that matches your system:',
+    ca: 'No hem pogut detectar la teva plataforma. Tria la que coincideixi amb el teu sistema:',
+    es: 'No hemos podido detectar tu plataforma. Elige la que coincida con tu sistema:',
+  },
+  allReleases: {
+    root: 'See all releases and older versions',
+    ca: 'Mira totes les releases i les versions anteriors',
+    es: 'Mira todas las releases y las versiones anteriores',
+  },
+};
+
+const t = (key: keyof typeof trans) => trans[key][loc] || trans[key].root;
+
+const platforms: Array<{
+  os: 'mac' | 'linux' | 'windows';
+  label: string;
+  asset: AssetInfo | null;
+}> = [
+  { os: 'mac', label: 'macOS', asset: latestRelease.mac },
+  { os: 'linux', label: 'Linux', asset: latestRelease.linux },
+  { os: 'windows', label: 'Windows', asset: latestRelease.windows },
+];
+
+const available = platforms.filter((p) => p.asset);
+const hasAny = available.length > 0;
+const htmlUrl = latestRelease.html_url || releasesHref;
+---
+
+{
+  hasAny ? (
+    <div class="download-button" data-latest-release>
+      <div class="download-button__options" data-options>
+        {available.map((p) => (
+          <a
+            class="download-button__btn"
+            data-os={p.os}
+            href={p.asset!.url}
+            download={p.asset!.filename}
+          >
+            <span class="download-button__os">
+              {t('download')} {p.label}
+            </span>
+            <span class="download-button__meta">
+              {t('version')} {latestRelease.version} · {p.asset!.size_mb} MB
+            </span>
+          </a>
+        ))}
+      </div>
+      <p class="download-button__unknown" data-unknown hidden>
+        {t('unknown')}
+      </p>
+      <p class="download-button__fallback">
+        <a href={htmlUrl}>{t('allReleases')}</a>
+      </p>
+    </div>
+  ) : (
+    <p class="download-button download-button--empty">
+      <a class="download-button__btn download-button__btn--primary" href={releasesHref}>
+        {t('allReleases')}
+      </a>
+    </p>
+  )
+}
+
+<script>
+  (() => {
+    type OSType = 'mac' | 'linux' | 'windows' | 'unknown';
+
+    function detectOS(): OSType {
+      const ua = navigator.userAgent.toLowerCase();
+      const uaData = (
+        navigator as Navigator & {
+          userAgentData?: { platform?: string };
+        }
+      ).userAgentData;
+      const platform = (
+        uaData?.platform ||
+        (navigator as Navigator & { platform?: string }).platform ||
+        ''
+      ).toLowerCase();
+
+      if (/mac|iphone|ipad|ipod/.test(platform) || /mac os x/.test(ua)) {
+        return 'mac';
+      }
+      if (/win/.test(platform) || /windows/.test(ua)) {
+        return 'windows';
+      }
+      if (/linux|x11/.test(platform) || /linux/.test(ua)) {
+        return 'linux';
+      }
+      return 'unknown';
+    }
+
+    function init() {
+      const root = document.querySelector<HTMLElement>('[data-latest-release]');
+      if (!root) return;
+      const options = root.querySelector<HTMLElement>('[data-options]');
+      const unknown = root.querySelector<HTMLElement>('[data-unknown]');
+      if (!options) return;
+
+      const os = detectOS();
+      const buttons = Array.from(options.querySelectorAll<HTMLAnchorElement>('a[data-os]'));
+      const match = buttons.find((b) => b.dataset.os === os) || null;
+
+      if (!match) {
+        if (unknown) unknown.hidden = false;
+        return;
+      }
+
+      options.insertBefore(match, options.firstChild);
+      buttons.forEach((b) => b.classList.remove('download-button__btn--primary'));
+      match.classList.add('download-button__btn--primary');
+      buttons.forEach((b) => {
+        if (b !== match) b.hidden = true;
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<style>
+  .download-button {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    background: var(--sl-color-gray-6);
+  }
+
+  .download-button--empty {
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .download-button__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .download-button__btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.375rem;
+    background: var(--sl-color-gray-7);
+    color: var(--sl-color-text);
+    text-decoration: none;
+    transition:
+      transform 0.1s ease,
+      border-color 0.1s ease,
+      background 0.1s ease;
+  }
+
+  .download-button__btn[hidden] {
+    display: none;
+  }
+
+  .download-button__btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--sl-color-accent);
+  }
+
+  .download-button__btn--primary,
+  .download-button__btn--primary:link,
+  .download-button__btn--primary:visited,
+  .download-button__btn--primary:hover,
+  .download-button__btn--primary:active,
+  .download-button__btn--primary:focus,
+  .download-button__btn--primary * {
+    background: #1e3a8a !important;
+    border-color: #1e3a8a !important;
+    color: #fff !important;
+  }
+
+  .download-button__btn--primary:hover {
+    background: #1e40af !important;
+    border-color: #1e40af !important;
+  }
+
+  .download-button__os {
+    font-weight: 600;
+  }
+
+  .download-button__meta {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-top: 0.15rem;
+  }
+
+  .download-button__unknown {
+    margin: 0.5rem 0 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.9rem;
+  }
+
+  .download-button__fallback {
+    margin: 0.75rem 0 0;
+    font-size: 0.85rem;
+  }
+</style>
