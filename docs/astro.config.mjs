@@ -109,6 +109,14 @@ export default defineConfig({
         },
         { label: 'History', translations: { 'ca': 'Historial', 'es': 'Historial' }, slug: 'history' },
         { label: 'Bookmarks', translations: { 'ca': 'Preferits', 'es': 'Favoritos' }, slug: 'bookmarks' },
+        {
+          label: 'Extensions',
+          translations: { 'ca': 'Extensions', 'es': 'Extensiones' },
+          items: [
+            { label: 'General', translations: { 'ca': 'General', 'es': 'General' }, slug: 'extensions/general' },
+            { label: 'Install', translations: { 'ca': 'Instal·lar', 'es': 'Instalar' }, slug: 'extensions/install' },
+          ],
+        },
       ]
     }),
   ],

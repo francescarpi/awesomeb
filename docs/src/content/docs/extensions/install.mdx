@@ -1,0 +1,27 @@
+---
+title: Install
+---
+
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
+Since there is no integration (yet) with the *Chrome Web Store*, extensions have to be installed manually.
+
+<FeatureAccess entity="extensions" command="Manage Extensions" />
+
+The first time you access the extensions management page, you'll only see this:
+
+![Extensions management](../../../assets/extensions-1.jpeg)
+
+You'll see that the help text points you to the path of your configuration folder, where extensions need to go.
+
+What you have to do is download the extension with the *Chrome* browser, locate the folder, and copy it to the path that **AwesomeB** indicates. Then you just have to click the **Refresh Extensions** button.
+
+![Extensions list](../../../assets/extensions-2.png)
+
+By default, new extensions appear disabled. Enable the ones you need and when you **open a tab** you'll see them in the top bar.
+
+![Active extensions](../../../assets/extensions-3.png)
+
+:::note
+Keep in mind that extensions are scoped per **profile**. This means that if an extension saves some settings in local storage and you work with multiple profiles, you'll have to access the extension and configure it for each one of them.
+:::
