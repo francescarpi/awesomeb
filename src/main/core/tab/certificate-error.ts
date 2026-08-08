@@ -19,6 +19,11 @@ export class CertificateError extends UIPageView {
     });
   }
 
+  checkVisibility(window: Window) {
+    const selectedTab = window.selectedTab;
+    this.setVisible(selectedTab !== null && selectedTab.tab.id === this.tab.id);
+  }
+
   refreshBounds(_window: Window) {
     this.webContentsView.setBounds({
       x: this.tab.left,
