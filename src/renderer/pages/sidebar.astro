@@ -18,7 +18,7 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
     <section class="px-2 mt-2 sidebar:mt-0 flex justify-between items-center">
       <div class="flex gap-2">
         <ButtonIcon icon="sidebar" />
-        <ButtonIcon icon="add" />
+        <ButtonIcon icon="add-circle" />
       </div>
       <AppUpdater />
     </section>
@@ -60,7 +60,7 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
 
-  onClick('add', () => abModal.open(winId, 'new-tab'));
+  onClick('add-circle', () => abModal.open(winId, 'new-tab'));
 
   abSidebar.onChangeDrag((_event, isDragable) => {
     const sidebar = document.getElementById('sidebarContainer')!;
