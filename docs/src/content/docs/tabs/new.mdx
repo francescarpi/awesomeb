@@ -3,12 +3,14 @@ title: New Tab
 ---
 
 import FeatureAccess from '../../../components/FeatureAccess.astro'
+import { Image } from 'astro:assets';
+import NewTab8 from "../../../assets/new-tab-8.png"
 
 <FeatureAccess entity="new tab" macOS="Cmd+t" command="New Tab" />
 
 You can also click the **+** button in the left panel.
 
-![New tab button](../../../assets/new-tab-8.png)
+<Image src={NewTab8} width="300" alt="New tab button" />
 
 You'll see a modal like this:
 
