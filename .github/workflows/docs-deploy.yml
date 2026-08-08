@@ -1,10 +1,14 @@
 name: Deploy Docs
 
 on:
-  workflow_run:
-    workflows: ['Build & Release App']
-    types: [completed]
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy docs for (e.g. v1.2.3)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -17,13 +21,18 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
+          ref: >-
+            ${{
+              github.event_name == 'release' && github.event.release.tag_name
+              || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag)
+              || github.ref
+            }}
           sparse-checkout: |
             docs
           sparse-checkout-cone-mode: false
