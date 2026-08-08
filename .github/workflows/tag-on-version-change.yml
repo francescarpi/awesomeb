@@ -46,6 +46,7 @@ jobs:
           echo "package.json version unchanged (${{ steps.versions.outputs.after }}). Skipping tag."
 
       - name: Validate and create tag
+        id: create_tag
         if: steps.versions.outputs.before != steps.versions.outputs.after
         env:
           AFTER: ${{ steps.versions.outputs.after }}
@@ -69,4 +70,16 @@ jobs:
                 "/repos/${{ github.repository }}/git/refs" \
                 -f ref="refs/tags/${TAG}" \
                 -f sha="$SHA"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "Created tag ${TAG} at ${SHA}"
+
+      - name: Trigger build & release
+        if: steps.create_tag.outputs.tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.create_tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          echo "Dispatching build-and-release for ${TAG}"
+          gh workflow run "build-and-release.yml" -f tag="${TAG}"
+          echo "Dispatched build-and-release for ${TAG}"

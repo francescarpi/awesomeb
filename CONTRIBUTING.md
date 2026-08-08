@@ -32,18 +32,26 @@ On this new branch, update the version field in _package.json_. Once updated, cr
 
 3. Tag the release (automatic)
 
-Once the version-bump PR merges into `main`, the **tag on version change** workflow takes over. It compares the `version` field before and after the merge, validates it matches a semver-like pattern (`X.Y.Z` or `X.Y.Z-prerelease`), and creates a tag of the form `v{version}` (e.g. `v0.5.2-alpha`) pointing at the merge commit. Pushing that tag in turn triggers the **build & release app** workflow.
+Once the version-bump PR merges into `main`, the **tag on version change** workflow takes over. It compares the `version` field before and after the merge, validates it matches a semver-like pattern (`X.Y.Z` or `X.Y.Z-prerelease`), and creates a tag of the form `v{version}` (e.g. `v0.5.2-alpha`) pointing at the merge commit.
 
-You no longer need to tag manually. If the tag already exists, the workflow fails loudly rather than overwriting it — this is intentional, to protect releases that may already have been built and published.
+Once the tag is created, the same workflow dispatches the **build & release app** workflow with the new tag as input, so the build starts immediately. You no longer need to tag manually or push anything. If the tag already exists, the workflow fails loudly rather than overwriting it — this is intentional, to protect releases that may already have been built and published.
 
 4. Wait for CI/CD completion
 
-Wait for the **build & release app** workflow to finish running.
+Wait for the **build & release app** workflow to finish running. The job matrix runs on Ubuntu, macOS and Windows. When it finishes successfully, a **draft** GitHub Release is created with all the platform artifacts already attached.
 
 5. Finalize on GitHub
 
-Once the workflow is complete:
+Once the build is complete:
 
 - Navigate to the Releases section on GitHub.
 - Edit the most recent release (which will be in a Draft state).
-- Click the **Generate release notes** button and then click **Publish release**.
+- Review the uploaded artifacts and the auto-detected tag.
+- Click the **Generate release notes** button to populate the description with PR titles since the previous release.
+- Click **Publish release** to make it public.
+
+6. Deploy the documentation
+
+Publishing the release automatically triggers the **Deploy Docs** workflow. It fetches the metadata of the newly published release, rebuilds the documentation site, and publishes it to GitHub Pages so the new version appears in the download links and changelog.
+
+If the docs deploy fails (or you need to re-publish docs for an already-released version), you can re-run it manually from the Actions tab using the **Run workflow** button with the corresponding tag (e.g. `v0.5.2-alpha`).
