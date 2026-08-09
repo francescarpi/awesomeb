@@ -12,3 +12,26 @@ hero:
       icon: right-arrow
 ---
 
+import { CardGrid, Card } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Escritorios para organizarte" icon="seti:default">
+		Agrupa las pestañas en espacios de trabajo independientes. Cada escritorio
+		tiene su tema, sus pestañas y su propio contexto.
+	</Card>
+	<Card title="Sesiones aisladas de forma nativa" icon="seti:lock">
+		AwesomeB nació para esto. Particiones con cookies, caché y datos separados
+		para que el trabajo, la cuenta personal y las pruebas no se mezclen.
+	</Card>
+	<Card title="Paleta de comandos" icon="list-format">
+		Más de 40 comandos para moverte entre pestañas, cambiar de escritorio,
+		mutear el sonido, dividir la pantalla… sin tocar el ratón.
+	</Card>
+	<Card title="Pestañas que hacen cosas útiles" icon="puzzle">
+		Divide la pantalla en dos, agrupa pestañas con separadores, mutea las
+		que hacen ruido, duplícalas para probar cosas sin perder el original.
+	</Card>
+</CardGrid>
+
+<div style="text-align: center;">*Hecho por [Francesc Arpí](/es/aboutme/).*</div>
+

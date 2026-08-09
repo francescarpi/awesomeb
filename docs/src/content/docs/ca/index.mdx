@@ -10,5 +10,32 @@ hero:
     - text: Llegir la documentació
       link: /ca/overview/
       icon: right-arrow
+    - text: Veure a GitHub
+      icon: external
+      variant: minimal
+      link: https://github.com/francescarpi/awesomeb/
 ---
+
+import { CardGrid, Card } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Escriptoris per organitzar-te" icon="seti:default">
+		Agrupa les pestanyes en espais de treball independents. Cada escriptori té
+		el seu tema, les seves pestanyes i el seu propi context.
+	</Card>
+	<Card title="Sessions aïllades de forma nativa" icon="seti:lock">
+		AwesomeB va néixer per això. Particions amb galetes, memòria cau i dades
+		separades perquè el treball, el compte personal i les proves no es barregin.
+	</Card>
+	<Card title="Paleta de comandes" icon="list-format">
+		Més de 40 comandes per moure't entre pestanyes, canviar d'escriptori,
+		mutar el so, dividir la pantalla… sense tocar el ratolí.
+	</Card>
+	<Card title="Pestanyes que fan coses útils" icon="puzzle">
+		Divideix la pantalla en dues, agrupa pestanyes amb separadors, muta les
+		que fan soroll, duplica-les per provar coses sense perdre l'original.
+	</Card>
+</CardGrid>
+
+<div style="text-align: center;">*Fet per [Francesc Arpí](/ca/aboutme/).*</div>
 
