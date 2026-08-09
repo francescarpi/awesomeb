@@ -6,8 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to deploy docs for (e.g. v1.2.3)'
-        required: true
+        description: 'Tag to deploy docs for (e.g. v1.2.3). Leave empty to deploy the branch selected in "Use workflow from".'
+        required: false
+        default: ''
         type: string
 
 permissions:
