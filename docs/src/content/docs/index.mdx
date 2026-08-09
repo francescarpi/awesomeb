@@ -12,3 +12,26 @@ hero:
       icon: right-arrow
 ---
 
+import { CardGrid, Card } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+	<Card title="Desktops to keep things organized" icon="seti:default">
+		Group tabs into independent workspaces. Each desktop has its own theme,
+		its own tabs, and its own context.
+	</Card>
+	<Card title="Natively isolated sessions" icon="seti:lock">
+		AwesomeB was born for this. Partitions with separate cookies, cache, and
+		data so work, personal accounts, and experiments never mix.
+	</Card>
+	<Card title="Command palette" icon="list-format">
+		Over 40 commands to jump between tabs, switch desktops, mute audio, split
+		the screen… without touching the mouse.
+	</Card>
+	<Card title="Tabs that do useful things" icon="puzzle">
+		Split the screen in two, group tabs with dividers, mute the noisy ones,
+		duplicate them to try things without losing the original.
+	</Card>
+</CardGrid>
+
+<div style="text-align: center;">*Made by [Francesc Arpí](/aboutme/).*</div>
+
