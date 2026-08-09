@@ -117,6 +117,7 @@ export default defineConfig({
             { label: 'Install', translations: { 'ca': 'Instal·lar', 'es': 'Instalar' }, slug: 'extensions/install' },
           ],
         },
+        { label: 'Auto update', translations: { 'ca': 'Actualitzacions automàtiques', 'es': 'Actualizaciones automáticas' }, slug: 'autoupdate' },
       ]
     }),
   ],
