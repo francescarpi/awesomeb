@@ -12,6 +12,8 @@ export class TabContainer {
   private _layoutSize: number = 50;
 
   private readonly _children: Map<TTabContainerId, TabContainer> = new Map();
+  private _childrenCollapsed = false;
+
   private _parent: TabContainer | null = null;
 
   constructor(
@@ -247,5 +249,14 @@ export class TabContainer {
 
   get parent(): TabContainer | null {
     return this._parent;
+  }
+
+  toggleChildrenCollapsed() {
+    this._childrenCollapsed = !this._childrenCollapsed;
+    this.browser.eventsChannel.emit('tabcontainer:children-collapsed-did-change', this);
+  }
+
+  get childrenCollapsed(): boolean {
+    return this._childrenCollapsed;
   }
 }
