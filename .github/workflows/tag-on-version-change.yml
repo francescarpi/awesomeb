@@ -2,6 +2,7 @@ name: Tag on version change
 
 permissions:
   contents: write
+  actions: write
 
 on:
   push:
@@ -73,13 +74,12 @@ jobs:
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "Created tag ${TAG} at ${SHA}"
 
-      - name: Trigger build & release
-        if: steps.create_tag.outputs.tag
+      - name: Trigger release workflow
+        if: steps.create_tag.outputs.tag != ''
         env:
-          GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.create_tag.outputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          echo "Dispatching build-and-release for ${TAG}"
-          gh workflow run "build-and-release.yml" -f tag="${TAG}"
-          echo "Dispatched build-and-release for ${TAG}"
+          gh workflow run build-and-release.yml --ref "$TAG"
+          echo "Dispatched build-and-release.yml for ${TAG}"

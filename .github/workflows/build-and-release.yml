@@ -8,13 +8,8 @@ on:
     tags:
       - '*'
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to build and release (e.g. v1.2.3)'
-        required: true
-        type: string
 
-run-name: Release ${{ github.event.inputs.tag || github.ref_name }}
+run-name: Release ${{ github.ref_name }}
 
 jobs:
   release:
@@ -30,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
+          ref: ${{ github.ref }}
 
       - name: Install Node
         uses: actions/setup-node@v4
