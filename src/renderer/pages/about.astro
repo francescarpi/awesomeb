@@ -30,6 +30,19 @@ import logo from '../assets/icon.png';
       'div',
       { class: c('flex', 'flex-col', 'gap-4') },
       h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+      h(
+        'a',
+        {
+          class: c('text-xs', 'text-blue-700'),
+          href: '#',
+          onclick: () => {
+            abCommands.perform(winId, 'new-tab', {
+              query: 'https://awesomeb.app',
+            });
+          },
+        },
+        'https://awesomeb.app',
+      ),
       ...btns,
     ),
     { onUpdated: registerBtnsEvents },
