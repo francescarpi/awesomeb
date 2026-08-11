@@ -163,6 +163,17 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
           await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
         },
       },
+      {
+        label: 'Collapse children',
+        type: 'checkbox',
+        checked: tabContainer.childrenCollapsed,
+        visible: tabContainer.children.length > 0,
+        click: async () => {
+          await browser.performCommand(window, 'toggle-collapse-children', {
+            tabContainerId: tabContainer.id,
+          });
+        },
+      },
     ];
   }
 

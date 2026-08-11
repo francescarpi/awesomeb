@@ -27,6 +27,7 @@ export type ISessionTab = z.infer<typeof SessionTabScheme>;
 export type ISessionTabContainer = {
   id: number;
   divider: boolean;
+  childrenCollapsed: boolean;
   tabs: z.infer<typeof SessionTabScheme>[];
   children: ISessionTabContainer[];
 };
@@ -36,6 +37,7 @@ export const SessionTabContainerScheme: z.ZodType<ISessionTabContainer> = z.lazy
     .object({
       id: z.number(),
       divider: z.boolean(),
+      childrenCollapsed: z.boolean().default(false),
       tabs: z.array(SessionTabScheme),
       children: z.array(SessionTabContainerScheme).default([]),
     })

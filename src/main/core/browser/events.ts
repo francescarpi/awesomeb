@@ -421,6 +421,15 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tabcontainer:children-collapsed-did-change', async () => {
+    const desktop = browser.selectedDesktop;
+    if (!desktop) {
+      return;
+    }
+    browser.toRenderer.refreshTabContainers(desktop.window);
+  });
+
+  //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:window-did-resize', async (win: Window) => {
     win.renderViews();
     browser.toRenderer.refreshLayoutData(win);

@@ -5,6 +5,7 @@ import type { TTabContainerId } from '~/types';
 
 export interface ITabContainerProps {
   divider?: boolean;
+  childrenCollapsed?: boolean;
   justAfter?: TTabContainerId;
 }
 
