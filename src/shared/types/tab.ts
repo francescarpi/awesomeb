@@ -17,6 +17,7 @@ export interface ITabContainer extends ISimpleTabContainer {
   shortcut: number | null;
   divider: boolean;
   children: ISimpleTabContainer[];
+  collapseChildren: boolean;
 }
 
 export interface ITab {

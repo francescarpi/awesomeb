@@ -82,7 +82,24 @@
             ),
           ),
           ...tc.children.map((tcc) =>
-            h('div', { class: c('ml-6', 'mr-1') }, ...tcc.tabs.map((tcct) => renderTab(tcct))),
+            h(
+              'div',
+              { class: c('ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
+              ...tcc.tabs.map((tcct) => renderTab(tcct)),
+            ),
+          ),
+          h(
+            'div',
+            {
+              class: c(
+                !tc.collapseChildren && 'hidden',
+                'text-xs',
+                'ml-4',
+                // '-mt-1',
+                'text-white/40',
+              ),
+            },
+            `(${tc.children.length} ${tc.children.length === 1 ? 'tab' : 'tabs'} collapsed)`,
           ),
         ),
       ),

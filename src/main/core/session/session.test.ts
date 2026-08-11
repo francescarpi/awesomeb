@@ -218,6 +218,93 @@ describe('Session', () => {
     });
   });
 
+  describe('childrenCollapsed persistence', () => {
+    test('round-trips true through save and reload', async () => {
+      const result = await browser.openURL('http://example.com');
+      result!.tabContainer.toggleChildrenCollapsed();
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const tc = persisted.windows[0].desktops[0].tabContainers[0];
+      expect(tc.childrenCollapsed).toBe(true);
+    });
+
+    test('sessionToStore emits childrenCollapsed: false by default', async () => {
+      await browser.openURL('http://example.com');
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const tc = data[0].desktops[0].tabContainers[0];
+
+      expect(tc.childrenCollapsed).toBe(false);
+    });
+
+    test('persists childrenCollapsed on nested containers', async () => {
+      const parent = await browser.openURL('http://parent.com');
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      child!.tabContainer.toggleChildrenCollapsed();
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const childTc = data[0].desktops[0].tabContainers[0].children[0];
+
+      expect(childTc.childrenCollapsed).toBe(true);
+    });
+
+    test('defaults to false when the field is missing in session.json (legacy)', () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example.com',
+                          favicon: null,
+                          closedAt: null,
+                          openTabsAsChild: false,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].tabContainers[0].childrenCollapsed).toBe(false);
+    });
+  });
+
   describe('legacy "name" field migration', () => {
     function writeLegacySessionFile(desktops: unknown[]) {
       const filePath = getSessionFilePath();
