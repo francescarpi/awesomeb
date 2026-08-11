@@ -4,12 +4,6 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to deploy docs for (e.g. v1.2.3). Leave empty to deploy the branch selected in "Use workflow from".'
-        required: false
-        default: ''
-        type: string
 
 permissions:
   contents: read
@@ -31,7 +25,6 @@ jobs:
           ref: >-
             ${{
               github.event_name == 'release' && github.event.release.tag_name
-              || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag)
               || github.ref
             }}
           sparse-checkout: |
