@@ -99,7 +99,10 @@
                 'text-white/40',
               ),
             },
-            `(${tc.children.length} ${tc.children.length === 1 ? 'tab' : 'tabs'} collapsed)`,
+            (() => {
+              const openCount = tc.children.filter((t) => !t.isClosed).length;
+              return `(${openCount} ${openCount === 1 ? 'tab' : 'tabs'} collapsed)`;
+            })(),
           ),
         ),
       ),
