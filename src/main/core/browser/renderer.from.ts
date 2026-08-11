@@ -194,6 +194,7 @@ export class BrowserRenderer {
           isClosed: tc.isClosed,
           tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
           isSplit: tc.hasSplitTabs,
+          collapseChildren: tc.childrenCollapsed,
           children: tc.children.map((tcc) => ({
             id: tcc.id,
             selected: selectedTabContainer?.id === tcc.id,

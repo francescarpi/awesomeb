@@ -30,6 +30,7 @@ const validSessionTab = {
 const validSessionTabContainer = {
   id: 1,
   divider: false,
+  childrenCollapsed: false,
   tabs: [validSessionTab],
   children: [],
 };
@@ -115,6 +116,25 @@ describe('SessionTabContainerScheme', () => {
     const legacy = { id: 1, divider: false, tabs: [validSessionTab] };
     const result = SessionTabContainerScheme.parse(legacy);
     expect(result.children).toEqual([]);
+  });
+
+  test('omitted childrenCollapsed field defaults to false (legacy session files)', () => {
+    const legacy = { id: 1, divider: false, tabs: [validSessionTab] };
+    const result = SessionTabContainerScheme.parse(legacy);
+    expect(result.childrenCollapsed).toBe(false);
+  });
+
+  test('childrenCollapsed: true round-trips as true', () => {
+    const container = { ...validSessionTabContainer, childrenCollapsed: true };
+    const result = SessionTabContainerScheme.parse(container);
+    expect(result.childrenCollapsed).toBe(true);
+  });
+
+  test('childrenCollapsed applies default to nested legacy children', () => {
+    const legacyChild = { id: 2, divider: false, tabs: [] };
+    const root = { ...validSessionTabContainer, children: [legacyChild] };
+    const result = SessionTabContainerScheme.parse(root);
+    expect(result.children[0].childrenCollapsed).toBe(false);
   });
 
   test('parses 3-level hierarchy (root -> mid -> leaf)', () => {
