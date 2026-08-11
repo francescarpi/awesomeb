@@ -92,10 +92,9 @@
             'div',
             {
               class: c(
-                !tc.collapseChildren && 'hidden',
+                !tc.collapseChildren ? 'hidden' : 'hidden sidebar:block',
                 'text-xs',
                 'ml-4',
-                // '-mt-1',
                 'text-white/40',
               ),
             },
