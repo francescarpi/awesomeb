@@ -1491,4 +1491,187 @@ describe('Browser', () => {
       expect(closedTab?.closedAt).toBe(1700000000000);
     });
   });
+
+  describe('Browser.loadSession - childrenCollapsed persistence', () => {
+    function writeSessionFile(data: unknown) {
+      const filePath = path.join(userDataPath(), 'session.json');
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify(data));
+    }
+
+    function cleanSessionFile() {
+      const filePath = path.join(userDataPath(), 'session.json');
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    afterEach(() => {
+      cleanSessionFile();
+    });
+
+    test('restores childrenCollapsed: true on a top-level tabContainer', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: false,
+                    childrenCollapsed: true,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Root',
+                        customTitle: null,
+                        url: 'http://root.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      expect(desktop.tabContainers[0].childrenCollapsed).toBe(true);
+    });
+
+    test('restores childrenCollapsed on a nested child container', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: false,
+                    childrenCollapsed: false,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Parent',
+                        customTitle: null,
+                        url: 'http://parent.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [
+                      {
+                        id: 2,
+                        divider: false,
+                        childrenCollapsed: true,
+                        tabs: [
+                          {
+                            id: 20,
+                            partitionId: 'default',
+                            title: 'Child',
+                            customTitle: null,
+                            url: 'http://child.com',
+                            favicon: null,
+                            closedAt: null,
+                            openTabsAsChild: false,
+                          },
+                        ],
+                        children: [],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      const parentTc = desktop.tabContainers[0];
+      expect(parentTc.childrenCollapsed).toBe(false);
+      expect(parentTc.children[0].childrenCollapsed).toBe(true);
+    });
+
+    test('omitted childrenCollapsed in session.json defaults to false (legacy)', async () => {
+      const data = {
+        windows: [
+          {
+            id: 1,
+            bounds: { x: 0, y: 0, width: 800, height: 600 },
+            selectedDesktopId: 1,
+            sidebarCollapsed: false,
+            areaMaximized: false,
+            desktops: [
+              {
+                id: 1,
+                shortName: null,
+                longName: null,
+                theme: 'blue',
+                tabContainers: [
+                  {
+                    id: 1,
+                    divider: false,
+                    tabs: [
+                      {
+                        id: 10,
+                        partitionId: 'default',
+                        title: 'Root',
+                        customTitle: null,
+                        url: 'http://root.com',
+                        favicon: null,
+                        closedAt: null,
+                        openTabsAsChild: false,
+                      },
+                    ],
+                    children: [],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      writeSessionFile(data);
+
+      await browser.loadSession();
+
+      const desktop = browser.activeWindow!.selectedDesktop;
+      expect(desktop.tabContainers[0].childrenCollapsed).toBe(false);
+    });
+  });
 });

@@ -22,6 +22,7 @@ export class TabContainer {
     props?: ITabContainerProps,
   ) {
     this._divider = props?.divider ?? false;
+    this._childrenCollapsed = props?.childrenCollapsed ?? false;
   }
 
   get tabs(): Tab[] {

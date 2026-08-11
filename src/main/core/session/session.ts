@@ -22,6 +22,7 @@ function serializeTabContainer(tc: TabContainer): ISessionTabContainer {
   return {
     id: tc.id,
     divider: tc.divider,
+    childrenCollapsed: tc.childrenCollapsed,
     tabs: tc.tabs
       .filter((tab) => !tab.partition.private)
       .map((tab) => ({

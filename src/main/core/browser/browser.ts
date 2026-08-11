@@ -419,8 +419,14 @@ export class Browser {
   ): void {
     const tabContainer =
       parent !== null
-        ? parent.createChildTabContainer(tcStore.id, { divider: tcStore.divider })
-        : desktop.createTabContainer(tcStore.id, { divider: tcStore.divider });
+        ? parent.createChildTabContainer(tcStore.id, {
+            divider: tcStore.divider,
+            childrenCollapsed: tcStore.childrenCollapsed,
+          })
+        : desktop.createTabContainer(tcStore.id, {
+            divider: tcStore.divider,
+            childrenCollapsed: tcStore.childrenCollapsed,
+          });
 
     this._indexTabContainer(newWindow, desktop, tabContainer);
 
