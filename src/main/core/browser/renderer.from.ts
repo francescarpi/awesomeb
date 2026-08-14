@@ -346,6 +346,8 @@ export class BrowserRenderer {
     return {
       progress,
       downloading: downloads.some((download) => download.status === EDownloadStatus.InProgress),
+      activeCount: downloads.filter((download) => download.status === EDownloadStatus.InProgress)
+        .length,
       items: downloads.map((download) => ({
         savePath: download.savePath,
         fileName: download.fileName,
