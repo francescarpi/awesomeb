@@ -1,5 +1,6 @@
 export interface IDownloads {
   downloading: boolean;
+  activeCount: number;
   progress: number;
   items: IDownloadItem[];
 }
