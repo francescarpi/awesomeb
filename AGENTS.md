@@ -8,6 +8,10 @@ These rules apply to any AI coding assistant operating in this repository. Tool-
 
 Do **not** stage, commit, or push changes unless the user explicitly asks you to. The user reviews every commit manually before it lands in history. When the user asks for a code change, do the work, summarize it, and stop — wait for an explicit "commit" or "haz commit" before running `git add` / `git commit`. Pushing is never implicit; the user always says so.
 
+### Never bypass git hooks
+
+Do **not** pass `--no-verify` (or any equivalent hook-bypass flag) to `git commit`, `git push`, or any other git command unless the user explicitly asks for it on that specific invocation. Pre-commit hooks (husky + commitlint + lint-staged) are the user's safety net — they exist to catch things the agent might miss, and bypassing them is never the agent's call to make. If hooks fail, fix the underlying problem (e.g. shorten a commit body line that exceeds commitlint's `body-max-line-length`) and retry with hooks enabled. If a hook is genuinely broken or unreasonably slow, **stop and ask the user** — do not decide unilaterally.
+
 ### Pull Request title format
 
 This repo validates PR titles in `.github/workflows/pr-checks.yml` (`lint-pr-title` job). The title ends up in the user-facing changelog, so it must be a plain-English description a human can understand.
