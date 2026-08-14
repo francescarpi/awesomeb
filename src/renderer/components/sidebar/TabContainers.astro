@@ -84,7 +84,7 @@
           ...tc.children.map((tcc) =>
             h(
               'div',
-              { class: c('ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
+              { class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
               ...tcc.tabs.map((tcct) => renderTab(tcct)),
             ),
           ),
