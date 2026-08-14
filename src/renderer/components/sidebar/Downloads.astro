@@ -16,7 +16,7 @@
   renderIcon(false);
 
   abDownloads.onRefresh((_event, data) => {
-    renderIcon(data.downloading, data.items.length);
+    renderIcon(data.downloading, data.activeCount);
   });
 
   function renderIcon(downloading: boolean, itemsCount = 0) {
