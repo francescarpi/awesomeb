@@ -32,6 +32,7 @@ import type {
   TMediaAction,
   IAppUpdaterInfo,
 } from '~/types';
+import type { Locale } from '~/i18n';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
 
@@ -412,6 +413,19 @@ const abAppUpdater = {
 };
 
 //--------------------------------------------------------------------------------------
+const abI18n = {
+  getLocale: async (): Promise<Locale> => {
+    return await ipcRenderer.invoke('i18n:get-locale');
+  },
+  setLocale: async (locale: Locale): Promise<{ success: boolean; locale: Locale }> => {
+    return await ipcRenderer.invoke('i18n:set-locale', { locale });
+  },
+  onLocaleChanged: (callback: (event: IpcRendererEvent, locale: Locale) => void): void => {
+    ipcRenderer.on('i18n:locale-changed', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -438,3 +452,4 @@ contextBridge.exposeInMainWorld('abBrowser', abBrowser);
 contextBridge.exposeInMainWorld('abWelcome', abWelcome);
 contextBridge.exposeInMainWorld('abMedia', abMedia);
 contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
+contextBridge.exposeInMainWorld('abI18n', abI18n);

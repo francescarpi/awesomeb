@@ -33,6 +33,8 @@ import { setupUIIPC } from '@/ui';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
 import { registerAppEvents } from './app.events';
 import { setupMenuIPC } from '@/menu';
+import { initI18n } from '@/i18n';
+import { setupI18nIPC } from '@/i18n/ipc';
 import electronDl from 'electron-dl';
 
 export type { IModalProps } from './ui';
@@ -44,6 +46,8 @@ electronDl();
 setupProtocols();
 
 app.whenReady().then(async () => {
+  await initI18n();
+
   partitions.init();
 
   const browser = new Browser();
@@ -84,6 +88,7 @@ app.whenReady().then(async () => {
   setupWelcomeIPC(browser);
   setupMediaIPC(browser);
   setupAppUpdaterIPC(browser);
+  setupI18nIPC(browser);
 
   if (config.wasConfigured) {
     await browser.loadSession();

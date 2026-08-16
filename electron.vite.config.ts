@@ -27,9 +27,35 @@ function copyIconsPlugin(): Plugin {
   };
 }
 
+function copyLocalesPlugin(): Plugin {
+  return {
+    name: 'awesomeb:copy-locales',
+    configureServer() {
+      copyLocales();
+    },
+    closeBundle() {
+      copyLocales();
+    },
+  };
+}
+
+function copyLocales() {
+  const srcDir = resolve('src/shared/i18n/locales');
+  const outDir = resolve(__dirname, 'dist-electron/main/locales');
+  mkdirSync(outDir, { recursive: true });
+  for (const lng of readdirSync(srcDir)) {
+    const lngSrc = resolve(srcDir, lng);
+    const lngDest = resolve(outDir, lng);
+    mkdirSync(lngDest, { recursive: true });
+    for (const file of readdirSync(lngSrc)) {
+      copyFileSync(resolve(lngSrc, file), resolve(lngDest, file));
+    }
+  }
+}
+
 export default defineConfig({
   main: {
-    plugins: [copyIconsPlugin()],
+    plugins: [copyIconsPlugin(), copyLocalesPlugin()],
     build: {
       minify: MINIFY ? 'esbuild' : false,
       outDir: 'dist-electron/main',

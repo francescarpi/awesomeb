@@ -33,6 +33,7 @@ import type {
   IAppUpdaterInfo,
   IConfigInfo,
 } from '~/types';
+import type { Locale } from '~/i18n';
 import { IpcRendererEvent } from 'electron';
 
 export {};
@@ -251,5 +252,12 @@ declare global {
     versionAvailable: (winId: TWindowId) => Promise<IAppUpdaterInfo | null>;
     install: (winId: TWindowId) => void;
     download: (winId: TWindowId) => void;
+  };
+
+  //--------------------------------------------------------------------------------------
+  const abI18n: {
+    getLocale: () => Promise<Locale>;
+    setLocale: (locale: Locale) => Promise<{ success: boolean; locale: Locale }>;
+    onLocaleChanged: (callback: (event: IpcRendererEvent, locale: Locale) => void) => void;
   };
 }
