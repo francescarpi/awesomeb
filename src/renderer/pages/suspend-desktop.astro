@@ -5,12 +5,29 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal>
-  <Title>Suspend Desktop</Title>
+  <Title><span id="title-desktop-suspend">Suspend Desktop</span></Title>
   <ListWithSearch placeholder="Filter and select desktop..." id="list" />
 </Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-desktop-suspend', 'pages.desktopSuspend.title');
+    setPlaceholder('list', 'pages.desktopSuspend.listPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 

@@ -12,6 +12,9 @@ import Layout from '#/layouts/Base.astro';
   import Close from '#/icons/close.svg?raw';
   import Previous from '#/icons/previous.svg?raw';
   import Next from '#/icons/next.svg?raw';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
 
   const { searchParams } = getSearchParams();
   const tabId = parseInt(searchParams.get('tabId')!, 10);
@@ -50,7 +53,7 @@ import Layout from '#/layouts/Base.astro';
         'input',
         {
           class: c('input', 'input-xs', 'text-base-content', 'rounded-full'),
-          placeholder: 'Find in page...',
+          placeholder: t('pages.findInPage.placeholder'),
           autofocus: true,
           onfocus: (event) => (event.target as HTMLInputElement).select(),
           id: 'search',
@@ -69,11 +72,11 @@ import Layout from '#/layouts/Base.astro';
         ? h(
             'div',
             { class: c('text-sm', 'ml-4') },
-            `${result.activeMatch} of ${result.matches} ${
-              result.matches === 1 ? 'match' : 'matches'
-            }`,
+            `${result.activeMatch} of ${result.matches} ${t('pages.findInPage.match', { count: result.matches })}`,
           )
         : null,
     );
   }
+
+  onLocaleChange(() => renderer.update(render()));
 </script>

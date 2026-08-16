@@ -4,13 +4,19 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal>
-  <Title>Rename Desktop</Title>
+  <Title><span id="title-desktop-rename">Rename Desktop</span></Title>
   <div id="content"></div>
 </Modal>
 
 <script>
   import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
   import { IDesktopEntity } from '~/types';
+  import { initI18n, setText, onLocaleChange, t } from '#/scripts/i18n';
+
+  await initI18n();
+
+  setText('title-desktop-rename', 'pages.desktopRename.title');
+  onLocaleChange(() => setText('title-desktop-rename', 'pages.desktopRename.title'));
 
   const { winId, searchParams } = getSearchParams();
   const desktopId = searchParams.get('desktopId') as string;
@@ -40,13 +46,30 @@ import Title from '#/components/common/Title.astro';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
-      input('shortName', 'Short name', selectedDesktop.shortName || '', { maxLength: 4 }),
-      input('longName', 'Long name', selectedDesktop.longName || '', { maxLength: 30 }),
+      input(
+        'shortName',
+        t('pages.desktopRename.shortNamePlaceholder'),
+        selectedDesktop.shortName || '',
+        {
+          maxLength: 4,
+        },
+      ),
+      input(
+        'longName',
+        t('pages.desktopRename.longNamePlaceholder'),
+        selectedDesktop.longName || '',
+        {
+          maxLength: 30,
+        },
+      ),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
   ).render('content', {
     onRendered: () => {
       const shortName = document.getElementById('shortName') as HTMLInputElement;
+      const longName = document.getElementById('longName') as HTMLInputElement;
+      shortName.placeholder = t('pages.desktopRename.shortNamePlaceholder');
+      longName.placeholder = t('pages.desktopRename.longNamePlaceholder');
       shortName.focus();
       shortName.select();
       registerBtnsEvents();

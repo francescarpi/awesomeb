@@ -8,26 +8,28 @@ import Base from '#/layouts/Base.astro';
       class="text-xs bg-base-200 text-base-content border border-base-content p-4 rounded-br-xl rounded-tl-xl"
       id="short-version"
     >
-      Listening for mark. <b class="text-primary">Hold</b> to see more details...
+      <span id="short-version-listening"></span>
+      <b class="text-primary"><span id="short-version-hold"></span></b>
+      <span id="short-version-suffix"></span>
     </div>
     <div
       class="text-xs bg-base-200 text-base-content border border-base-content p-4 rounded-br-xl rounded-tl-xl hidden flex-col gap-4"
       id="full-version"
     >
-      <p class="text-lg">Available tab marks...</p>
+      <p class="text-lg" id="full-version-title"></p>
 
-      <p id="no-marks">No maks...</p>
+      <p id="no-marks"><span id="no-marks-text"></span></p>
       <div id="marks-container"></div>
 
       <div class="grid grid-cols-[50px_auto] border-t border-t-primary pt-2 mt-2">
         <span class="text-primary">m</span>
-        <p>Press "m" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)</p>
+        <p id="help-mark"></p>
         <span class="text-primary">n</span>
-        <p>Delete the mark from the active tab</p>
+        <p id="help-delete-one"></p>
         <span class="text-primary">b</span>
-        <p>Delete all marks</p>
+        <p id="help-delete-all"></p>
         <span class="text-primary">&lt;letter&gt;</span>
-        <p>Select the tab marked with that letter (e.g., a, b, c, ...)</p>
+        <p id="help-select"></p>
       </div>
     </div>
   </div>
@@ -36,8 +38,22 @@ import Base from '#/layouts/Base.astro';
 <script>
   import { getSearchParams } from '#/scripts';
   import { ITabMark } from '~/types';
+  import { initI18n, t, setText } from '#/scripts/i18n';
 
-  document.title = 'Tab marks';
+  await initI18n();
+
+  function apply() {
+    setText('short-version-listening', 'pages.tabMarks.listening');
+    setText('short-version-hold', 'pages.tabMarks.listeningHold');
+    setText('short-version-suffix', 'pages.tabMarks.listeningSuffix');
+    setText('full-version-title', 'pages.tabMarks.availableMarks');
+    setText('no-marks-text', 'pages.tabMarks.noMarks');
+    setText('help-mark', 'pages.tabMarks.helpMark');
+    setText('help-delete-one', 'pages.tabMarks.helpDeleteOne');
+    setText('help-delete-all', 'pages.tabMarks.helpDeleteAll');
+    setText('help-select', 'pages.tabMarks.helpSelect');
+  }
+  apply();
 
   const { winId } = getSearchParams();
   const shortVersion = document.getElementById('short-version')!;

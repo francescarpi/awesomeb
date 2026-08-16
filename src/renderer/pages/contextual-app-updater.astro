@@ -6,6 +6,9 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
 <script>
   import { getSearchParams, Renderer, c, h } from '#/scripts';
+  import { initI18n, t } from '#/scripts/i18n';
+
+  await initI18n();
 
   const { winId } = getSearchParams();
 
@@ -20,8 +23,13 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
         h(
           'div',
           { class: c('flex', 'items-center', 'justify-between', 'mb-4') },
-          h('span', null, 'Current:', h('strong', null, ` ${data.current}`)),
-          h('span', null, 'New:', h('strong', null, ` ${data.version}`)),
+          h(
+            'span',
+            null,
+            `${t('pages.appUpdater.currentVersion')} `,
+            h('strong', null, data.current),
+          ),
+          h('span', null, `${t('pages.appUpdater.newVersion')} `, h('strong', null, data.version)),
           h(
             'button',
             {
@@ -30,14 +38,14 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
                 abAppUpdater.download(winId);
               },
             },
-            'Update now',
+            t('pages.appUpdater.updateNow'),
           ),
         ),
         h('div', { class: c('h-90', 'overflow-y-auto'), innerHTML: data.releaseNotes }),
       ),
     );
   } else {
-    renderer.update(h('div', null, 'Oops... something went wrong :('));
+    renderer.update(h('div', null, t('pages.appUpdater.oops')));
   }
 </script>
 

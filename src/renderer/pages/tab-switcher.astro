@@ -9,8 +9,11 @@ import Base from '../layouts/Base.astro';
 <script>
   import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
   import type { ITabSwitcherTab } from '~/types';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  document.title = 'Tab switcher';
+  await initI18n();
+
+  document.title = t('pages.tabSwitcher.title');
 
   const { winId } = getSearchParams();
 
@@ -72,7 +75,7 @@ import Base from '../layouts/Base.astro';
                   h(
                     'span',
                     { class: c('text-[10px]', '-mt-1') },
-                    t.desktopName || '(no desktop name)',
+                    t.desktopName || t('pages.tabSwitcher.noDesktopName'),
                   ),
                 ),
                 h(
@@ -85,7 +88,7 @@ import Base from '../layouts/Base.astro';
                 ),
               ),
             )
-          : 'No tabs...'),
+          : t('pages.tabSwitcher.noTabs')),
       ),
     );
   }
@@ -140,4 +143,9 @@ import Base from '../layouts/Base.astro';
       }
     }
   }
+
+  onLocaleChange(() => {
+    document.title = t('pages.tabSwitcher.title');
+    renderer.update(renderTabs());
+  });
 </script>

@@ -11,8 +11,16 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import type { IHistoryItem } from '~/types';
   import dayjs from 'dayjs';
   import Search from '#/icons/search.svg?raw';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  document.title = 'History';
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.history.title');
+    const h1 = document.querySelector('h1.text-lg.mb-10');
+    if (h1) h1.textContent = t('pages.history.title');
+  }
+  applyTitle();
 
   let currentPage = 1;
   let currentQuery = '';
@@ -20,7 +28,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   const selectedUrls = new Set<string>();
   let currentItems: IHistoryItem[] = [];
 
-  const mainRenderer = new Renderer(h('div', null, 'Loading...')).render('content');
+  const mainRenderer = new Renderer(h('div', null, t('pages.history.loading'))).render('content');
   const headerActionsRenderer = new Renderer(h('div', null));
   const tableRenderer = new Renderer(h('div', null));
   const paginationRenderer = new Renderer(h('div', null));
@@ -38,7 +46,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h('input', {
             id: 'history-search-input',
             type: 'text',
-            placeholder: 'Search history...',
+            placeholder: t('pages.history.searchPlaceholder'),
             class: c('input', 'input-sm', 'input-bordered', 'w-full', 'pl-8'),
             onKeydown: (e) => {
               if ((e as KeyboardEvent).key === 'Enter') {
@@ -71,7 +79,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               loadPage(1);
             },
           },
-          'Reset',
+          t('pages.history.reset'),
         ),
       ),
       h('div', { id: 'header-actions', class: c('flex', 'gap-2', 'items-center', 'min-h-[2rem]') }),
@@ -108,14 +116,18 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           {
             class: c('btn', 'btn-sm', 'btn-error'),
             onClick: async () => {
-              if (window.confirm(`Delete ${selectedUrls.size} selected item(s)?`)) {
+              if (
+                window.confirm(
+                  t('pages.history.deleteSelectedConfirm', { count: selectedUrls.size }),
+                )
+              ) {
                 await abVisitHistory.deleteUrls([...selectedUrls]);
                 selectedUrls.clear();
                 loadPage(currentPage);
               }
             },
           },
-          `Delete Selected (${selectedUrls.size})`,
+          t('pages.history.deleteSelected', { count: selectedUrls.size }),
         ),
       );
     }
@@ -126,14 +138,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         {
           class: c('btn', 'btn-sm', 'btn-error', 'btn-outline'),
           onClick: async () => {
-            if (window.confirm('Are you sure you want to clear all history?')) {
+            if (window.confirm(t('pages.history.clearHistoryConfirm'))) {
               await abVisitHistory.deleteAll();
               selectedUrls.clear();
               loadPage(1);
             }
           },
         },
-        'Clear History',
+        t('pages.history.clearHistory'),
       ),
     );
 
@@ -173,10 +185,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 },
               }),
             ),
-            h('th', null, 'Title'),
-            h('th', null, 'URL'),
-            h('th', { class: c('w-40') }, 'Last Visit'),
-            h('th', { class: c('w-20', 'text-center') }, 'Visits'),
+            h('th', null, t('pages.history.titleColumn')),
+            h('th', null, t('pages.history.urlColumn')),
+            h('th', { class: c('w-40') }, t('pages.history.lastVisitColumn')),
+            h('th', { class: c('w-20', 'text-center') }, t('pages.history.visitsColumn')),
             h('th', { class: c('w-20') }),
           ),
         ),
@@ -242,7 +254,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     const buttons: VNode[] = [];
 
-    // Previous
     buttons.push(
       h(
         'button',
@@ -254,7 +265,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
     );
 
-    // Page numbers
     visiblePages.forEach((page) => {
       if (page === '...') {
         buttons.push(
@@ -274,7 +284,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       }
     });
 
-    // Next
     buttons.push(
       h(
         'button',
@@ -288,4 +297,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     paginationRenderer.update(h('div', { class: c('join') }, ...buttons));
   }
+
+  onLocaleChange(() => {
+    applyTitle();
+    const input = document.getElementById('history-search-input') as HTMLInputElement;
+    if (input) input.placeholder = t('pages.history.searchPlaceholder');
+    renderHeaderActions();
+    renderTable(currentItems);
+    renderPagination();
+  });
 </script>

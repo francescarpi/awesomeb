@@ -6,7 +6,7 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Duplicate Tab</Title>
+  <Title><span id="title-tab-duplicate">Duplicate Tab</span></Title>
   <div class="h-full">
     <Pagination />
     <ListWithSearch placeholder="Select tab..." id="tab" />
@@ -18,6 +18,25 @@ import Pagination from '#/components/common/Pagination.astro';
 <script>
   import { listWithSearchManager, paginatorManager, getSearchParams } from '#/scripts';
   import { IPartitionEntity } from '~/types';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-tab-duplicate', 'pages.tabDuplicate.title');
+    setPlaceholder('tab', 'pages.tabDuplicate.tabPlaceholder');
+    setPlaceholder('partition', 'pages.tabDuplicate.profilePlaceholder');
+    setPlaceholder('target', 'pages.tabDuplicate.targetPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 

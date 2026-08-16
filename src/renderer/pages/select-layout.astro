@@ -5,12 +5,29 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="300px" height="400px">
-  <Title>Select Layout</Title>
+  <Title><span id="title-layout-select">Select Layout</span></Title>
   <ListWithSearch placeholder="Select a layout..." id="list" />
 </Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-layout-select', 'pages.layoutSelect.title');
+    setPlaceholder('list', 'pages.layoutSelect.listPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 

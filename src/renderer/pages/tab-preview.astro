@@ -8,7 +8,7 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
     <div
       class="w-full border border-white rounded-xl flex justify-center items-center animate-pulse"
     >
-      Loading site...
+      <span id="tab-preview-loading">Loading site...</span>
     </div>
     <div class="flex flex-col gap-1 justify-start items-center">
       <ButtonIcon icon="close" />
@@ -20,6 +20,11 @@ import ButtonIcon from '#/components/common/ButtonIcon.astro';
 
 <script>
   import { onClick, getSearchParams } from '#/scripts';
+  import { initI18n, setText, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+  setText('tab-preview-loading', 'pages.tabPreview.loading');
+  onLocaleChange(() => setText('tab-preview-loading', 'pages.tabPreview.loading'));
 
   const { searchParams } = getSearchParams();
   const parentTabId = parseInt(searchParams.get('tabId')!, 10);

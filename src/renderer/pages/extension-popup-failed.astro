@@ -4,6 +4,18 @@ import Layout from '#/layouts/Base.astro';
 
 <Layout>
   <div class="flex flex-col gap-2 text-base-content text-sm p-2">
-    <p>Sorry, but the extension popup failed to load. Please try again later.</p>
+    <p id="extension-popup-failed-message">
+      Sorry, but the extension popup failed to load. Please try again later.
+    </p>
   </div>
 </Layout>
+
+<script>
+  import { initI18n, setText, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+  setText('extension-popup-failed-message', 'pages.extensionPopupFailed.message');
+  onLocaleChange(() =>
+    setText('extension-popup-failed-message', 'pages.extensionPopupFailed.message'),
+  );
+</script>

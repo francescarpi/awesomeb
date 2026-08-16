@@ -8,6 +8,9 @@ import Modal from '#/layouts/Modal.astro';
 
 <script>
   import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+  import { initI18n, t } from '#/scripts/i18n';
+
+  await initI18n();
 
   const { searchParams, winId } = getSearchParams();
 
@@ -22,7 +25,7 @@ import Modal from '#/layouts/Modal.astro';
     h(
       'div',
       { classs: c('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h('h1', { class: c('text-lg') }, t('pages.prompts.hostnameSays', { hostname: url.hostname })),
       h('p', { class: c('text-md', 'my-6') }, message),
       h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
     ),

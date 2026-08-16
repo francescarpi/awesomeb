@@ -10,5 +10,15 @@ import DownloadsList from '#/components/downloads/DownloadsList.astro';
 </BlackBgWithTitle>
 
 <script>
-  document.title = 'Downloads';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    document.title = t('pages.downloads.title');
+    const h1 = document.querySelector('h1.text-lg.mb-10');
+    if (h1) h1.textContent = t('pages.downloads.title');
+  }
+  apply();
+  onLocaleChange(apply);
 </script>

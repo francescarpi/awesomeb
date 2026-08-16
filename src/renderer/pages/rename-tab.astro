@@ -4,13 +4,19 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal>
-  <Title>Rename Tab</Title>
+  <Title><span id="title-tab-rename">Rename Tab</span></Title>
   <div id="content"></div>
 </Modal>
 
 <script>
   import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
   import { ITabEntity } from '~/types';
+  import { initI18n, setText, setPlaceholder, onLocaleChange, t } from '#/scripts/i18n';
+
+  await initI18n();
+
+  setText('title-tab-rename', 'pages.tabRename.title');
+  onLocaleChange(() => setText('title-tab-rename', 'pages.tabRename.title'));
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId') as string;
@@ -38,12 +44,15 @@ import Title from '#/components/common/Title.astro';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
-      input('name', 'Tab name', selectedTab.label || '', { maxLength: 20 }),
+      input('name', t('pages.tabRename.namePlaceholder'), selectedTab.label || '', {
+        maxLength: 20,
+      }),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
   ).render('content', {
     onRendered: () => {
       const name = document.getElementById('name') as HTMLInputElement;
+      name.placeholder = t('pages.tabRename.namePlaceholder');
       name.focus();
       name.select();
       registerBtnsEvents();

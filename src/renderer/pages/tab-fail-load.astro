@@ -9,6 +9,9 @@ import Layout from '#/layouts/Base.astro';
 <script>
   import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
   import alert from '#/icons/alert.svg?raw';
+  import { initI18n, t } from '#/scripts/i18n';
+
+  await initI18n();
 
   const { searchParams } = getSearchParams();
   const url = searchParams.get('url');
@@ -17,7 +20,7 @@ import Layout from '#/layouts/Base.astro';
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
   const [btns, registerBtnsEvents] = confirmButtons({
-    confirmText: 'Retry',
+    confirmText: t('pages.tabFailLoad.retry'),
     onConfirm: () => {
       abTabs.retryFailed(tabId);
     },
@@ -47,13 +50,13 @@ import Layout from '#/layouts/Base.astro';
           innerHTML: alert,
           class: c('w-30', 'h-30', 'text-error', '[&>svg]:w-full', '[&>svg]:h-full'),
         }),
-        h('h6', { class: c('font-bold') }, 'Cannot Connect to the Website'),
+        h('h6', { class: c('font-bold') }, t('pages.tabFailLoad.title')),
         h(
           'p',
           { class: c('w-full', 'truncate', 'text-center', 'px-10') },
-          'The page at ',
+          t('pages.tabFailLoad.pageAt'),
           h('strong', null, url),
-          ' cannot be reached.',
+          t('pages.tabFailLoad.cannotBeReached'),
         ),
         h(
           'div',
@@ -67,8 +70,13 @@ import Layout from '#/layouts/Base.astro';
               'max-w-md',
             ),
           },
-          h('p', null, 'Error code: ', h('span', { class: 'code' }, code)),
-          h('p', null, 'Error: ', h('span', { class: 'description' }, description)),
+          h('p', null, t('pages.tabFailLoad.errorCode'), h('span', { class: 'code' }, code)),
+          h(
+            'p',
+            null,
+            t('pages.tabFailLoad.error'),
+            h('span', { class: 'description' }, description),
+          ),
         ),
         ...btns,
       ),

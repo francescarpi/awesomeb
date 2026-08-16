@@ -12,8 +12,16 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 <script>
   import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
   import type { IDebugWebContent, IDebugTabIndex } from '~/types';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  document.title = 'Debug page';
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.debug.title');
+    const h1 = document.querySelector('h1.text-lg.mb-10');
+    if (h1) h1.textContent = t('pages.debug.title');
+  }
+  applyTitle();
 
   const state = {
     rawWcs: [] as IDebugWebContent[],
@@ -101,7 +109,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   function renderWCs(): VNode {
     if (state.error) {
-      return h('div', { class: c('p-4', 'text-error') }, `Error: ${state.error}`);
+      return h(
+        'div',
+        { class: c('p-4', 'text-error') },
+        `${t('pages.debug.errorPrefix')}${state.error}`,
+      );
     }
 
     let displayWcs = [...state.rawWcs];
@@ -131,16 +143,12 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     }
 
     const rowCount = displayWcs.length;
-    const countText = `${rowCount} item${rowCount !== 1 ? 's' : ''}`;
+    const countText = t('pages.debug.items', { count: rowCount });
 
     return h(
       'div',
       null,
-      h(
-        'p',
-        { class: c('text-sm', 'mb-4') },
-        'List of all registered web contents with useful information about each one. Remember that you can filter and sort.',
-      ),
+      h('p', { class: c('text-sm', 'mb-4') }, t('pages.debug.intro')),
       h(
         'div',
         {
@@ -152,7 +160,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h('div', { id: 'select-placeholder', class: c('w-40') }),
           h('input', {
             type: 'text',
-            placeholder: 'Search title, URL or PID...',
+            placeholder: t('pages.debug.searchPlaceholder'),
             class: c('input', 'input-sm', 'w-80'),
             oninput: onSearchInput,
           }),
@@ -160,11 +168,17 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         h(
           'div',
           { class: c('flex', 'items-center', 'gap-2') },
-          radioBtn('performance', 'none', 'No order', state.ordering === 'none', onChangeOrdering),
+          radioBtn(
+            'performance',
+            'none',
+            t('pages.debug.noOrder'),
+            state.ordering === 'none',
+            onChangeOrdering,
+          ),
           radioBtn(
             'performance',
             'mem',
-            'Memory',
+            t('pages.debug.memory'),
             state.ordering === 'mem',
             onChangeOrdering,
             getRadioIndicator('mem'),
@@ -172,7 +186,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           radioBtn(
             'performance',
             'cpu',
-            'CPU',
+            t('pages.debug.cpu'),
             state.ordering === 'cpu',
             onChangeOrdering,
             getRadioIndicator('cpu'),
@@ -191,14 +205,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             h(
               'tr',
               null,
-              h('th', { class: c('w-10', 'font-mono') }, 'Win'),
-              h('th', { class: c('w-16', 'font-mono') }, 'Pid'),
-              h('th', null, `Title/URL (${countText})`),
-              h('th', { class: c('text-center', 'w-20') }, 'Visible'),
-              h('th', { class: c('text-left', 'w-40') }, 'Profile'),
-              h('th', { class: c('text-left', 'w-48') }, 'Preloads'),
-              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
-              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'CPU'),
+              h('th', { class: c('w-10', 'font-mono') }, t('pages.debug.winCol')),
+              h('th', { class: c('w-16', 'font-mono') }, t('pages.debug.pidCol')),
+              h('th', null, t('pages.debug.titleUrlCount', { count: rowCount })),
+              h('th', { class: c('text-center', 'w-20') }, t('pages.debug.visibleCol')),
+              h('th', { class: c('text-left', 'w-40') }, t('pages.debug.profileCol')),
+              h('th', { class: c('text-left', 'w-48') }, t('pages.debug.preloadsCol')),
+              h('th', { class: c('text-right', 'w-24', 'font-mono') }, t('pages.debug.memoryCol')),
+              h('th', { class: c('text-right', 'w-24', 'font-mono') }, t('pages.debug.cpuCol')),
             ),
           ),
           h(
@@ -272,7 +286,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '-1';
-    defaultOpt.textContent = 'Filter by window';
+    defaultOpt.textContent = t('pages.debug.filterByWindow');
     staticSelect.appendChild(defaultOpt);
 
     placeholder.parentNode!.insertBefore(staticSelect, placeholder);
@@ -314,11 +328,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     return h(
       'div',
       { class: c('mt-3') },
-      h(
-        'p',
-        { class: c('text-sm', 'mb-2') },
-        'Tab index data for all tabs in all windows/desktops.',
-      ),
+      h('p', { class: c('text-sm', 'mb-2') }, t('pages.debug.tabIndex')),
       h(
         'div',
         { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
@@ -359,4 +369,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
     );
   }
+
+  onLocaleChange(() => {
+    applyTitle();
+    if (staticSelect) {
+      const defaultOpt = staticSelect.options[0];
+      if (defaultOpt && defaultOpt.value === '-1') {
+        defaultOpt.textContent = t('pages.debug.filterByWindow');
+      }
+    }
+    render();
+  });
 </script>

@@ -6,7 +6,7 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Open Bookmark</Title>
+  <Title><span id="title-bookmark-open">Open Bookmark</span></Title>
   <div class="h-full">
     <Pagination />
     <ListWithSearch placeholder="Filter and select a bookmark..." id="list" />
@@ -18,6 +18,25 @@ import Pagination from '#/components/common/Pagination.astro';
 <script>
   import { getSearchParams, listWithSearchManager, paginatorManager } from '#/scripts';
   import { IPartitionEntity } from '~/types';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-bookmark-open', 'pages.bookmarkOpen.title');
+    setPlaceholder('list', 'pages.bookmarkOpen.bookmarkPlaceholder');
+    setPlaceholder('partition', 'pages.bookmarkOpen.profilePlaceholder');
+    setPlaceholder('target', 'pages.bookmarkOpen.targetPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 
@@ -58,7 +77,6 @@ import Pagination from '#/components/common/Pagination.astro';
     onAccept: () => handleSelect(),
   });
 
-  // ------------------------------------------------------
   function handleSelect() {
     const query = getBookmark()!.id;
     const partitionId = getPartition()!.id;

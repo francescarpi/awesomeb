@@ -10,43 +10,53 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 <script>
   import { h, c, Renderer } from '#/scripts';
   import { IExtension } from '~/types';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  // Initial loading state...
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.extensions.title');
+    const h1 = document.querySelector('h1.text-lg.mb-10');
+    if (h1) h1.textContent = t('pages.extensions.title');
+  }
+  applyTitle();
+
   const infoRenderer = new Renderer(
     h('div', null, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
   ).render('content');
 
   const resp = await abExtensions.get();
 
-  // Update the info section with instructions and refresh button
-  infoRenderer.update(
-    h(
-      'div',
-      { class: c('flex', 'gap-2') },
-      h('p', {
-        innerHTML: `AwesomeB offers limited support for Chrome extensions. At this time, installation must be done manually: place your extensions in the following directory (<i>${resp.path}</i>) and then click the Refresh Extensions button.`,
-      }),
+  function refreshInfo() {
+    infoRenderer.update(
       h(
-        'button',
-        {
-          class: c('btn', 'btn-primary', 'btn-sm'),
-          onclick: async () => {
-            const resp = await abExtensions.refresh();
-            renderExtensions(resp.extensions);
+        'div',
+        { class: c('flex', 'gap-2') },
+        h('p', {
+          innerHTML: t('pages.extensions.intro', { path: resp.path }),
+        }),
+        h(
+          'button',
+          {
+            class: c('btn', 'btn-primary', 'btn-sm'),
+            onclick: async () => {
+              const r = await abExtensions.refresh();
+              renderExtensions(r.extensions);
+            },
           },
-        },
-        'Refresh Extensions',
+          t('pages.extensions.refresh'),
+        ),
       ),
-    ),
-  );
+    );
+  }
+  refreshInfo();
 
-  // Render the list of extensions
   const extensionsRenderer = new Renderer(h('div', null, '')).render('extensions');
   renderExtensions(resp.extensions);
 
   function renderExtensions(extensions: IExtension[]) {
     if (extensions.length === 0) {
-      extensionsRenderer.update(h('p', null, 'No extensions found.'));
+      extensionsRenderer.update(h('p', null, t('pages.extensions.noExtensions')));
       return;
     }
 
@@ -74,7 +84,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         const descp = h(
           'p',
           { class: c('text-sm', 'text-gray-400', 'mt-1') },
-          ext.manifest.description || 'No description',
+          ext.manifest.description || t('pages.extensions.noDescription'),
         );
 
         const footer = h(
@@ -83,9 +93,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h(
             'span',
             { class: c('text-xs', 'text-gray-500', 'w-full') },
-            `Version: ${ext.manifest.version}`,
+            t('pages.extensions.version', { version: ext.manifest.version }),
           ),
-          h('span', { class: c('text-xs', 'text-gray-500', 'w-full') }, `ID: ${ext.id}`),
+          h(
+            'span',
+            { class: c('text-xs', 'text-gray-500', 'w-full') },
+            t('pages.extensions.id', { id: ext.id }),
+          ),
         );
 
         return h('div', { class: c('bg-white/10', 'p-2', 'rounded') }, header, descp, footer);
@@ -94,4 +108,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     extensionsRenderer.update(container);
   }
+
+  onLocaleChange(() => {
+    applyTitle();
+    refreshInfo();
+    renderExtensions(resp.extensions);
+  });
 </script>

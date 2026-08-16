@@ -6,7 +6,7 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="700px" height="600px">
-  <Title>New Tab</Title>
+  <Title><span id="title-new-tab">New Tab</span></Title>
   <div class="h-full">
     <Pagination />
     <ListWithSearch
@@ -28,6 +28,34 @@ import Pagination from '#/components/common/Pagination.astro';
     highlightString,
   } from '#/scripts';
   import { IPartitionEntity } from '~/types';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+    t,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-new-tab', 'pages.newTab.title');
+    setPlaceholder('query', 'pages.newTab.queryPlaceholder');
+    setPlaceholder('partition', 'pages.newTab.profilePlaceholder');
+    setPlaceholder('target', 'pages.newTab.targetPlaceholder');
+    setListEmptyText();
+
+    const titles = document.querySelectorAll<HTMLElement>('#query h2, #partition h2, #target h2');
+    const queryTitleEl = document.querySelector<HTMLElement>('#query h2');
+    const partitionTitleEl = document.querySelector<HTMLElement>('#partition h2');
+    const targetTitleEl = document.querySelector<HTMLElement>('#target h2');
+    if (queryTitleEl) queryTitleEl.textContent = t('pages.newTab.queryTitle');
+    if (partitionTitleEl) partitionTitleEl.textContent = t('pages.newTab.profileTitle');
+    if (targetTitleEl) targetTitleEl.textContent = t('pages.newTab.targetTitle');
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 
@@ -39,7 +67,6 @@ import Pagination from '#/components/common/Pagination.astro';
   refreshPageVisibility();
   refreshPageIndicator();
 
-  // ------------------------------------------------------
   const { getSelected: getSearchEngine, inputEl: queryEl } = await listWithSearchManager('query', {
     entity: 'searchEngines',
     filtering: false,
@@ -57,7 +84,9 @@ import Pagination from '#/components/common/Pagination.astro';
         ...originalEntities.map((item) => ({
           id: item.id,
           label:
-            inputValue.trim().length > 0 ? `${inputValue} - Search by ${item.label}` : item.label,
+            inputValue.trim().length > 0
+              ? `${inputValue}${t('pages.newTab.searchBy')}${item.label}`
+              : item.label,
         })),
       ];
     },
@@ -84,7 +113,6 @@ import Pagination from '#/components/common/Pagination.astro';
     onAccept: () => handleSelect(),
   });
 
-  // ------------------------------------------------------
   function handleSelect() {
     if (queryEl.value.trim().length > 0) {
       const partitionId = getPartition()!.id;

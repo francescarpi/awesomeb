@@ -5,12 +5,29 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal height="400px">
-  <Title>Add Tab Container Divider</Title>
+  <Title><span id="title-divider-add">Add Tab Container Divider</span></Title>
   <ListWithSearch placeholder="Filter and select a tab container..." id="list" />
 </Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-divider-add', 'pages.dividerAdd.title');
+    setPlaceholder('list', 'pages.dividerAdd.listPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 

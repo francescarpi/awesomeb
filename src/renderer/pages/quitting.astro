@@ -3,5 +3,13 @@ import Modal from '#/layouts/Modal.astro';
 ---
 
 <Modal>
-  <div class="p-2 text-center">Closing AwesomeB...</div>
+  <div class="p-2 text-center"><span id="quitting-closing">Closing AwesomeB...</span></div>
 </Modal>
+
+<script>
+  import { initI18n, setText, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+  setText('quitting-closing', 'pages.quitting.closing');
+  onLocaleChange(() => setText('quitting-closing', 'pages.quitting.closing'));
+</script>

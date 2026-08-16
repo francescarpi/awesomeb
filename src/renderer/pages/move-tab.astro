@@ -6,7 +6,7 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Move Tab</Title>
+  <Title><span id="title-tab-move">Move Tab</span></Title>
   <div class="h-full">
     <Pagination />
     <ListWithSearch placeholder="Select a tab..." id="tab" />
@@ -17,6 +17,24 @@ import Pagination from '#/components/common/Pagination.astro';
 <script>
   import { paginatorManager, listWithSearchManager, getSearchParams } from '#/scripts';
   import { IEntity, IPartitionEntity } from '~/types';
+  import {
+    initI18n,
+    setText,
+    setPlaceholder,
+    setListEmptyText,
+    onLocaleChange,
+  } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function apply() {
+    setText('title-tab-move', 'pages.tabMove.title');
+    setPlaceholder('tab', 'pages.tabMove.tabPlaceholder');
+    setPlaceholder('target', 'pages.tabMove.targetPlaceholder');
+    setListEmptyText();
+  }
+  apply();
+  onLocaleChange(apply);
 
   const { winId } = getSearchParams();
 
@@ -31,13 +49,12 @@ import Pagination from '#/components/common/Pagination.astro';
   let tab: IEntity | null = null;
   let target: IPartitionEntity | null = null;
 
-  // ------------------------------------------------------
   listWithSearchManager('tab', {
     entity: 'tabs',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: async (_inputValue, entity, _inputEl) => {
+    onChange: async (_inputValue, entity) => {
       tab = entity as IEntity;
     },
     onAccept: () => {
@@ -50,7 +67,6 @@ import Pagination from '#/components/common/Pagination.astro';
     },
   });
 
-  // ------------------------------------------------------
   listWithSearchManager('target', {
     entity: 'targets',
     onEscape: () => abModal.close(winId),

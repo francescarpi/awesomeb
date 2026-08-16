@@ -4,7 +4,7 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="800px">
-  <Title>Edit URL</Title>
+  <Title><span id="title-edit-url">Edit URL</span></Title>
   <div id="content"></div>
 </Modal>
 
@@ -23,6 +23,12 @@ import Title from '#/components/common/Title.astro';
   import type { UrlParts } from '#/scripts';
   import deleteIcon from '#/icons/delete.svg?raw';
   import type { ITabEntity } from '~/types';
+  import { initI18n, setText, onLocaleChange, t } from '#/scripts/i18n';
+
+  await initI18n();
+
+  setText('title-edit-url', 'pages.editUrl.title');
+  onLocaleChange(() => setText('title-edit-url', 'pages.editUrl.title'));
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId');
@@ -146,8 +152,8 @@ import Title from '#/components/common/Title.astro';
         h(
           'div',
           { class: c('flex', 'flex-col', 'gap-2') },
-          h('h1', null, 'Modify full URL'),
-          input('fullURL', 'Full URL', state.fullURL, {
+          h('h1', null, t('pages.editUrl.modifyFullUrl')),
+          input('fullURL', t('pages.editUrl.fullUrlPlaceholder'), state.fullURL, {
             onInput: parseFullURL,
             autofocus: true,
             select: true,
@@ -156,50 +162,50 @@ import Title from '#/components/common/Title.astro';
         h(
           'div',
           { class: c('flex', 'flex-col', 'gap-2', 'mt-3') },
-          h('h1', null, 'Modify URL parts'),
-          input('protocol', 'Protocol', state.protocol, {
+          h('h1', null, t('pages.editUrl.modifyUrlParts')),
+          input('protocol', t('pages.editUrl.protocolPlaceholder'), state.protocol, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('hostname', 'Hostname', state.hostname, {
+          input('hostname', t('pages.editUrl.hostnamePlaceholder'), state.hostname, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('port', 'Port', state.port, {
+          input('port', t('pages.editUrl.portPlaceholder'), state.port, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('pathname', 'Pathname', state.pathname, {
+          input('pathname', t('pages.editUrl.pathnamePlaceholder'), state.pathname, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('hash', 'Hash', state.hash, {
+          input('hash', t('pages.editUrl.hashPlaceholder'), state.hash, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          h('h2', { class: c('text-sm') }, 'Query Parameters'),
+          h('h2', { class: c('text-sm') }, t('pages.editUrl.queryParameters')),
           h(
             'div',
             { class: c('grid', 'grid-cols-[auto_auto_20px]', 'gap-2', 'items-center') },
             ...state.queryParams
               .map((param, index) => [
-                input(`key_${index}`, 'Key', param.key, {
+                input(`key_${index}`, t('pages.editUrl.keyPlaceholder'), param.key, {
                   onInput: (value) => {
                     state.queryParams[index].key = value;
                     updateFullURL();
                   },
                 }),
-                input(`value_${index}`, 'Value', param.value, {
+                input(`value_${index}`, t('pages.editUrl.valuePlaceholder'), param.value, {
                   onInput: (value) => {
                     state.queryParams[index].value = value;
                     updateFullURL();
@@ -231,7 +237,7 @@ import Title from '#/components/common/Title.astro';
                   renderer.update(buildVDOM(urlState));
                 },
               },
-              '+ Add',
+              t('pages.editUrl.add'),
             ),
           ),
         ),
@@ -244,6 +250,20 @@ import Title from '#/components/common/Title.astro';
 
   renderer.render('content', {
     onRendered: () => {
+      document.querySelectorAll<HTMLInputElement>('#content input').forEach((el) => {
+        const id = el.id;
+        const map: Record<string, string> = {
+          fullURL: 'pages.editUrl.fullUrlPlaceholder',
+          protocol: 'pages.editUrl.protocolPlaceholder',
+          hostname: 'pages.editUrl.hostnamePlaceholder',
+          port: 'pages.editUrl.portPlaceholder',
+          pathname: 'pages.editUrl.pathnamePlaceholder',
+          hash: 'pages.editUrl.hashPlaceholder',
+        };
+        if (map[id]) el.placeholder = t(map[id]);
+        if (id.startsWith('key_')) el.placeholder = t('pages.editUrl.keyPlaceholder');
+        if (id.startsWith('value_')) el.placeholder = t('pages.editUrl.valuePlaceholder');
+      });
       registerBtnsEvents();
     },
   });

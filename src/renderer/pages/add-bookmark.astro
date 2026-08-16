@@ -4,12 +4,18 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="600px" height="auto">
-  <Title>Add Bookmark</Title>
+  <Title><span id="title-bookmark-add">Add Bookmark</span></Title>
   <div id="content"></div>
 </Modal>
 
 <script>
   import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
+  import { initI18n, setText, onLocaleChange, t } from '#/scripts/i18n';
+
+  await initI18n();
+
+  setText('title-bookmark-add', 'pages.bookmarkAdd.title');
+  onLocaleChange(() => setText('title-bookmark-add', 'pages.bookmarkAdd.title'));
 
   const { winId, searchParams } = getSearchParams();
 
@@ -51,10 +57,16 @@ import Title from '#/components/common/Title.astro';
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
-        h('span', { class: c('text-sm') }, `Parent folder: ${parentName}`),
-        input('folder-name', 'Folder name', '', { visible: createFolder }),
-        input('title', 'Title', title),
-        input('url', 'URL', url),
+        h(
+          'span',
+          { class: c('text-sm') },
+          t('pages.bookmarkAdd.parentFolder', { name: parentName }),
+        ),
+        input('folder-name', t('pages.bookmarkAdd.folderNamePlaceholder'), '', {
+          visible: createFolder,
+        }),
+        input('title', t('pages.bookmarkAdd.titlePlaceholder'), title),
+        input('url', t('pages.bookmarkAdd.urlPlaceholder'), url),
       ),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
@@ -62,6 +74,11 @@ import Title from '#/components/common/Title.astro';
     onRendered: () => {
       const folderNameInput = document.getElementById('folder-name') as HTMLInputElement;
       const titleInput = document.getElementById('title') as HTMLInputElement;
+      const urlInput = document.getElementById('url') as HTMLInputElement;
+
+      folderNameInput.placeholder = t('pages.bookmarkAdd.folderNamePlaceholder');
+      titleInput.placeholder = t('pages.bookmarkAdd.titlePlaceholder');
+      urlInput.placeholder = t('pages.bookmarkAdd.urlPlaceholder');
 
       if (createFolder) {
         folderNameInput.focus();
