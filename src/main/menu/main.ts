@@ -88,7 +88,7 @@ function fileMenu(
     icon: showRootIcon ? getIcon(EIcon.File) : undefined,
     submenu: [
       {
-        label: t('menu.file.performCommand'),
+        label: t(performCommand.label),
         accelerator: performCommand.key,
         enabled: !!window,
         icon: getIcon(EIcon.Command),
@@ -100,7 +100,7 @@ function fileMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.file.newWindow'),
+        label: t(newWindow.label),
         accelerator: newWindow.key,
         icon: getIcon(EIcon.Windows),
         click: async () => {
@@ -110,7 +110,7 @@ function fileMenu(
         },
       },
       {
-        label: t('menu.file.newTab'),
+        label: t(newTab.label),
         accelerator: newTab.key,
         icon: getIcon(EIcon.Tab),
         click: () => {
@@ -130,7 +130,7 @@ function fileMenu(
         },
       },
       {
-        label: t('menu.file.openRecentlyClosed'),
+        label: t(openRecentlyClosed.label),
         accelerator: openRecentlyClosed.key,
         enabled: browser.hasClosedTabs,
         icon: getIcon(EIcon.Open),
@@ -170,7 +170,7 @@ function editMenu(
       { role: 'selectAll' },
       { type: 'separator' },
       {
-        label: t('menu.edit.copyUrl'),
+        label: t(copyUrl.label),
         accelerator: copyUrl.key,
         icon: getIcon(EIcon.Copy),
         enabled: Boolean(tab),
@@ -181,7 +181,7 @@ function editMenu(
         },
       },
       {
-        label: t('menu.edit.editUrl'),
+        label: t(editUrl.label),
         accelerator: editUrl.key,
         icon: getIcon(EIcon.Edit),
         enabled: Boolean(tab),
@@ -193,7 +193,7 @@ function editMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.edit.findInPage'),
+        label: t(findInPage.label),
         accelerator: findInPage.key,
         icon: getIcon(EIcon.Search),
         enabled: Boolean(tab),
@@ -220,7 +220,7 @@ function windowMenu(
     icon: showRootIcon ? getIcon(EIcon.Windows) : undefined,
     submenu: [
       {
-        label: t('menu.window.toggleSidebar'),
+        label: t(toggleSidebar.label),
         accelerator: toggleSidebar.key,
         enabled: !!window,
         icon: getIcon(EIcon.Sidebar),
@@ -231,7 +231,7 @@ function windowMenu(
         },
       },
       {
-        label: t('menu.window.toggleMaximizeArea'),
+        label: t(toggleMaximizeArea.label),
         accelerator: toggleMaximizeArea.key,
         enabled: !!window,
         icon: getIcon(EIcon.Maximize),
@@ -288,7 +288,7 @@ function desktopsMenu(
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
-        label: t('menu.desktops.findDesktop'),
+        label: t(findDesktop.label),
         accelerator: findDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Desktop),
@@ -302,7 +302,7 @@ function desktopsMenu(
       ...desktopItems,
       { type: 'separator' },
       {
-        label: t('menu.desktops.previous'),
+        label: t(previousDesktop.label),
         accelerator: previousDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -313,7 +313,7 @@ function desktopsMenu(
         },
       },
       {
-        label: t('menu.desktops.next'),
+        label: t(nextDesktop.label),
         accelerator: nextDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -385,7 +385,7 @@ function tabsMenu(
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
       {
-        label: t('menu.tabs.findTab'),
+        label: t(findTab.label),
         accelerator: findTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Tab),
@@ -399,7 +399,7 @@ function tabsMenu(
       ...tabs,
       { type: 'separator' },
       {
-        label: t('menu.tabs.previous'),
+        label: t(previousTab.label),
         accelerator: previousTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -410,7 +410,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.next'),
+        label: t(nextTab.label),
         accelerator: nextTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -421,7 +421,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.selectTabAttention'),
+        label: t(selectTabAttention.label),
         accelerator: selectTabAttention.key,
         icon: getIcon(EIcon.Notification),
         click: async () => {
@@ -431,7 +431,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.tabSwitcher'),
+        label: t(tabSwitcher.label),
         accelerator: tabSwitcher.key,
         icon: getIcon(EIcon.Tab),
         click: async () => {
@@ -441,7 +441,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.previousVisited'),
+        label: t(previousVisited.label),
         accelerator: previousVisited.key,
         icon: getIcon(EIcon.PreviousVisited),
         click: async () => {
@@ -451,7 +451,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.tabMarks'),
+        label: t(tabMarks.label),
         accelerator: tabMarks.key,
         icon: getIcon(EIcon.Bookmarks),
         click: async () => {
@@ -462,7 +462,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.tabs.moveTabUp'),
+        label: t(moveTabUp.label),
         accelerator: moveTabUp.key,
         icon: getIcon(EIcon.Up),
         click: async () => {
@@ -473,7 +473,7 @@ function tabsMenu(
         enabled: !!tab,
       },
       {
-        label: t('menu.tabs.moveTabDown'),
+        label: t(moveTabDown.label),
         accelerator: moveTabDown.key,
         icon: getIcon(EIcon.Down),
         click: async () => {
@@ -485,7 +485,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.tabs.suspendTab'),
+        label: t(suspendTab.label),
         accelerator: suspendTab.key,
         enabled: tab !== null && !tab?.suspended,
         icon: getIcon(EIcon.Suspend),
@@ -496,7 +496,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.closeTab'),
+        label: t(closeTab.label),
         accelerator: closeTab.key,
         enabled: tab !== null,
         icon: getIcon(EIcon.Close),
@@ -508,7 +508,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.tabs.reloadTab'),
+        label: t(reloadTab.label),
         accelerator: reloadTab.key,
         enabled: !!tab && !tab?.suspended,
         icon: getIcon(EIcon.Reload),
@@ -519,7 +519,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.goBack'),
+        label: t(goBack.label),
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoBack,
         accelerator: goBack.key,
         icon: getIcon(EIcon.Back),
@@ -530,7 +530,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.goForward'),
+        label: t(goForward.label),
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoForward,
         accelerator: goForward.key,
         icon: getIcon(EIcon.Forward),
@@ -564,7 +564,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: t('menu.tabs.zoomIn'),
+        label: t(zoomIn.label),
         enabled: !!tab,
         accelerator: zoomIn.key,
         click: () => {
@@ -574,7 +574,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.zoomOut'),
+        label: t(zoomOut.label),
         enabled: !!tab,
         accelerator: zoomOut.key,
         click: () => {
@@ -584,7 +584,7 @@ function tabsMenu(
         },
       },
       {
-        label: t('menu.tabs.zoomReset'),
+        label: t(zoomReset.label),
         enabled: !!tab,
         accelerator: zoomReset.key,
         click: () => {
@@ -619,7 +619,7 @@ async function bookmarksMenu(
         },
       },
       {
-        label: t('menu.bookmarks.openBookmark'),
+        label: t(openBookmark.label),
         accelerator: openBookmark.key,
         icon: getIcon(EIcon.Open),
         click: () => {

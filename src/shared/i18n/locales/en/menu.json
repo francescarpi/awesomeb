@@ -4,57 +4,27 @@
   },
   "file": {
     "label": "File",
-    "performCommand": "Perform command",
-    "newTab": "New tab",
-    "newWindow": "New window",
-    "pasteAndGo": "Paste and go",
-    "openRecentlyClosed": "Open recently closed tab"
+    "pasteAndGo": "Paste and go"
   },
   "edit": {
-    "label": "Edit",
-    "copyUrl": "Copy URL",
-    "editUrl": "Edit URL",
-    "findInPage": "Find in page"
+    "label": "Edit"
   },
   "window": {
-    "label": "Window",
-    "toggleSidebar": "Toggle sidebar",
-    "toggleMaximizeArea": "Toggle maximize area"
+    "label": "Window"
   },
   "desktops": {
     "label": "Desktops",
-    "findDesktop": "Find desktop",
-    "entry": "Desktop {{index}}",
-    "previous": "Previous",
-    "next": "Next"
+    "entry": "Desktop {{index}}"
   },
   "tabs": {
     "label": "Tabs",
-    "findTab": "Find tab",
     "entry": "Tab {{index}}",
-    "previous": "Previous",
-    "next": "Next",
-    "selectTabAttention": "Select tab requiring attention",
-    "tabSwitcher": "Tab switcher",
-    "previousVisited": "Previously visited tab",
-    "tabMarks": "Tab marks",
-    "moveTabUp": "Move tab up",
-    "moveTabDown": "Move tab down",
-    "suspendTab": "Suspend tab",
-    "closeTab": "Close tab",
-    "reloadTab": "Reload tab",
-    "goBack": "Go back",
-    "goForward": "Go forward",
     "closeTabPreview": "Close tab preview",
-    "acceptTabPreview": "Accept tab preview",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "zoomReset": "Reset zoom"
+    "acceptTabPreview": "Accept tab preview"
   },
   "bookmarks": {
     "label": "Bookmarks",
-    "manage": "Manage bookmarks",
-    "openBookmark": "Open bookmark"
+    "manage": "Manage bookmarks"
   },
   "split": {
     "swapTabs": "Swap tabs",

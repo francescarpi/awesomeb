@@ -4,57 +4,27 @@
   },
   "file": {
     "label": "Archivo",
-    "performCommand": "Ejecutar comando",
-    "newTab": "Nueva pestaña",
-    "newWindow": "Nueva ventana",
-    "pasteAndGo": "Pegar e ir",
-    "openRecentlyClosed": "Abrir pestaña cerrada recientemente"
+    "pasteAndGo": "Pegar e ir"
   },
   "edit": {
-    "label": "Edición",
-    "copyUrl": "Copiar URL",
-    "editUrl": "Editar URL",
-    "findInPage": "Buscar en la página"
+    "label": "Edición"
   },
   "window": {
-    "label": "Ventana",
-    "toggleSidebar": "Alternar barra lateral",
-    "toggleMaximizeArea": "Alternar área maximizada"
+    "label": "Ventana"
   },
   "desktops": {
     "label": "Escritorios",
-    "findDesktop": "Buscar escritorio",
-    "entry": "Escritorio {{index}}",
-    "previous": "Anterior",
-    "next": "Siguiente"
+    "entry": "Escritorio {{index}}"
   },
   "tabs": {
     "label": "Pestañas",
-    "findTab": "Buscar pestaña",
     "entry": "Pestaña {{index}}",
-    "previous": "Anterior",
-    "next": "Siguiente",
-    "selectTabAttention": "Seleccionar pestaña que requiere atención",
-    "tabSwitcher": "Cambiador de pestañas",
-    "previousVisited": "Pestaña visitada anteriormente",
-    "tabMarks": "Marcadores de pestañas",
-    "moveTabUp": "Mover pestaña arriba",
-    "moveTabDown": "Mover pestaña abajo",
-    "suspendTab": "Suspender pestaña",
-    "closeTab": "Cerrar pestaña",
-    "reloadTab": "Recargar pestaña",
-    "goBack": "Ir atrás",
-    "goForward": "Ir adelante",
     "closeTabPreview": "Cerrar vista previa de pestaña",
-    "acceptTabPreview": "Aceptar vista previa de pestaña",
-    "zoomIn": "Acercar",
-    "zoomOut": "Alejar",
-    "zoomReset": "Restablecer zoom"
+    "acceptTabPreview": "Aceptar vista previa de pestaña"
   },
   "bookmarks": {
     "label": "Marcadores",
-    "manage": "Gestionar marcadores",
-    "openBookmark": "Abrir marcador"
+    "manage": "Gestionar marcadores"
   },
   "split": {
     "swapTabs": "Intercambiar pestañas",

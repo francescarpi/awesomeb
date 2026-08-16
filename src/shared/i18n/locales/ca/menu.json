@@ -4,57 +4,27 @@
   },
   "file": {
     "label": "Fitxer",
-    "performCommand": "Executar ordre",
-    "newTab": "Pestanya nova",
-    "newWindow": "Finestra nova",
-    "pasteAndGo": "Enganxar i anar",
-    "openRecentlyClosed": "Tornar a obrir la pestanya recentment tancada"
+    "pasteAndGo": "Enganxar i anar"
   },
   "edit": {
-    "label": "Edició",
-    "copyUrl": "Copia l'URL",
-    "editUrl": "Edita l'URL",
-    "findInPage": "Cerca a la pàgina"
+    "label": "Edició"
   },
   "window": {
-    "label": "Finestra",
-    "toggleSidebar": "Mostra/amaga la barra lateral",
-    "toggleMaximizeArea": "Mostra/amaga l'àrea maximitzada"
+    "label": "Finestra"
   },
   "desktops": {
     "label": "Escriptoris",
-    "findDesktop": "Cerca un escriptori",
-    "entry": "Escriptori {{index}}",
-    "previous": "Anterior",
-    "next": "Següent"
+    "entry": "Escriptori {{index}}"
   },
   "tabs": {
     "label": "Pestanyes",
-    "findTab": "Cerca una pestanya",
     "entry": "Pestanya {{index}}",
-    "previous": "Anterior",
-    "next": "Següent",
-    "selectTabAttention": "Selecciona la pestanya que requereix atenció",
-    "tabSwitcher": "Canviador de pestanyes",
-    "previousVisited": "Pestanya visitada anteriorment",
-    "tabMarks": "Marques de pestanyes",
-    "moveTabUp": "Mou la pestanya amunt",
-    "moveTabDown": "Mou la pestanya avall",
-    "suspendTab": "Suspen la pestanya",
-    "closeTab": "Tanca la pestanya",
-    "reloadTab": "Recarrega la pestanya",
-    "goBack": "Enrere",
-    "goForward": "Endavant",
     "closeTabPreview": "Tanca la previsualització de la pestanya",
-    "acceptTabPreview": "Accepta la previsualització de la pestanya",
-    "zoomIn": "Apropa",
-    "zoomOut": "Allunya",
-    "zoomReset": "Restableix el zoom"
+    "acceptTabPreview": "Accepta la previsualització de la pestanya"
   },
   "bookmarks": {
     "label": "Adreces d'interès",
-    "manage": "Gestiona les adreces d'interès",
-    "openBookmark": "Obre una adreça d'interès"
+    "manage": "Gestiona les adreces d'interès"
   },
   "split": {
     "swapTabs": "Intercanvia les pestanyes",
