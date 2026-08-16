@@ -13,8 +13,8 @@ export const TRIGGER = 'print';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Print',
-  description: 'Print the current page',
+  name: 'commands.print.name',
+  description: 'commands.print.description',
   visibility: ({ tab }) => !!tab && tab.canGoBack,
   async handler({ browser, tab, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);

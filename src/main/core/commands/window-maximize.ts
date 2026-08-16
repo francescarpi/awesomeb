@@ -6,8 +6,8 @@ export const TRIGGER = 'maximize-window';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Maximize Window',
-  description: 'Maximize the specified window',
+  name: 'commands.maximizeWindow.name',
+  description: 'commands.maximizeWindow.description',
   visibility: ({ window }) => !!window,
   async handler({ window }) {
     if (window.bw.isMaximized()) {

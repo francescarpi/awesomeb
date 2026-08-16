@@ -11,8 +11,8 @@ export const TRIGGER = 'change-layout-size';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Change layout size',
-  description: 'Change the size of the split layout',
+  name: 'commands.changeLayoutSize.name',
+  description: 'commands.changeLayoutSize.description',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   modal: {
     page: 'layout-size',

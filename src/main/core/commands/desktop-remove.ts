@@ -7,8 +7,8 @@ export const TRIGGER = 'remove-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Remove Desktop',
-  description: 'Remove the current desktop',
+  name: 'commands.removeDesktop.name',
+  description: 'commands.removeDesktop.description',
   visibility: ({ window, desktop }) =>
     !!window && !!desktop && !desktop.hasTabs && window.desktops.length > MIN_DESKTOPS,
   async handler({ window, desktop }) {

@@ -9,8 +9,8 @@ export const TRIGGER = 'select-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select Desktop',
-  description: 'Switch to a specific desktop',
+  name: 'commands.selectDesktop.name',
+  description: 'commands.selectDesktop.description',
   modal: {
     page: 'select-desktop',
   },

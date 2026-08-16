@@ -6,8 +6,8 @@ export const TRIGGER = 'minimize-window';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Minimize Window',
-  description: 'Minimizes the specified window',
+  name: 'commands.minimizeWindow.name',
+  description: 'commands.minimizeWindow.description',
   visibility: ({ window }) => !!window && !window.bw.isMinimized(),
   async handler({ window }) {
     window.bw.minimize();

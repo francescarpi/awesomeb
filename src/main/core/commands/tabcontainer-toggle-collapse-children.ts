@@ -13,8 +13,8 @@ export const TRIGGER = 'toggle-collapse-children';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Collapse Children',
-  description: '',
+  name: 'commands.toggleCollapseChildren.name',
+  description: 'commands.toggleCollapseChildren.description',
   visibility: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
   async handler({ tabContainer, params, window }) {
     const targetTabContainer = getTabContainer(window, tabContainer, params?.tabContainerId);

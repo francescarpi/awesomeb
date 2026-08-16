@@ -10,8 +10,8 @@ export const TRIGGER = 'new-window';
 
 export const Command: ICommand<ICommandParams, { window: Window | null }> = {
   trigger: TRIGGER,
-  name: 'New Window',
-  description: 'Open a new window',
+  name: 'commands.newWindow.name',
+  description: 'commands.newWindow.description',
   modal: {
     page: 'new-window',
   },

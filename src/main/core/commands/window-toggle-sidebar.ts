@@ -6,8 +6,8 @@ export const TRIGGER = 'toggle-sidebar';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Sidebar',
-  description: 'Toggles the visibility of the sidebar in the focused window.',
+  name: 'commands.toggleSidebar.name',
+  description: 'commands.toggleSidebar.description',
   visibility: ({ window }) => !!window,
   async handler({ window }) {
     window.toggleSidebar(window);

@@ -11,8 +11,8 @@ export const TRIGGER = 'duplicate-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Duplicate Tab',
-  description: 'Duplicate the current tab in a new tab',
+  name: 'commands.duplicateTab.name',
+  description: 'commands.duplicateTab.description',
   modal: {
     page: 'duplicate-tab',
   },

@@ -7,8 +7,8 @@ export const TRIGGER = 'manage-history';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Manage history',
-  description: 'Open the history management page.',
+  name: 'commands.manageHistory.name',
+  description: 'commands.manageHistory.description',
   visibility: ({ window }) => !!window,
   async handler({ browser }) {
     browser.openURL(`${INTERNAL_PROTOCOL}://history/`, { selectTab: true });

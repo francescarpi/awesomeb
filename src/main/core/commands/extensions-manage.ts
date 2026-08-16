@@ -7,8 +7,8 @@ export const TRIGGER = 'manage-extensions';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Manage Extensions',
-  description: 'Open the extension management interface.',
+  name: 'commands.manageExtensions.name',
+  description: 'commands.manageExtensions.description',
   async handler({ browser }) {
     browser.openURL(`${INTERNAL_PROTOCOL}://extensions`, {
       selectTab: true,

@@ -12,8 +12,8 @@ export const TRIGGER = 'add-divider';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Add Tab Container Divider',
-  description: 'Add a divider to the tab container.',
+  name: 'commands.addDivider.name',
+  description: 'commands.addDivider.description',
   modal: {
     page: TRIGGER,
   },

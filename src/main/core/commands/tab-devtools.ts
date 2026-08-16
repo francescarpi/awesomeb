@@ -6,8 +6,8 @@ export const TRIGGER = 'devtools';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Open DevTools',
-  description: 'Open the DevTools for the current tab.',
+  name: 'commands.devtools.name',
+  description: 'commands.devtools.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {

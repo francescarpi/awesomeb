@@ -12,8 +12,8 @@ export const TRIGGER = 'suspend-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Suspend Desktop',
-  description: 'Suspend all tabs in the selected desktop',
+  name: 'commands.suspendDesktop.name',
+  description: 'commands.suspendDesktop.description',
   modal: {
     page: TRIGGER,
   },

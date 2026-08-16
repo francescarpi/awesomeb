@@ -6,8 +6,8 @@ export const TRIGGER = 'move-desktop-right';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Move Desktop Right',
-  description: 'Move the current desktop one position to the right',
+  name: 'commands.moveDesktopRight.name',
+  description: 'commands.moveDesktopRight.description',
   visibility: ({ window }) => !!window,
   async handler({ window, desktop }) {
     window.moveDesktop(desktop.id, 'right');

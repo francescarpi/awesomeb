@@ -7,8 +7,8 @@ export const TRIGGER = 'save-session';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Save Session',
-  description: 'Saves the current session to disk.',
+  name: 'commands.saveSession.name',
+  description: 'commands.saveSession.description',
   async handler({ browser }) {
     browser.saveSession();
     notification('Session Save', 'Session saved successfully');

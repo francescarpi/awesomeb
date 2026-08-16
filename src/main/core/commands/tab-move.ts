@@ -10,8 +10,8 @@ export const TRIGGER = 'move-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Move Tab',
-  description: 'Move a tab to a target',
+  name: 'commands.moveTab.name',
+  description: 'commands.moveTab.description',
   modal: {
     page: 'move-tab',
   },

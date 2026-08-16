@@ -13,8 +13,8 @@ export const TRIGGER = 'go-back';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Go Back',
-  description: 'Navigates back in the browsing history of the specified tab.',
+  name: 'commands.goBack.name',
+  description: 'commands.goBack.description',
   visibility: ({ tab }) => !!tab && tab.canGoBack,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);

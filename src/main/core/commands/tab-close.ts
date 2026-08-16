@@ -13,8 +13,8 @@ export const TRIGGER = 'close-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tab',
-  description: 'Closes the currently active tab or a specified tab in the focused window.',
+  name: 'commands.closeTab.name',
+  description: 'commands.closeTab.description',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToClose = getTab(browser, tab, params?.tabId);

@@ -7,8 +7,8 @@ export const TRIGGER = 'devtools-sidebar';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools Sidebar',
-  description: 'Show the sidebar devtools',
+  name: 'commands.devtoolsSidebar.name',
+  description: 'commands.devtoolsSidebar.description',
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {

@@ -6,8 +6,8 @@ export const TRIGGER = 'zoom-in';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Zoom In',
-  description: 'Increase zoom level of the current tab',
+  name: 'commands.zoomIn.name',
+  description: 'commands.zoomIn.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {

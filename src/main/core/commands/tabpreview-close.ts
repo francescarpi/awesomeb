@@ -9,8 +9,8 @@ export const TRIGGER = 'close-tab-preview';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tab Preview',
-  description: 'Close the preview of the current tab',
+  name: 'commands.closeTabPreview.name',
+  description: 'commands.closeTabPreview.description',
   visibility: ({ tab }) => !!tab?.tabPreview,
   async handler({ browser, tab }) {
     if (!tab) {

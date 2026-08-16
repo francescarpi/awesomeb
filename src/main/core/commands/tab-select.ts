@@ -9,8 +9,8 @@ export const TRIGGER = 'select-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select Tab',
-  description: 'Selects a tab by its ID in the focused window.',
+  name: 'commands.selectTab.name',
+  description: 'commands.selectTab.description',
   visibility: ({ tab }) => !!tab,
   async handler({ window, params }) {
     await window.selectTab(params.tabId);

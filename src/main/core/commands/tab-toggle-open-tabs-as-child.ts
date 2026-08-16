@@ -13,8 +13,8 @@ export const TRIGGER = 'toggle-open-tabs-as-child';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Open Tabs As Child',
-  description: 'Toggles whether new tabs opened from this tab become its children.',
+  name: 'commands.toggleOpenTabsAsChild.name',
+  description: 'commands.toggleOpenTabsAsChild.description',
   visibility: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
   async handler({ tab, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);

@@ -7,8 +7,8 @@ export const TRIGGER = 'devtools-urlbar';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools URLBar',
-  description: 'Show the URL bar devtools',
+  name: 'commands.devtoolsUrlbar.name',
+  description: 'commands.devtoolsUrlbar.description',
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {

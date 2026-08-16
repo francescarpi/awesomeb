@@ -12,8 +12,8 @@ export const TRIGGER = 'new-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'New Tab',
-  description: 'Open a new tab in specified target',
+  name: 'commands.newTab.name',
+  description: 'commands.newTab.description',
   modal: {
     page: 'new-tab',
   },

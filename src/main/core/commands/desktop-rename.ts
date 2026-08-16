@@ -14,8 +14,8 @@ export const TRIGGER = 'rename-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rename Desktop',
-  description: 'Rename the current virtual desktop',
+  name: 'commands.renameDesktop.name',
+  description: 'commands.renameDesktop.description',
   modal: {
     page: 'rename-desktop',
     props: {

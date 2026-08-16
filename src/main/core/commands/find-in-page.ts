@@ -6,8 +6,8 @@ export const TRIGGER = 'find-in-page';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Find in page',
-  description: 'Find text in the current page',
+  name: 'commands.findInPage.name',
+  description: 'commands.findInPage.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {

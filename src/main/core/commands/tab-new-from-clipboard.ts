@@ -8,8 +8,8 @@ export const TRIGGER = 'tab-new-from-clipboard';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Paste & Go',
-  description: 'Open a new tab from the URL in the clipboard.',
+  name: 'commands.tabNewFromClipboard.name',
+  description: 'commands.tabNewFromClipboard.description',
   visibility: ({ window }) => !!window,
   async handler({ browser, window: _window }) {
     const clipboardText = clipboard.readText().trim();

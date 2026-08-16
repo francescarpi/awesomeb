@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import { Browser } from '@/core';
+import { t } from '@/i18n';
 
 export { setupCommandsIPC } from './ipc';
 
@@ -160,6 +161,11 @@ export function getCommands(browser: Browser): ICommand<any, any>[] {
       (c) =>
         c.visibility === undefined || c.visibility({ browser, window, desktop, tabContainer, tab }),
     )
+    .map((c) => ({
+      ...c,
+      name: t(c.name, 'commands'),
+      description: t(c.description, 'commands'),
+    }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

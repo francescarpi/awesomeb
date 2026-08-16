@@ -7,8 +7,8 @@ export const TRIGGER = 'clear-closed-tabs';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Clear Closed Tabs',
-  description: 'Clear the list of recently closed tabs',
+  name: 'commands.clearClosedTabs.name',
+  description: 'commands.clearClosedTabs.description',
   modal: {
     page: 'clear-closed-tabs',
   },

@@ -7,8 +7,8 @@ export const TRIGGER = 'debug-page';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Debug Page',
-  description: 'Open the debug page.',
+  name: 'commands.debugPage.name',
+  description: 'commands.debugPage.description',
   visibility: ({ window }) => !!window,
   async handler({ browser }) {
     browser.openURL(`${INTERNAL_PROTOCOL}://debug/`, { selectTab: true });

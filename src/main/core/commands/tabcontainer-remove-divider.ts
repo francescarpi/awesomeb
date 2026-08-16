@@ -12,8 +12,8 @@ export const TRIGGER = 'remove-divider';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Remove Tab Container Divider',
-  description: 'Remove a divider to the tab container.',
+  name: 'commands.removeDivider.name',
+  description: 'commands.removeDivider.description',
   modal: {
     page: TRIGGER,
   },

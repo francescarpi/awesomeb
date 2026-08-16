@@ -6,8 +6,8 @@ export const TRIGGER = 'zoom-reset';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Zoom Reset',
-  description: 'Reset default zoom of selected tab',
+  name: 'commands.zoomReset.name',
+  description: 'commands.zoomReset.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {

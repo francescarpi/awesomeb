@@ -13,8 +13,8 @@ export const TRIGGER = 'go-forward';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Go Forward',
-  description: 'Navigates forward in the browsing history of the specified tab.',
+  name: 'commands.goForward.name',
+  description: 'commands.goForward.description',
   visibility: ({ tab }) => !!tab && tab.canGoForward,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);

@@ -13,8 +13,8 @@ export const TRIGGER = 'toggle-mute';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Mute',
-  description: 'Toggles the mute state of the current tab.',
+  name: 'commands.toggleMute.name',
+  description: 'commands.toggleMute.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);

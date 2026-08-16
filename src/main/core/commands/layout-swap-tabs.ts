@@ -9,8 +9,8 @@ export const TRIGGER = 'swap-tabs';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Swap Tabs',
-  description: 'Rotate the position of tabs in a split container',
+  name: 'commands.swapTabs.name',
+  description: 'commands.swapTabs.description',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   async handler({ tabContainer }) {
     if (!tabContainer) {

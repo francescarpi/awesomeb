@@ -6,8 +6,8 @@ export const TRIGGER = 'select-first-tab-require-attention';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select First Tab Requiring Attention',
-  description: 'Select the first tab that has a badge indicating it requires attention.',
+  name: 'commands.selectFirstTabRequireAttention.name',
+  description: 'commands.selectFirstTabRequireAttention.description',
   visibility: ({ window }) => (window ? window.tabsRequireAttention.length > 0 : false),
   async handler({ window, tab }) {
     const nextTab = window.tabsRequireAttention[0];

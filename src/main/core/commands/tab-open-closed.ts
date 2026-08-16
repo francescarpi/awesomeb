@@ -11,8 +11,8 @@ export const TRIGGER = 'open-closed';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Open Closed Tab',
-  description: 'Open the most recently closed tab',
+  name: 'commands.openClosed.name',
+  description: 'commands.openClosed.description',
   modal: {
     page: 'open-closed',
   },

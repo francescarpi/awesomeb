@@ -13,8 +13,8 @@ export const TRIGGER = 'certificate-info';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Certificate Info',
-  description: 'View SSL/TLS certificate information for the current tab.',
+  name: 'commands.certificateInfo.name',
+  description: 'commands.certificateInfo.description',
   visibility: ({ tab }) => !!tab && tab.safe,
   modal: {
     page: 'certificate-info',

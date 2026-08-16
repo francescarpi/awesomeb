@@ -6,8 +6,8 @@ export const TRIGGER = 'move-tab-container-up';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Move Tab Container Up',
-  description: 'Move the current tab container up in the list.',
+  name: 'commands.moveTabContainerUp.name',
+  description: 'commands.moveTabContainerUp.description',
   visibility: ({ tabContainer }) => !!tabContainer,
   async handler({ desktop, tabContainer }) {
     if (tabContainer) {

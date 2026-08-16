@@ -12,8 +12,8 @@ export const TRIGGER = 'remove-all-dividers';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Remove All Desktop Dividers',
-  description: 'Remove all dividers from the desktop.',
+  name: 'commands.removeAllDividers.name',
+  description: 'commands.removeAllDividers.description',
   modal: {
     page: TRIGGER,
   },

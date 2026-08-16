@@ -14,8 +14,8 @@ export const TRIGGER = 'desktop-theme';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Desktop Theme',
-  description: 'Change the theme of the selected desktop',
+  name: 'commands.desktopTheme.name',
+  description: 'commands.desktopTheme.description',
   modal: {
     page: 'desktop-theme',
     props: {

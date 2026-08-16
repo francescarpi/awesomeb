@@ -15,8 +15,8 @@ export const TRIGGER = 'copy-url';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Copy URL',
-  description: 'Copy the URL of the active tab to the clipboard.',
+  name: 'commands.copyUrl.name',
+  description: 'commands.copyUrl.description',
   visibility: ({ tab }) => !!tab,
   async handler({ tab, window, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);

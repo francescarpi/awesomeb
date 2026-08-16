@@ -12,8 +12,8 @@ export const TRIGGER = 'select-layout';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select layout',
-  description: 'Select a layout for the current tab container',
+  name: 'commands.selectLayout.name',
+  description: 'commands.selectLayout.description',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   modal: {
     page: 'select-layout',

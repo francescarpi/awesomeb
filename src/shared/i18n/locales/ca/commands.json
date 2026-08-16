@@ -1,0 +1,282 @@
+{
+  "acceptTabPreview": {
+    "name": "Accepta la previsualització",
+    "description": "Accepta la previsualització de la pestanya actual"
+  },
+  "addDesktop": {
+    "name": "Afegeix escriptori",
+    "description": "Afegeix un escriptori nou"
+  },
+  "addDivider": {
+    "name": "Afegeix divisor de contenidor de pestanyes",
+    "description": "Afegeix un divisor al contenidor de pestanyes."
+  },
+  "certificateInfo": {
+    "name": "Informació del certificat",
+    "description": "Mostra la informació del certificat SSL/TLS de la pestanya actual."
+  },
+  "changeLayoutSize": {
+    "name": "Canvia la mida del disseny",
+    "description": "Canvia la mida del disseny dividit"
+  },
+  "changeTabProfile": {
+    "name": "Canvia el perfil de la pestanya",
+    "description": "Canvia el perfil de la pestanya actual."
+  },
+  "clearClosedTabs": {
+    "name": "Esborra les pestanyes tancades",
+    "description": "Esborra la llista de pestanyes tancades recentment"
+  },
+  "closeTab": {
+    "name": "Tanca la pestanya",
+    "description": "Tanca la pestanya activa o una pestanya específica a la finestra enfocada."
+  },
+  "closeTabChildren": {
+    "name": "Tanca les filles",
+    "description": "Tanca totes les pestanyes filles de la pestanya seleccionada"
+  },
+  "closeTabPreview": {
+    "name": "Tanca la previsualització",
+    "description": "Tanca la previsualització de la pestanya actual"
+  },
+  "closeTabsBelow": {
+    "name": "Tanca les pestanyes inferiors",
+    "description": "Tanca totes les pestanyes per sota de l'actual."
+  },
+  "closeWindow": {
+    "name": "Tanca la finestra",
+    "description": "Tanca la finestra especificada"
+  },
+  "copyUrl": {
+    "name": "Copia l'URL",
+    "description": "Copia l'URL de la pestanya activa al porta-retalls."
+  },
+  "debugPage": {
+    "name": "Pàgina de depuració",
+    "description": "Obre la pàgina de depuració."
+  },
+  "desktopTheme": {
+    "name": "Tema de l'escriptori",
+    "description": "Canvia el tema de l'escriptori seleccionat"
+  },
+  "devtools": {
+    "name": "Obre DevTools",
+    "description": "Obre les DevTools de la pestanya actual."
+  },
+  "devtoolsSidebar": {
+    "name": "DevTools de la barra lateral",
+    "description": "Mostra les DevTools de la barra lateral"
+  },
+  "devtoolsTabswitcher": {
+    "name": "DevTools del selector de pestanyes",
+    "description": "Obre les DevTools de la vista del selector de pestanyes"
+  },
+  "devtoolsUrlbar": {
+    "name": "DevTools de la barra d'URL",
+    "description": "Mostra les DevTools de la barra d'URL"
+  },
+  "devtoolsWindow": {
+    "name": "DevTools de la finestra",
+    "description": "Mostra les DevTools de la finestra principal"
+  },
+  "duplicateTab": {
+    "name": "Duplica la pestanya",
+    "description": "Duplica la pestanya actual en una pestanya nova"
+  },
+  "editUrl": {
+    "name": "Edita l'URL",
+    "description": "Edita l'URL de la pestanya activa"
+  },
+  "findInPage": {
+    "name": "Cerca a la pàgina",
+    "description": "Cerca text a la pàgina actual"
+  },
+  "goBack": {
+    "name": "Enrere",
+    "description": "Navega enrere a l'historial de la pestanya especificada."
+  },
+  "goForward": {
+    "name": "Endavant",
+    "description": "Navega endavant a l'historial de la pestanya especificada."
+  },
+  "manageExtensions": {
+    "name": "Gestiona les extensions",
+    "description": "Obre la interfície de gestió d'extensions."
+  },
+  "manageHistory": {
+    "name": "Gestiona l'historial",
+    "description": "Obre la pàgina de gestió de l'historial."
+  },
+  "maximizeWindow": {
+    "name": "Maximitza la finestra",
+    "description": "Maximitza la finestra especificada"
+  },
+  "minimizeWindow": {
+    "name": "Minimitza la finestra",
+    "description": "Minimitza la finestra especificada"
+  },
+  "moveDesktopLeft": {
+    "name": "Mou l'escriptori a l'esquerra",
+    "description": "Mou l'escriptori actual una posició a l'esquerra"
+  },
+  "moveDesktopRight": {
+    "name": "Mou l'escriptori a la dreta",
+    "description": "Mou l'escriptori actual una posició a la dreta"
+  },
+  "moveTab": {
+    "name": "Mou la pestanya",
+    "description": "Mou una pestanya a una destinació"
+  },
+  "moveTabContainerDown": {
+    "name": "Baixa el contenidor de pestanyes",
+    "description": "Baixa el contenidor de pestanyes actual a la llista."
+  },
+  "moveTabContainerUp": {
+    "name": "Puja el contenidor de pestanyes",
+    "description": "Puja el contenidor de pestanyes actual a la llista."
+  },
+  "newTab": {
+    "name": "Pestanya nova",
+    "description": "Obre una pestanya nova a la destinació especificada"
+  },
+  "newWindow": {
+    "name": "Finestra nova",
+    "description": "Obre una finestra nova"
+  },
+  "nextDesktop": {
+    "name": "Escriptori següent",
+    "description": "Canvia a l'escriptori següent"
+  },
+  "nextTab": {
+    "name": "Pestanya següent",
+    "description": "Canvia a la pestanya següent a la finestra actual"
+  },
+  "openClosed": {
+    "name": "Torna a obrir la pestanya tancada",
+    "description": "Torna a obrir la pestanya tancada més recentment"
+  },
+  "previousDesktop": {
+    "name": "Escriptori anterior",
+    "description": "Canvia a l'escriptori anterior"
+  },
+  "previousTab": {
+    "name": "Pestanya anterior",
+    "description": "Canvia a la pestanya anterior a la finestra actual"
+  },
+  "previousVisitedTab": {
+    "name": "Pestanya visitada anteriorment",
+    "description": "Canvia a la pestanya visitada anteriorment"
+  },
+  "print": {
+    "name": "Imprimeix",
+    "description": "Imprimeix la pàgina actual"
+  },
+  "reloadTab": {
+    "name": "Recarrega la pestanya",
+    "description": "Recarrega la pestanya especificada."
+  },
+  "removeAllDividers": {
+    "name": "Treu tots els divisors de l'escriptori",
+    "description": "Treu tots els divisors de l'escriptori."
+  },
+  "removeDesktop": {
+    "name": "Elimina l'escriptori",
+    "description": "Elimina l'escriptori actual"
+  },
+  "removeDivider": {
+    "name": "Treu el divisor del contenidor de pestanyes",
+    "description": "Treu un divisor del contenidor de pestanyes."
+  },
+  "renameDesktop": {
+    "name": "Reanomena l'escriptori",
+    "description": "Reanomena l'escriptori virtual actual"
+  },
+  "renameTab": {
+    "name": "Reanomena la pestanya",
+    "description": "Reanomena la pestanya especificada."
+  },
+  "saveSession": {
+    "name": "Desa la sessió",
+    "description": "Desa la sessió actual al disc."
+  },
+  "selectDesktop": {
+    "name": "Selecciona un escriptori",
+    "description": "Canvia a un escriptori específic"
+  },
+  "selectFirstTabRequireAttention": {
+    "name": "Selecciona la primera pestanya que requereix atenció",
+    "description": "Selecciona la primera pestanya que té una insígnia que indica que requereix atenció."
+  },
+  "selectLayout": {
+    "name": "Selecciona el disseny",
+    "description": "Selecciona un disseny per al contenidor de pestanyes actual"
+  },
+  "selectTab": {
+    "name": "Selecciona la pestanya",
+    "description": "Selecciona una pestanya pel seu ID a la finestra enfocada."
+  },
+  "selectTabcontainerByIndex": {
+    "name": "Selecciona el contenidor de pestanyes per índex",
+    "description": "Selecciona un contenidor de pestanyes segons l'índex proporcionat, essent one-based."
+  },
+  "splitTabPreview": {
+    "name": "Divideix la previsualització de la pestanya",
+    "description": "Divideix la previsualització de la pestanya dins de la pestanya seleccionada"
+  },
+  "stopTab": {
+    "name": "Atura la càrrega de la pestanya",
+    "description": "Atura la càrrega de la pestanya actual o d'una pestanya especificada"
+  },
+  "suspendDesktop": {
+    "name": "Suspèn l'escriptori",
+    "description": "Suspèn totes les pestanyes de l'escriptori seleccionat"
+  },
+  "suspendTab": {
+    "name": "Suspèn la pestanya",
+    "description": "Suspèn la pestanya activa a la finestra enfocada."
+  },
+  "swapTabs": {
+    "name": "Intercanvia pestanyes",
+    "description": "Rota la posició de les pestanyes en un contenidor dividit"
+  },
+  "tabNewFromClipboard": {
+    "name": "Enganxa i vés",
+    "description": "Obre una pestanya nova amb l'URL del porta-retalls."
+  },
+  "toggleCollapseChildren": {
+    "name": "Mostra/amaga les filles",
+    "description": ""
+  },
+  "toggleMaximizeArea": {
+    "name": "Mostra/amaga l'àrea maximitzada",
+    "description": "Mostra o amaga l'àrea de contingut principal amagant o mostrant la barra lateral i la barra d'URL."
+  },
+  "toggleMute": {
+    "name": "Mostra/amaga el silenci",
+    "description": "Alterna l'estat de silenci de la pestanya actual."
+  },
+  "toggleOpenTabsAsChild": {
+    "name": "Mostra/amaga l'obertura de pestanyes com a filles",
+    "description": "Alterna si les noves pestanyes obertes des d'aquesta pestanya es converteixen en les seves filles."
+  },
+  "toggleSidebar": {
+    "name": "Mostra/amaga la barra lateral",
+    "description": "Alterna la visibilitat de la barra lateral a la finestra enfocada."
+  },
+  "unsplitTabs": {
+    "name": "Fusiona les pestanyes",
+    "description": "Desfà la divisió del contenidor de pestanyes actual, movent totes les pestanyes al contenidor principal."
+  },
+  "zoomIn": {
+    "name": "Apropa",
+    "description": "Augmenta el nivell de zoom de la pestanya actual"
+  },
+  "zoomOut": {
+    "name": "Allunya",
+    "description": "Disminueix el nivell de zoom de la pestanya actual"
+  },
+  "zoomReset": {
+    "name": "Restableix el zoom",
+    "description": "Restableix el zoom predeterminat de la pestanya seleccionada"
+  }
+}

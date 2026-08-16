@@ -7,8 +7,8 @@ export const TRIGGER = 'devtools-tabswitcher';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools Tab Switcher',
-  description: 'Open devtools for the Tab Switcher view',
+  name: 'commands.devtoolsTabswitcher.name',
+  description: 'commands.devtoolsTabswitcher.description',
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {

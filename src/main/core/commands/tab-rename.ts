@@ -14,8 +14,8 @@ export const TRIGGER = 'rename-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rename Tab',
-  description: 'Renames the specified tab.',
+  name: 'commands.renameTab.name',
+  description: 'commands.renameTab.description',
   visibility: ({ tab }) => !!tab,
   modal: {
     page: 'rename-tab',

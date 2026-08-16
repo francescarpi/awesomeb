@@ -13,8 +13,8 @@ export const TRIGGER = 'close-tabs-below';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tabs Below',
-  description: 'Closes all tabs below the current one.',
+  name: 'commands.closeTabsBelow.name',
+  description: 'commands.closeTabsBelow.description',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToClose = getTab(browser, tab, params?.tabId);

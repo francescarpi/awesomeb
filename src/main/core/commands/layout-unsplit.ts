@@ -9,8 +9,8 @@ export const TRIGGER = 'unsplit-tabs';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Unsplit Tabs',
-  description: 'Unsplit the current tab container, moving all tabs to the main container.',
+  name: 'commands.unsplitTabs.name',
+  description: 'commands.unsplitTabs.description',
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   async handler({ tabContainer, browser }) {
     if (!tabContainer) {

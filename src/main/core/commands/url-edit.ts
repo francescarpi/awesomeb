@@ -13,8 +13,8 @@ export const TRIGGER = 'edit-url';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Edit URL',
-  description: 'Edit the URL of the active tab',
+  name: 'commands.editUrl.name',
+  description: 'commands.editUrl.description',
   modal: {
     page: 'edit-url',
   },

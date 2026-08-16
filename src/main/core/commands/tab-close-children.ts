@@ -10,8 +10,8 @@ export const TRIGGER = 'close-tab-children';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Children',
-  description: 'Close all child tabs of the selected tab',
+  name: 'commands.closeTabChildren.name',
+  description: 'commands.closeTabChildren.description',
   visibility: ({ tabContainer }) => !!tabContainer && tabContainer.hasChildren,
   async handler({ browser, window, tabContainer, params }) {
     const target = getTabContainer(window, tabContainer, params?.tabContainerId);

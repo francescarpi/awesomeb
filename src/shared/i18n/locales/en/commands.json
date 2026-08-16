@@ -1,0 +1,282 @@
+{
+  "acceptTabPreview": {
+    "name": "Accept Tab Preview",
+    "description": "Accept the preview of the current tab"
+  },
+  "addDesktop": {
+    "name": "Add Desktop",
+    "description": "Add a new desktop"
+  },
+  "addDivider": {
+    "name": "Add Tab Container Divider",
+    "description": "Add a divider to the tab container."
+  },
+  "certificateInfo": {
+    "name": "Certificate Info",
+    "description": "View SSL/TLS certificate information for the current tab."
+  },
+  "changeLayoutSize": {
+    "name": "Change layout size",
+    "description": "Change the size of the split layout"
+  },
+  "changeTabProfile": {
+    "name": "Change Tab Profile",
+    "description": "Changes the profile of the current tab."
+  },
+  "clearClosedTabs": {
+    "name": "Clear Closed Tabs",
+    "description": "Clear the list of recently closed tabs"
+  },
+  "closeTab": {
+    "name": "Close Tab",
+    "description": "Closes the currently active tab or a specified tab in the focused window."
+  },
+  "closeTabChildren": {
+    "name": "Close Children",
+    "description": "Close all child tabs of the selected tab"
+  },
+  "closeTabPreview": {
+    "name": "Close Tab Preview",
+    "description": "Close the preview of the current tab"
+  },
+  "closeTabsBelow": {
+    "name": "Close Tabs Below",
+    "description": "Closes all tabs below the current one."
+  },
+  "closeWindow": {
+    "name": "Close Window",
+    "description": "Close the specified window"
+  },
+  "copyUrl": {
+    "name": "Copy URL",
+    "description": "Copy the URL of the active tab to the clipboard."
+  },
+  "debugPage": {
+    "name": "Debug Page",
+    "description": "Open the debug page."
+  },
+  "desktopTheme": {
+    "name": "Desktop Theme",
+    "description": "Change the theme of the selected desktop"
+  },
+  "devtools": {
+    "name": "Open DevTools",
+    "description": "Open the DevTools for the current tab."
+  },
+  "devtoolsSidebar": {
+    "name": "Devtools Sidebar",
+    "description": "Show the sidebar devtools"
+  },
+  "devtoolsTabswitcher": {
+    "name": "Devtools Tab Switcher",
+    "description": "Open devtools for the Tab Switcher view"
+  },
+  "devtoolsUrlbar": {
+    "name": "Devtools URLBar",
+    "description": "Show the URL bar devtools"
+  },
+  "devtoolsWindow": {
+    "name": "Devtools Window",
+    "description": "Show the main window devtools"
+  },
+  "duplicateTab": {
+    "name": "Duplicate Tab",
+    "description": "Duplicate the current tab in a new tab"
+  },
+  "editUrl": {
+    "name": "Edit URL",
+    "description": "Edit the URL of the active tab"
+  },
+  "findInPage": {
+    "name": "Find in page",
+    "description": "Find text in the current page"
+  },
+  "goBack": {
+    "name": "Go Back",
+    "description": "Navigates back in the browsing history of the specified tab."
+  },
+  "goForward": {
+    "name": "Go Forward",
+    "description": "Navigates forward in the browsing history of the specified tab."
+  },
+  "manageExtensions": {
+    "name": "Manage Extensions",
+    "description": "Open the extension management interface."
+  },
+  "manageHistory": {
+    "name": "Manage history",
+    "description": "Open the history management page."
+  },
+  "maximizeWindow": {
+    "name": "Maximize Window",
+    "description": "Maximize the specified window"
+  },
+  "minimizeWindow": {
+    "name": "Minimize Window",
+    "description": "Minimizes the specified window"
+  },
+  "moveDesktopLeft": {
+    "name": "Move Desktop Left",
+    "description": "Move the current desktop one position to the left"
+  },
+  "moveDesktopRight": {
+    "name": "Move Desktop Right",
+    "description": "Move the current desktop one position to the right"
+  },
+  "moveTab": {
+    "name": "Move Tab",
+    "description": "Move a tab to a target"
+  },
+  "moveTabContainerDown": {
+    "name": "Move Tab Container Down",
+    "description": "Move the current tab container down in the list."
+  },
+  "moveTabContainerUp": {
+    "name": "Move Tab Container Up",
+    "description": "Move the current tab container up in the list."
+  },
+  "newTab": {
+    "name": "New Tab",
+    "description": "Open a new tab in specified target"
+  },
+  "newWindow": {
+    "name": "New Window",
+    "description": "Open a new window"
+  },
+  "nextDesktop": {
+    "name": "Next Desktop",
+    "description": "Switch to the next desktop"
+  },
+  "nextTab": {
+    "name": "Next Tab",
+    "description": "Switch to the next tab in the current window"
+  },
+  "openClosed": {
+    "name": "Open Closed Tab",
+    "description": "Open the most recently closed tab"
+  },
+  "previousDesktop": {
+    "name": "Previous Desktop",
+    "description": "Switch to the previous desktop"
+  },
+  "previousTab": {
+    "name": "Previous Tab",
+    "description": "Switch to the previous tab in the current window"
+  },
+  "previousVisitedTab": {
+    "name": "Previous Visited Tab",
+    "description": "Switch to the previously visited tab"
+  },
+  "print": {
+    "name": "Print",
+    "description": "Print the current page"
+  },
+  "reloadTab": {
+    "name": "Reload Tab",
+    "description": "Reloads the specified browser tab."
+  },
+  "removeAllDividers": {
+    "name": "Remove All Desktop Dividers",
+    "description": "Remove all dividers from the desktop."
+  },
+  "removeDesktop": {
+    "name": "Remove Desktop",
+    "description": "Remove the current desktop"
+  },
+  "removeDivider": {
+    "name": "Remove Tab Container Divider",
+    "description": "Remove a divider to the tab container."
+  },
+  "renameDesktop": {
+    "name": "Rename Desktop",
+    "description": "Rename the current virtual desktop"
+  },
+  "renameTab": {
+    "name": "Rename Tab",
+    "description": "Renames the specified tab."
+  },
+  "saveSession": {
+    "name": "Save Session",
+    "description": "Saves the current session to disk."
+  },
+  "selectDesktop": {
+    "name": "Select Desktop",
+    "description": "Switch to a specific desktop"
+  },
+  "selectFirstTabRequireAttention": {
+    "name": "Select First Tab Requiring Attention",
+    "description": "Select the first tab that has a badge indicating it requires attention."
+  },
+  "selectLayout": {
+    "name": "Select layout",
+    "description": "Select a layout for the current tab container"
+  },
+  "selectTab": {
+    "name": "Select Tab",
+    "description": "Selects a tab by its ID in the focused window."
+  },
+  "selectTabcontainerByIndex": {
+    "name": "Select Tab Container by Index",
+    "description": "Selects a tab container based on the provided index, being one-based."
+  },
+  "splitTabPreview": {
+    "name": "Split Tab Preview",
+    "description": "Split the tab preview within the selected tab"
+  },
+  "stopTab": {
+    "name": "Stop loading tab",
+    "description": "Stop loading the current tab or a specified tab"
+  },
+  "suspendDesktop": {
+    "name": "Suspend Desktop",
+    "description": "Suspend all tabs in the selected desktop"
+  },
+  "suspendTab": {
+    "name": "Suspend Tab",
+    "description": "Suspends the currently active tab in the focused window."
+  },
+  "swapTabs": {
+    "name": "Swap Tabs",
+    "description": "Rotate the position of tabs in a split container"
+  },
+  "tabNewFromClipboard": {
+    "name": "Paste & Go",
+    "description": "Open a new tab from the URL in the clipboard."
+  },
+  "toggleCollapseChildren": {
+    "name": "Toggle Collapse Children",
+    "description": ""
+  },
+  "toggleMaximizeArea": {
+    "name": "Toggle Maximize Area",
+    "description": "Toggle the maximization of the main content area by hiding or showing the sidebar and urlbar."
+  },
+  "toggleMute": {
+    "name": "Toggle Mute",
+    "description": "Toggles the mute state of the current tab."
+  },
+  "toggleOpenTabsAsChild": {
+    "name": "Toggle Open Tabs As Child",
+    "description": "Toggles whether new tabs opened from this tab become its children."
+  },
+  "toggleSidebar": {
+    "name": "Toggle Sidebar",
+    "description": "Toggles the visibility of the sidebar in the focused window."
+  },
+  "unsplitTabs": {
+    "name": "Unsplit Tabs",
+    "description": "Unsplit the current tab container, moving all tabs to the main container."
+  },
+  "zoomIn": {
+    "name": "Zoom In",
+    "description": "Increase zoom level of the current tab"
+  },
+  "zoomOut": {
+    "name": "Zoom Out",
+    "description": "Decrease zoom level of the current tab"
+  },
+  "zoomReset": {
+    "name": "Zoom Reset",
+    "description": "Reset default zoom of selected tab"
+  }
+}

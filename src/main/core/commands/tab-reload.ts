@@ -13,8 +13,8 @@ export const TRIGGER = 'reload-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Reload Tab',
-  description: 'Reloads the specified browser tab.',
+  name: 'commands.reloadTab.name',
+  description: 'commands.reloadTab.description',
   visibility: ({ tab }) => !!tab,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);
