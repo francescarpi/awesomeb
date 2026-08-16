@@ -1,4 +1,5 @@
 import { h, Renderer, c, type VNode, btnIcon } from '#/scripts';
+import { t } from '#/scripts/i18n';
 import type { IConfig, IConfigTheme } from '~/types';
 import { box, inputColorPicker } from './common';
 import Delete from '#/icons/delete.svg?raw';
@@ -34,8 +35,8 @@ function buildGeneralBody(
     'div',
     { class: c('flex', 'flex-col', 'gap-2') },
     box(
-      'Themes',
-      'Manage custom themes to personalize the appearance of your desktops.',
+      t('pages.settings.themes.title'),
+      t('pages.settings.themes.description'),
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
@@ -48,10 +49,10 @@ function buildGeneralBody(
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, 'Name'),
-              h('th', { class: c('text-left', 'px-1') }, 'Primary'),
-              h('th', { class: c('text-left', 'px-1') }, 'Secondary'),
-              h('th', { class: c('text-left', 'px-1') }, 'Degrees'),
+              h('th', { class: c('text-left', 'px-1') }, t('pages.settings.themes.name')),
+              h('th', { class: c('text-left', 'px-1') }, t('pages.settings.themes.primary')),
+              h('th', { class: c('text-left', 'px-1') }, t('pages.settings.themes.secondary')),
+              h('th', { class: c('text-left', 'px-1') }, t('pages.settings.themes.degrees')),
               h('th', { class: c('w-13') }, ''),
             ),
           ),
@@ -94,7 +95,11 @@ function buildGeneralBody(
                       },
                       '',
                     ),
-                    h('span', { class: c('ml-2', 'w-13') }, `${theme.degrees}°`),
+                    h(
+                      'span',
+                      { class: c('ml-2', 'w-13') },
+                      t('pages.settings.themes.degreesValue', { value: theme.degrees }),
+                    ),
                   ),
                 ),
                 h(
@@ -115,14 +120,14 @@ function buildGeneralBody(
           h(
             'button',
             { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
-            'Add',
+            t('pages.settings.themes.add'),
           ),
         ),
       ),
     ),
     box(
-      'UI Theme',
-      'Customize the look of the AwesomeB UI with themes created by the community.',
+      t('pages.settings.themes.uiThemeTitle'),
+      t('pages.settings.themes.uiThemeDescription'),
       h(
         'select',
         { class: c('select', 'select-sm'), id: 'ui-theme-select', onchange: testUITheme },
@@ -137,7 +142,7 @@ function buildGeneralBody(
       h(
         'button',
         { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
-        'Save changes',
+        t('pages.settings.themes.saveChanges'),
       ),
     ),
   );
@@ -228,7 +233,7 @@ function addTheme(renderer: Renderer, config: IConfig) {
 function updateDegrees(e: Event) {
   const input = e.target as HTMLInputElement;
   const span = input.closest('td')!.querySelector('span') as HTMLSpanElement;
-  span.textContent = `${input.value}°`;
+  span.textContent = t('pages.settings.themes.degreesValue', { value: parseInt(input.value, 10) });
 }
 
 //-----------------------------------------------------------------------------

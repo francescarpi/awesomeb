@@ -4,6 +4,7 @@ export { getSearchParams } from './url';
 export { inputManager, type TSetValue, type TSetDefault } from './inputs';
 export { dialogConfirm } from './dialog-confirm';
 export { dialogWithSelect, type IOption } from './dialog-with-select';
+export { setText, setInnerHTML, setPlaceholder, setListEmptyText } from './i18n-helpers';
 export * from './buttons';
 export * from './icons';
 export * from './vdom';

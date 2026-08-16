@@ -1,4 +1,5 @@
 import { h, Renderer, c } from '#/scripts';
+import { t, onLocaleChange } from '#/scripts/i18n';
 import type { IConfig, IShortcut, TShortcutId, TShortcutMapId } from '~/types';
 import { acceleratorToDisplay, keyEventToAccelerator } from '~/utils/shortcuts';
 import { box } from './common';
@@ -66,15 +67,17 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
     if (shortcuts[id]) shortcuts[id].key = key;
   }
 
-  const shortcutsRenderer = new Renderer(h('ul', {}, h('li', {}, 'Loading...')));
+  const shortcutsRenderer = new Renderer(
+    h('ul', {}, h('li', {}, t('pages.settings.shortcuts.loading'))),
+  );
 
   const renderer = new Renderer(
     h(
       'div',
       {},
       box(
-        'Default Map',
-        'Define a default keyboard layout that suits you best. You can then customize specific keys to your preferences.',
+        t('pages.settings.shortcuts.defaultMapTitle'),
+        t('pages.settings.shortcuts.defaultMapDescription'),
         h(
           'select',
           { class: c('select', 'select-sm', 'w-40'), onchange: () => {} },
@@ -84,8 +87,8 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
         ),
       ),
       box(
-        'Shortcuts',
-        'Click on a shortcut key to change its combination. Press Escape to cancel.',
+        t('pages.settings.shortcuts.title'),
+        t('pages.settings.shortcuts.description'),
         h('div', { id: 'shortcuts-list', class: c('text-sm') }),
       ),
     ),
@@ -95,6 +98,12 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
     shortcutsRenderer.render('shortcuts-list');
     updateShortcutsList(shortcutsRenderer, shortcuts);
   };
+
+  onLocaleChange(() => {
+    if (shortcutsRenderer) {
+      updateShortcutsList(shortcutsRenderer, shortcuts);
+    }
+  });
 
   return { renderer, callback };
 }
@@ -112,9 +121,15 @@ function updateShortcutsList(renderer: Renderer, shortcuts: Record<TShortcutId, 
     {} as Record<string, [TShortcutId, IShortcut][]>,
   );
 
-  const sortedGroups = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
+  const sortedGroups = Object.keys(grouped).sort((a, b) =>
+    t(`pages.settings.shortcuts.groups.${a}`).localeCompare(
+      t(`pages.settings.shortcuts.groups.${b}`),
+    ),
+  );
   sortedGroups.forEach((g) => {
-    grouped[g].sort((a, b) => a[1].label.localeCompare(b[1].label));
+    grouped[g].sort((a, b) =>
+      t(a[1].label, { ns: 'shortcuts' }).localeCompare(t(b[1].label, { ns: 'shortcuts' })),
+    );
   });
 
   renderer.update(
@@ -125,7 +140,11 @@ function updateShortcutsList(renderer: Renderer, shortcuts: Record<TShortcutId, 
         h(
           'div',
           { class: c('mb-2', 'bg-base-content/5', 'p-2', 'rounded') },
-          h('span', { class: c('font-bold', 'text-base-content') }, groupKey),
+          h(
+            'span',
+            { class: c('font-bold', 'text-base-content') },
+            t(`pages.settings.shortcuts.groups.${groupKey}`),
+          ),
           h(
             'div',
             {},
@@ -134,13 +153,13 @@ function updateShortcutsList(renderer: Renderer, shortcuts: Record<TShortcutId, 
               return h(
                 'div',
                 { class: c('flex', 'items-center', 'justify-start', 'mb-2', 'ml-4') },
-                h('span', { class: c('w-55') }, sc.label),
+                h('span', { class: c('w-55') }, t(sc.label, { ns: 'shortcuts' })),
                 // Show a "listening" badge while capturing, otherwise a clickable button
                 isCapturing
                   ? h(
                       'span',
                       { class: c('badge', 'badge-warning', 'w-36', 'py-3.5') },
-                      'Press a key...',
+                      t('pages.settings.shortcuts.pressAKey'),
                     )
                   : h(
                       'button',

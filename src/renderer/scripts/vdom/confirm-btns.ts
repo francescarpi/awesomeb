@@ -1,11 +1,12 @@
 import type { VNode } from './types';
 import { h } from './vdom';
 import { c } from './classnames';
+import { t } from '#/scripts/i18n';
 import enter from '#/icons/return.svg?raw';
 import esc from '#/icons/escape.svg?raw';
 
 export function confirmButtons({
-  confirmText = 'OK',
+  confirmText,
   onConfirm,
   onCancel,
 }: {
@@ -13,6 +14,9 @@ export function confirmButtons({
   onConfirm: () => void;
   onCancel?: () => void;
 }): [VNode[], () => void] {
+  const okLabel = confirmText ?? t('common.ok');
+  const cancelLabel = t('common.cancel');
+
   const onKeydown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       onConfirm();
@@ -38,7 +42,7 @@ export function confirmButtons({
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
-      'Cancel',
+      cancelLabel,
       h('div', {
         class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
         innerHTML: esc,
@@ -52,7 +56,7 @@ export function confirmButtons({
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
-      confirmText,
+      okLabel,
       h('div', {
         class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
         innerHTML: enter,

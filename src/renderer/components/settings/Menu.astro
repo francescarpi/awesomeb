@@ -6,6 +6,9 @@
 
 <script>
   import { Renderer, h, c, type VNode, settingsMenuItems } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
 
   const renderer = new Renderer(renderMenu()).render('settings-menu');
 
@@ -25,7 +28,7 @@
               onclick: () => handleNavItemClick(item.hash[0]),
               class: c(item.hash.includes(window.location.hash) && 'menu-active'),
             },
-            item.name,
+            t(item.nameKey),
           ),
         ),
       ),
@@ -39,4 +42,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', renderMenu);
+
+  onLocaleChange(() => {
+    renderer.update(renderMenu());
+  });
 </script>

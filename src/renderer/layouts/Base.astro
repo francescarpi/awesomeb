@@ -52,7 +52,14 @@ const { backgroundColor, borderRadius, noDrag } = Astro.props;
 
 <script>
   import { getSearchParams } from '#/scripts';
+  import { initI18n, getLocale, onLocaleChange } from '#/scripts/i18n';
   import type { IConfig } from '~/types';
+
+  await initI18n();
+  document.documentElement.lang = getLocale();
+  onLocaleChange(() => {
+    document.documentElement.lang = getLocale();
+  });
 
   const { winId } = getSearchParams();
 

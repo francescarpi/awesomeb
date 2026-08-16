@@ -1,4 +1,5 @@
 import { h, Renderer, c, btnIcon, type VNode, radioBtn } from '#/scripts';
+import { t } from '#/scripts/i18n';
 import { box } from './common';
 import {
   type IConfig,
@@ -14,15 +15,17 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
   callback: () => void;
 }> {
   const permissions = await abPermissions.get();
-  const permissionsRenderer = new Renderer(h('ul', {}, h('li', {}, 'Loading...')));
+  const permissionsRenderer = new Renderer(
+    h('ul', {}, h('li', {}, t('pages.settings.shortcuts.loading'))),
+  );
 
   const renderer = new Renderer(
     h(
       'div',
       {},
       box(
-        'Security Level',
-        "This setting determines the level of access granted to websites regarding your device's functionalities (sensors, APIs, etc.).<br/><br/><strong>Standard</strong>: Allows common permissions necessary for most web pages to function correctly.<br/><strong>Strict</strong>: Requires your explicit consent for every permission a website attempts to use, offering maximum privacy.",
+        t('pages.settings.permissions.securityLevelTitle'),
+        t('pages.settings.permissions.securityLevelDescription'),
         h(
           'div',
           {},
@@ -35,19 +38,19 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
             h(
               'option',
               { selected: config.permissionsType === 'standard', value: 'standard' },
-              'Standard',
+              t('pages.settings.permissions.standard'),
             ),
             h(
               'option',
               { selected: config.permissionsType === 'strict', value: 'strict' },
-              'Strict',
+              t('pages.settings.permissions.strict'),
             ),
           ),
         ),
       ),
       box(
-        'Permissions',
-        'Manage the permissions required for the extension to function properly.',
+        t('pages.settings.permissions.permissionsTitle'),
+        t('pages.settings.permissions.permissionsDescription'),
         h('div', { id: 'permissions-list', class: c('text-sm') }),
       ),
     ),
@@ -114,14 +117,14 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
                   radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-allow`,
-                    'Allow',
+                    t('pages.settings.permissions.allow'),
                     value,
                     savePermission.bind(null, key, perm, true, permissions),
                   ),
                   radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-deny`,
-                    'Deny',
+                    t('pages.settings.permissions.deny'),
                     !value,
                     savePermission.bind(null, key, perm, false, permissions),
                   ),

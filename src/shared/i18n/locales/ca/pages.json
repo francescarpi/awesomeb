@@ -1,0 +1,380 @@
+{
+  "welcome": {
+    "title": "Benvingut a AwesomeB",
+    "subtitle": "AwesomeB(rowser)",
+    "initialSetup": "Configuració inicial",
+    "intro": "Perquè AwesomeB funcioni correctament, cal configurar un motor de cerca com a requisit mínim. Si us plau, facilita l'URL del motor de cerca que vulguis utilitzar:",
+    "exampleLabel": "Exemple:",
+    "exampleValue": "Nom: Moogle<br/>URL: https://www.moogle.com/search?q={query}",
+    "namePlaceholder": "Nom",
+    "urlPlaceholder": "URL",
+    "note": "Nota: els motors de cerca es poden modificar més endavant des de la configuració principal.",
+    "saveButton": "Desa i comença a fer servir AwesomeB"
+  },
+  "window": {
+    "title": "Finestra",
+    "helpNewTabSuffix": "obrir una pestanya nova",
+    "helpCommandsSuffix": "obrir la paleta d'ordres"
+  },
+  "sidebar": {
+    "title": "Barra lateral",
+    "collapsedCount": "{{count}} pestanya replegada",
+    "collapsedCount_other": "{{count}} pestanyes replegades",
+    "windowId": "ID: {{id}}",
+    "updateAvailable": "Actualització disponible",
+    "progress": "Progrés {{percent}}%",
+    "quitAndInstall": "Surt i instal·la"
+  },
+  "urlbar": {
+    "title": "Barra d'URL"
+  },
+  "performCommand": {
+    "title": "Executar ordre",
+    "placeholder": "Comença a escriure per cercar ordres...",
+    "empty": "Buit..."
+  },
+  "settings": {
+    "title": "Configuració",
+    "menu": {
+      "general": "General",
+      "profiles": "Perfils",
+      "themes": "Temes",
+      "permissions": "Permisos",
+      "shortcuts": "Dreceres"
+    },
+    "general": {
+      "appVersion": "Versió de l'aplicació:",
+      "chromeVersion": "Versió del Chrome:",
+      "configFolder": "Carpeta de configuració:",
+      "openFolder": "Obre la carpeta",
+      "githubRepository": "Repositori a GitHub:",
+      "saveChanges": "Desa els canvis",
+      "searchEnginesTitle": "Motors de cerca",
+      "searchEnginesDescription": "Configuració dels motors de cerca",
+      "searchEnginesName": "Nom",
+      "searchEnginesUrl": "URL",
+      "searchEnginesAdd": "Afegeix",
+      "downloadLocationTitle": "Ubicació de les descàrregues",
+      "downloadLocationDescription": "Defineix la ubicació predeterminada de les descàrregues.",
+      "downloadLocationPlaceholder": "Ubicació",
+      "downloadLocationChange": "Canvia",
+      "historyRetentionTitle": "Retenció de l'historial",
+      "historyRetentionDescription": "Nombre de dies per conservar l'historial de navegació.",
+      "historyRetentionManage": "Gestiona l'historial",
+      "historyRetentionDays": "{{count}} dies",
+      "closedTabsRetentionTitle": "Retenció de pestanyes tancades",
+      "closedTabsRetentionDescription": "Nombre de dies per conservar l'historial de pestanyes tancades.",
+      "informationTitle": "Informació",
+      "informationDescription": "Aquí pots veure informació sobre la versió de l'aplicació, la ruta on es desa la configuració, sessió, historial, etc., la versió subjacent del Chromium i el repositori del projecte."
+    },
+    "profiles": {
+      "title": "Perfils",
+      "description": "Gestiona perfils aïllats de Chrome (particions) amb galetes, sessions i emmagatzematge separats per a cada espai de treball o usuari.",
+      "name": "Nom",
+      "color": "Color",
+      "add": "Afegeix",
+      "saveChanges": "Desa els canvis",
+      "restartNote": "Per aplicar els canvis als perfils cal reiniciar el navegador."
+    },
+    "themes": {
+      "title": "Temes",
+      "description": "Gestiona temes personalitzats per personalitzar l'aspecte dels teus escriptoris.",
+      "name": "Nom",
+      "primary": "Primari",
+      "secondary": "Secundari",
+      "degrees": "Graus",
+      "degreesValue": "{{value}}°",
+      "add": "Afegeix",
+      "saveChanges": "Desa els canvis",
+      "uiThemeTitle": "Tema de la interfície",
+      "uiThemeDescription": "Personalitza l'aspecte de la interfície d'AwesomeB amb temes creats per la comunitat."
+    },
+    "permissions": {
+      "securityLevelTitle": "Nivell de seguretat",
+      "securityLevelDescription": "Aquesta configuració determina el nivell d'accés concedit als llocs web respecte a les funcionalitats del dispositiu (sensors, API, etc.).<br/><br/><strong>Estàndard</strong>: permet els permisos comuns necessaris perquè la majoria de pàgines funcionin correctament.<br/><strong>Estricte</strong>: requereix el teu consentiment explícit per a cada permís que un lloc web intenti utilitzar, oferint la màxima privadesa.",
+      "standard": "Estàndard",
+      "strict": "Estricte",
+      "permissionsTitle": "Permisos",
+      "permissionsDescription": "Gestiona els permisos necessaris perquè l'extensió funcioni correctament.",
+      "allow": "Permet",
+      "deny": "Denega"
+    },
+    "shortcuts": {
+      "defaultMapTitle": "Mapa predeterminat",
+      "defaultMapDescription": "Defineix un mapa de teclat predeterminat que s'adapti a tu. Després pots personalitzar tecles específiques al teu gust.",
+      "title": "Dreceres",
+      "description": "Fes clic en una tecla de drecera per canviar la combinació. Prem Escape per cancel·lar.",
+      "pressAKey": "Prem una tecla...",
+      "loading": "Carregant...",
+      "groups": {
+        "General": "General",
+        "Navigation": "Navegació",
+        "Tab Management": "Gestió de pestanyes",
+        "Window Management": "Gestió de finestres",
+        "Tab Navigation": "Navegació entre pestanyes",
+        "Zoom": "Zoom",
+        "Desktops": "Escriptoris",
+        "Bookmarks": "Adreces d'interès"
+      }
+    }
+  },
+  "about": {
+    "title": "Quant a",
+    "subtitle": "AwesomeB(rowser)",
+    "developer": "Desenvolupat per Francesc Arpi Roca",
+    "developerEmail": "(francesc.arpi@gmail.com)",
+    "version": "Versió: {{version}}"
+  },
+  "bookmarks": {
+    "title": "Adreces d'interès",
+    "titlePlaceholder": "Títol...",
+    "urlPlaceholder": "URL...",
+    "delete": "Elimina",
+    "move": "Mou",
+    "save": "Desa",
+    "deleteConfirm": "Segur que vols eliminar aquesta adreça d'interès?",
+    "selectParent": "Selecciona la carpeta pare nova",
+    "rootOption": "Arrel"
+  },
+  "bookmarkAdd": {
+    "title": "Afegeix una adreça d'interès",
+    "parentFolder": "Carpeta pare: {{name}}",
+    "folderNamePlaceholder": "Nom de la carpeta",
+    "titlePlaceholder": "Títol",
+    "urlPlaceholder": "URL"
+  },
+  "bookmarkOpen": {
+    "title": "Obre una adreça d'interès",
+    "bookmarkPlaceholder": "Filtra i selecciona una adreça d'interès...",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "targetPlaceholder": "Selecciona una destinació"
+  },
+  "history": {
+    "title": "Historial",
+    "searchPlaceholder": "Cerca a l'historial...",
+    "reset": "Reinicialitza",
+    "titleColumn": "Títol",
+    "urlColumn": "URL",
+    "lastVisitColumn": "Última visita",
+    "visitsColumn": "Visites",
+    "clearHistory": "Buida l'historial",
+    "clearHistoryConfirm": "Segur que vols buidar tot l'historial?",
+    "deleteSelected": "Elimina seleccionades ({{count}})",
+    "deleteSelectedConfirm": "Eliminar {{count}} element(s) seleccionat(s)?",
+    "loading": "Carregant..."
+  },
+  "downloads": {
+    "title": "Descàrregues",
+    "noDownloads": "No hi ha descàrregues en aquesta sessió",
+    "name": "Nom",
+    "date": "Data",
+    "percent": "%",
+    "viewAll": "Mostra tot",
+    "clearCompleted": "Buida les completades"
+  },
+  "tabSwitcher": {
+    "title": "Canviador de pestanyes",
+    "noTabs": "Sense pestanyes...",
+    "noDesktopName": "(sense nom d'escriptori)"
+  },
+  "tabMarks": {
+    "title": "Marques de pestanyes",
+    "listening": "Esperant marques.",
+    "listeningHold": "Mantén",
+    "listeningSuffix": "per veure més detalls...",
+    "availableMarks": "Marques de pestanyes disponibles...",
+    "noMarks": "Sense marques...",
+    "helpMark": "Prem \"m\" seguit d'una lletra per marcar la pestanya activa (p. ex., ma, mb, mc, ...)",
+    "helpDeleteOne": "Eliminar la marca de la pestanya activa",
+    "helpDeleteAll": "Eliminar totes les marques",
+    "helpSelect": "Selecciona la pestanya marcada amb aquesta lletra (p. ex., a, b, c, ...)"
+  },
+  "tabPreview": {
+    "loading": "Carregant lloc..."
+  },
+  "tabFailLoad": {
+    "title": "No es pot connectar amb el lloc web",
+    "pageAt": "La pàgina a ",
+    "cannotBeReached": " no es pot carregar.",
+    "errorCode": "Codi d'error: ",
+    "error": "Error: ",
+    "retry": "Torna-ho a provar"
+  },
+  "tabCertificateError": {
+    "title": "No es pot connectar amb el lloc web",
+    "description": "El certificat per a l'URL <i>{{url}}</i> no és vàlid. Com a resultat, la connexió entre el teu navegador i el servidor no està correctament xifrada, cosa que podria permetre que un atacant interceptés o robés dades sensibles. Codi d'error: <strong>{{error}}</strong>.",
+    "proceed": "Entenc els riscos i trio continuar de totes maneres."
+  },
+  "tabMove": {
+    "title": "Mou la pestanya",
+    "tabPlaceholder": "Selecciona una pestanya...",
+    "targetPlaceholder": "Selecciona una destinació"
+  },
+  "tabDuplicate": {
+    "title": "Duplica la pestanya",
+    "tabPlaceholder": "Selecciona una pestanya...",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "targetPlaceholder": "Selecciona una destinació"
+  },
+  "tabRename": {
+    "title": "Canvia el nom de la pestanya",
+    "namePlaceholder": "Nom de la pestanya"
+  },
+  "tabSelect": {
+    "title": "Selecciona la pestanya",
+    "listPlaceholder": "Filtra i selecciona una pestanya..."
+  },
+  "layoutSelect": {
+    "title": "Selecciona la disposició",
+    "listPlaceholder": "Selecciona una disposició..."
+  },
+  "layoutSize": {
+    "title": "Tria una mida...",
+    "listPlaceholder": "Selecciona..."
+  },
+  "desktopSelect": {
+    "title": "Selecciona l'escriptori",
+    "listPlaceholder": "Filtra i selecciona un escriptori..."
+  },
+  "desktopRename": {
+    "title": "Canvia el nom de l'escriptori",
+    "shortNamePlaceholder": "Nom curt",
+    "longNamePlaceholder": "Nom llarg"
+  },
+  "desktopTheme": {
+    "title": "Tema de l'escriptori",
+    "listPlaceholder": "Filtra i selecciona un tema..."
+  },
+  "desktopSuspend": {
+    "title": "Suspen l'escriptori",
+    "listPlaceholder": "Filtra i selecciona un escriptori..."
+  },
+  "newTab": {
+    "title": "Pestanya nova",
+    "queryPlaceholder": "Introdueix una consulta o una URL vàlida...",
+    "queryTitle": "URL o consulta de cerca",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "profileTitle": "Perfil",
+    "targetPlaceholder": "Selecciona una destinació",
+    "targetTitle": "Destinació",
+    "searchBy": " - Cerca amb "
+  },
+  "editUrl": {
+    "title": "Edita l'URL",
+    "modifyFullUrl": "Modifica l'URL completa",
+    "fullUrlPlaceholder": "URL completa",
+    "modifyUrlParts": "Modifica les parts de l'URL",
+    "protocolPlaceholder": "Protocol",
+    "hostnamePlaceholder": "Host",
+    "portPlaceholder": "Port",
+    "pathnamePlaceholder": "Camí",
+    "hashPlaceholder": "Hash",
+    "queryParameters": "Paràmetres de consulta",
+    "keyPlaceholder": "Clau",
+    "valuePlaceholder": "Valor",
+    "add": "+ Afegeix"
+  },
+  "findInPage": {
+    "placeholder": "Cerca a la pàgina...",
+    "match": "coincidència",
+    "match_other": "coincidències"
+  },
+  "newWindow": {
+    "title": "Finestra nova",
+    "listPlaceholder": "Selecciona la destinació..."
+  },
+  "quitting": {
+    "closing": "Tancant AwesomeB..."
+  },
+  "login": {
+    "title": "Inicia sessió",
+    "description": "El lloc ({{host}}) requereix un nom d'usuari i una contrasenya per continuar.",
+    "usernamePlaceholder": "Nom d'usuari",
+    "passwordPlaceholder": "Contrasenya"
+  },
+  "extensions": {
+    "title": "Extensions",
+    "intro": "AwesomeB ofereix suport limitat per a extensions del Chrome. De moment, la instal·lació s'ha de fer manualment: posa les teves extensions al directori següent (<i>{{path}}</i>) i després fes clic al botó Refresca les extensions.",
+    "refresh": "Refresca les extensions",
+    "noExtensions": "No s'han trobat extensions.",
+    "noDescription": "Sense descripció",
+    "version": "Versió: {{version}}",
+    "id": "ID: {{id}}"
+  },
+  "extensionPopupFailed": {
+    "message": "Ho sentim, però el popup de l'extensió no s'ha pogut carregar. Torna-ho a provar més tard."
+  },
+  "certificateInfo": {
+    "title": "Informació del certificat",
+    "commonName": "Nom comú:",
+    "issuerCountry": "País de l'emissor:",
+    "issuerOrganization": "Organització de l'emissor:",
+    "issuerCommonName": "Nom comú de l'emissor:",
+    "validFrom": "Vàlid des de:",
+    "validTo": "Vàlid fins a:",
+    "failed": "No s'ha pogut obtenir la informació del certificat."
+  },
+  "clientCertificate": {
+    "title": "Tria un certificat de client",
+    "description": "El lloc <i>{{url}}</i> sol·licita un certificat de client per autenticar-se. Tria un certificat per continuar."
+  },
+  "requestPermission": {
+    "title": "Concedir permís",
+    "description": "El lloc <b>{{host}}</b> està sol·licitant permís per <b>{{permission}}</b>."
+  },
+  "tabChangeProfile": {
+    "title": "Canvia el perfil de la pestanya",
+    "listPlaceholder": "Selecciona el perfil nou de la pestanya..."
+  },
+  "prompts": {
+    "hostnameSays": "{{hostname}} diu",
+    "alertOk": "D'acord"
+  },
+  "appUpdater": {
+    "currentVersion": "Actual:",
+    "newVersion": "Nou:",
+    "updateNow": "Actualitza ara",
+    "oops": "Ups... alguna cosa ha anat malament :("
+  },
+  "dividerAdd": {
+    "title": "Afegeix un separador al contenidor de pestanyes",
+    "listPlaceholder": "Filtra i selecciona un contenidor de pestanyes..."
+  },
+  "dividerRemove": {
+    "title": "Treu un separador d'un contenidor de pestanyes",
+    "listPlaceholder": "Filtra i selecciona un contenidor de pestanyes..."
+  },
+  "dividersRemoveAll": {
+    "title": "Treu tots els separadors d'un escriptori",
+    "listPlaceholder": "Filtra i selecciona un escriptori..."
+  },
+  "closedTabsClear": {
+    "confirmMessage": "Segur que vols buidar tot l'historial de pestanyes tancades?"
+  },
+  "closedTabsOpen": {
+    "title": "Torna a obrir una pestanya tancada",
+    "listPlaceholder": "Filtra i selecciona una pestanya..."
+  },
+  "debug": {
+    "title": "Depuració",
+    "intro": "Llista de tots els web contents registrats amb informació útil sobre cadascun. Recorda que pots filtrar i ordenar.",
+    "searchPlaceholder": "Cerca títol, URL o PID...",
+    "filterByWindow": "Filtra per finestra",
+    "noOrder": "Sense ordre",
+    "memory": "Memòria",
+    "cpu": "CPU",
+    "tabIndex": "Dades de l'índex de pestanyes per a totes les pestanyes en totes les finestres/escriptoris.",
+    "winCol": "Fin",
+    "pidCol": "Pid",
+    "titleUrlCount": "Títol/URL ({{count}})",
+    "visibleCol": "Visible",
+    "profileCol": "Perfil",
+    "preloadsCol": "Preloads",
+    "memoryCol": "Memòria",
+    "cpuCol": "CPU",
+    "items_one": "{{count}} element",
+    "items_other": "{{count}} elements",
+    "errorPrefix": "Error: "
+  },
+  "listEmpty": "Buit..."
+}

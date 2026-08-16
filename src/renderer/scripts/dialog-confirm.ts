@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 export function dialogConfirm(
   message: string,
   props?: {
@@ -23,12 +25,12 @@ export function dialogConfirm(
 
   const acceptButton = document.createElement('button');
   acceptButton.classList.add('btn', 'btn-sm', 'btn-primary');
-  acceptButton.textContent = 'OK';
+  acceptButton.textContent = t('common.ok');
   acceptButton.value = 'ok';
 
   const cancelButton = document.createElement('button');
   cancelButton.classList.add('btn', 'btn-sm');
-  cancelButton.textContent = 'Cancel';
+  cancelButton.textContent = t('common.cancel');
   cancelButton.value = 'cancel';
 
   actionsForm.appendChild(cancelButton);

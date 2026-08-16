@@ -20,5 +20,14 @@ import SplitMenu from '#/components/urlbar/SplitMenu.astro';
 </Layout>
 
 <script>
-  document.title = 'URL bar';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.urlbar.title');
+  }
+  applyTitle();
+
+  onLocaleChange(applyTitle);
 </script>

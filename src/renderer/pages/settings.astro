@@ -11,8 +11,16 @@ import '@thednp/color-picker/color-picker.css';
 
 <script>
   import { settingsMenuItems } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  document.title = 'Settings';
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.settings.title');
+    const h1 = document.querySelector('h1.text-lg.mb-10');
+    if (h1) h1.textContent = t('pages.settings.title');
+  }
+  applyTitle();
 
   async function renderContent() {
     const config = await abConfig.get();
@@ -25,6 +33,11 @@ import '@thednp/color-picker/color-picker.css';
 
   document.addEventListener('DOMContentLoaded', renderContent);
   window.addEventListener('app:navigate', renderContent);
+
+  onLocaleChange(() => {
+    applyTitle();
+    renderContent();
+  });
 </script>
 
 <style is:global>

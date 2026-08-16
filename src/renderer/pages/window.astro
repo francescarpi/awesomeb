@@ -17,10 +17,11 @@ import Layout from '#/layouts/Base.astro';
 
 <script>
   import { getSearchParams } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
   import { Rectangle } from 'electron';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
-  document.title = 'Window';
+  await initI18n();
 
   const BORDER_WIDTH = 2;
 
@@ -35,6 +36,11 @@ import Layout from '#/layouts/Base.astro';
 
   refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
 
+  function applyTitle() {
+    document.title = t('pages.window.title');
+  }
+  applyTitle();
+
   abDesktops.getTheme(winId).then((theme) => {
     const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
@@ -46,22 +52,26 @@ import Layout from '#/layouts/Base.astro';
     rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
   });
 
-  function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffix: string) {
+  function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffixKey: string) {
     if (!key) {
       el.classList.add('hidden');
       el.textContent = '';
       return;
     }
     const platform = isMacPlatform() ? 'mac' : 'win';
-    el.textContent = `${acceleratorToDisplay(key, platform)} ${suffix}`;
+    el.textContent = `${acceleratorToDisplay(key, platform)} ${t(suffixKey)}`;
     el.classList.remove('hidden');
   }
 
   async function refreshShortcutsHelp() {
     try {
       const map = await abShortcuts.active(winId);
-      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, 'open a new tab');
-      setHelpLine(helpCommandsTool, map.shortcuts.performCommand?.key, 'open the commands palette');
+      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, 'pages.window.helpNewTabSuffix');
+      setHelpLine(
+        helpCommandsTool,
+        map.shortcuts.performCommand?.key,
+        'pages.window.helpCommandsSuffix',
+      );
     } catch (err) {
       console.error('Failed to load active shortcuts', err);
     }
@@ -108,4 +118,9 @@ import Layout from '#/layouts/Base.astro';
     selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
     selectedTab.style.borderColor = color || 'yellow';
   }
+
+  onLocaleChange(() => {
+    applyTitle();
+    refreshShortcutsHelp();
+  });
 </script>

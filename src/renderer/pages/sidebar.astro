@@ -41,8 +41,14 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
 <script>
   import { onClick, getSearchParams } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
 
-  document.title = 'Sidebar';
+  await initI18n();
+
+  function applyTitle() {
+    document.title = t('pages.sidebar.title');
+  }
+  applyTitle();
 
   const { winId, searchParams } = getSearchParams();
 
@@ -73,4 +79,6 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
       sidebar.classList.remove('dragable');
     }
   });
+
+  onLocaleChange(applyTitle);
 </script>

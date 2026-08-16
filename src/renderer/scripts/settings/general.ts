@@ -1,4 +1,5 @@
 import { h, c, Renderer, type VNode, btnIcon, input } from '#/scripts';
+import { t } from '#/scripts/i18n';
 import type { IConfig, IConfigSearchEngine } from '~/types';
 import { box } from './common';
 import slugify from 'slugify';
@@ -55,7 +56,7 @@ async function buildGeneralBody(
       h(
         'button',
         { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
-        'Save changes',
+        t('pages.settings.general.saveChanges'),
       ),
     ),
   );
@@ -75,39 +76,39 @@ function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
 async function renderConfigFolder(): Promise<VNode> {
   const info = await abConfig.getConfigInfo();
   return box(
-    'Information',
-    'Here you can view information about the application version, the file path where configuration, session, history, etc., are stored, the underlying Chromium version, and the project repository.',
+    t('pages.settings.general.informationTitle'),
+    t('pages.settings.general.informationDescription'),
     h(
       'div',
       { class: c('text-md', 'flex', 'flex-col', 'gap-2') },
       h(
         'div',
         { class: c('flex', 'gap-2') },
-        h('span', null, 'App version:'),
+        h('span', null, t('pages.settings.general.appVersion')),
         h('span', { class: c('font-bold') }, info.version),
       ),
       h(
         'div',
         { class: c('flex', 'gap-2') },
-        h('span', null, 'Chrome version:'),
+        h('span', null, t('pages.settings.general.chromeVersion')),
         h('span', { class: c('font-bold') }, info.chromeVersion),
       ),
       h(
         'div',
         { class: c('flex', 'gap-2', 'items-center') },
-        h('span', null, 'Config folder:'),
+        h('span', null, t('pages.settings.general.configFolder')),
         h('span', { class: c('font-bold') }, info.configPath),
         h(
           'button',
           { class: c('btn', 'btn-xs'), onclick: () => abConfig.openConfigFolder() },
-          'Open folder',
+          t('pages.settings.general.openFolder'),
         ),
       ),
       info.repoUrl
         ? h(
             'div',
             { class: c('flex', 'gap-2', 'items-center') },
-            h('span', null, 'GitHub repository:'),
+            h('span', null, t('pages.settings.general.githubRepository')),
             h(
               'a',
               {
@@ -139,8 +140,8 @@ function renderSearchEngines(
       h(
         'tr',
         {},
-        h('th', { class: c('text-left', 'px-1') }, 'Name'),
-        h('th', { class: c('text-left', 'px-1') }, 'URL'),
+        h('th', { class: c('text-left', 'px-1') }, t('pages.settings.general.searchEnginesName')),
+        h('th', { class: c('text-left', 'px-1') }, t('pages.settings.general.searchEnginesUrl')),
         h('th', { class: c('w-13') }, ''),
       ),
     ),
@@ -192,8 +193,8 @@ function renderSearchEngines(
   );
 
   return box(
-    'Search Engines',
-    'Configuration for search engines',
+    t('pages.settings.general.searchEnginesTitle'),
+    t('pages.settings.general.searchEnginesDescription'),
     h(
       'div',
       { class: c('text-sm', 'flex', 'flex-col', 'gap-2') },
@@ -201,7 +202,11 @@ function renderSearchEngines(
       h(
         'div',
         { class: c('flex', 'justify-between') },
-        h('button', { class: c('btn', 'btn-sm', 'btn-outline'), onclick: handleAdd }, 'Add'),
+        h(
+          'button',
+          { class: c('btn', 'btn-sm', 'btn-outline'), onclick: handleAdd },
+          t('pages.settings.general.searchEnginesAdd'),
+        ),
       ),
     ),
   );
@@ -214,16 +219,25 @@ function renderDownloadLocation(
   handleChange: () => void,
 ): VNode {
   return box(
-    'Download Location',
-    'Set the default download location for files.',
+    t('pages.settings.general.downloadLocationTitle'),
+    t('pages.settings.general.downloadLocationDescription'),
     h(
       'div',
       { class: c('flex', 'gap-2', 'items-center') },
-      input('downloads-location', 'Location', downloadsLocation || config.downloadsFolder, {
-        width: 'w-92',
-        readonly: true,
-      }),
-      h('button', { class: c('btn', 'btn-sm', 'btn-primary'), onClick: handleChange }, 'Change'),
+      input(
+        'downloads-location',
+        t('pages.settings.general.downloadLocationPlaceholder'),
+        downloadsLocation || config.downloadsFolder,
+        {
+          width: 'w-92',
+          readonly: true,
+        },
+      ),
+      h(
+        'button',
+        { class: c('btn', 'btn-sm', 'btn-primary'), onClick: handleChange },
+        t('pages.settings.general.downloadLocationChange'),
+      ),
     ),
   );
 }
@@ -233,8 +247,8 @@ function renderHistoryRetention(config: IConfig): VNode {
   const currentValue = config.historyRetentionDays ?? 7;
 
   return box(
-    'History Retention',
-    'Number of days to keep browsing history.',
+    t('pages.settings.general.historyRetentionTitle'),
+    t('pages.settings.general.historyRetentionDescription'),
     h(
       'div',
       { class: c('flex', 'gap-2') },
@@ -251,7 +265,7 @@ function renderHistoryRetention(config: IConfig): VNode {
               value: String(days),
               selected: days === currentValue,
             },
-            `${days} days`,
+            t('pages.settings.general.historyRetentionDays', { count: days }),
           ),
         ),
       ),
@@ -262,7 +276,7 @@ function renderHistoryRetention(config: IConfig): VNode {
           class: c('btn', 'btn-sm', 'btn-ghost'),
           target: '_blank',
         },
-        'Manage history',
+        t('pages.settings.general.historyRetentionManage'),
       ),
     ),
   );
@@ -273,8 +287,8 @@ function renderClosedTabsRetention(config: IConfig): VNode {
   const currentValue = config.closedTabsRetentionDays ?? 7;
 
   return box(
-    'Closed Tabs Retention',
-    'Number of days to keep closed tabs history.',
+    t('pages.settings.general.closedTabsRetentionTitle'),
+    t('pages.settings.general.closedTabsRetentionDescription'),
     h(
       'div',
       { class: c('flex', 'gap-2') },
@@ -291,7 +305,7 @@ function renderClosedTabsRetention(config: IConfig): VNode {
               value: String(days),
               selected: days === currentValue,
             },
-            `${days} days`,
+            t('pages.settings.general.historyRetentionDays', { count: days }),
           ),
         ),
       ),

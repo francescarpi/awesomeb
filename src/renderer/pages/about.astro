@@ -6,18 +6,27 @@ import logo from '../assets/icon.png';
 <Modal width="400px" height="300px">
   <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
     <img src={logo.src} alt="AwesomeB" width="64" height="64" />
-    <b>AwesomeB(rowser)</b>
-    <p class="text-sm">Developed by Francesc Arpi Roca <i>(francesc.arpi@gmail.com)</i></p>
+    <b id="about-subtitle">AwesomeB(rowser)</b>
+    <p class="text-sm" id="about-developer">
+      Developed by Francesc Arpi Roca <i>(francesc.arpi@gmail.com)</i>
+    </p>
     <div id="content"></div>
   </div>
 </Modal>
 
 <script>
   import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+
+  const subtitleEl = document.getElementById('about-subtitle');
+  const developerEl = document.getElementById('about-developer');
 
   const { winId } = getSearchParams();
   const renderer = new Renderer(h('div', null)).render('content');
   const data = await abBrowser.about(winId);
+  const currentVersion = data.version;
 
   const [btns, registerBtnsEvents] = confirmButtons({
     onConfirm: () => {
@@ -25,11 +34,25 @@ import logo from '../assets/icon.png';
     },
   });
 
+  const versionEl = h(
+    'p',
+    { class: c('text-xs') },
+    t('pages.about.version', { version: data.version }),
+  );
+
+  function applyStatic() {
+    if (subtitleEl) subtitleEl.textContent = t('pages.about.subtitle');
+    if (developerEl) {
+      developerEl.innerHTML =
+        t('pages.about.developer') + ' <i>' + t('pages.about.developerEmail') + '</i>';
+    }
+  }
+
   renderer.update(
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-4') },
-      h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+      versionEl,
       h(
         'a',
         {
@@ -47,4 +70,12 @@ import logo from '../assets/icon.png';
     ),
     { onUpdated: registerBtnsEvents },
   );
+
+  applyStatic();
+  versionEl.textContent = t('pages.about.version', { version: currentVersion });
+
+  onLocaleChange(() => {
+    applyStatic();
+    versionEl.textContent = t('pages.about.version', { version: currentVersion });
+  });
 </script>

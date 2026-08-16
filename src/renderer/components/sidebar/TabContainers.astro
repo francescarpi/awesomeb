@@ -6,6 +6,7 @@
 
 <script>
   import { getSearchParams, h, type VNode, c, Renderer, btnIcon } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
   import type { ITabContainer, IDesktopEntity, TDesktopId, ITab } from '~/types';
   import TabPreview from '#/icons/tab-preview.svg?raw';
   import Muted from '#/icons/muted.svg?raw';
@@ -13,6 +14,8 @@
   import Minus from '#/icons/minus.svg?raw';
   import Close from '#/icons/close.svg?raw';
   import Warning from '#/icons/warning.svg?raw';
+
+  await initI18n();
 
   const { winId } = getSearchParams();
 
@@ -23,6 +26,12 @@
   abTabs.onRefreshTabContainers((_event, tabContainers) =>
     renderer.update(renderTabContainers(tabContainers)),
   );
+
+  onLocaleChange(() => {
+    abTabs.getTabContainers(winId).then((tabContainers) => {
+      renderer.update(renderTabContainers(tabContainers));
+    });
+  });
 
   // Selected desktop...
   const desktops = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
@@ -100,7 +109,7 @@
             },
             (() => {
               const openCount = tc.children.filter((t) => !t.isClosed).length;
-              return `(${openCount} ${openCount === 1 ? 'tab' : 'tabs'} collapsed)`;
+              return `(${t('pages.sidebar.collapsedCount', { count: openCount })})`;
             })(),
           ),
         ),

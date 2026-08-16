@@ -1,0 +1,380 @@
+{
+  "welcome": {
+    "title": "Bienvenido a AwesomeB",
+    "subtitle": "AwesomeB(rowser)",
+    "initialSetup": "Configuración inicial",
+    "intro": "Para que AwesomeB funcione correctamente, es necesario configurar un motor de búsqueda como requisito mínimo. Por favor, proporciona la URL de tu motor de búsqueda deseado:",
+    "exampleLabel": "Ejemplo:",
+    "exampleValue": "Nombre: Moogle<br/>URL: https://www.moogle.com/search?q={query}",
+    "namePlaceholder": "Nombre",
+    "urlPlaceholder": "URL",
+    "note": "Nota: Los motores de búsqueda se pueden modificar más adelante en la configuración principal.",
+    "saveButton": "Guardar y empezar a usar AwesomeB"
+  },
+  "window": {
+    "title": "Ventana",
+    "helpNewTabSuffix": "abrir una nueva pestaña",
+    "helpCommandsSuffix": "abrir la paleta de comandos"
+  },
+  "sidebar": {
+    "title": "Barra lateral",
+    "collapsedCount": "{{count}} pestaña plegada",
+    "collapsedCount_other": "{{count}} pestañas plegadas",
+    "windowId": "ID: {{id}}",
+    "updateAvailable": "Actualización disponible",
+    "progress": "Progreso {{percent}}%",
+    "quitAndInstall": "Salir e instalar"
+  },
+  "urlbar": {
+    "title": "Barra de URL"
+  },
+  "performCommand": {
+    "title": "Ejecutar comando",
+    "placeholder": "Empieza a escribir para buscar comandos...",
+    "empty": "Vacío..."
+  },
+  "settings": {
+    "title": "Configuración",
+    "menu": {
+      "general": "General",
+      "profiles": "Perfiles",
+      "themes": "Temas",
+      "permissions": "Permisos",
+      "shortcuts": "Atajos"
+    },
+    "general": {
+      "appVersion": "Versión de la aplicación:",
+      "chromeVersion": "Versión de Chrome:",
+      "configFolder": "Carpeta de configuración:",
+      "openFolder": "Abrir carpeta",
+      "githubRepository": "Repositorio en GitHub:",
+      "saveChanges": "Guardar cambios",
+      "searchEnginesTitle": "Motores de búsqueda",
+      "searchEnginesDescription": "Configuración de los motores de búsqueda",
+      "searchEnginesName": "Nombre",
+      "searchEnginesUrl": "URL",
+      "searchEnginesAdd": "Añadir",
+      "downloadLocationTitle": "Ubicación de descargas",
+      "downloadLocationDescription": "Establece la ubicación predeterminada para las descargas.",
+      "downloadLocationPlaceholder": "Ubicación",
+      "downloadLocationChange": "Cambiar",
+      "historyRetentionTitle": "Retención del historial",
+      "historyRetentionDescription": "Número de días para conservar el historial de navegación.",
+      "historyRetentionManage": "Gestionar historial",
+      "historyRetentionDays": "{{count}} días",
+      "closedTabsRetentionTitle": "Retención de pestañas cerradas",
+      "closedTabsRetentionDescription": "Número de días para conservar el historial de pestañas cerradas.",
+      "informationTitle": "Información",
+      "informationDescription": "Aquí puedes ver información sobre la versión de la aplicación, la ruta donde se almacenan la configuración, sesión, historial, etc., la versión subyacente de Chromium y el repositorio del proyecto."
+    },
+    "profiles": {
+      "title": "Perfiles",
+      "description": "Gestiona perfiles aislados de Chrome (particiones) con cookies, sesiones y almacenamiento separados para cada espacio de trabajo o usuario.",
+      "name": "Nombre",
+      "color": "Color",
+      "add": "Añadir",
+      "saveChanges": "Guardar cambios",
+      "restartNote": "Para aplicar los nuevos cambios a los perfiles, es necesario reiniciar el navegador."
+    },
+    "themes": {
+      "title": "Temas",
+      "description": "Gestiona temas personalizados para personalizar la apariencia de tus escritorios.",
+      "name": "Nombre",
+      "primary": "Primario",
+      "secondary": "Secundario",
+      "degrees": "Grados",
+      "degreesValue": "{{value}}°",
+      "add": "Añadir",
+      "saveChanges": "Guardar cambios",
+      "uiThemeTitle": "Tema de la interfaz",
+      "uiThemeDescription": "Personaliza el aspecto de la interfaz de AwesomeB con temas creados por la comunidad."
+    },
+    "permissions": {
+      "securityLevelTitle": "Nivel de seguridad",
+      "securityLevelDescription": "Esta configuración determina el nivel de acceso concedido a los sitios web respecto a las funcionalidades del dispositivo (sensores, APIs, etc.).<br/><br/><strong>Estándar</strong>: permite los permisos comunes necesarios para que la mayoría de las páginas funcionen correctamente.<br/><strong>Estricto</strong>: requiere tu consentimiento explícito para cada permiso que un sitio web intente usar, ofreciendo la máxima privacidad.",
+      "standard": "Estándar",
+      "strict": "Estricto",
+      "permissionsTitle": "Permisos",
+      "permissionsDescription": "Gestiona los permisos necesarios para que la extensión funcione correctamente.",
+      "allow": "Permitir",
+      "deny": "Denegar"
+    },
+    "shortcuts": {
+      "defaultMapTitle": "Mapa predeterminado",
+      "defaultMapDescription": "Define un mapa de teclado predeterminado que se adapte a ti. Después puedes personalizar teclas específicas a tu gusto.",
+      "title": "Atajos",
+      "description": "Haz clic en una tecla de atajo para cambiar su combinación. Pulsa Escape para cancelar.",
+      "pressAKey": "Pulsa una tecla...",
+      "loading": "Cargando...",
+      "groups": {
+        "General": "General",
+        "Navigation": "Navegación",
+        "Tab Management": "Gestión de pestañas",
+        "Window Management": "Gestión de ventanas",
+        "Tab Navigation": "Navegación entre pestañas",
+        "Zoom": "Zoom",
+        "Desktops": "Escritorios",
+        "Bookmarks": "Marcadores"
+      }
+    }
+  },
+  "about": {
+    "title": "Acerca de",
+    "subtitle": "AwesomeB(rowser)",
+    "developer": "Desarrollado por Francesc Arpi Roca",
+    "developerEmail": "(francesc.arpi@gmail.com)",
+    "version": "Versión: {{version}}"
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "titlePlaceholder": "Título...",
+    "urlPlaceholder": "URL...",
+    "delete": "Eliminar",
+    "move": "Mover",
+    "save": "Guardar",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este marcador?",
+    "selectParent": "Selecciona la nueva carpeta padre",
+    "rootOption": "Raíz"
+  },
+  "bookmarkAdd": {
+    "title": "Añadir marcador",
+    "parentFolder": "Carpeta padre: {{name}}",
+    "folderNamePlaceholder": "Nombre de la carpeta",
+    "titlePlaceholder": "Título",
+    "urlPlaceholder": "URL"
+  },
+  "bookmarkOpen": {
+    "title": "Abrir marcador",
+    "bookmarkPlaceholder": "Filtra y selecciona un marcador...",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "targetPlaceholder": "Selecciona un destino"
+  },
+  "history": {
+    "title": "Historial",
+    "searchPlaceholder": "Buscar en el historial...",
+    "reset": "Restablecer",
+    "titleColumn": "Título",
+    "urlColumn": "URL",
+    "lastVisitColumn": "Última visita",
+    "visitsColumn": "Visitas",
+    "clearHistory": "Borrar historial",
+    "clearHistoryConfirm": "¿Estás seguro de que quieres borrar todo el historial?",
+    "deleteSelected": "Eliminar seleccionados ({{count}})",
+    "deleteSelectedConfirm": "¿Eliminar {{count}} elemento(s) seleccionado(s)?",
+    "loading": "Cargando..."
+  },
+  "downloads": {
+    "title": "Descargas",
+    "noDownloads": "No hay descargas en esta sesión",
+    "name": "Nombre",
+    "date": "Fecha",
+    "percent": "%",
+    "viewAll": "Ver todo",
+    "clearCompleted": "Borrar completadas"
+  },
+  "tabSwitcher": {
+    "title": "Cambiador de pestañas",
+    "noTabs": "Sin pestañas...",
+    "noDesktopName": "(sin nombre de escritorio)"
+  },
+  "tabMarks": {
+    "title": "Marcadores de pestañas",
+    "listening": "Escuchando marcas.",
+    "listeningHold": "Mantén",
+    "listeningSuffix": "para ver más detalles...",
+    "availableMarks": "Marcas de pestañas disponibles...",
+    "noMarks": "Sin marcas...",
+    "helpMark": "Pulsa \"m\" seguido de una letra para marcar la pestaña activa (ej., ma, mb, mc, ...)",
+    "helpDeleteOne": "Eliminar la marca de la pestaña activa",
+    "helpDeleteAll": "Eliminar todas las marcas",
+    "helpSelect": "Selecciona la pestaña marcada con esa letra (ej., a, b, c, ...)"
+  },
+  "tabPreview": {
+    "loading": "Cargando sitio..."
+  },
+  "tabFailLoad": {
+    "title": "No se puede conectar al sitio web",
+    "pageAt": "La página en ",
+    "cannotBeReached": " no se puede cargar.",
+    "errorCode": "Código de error: ",
+    "error": "Error: ",
+    "retry": "Reintentar"
+  },
+  "tabCertificateError": {
+    "title": "No se puede conectar al sitio web",
+    "description": "El certificado para la URL <i>{{url}}</i> no es válido. Como resultado, la conexión entre tu navegador y el servidor no está cifrada correctamente, lo que podría permitir que un atacante interceptase o robase datos sensibles. Código de error: <strong>{{error}}</strong>.",
+    "proceed": "Entiendo los riesgos y elijo continuar de todos modos."
+  },
+  "tabMove": {
+    "title": "Mover pestaña",
+    "tabPlaceholder": "Selecciona una pestaña...",
+    "targetPlaceholder": "Selecciona un destino"
+  },
+  "tabDuplicate": {
+    "title": "Duplicar pestaña",
+    "tabPlaceholder": "Selecciona una pestaña...",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "targetPlaceholder": "Selecciona un destino"
+  },
+  "tabRename": {
+    "title": "Renombrar pestaña",
+    "namePlaceholder": "Nombre de la pestaña"
+  },
+  "tabSelect": {
+    "title": "Seleccionar pestaña",
+    "listPlaceholder": "Filtra y selecciona una pestaña..."
+  },
+  "layoutSelect": {
+    "title": "Seleccionar diseño",
+    "listPlaceholder": "Selecciona un diseño..."
+  },
+  "layoutSize": {
+    "title": "Elige un tamaño...",
+    "listPlaceholder": "Selecciona..."
+  },
+  "desktopSelect": {
+    "title": "Seleccionar escritorio",
+    "listPlaceholder": "Filtra y selecciona un escritorio..."
+  },
+  "desktopRename": {
+    "title": "Renombrar escritorio",
+    "shortNamePlaceholder": "Nombre corto",
+    "longNamePlaceholder": "Nombre largo"
+  },
+  "desktopTheme": {
+    "title": "Tema del escritorio",
+    "listPlaceholder": "Filtra y selecciona un tema..."
+  },
+  "desktopSuspend": {
+    "title": "Suspender escritorio",
+    "listPlaceholder": "Filtra y selecciona un escritorio..."
+  },
+  "newTab": {
+    "title": "Nueva pestaña",
+    "queryPlaceholder": "Introduce una consulta o una URL válida...",
+    "queryTitle": "URL o consulta de búsqueda",
+    "profilePlaceholder": "Selecciona un perfil...",
+    "profileTitle": "Perfil",
+    "targetPlaceholder": "Selecciona un destino",
+    "targetTitle": "Destino",
+    "searchBy": " - Buscar con "
+  },
+  "editUrl": {
+    "title": "Editar URL",
+    "modifyFullUrl": "Modificar URL completa",
+    "fullUrlPlaceholder": "URL completa",
+    "modifyUrlParts": "Modificar partes de la URL",
+    "protocolPlaceholder": "Protocolo",
+    "hostnamePlaceholder": "Host",
+    "portPlaceholder": "Puerto",
+    "pathnamePlaceholder": "Ruta",
+    "hashPlaceholder": "Hash",
+    "queryParameters": "Parámetros de consulta",
+    "keyPlaceholder": "Clave",
+    "valuePlaceholder": "Valor",
+    "add": "+ Añadir"
+  },
+  "findInPage": {
+    "placeholder": "Buscar en la página...",
+    "match": "coincidencia",
+    "match_other": "coincidencias"
+  },
+  "newWindow": {
+    "title": "Nueva ventana",
+    "listPlaceholder": "Selecciona el destino..."
+  },
+  "quitting": {
+    "closing": "Cerrando AwesomeB..."
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "description": "El sitio ({{host}}) requiere un usuario y contraseña para continuar.",
+    "usernamePlaceholder": "Usuario",
+    "passwordPlaceholder": "Contraseña"
+  },
+  "extensions": {
+    "title": "Extensiones",
+    "intro": "AwesomeB ofrece soporte limitado para extensiones de Chrome. Por ahora, la instalación debe hacerse manualmente: coloca tus extensiones en el siguiente directorio (<i>{{path}}</i>) y luego pulsa el botón Refrescar extensiones.",
+    "refresh": "Refrescar extensiones",
+    "noExtensions": "No se han encontrado extensiones.",
+    "noDescription": "Sin descripción",
+    "version": "Versión: {{version}}",
+    "id": "ID: {{id}}"
+  },
+  "extensionPopupFailed": {
+    "message": "Lo sentimos, pero el popup de la extensión no se pudo cargar. Inténtalo de nuevo más tarde."
+  },
+  "certificateInfo": {
+    "title": "Información del certificado",
+    "commonName": "Nombre común:",
+    "issuerCountry": "País del emisor:",
+    "issuerOrganization": "Organización del emisor:",
+    "issuerCommonName": "Nombre común del emisor:",
+    "validFrom": "Válido desde:",
+    "validTo": "Válido hasta:",
+    "failed": "No se pudo obtener la información del certificado."
+  },
+  "clientCertificate": {
+    "title": "Elige un certificado de cliente",
+    "description": "El sitio <i>{{url}}</i> está solicitando un certificado de cliente para autenticarse. Elige un certificado para continuar."
+  },
+  "requestPermission": {
+    "title": "Conceder permiso",
+    "description": "El sitio <b>{{host}}</b> está solicitando permiso para <b>{{permission}}</b>."
+  },
+  "tabChangeProfile": {
+    "title": "Cambiar perfil de la pestaña",
+    "listPlaceholder": "Selecciona el nuevo perfil de la pestaña..."
+  },
+  "prompts": {
+    "hostnameSays": "{{hostname}} dice",
+    "alertOk": "OK"
+  },
+  "appUpdater": {
+    "currentVersion": "Actual:",
+    "newVersion": "Nuevo:",
+    "updateNow": "Actualizar ahora",
+    "oops": "Ups... algo salió mal :("
+  },
+  "dividerAdd": {
+    "title": "Añadir separador de contenedor de pestañas",
+    "listPlaceholder": "Filtra y selecciona un contenedor de pestañas..."
+  },
+  "dividerRemove": {
+    "title": "Quitar un separador de un contenedor de pestañas",
+    "listPlaceholder": "Filtra y selecciona un contenedor de pestañas..."
+  },
+  "dividersRemoveAll": {
+    "title": "Quitar todos los separadores de un escritorio",
+    "listPlaceholder": "Filtra y selecciona un escritorio..."
+  },
+  "closedTabsClear": {
+    "confirmMessage": "¿Estás seguro de que quieres borrar todo el historial de pestañas cerradas?"
+  },
+  "closedTabsOpen": {
+    "title": "Abrir pestaña cerrada",
+    "listPlaceholder": "Filtra y selecciona una pestaña..."
+  },
+  "debug": {
+    "title": "Depuración",
+    "intro": "Lista de todos los web contents registrados con información útil sobre cada uno. Recuerda que puedes filtrar y ordenar.",
+    "searchPlaceholder": "Buscar título, URL o PID...",
+    "filterByWindow": "Filtrar por ventana",
+    "noOrder": "Sin orden",
+    "memory": "Memoria",
+    "cpu": "CPU",
+    "tabIndex": "Datos del índice de pestañas para todas las pestañas en todas las ventanas/escritorios.",
+    "winCol": "Ven",
+    "pidCol": "Pid",
+    "titleUrlCount": "Título/URL ({{count}})",
+    "visibleCol": "Visible",
+    "profileCol": "Perfil",
+    "preloadsCol": "Preloads",
+    "memoryCol": "Memoria",
+    "cpuCol": "CPU",
+    "items_one": "{{count}} elemento",
+    "items_other": "{{count}} elementos",
+    "errorPrefix": "Error: "
+  },
+  "listEmpty": "Vacío..."
+}

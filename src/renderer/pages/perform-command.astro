@@ -5,12 +5,24 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="800px" height="600px">
-  <Title>Perform Command</Title>
+  <Title id="perform-command-title">Perform Command</Title>
   <ListWithSearch placeholder="Start typing to search commands..." id="list" />
 </Modal>
 
 <script>
   import { getSearchParams, listWithSearchManager } from '#/scripts';
+  import { initI18n, t, onLocaleChange } from '#/scripts/i18n';
+
+  await initI18n();
+
+  const titleEl = document.getElementById('perform-command-title');
+  if (titleEl) titleEl.textContent = t('pages.performCommand.title');
+
+  const input = document.querySelector<HTMLInputElement>('#list input');
+  if (input) input.placeholder = t('pages.performCommand.placeholder');
+
+  const emptyEl = document.querySelector<HTMLElement>('#list ul li p');
+  if (emptyEl) emptyEl.textContent = t('pages.performCommand.empty');
 
   const { winId } = getSearchParams();
 
@@ -22,5 +34,11 @@ import Title from '#/components/common/Title.astro';
     onEscape: () => {
       abModal.close(winId);
     },
+  });
+
+  onLocaleChange(() => {
+    if (titleEl) titleEl.textContent = t('pages.performCommand.title');
+    if (input) input.placeholder = t('pages.performCommand.placeholder');
+    if (emptyEl) emptyEl.textContent = t('pages.performCommand.empty');
   });
 </script>

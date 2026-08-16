@@ -1,4 +1,5 @@
 import { h, Renderer, type VNode, c, btnIcon } from '#/scripts';
+import { t } from '#/scripts/i18n';
 import type { IConfig, IConfigPartition } from '~/types';
 import { box, inputColorPicker } from './common';
 import Delete from '#/icons/delete.svg?raw';
@@ -32,8 +33,8 @@ function buildGeneralBody(
     'div',
     { class: c('flex', 'flex-col', 'gap-2') },
     box(
-      'Profiles',
-      'Manage isolated CHrome profiles (partitions) with separate cookies, sessions, and storage for each workspace or user.',
+      t('pages.settings.profiles.title'),
+      t('pages.settings.profiles.description'),
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
@@ -46,8 +47,12 @@ function buildGeneralBody(
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, 'Name'),
-              h('th', { class: c('text-left', 'px-1', 'w-25') }, 'Color'),
+              h('th', { class: c('text-left', 'px-1') }, t('pages.settings.profiles.name')),
+              h(
+                'th',
+                { class: c('text-left', 'px-1', 'w-25') },
+                t('pages.settings.profiles.color'),
+              ),
               h('th', { class: c('w-13') }, ''),
             ),
           ),
@@ -89,7 +94,7 @@ function buildGeneralBody(
           h(
             'button',
             { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
-            'Add',
+            t('pages.settings.profiles.add'),
           ),
         ),
       ),
@@ -97,15 +102,11 @@ function buildGeneralBody(
     h(
       'div',
       { class: c('flex', 'justify-between') },
-      h(
-        'p',
-        {},
-        'To apply the new changes to the profiles, it is necessary to restart the browser.',
-      ),
+      h('p', {}, t('pages.settings.profiles.restartNote')),
       h(
         'button',
         { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
-        'Save changes',
+        t('pages.settings.profiles.saveChanges'),
       ),
     ),
   );

@@ -6,6 +6,10 @@
 
 <script>
   import { getSearchParams } from '#/scripts/url';
+  import { initI18n, t } from '#/scripts/i18n';
+
+  await initI18n();
+
   const { winId } = getSearchParams();
-  document.querySelector('#window-id')!.textContent = `ID: ${winId}`;
+  document.querySelector('#window-id')!.textContent = t('pages.sidebar.windowId', { id: winId });
 </script>
