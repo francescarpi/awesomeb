@@ -1,5 +1,6 @@
 import { Browser, Window, Desktop } from '@/core';
 import { Menu } from 'electron';
+import { t } from '@/i18n';
 import { EIcon, getIcon } from './utils';
 
 export function desktopMenu(browser: Browser, window: Window, desktop: Desktop): Menu {
@@ -7,7 +8,7 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
 
   const menu = Menu.buildFromTemplate([
     {
-      label: 'Suspend all tabs',
+      label: t('menu.contextDesktop.suspendAllTabs'),
       enabled: desktop.hasActiveTabs,
       icon: getIcon(EIcon.Suspend),
       click: () => {
@@ -16,7 +17,7 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
     },
     { type: 'separator' },
     {
-      label: 'Rename',
+      label: t('menu.contextDesktop.rename'),
       icon: getIcon(EIcon.Edit),
       click: () => {
         window.modal.open('rename-desktop', {
@@ -25,7 +26,7 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
       },
     },
     {
-      label: 'Change theme',
+      label: t('menu.contextDesktop.changeTheme'),
       icon: getIcon(EIcon.Theme),
       click: () => {
         window.modal.open('desktop-theme', {
@@ -35,14 +36,14 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
     },
     { type: 'separator' },
     {
-      label: 'Move left',
+      label: t('menu.contextDesktop.moveLeft'),
       icon: getIcon(EIcon.Previous),
       click: () => {
         browser.performCommand(window, 'move-desktop-left');
       },
     },
     {
-      label: 'Move right',
+      label: t('menu.contextDesktop.moveRight'),
       icon: getIcon(EIcon.Next),
       click: () => {
         browser.performCommand(window, 'move-desktop-right');

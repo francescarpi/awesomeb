@@ -4,6 +4,19 @@ import { Browser, partitions } from '@/core';
 import { tabMenu } from './tab';
 import { IWinDesConTab } from '~/types';
 
+const { mockT } = vi.hoisted(() => ({
+  mockT: vi.fn((key: string): string => {
+    const labels: Record<string, string> = {
+      'menu.contextTab.duplicate': 'Duplicate...',
+    };
+    return labels[key] ?? key;
+  }),
+}));
+
+vi.mock('@/i18n', () => ({
+  t: mockT,
+}));
+
 describe('tabMenu', () => {
   let browser: Browser;
 

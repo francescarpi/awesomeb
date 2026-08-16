@@ -1,0 +1,105 @@
+{
+  "app": {
+    "about": "Quant a {{appName}}"
+  },
+  "file": {
+    "label": "Fitxer",
+    "performCommand": "Executar ordre",
+    "newTab": "Pestanya nova",
+    "newWindow": "Finestra nova",
+    "pasteAndGo": "Enganxar i anar",
+    "openRecentlyClosed": "Tornar a obrir la pestanya recentment tancada"
+  },
+  "edit": {
+    "label": "Edició",
+    "copyUrl": "Copia l'URL",
+    "editUrl": "Edita l'URL",
+    "findInPage": "Cerca a la pàgina"
+  },
+  "window": {
+    "label": "Finestra",
+    "toggleSidebar": "Mostra/amaga la barra lateral",
+    "toggleMaximizeArea": "Mostra/amaga l'àrea maximitzada"
+  },
+  "desktops": {
+    "label": "Escriptoris",
+    "findDesktop": "Cerca un escriptori",
+    "entry": "Escriptori {{index}}",
+    "previous": "Anterior",
+    "next": "Següent"
+  },
+  "tabs": {
+    "label": "Pestanyes",
+    "findTab": "Cerca una pestanya",
+    "entry": "Pestanya {{index}}",
+    "previous": "Anterior",
+    "next": "Següent",
+    "selectTabAttention": "Selecciona la pestanya que requereix atenció",
+    "tabSwitcher": "Canviador de pestanyes",
+    "previousVisited": "Pestanya visitada anteriorment",
+    "tabMarks": "Marques de pestanyes",
+    "moveTabUp": "Mou la pestanya amunt",
+    "moveTabDown": "Mou la pestanya avall",
+    "suspendTab": "Suspen la pestanya",
+    "closeTab": "Tanca la pestanya",
+    "reloadTab": "Recarrega la pestanya",
+    "goBack": "Enrere",
+    "goForward": "Endavant",
+    "closeTabPreview": "Tanca la previsualització de la pestanya",
+    "acceptTabPreview": "Accepta la previsualització de la pestanya",
+    "zoomIn": "Apropa",
+    "zoomOut": "Allunya",
+    "zoomReset": "Restableix el zoom"
+  },
+  "bookmarks": {
+    "label": "Adreces d'interès",
+    "manage": "Gestiona les adreces d'interès",
+    "openBookmark": "Obre una adreça d'interès"
+  },
+  "split": {
+    "swapTabs": "Intercanvia les pestanyes",
+    "unsplitTabs": "Treu la divisió",
+    "size": "Mida"
+  },
+  "contextDesktop": {
+    "suspendAllTabs": "Suspen totes les pestanyes",
+    "rename": "Canvia el nom",
+    "changeTheme": "Canvia el tema",
+    "moveLeft": "Mou a l'esquerra",
+    "moveRight": "Mou a la dreta"
+  },
+  "contextTab": {
+    "reload": "Recarrega",
+    "goBack": "Enrere",
+    "goForward": "Endavant",
+    "rename": "Canvia el nom",
+    "copyUrl": "Copia l'URL",
+    "move": "Mou…",
+    "duplicate": "Duplica…",
+    "changeProfile": "Canvia el perfil…",
+    "suspend": "Suspen",
+    "close": "Tanca",
+    "closeBelow": "Tanca les següents",
+    "closeChildren": "Tanca les filles",
+    "mute": "Silencia",
+    "unmute": "Activa el so",
+    "addBookmark": "Afegeix una adreça d'interès",
+    "addHere": "Afegeix aquí…",
+    "createFolderHere": "Crea una carpeta aquí i afegeix…",
+    "addDivider": "Afegeix un separador",
+    "removeDivider": "Treu el separador",
+    "removeAllDividers": "Treu tots els separadors",
+    "openTargetBlankAsChild": "Obre els enllaços target blank com a fills…",
+    "collapseChildren": "Replega les filles"
+  },
+  "contextWebContents": {
+    "back": "Enrere",
+    "forward": "Endavant",
+    "reload": "Recarrega",
+    "openInNewTab": "Obre l'enllaç en una pestanya nova",
+    "openInFollowingTab": "Obre l'enllaç en la següent pestanya",
+    "openInBackgroundTab": "Obre l'enllaç en una pestanya nova en segon pla",
+    "openInSplitView": "Obre l'enllaç en vista dividida",
+    "openIn": "Obre l'enllaç a…"
+  }
+}

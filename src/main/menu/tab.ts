@@ -1,5 +1,6 @@
 import { Browser, bookmarks, Window, partitions } from '@/core';
 import { Menu, MenuItemConstructorOptions } from 'electron';
+import { t } from '@/i18n';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
 import { createColorImage } from '@/utils';
@@ -9,7 +10,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
 
   let menu: MenuItemConstructorOptions[] = [
     {
-      label: 'Reload',
+      label: t('menu.contextTab.reload'),
       enabled: !tab.loading && !tab.suspended,
       icon: getIcon(EIcon.Reload),
       click: () => {
@@ -17,7 +18,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       },
     },
     {
-      label: 'Go back',
+      label: t('menu.contextTab.goBack'),
       enabled: !tab.loading && !tab.suspended && tab.canGoBack,
       icon: getIcon(EIcon.Back),
       click: () => {
@@ -25,7 +26,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       },
     },
     {
-      label: 'Go forward',
+      label: t('menu.contextTab.goForward'),
       enabled: !tab.loading && !tab.suspended && tab.canGoForward,
       icon: getIcon(EIcon.Forward),
       click: () => {
@@ -34,7 +35,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Rename',
+      label: t('menu.contextTab.rename'),
       icon: getIcon(EIcon.Edit),
       click: () => {
         window.modal.open('rename-tab', {
@@ -44,7 +45,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Copy URL',
+      label: t('menu.contextTab.copyUrl'),
       icon: getIcon(EIcon.Copy),
       click: async () => {
         await browser.performCommand(window, 'copy-url', { tabId: tab.id });
@@ -52,7 +53,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Move...',
+      label: t('menu.contextTab.move'),
       icon: getIcon(EIcon.Move),
       submenu: browser.renderer.targetsEntities(window).map((target) => ({
         label: target.label,
@@ -62,7 +63,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       })),
     },
     {
-      label: 'Duplicate...',
+      label: t('menu.contextTab.duplicate'),
       icon: getIcon(EIcon.Copy),
       submenu: browser.renderer.targetsEntities(window).map((target) => ({
         label: target.label,
@@ -76,7 +77,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       })),
     },
     {
-      label: 'Change profile...',
+      label: t('menu.contextTab.changeProfile'),
       icon: getIcon(EIcon.Partition),
       submenu: partitions.all.map((partition) => ({
         label: partition.name,
@@ -91,7 +92,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Suspend',
+      label: t('menu.contextTab.suspend'),
       icon: getIcon(EIcon.Suspend),
       enabled: !tab.suspended,
       click: async () => {
@@ -99,14 +100,14 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       },
     },
     {
-      label: 'Close',
+      label: t('menu.contextTab.close'),
       icon: getIcon(EIcon.Close),
       click: async () => {
         await browser.performCommand(window, 'close-tab', { tabId: tab.id });
       },
     },
     {
-      label: 'Close below',
+      label: t('menu.contextTab.closeBelow'),
       icon: getIcon(EIcon.Close),
       click: async () => {
         await browser.performCommand(window, 'close-tabs-below', { tabId: tab.id });
@@ -114,7 +115,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: tab.isMuted ? 'Unmute' : 'Mute',
+      label: tab.isMuted ? t('menu.contextTab.unmute') : t('menu.contextTab.mute'),
       icon: getIcon(tab.isMuted ? EIcon.Unmute : EIcon.Mute),
       click: async () => {
         await browser.performCommand(window, 'toggle-mute', { tabId: tab.id });
@@ -122,7 +123,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Add bookmark',
+      label: t('menu.contextTab.addBookmark'),
       icon: getIcon(EIcon.Bookmarks),
       enabled: !!tab.url && !tab.suspended,
       submenu: tab.url
@@ -131,20 +132,20 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: 'Add divider',
+      label: t('menu.contextTab.addDivider'),
       icon: getIcon(EIcon.Divider),
       click: () => {
         browser.performCommand(window, 'add-divider', { tabContainerId: tabContainer.id });
       },
     },
     {
-      label: 'Remove divider',
+      label: t('menu.contextTab.removeDivider'),
       click: () => {
         browser.performCommand(window, 'remove-divider', { tabContainerId: tabContainer.id });
       },
     },
     {
-      label: 'Remove all dividers',
+      label: t('menu.contextTab.removeAllDividers'),
       click: () => {
         browser.performCommand(window, 'remove-all-dividers', { desktopId: desktop.id });
       },
@@ -156,7 +157,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       ...menu,
       { type: 'separator' },
       {
-        label: 'Open target blank links as a child...',
+        label: t('menu.contextTab.openTargetBlankAsChild'),
         type: 'checkbox',
         checked: tab.openTabsAsChild,
         click: async () => {
@@ -164,7 +165,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         },
       },
       {
-        label: 'Collapse children',
+        label: t('menu.contextTab.collapseChildren'),
         type: 'checkbox',
         checked: tabContainer.childrenCollapsed,
         visible: tabContainer.children.length > 0,
@@ -181,7 +182,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     menu = [
       ...menu,
       {
-        label: 'Close Children',
+        label: t('menu.contextTab.closeChildren'),
         icon: getIcon(EIcon.Close),
         click: async () => {
           await browser.performCommand(window, 'close-tab-children', {
@@ -222,7 +223,7 @@ function bookmarkFolderOptions(
     ...foldersOptions,
     { type: 'separator' },
     {
-      label: 'Add here...',
+      label: t('menu.contextTab.addHere'),
       click: () => {
         window.modal.open('add-bookmark', {
           query: { title: tabTitle, url: tabUrl, parentId, parentName },
@@ -230,7 +231,7 @@ function bookmarkFolderOptions(
       },
     },
     {
-      label: 'Create folder here and add...',
+      label: t('menu.contextTab.createFolderHere'),
       click: () => {
         window.modal.open('add-bookmark', {
           query: { title: tabTitle, url: tabUrl, parentId, parentName, createFolder: 'true' },

@@ -1,5 +1,6 @@
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { Browser, TabContainer, Layouts, Window, LAYOUT_SIZES } from '@/core';
+import { t } from '@/i18n';
 import { getIcon, EIcon } from './utils';
 
 export function splitMenu(browser: Browser, win: Window, tabContainer: TabContainer): Menu {
@@ -17,7 +18,7 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     ...layouts,
     { type: 'separator' },
     {
-      label: 'Swap tabs',
+      label: t('menu.split.swapTabs'),
       icon: getIcon(EIcon.RotateRight),
       click: () => {
         browser.performCommand(win, 'swap-tabs', {});
@@ -25,7 +26,7 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     },
     { type: 'separator' },
     {
-      label: 'Unsplit tabs',
+      label: t('menu.split.unsplitTabs'),
       icon: getIcon(EIcon.Unsplit),
       click: () => {
         browser.performCommand(win, 'unsplit-tabs', {});
@@ -33,7 +34,7 @@ export function splitMenu(browser: Browser, win: Window, tabContainer: TabContai
     },
     { type: 'separator' },
     {
-      label: 'Size',
+      label: t('menu.split.size'),
       icon: getIcon(EIcon.Size),
       submenu: LAYOUT_SIZES.map((size) => ({
         label: `${size}%`,

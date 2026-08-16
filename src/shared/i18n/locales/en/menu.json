@@ -1,0 +1,105 @@
+{
+  "app": {
+    "about": "About {{appName}}"
+  },
+  "file": {
+    "label": "File",
+    "performCommand": "Perform command",
+    "newTab": "New tab",
+    "newWindow": "New window",
+    "pasteAndGo": "Paste and go",
+    "openRecentlyClosed": "Open recently closed tab"
+  },
+  "edit": {
+    "label": "Edit",
+    "copyUrl": "Copy URL",
+    "editUrl": "Edit URL",
+    "findInPage": "Find in page"
+  },
+  "window": {
+    "label": "Window",
+    "toggleSidebar": "Toggle sidebar",
+    "toggleMaximizeArea": "Toggle maximize area"
+  },
+  "desktops": {
+    "label": "Desktops",
+    "findDesktop": "Find desktop",
+    "entry": "Desktop {{index}}",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "tabs": {
+    "label": "Tabs",
+    "findTab": "Find tab",
+    "entry": "Tab {{index}}",
+    "previous": "Previous",
+    "next": "Next",
+    "selectTabAttention": "Select tab requiring attention",
+    "tabSwitcher": "Tab switcher",
+    "previousVisited": "Previously visited tab",
+    "tabMarks": "Tab marks",
+    "moveTabUp": "Move tab up",
+    "moveTabDown": "Move tab down",
+    "suspendTab": "Suspend tab",
+    "closeTab": "Close tab",
+    "reloadTab": "Reload tab",
+    "goBack": "Go back",
+    "goForward": "Go forward",
+    "closeTabPreview": "Close tab preview",
+    "acceptTabPreview": "Accept tab preview",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Reset zoom"
+  },
+  "bookmarks": {
+    "label": "Bookmarks",
+    "manage": "Manage bookmarks",
+    "openBookmark": "Open bookmark"
+  },
+  "split": {
+    "swapTabs": "Swap tabs",
+    "unsplitTabs": "Unsplit tabs",
+    "size": "Size"
+  },
+  "contextDesktop": {
+    "suspendAllTabs": "Suspend all tabs",
+    "rename": "Rename",
+    "changeTheme": "Change theme",
+    "moveLeft": "Move left",
+    "moveRight": "Move right"
+  },
+  "contextTab": {
+    "reload": "Reload",
+    "goBack": "Go back",
+    "goForward": "Go forward",
+    "rename": "Rename",
+    "copyUrl": "Copy URL",
+    "move": "Move...",
+    "duplicate": "Duplicate...",
+    "changeProfile": "Change profile...",
+    "suspend": "Suspend",
+    "close": "Close",
+    "closeBelow": "Close below",
+    "closeChildren": "Close children",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "addBookmark": "Add bookmark",
+    "addHere": "Add here...",
+    "createFolderHere": "Create folder here and add...",
+    "addDivider": "Add divider",
+    "removeDivider": "Remove divider",
+    "removeAllDividers": "Remove all dividers",
+    "openTargetBlankAsChild": "Open target blank links as a child...",
+    "collapseChildren": "Collapse children"
+  },
+  "contextWebContents": {
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "openInNewTab": "Open link in new tab",
+    "openInFollowingTab": "Open link in following tab",
+    "openInBackgroundTab": "Open link in new background tab",
+    "openInSplitView": "Open link in split view",
+    "openIn": "Open link in ..."
+  }
+}
