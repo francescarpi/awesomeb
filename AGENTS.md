@@ -39,6 +39,23 @@ Bad examples (will fail CI):
 - `Feat: add new command palette shortcut`
 - `chore: bump electron version`
 
+### Pull Request template
+
+Before opening a PR, **read `.github/PULL_REQUEST_TEMPLATE.md` in full** and follow every section. The template is the source of truth for the PR body — do not invent your own section names, do not drop sections, and do not skip required fields.
+
+Required structure (every PR):
+
+- `## Summary` — 1–3 bullets describing the user-visible change. This feeds the changelog.
+- `## Linked issue` — MUST include a `Closes #NNN` line. PRs without a linked issue will not be merged.
+- `## Screenshots / recordings` — required for any UI change. For non-UI changes, delete the section entirely (do not leave a placeholder).
+- `## Checklist` — copy verbatim from the template and mark each box. Leave "Manually tested the change" unchecked if you did not test it yourself; the user ticks it.
+
+Common mistakes to avoid:
+
+- Renaming template sections (e.g. `## Fixes` instead of `## Linked issue`).
+- Writing `Fixes #NNN` instead of `Closes #NNN` — the latter is what the merge workflow expects.
+- Forgetting screenshots on a UI change.
+
 ## 🎯 Project Overview
 
 **AwesomeB** is a custom desktop browser/navigator application built with **Electron** and **Astro**. It provides advanced tab organization through customizable "desktops", sophisticated session management, and a powerful command system for enhanced browsing workflows.
