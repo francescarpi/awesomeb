@@ -11,25 +11,49 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply label based on branch prefix
+      - name: Apply label based on branch prefix and commit subject
         uses: actions/github-script@v7
         with:
           script: |
             const branch = context.payload.pull_request.head.ref;
+            const sha = context.payload.pull_request.head.sha;
             const map = [
               { re: /^(feat|feature)\//, label: 'feature' },
               { re: /^(fix|bugfix|hotfix)\//, label: 'fix' },
               { re: /^docs\//, label: 'documentation' },
             ];
-            const match = map.find(m => m.re.test(branch));
-            if (!match) {
-              core.info(`Branch '${branch}' did not match any auto-label rule. Skipping.`);
+            const choreRe = /^chore(\([^)]+\))?(!)?:/;
+            const labels = new Set();
+
+            const branchMatch = map.find(m => m.re.test(branch));
+            if (branchMatch) {
+              labels.add(branchMatch.label);
+            }
+
+            try {
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: sha,
+              });
+              const subject = (commit.commit.message || '').split('\n')[0];
+              if (choreRe.test(subject)) {
+                labels.add('chore');
+              }
+            } catch (err) {
+              core.warning(`Could not fetch commit ${sha} to inspect subject: ${err.message}`);
+            }
+
+            if (labels.size === 0) {
+              core.info(`PR #${context.payload.pull_request.number} (branch: ${branch}) matched no auto-label rules. Skipping.`);
               return;
             }
+
+            const labelsToApply = [...labels];
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
-              labels: [match.label],
+              labels: labelsToApply,
             });
-            core.info(`Applied label '${match.label}' to PR #${context.payload.pull_request.number} (branch: ${branch}).`);
+            core.info(`Applied labels [${labelsToApply.join(', ')}] to PR #${context.payload.pull_request.number} (branch: ${branch}, sha: ${sha}).`);
