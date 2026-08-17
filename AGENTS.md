@@ -46,7 +46,7 @@ Before opening a PR, **read `.github/PULL_REQUEST_TEMPLATE.md` in full** and fol
 Required structure (every PR):
 
 - `## Summary` — 1–3 bullets describing the user-visible change. This feeds the changelog.
-- `## Linked issue` — MUST include a `Closes #NNN` line. PRs without a linked issue will not be merged.
+- `## Linked issue` — MUST include a `Closes #NNN` line for feature and fix PRs. PRs without a linked issue will not be merged. **Exception**: version-bump / release PRs that only touch `package.json` (or other release-manifest files) do NOT require a linked issue — these are routine release bookkeeping and have no user-visible change to track against an issue.
 - `## Screenshots / recordings` — required for any UI change. For non-UI changes, delete the section entirely (do not leave a placeholder).
 - `## Checklist` — copy verbatim from the template and mark each box. Leave "Manually tested the change" unchecked if you did not test it yourself; the user ticks it.
 

@@ -4,7 +4,7 @@
 
 ## Linked issue
 
-<!-- Closes #NNN (required — PRs without a linked issue will not be merged) -->
+<!-- Closes #NNN (required for feature and fix PRs). Version-bump / release PRs that only touch release-manifest files do NOT require an issue. -->
 
 ## Screenshots / recordings
 
