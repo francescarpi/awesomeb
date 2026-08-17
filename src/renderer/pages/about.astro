@@ -14,6 +14,7 @@ import logo from '../assets/icon.png';
 
 <script>
   import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
+  import Copy from '#/icons/copy.svg?raw';
 
   const { winId } = getSearchParams();
   const renderer = new Renderer(h('div', null)).render('content');
@@ -29,7 +30,25 @@ import logo from '../assets/icon.png';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-4') },
-      h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+      h(
+        'div',
+        { class: c('flex', 'items-center', 'gap-2') },
+        h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+        h('div', {
+          class: c(
+            'w-3.5',
+            'h-3.5',
+            '[&>svg]:w-full',
+            '[&>svg]:h-full',
+            'cursor-pointer',
+            'hover:text-blue-700',
+          ),
+          innerHTML: Copy,
+          onclick: () => {
+            abCommands.perform(winId, 'copy-version');
+          },
+        }),
+      ),
       h(
         'a',
         {

@@ -73,6 +73,7 @@ import * as tabPreviousVisited from './tab-previous-visited';
 import * as tabToggleOpenTabsAschild from './tab-toggle-open-tabs-as-child';
 import * as tabCloseChildren from './tab-close-children';
 import * as tabContainerToggleCollapseChildren from './tabcontainer-toggle-collapse-children';
+import * as appCopyVersion from './app-copy-version';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -145,6 +146,7 @@ const COMMANDS = {
   [tabPreviousVisited.TRIGGER]: tabPreviousVisited.Command,
   [tabToggleOpenTabsAschild.TRIGGER]: tabToggleOpenTabsAschild.Command,
   [tabContainerToggleCollapseChildren.TRIGGER]: tabContainerToggleCollapseChildren.Command,
+  [appCopyVersion.TRIGGER]: appCopyVersion.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;
