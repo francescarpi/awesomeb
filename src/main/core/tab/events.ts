@@ -17,6 +17,9 @@ function checkIfRequireAttention(browser: Browser, tab: Tab) {
 
 export function registerTabEvents(browser: Browser, tab: Tab) {
   if (tab.eventsRegistered) {
+    scopeLog.info(
+      `Tab events already registered for Tab ID ${tab.id}, skipping duplicate registration`,
+    );
     return;
   }
 
