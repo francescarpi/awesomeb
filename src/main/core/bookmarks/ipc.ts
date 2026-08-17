@@ -19,6 +19,7 @@ export function setupBookmarksIPC(browser: Browser) {
       bookmarks.add(parentFolderId, title, url, newFolderName);
       win.modal.close();
       notification('Bookmark Added', 'Bookmark added successfully');
+      browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
     },
   );
@@ -42,6 +43,7 @@ export function setupBookmarksIPC(browser: Browser) {
     async ({ bookmarksList }) => {
       bookmarks.update(bookmarksList);
       notification('Bookmarks Updated', 'Bookmarks updated successfully');
+      browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
     },
   );

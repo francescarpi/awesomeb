@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
-import { Browser, partitions, windowOpenHadler } from '@/core';
+import { Browser, bookmarks, partitions, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
-import type { HandlerDetails } from 'electron';
+import { type HandlerDetails } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { userDataPath } from '@/paths';
@@ -1672,6 +1672,52 @@ describe('Browser', () => {
 
       const desktop = browser.activeWindow!.selectedDesktop;
       expect(desktop.tabContainers[0].childrenCollapsed).toBe(false);
+    });
+  });
+
+  describe('Browser.getBookmarksSubMenu cache', () => {
+    beforeEach(() => {
+      browser = new Browser();
+      partitions.init();
+      browser.createWindow(1, { withDesktops: true });
+      bookmarks.update([]);
+    });
+
+    afterEach(() => {
+      bookmarks.update([]);
+    });
+
+    test('repeated calls with the same window return the same cached array reference', async () => {
+      const w = browser.getWindow(1)!;
+      const r1 = await browser.getBookmarksSubMenu(w);
+      const r2 = await browser.getBookmarksSubMenu(w);
+      const r3 = await browser.getBookmarksSubMenu(w);
+
+      expect(r1).toBe(r2);
+      expect(r2).toBe(r3);
+    });
+
+    test('invalidateBookmarksMenuCache forces a rebuild (new array reference)', async () => {
+      const w = browser.getWindow(1)!;
+
+      const r1 = await browser.getBookmarksSubMenu(w);
+      browser.invalidateBookmarksMenuCache();
+      const r2 = await browser.getBookmarksSubMenu(w);
+
+      expect(r1).not.toBe(r2);
+    });
+
+    test('cache survives multiple invalidate + rebuild cycles', async () => {
+      const w = browser.getWindow(1)!;
+
+      const r1 = await browser.getBookmarksSubMenu(w);
+      browser.invalidateBookmarksMenuCache();
+      const r2 = await browser.getBookmarksSubMenu(w);
+      browser.invalidateBookmarksMenuCache();
+      const r3 = await browser.getBookmarksSubMenu(w);
+
+      expect(r1).not.toBe(r2);
+      expect(r2).not.toBe(r3);
     });
   });
 });
