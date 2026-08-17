@@ -1,4 +1,4 @@
-import { Browser, Tab, Window, bookmarks, getCachedFavicon, getShortcut } from '@/core';
+import { Browser, Tab, Window, getCachedFavicon, getShortcut } from '@/core';
 import { truncate } from '@/utils';
 import { MenuItemConstructorOptions, Menu, NativeImage, app } from 'electron';
 import log from 'electron-log';
@@ -629,12 +629,12 @@ async function bookmarksMenu(
         },
       },
       { type: 'separator' },
-      ...(await bookmarkSubMenu(browser, window, bookmarks.all)),
+      ...(await browser.getBookmarksSubMenu(window)),
     ],
   };
 }
 
-async function bookmarkSubMenu(
+export async function bookmarkSubMenu(
   browser: Browser,
   window: Window | null,
   bookmarks: IBookmark[],

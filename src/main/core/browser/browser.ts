@@ -13,13 +13,14 @@ import {
   history,
   MediaManager,
   AppUpdater,
+  bookmarks,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
 import { Tab } from '@/core/tab/tab';
 import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
-import { mainMenu, minimumMenu } from '@/menu';
-import { Menu, BrowserWindow } from 'electron';
+import { mainMenu, minimumMenu, bookmarkSubMenu } from '@/menu';
+import { Menu, BrowserWindow, type MenuItemConstructorOptions } from 'electron';
 import EventEmitter from 'events';
 import { registerBrowserEvents } from './events';
 import { registerVisitHistoryHooks } from '@/core/visit-history';
@@ -41,6 +42,9 @@ export class Browser {
   private readonly _webContentsIndex: Map<number, TTabId> = new Map();
   private readonly _tabContainerIndex: Map<TTabContainerId, IWinDesCon> = new Map();
   private _welcomeWindow: WelcomeWindow | null = null;
+  private _menuRefreshScheduled = false;
+  private _bookmarksMenuCache: MenuItemConstructorOptions[] | null = null;
+  private _bookmarksMenuCacheWindowId: TWindowId | null = null;
 
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
@@ -142,9 +146,41 @@ export class Browser {
     return this._windows.get(id) || null;
   }
 
-  async refreshMainMenu() {
-    const items = await mainMenu(this, false);
-    Menu.setApplicationMenu(items);
+  async refreshMainMenu(): Promise<void> {
+    if (this._menuRefreshScheduled) return;
+    this._menuRefreshScheduled = true;
+
+    await new Promise<void>((resolve) => {
+      setTimeout(async () => {
+        try {
+          const items = await mainMenu(this, false);
+          Menu.setApplicationMenu(items);
+        } catch (err) {
+          scopeLog.error('refreshMainMenu failed:', err);
+        } finally {
+          this._menuRefreshScheduled = false;
+          resolve();
+        }
+      }, 0);
+    });
+  }
+
+  invalidateBookmarksMenuCache(): void {
+    this._bookmarksMenuCache = null;
+    this._bookmarksMenuCacheWindowId = null;
+  }
+
+  async getBookmarksSubMenu(window: Window | null): Promise<MenuItemConstructorOptions[]> {
+    if (
+      this._bookmarksMenuCache !== null &&
+      this._bookmarksMenuCacheWindowId === (window?.id ?? null)
+    ) {
+      return this._bookmarksMenuCache;
+    }
+    const items = await bookmarkSubMenu(this, window, bookmarks.all);
+    this._bookmarksMenuCache = items;
+    this._bookmarksMenuCacheWindowId = window?.id ?? null;
+    return items;
   }
 
   setActiveWindowId(id: TWindowId | null) {
