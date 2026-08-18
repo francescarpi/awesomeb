@@ -540,6 +540,10 @@ export class Tab extends UIView {
     this.webContents.setZoomFactor((100 + this._zoomStep * 10) / 100);
   }
 
+  getZoomFactor(): number {
+    return this.webContents.getZoomFactor();
+  }
+
   get closedAt(): number | null {
     return this._closedAt;
   }
