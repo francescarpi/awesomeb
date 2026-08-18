@@ -260,6 +260,12 @@ const mockElectron = vi.hoisted(() => {
       }),
       fetch: (): Promise<unknown> => Promise.resolve({}),
     },
+    Notification: vi.fn().mockImplementation(function () {
+      return {
+        on: noopFn,
+        show: noopFn,
+      };
+    }),
     shell: {
       openExternal: (): Promise<void> => Promise.resolve(),
       openPath: (): Promise<string> => Promise.resolve(''),
