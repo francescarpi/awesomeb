@@ -25,6 +25,6 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
     clipboard.writeText(targetTab.url);
-    notification('URL Copied', 'URL of the active tab copied to clipboard');
+    notification('URL Copied', targetTab.url);
   },
 };
