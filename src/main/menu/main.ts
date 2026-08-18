@@ -584,8 +584,8 @@ function tabsMenu(
         },
       },
       {
-        label: zoomReset.label,
-        enabled: !!tab,
+        label: `${zoomReset.label}${tab && tab.getZoomFactor() !== 1 ? ` (${(tab.getZoomFactor() * 100).toFixed(0)}%)` : ''}`,
+        enabled: !!tab && tab.getZoomFactor() !== 1,
         accelerator: zoomReset.key,
         click: () => {
           if (tab && window) {
