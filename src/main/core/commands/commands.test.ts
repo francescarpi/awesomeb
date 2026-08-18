@@ -1,4 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { clipboard, Notification } from 'electron';
 import { Browser, partitions } from '@/core';
 import * as windowMinimize from './window-minimize';
 import * as windowMaximize from './window-maximize';
@@ -22,6 +23,7 @@ import * as tabReload from './tab-reload';
 import * as tabHistoryBack from './tab-history-back';
 import * as tabHistoryForward from './tab-history-forward';
 import * as urlEdit from './url-edit';
+import * as urlCopy from './url-copy';
 import * as tabcontainerMoveUp from './tabcontainer-move-up';
 import * as tabcontainerMoveDown from './tabcontainer-move-down';
 
@@ -635,6 +637,24 @@ describe('Commands', () => {
       expect(cleanCertSpy.mock.invocationCallOrder[0]).toBeLessThan(
         goForwardSpy.mock.invocationCallOrder[0],
       );
+    });
+
+    test('copy-url: should copy the tab URL to the clipboard and show it in the notification (issue #202)', async () => {
+      const { window, tab } = setupTab(browser);
+
+      const writeTextSpy = vi.spyOn(clipboard, 'writeText');
+      const notificationSpy = vi.mocked(Notification);
+      notificationSpy.mockClear();
+
+      await browser.performCommand(window, urlCopy.TRIGGER, { tabId: tab.id });
+
+      expect(writeTextSpy).toHaveBeenCalledTimes(1);
+      expect(writeTextSpy).toHaveBeenCalledWith('https://example.com/');
+      expect(notificationSpy).toHaveBeenCalledTimes(1);
+      expect(notificationSpy).toHaveBeenCalledWith({
+        title: 'URL Copied',
+        body: 'https://example.com/',
+      });
     });
   });
 
