@@ -10,6 +10,6 @@ export default defineConfig({
   },
   test: {
     setupFiles: ['vitest.setup.ts'],
-    exclude: ['node_modules/**', 'dist/**', 'docs/**'],
+    exclude: ['node_modules/**', '.opencode/**', 'dist/**', 'docs/**'],
   },
 });

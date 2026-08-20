@@ -12,6 +12,7 @@ const { isPage = false } = Astro.props;
 <script>
   import { Renderer, h, c, type VNode, getSearchParams, btnIcon } from '#/scripts';
   import { type IDownloads, EDownloadStatus, type IDownloadItem } from '~/types';
+  import dayjs from 'dayjs';
   import Search from '#/icons/search.svg?raw';
   import Pause from '#/icons/pause.svg?raw';
   import Resume from '#/icons/resume.svg?raw';
@@ -67,7 +68,7 @@ const { isPage = false } = Astro.props;
                 h(
                   'div',
                   { class: c('text-xs', 'opacity-70', paused && 'opacity-30') },
-                  new Date(item.created).toISOString(),
+                  dayjs(item.created).format('YYYY-MM-DD HH:mm'),
                 ),
               );
             }
