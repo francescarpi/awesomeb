@@ -1,5 +1,6 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { Browser, partitions } from '@/core';
+import { MAX_SPLIT_TABS } from '~/constants';
 
 describe('parseTarget - justAfter positioning', () => {
   let browser: Browser;
@@ -116,5 +117,58 @@ describe('parseTarget - justAfter positioning', () => {
     expect(newChild!.tabContainer.parent).toBe(parent!.tabContainer);
     expect(parent!.tabContainer.children).toContain(newChild!.tabContainer);
     expect(desktop.tabContainers).not.toContain(newChild!.tabContainer);
+  });
+});
+
+describe('parseTarget - split-tab capacity', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  async function fillSplitContainer() {
+    const first = await browser.openURL('http://a.com', { selectTab: true });
+    const second = await browser.openURL('http://b.com', { targetId: 'split-tab' });
+    const third = await browser.openURL('http://c.com', { targetId: 'split-tab' });
+
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    expect(third).not.toBeNull();
+
+    return { first: first!, second: second!, third: third! };
+  }
+
+  test('a container at MAX_SPLIT_TABS active tabs sends the next split to a new container', async () => {
+    const { first } = await fillSplitContainer();
+    const container = first.tabContainer;
+
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+
+    const fourth = await browser.openURL('http://d.com', { targetId: 'split-tab' });
+
+    expect(fourth).not.toBeNull();
+    expect(fourth!.tabContainer.id).not.toBe(container.id);
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+  });
+
+  test('closed tabs do not consume split capacity (regression: ghost tabs blocked splits)', async () => {
+    const { first, third } = await fillSplitContainer();
+    const container = first.tabContainer;
+
+    third.tab.markAsClosed();
+
+    // The closed tab stays in the container but must not count against capacity.
+    expect(container.tabs.length).toBe(3);
+    expect(container.activeTabsLength).toBe(2);
+
+    const fourth = await browser.openURL('http://d.com', { targetId: 'split-tab' });
+
+    expect(fourth).not.toBeNull();
+    expect(fourth!.tabContainer.id).toBe(container.id);
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+    expect(container.tabs.length).toBe(4);
   });
 });

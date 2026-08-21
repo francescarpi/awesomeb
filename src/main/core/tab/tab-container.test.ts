@@ -534,3 +534,74 @@ describe('TabContainer.ownAndChildTabs', () => {
     expect(tc.ownAndChildTabs).toEqual([]);
   });
 });
+
+describe('TabContainer.activeTabsLength', () => {
+  let browser: Browser;
+  let window: Window;
+  let desktop: Desktop;
+  let tc: TabContainer;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+    desktop = window.selectedDesktop;
+    tc = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+  });
+
+  function makeTab(url = 'http://example.com') {
+    return tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url,
+    });
+  }
+
+  test('returns 0 on an empty container', () => {
+    expect(tc.activeTabsLength).toBe(0);
+  });
+
+  test('counts every tab when none are closed', () => {
+    makeTab();
+    makeTab();
+
+    expect(tc.tabs.length).toBe(2);
+    expect(tc.activeTabsLength).toBe(2);
+  });
+
+  test('excludes closed tabs from the count while keeping them in tabs', () => {
+    const first = makeTab();
+    makeTab();
+
+    first.markAsClosed();
+
+    expect(tc.tabs.length).toBe(2);
+    expect(tc.activeTabsLength).toBe(1);
+  });
+
+  test('decreases as tabs get closed down to zero', () => {
+    const first = makeTab();
+    const second = makeTab();
+
+    expect(tc.activeTabsLength).toBe(2);
+
+    first.markAsClosed();
+    expect(tc.activeTabsLength).toBe(1);
+
+    second.markAsClosed();
+    expect(tc.activeTabsLength).toBe(0);
+  });
+
+  test('counts a resumed (reopened) tab again', () => {
+    const first = makeTab();
+    makeTab();
+
+    first.markAsClosed();
+    expect(tc.activeTabsLength).toBe(1);
+
+    first.resume();
+
+    expect(first.isClosed).toBe(false);
+    expect(tc.activeTabsLength).toBe(2);
+  });
+});
