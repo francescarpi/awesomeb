@@ -104,7 +104,7 @@ function openOptions(
     {
       label: 'Open link in split view',
       icon: getIcon(EIcon.Vertical),
-      enabled: tabData.tabContainer.tabs.length < MAX_SPLIT_TABS,
+      enabled: tabData.tabContainer.activeTabsLength < MAX_SPLIT_TABS,
       click: () => {
         browser.openURL(url, { selectTab: true, targetId: 'split-tab' });
       },

@@ -1,7 +1,10 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { Menu } from 'electron';
+import type { ContextMenuParams, MenuItemConstructorOptions, WebContents } from 'electron';
+import type { Actions } from 'electron-context-menu';
 import { Browser, partitions } from '@/core';
 import { tabMenu } from './tab';
+import { tabWebContentsMenu } from './tab.webcontents';
 import { IWinDesConTab } from '~/types';
 
 describe('tabMenu', () => {
@@ -84,5 +87,78 @@ describe('tabMenu', () => {
         expect.objectContaining({ partitionId: partitions.private.id }),
       );
     }
+  });
+});
+
+describe('tabWebContentsMenu - Open link in split view availability', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  function makeActions(): Actions {
+    const item = (): { label: string } => ({ label: '' });
+    return {
+      copy: item,
+      copyLink: item,
+      paste: item,
+      cut: item,
+      separator: item,
+      copyImage: item,
+      copyImageAddress: item,
+      saveImage: item,
+      inspect: item,
+    } as unknown as Actions;
+  }
+
+  function buildMenu(tabInfo: IWinDesConTab): MenuItemConstructorOptions[] {
+    return tabWebContentsMenu(
+      browser,
+      tabInfo,
+      makeActions(),
+      { linkURL: 'http://link.com' } as ContextMenuParams,
+      {
+        navigationHistory: { canGoBack: () => false, canGoForward: () => false },
+      } as unknown as WebContents,
+      [],
+    );
+  }
+
+  function findSplitViewItem(template: MenuItemConstructorOptions[]) {
+    return template.find((item) => item.label === 'Open link in split view');
+  }
+
+  test('is disabled when the tab container already has MAX_SPLIT_TABS active tabs', async () => {
+    const first = await browser.openURL('http://a.com', { selectTab: true });
+    await browser.openURL('http://b.com', { targetId: 'split-tab' });
+    await browser.openURL('http://c.com', { targetId: 'split-tab' });
+
+    const tabInfo = browser.getTab(first!.tab.id)!;
+    expect(tabInfo.tabContainer.activeTabsLength).toBe(3);
+
+    const item = findSplitViewItem(buildMenu(tabInfo));
+
+    expect(item).toBeDefined();
+    expect(item!.enabled).toBe(false);
+  });
+
+  test('is enabled when closed tabs leave free split slots (regression: ghost tabs)', async () => {
+    const first = await browser.openURL('http://a.com', { selectTab: true });
+    await browser.openURL('http://b.com', { targetId: 'split-tab' });
+    const third = await browser.openURL('http://c.com', { targetId: 'split-tab' });
+
+    third!.tab.markAsClosed();
+
+    const tabInfo = browser.getTab(first!.tab.id)!;
+    expect(tabInfo.tabContainer.tabs.length).toBe(3);
+    expect(tabInfo.tabContainer.activeTabsLength).toBe(2);
+
+    const item = findSplitViewItem(buildMenu(tabInfo));
+
+    expect(item).toBeDefined();
+    expect(item!.enabled).toBe(true);
   });
 });
