@@ -47,6 +47,22 @@ export async function listWithSearchManager(
   let indexSelected = entitySelectedIndex >= 0 ? entitySelectedIndex : 0;
   selectItemAtIndex(ul, indexSelected);
 
+  // Click event
+  ul.onclick = function (e) {
+    const li = (e.target as HTMLElement).closest('li');
+    if (!li) return;
+
+    const items = Array.from(ul.querySelectorAll('li'));
+    const idx = items.indexOf(li);
+    if (idx === -1 || !filteredEntities[idx]) return;
+
+    indexSelected = idx;
+    selectItemAtIndex(ul, indexSelected);
+    if (props.onChange) props.onChange(input.value, filteredEntities[idx], input, originalEntities);
+
+    if (props.onAccept) props.onAccept(filteredEntities[idx]);
+  };
+
   // Handle keyboard navigation
   input.addEventListener('keydown', (e) => {
     const items = ul.querySelectorAll('li');
