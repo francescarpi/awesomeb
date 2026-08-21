@@ -52,8 +52,15 @@ export async function listWithSearchManager(
     const li = (e.target as HTMLElement).closest('li');
     if (!li) return;
 
-    const entity = filteredEntities.find((ent) => ent.id === li.dataset.id);
-    if (entity && props.onAccept) props.onAccept(entity);
+    const items = Array.from(ul.querySelectorAll('li'));
+    const idx = items.indexOf(li);
+    if (idx === -1 || !filteredEntities[idx]) return;
+
+    indexSelected = idx;
+    selectItemAtIndex(ul, indexSelected);
+    if (props.onChange) props.onChange(input.value, filteredEntities[idx], input, originalEntities);
+
+    if (props.onAccept) props.onAccept(filteredEntities[idx]);
   };
 
   // Handle keyboard navigation
@@ -164,9 +171,6 @@ function renderEntity(
   for (const item of entities) {
     const clone = tpl.content.cloneNode(true) as HTMLElement;
     const extra = clone.querySelector('small') as HTMLElement;
-    const li = clone.querySelector('li') as HTMLLIElement;
-
-    li.dataset.id = item.id;
 
     const container = clone.querySelector('p') as HTMLElement;
     container.innerHTML = item.label;
