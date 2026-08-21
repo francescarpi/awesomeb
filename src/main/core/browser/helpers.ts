@@ -122,7 +122,7 @@ export function parseTarget(
   }
 
   const { selectedTab } = desktop;
-  const totalSelectedTabContainerTabs = selectedTab?.tabContainer.tabs.length || 0;
+  const totalSelectedTabContainerTabs = selectedTab?.tabContainer.activeTabsLength || 0;
 
   let tabContainer: TabContainer;
   if (

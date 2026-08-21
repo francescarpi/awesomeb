@@ -105,6 +105,10 @@ export class TabContainer {
     return this.tabs.filter((t) => t.visible && !t.isClosed);
   }
 
+  get activeTabsLength(): number {
+    return this.tabs.filter((t) => !t.isClosed).length;
+  }
+
   get isSplit(): boolean {
     return this.visibleTabs.length > 1;
   }

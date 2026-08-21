@@ -1,5 +1,6 @@
 import { expect, test, describe, vi, beforeEach } from 'vitest';
 import type { TDesktopId } from '~/types';
+import { MAX_SPLIT_TABS } from '~/constants';
 import { Browser, getCommand, partitions, Window } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 
@@ -1390,5 +1391,60 @@ describe('Window Open Closed Tab', () => {
     expect(allTabIds).toContain(p1!.tab.id);
     expect(allTabIds).toContain(p2!.tab.id);
     expect(window.tabs.length).toBe(4);
+  });
+
+  test('should refuse to reopen when the container is at MAX_SPLIT_TABS active tabs', async () => {
+    const first = await browser.openURL('http://a.com', { selectTab: true });
+    await browser.openURL('http://b.com', { targetId: 'split-tab' });
+    const third = await browser.openURL('http://c.com', { targetId: 'split-tab' });
+    const container = first!.tabContainer;
+
+    // Free a slot and refill it: the container ends up with MAX_SPLIT_TABS
+    // active tabs plus the closed one we try to reopen.
+    await browser.closeTab(third!.tab.id);
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS - 1);
+
+    await browser.openURL('http://d.com', { targetId: 'split-tab' });
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+    expect(third!.tab.isClosed).toBe(true);
+
+    const eventSpy = vi.fn();
+    window.eventsChannel.on('window:tab-did-resume', eventSpy);
+
+    window.openClosedTab(third!.tab.id);
+
+    expect(third!.tab.isClosed).toBe(true);
+    expect(eventSpy).not.toHaveBeenCalled();
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+
+    const viewsForClosedTab = window.views.filter((v) =>
+      v.viewId.startsWith(`tab-${third!.tab.id}#`),
+    );
+    expect(viewsForClosedTab.length).toBe(0);
+  });
+
+  test('should reopen when the container has free slots (active tabs below MAX_SPLIT_TABS)', async () => {
+    const first = await browser.openURL('http://a.com', { selectTab: true });
+    await browser.openURL('http://b.com', { targetId: 'split-tab' });
+    const third = await browser.openURL('http://c.com', { targetId: 'split-tab' });
+    const container = first!.tabContainer;
+
+    await browser.closeTab(third!.tab.id);
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS - 1);
+    expect(third!.tab.isClosed).toBe(true);
+
+    const eventSpy = vi.fn();
+    window.eventsChannel.on('window:tab-did-resume', eventSpy);
+
+    window.openClosedTab(third!.tab.id);
+
+    expect(third!.tab.isClosed).toBe(false);
+    expect(eventSpy).toHaveBeenCalledWith(window, third!.tab);
+    expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
+
+    const viewsForReopenedTab = window.views.filter((v) =>
+      v.viewId.startsWith(`tab-${third!.tab.id}#`),
+    );
+    expect(viewsForReopenedTab.length).toBeGreaterThan(0);
   });
 });

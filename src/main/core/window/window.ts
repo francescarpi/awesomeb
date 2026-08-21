@@ -2,6 +2,7 @@ import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
+import { MAX_SPLIT_TABS } from '~/constants';
 import {
   IContextualModalParams,
   IDesCon,
@@ -224,19 +225,26 @@ export class Window extends UIWindow {
   }
 
   openClosedTab(tabId: TTabId) {
-    const tab = this.getTab(tabId);
-    if (!tab) {
+    const tabData = this.getTab(tabId);
+    if (!tabData) {
       scopeLog.warn(`No tab found with id: ${tabId}`);
       return;
     }
 
-    tab.tab.resume();
+    if (tabData.tabContainer.activeTabsLength >= MAX_SPLIT_TABS) {
+      scopeLog.warn(
+        "The tab is in the tab container along with others, and there isn't enough space.",
+      );
+      return;
+    }
 
-    this.addView(tab.tab);
+    tabData.tab.resume();
 
-    this.selectTab(tab.tab.id);
+    this.addView(tabData.tab);
 
-    this.browser.eventsChannel.emit('window:tab-did-resume', this, tab.tab);
+    this.selectTab(tabData.tab.id);
+
+    this.browser.eventsChannel.emit('window:tab-did-resume', this, tabData.tab);
   }
 
   async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {
