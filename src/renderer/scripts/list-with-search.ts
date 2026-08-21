@@ -47,6 +47,15 @@ export async function listWithSearchManager(
   let indexSelected = entitySelectedIndex >= 0 ? entitySelectedIndex : 0;
   selectItemAtIndex(ul, indexSelected);
 
+  // Click event
+  ul.onclick = function (e) {
+    const li = (e.target as HTMLElement).closest('li');
+    if (!li) return;
+
+    const entity = filteredEntities.find((ent) => ent.id === li.dataset.id);
+    if (entity && props.onAccept) props.onAccept(entity);
+  };
+
   // Handle keyboard navigation
   input.addEventListener('keydown', (e) => {
     const items = ul.querySelectorAll('li');
@@ -155,6 +164,9 @@ function renderEntity(
   for (const item of entities) {
     const clone = tpl.content.cloneNode(true) as HTMLElement;
     const extra = clone.querySelector('small') as HTMLElement;
+    const li = clone.querySelector('li') as HTMLLIElement;
+
+    li.dataset.id = item.id;
 
     const container = clone.querySelector('p') as HTMLElement;
     container.innerHTML = item.label;
