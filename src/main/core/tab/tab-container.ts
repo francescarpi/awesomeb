@@ -105,12 +105,16 @@ export class TabContainer {
     return this.tabs.filter((t) => t.visible && !t.isClosed);
   }
 
+  get activeTabsLength(): number {
+    return this.tabs.filter((t) => !t.isClosed).length;
+  }
+
   get isSplit(): boolean {
     return this.visibleTabs.length > 1;
   }
 
   get hasSplitTabs(): boolean {
-    return this.tabs.filter((t) => !t.isClosed).length > 1;
+    return this.activeTabsLength > 1;
   }
 
   setLayout(layout: LayoutBase) {
