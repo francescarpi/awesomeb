@@ -233,7 +233,8 @@ export class Window extends UIWindow {
 
     if (tabData.tabContainer.activeTabsLength >= MAX_SPLIT_TABS) {
       scopeLog.warn(
-        "The tab is in the tab container along with others, and there isn't enough space.",
+        `Cannot reopen tab ${tabId}: its container ${tabData.tabContainer.id} already has ` +
+          `${tabData.tabContainer.activeTabsLength} active tabs (max ${MAX_SPLIT_TABS}).`,
       );
       return;
     }

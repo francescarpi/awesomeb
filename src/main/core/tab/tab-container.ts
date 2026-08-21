@@ -114,7 +114,7 @@ export class TabContainer {
   }
 
   get hasSplitTabs(): boolean {
-    return this.tabs.filter((t) => !t.isClosed).length > 1;
+    return this.activeTabsLength > 1;
   }
 
   setLayout(layout: LayoutBase) {
