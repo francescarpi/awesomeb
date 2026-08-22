@@ -1,0 +1,106 @@
+{
+  "app": {
+    "about": "Acerca de {{appName}}",
+    "preferences": "Preferencias"
+  },
+  "file": {
+    "label": "Archivo",
+    "performCommand": "Ejecutar comando",
+    "newWindow": "Nueva ventana",
+    "newTab": "Nueva pestaña",
+    "pasteAndGo": "Pegar e ir",
+    "openRecentlyClosed": "Abrir pestaña cerrada recientemente"
+  },
+  "edit": {
+    "label": "Edición",
+    "copyUrl": "Copiar URL",
+    "editUrl": "Editar URL",
+    "findInPage": "Buscar en la página"
+  },
+  "window": {
+    "label": "Ventana",
+    "toggleSidebar": "Alternar barra lateral",
+    "toggleMaximizeArea": "Alternar área maximizada"
+  },
+  "desktops": {
+    "label": "Escritorios",
+    "entry": "Escritorio {{index}}",
+    "find": "Buscar escritorio",
+    "previous": "Anterior",
+    "next": "Siguiente"
+  },
+  "tabs": {
+    "label": "Pestañas",
+    "entry": "Pestaña {{index}}",
+    "find": "Buscar pestaña",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "switcher": "Conmutador de pestañas",
+    "previousVisited": "Pestaña visitada anterior",
+    "selectAttention": "Seleccionar pestaña que requiere atención",
+    "marks": "Marcas",
+    "moveUp": "Subir pestaña",
+    "moveDown": "Bajar pestaña",
+    "suspend": "Suspender pestaña",
+    "close": "Cerrar pestaña",
+    "reload": "Recargar",
+    "goBack": "Ir atrás",
+    "goForward": "Ir adelante",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "zoomReset": "Restablecer zoom",
+    "closeTabPreview": "Cerrar vista previa de pestaña",
+    "acceptTabPreview": "Aceptar vista previa de pestaña"
+  },
+  "bookmarks": {
+    "label": "Marcadores",
+    "manage": "Gestionar marcadores",
+    "open": "Abrir marcador"
+  },
+  "split": {
+    "swapTabs": "Intercambiar pestañas",
+    "unsplitTabs": "Desdividir pestañas",
+    "size": "Tamaño"
+  },
+  "contextDesktop": {
+    "suspendAllTabs": "Suspender todas las pestañas",
+    "rename": "Renombrar",
+    "changeTheme": "Cambiar tema",
+    "moveLeft": "Mover a la izquierda",
+    "moveRight": "Mover a la derecha"
+  },
+  "contextTab": {
+    "reload": "Recargar",
+    "goBack": "Ir atrás",
+    "goForward": "Ir adelante",
+    "rename": "Renombrar",
+    "copyUrl": "Copiar URL",
+    "move": "Mover…",
+    "duplicate": "Duplicar…",
+    "changeProfile": "Cambiar perfil…",
+    "suspend": "Suspender",
+    "close": "Cerrar",
+    "closeBelow": "Cerrar las de abajo",
+    "closeChildren": "Cerrar hijas",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido",
+    "addBookmark": "Añadir marcador",
+    "addHere": "Añadir aquí…",
+    "createFolderHere": "Crear carpeta aquí y añadir…",
+    "addDivider": "Añadir separador",
+    "removeDivider": "Quitar separador",
+    "removeAllDividers": "Quitar todos los separadores",
+    "openTargetBlankAsChild": "Abrir enlaces target blank como hija…",
+    "collapseChildren": "Plegar hijas"
+  },
+  "contextWebContents": {
+    "back": "Atrás",
+    "forward": "Adelante",
+    "reload": "Recargar",
+    "openInNewTab": "Abrir enlace en pestaña nueva",
+    "openInFollowingTab": "Abrir enlace en la siguiente pestaña",
+    "openInBackgroundTab": "Abrir enlace en nueva pestaña en segundo plano",
+    "openInSplitView": "Abrir enlace en vista dividida",
+    "openIn": "Abrir enlace en…"
+  }
+}

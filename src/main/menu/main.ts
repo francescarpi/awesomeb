@@ -5,6 +5,7 @@ import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark } from '~/types';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('MainMenu');
 
@@ -40,7 +41,7 @@ function appMenu(
     icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
     submenu: [
       {
-        label: `About ${app.getName()}`,
+        label: t('menu:app.about', { appName: app.getName() }),
         icon: getIcon(EIcon.Info),
         click: () => {
           if (window) {
@@ -50,7 +51,7 @@ function appMenu(
       },
       { type: 'separator' },
       {
-        label: preferences.label,
+        label: t(preferences.label),
         accelerator: preferences.key,
         icon: getIcon(EIcon.Command),
         enabled: !!window,
@@ -84,11 +85,11 @@ function fileMenu(
   const openRecentlyClosed = getShortcut('openRecentlyClosed');
 
   return {
-    label: 'File',
+    label: t('menu:file.label'),
     icon: showRootIcon ? getIcon(EIcon.File) : undefined,
     submenu: [
       {
-        label: performCommand.label,
+        label: t(performCommand.label),
         accelerator: performCommand.key,
         enabled: !!window,
         icon: getIcon(EIcon.Command),
@@ -100,7 +101,7 @@ function fileMenu(
       },
       { type: 'separator' },
       {
-        label: newWindow.label,
+        label: t(newWindow.label),
         accelerator: newWindow.key,
         icon: getIcon(EIcon.Windows),
         click: async () => {
@@ -110,7 +111,7 @@ function fileMenu(
         },
       },
       {
-        label: newTab.label,
+        label: t(newTab.label),
         accelerator: newTab.key,
         icon: getIcon(EIcon.Tab),
         click: () => {
@@ -120,7 +121,7 @@ function fileMenu(
         },
       },
       {
-        label: pasteAndGo.label,
+        label: t(pasteAndGo.label),
         enabled: !!window,
         icon: getIcon(EIcon.Open),
         click: async () => {
@@ -130,7 +131,7 @@ function fileMenu(
         },
       },
       {
-        label: openRecentlyClosed.label,
+        label: t(openRecentlyClosed.label),
         accelerator: openRecentlyClosed.key,
         enabled: browser.hasClosedTabs,
         icon: getIcon(EIcon.Open),
@@ -156,7 +157,7 @@ function editMenu(
   const findInPage = getShortcut('findInPage');
 
   return {
-    label: 'Edit',
+    label: t('menu:edit.label'),
     icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
     submenu: [
       { role: 'undo' },
@@ -170,7 +171,7 @@ function editMenu(
       { role: 'selectAll' },
       { type: 'separator' },
       {
-        label: copyUrl.label,
+        label: t(copyUrl.label),
         accelerator: copyUrl.key,
         icon: getIcon(EIcon.Copy),
         enabled: Boolean(tab),
@@ -181,7 +182,7 @@ function editMenu(
         },
       },
       {
-        label: editUrl.label,
+        label: t(editUrl.label),
         accelerator: editUrl.key,
         icon: getIcon(EIcon.Edit),
         enabled: Boolean(tab),
@@ -193,7 +194,7 @@ function editMenu(
       },
       { type: 'separator' },
       {
-        label: findInPage.label,
+        label: t(findInPage.label),
         accelerator: findInPage.key,
         icon: getIcon(EIcon.Search),
         enabled: Boolean(tab),
@@ -216,11 +217,11 @@ function windowMenu(
   const toggleMaximizeArea = getShortcut('toggleMaximizeArea');
 
   return {
-    label: 'Window',
+    label: t('menu:window.label'),
     icon: showRootIcon ? getIcon(EIcon.Windows) : undefined,
     submenu: [
       {
-        label: toggleSidebar.label,
+        label: t(toggleSidebar.label),
         accelerator: toggleSidebar.key,
         enabled: !!window,
         icon: getIcon(EIcon.Sidebar),
@@ -231,7 +232,7 @@ function windowMenu(
         },
       },
       {
-        label: toggleMaximizeArea.label,
+        label: t(toggleMaximizeArea.label),
         accelerator: toggleMaximizeArea.key,
         enabled: !!window,
         icon: getIcon(EIcon.Maximize),
@@ -272,7 +273,7 @@ function desktopsMenu(
   for (let i = 1; i <= 9; i++) {
     const shortcut = getShortcut(desktopShortcuts[i - 1]);
     desktopItems.push({
-      label: `Desktop ${i}`,
+      label: t('menu:desktops.entry', { index: i }),
       accelerator: shortcut.key,
       enabled: i <= totalDesktops,
       click: async () => {
@@ -284,11 +285,11 @@ function desktopsMenu(
   }
 
   return {
-    label: 'Desktops',
+    label: t('menu:desktops.label'),
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
-        label: findDesktop.label,
+        label: t(findDesktop.label),
         accelerator: findDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Desktop),
@@ -302,7 +303,7 @@ function desktopsMenu(
       ...desktopItems,
       { type: 'separator' },
       {
-        label: 'Previous',
+        label: t('menu:desktops.previous'),
         accelerator: previousDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -313,7 +314,7 @@ function desktopsMenu(
         },
       },
       {
-        label: 'Next',
+        label: t('menu:desktops.next'),
         accelerator: nextDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -369,7 +370,7 @@ function tabsMenu(
   for (let i = 1; i <= 9; i++) {
     const shortcut = getShortcut(tabShortcuts[i - 1]);
     tabs.push({
-      label: `Tab ${i}`,
+      label: t('menu:tabs.entry', { index: i }),
       enabled: i <= totalContainers,
       accelerator: shortcut.key,
       click: () => {
@@ -381,11 +382,11 @@ function tabsMenu(
   }
 
   return {
-    label: 'Tabs',
+    label: t('menu:tabs.label'),
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
       {
-        label: findTab.label,
+        label: t(findTab.label),
         accelerator: findTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Tab),
@@ -399,7 +400,7 @@ function tabsMenu(
       ...tabs,
       { type: 'separator' },
       {
-        label: 'Previous',
+        label: t('menu:tabs.previous'),
         accelerator: previousTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -410,7 +411,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Next',
+        label: t('menu:tabs.next'),
         accelerator: nextTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -421,7 +422,7 @@ function tabsMenu(
         },
       },
       {
-        label: selectTabAttention.label,
+        label: t(selectTabAttention.label),
         accelerator: selectTabAttention.key,
         icon: getIcon(EIcon.Notification),
         click: async () => {
@@ -431,7 +432,7 @@ function tabsMenu(
         },
       },
       {
-        label: tabSwitcher.label,
+        label: t(tabSwitcher.label),
         accelerator: tabSwitcher.key,
         icon: getIcon(EIcon.Tab),
         click: async () => {
@@ -441,7 +442,7 @@ function tabsMenu(
         },
       },
       {
-        label: previousVisited.label,
+        label: t(previousVisited.label),
         accelerator: previousVisited.key,
         icon: getIcon(EIcon.PreviousVisited),
         click: async () => {
@@ -451,7 +452,7 @@ function tabsMenu(
         },
       },
       {
-        label: tabMarks.label,
+        label: t(tabMarks.label),
         accelerator: tabMarks.key,
         icon: getIcon(EIcon.Bookmarks),
         click: async () => {
@@ -462,7 +463,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: moveTabUp.label,
+        label: t(moveTabUp.label),
         accelerator: moveTabUp.key,
         icon: getIcon(EIcon.Up),
         click: async () => {
@@ -473,7 +474,7 @@ function tabsMenu(
         enabled: !!tab,
       },
       {
-        label: moveTabDown.label,
+        label: t(moveTabDown.label),
         accelerator: moveTabDown.key,
         icon: getIcon(EIcon.Down),
         click: async () => {
@@ -485,7 +486,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: suspendTab.label,
+        label: t(suspendTab.label),
         accelerator: suspendTab.key,
         enabled: tab !== null && !tab?.suspended,
         icon: getIcon(EIcon.Suspend),
@@ -496,7 +497,7 @@ function tabsMenu(
         },
       },
       {
-        label: closeTab.label,
+        label: t(closeTab.label),
         accelerator: closeTab.key,
         enabled: tab !== null,
         icon: getIcon(EIcon.Close),
@@ -508,7 +509,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: reloadTab.label,
+        label: t(reloadTab.label),
         accelerator: reloadTab.key,
         enabled: !!tab && !tab?.suspended,
         icon: getIcon(EIcon.Reload),
@@ -519,7 +520,7 @@ function tabsMenu(
         },
       },
       {
-        label: goBack.label,
+        label: t(goBack.label),
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoBack,
         accelerator: goBack.key,
         icon: getIcon(EIcon.Back),
@@ -530,7 +531,7 @@ function tabsMenu(
         },
       },
       {
-        label: goForward.label,
+        label: t(goForward.label),
         enabled: !!tab && !tab.loading && !tab.suspended && tab.canGoForward,
         accelerator: goForward.key,
         icon: getIcon(EIcon.Forward),
@@ -541,7 +542,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Close tab preview',
+        label: t('menu:tabs.closeTabPreview'),
         visible: false,
         accelerator: 'Escape',
         enabled: !!tab && !!tab.tabPreview,
@@ -552,7 +553,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Accept tab preview',
+        label: t('menu:tabs.acceptTabPreview'),
         visible: false,
         accelerator: 'Enter',
         enabled: !!tab && !!tab.tabPreview,
@@ -564,7 +565,7 @@ function tabsMenu(
       },
       { type: 'separator' },
       {
-        label: zoomIn.label,
+        label: t(zoomIn.label),
         enabled: !!tab,
         accelerator: zoomIn.key,
         click: () => {
@@ -574,7 +575,7 @@ function tabsMenu(
         },
       },
       {
-        label: zoomOut.label,
+        label: t(zoomOut.label),
         enabled: !!tab,
         accelerator: zoomOut.key,
         click: () => {
@@ -584,7 +585,7 @@ function tabsMenu(
         },
       },
       {
-        label: `${zoomReset.label}${tab && tab.getZoomFactor() !== 1 ? ` (${(tab.getZoomFactor() * 100).toFixed(0)}%)` : ''}`,
+        label: `${t(zoomReset.label)}${tab && tab.getZoomFactor() !== 1 ? ` (${(tab.getZoomFactor() * 100).toFixed(0)}%)` : ''}`,
         enabled: !!tab && tab.getZoomFactor() !== 1,
         accelerator: zoomReset.key,
         click: () => {
@@ -605,11 +606,11 @@ async function bookmarksMenu(
   const openBookmark = getShortcut('openBookmark');
 
   return {
-    label: 'Bookmarks',
+    label: t('menu:bookmarks.label'),
     icon: showRootIcon ? getIcon(EIcon.Bookmarks) : undefined,
     submenu: [
       {
-        label: 'Manage bookmarks',
+        label: t('menu:bookmarks.manage'),
         icon: getIcon(EIcon.Bookmarks),
         enabled: !!window,
         click: () => {
@@ -619,7 +620,7 @@ async function bookmarksMenu(
         },
       },
       {
-        label: openBookmark.label,
+        label: t(openBookmark.label),
         accelerator: openBookmark.key,
         icon: getIcon(EIcon.Open),
         click: () => {
