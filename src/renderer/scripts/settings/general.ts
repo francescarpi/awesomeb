@@ -259,7 +259,7 @@ function renderLocale(config: IConfig): VNode {
           ),
         ),
       ),
-      h('small', {}, '* Restart app after change the language'),
+      h('small', {}, '* Restart is required after changing the language'),
     ),
   );
 }

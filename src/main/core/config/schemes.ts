@@ -38,7 +38,7 @@ export const ConfigScheme = z
     historyRetentionDays: z.number().default(7),
     closedTabsRetentionDays: z.number().default(7),
     uiTheme: z.enum(UI_THEMES).default(DEFAULT_UI_THEME),
-    locale: z.enum(SUPPORTED_LOCALES).optional(),
+    locale: z.enum(SUPPORTED_LOCALES as [string, ...string[]]).optional(),
   })
   .strict();
 
