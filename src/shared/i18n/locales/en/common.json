@@ -1,1 +1,13 @@
-{}
+{
+  "targets": {
+    "newWindow": "New window",
+    "newWindowLeft": "New left window",
+    "newWindowRight": "New right window",
+    "newTab": "New tab",
+    "currentTab": "Current tab",
+    "newFollowingTab": "New following tab",
+    "splitIntoSelectedTab": "Split into selected tab",
+    "window": "Window {{id}}",
+    "desktop": "Desktop: \"{{label}}\""
+  }
+}
