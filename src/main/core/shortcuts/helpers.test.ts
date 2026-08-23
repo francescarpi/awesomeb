@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeEach, afterEach } from 'vitest';
 import { getActiveMap, getShortcut } from './helpers';
 import { config } from '@/core';
-import { SHORTCUTS_MAPS } from './index';
+import { getShortcutMaps } from './index';
 
 describe('getActiveMap', () => {
   let originalOverrides: Record<string, string> | undefined;
@@ -35,11 +35,11 @@ describe('getActiveMap', () => {
     expect(map.shortcuts.newTab.key).toBe('CmdOrCtrl+T');
   });
 
-  test('returns a clone that does not leak back to SHORTCUTS_MAPS', () => {
+  test('returns a clone that does not leak back to getShortcutMaps()', () => {
     const map = getActiveMap();
     map.shortcuts.performCommand.key = 'CmdOrCtrl+Z';
 
-    expect(SHORTCUTS_MAPS['generic-iso'].shortcuts.performCommand.key).toBe('CmdOrCtrl+P');
+    expect(getShortcutMaps()['generic-iso'].shortcuts.performCommand.key).toBe('CmdOrCtrl+P');
     expect(getShortcut('performCommand').key).toBe('CmdOrCtrl+P');
   });
 

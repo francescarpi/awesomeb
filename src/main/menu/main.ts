@@ -5,6 +5,7 @@ import log from 'electron-log';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark } from '~/types';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('MainMenu');
 
@@ -40,7 +41,7 @@ function appMenu(
     icon: showRootIcon ? getIcon(EIcon.Logo) : undefined,
     submenu: [
       {
-        label: `About ${app.getName()}`,
+        label: t('menu:app.about', { appName: app.getName() }),
         icon: getIcon(EIcon.Info),
         click: () => {
           if (window) {
@@ -84,7 +85,7 @@ function fileMenu(
   const openRecentlyClosed = getShortcut('openRecentlyClosed');
 
   return {
-    label: 'File',
+    label: t('menu:file.label'),
     icon: showRootIcon ? getIcon(EIcon.File) : undefined,
     submenu: [
       {
@@ -156,7 +157,7 @@ function editMenu(
   const findInPage = getShortcut('findInPage');
 
   return {
-    label: 'Edit',
+    label: t('menu:edit.label'),
     icon: showRootIcon ? getIcon(EIcon.Edit) : undefined,
     submenu: [
       { role: 'undo' },
@@ -216,7 +217,7 @@ function windowMenu(
   const toggleMaximizeArea = getShortcut('toggleMaximizeArea');
 
   return {
-    label: 'Window',
+    label: t('menu:window.label'),
     icon: showRootIcon ? getIcon(EIcon.Windows) : undefined,
     submenu: [
       {
@@ -272,7 +273,7 @@ function desktopsMenu(
   for (let i = 1; i <= 9; i++) {
     const shortcut = getShortcut(desktopShortcuts[i - 1]);
     desktopItems.push({
-      label: `Desktop ${i}`,
+      label: shortcut.label,
       accelerator: shortcut.key,
       enabled: i <= totalDesktops,
       click: async () => {
@@ -284,7 +285,7 @@ function desktopsMenu(
   }
 
   return {
-    label: 'Desktops',
+    label: t('menu:desktops.label'),
     icon: showRootIcon ? getIcon(EIcon.Desktop) : undefined,
     submenu: [
       {
@@ -302,7 +303,7 @@ function desktopsMenu(
       ...desktopItems,
       { type: 'separator' },
       {
-        label: 'Previous',
+        label: previousDesktop.label,
         accelerator: previousDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -313,7 +314,7 @@ function desktopsMenu(
         },
       },
       {
-        label: 'Next',
+        label: nextDesktop.label,
         accelerator: nextDesktop.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -369,7 +370,7 @@ function tabsMenu(
   for (let i = 1; i <= 9; i++) {
     const shortcut = getShortcut(tabShortcuts[i - 1]);
     tabs.push({
-      label: `Tab ${i}`,
+      label: shortcut.label,
       enabled: i <= totalContainers,
       accelerator: shortcut.key,
       click: () => {
@@ -381,7 +382,7 @@ function tabsMenu(
   }
 
   return {
-    label: 'Tabs',
+    label: t('menu:tabs.label'),
     icon: showRootIcon ? getIcon(EIcon.Tab) : undefined,
     submenu: [
       {
@@ -399,7 +400,7 @@ function tabsMenu(
       ...tabs,
       { type: 'separator' },
       {
-        label: 'Previous',
+        label: previousTab.label,
         accelerator: previousTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Previous),
@@ -410,7 +411,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Next',
+        label: nextTab.label,
         accelerator: nextTab.key,
         enabled: !!window,
         icon: getIcon(EIcon.Next),
@@ -541,7 +542,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Close tab preview',
+        label: t('menu:tabs.closeTabPreview'),
         visible: false,
         accelerator: 'Escape',
         enabled: !!tab && !!tab.tabPreview,
@@ -552,7 +553,7 @@ function tabsMenu(
         },
       },
       {
-        label: 'Accept tab preview',
+        label: t('menu:tabs.acceptTabPreview'),
         visible: false,
         accelerator: 'Enter',
         enabled: !!tab && !!tab.tabPreview,
@@ -605,11 +606,11 @@ async function bookmarksMenu(
   const openBookmark = getShortcut('openBookmark');
 
   return {
-    label: 'Bookmarks',
+    label: t('menu:bookmarks.label'),
     icon: showRootIcon ? getIcon(EIcon.Bookmarks) : undefined,
     submenu: [
       {
-        label: 'Manage bookmarks',
+        label: t('menu:bookmarks.manage'),
         icon: getIcon(EIcon.Bookmarks),
         enabled: !!window,
         click: () => {

@@ -5,6 +5,7 @@ import slugify from 'slugify';
 import Delete from '#/icons/delete.svg?raw';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import { RETENTION_OPTIONS } from './constants';
+import { LOCALES, SUPPORTED_LOCALES } from '~/i18n/constants';
 
 //-----------------------------------------------------------------------------
 export async function renderGeneralPage(config: IConfig): Promise<{
@@ -42,7 +43,12 @@ async function buildGeneralBody(
     { class: c('flex', 'flex-col', 'gap-2') },
     await renderConfigFolder(),
     renderSearchEngines(engines, callbacks.onAdd, callbacks.onDelete),
-    renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation),
+    h(
+      'div',
+      { class: c('flex', 'gap-2') },
+      renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation),
+      renderLocale(config),
+    ),
     h(
       'div',
       { class: c('flex', 'gap-2') },
@@ -229,6 +235,36 @@ function renderDownloadLocation(
 }
 
 //-----------------------------------------------------------------------------
+function renderLocale(config: IConfig): VNode {
+  return box(
+    'Language',
+    'Set the default app language.',
+    h(
+      'div',
+      { class: c('flex', 'flex-col', 'gap-2') },
+      h(
+        'select',
+        {
+          id: 'app-locale',
+          class: c('select', 'select-sm', 'select-bordered', 'w-32'),
+        },
+        ...SUPPORTED_LOCALES.map((locale) =>
+          h(
+            'option',
+            {
+              value: locale,
+              selected: locale === config.locale,
+            },
+            LOCALES.get(locale),
+          ),
+        ),
+      ),
+      h('small', {}, '* Restart is required after changing the language'),
+    ),
+  );
+}
+
+//-----------------------------------------------------------------------------
 function renderHistoryRetention(config: IConfig): VNode {
   const currentValue = config.historyRetentionDays ?? 7;
 
@@ -318,12 +354,17 @@ async function saveChanges(config: IConfig) {
   ) as HTMLSelectElement;
   const closedTabsRetentionDays = parseInt(closedTabsRetentionSelect.value, 10);
 
+  // Locale
+  const localeSelect = document.getElementById('app-locale') as HTMLSelectElement;
+  const locale = localeSelect.value;
+
   const newConfig = {
     ...config,
     searchEngines,
     downloadsFolder,
     historyRetentionDays,
     closedTabsRetentionDays,
+    locale,
   };
   await abConfig.save(newConfig);
 }
