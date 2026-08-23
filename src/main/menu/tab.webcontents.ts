@@ -10,6 +10,7 @@ import { createColorImage } from '@/utils';
 import { Browser, partitions } from '@/core';
 import type { IWinDesConTab } from '~/types';
 import { MAX_SPLIT_TABS } from '~/constants';
+import { t } from '~/i18n';
 
 export function tabWebContentsMenu(
   browser: Browser,
@@ -50,19 +51,19 @@ function navigationOptions(wc: WebContents): MenuItemConstructorOptions[] {
 
   return [
     {
-      label: 'Back',
+      label: t('menu:contextWebContents.back'),
       enabled: canGoBack,
       icon: getIcon(EIcon.Back),
       click: () => navigationHistory.goBack(),
     },
     {
-      label: 'Forward',
+      label: t('menu:contextWebContents.forward'),
       icon: getIcon(EIcon.Forward),
       enabled: canGoForward,
       click: () => navigationHistory.goForward(),
     },
     {
-      label: 'Reload',
+      label: t('menu:contextWebContents.reload'),
       icon: getIcon(EIcon.Reload),
       enabled: true,
       click: () => wc.reload(),
@@ -81,28 +82,28 @@ function openOptions(
 
   return [
     {
-      label: 'Open link in new tab',
+      label: t('menu:contextWebContents.openInNewTab'),
       icon: getIcon(EIcon.Open),
       click: () => {
         browser.openURL(url, { selectTab: true });
       },
     },
     {
-      label: 'Open link in following tab',
+      label: t('menu:contextWebContents.openInFollowingTab'),
       icon: getIcon(EIcon.Open),
       click: () => {
         browser.openURL(url, { selectTab: true, targetId: 'after-current' });
       },
     },
     {
-      label: 'Open link in new background tab',
+      label: t('menu:contextWebContents.openInBackgroundTab'),
       icon: getIcon(EIcon.Open),
       click: () => {
         browser.openURL(url);
       },
     },
     {
-      label: 'Open link in split view',
+      label: t('menu:contextWebContents.openInSplitView'),
       icon: getIcon(EIcon.Vertical),
       enabled: tabData.tabContainer.activeTabsLength < MAX_SPLIT_TABS,
       click: () => {
@@ -110,7 +111,7 @@ function openOptions(
       },
     },
     {
-      label: 'Open link in ...',
+      label: t('menu:contextWebContents.openIn'),
       icon: getIcon(EIcon.Open),
       submenu: browser.renderer.targetsEntities(tabData.window).map((target) => ({
         label: target.label,

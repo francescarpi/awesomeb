@@ -1,11 +1,16 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Menu } from 'electron';
 import type { ContextMenuParams, MenuItemConstructorOptions, WebContents } from 'electron';
 import type { Actions } from 'electron-context-menu';
+import i18next from 'i18next';
 import { Browser, partitions } from '@/core';
 import { tabMenu } from './tab';
 import { tabWebContentsMenu } from './tab.webcontents';
 import { IWinDesConTab } from '~/types';
+import { initI18n } from '~/i18n';
+
+beforeAll(initI18n);
+afterAll(() => i18next.changeLanguage('en'));
 
 describe('tabMenu', () => {
   let browser: Browser;

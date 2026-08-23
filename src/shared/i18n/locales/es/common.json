@@ -1,1 +1,13 @@
-{}
+{
+  "targets": {
+    "newWindow": "Nueva ventana",
+    "newWindowLeft": "Nueva ventana izquierda",
+    "newWindowRight": "Nueva ventana derecha",
+    "newTab": "Nueva pestaña",
+    "currentTab": "Pestaña actual",
+    "newFollowingTab": "Nueva pestaña siguiente",
+    "splitIntoSelectedTab": "Dividir en pestaña seleccionada",
+    "window": "Ventana {{id}}",
+    "desktop": "Escritorio: \"{{label}}\""
+  }
+}
