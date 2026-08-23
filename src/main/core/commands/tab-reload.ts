@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('ReloadTabCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'reload-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Reload Tab',
-  description: 'Reloads the specified browser tab.',
+  name: () => t('commands:reloadTab.name'),
+  description: () => t('commands:reloadTab.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);

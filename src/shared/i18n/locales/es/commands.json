@@ -1,0 +1,286 @@
+{
+  "acceptTabPreview": {
+    "name": "Aceptar vista previa",
+    "description": "Acepta la vista previa de la pestaña actual"
+  },
+  "addDesktop": {
+    "name": "Agregar escritorio",
+    "description": "Agrega un nuevo escritorio"
+  },
+  "addDivider": {
+    "name": "Agregar divisor de contenedor de pestañas",
+    "description": "Agrega un divisor al contenedor de pestañas."
+  },
+  "certificateInfo": {
+    "name": "Información del certificado",
+    "description": "Muestra la información del certificado SSL/TLS de la pestaña actual."
+  },
+  "changeLayoutSize": {
+    "name": "Cambiar tamaño del diseño",
+    "description": "Cambia el tamaño del diseño dividido"
+  },
+  "changeTabProfile": {
+    "name": "Cambiar perfil de pestaña",
+    "description": "Cambia el perfil de la pestaña actual."
+  },
+  "clearClosedTabs": {
+    "name": "Borrar pestañas cerradas",
+    "description": "Borra la lista de pestañas cerradas recientemente"
+  },
+  "closeTab": {
+    "name": "Cerrar pestaña",
+    "description": "Cierra la pestaña activa o una pestaña específica en la ventana enfocada."
+  },
+  "closeTabChildren": {
+    "name": "Cerrar hijas",
+    "description": "Cierra todas las pestañas hijas de la pestaña seleccionada"
+  },
+  "closeTabPreview": {
+    "name": "Cerrar vista previa",
+    "description": "Cierra la vista previa de la pestaña actual"
+  },
+  "closeTabsBelow": {
+    "name": "Cerrar pestañas inferiores",
+    "description": "Cierra todas las pestañas por debajo de la actual."
+  },
+  "closeWindow": {
+    "name": "Cerrar ventana",
+    "description": "Cierra la ventana especificada"
+  },
+  "copyUrl": {
+    "name": "Copiar URL",
+    "description": "Copia la URL de la pestaña activa al portapapeles."
+  },
+  "copyVersion": {
+    "name": "Copiar versión",
+    "description": "Copia la versión de la App al portapapeles"
+  },
+  "debugPage": {
+    "name": "Página de depuración",
+    "description": "Abre la página de depuración."
+  },
+  "desktopTheme": {
+    "name": "Tema del escritorio",
+    "description": "Cambia el tema del escritorio seleccionado"
+  },
+  "devtools": {
+    "name": "Abrir DevTools",
+    "description": "Abre las DevTools para la pestaña actual."
+  },
+  "devtoolsSidebar": {
+    "name": "DevTools de la barra lateral",
+    "description": "Muestra las DevTools de la barra lateral"
+  },
+  "devtoolsTabswitcher": {
+    "name": "DevTools del selector de pestañas",
+    "description": "Abre las DevTools de la vista del selector de pestañas"
+  },
+  "devtoolsUrlbar": {
+    "name": "DevTools de la barra de URL",
+    "description": "Muestra las DevTools de la barra de URL"
+  },
+  "devtoolsWindow": {
+    "name": "DevTools de la ventana",
+    "description": "Muestra las DevTools de la ventana principal"
+  },
+  "duplicateTab": {
+    "name": "Duplicar pestaña",
+    "description": "Duplica la pestaña actual en una nueva pestaña"
+  },
+  "editUrl": {
+    "name": "Editar URL",
+    "description": "Edita la URL de la pestaña activa"
+  },
+  "findInPage": {
+    "name": "Buscar en la página",
+    "description": "Busca texto en la página actual"
+  },
+  "goBack": {
+    "name": "Atrás",
+    "description": "Navega hacia atrás en el historial de la pestaña especificada."
+  },
+  "goForward": {
+    "name": "Adelante",
+    "description": "Navega hacia adelante en el historial de la pestaña especificada."
+  },
+  "manageExtensions": {
+    "name": "Gestionar extensiones",
+    "description": "Abre la interfaz de gestión de extensiones."
+  },
+  "manageHistory": {
+    "name": "Gestionar historial",
+    "description": "Abre la página de gestión del historial."
+  },
+  "maximizeWindow": {
+    "name": "Maximizar ventana",
+    "description": "Maximiza la ventana especificada"
+  },
+  "minimizeWindow": {
+    "name": "Minimizar ventana",
+    "description": "Minimiza la ventana especificada"
+  },
+  "moveDesktopLeft": {
+    "name": "Mover escritorio a la izquierda",
+    "description": "Mueve el escritorio actual una posición a la izquierda"
+  },
+  "moveDesktopRight": {
+    "name": "Mover escritorio a la derecha",
+    "description": "Mueve el escritorio actual una posición a la derecha"
+  },
+  "moveTab": {
+    "name": "Mover pestaña",
+    "description": "Mueve una pestaña a un destino"
+  },
+  "moveTabContainerDown": {
+    "name": "Bajar contenedor de pestañas",
+    "description": "Baja el contenedor de pestañas actual en la lista."
+  },
+  "moveTabContainerUp": {
+    "name": "Subir contenedor de pestañas",
+    "description": "Sube el contenedor de pestañas actual en la lista."
+  },
+  "newTab": {
+    "name": "Nueva pestaña",
+    "description": "Abre una nueva pestaña en el destino especificado"
+  },
+  "newWindow": {
+    "name": "Nueva ventana",
+    "description": "Abre una nueva ventana"
+  },
+  "nextDesktop": {
+    "name": "Siguiente escritorio",
+    "description": "Cambia al siguiente escritorio"
+  },
+  "nextTab": {
+    "name": "Siguiente pestaña",
+    "description": "Cambia a la siguiente pestaña en la ventana actual"
+  },
+  "openClosed": {
+    "name": "Abrir pestaña cerrada",
+    "description": "Abre la pestaña cerrada más recientemente"
+  },
+  "previousDesktop": {
+    "name": "Escritorio anterior",
+    "description": "Cambia al escritorio anterior"
+  },
+  "previousTab": {
+    "name": "Pestaña anterior",
+    "description": "Cambia a la pestaña anterior en la ventana actual"
+  },
+  "previousVisitedTab": {
+    "name": "Pestaña visitada anteriormente",
+    "description": "Cambia a la pestaña visitada anteriormente"
+  },
+  "print": {
+    "name": "Imprimir",
+    "description": "Imprime la página actual"
+  },
+  "reloadTab": {
+    "name": "Recargar pestaña",
+    "description": "Recarga la pestaña especificada."
+  },
+  "removeAllDividers": {
+    "name": "Quitar todos los divisores del escritorio",
+    "description": "Quita todos los divisores del escritorio."
+  },
+  "removeDesktop": {
+    "name": "Eliminar escritorio",
+    "description": "Elimina el escritorio actual"
+  },
+  "removeDivider": {
+    "name": "Quitar divisor del contenedor de pestañas",
+    "description": "Quita un divisor del contenedor de pestañas."
+  },
+  "renameDesktop": {
+    "name": "Renombrar escritorio",
+    "description": "Renombra el escritorio virtual actual"
+  },
+  "renameTab": {
+    "name": "Renombrar pestaña",
+    "description": "Renombra la pestaña especificada."
+  },
+  "saveSession": {
+    "name": "Guardar sesión",
+    "description": "Guarda la sesión actual en disco."
+  },
+  "selectDesktop": {
+    "name": "Seleccionar escritorio",
+    "description": "Cambia a un escritorio específico"
+  },
+  "selectFirstTabRequireAttention": {
+    "name": "Seleccionar primera pestaña que requiere atención",
+    "description": "Selecciona la primera pestaña que tiene una insignia indicando que requiere atención."
+  },
+  "selectLayout": {
+    "name": "Seleccionar diseño",
+    "description": "Selecciona un diseño para el contenedor de pestañas actual"
+  },
+  "selectTab": {
+    "name": "Seleccionar pestaña",
+    "description": "Selecciona una pestaña por su ID en la ventana enfocada."
+  },
+  "selectTabcontainerByIndex": {
+    "name": "Seleccionar contenedor de pestañas por índice",
+    "description": "Selecciona un contenedor de pestañas según el índice proporcionado, siendo uno-based."
+  },
+  "splitTabPreview": {
+    "name": "Dividir vista previa de pestaña",
+    "description": "Divide la vista previa de pestaña dentro de la pestaña seleccionada"
+  },
+  "stopTab": {
+    "name": "Detener carga de pestaña",
+    "description": "Detiene la carga de la pestaña actual o de una pestaña especificada"
+  },
+  "suspendDesktop": {
+    "name": "Suspender escritorio",
+    "description": "Suspende todas las pestañas del escritorio seleccionado"
+  },
+  "suspendTab": {
+    "name": "Suspender pestaña",
+    "description": "Suspende la pestaña activa en la ventana enfocada."
+  },
+  "swapTabs": {
+    "name": "Intercambiar pestañas",
+    "description": "Rota la posición de las pestañas en un contenedor dividido"
+  },
+  "tabNewFromClipboard": {
+    "name": "Pegar e ir",
+    "description": "Abre una nueva pestaña con la URL del portapapeles."
+  },
+  "toggleCollapseChildren": {
+    "name": "Alternar colapsar hijas",
+    "description": ""
+  },
+  "toggleMaximizeArea": {
+    "name": "Alternar área maximizada",
+    "description": "Alterna la maximización del área de contenido principal ocultando o mostrando la barra lateral y la barra de URL."
+  },
+  "toggleMute": {
+    "name": "Alternar silencio",
+    "description": "Alterna el estado de silencio de la pestaña actual."
+  },
+  "toggleOpenTabsAsChild": {
+    "name": "Alternar abrir pestañas como hijas",
+    "description": "Alterna si las nuevas pestañas abiertas desde esta pestaña se convierten en sus hijas."
+  },
+  "toggleSidebar": {
+    "name": "Alternar barra lateral",
+    "description": "Alterna la visibilidad de la barra lateral en la ventana enfocada."
+  },
+  "unsplitTabs": {
+    "name": "Unificar pestañas",
+    "description": "Deshace la división del contenedor de pestañas actual, moviendo todas las pestañas al contenedor principal."
+  },
+  "zoomIn": {
+    "name": "Acercar",
+    "description": "Aumenta el nivel de zoom de la pestaña actual"
+  },
+  "zoomOut": {
+    "name": "Alejar",
+    "description": "Disminuye el nivel de zoom de la pestaña actual"
+  },
+  "zoomReset": {
+    "name": "Restablecer zoom",
+    "description": "Restablece el zoom predeterminado de la pestaña seleccionada"
+  }
+}

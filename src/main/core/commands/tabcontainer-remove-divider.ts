@@ -1,6 +1,7 @@
 import { TTabContainerId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('RemoveDividerCommand');
 
@@ -12,8 +13,8 @@ export const TRIGGER = 'remove-divider';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Remove Tab Container Divider',
-  description: 'Remove a divider to the tab container.',
+  name: () => t('commands:removeDivider.name'),
+  description: () => t('commands:removeDivider.description'),
   modal: {
     page: TRIGGER,
   },

@@ -2,6 +2,7 @@ import { ICommand } from './types';
 import type { TTabContainerId } from '~/types';
 import log from 'electron-log';
 import { getTabContainer } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('ToggleCollapseChildren');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'toggle-collapse-children';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Collapse Children',
-  description: '',
+  name: () => t('commands:toggleCollapseChildren.name'),
+  description: () => t('commands:toggleCollapseChildren.description'),
   visibility: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
   async handler({ tabContainer, params, window }) {
     const targetTabContainer = getTabContainer(window, tabContainer, params?.tabContainerId);

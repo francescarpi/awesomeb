@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('SelectTabContainerByIndexCommand');
 
@@ -11,8 +12,8 @@ export const TRIGGER = 'select-tabcontainer-by-index';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select Tab Container by Index',
-  description: 'Selects a tab container based on the provided index, being one-based.',
+  name: () => t('commands:selectTabcontainerByIndex.name'),
+  description: () => t('commands:selectTabcontainerByIndex.description'),
   visibility: ({ window }) => !!window,
   async handler({ window, desktop, params, tabContainer: selectedTabContainer }) {
     const tabContainer = desktop.getTabContainerByIndex(params.index - 1);

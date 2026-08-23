@@ -1,5 +1,6 @@
 import { TPartitionId, TSearchEngineCode } from '~/types';
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {
   query: string;
@@ -12,8 +13,8 @@ export const TRIGGER = 'new-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'New Tab',
-  description: 'Open a new tab in specified target',
+  name: () => t('commands:newTab.name'),
+  description: () => t('commands:newTab.description'),
   modal: {
     page: 'new-tab',
   },

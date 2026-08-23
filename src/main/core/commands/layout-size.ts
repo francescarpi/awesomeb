@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('LayoutSizeCommand');
 
@@ -11,8 +12,8 @@ export const TRIGGER = 'change-layout-size';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Change layout size',
-  description: 'Change the size of the split layout',
+  name: () => t('commands:changeLayoutSize.name'),
+  description: () => t('commands:changeLayoutSize.description'),
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   modal: {
     page: 'layout-size',
