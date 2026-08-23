@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('StopLoadingCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'stop-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Stop loading tab',
-  description: 'Stop loading the current tab or a specified tab',
+  name: () => t('commands:stopTab.name'),
+  description: () => t('commands:stopTab.description'),
   visibility: ({ tab }) => !!tab && tab.webContentsLoading,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);

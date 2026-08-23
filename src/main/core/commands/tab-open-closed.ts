@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('OpenClosedCommand');
 
@@ -11,8 +12,8 @@ export const TRIGGER = 'open-closed';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Open Closed Tab',
-  description: 'Open the most recently closed tab',
+  name: () => t('commands:openClosed.name'),
+  description: () => t('commands:openClosed.description'),
   modal: {
     page: 'open-closed',
   },

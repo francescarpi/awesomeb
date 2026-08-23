@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('CloseTabPreviewCommand');
 
@@ -9,8 +10,8 @@ export const TRIGGER = 'close-tab-preview';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tab Preview',
-  description: 'Close the preview of the current tab',
+  name: () => t('commands:closeTabPreview.name'),
+  description: () => t('commands:closeTabPreview.description'),
   visibility: ({ tab }) => !!tab?.tabPreview,
   async handler({ browser, tab }) {
     if (!tab) {

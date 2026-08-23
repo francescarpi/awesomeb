@@ -1,4 +1,5 @@
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -6,8 +7,8 @@ export const TRIGGER = 'previous-visited-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Previous Visited Tab',
-  description: 'Switch to the previously visited tab',
+  name: () => t('commands:previousVisitedTab.name'),
+  description: () => t('commands:previousVisitedTab.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ window, tab }) {
     if (!tab) return;

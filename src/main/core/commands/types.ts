@@ -4,8 +4,8 @@ import { TPage } from '~/types';
 
 export interface ICommand<T, R = void> {
   trigger: string;
-  name: string;
-  description: string;
+  name: () => string;
+  description: () => string;
   modal?: ICommandModal;
   visibility?: (params: {
     window: Window | null;

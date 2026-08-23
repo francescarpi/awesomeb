@@ -1,6 +1,7 @@
 import { TDesktopId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('SuspendDesktopCommand');
 
@@ -12,8 +13,8 @@ export const TRIGGER = 'suspend-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Suspend Desktop',
-  description: 'Suspend all tabs in the selected desktop',
+  name: () => t('commands:suspendDesktop.name'),
+  description: () => t('commands:suspendDesktop.description'),
   modal: {
     page: TRIGGER,
   },

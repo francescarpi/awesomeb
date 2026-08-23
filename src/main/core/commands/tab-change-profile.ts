@@ -2,6 +2,7 @@ import { TPartitionId, TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('ChangeTabProfileCommand');
 
@@ -14,8 +15,8 @@ export const TRIGGER = 'change-tab-profile';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Change Tab Profile',
-  description: 'Changes the profile of the current tab.',
+  name: () => t('commands:changeTabProfile.name'),
+  description: () => t('commands:changeTabProfile.description'),
   visibility: ({ tab }) => !!tab,
   modal: {
     page: 'change-tab-profile',

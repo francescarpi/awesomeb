@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('CloseTabCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'close-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tab',
-  description: 'Closes the currently active tab or a specified tab in the focused window.',
+  name: () => t('commands:closeTab.name'),
+  description: () => t('commands:closeTab.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToClose = getTab(browser, tab, params?.tabId);
