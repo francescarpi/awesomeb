@@ -1,1 +1,13 @@
-{}
+{
+  "targets": {
+    "newWindow": "Nova finestra",
+    "newWindowLeft": "Nova finestra esquerra",
+    "newWindowRight": "Nova finestra dreta",
+    "newTab": "Nova pestanya",
+    "currentTab": "Pestanya actual",
+    "newFollowingTab": "Nova pestanya següent",
+    "splitIntoSelectedTab": "Dividir en pestanya seleccionada",
+    "window": "Finestra {{id}}",
+    "desktop": "Escriptori: \"{{label}}\""
+  }
+}

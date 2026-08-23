@@ -41,6 +41,7 @@ import dayjs from 'dayjs';
 import { extensionsPath } from '@/paths';
 import { type WebContentsView, type WebContents, app } from 'electron';
 import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
+import { t } from '~/i18n';
 
 export class BrowserRenderer {
   constructor(private readonly _browser: Browser) {}
@@ -112,15 +113,15 @@ export class BrowserRenderer {
     const newWindowOption = [
       {
         id: 'new-window',
-        label: 'New window',
+        label: t('targets.newWindow'),
       },
       {
         id: 'new-window-left',
-        label: 'New left window',
+        label: t('targets.newWindowLeft'),
       },
       {
         id: 'new-window-right',
-        label: 'New right window',
+        label: t('targets.newWindowRight'),
       },
     ];
 
@@ -131,14 +132,14 @@ export class BrowserRenderer {
     let result: IEntity[] = [
       {
         id: 'current-desktop-window',
-        label: 'New tab',
+        label: t('targets.newTab'),
       },
     ];
 
     if (selectedTab) {
       result.push({
         id: 'current-tab',
-        label: 'Current tab',
+        label: t('targets.currentTab'),
       });
     }
 
@@ -146,11 +147,11 @@ export class BrowserRenderer {
       ...result,
       {
         id: 'after-current',
-        label: 'New following tab',
+        label: t('targets.newFollowingTab'),
       },
       {
         id: 'split-tab',
-        label: 'Split into selected tab',
+        label: t('targets.splitIntoSelectedTab'),
       },
       ...newWindowOption,
     ];
@@ -158,14 +159,14 @@ export class BrowserRenderer {
     for (const win of this._browser.windows) {
       result.push({
         id: `window-${win.id}`,
-        label: `Window ${win.id}`,
+        label: t('targets.window', { id: win.id }),
       });
     }
 
     for (const desk of window.desktops) {
       result.push({
         id: `desktop-${desk.id}`,
-        label: `Desktop: "${desk.label}"`,
+        label: t('targets.desktop', { label: desk.label }),
       });
     }
 
