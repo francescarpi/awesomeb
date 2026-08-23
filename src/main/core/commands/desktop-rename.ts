@@ -1,6 +1,7 @@
 import { TDesktopId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('RenameDesktopCommand');
 
@@ -14,8 +15,8 @@ export const TRIGGER = 'rename-desktop';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rename Desktop',
-  description: 'Rename the current virtual desktop',
+  name: () => t('commands:renameDesktop.name'),
+  description: () => t('commands:renameDesktop.description'),
   modal: {
     page: 'rename-desktop',
     props: {

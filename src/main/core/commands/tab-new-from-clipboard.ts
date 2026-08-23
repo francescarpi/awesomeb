@@ -1,6 +1,7 @@
 import { notification, isValidUrl } from '@/core';
 import { clipboard } from 'electron';
 import type { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -8,8 +9,8 @@ export const TRIGGER = 'tab-new-from-clipboard';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Paste & Go',
-  description: 'Open a new tab from the URL in the clipboard.',
+  name: () => t('commands:tabNewFromClipboard.name'),
+  description: () => t('commands:tabNewFromClipboard.description'),
   visibility: ({ window }) => !!window,
   async handler({ browser, window: _window }) {
     const clipboardText = clipboard.readText().trim();

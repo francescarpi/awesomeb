@@ -1,5 +1,10 @@
-import { expect, test, describe, beforeEach } from 'vitest';
+import { beforeAll, expect, test, describe, beforeEach } from 'vitest';
 import { Browser, partitions, Window } from '@/core';
+import { initI18n } from '~/i18n';
+
+beforeAll(async () => {
+  await initI18n();
+});
 
 describe('Renderer', () => {
   let browser: Browser;

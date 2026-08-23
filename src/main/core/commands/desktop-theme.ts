@@ -2,6 +2,7 @@ import { TDesktopId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 import { getTheme } from '../themes';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('ChangeDesktopThemeCommand');
 
@@ -14,8 +15,8 @@ export const TRIGGER = 'desktop-theme';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Desktop Theme',
-  description: 'Change the theme of the selected desktop',
+  name: () => t('commands:desktopTheme.name'),
+  description: () => t('commands:desktopTheme.description'),
   modal: {
     page: 'desktop-theme',
     props: {

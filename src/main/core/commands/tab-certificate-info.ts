@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('CertificateInfoCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'certificate-info';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Certificate Info',
-  description: 'View SSL/TLS certificate information for the current tab.',
+  name: () => t('commands:certificateInfo.name'),
+  description: () => t('commands:certificateInfo.description'),
   visibility: ({ tab }) => !!tab && tab.safe,
   modal: {
     page: 'certificate-info',

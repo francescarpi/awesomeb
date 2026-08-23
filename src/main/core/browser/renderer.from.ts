@@ -49,8 +49,8 @@ export class BrowserRenderer {
   commandsEntities(): IEntity[] {
     return getCommands(this._browser).map((cmd) => ({
       id: cmd.trigger,
-      label: cmd.name,
-      extra: cmd.description,
+      label: cmd.name(),
+      extra: cmd.description(),
     }));
   }
 

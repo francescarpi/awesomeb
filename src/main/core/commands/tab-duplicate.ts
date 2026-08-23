@@ -1,5 +1,6 @@
 import { TPartitionId, TTabId } from '~/types';
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {
   tabId: TTabId;
@@ -11,8 +12,8 @@ export const TRIGGER = 'duplicate-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Duplicate Tab',
-  description: 'Duplicate the current tab in a new tab',
+  name: () => t('commands:duplicateTab.name'),
+  description: () => t('commands:duplicateTab.description'),
   modal: {
     page: 'duplicate-tab',
   },

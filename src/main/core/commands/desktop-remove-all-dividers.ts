@@ -1,6 +1,7 @@
 import { TDesktopId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('RemoveAllDividersCommand');
 
@@ -12,8 +13,8 @@ export const TRIGGER = 'remove-all-dividers';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Remove All Desktop Dividers',
-  description: 'Remove all dividers from the desktop.',
+  name: () => t('commands:removeAllDividers.name'),
+  description: () => t('commands:removeAllDividers.description'),
   modal: {
     page: TRIGGER,
   },

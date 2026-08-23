@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import { getTab } from './helpers';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('RenameTabCommand');
 
@@ -14,8 +15,8 @@ export const TRIGGER = 'rename-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Rename Tab',
-  description: 'Renames the specified tab.',
+  name: () => t('commands:renameTab.name'),
+  description: () => t('commands:renameTab.description'),
   visibility: ({ tab }) => !!tab,
   modal: {
     page: 'rename-tab',

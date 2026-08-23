@@ -1,6 +1,7 @@
 import { TTabContainerId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('AddDividerCommand');
 
@@ -12,8 +13,8 @@ export const TRIGGER = 'add-divider';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Add Tab Container Divider',
-  description: 'Add a divider to the tab container.',
+  name: () => t('commands:addDivider.name'),
+  description: () => t('commands:addDivider.description'),
   modal: {
     page: TRIGGER,
   },

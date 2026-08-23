@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('SuspendTabCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'suspend-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Suspend Tab',
-  description: 'Suspends the currently active tab in the focused window.',
+  name: () => t('commands:suspendTab.name'),
+  description: () => t('commands:suspendTab.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToSuspend = getTab(browser, tab, params?.tabId);

@@ -1,4 +1,5 @@
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -6,8 +7,8 @@ export const TRIGGER = 'devtools';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Open DevTools',
-  description: 'Open the DevTools for the current tab.',
+  name: () => t('commands:devtools.name'),
+  description: () => t('commands:devtools.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {

@@ -4,6 +4,7 @@ import type { TTabId } from '~/types';
 import { clipboard } from 'electron';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('CopyURLCommand');
 
@@ -15,8 +16,8 @@ export const TRIGGER = 'copy-url';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Copy URL',
-  description: 'Copy the URL of the active tab to the clipboard.',
+  name: () => t('commands:copyUrl.name'),
+  description: () => t('commands:copyUrl.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ tab, window, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);
