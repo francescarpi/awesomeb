@@ -1,5 +1,6 @@
 {
   "performCommand": {
-    "title": "Executar ordre"
+    "title": "Executar ordre",
+    "placeholder": "Escriu per a cercar una ordre..."
   }
 }

@@ -1,5 +1,6 @@
 {
   "performCommand": {
-    "title": "Perform command"
+    "title": "Perform command",
+    "placeholder": "Start typing to search commands..."
   }
 }

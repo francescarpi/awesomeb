@@ -1,15 +1,14 @@
 ---
 interface Props {
-  tKey?: string;
+  title?: string;
 }
 
-const { tKey } = Astro.props;
+const { title } = Astro.props;
 ---
 
-<h1 class="text-lg mb-2 opacity-30" data-tkey={tKey}><slot /></h1>
+<h1 class="text-lg mb-2 opacity-30" data-tkey={title}><slot /></h1>
 
 <script>
   import { t } from '#/scripts';
-
-  await t('h1[data-tkey]');
+  await t('h1[data-tkey]', 'textContent');
 </script>
