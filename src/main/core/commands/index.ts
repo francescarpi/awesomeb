@@ -162,7 +162,7 @@ export function getCommands(browser: Browser): ICommand<any, any>[] {
       (c) =>
         c.visibility === undefined || c.visibility({ browser, window, desktop, tabContainer, tab }),
     )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => a.name().localeCompare(b.name()));
 }
 
 export function getCommand(trigger: TCommandTrigger): ICommand<any, any> | null {

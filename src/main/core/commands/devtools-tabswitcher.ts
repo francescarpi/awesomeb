@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import { TabSwitcher } from '@/ui';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -7,8 +8,8 @@ export const TRIGGER = 'devtools-tabswitcher';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools Tab Switcher',
-  description: 'Open devtools for the Tab Switcher view',
+  name: () => t('commands:devtoolsTabswitcher.name'),
+  description: () => t('commands:devtoolsTabswitcher.description'),
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {

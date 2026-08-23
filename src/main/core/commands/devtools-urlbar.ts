@@ -1,5 +1,6 @@
 import { URLBar } from '@/ui';
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -7,8 +8,8 @@ export const TRIGGER = 'devtools-urlbar';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools URLBar',
-  description: 'Show the URL bar devtools',
+  name: () => t('commands:devtoolsUrlbar.name'),
+  description: () => t('commands:devtoolsUrlbar.description'),
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {

@@ -1,6 +1,7 @@
 import type { ICommand } from './types';
 import type { TEntityType } from '~/types';
 import { createWindowByTarget, Window } from '@/core';
+import { t } from '~/i18n';
 
 export interface ICommandParams {
   target: TEntityType;
@@ -10,8 +11,8 @@ export const TRIGGER = 'new-window';
 
 export const Command: ICommand<ICommandParams, { window: Window | null }> = {
   trigger: TRIGGER,
-  name: 'New Window',
-  description: 'Open a new window',
+  name: () => t('commands:newWindow.name'),
+  description: () => t('commands:newWindow.description'),
   modal: {
     page: 'new-window',
   },

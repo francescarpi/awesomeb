@@ -1,6 +1,7 @@
 import { ICommand } from './types';
 import { Layouts } from '@/core';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('SelectLayoutCommand');
 
@@ -12,8 +13,8 @@ export const TRIGGER = 'select-layout';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Select layout',
-  description: 'Select a layout for the current tab container',
+  name: () => t('commands:selectLayout.name'),
+  description: () => t('commands:selectLayout.description'),
   visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   modal: {
     page: 'select-layout',

@@ -2,6 +2,7 @@ import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('CloseTabsBelowCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'close-tabs-below';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Close Tabs Below',
-  description: 'Closes all tabs below the current one.',
+  name: () => t('commands:closeTabsBelow.name'),
+  description: () => t('commands:closeTabsBelow.description'),
   visibility: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToClose = getTab(browser, tab, params?.tabId);

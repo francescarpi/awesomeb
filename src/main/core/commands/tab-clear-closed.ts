@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import { notification } from '@/core';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -7,8 +8,8 @@ export const TRIGGER = 'clear-closed-tabs';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Clear Closed Tabs',
-  description: 'Clear the list of recently closed tabs',
+  name: () => t('commands:clearClosedTabs.name'),
+  description: () => t('commands:clearClosedTabs.description'),
   modal: {
     page: 'clear-closed-tabs',
   },

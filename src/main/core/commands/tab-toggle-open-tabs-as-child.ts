@@ -2,6 +2,7 @@ import { ICommand } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { getTab } from './helpers';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('ToggleOpenTabsAsChildCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'toggle-open-tabs-as-child';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Toggle Open Tabs As Child',
-  description: 'Toggles whether new tabs opened from this tab become its children.',
+  name: () => t('commands:toggleOpenTabsAsChild.name'),
+  description: () => t('commands:toggleOpenTabsAsChild.description'),
   visibility: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
   async handler({ tab, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);

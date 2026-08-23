@@ -1,6 +1,11 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { beforeAll, describe, expect, test, vi, beforeEach } from 'vitest';
 import { clipboard, Notification } from 'electron';
 import { Browser, partitions } from '@/core';
+import { initI18n } from '~/i18n';
+
+beforeAll(async () => {
+  await initI18n();
+});
 import * as windowMinimize from './window-minimize';
 import * as windowMaximize from './window-maximize';
 import * as windowClose from './window-close';
@@ -758,9 +763,11 @@ describe('Commands', () => {
         expect(command.trigger).toBeDefined();
         expect(typeof command.trigger).toBe('string');
         expect(command.name).toBeDefined();
-        expect(typeof command.name).toBe('string');
+        expect(typeof command.name).toBe('function');
+        expect(typeof command.name()).toBe('string');
         expect(command.description).toBeDefined();
-        expect(typeof command.description).toBe('string');
+        expect(typeof command.description).toBe('function');
+        expect(typeof command.description()).toBe('string');
         expect(command.handler).toBeDefined();
         expect(typeof command.handler).toBe('function');
       });

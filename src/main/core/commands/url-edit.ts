@@ -1,6 +1,7 @@
 import { TTabId } from '~/types';
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('EditURLCommand');
 
@@ -13,8 +14,8 @@ export const TRIGGER = 'edit-url';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Edit URL',
-  description: 'Edit the URL of the active tab',
+  name: () => t('commands:editUrl.name'),
+  description: () => t('commands:editUrl.description'),
   modal: {
     page: 'edit-url',
   },

@@ -1,5 +1,6 @@
 import { TTabId } from '~/types';
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {
   targetId: string;
@@ -10,8 +11,8 @@ export const TRIGGER = 'move-tab';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Move Tab',
-  description: 'Move a tab to a target',
+  name: () => t('commands:moveTab.name'),
+  description: () => t('commands:moveTab.description'),
   modal: {
     page: 'move-tab',
   },

@@ -1,5 +1,6 @@
 import { ICommand } from './types';
 import log from 'electron-log';
+import { t } from '~/i18n';
 
 const scopeLog = log.scope('AcceptTabPreviewCommand');
 
@@ -9,8 +10,8 @@ export const TRIGGER = 'accept-tab-preview';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Accept Tab Preview',
-  description: 'Accept the preview of the current tab',
+  name: () => t('commands:acceptTabPreview.name'),
+  description: () => t('commands:acceptTabPreview.description'),
   visibility: ({ tab }) => !!tab?.tabPreview,
   async handler({ browser, tab }) {
     if (!tab) {

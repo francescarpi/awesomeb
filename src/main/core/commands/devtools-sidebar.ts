@@ -1,5 +1,6 @@
 import { Sidebar } from '@/ui';
 import { ICommand } from './types';
+import { t } from '~/i18n';
 
 export interface ICommandParams {}
 
@@ -7,8 +8,8 @@ export const TRIGGER = 'devtools-sidebar';
 
 export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
-  name: 'Devtools Sidebar',
-  description: 'Show the sidebar devtools',
+  name: () => t('commands:devtoolsSidebar.name'),
+  description: () => t('commands:devtoolsSidebar.description'),
   visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {
