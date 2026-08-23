@@ -1,9 +1,13 @@
-import { SHORTCUTS_MAP_GENERIC_ISO } from './maps';
+import { getGenericISOShortcuts } from './maps';
 import type { TShortcutMapId, IShortcutMap } from '~/types';
 
-export const SHORTCUTS_MAPS: Record<TShortcutMapId, IShortcutMap> = {
-  [SHORTCUTS_MAP_GENERIC_ISO.id]: SHORTCUTS_MAP_GENERIC_ISO,
-};
+export function getShortcutMaps(): Record<TShortcutMapId, IShortcutMap> {
+  const genericIso = getGenericISOShortcuts();
+
+  return {
+    [genericIso.id]: genericIso,
+  };
+}
 
 export { getShortcut, getActiveMap } from './helpers';
 export { setupShortcutsIPC } from './ipc';
