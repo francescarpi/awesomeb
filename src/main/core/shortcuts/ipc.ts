@@ -1,6 +1,6 @@
 import { Browser, config, notification, type Window } from '@/core';
 import { createHandler, internalPageChecker, viewChecker, windowChecker } from '@/utils';
-import { SHORTCUTS_MAPS } from './index';
+import { getShortcutMaps } from './index';
 import { getActiveMap } from './helpers';
 import type { TShortcutMapId, TShortcutId } from '~/types';
 
@@ -12,7 +12,7 @@ export function setupShortcutsIPC(browser: Browser) {
     browser,
     [internalPageChecker.bind(null, 'settings')],
     async ({}) => {
-      return SHORTCUTS_MAPS;
+      return getShortcutMaps();
     },
   );
 
@@ -23,7 +23,7 @@ export function setupShortcutsIPC(browser: Browser) {
     browser,
     [internalPageChecker.bind(null, 'settings')],
     async ({ mapId: id, shortcutId, key }) => {
-      const map = SHORTCUTS_MAPS[id];
+      const map = getShortcutMaps()[id];
       if (!map) throw new Error(`Shortcut map "${id}" not found`);
       if (!map.shortcuts[shortcutId])
         throw new Error(`Shortcut "${shortcutId}" not found in map "${id}"`);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { UI_THEMES, DEFAULT_UI_THEME } from '~/constants';
+import { SUPPORTED_LOCALES } from '~/i18n/constants';
 
 export const ConfigSearchEngineScheme = z
   .object({
@@ -37,6 +38,7 @@ export const ConfigScheme = z
     historyRetentionDays: z.number().default(7),
     closedTabsRetentionDays: z.number().default(7),
     uiTheme: z.enum(UI_THEMES).default(DEFAULT_UI_THEME),
+    locale: z.enum(SUPPORTED_LOCALES as [string, ...string[]]).optional(),
   })
   .strict();
 
