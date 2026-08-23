@@ -1,1 +1,1 @@
-export { SHORTCUTS_MAP as SHORTCUTS_MAP_GENERIC_ISO } from './generic_iso';
+export { getShortcuts as getGenericISOShortcuts } from './generic_iso';
