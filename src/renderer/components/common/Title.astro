@@ -1,5 +1,15 @@
 ---
+interface Props {
+  tKey?: string;
+}
 
+const { tKey } = Astro.props;
 ---
 
-<h1 class="text-lg mb-2 opacity-30"><slot /></h1>
+<h1 class="text-lg mb-2 opacity-30" data-tkey={tKey}><slot /></h1>
+
+<script>
+  import { t } from '#/scripts';
+
+  await t('h1[data-tkey]');
+</script>

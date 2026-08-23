@@ -34,7 +34,7 @@ import { setupLogs, setupAbout, setupFeatures } from './boot';
 import { registerAppEvents } from './app.events';
 import { setupMenuIPC } from '@/menu';
 import electronDl from 'electron-dl';
-import { initI18n } from '~/i18n';
+import { initI18n, setupI18nIPC } from '~/i18n';
 
 export type { IModalProps } from './ui';
 
@@ -87,6 +87,7 @@ app.whenReady().then(async () => {
   setupWelcomeIPC(browser);
   setupMediaIPC(browser);
   setupAppUpdaterIPC(browser);
+  setupI18nIPC(browser);
 
   if (config.wasConfigured) {
     await browser.loadSession();

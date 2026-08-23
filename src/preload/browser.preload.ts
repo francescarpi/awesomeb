@@ -412,6 +412,13 @@ const abAppUpdater = {
 };
 
 //--------------------------------------------------------------------------------------
+const abI18n = {
+  t: (winId: TWindowId, key: string) => {
+    return ipcRenderer.invoke('i18n:t', { winId, key });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -438,3 +445,4 @@ contextBridge.exposeInMainWorld('abBrowser', abBrowser);
 contextBridge.exposeInMainWorld('abWelcome', abWelcome);
 contextBridge.exposeInMainWorld('abMedia', abMedia);
 contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
+contextBridge.exposeInMainWorld('abI18n', abI18n);

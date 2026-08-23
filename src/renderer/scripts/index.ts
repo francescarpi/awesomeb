@@ -11,3 +11,4 @@ export * from './string';
 export * from './settings';
 export * from './button-manager';
 export * from './edit-url';
+export * from './i18n';
