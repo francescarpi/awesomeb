@@ -2,5 +2,50 @@
   "performCommand": {
     "title": "Ejecutar comando",
     "placeholder": "Escribe para buscar un comando..."
+  },
+  "about": {
+    "developedBy": "Desarrollado por {{name}} <i>({{email}})</i>",
+    "version": "Versión {{version}}"
+  },
+  "addBookmark": {
+    "title": "Añadir marcador",
+    "parentFolder": "Carpeta padre: {{id}}",
+    "inputTitle": "Título",
+    "inputURL": "URL",
+    "folderName": "Nombre de la carpeta"
+  },
+  "addDivider": {
+    "title": "Agregar divisor",
+    "placeholder": "Escribe para buscar un contenedor de pestañas..."
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "deleteConfirm": "¿Estás seguro que quieres eliminar este marcador?",
+    "selectNewParent": "Selecciona la nueva carpeta padre"
+  },
+  "certificateInfo": {
+    "title": "Información del certificado",
+    "commonName": "Nombre común",
+    "issuerCountry": "País emisor",
+    "issuerOrganization": "Organización emisora",
+    "issuerCommonName": "Nombre común del emisor",
+    "validFrom": "Válido desde",
+    "validTo": "Válido hasta"
+  },
+  "changeTabProfile": {
+    "title": "Cambiar perfil de pestaña",
+    "placeholder": "Selecciona un nuevo perfil..."
+  },
+  "clearClosedTabs": {
+    "message": "¿Estás seguro que quieres borrar el historial de pestañas cerradas?"
+  },
+  "clientCertificate": {
+    "title": "Selecciona un certificado",
+    "message": "El sitio <i>{{url}}</i> solicita un certificado de cliente para la autenticación. Elija un certificado para continuar."
+  },
+  "appUpdater": {
+    "current": "Actual",
+    "new": "Nueva",
+    "failed": "Oops... algo fue mal :("
   }
 }

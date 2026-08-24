@@ -9,5 +9,10 @@
     "splitIntoSelectedTab": "Split into selected tab",
     "window": "Window {{id}}",
     "desktop": "Desktop: \"{{label}}\""
-  }
+  },
+  "ok": "OK",
+  "cancel": "Cancel",
+  "save": "Save",
+  "move": "Move",
+  "delete": "Delete"
 }

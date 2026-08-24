@@ -7,7 +7,7 @@ import logo from '../assets/icon.png';
   <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
     <img src={logo.src} alt="AwesomeB" width="64" height="64" />
     <b>AwesomeB(rowser)</b>
-    <p class="text-sm">Developed by Francesc Arpi Roca <i>(francesc.arpi@gmail.com)</i></p>
+    <p class="text-sm" id="developedBy"></p>
     <div id="content"></div>
   </div>
 </Modal>
@@ -20,11 +20,19 @@ import logo from '../assets/icon.png';
   const renderer = new Renderer(h('div', null)).render('content');
   const data = await abBrowser.about(winId);
 
+  const developedBy = document.getElementById('developedBy') as HTMLParagraphElement;
+  developedBy.innerHTML = await abI18n.t(winId, 'pages:about.developedBy', {
+    name: 'Francesc Arpi Roca',
+    email: 'francesc.arpi@gmail.com',
+  });
+
   const [btns, registerBtnsEvents] = confirmButtons({
     onConfirm: () => {
       abModal.close(winId);
     },
   });
+
+  const version = await abI18n.t(winId, 'pages:about.version', { version: data.version });
 
   renderer.update(
     h(
@@ -33,7 +41,7 @@ import logo from '../assets/icon.png';
       h(
         'div',
         { class: c('flex', 'items-center', 'gap-2') },
-        h('p', { class: c('text-xs') }, `Version: ${data.version}`),
+        h('p', { class: c('text-xs') }, version),
         h('div', {
           class: c(
             'w-3.5',

@@ -1,4 +1,7 @@
-export function dialogConfirm(
+import type { TWindowId } from '~/types';
+
+export async function dialogConfirm(
+  winId: TWindowId,
   message: string,
   props?: {
     onAccept?: () => void;
@@ -23,12 +26,12 @@ export function dialogConfirm(
 
   const acceptButton = document.createElement('button');
   acceptButton.classList.add('btn', 'btn-sm', 'btn-primary');
-  acceptButton.textContent = 'OK';
+  acceptButton.textContent = await abI18n.t(winId, 'ok');
   acceptButton.value = 'ok';
 
   const cancelButton = document.createElement('button');
   cancelButton.classList.add('btn', 'btn-sm');
-  cancelButton.textContent = 'Cancel';
+  cancelButton.textContent = await abI18n.t(winId, 'cancel');
   cancelButton.value = 'cancel';
 
   actionsForm.appendChild(cancelButton);

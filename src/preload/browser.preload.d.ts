@@ -255,6 +255,6 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abI18n: {
-    t: (winId: TWindowId, key: string) => Promise<string>;
+    t: (winId: TWindowId, key: string, params?: Record<string, unknown>) => Promise<string>;
   };
 }

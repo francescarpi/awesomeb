@@ -2,5 +2,50 @@
   "performCommand": {
     "title": "Executar ordre",
     "placeholder": "Escriu per a cercar una ordre..."
+  },
+  "about": {
+    "developedBy": "Desenvolupat per {{name}} <i>({{email}})</i>",
+    "version": "Versió {{version}}"
+  },
+  "addBookmark": {
+    "title": "Afegeix una adreça d'interès",
+    "parentFolder": "Carpeta pare: {{id}}",
+    "inputTitle": "Títol",
+    "inputURL": "URL",
+    "folderName": "Nom de la carpeta"
+  },
+  "addDivider": {
+    "title": "Afegeix un separador",
+    "placeholder": "Escriu per a cercar un contenidor de pestanyes..."
+  },
+  "bookmarks": {
+    "title": "Adreces d'interès",
+    "deleteConfirm": "Segur que vols eliminar aquesta adreça d'interès?",
+    "selectNewParent": "Selecciona la nova carpeta pare"
+  },
+  "certificateInfo": {
+    "title": "Informació del certificat",
+    "commonName": "Nom comú",
+    "issuerCountry": "País emissor",
+    "issuerOrganization": "Organització emissora",
+    "issuerCommonName": "Nom comú de l'emissor",
+    "validFrom": "Vàlid des de",
+    "validTo": "Vàlid fins"
+  },
+  "changeTabProfile": {
+    "title": "Canvia el perfil de la pestanya",
+    "placeholder": "Selecciona un perfil nou..."
+  },
+  "clearClosedTabs": {
+    "message": "Segur que vols esborrar l'historial de pestanyes tancades?"
+  },
+  "clientCertificate": {
+    "title": "Selecciona un certificat",
+    "message": "El lloc <i>{{url}}</i> sol·licita un certificat de client per a l'autenticació. Trieu un certificat per continuar."
+  },
+  "appUpdater": {
+    "current": "Actual",
+    "new": "Nova",
+    "failed": "Ups... alguna cosa ha fallat :("
   }
 }

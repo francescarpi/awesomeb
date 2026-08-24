@@ -16,7 +16,8 @@ import Title from '#/components/common/Title.astro';
   const permission = searchParams.get('permission') as string;
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => {
       abTabs.grantPermission(winId, tabId, true);
       abModal.close(winId);

@@ -1,18 +1,24 @@
 import type { VNode } from './types';
+import type { TWindowId } from '~/types';
 import { h } from './vdom';
 import { c } from './classnames';
 import enter from '#/icons/return.svg?raw';
 import esc from '#/icons/escape.svg?raw';
 
-export function confirmButtons({
-  confirmText = 'OK',
+export async function confirmButtons({
+  winId,
+  confirmText,
   onConfirm,
   onCancel,
 }: {
+  winId: TWindowId;
   confirmText?: string;
   onConfirm: () => void;
   onCancel?: () => void;
-}): [VNode[], () => void] {
+}): Promise<[VNode[], () => void]> {
+  const confText = confirmText || (await abI18n.t(winId, 'ok'));
+  const cancelText = await abI18n.t(winId, 'cancel');
+
   const onKeydown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       onConfirm();
@@ -38,7 +44,7 @@ export function confirmButtons({
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
-      'Cancel',
+      cancelText,
       h('div', {
         class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
         innerHTML: esc,
@@ -52,7 +58,7 @@ export function confirmButtons({
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
-      confirmText,
+      confText,
       h('div', {
         class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
         innerHTML: enter,

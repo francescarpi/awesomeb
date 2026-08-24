@@ -2,7 +2,7 @@
 import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
-<BlackBgWithTitle title="Bookmarks">
+<BlackBgWithTitle title="pages:bookmarks.title">
   <div class="flex gap-2">
     <!-- Bookmarks tree navigation (left panel) -->
     <div id="bookmarks-tree" class="w-75 flex flex-col gap-2 p-2 overflow-y-auto border-r"></div>
@@ -71,7 +71,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
 <script>
   import { IBookmark, IFolderBookmark, IUrlBookmark, EBookmarkType } from '~/types';
-  import { dialogConfirm, dialogWithSelect, type IOption } from '#/scripts';
+  import { dialogConfirm, dialogWithSelect, type IOption, getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
 
   // =============================================================================
   // DOM ELEMENTS
@@ -84,6 +86,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   const folderTemplate = document.getElementById('folder-template') as HTMLTemplateElement;
   const urlTemplate = document.getElementById('url-template') as HTMLTemplateElement;
   const detailsTemplate = document.getElementById('details-template') as HTMLTemplateElement;
+
+  // Texts
+  const saveText = await abI18n.t(winId, 'save');
+  const moveText = await abI18n.t(winId, 'move');
+  const deleteText = await abI18n.t(winId, 'delete');
+  const deleteConfirm = await abI18n.t(winId, 'pages:bookmarks.deleteConfirm');
+  const selectNewParent = await abI18n.t(winId, 'pages:bookmarks.selectNewParent');
 
   // =============================================================================
   // INITIALIZATION
@@ -180,8 +189,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     // Get action buttons
     const saveButton = detailsElement.querySelector('.save') as HTMLButtonElement;
+    saveButton.textContent = saveText;
+
     const deleteButton = detailsElement.querySelector('.delete') as HTMLButtonElement;
+    deleteButton.textContent = deleteText;
+
     const moveButton = detailsElement.querySelector('.move') as HTMLButtonElement;
+    moveButton.textContent = moveText;
 
     // Clear previous details
     bookmarkDetails.innerHTML = '';
@@ -234,8 +248,8 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     bookmarks: IBookmark[],
     bookmark: IBookmark,
   ) {
-    button.addEventListener('click', () => {
-      dialogConfirm('Are you sure you want to delete this bookmark?', {
+    button.addEventListener('click', async () => {
+      await dialogConfirm(winId, deleteConfirm, {
         onAccept: () => {
           const newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
           abBookmarks.update(newBookmarks).then(() => {
@@ -255,13 +269,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     bookmarks: IBookmark[],
     bookmark: IBookmark,
   ) {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
       const options = [
         { label: 'Root', value: 'root' },
         ...bookmarksToOptions(bookmarks, bookmark.id, 1),
       ];
 
-      dialogWithSelect('Select new parent folder', options, {
+      await dialogWithSelect(winId, selectNewParent, options, {
         onAccept: (selectedFolderId) => {
           let newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
 

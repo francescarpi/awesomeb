@@ -4,7 +4,7 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="600px">
-  <Title>Certificate Info</Title>
+  <Title title="pages:certificateInfo.title" />
   <div id="content"></div>
 </Modal>
 
@@ -14,28 +14,38 @@ import Title from '#/components/common/Title.astro';
 
   const { winId } = getSearchParams();
 
+  const commonName = await abI18n.t(winId, 'pages:certificateInfo.commonName');
+  const issuerCountry = await abI18n.t(winId, 'pages:certificateInfo.issuerCountry');
+  const issuerOrganization = await abI18n.t(winId, 'pages:certificateInfo.issuerOrganization');
+  const issuerCommonName = await abI18n.t(winId, 'pages:certificateInfo.issuerCommonName');
+  const validFrom = await abI18n.t(winId, 'pages:certificateInfo.validFrom');
+  const validTo = await abI18n.t(winId, 'pages:certificateInfo.validTo');
+
   const renderer = new Renderer(
     h('div', null, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
   ).render('content');
 
-  abCertificates.info(winId).then((data) => {
-    const [btns, registerBtnsEvents] = confirmButtons({ onConfirm: () => abModal.close(winId) });
+  abCertificates.info(winId).then(async (data) => {
+    const [btns, registerBtnsEvents] = await confirmButtons({
+      winId,
+      onConfirm: () => abModal.close(winId),
+    });
 
     if (data) {
       const vnode = h(
         'div',
         { class: c('grid', 'grid-cols-2') },
-        h('span', { class: c('font-bold') }, 'Common Name:'),
+        h('span', { class: c('font-bold') }, commonName),
         h('span', null, data.subject.CN),
-        h('span', { class: c('font-bold') }, 'Issuer Country:'),
+        h('span', { class: c('font-bold') }, issuerCountry),
         h('span', null, data.issuer.C),
-        h('span', { class: c('font-bold') }, 'Issuer Organization:'),
+        h('span', { class: c('font-bold') }, issuerOrganization),
         h('span', null, data.issuer.O),
-        h('span', { class: c('font-bold') }, 'Issuer Common Name:'),
+        h('span', { class: c('font-bold') }, issuerCommonName),
         h('span', null, data.issuer.CN),
-        h('span', { class: c('font-bold') }, 'Valid From:'),
+        h('span', { class: c('font-bold') }, validFrom),
         h('span', null, dayjs(data.valid_from).format('ddd, D MMM YYYY HH:mm:ss')),
-        h('span', { class: c('font-bold') }, 'Valid To:'),
+        h('span', { class: c('font-bold') }, validTo),
         h('span', null, dayjs(data.valid_to).format('ddd, D MMM YYYY HH:mm:ss')),
         h('div', { class: c('col-span-2', 'mt-6', 'flex', 'justify-center') }, ...btns),
       );

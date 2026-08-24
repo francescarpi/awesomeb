@@ -13,6 +13,6 @@ export const Command: ICommand<ICommandParams> = {
   description: () => t('commands:copyVersion.description'),
   async handler({}) {
     clipboard.writeText(app.getVersion());
-    notification('Version Copied', `Version text "${app.getVersion()}" copied to clipboard`);
+    notification('Version Copied', `Version "${app.getVersion()}" copied to clipboard`);
   },
 };
