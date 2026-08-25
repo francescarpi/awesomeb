@@ -24,7 +24,7 @@
     "description": "Cambia el perfil de la pestaña actual."
   },
   "clearClosedTabs": {
-    "name": "Borrar pestañas cerradas",
+    "name": "Limpiar historial de pestañas cerradas",
     "description": "Borra la lista de pestañas cerradas recientemente"
   },
   "closeTab": {

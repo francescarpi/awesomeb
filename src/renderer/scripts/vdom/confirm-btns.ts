@@ -16,8 +16,9 @@ export async function confirmButtons({
   onConfirm: () => void;
   onCancel?: () => void;
 }): Promise<[VNode[], () => void]> {
-  const confText = confirmText || (await abI18n.t(winId, 'ok'));
-  const cancelText = await abI18n.t(winId, 'cancel');
+  const t = await abI18n.t(winId, [{ key: 'ok' }, { key: 'cancel' }]);
+  const confText = confirmText || t['ok'];
+  const cancelText = t['cancel'];
 
   const onKeydown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {

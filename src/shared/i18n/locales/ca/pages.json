@@ -47,5 +47,68 @@
     "current": "Actual",
     "new": "Nova",
     "failed": "Ups... alguna cosa ha fallat :("
+  },
+  "downloads": {
+    "title": "Baixades",
+    "noDownloads": "No hi ha baixades per a aquesta sessió",
+    "viewAll": "Veure-les totes",
+    "clearCompleted": "Neteja les completades",
+    "name": "Nom",
+    "date": "Data"
+  },
+  "debug": {
+    "title": "Depuració",
+    "wcTitle": "Llistat de tots els continguts web registrats amb informació útil de cadascun. Recorda que pots filtrar i ordenar.",
+    "filterByWindow": "Filtra per finestra",
+    "searchTitleURL": "Cerca per títol, URL o PID...",
+    "order": {
+      "no": "Sense ordre",
+      "mem": "Memòria",
+      "cpu": "CPU"
+    },
+    "wcTableColumns": {
+      "win": "Fin.",
+      "pid": "PID",
+      "title": "Títol/URL",
+      "visible": "Visible",
+      "profile": "Perfil",
+      "preloads": "Preloads",
+      "memory": "Memòria",
+      "cpu": "CPU"
+    },
+    "tiTitle": "Dades d'índex de pestanyes per a totes les pestanyes en totes les finestres/escriptoris.",
+    "tiTableColumns": {
+      "tabIndex": "Índex",
+      "window": "Finestra",
+      "desktop": "Escriptori",
+      "tabContainer": "Contenidor de pest.",
+      "tabId": "Id pestanya",
+      "tabTitle": "Títol pestanya"
+    }
+  },
+  "desktopTheme": {
+    "title": "Tema de l'escriptori",
+    "placeholder": "Filtra i selecciona un tema..."
+  },
+  "duplicateTab": {
+    "title": "Duplica una pestanya",
+    "placeholder1": "Selecciona una pestanya",
+    "placeholder2": "Selecciona un perfil",
+    "placeholder3": "Selecciona una destinació"
+  },
+  "editURL": {
+    "title": "Edita l'URL",
+    "option1Title": "Edita l'URL completa",
+    "url": "URL completa",
+    "option2Title": "Edita l'URL per parts",
+    "protocol": "Protocol",
+    "hostname": "Nom del host",
+    "port": "Port",
+    "pathname": "Pathname",
+    "hash": "Hash",
+    "queryParams": "Queryparams",
+    "add": "Afegeix",
+    "key": "Clau",
+    "value": "Valor"
   }
 }

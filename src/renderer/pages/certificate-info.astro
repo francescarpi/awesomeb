@@ -14,12 +14,14 @@ import Title from '#/components/common/Title.astro';
 
   const { winId } = getSearchParams();
 
-  const commonName = await abI18n.t(winId, 'pages:certificateInfo.commonName');
-  const issuerCountry = await abI18n.t(winId, 'pages:certificateInfo.issuerCountry');
-  const issuerOrganization = await abI18n.t(winId, 'pages:certificateInfo.issuerOrganization');
-  const issuerCommonName = await abI18n.t(winId, 'pages:certificateInfo.issuerCommonName');
-  const validFrom = await abI18n.t(winId, 'pages:certificateInfo.validFrom');
-  const validTo = await abI18n.t(winId, 'pages:certificateInfo.validTo');
+  const t = await abI18n.t(winId, [
+    { key: 'pages:certificateInfo.commonName' },
+    { key: 'pages:certificateInfo.issuerCountry' },
+    { key: 'pages:certificateInfo.issuerOrganization' },
+    { key: 'pages:certificateInfo.issuerCommonName' },
+    { key: 'pages:certificateInfo.validFrom' },
+    { key: 'pages:certificateInfo.validTo' },
+  ]);
 
   const renderer = new Renderer(
     h('div', null, h('span', { class: c('loading', 'loading-dots', 'loading-xs') }, '')),
@@ -35,17 +37,17 @@ import Title from '#/components/common/Title.astro';
       const vnode = h(
         'div',
         { class: c('grid', 'grid-cols-2') },
-        h('span', { class: c('font-bold') }, commonName),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.commonName']),
         h('span', null, data.subject.CN),
-        h('span', { class: c('font-bold') }, issuerCountry),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.issuerCountry']),
         h('span', null, data.issuer.C),
-        h('span', { class: c('font-bold') }, issuerOrganization),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.issuerOrganization']),
         h('span', null, data.issuer.O),
-        h('span', { class: c('font-bold') }, issuerCommonName),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.issuerCommonName']),
         h('span', null, data.issuer.CN),
-        h('span', { class: c('font-bold') }, validFrom),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.validFrom']),
         h('span', null, dayjs(data.valid_from).format('ddd, D MMM YYYY HH:mm:ss')),
-        h('span', { class: c('font-bold') }, validTo),
+        h('span', { class: c('font-bold') }, t['pages:certificateInfo.validTo']),
         h('span', null, dayjs(data.valid_to).format('ddd, D MMM YYYY HH:mm:ss')),
         h('div', { class: c('col-span-2', 'mt-6', 'flex', 'justify-center') }, ...btns),
       );

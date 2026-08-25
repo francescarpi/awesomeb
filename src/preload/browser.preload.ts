@@ -413,8 +413,8 @@ const abAppUpdater = {
 
 //--------------------------------------------------------------------------------------
 const abI18n = {
-  t: (winId: TWindowId, key: string, params?: Record<string, unknown>) => {
-    return ipcRenderer.invoke('i18n:t', { winId, key, params });
+  t: (winId: TWindowId, keys: { key: string; params?: Record<string, unknown> }[]) => {
+    return ipcRenderer.invoke('i18n:t', { winId, keys });
   },
 };
 

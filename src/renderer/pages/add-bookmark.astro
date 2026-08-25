@@ -19,6 +19,13 @@ import Title from '#/components/common/Title.astro';
   const parentName = searchParams.get('parentName') as string;
   const createFolder = (searchParams.get('createFolder') as string) === 'true';
 
+  const t = await abI18n.t(winId, [
+    { key: 'pages:addBookmark.parentFolder', params: { id: parentName } },
+    { key: 'pages:addBookmark.inputTitle' },
+    { key: 'pages:addBookmark.inputURL' },
+    { key: 'pages:addBookmark.folderName' },
+  ]);
+
   const [btns, registerBtnsEvents] = await confirmButtons({
     winId,
     onConfirm: () => {
@@ -45,11 +52,6 @@ import Title from '#/components/common/Title.astro';
     },
   });
 
-  const parentFolder = await abI18n.t(winId, 'pages:addBookmark.parentFolder', { id: parentName });
-  const inputTitle = await abI18n.t(winId, 'pages:addBookmark.inputTitle');
-  const inputURL = await abI18n.t(winId, 'pages:addBookmark.inputURL');
-  const folderName = await abI18n.t(winId, 'pages:addBookmark.folderName');
-
   new Renderer(
     h(
       'div',
@@ -57,10 +59,10 @@ import Title from '#/components/common/Title.astro';
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
-        h('span', { class: c('text-sm') }, parentFolder),
-        input('folder-name', folderName, '', { visible: createFolder }),
-        input('title', inputTitle, title),
-        input('url', inputURL, url),
+        h('span', { class: c('text-sm') }, t['pages:addBookmark.parentFolder']),
+        input('folder-name', t['pages:addBookmark.inputTitle'], '', { visible: createFolder }),
+        input('title', t['pages:addBookmark.inputURL'], title),
+        input('url', t['pages:addBookmark.folderName'], url),
       ),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),

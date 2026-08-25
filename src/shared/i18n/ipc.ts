@@ -10,7 +10,7 @@ import { t } from '~/i18n';
 
 export function setupI18nIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
-  createHandler<{ key: string; params?: Record<string, unknown> }>(
+  createHandler<{ keys: { key: string; params?: Record<string, unknown> }[] }>(
     'i18n:t',
     'handle',
     browser,
@@ -19,11 +19,14 @@ export function setupI18nIPC(browser: Browser) {
         null,
         (args) => typeof args.winId === 'number',
         [windowChecker, modalChecker],
-        [internalPageChecker.bind(null, 'bookmarks')],
+        [internalPageChecker.bind(null, 'bookmarks'), internalPageChecker.bind(null, 'downloads')],
       ),
     ],
-    async ({ key, params }) => {
-      return t(key, params);
+    async ({ keys }) => {
+      return keys.reduce((acc, curr) => {
+        acc[curr.key] = t(curr.key, curr.params);
+        return acc;
+      }, {});
     },
   );
 }

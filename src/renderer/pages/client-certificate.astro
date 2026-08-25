@@ -19,7 +19,7 @@ import Title from '#/components/common/Title.astro';
     return { fingerprint, subject };
   });
 
-  const msg = await abI18n.t(winId, 'pages:clientCertificate.message', { url });
+  const t = await abI18n.t(winId, [{ key: 'pages:clientCertificate.message', params: { url } }]);
 
   const [btns, registerBtnsEvents] = await confirmButtons({
     winId,
@@ -37,7 +37,7 @@ import Title from '#/components/common/Title.astro';
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
       h('p', {
-        innerHTML: msg,
+        innerHTML: t['pages:clientCertificate.message'],
       }),
       h(
         'select',

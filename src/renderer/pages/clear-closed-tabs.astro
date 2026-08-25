@@ -17,13 +17,13 @@ import Modal from '#/layouts/Modal.astro';
     onCancel: () => abModal.close(winId),
   });
 
-  const msg = await abI18n.t(winId, 'pages:clearClosedTabs.message');
+  const t = await abI18n.t(winId, [{ key: 'pages:clearClosedTabs.message' }]);
 
   new Renderer(
     h(
       'div',
       { classs: c('flex', 'flex-col', 'gap-3') },
-      h('p', { class: c('text-md', 'my-6') }, msg),
+      h('p', { class: c('text-md', 'my-6') }, t['pages:clearClosedTabs.message']),
       h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
     ),
   ).render('container', { onRendered: registerBtnsEvents });

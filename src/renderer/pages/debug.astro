@@ -2,7 +2,7 @@
 import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
-<BlackBgWithTitle title="Debug">
+<BlackBgWithTitle title="pages:debug.title">
   <div>
     <div id="webcontents"></div>
     <div id="tabindex"></div>
@@ -13,7 +13,32 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
   import type { IDebugWebContent, IDebugTabIndex } from '~/types';
 
-  document.title = 'Debug page';
+  const t = await abI18n.t(-1, [
+    { key: 'pages:debug.title' },
+    { key: 'pages:debug.wcTitle' },
+    { key: 'pages:debug.filterByWindow' },
+    { key: 'pages:debug.order.no' },
+    { key: 'pages:debug.order.mem' },
+    { key: 'pages:debug.order.cpu' },
+    { key: 'pages:debug.searchTitleURL' },
+    { key: 'pages:debug.wcTableColumns.win' },
+    { key: 'pages:debug.wcTableColumns.pid' },
+    { key: 'pages:debug.wcTableColumns.title' },
+    { key: 'pages:debug.wcTableColumns.visible' },
+    { key: 'pages:debug.wcTableColumns.profile' },
+    { key: 'pages:debug.wcTableColumns.preloads' },
+    { key: 'pages:debug.wcTableColumns.memory' },
+    { key: 'pages:debug.wcTableColumns.cpu' },
+    { key: 'pages:debug.tiTitle' },
+    { key: 'pages:debug.tiTableColumns.tabIndex' },
+    { key: 'pages:debug.tiTableColumns.window' },
+    { key: 'pages:debug.tiTableColumns.desktop' },
+    { key: 'pages:debug.tiTableColumns.tabContainer' },
+    { key: 'pages:debug.tiTableColumns.tabId' },
+    { key: 'pages:debug.tiTableColumns.tabTitle' },
+  ]);
+
+  document.title = t['pages:debug.title'];
 
   const state = {
     rawWcs: [] as IDebugWebContent[],
@@ -51,7 +76,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     const windowsIDs = [...new Set(state.rawWcs.map((v) => v.winId))].sort((a, b) => a - b);
     const currentValue = staticSelect.value;
 
-    while (staticSelect.options.length > 1) {
+    while (staticSelect.options.length > 2) {
       staticSelect.remove(1);
     }
 
@@ -130,17 +155,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       });
     }
 
-    const rowCount = displayWcs.length;
-    const countText = `${rowCount} item${rowCount !== 1 ? 's' : ''}`;
-
     return h(
       'div',
       null,
-      h(
-        'p',
-        { class: c('text-sm', 'mb-4') },
-        'List of all registered web contents with useful information about each one. Remember that you can filter and sort.',
-      ),
+      h('p', { class: c('text-sm', 'mb-4') }, t['pages:debug.wcTitle']),
       h(
         'div',
         {
@@ -152,7 +170,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h('div', { id: 'select-placeholder', class: c('w-40') }),
           h('input', {
             type: 'text',
-            placeholder: 'Search title, URL or PID...',
+            placeholder: t['pages:debug.searchTitleURL'],
             class: c('input', 'input-sm', 'w-80'),
             oninput: onSearchInput,
           }),
@@ -160,11 +178,17 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         h(
           'div',
           { class: c('flex', 'items-center', 'gap-2') },
-          radioBtn('performance', 'none', 'No order', state.ordering === 'none', onChangeOrdering),
+          radioBtn(
+            'performance',
+            'none',
+            t['pages:debug.order.no'],
+            state.ordering === 'none',
+            onChangeOrdering,
+          ),
           radioBtn(
             'performance',
             'mem',
-            'Memory',
+            t['pages:debug.order.mem'],
             state.ordering === 'mem',
             onChangeOrdering,
             getRadioIndicator('mem'),
@@ -172,7 +196,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           radioBtn(
             'performance',
             'cpu',
-            'CPU',
+            t['pages:debug.order.cpu'],
             state.ordering === 'cpu',
             onChangeOrdering,
             getRadioIndicator('cpu'),
@@ -191,14 +215,22 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             h(
               'tr',
               null,
-              h('th', { class: c('w-10', 'font-mono') }, 'Win'),
-              h('th', { class: c('w-16', 'font-mono') }, 'Pid'),
-              h('th', null, `Title/URL (${countText})`),
-              h('th', { class: c('text-center', 'w-20') }, 'Visible'),
-              h('th', { class: c('text-left', 'w-40') }, 'Profile'),
-              h('th', { class: c('text-left', 'w-48') }, 'Preloads'),
-              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'Memory'),
-              h('th', { class: c('text-right', 'w-24', 'font-mono') }, 'CPU'),
+              h('th', { class: c('w-10', 'font-mono') }, t['pages:debug.wcTableColumns.win']),
+              h('th', { class: c('w-16', 'font-mono') }, t['pages:debug.wcTableColumns.pid']),
+              h('th', null, t['pages:debug.wcTableColumns.title']),
+              h('th', { class: c('text-center', 'w-20') }, t['pages:debug.wcTableColumns.visible']),
+              h('th', { class: c('text-left', 'w-40') }, t['pages:debug.wcTableColumns.profile']),
+              h('th', { class: c('text-left', 'w-48') }, t['pages:debug.wcTableColumns.preloads']),
+              h(
+                'th',
+                { class: c('text-right', 'w-24', 'font-mono') },
+                t['pages:debug.wcTableColumns.memory'],
+              ),
+              h(
+                'th',
+                { class: c('text-right', 'w-24', 'font-mono') },
+                t['pages:debug.wcTableColumns.cpu'],
+              ),
             ),
           ),
           h(
@@ -272,7 +304,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '-1';
-    defaultOpt.textContent = 'Filter by window';
+    defaultOpt.textContent = t['pages:debug.filterByWindow'];
     staticSelect.appendChild(defaultOpt);
 
     placeholder.parentNode!.insertBefore(staticSelect, placeholder);
@@ -314,11 +346,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     return h(
       'div',
       { class: c('mt-3') },
-      h(
-        'p',
-        { class: c('text-sm', 'mb-2') },
-        'Tab index data for all tabs in all windows/desktops.',
-      ),
+      h('p', { class: c('text-sm', 'mb-2') }, t['pages:debug.tiTitle']),
       h(
         'div',
         { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
@@ -331,12 +359,12 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             h(
               'tr',
               null,
-              h('th', null, 'Idx Tab Id'),
-              h('th', null, 'Window'),
-              h('th', null, 'Desktop'),
-              h('th', null, 'Tab Container'),
-              h('th', null, 'Tab Id'),
-              h('th', null, 'Tab Title'),
+              h('th', null, t['pages:debug.tiTableColumns.tabIndex']),
+              h('th', null, t['pages:debug.tiTableColumns.window']),
+              h('th', null, t['pages:debug.tiTableColumns.desktop']),
+              h('th', null, t['pages:debug.tiTableColumns.tabContainer']),
+              h('th', null, t['pages:debug.tiTableColumns.tabId']),
+              h('th', null, t['pages:debug.tiTableColumns.tabTitle']),
             ),
           ),
           h(

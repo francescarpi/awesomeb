@@ -20,19 +20,31 @@ import logo from '../assets/icon.png';
   const renderer = new Renderer(h('div', null)).render('content');
   const data = await abBrowser.about(winId);
 
-  const developedBy = document.getElementById('developedBy') as HTMLParagraphElement;
-  developedBy.innerHTML = await abI18n.t(winId, 'pages:about.developedBy', {
-    name: 'Francesc Arpi Roca',
-    email: 'francesc.arpi@gmail.com',
-  });
+  const t = await abI18n.t(winId, [
+    {
+      key: 'pages:about.developedBy',
+      params: {
+        name: 'Francesc Arpi Roca',
+        email: 'francesc.arpi@gmail.com',
+      },
+    },
+    {
+      key: 'pages:about.version',
+      params: {
+        version: data.version,
+      },
+    },
+  ]);
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const developedBy = document.getElementById('developedBy') as HTMLParagraphElement;
+  developedBy.innerHTML = t['pages:about.developedBy'];
+
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => {
       abModal.close(winId);
     },
   });
-
-  const version = await abI18n.t(winId, 'pages:about.version', { version: data.version });
 
   renderer.update(
     h(
@@ -41,7 +53,7 @@ import logo from '../assets/icon.png';
       h(
         'div',
         { class: c('flex', 'items-center', 'gap-2') },
-        h('p', { class: c('text-xs') }, version),
+        h('p', { class: c('text-xs') }, t['pages:about.version']),
         h('div', {
           class: c(
             'w-3.5',

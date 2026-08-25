@@ -22,6 +22,14 @@ const { isPage = false } = Astro.props;
   const isPage = root.dataset.isPage === 'true';
   const { winId } = getSearchParams();
 
+  const t = await abI18n.t(winId, [
+    { key: 'pages:downloads.noDownloads' },
+    { key: 'pages:downloads.viewAll' },
+    { key: 'pages:downloads.clearCompleted' },
+    { key: 'pages:downloads.name' },
+    { key: 'pages:downloads.date' },
+  ]);
+
   const data = await abDownloads.get(winId);
   const renderer = new Renderer(renderDownloads(data)).render('downloads-list-container');
   abDownloads.onRefresh((_event, data) => renderer.update(renderDownloads(data)));
@@ -33,7 +41,7 @@ const { isPage = false } = Astro.props;
     return h(
       'div',
       { style: 'app-region: no-drag' },
-      h('div', { class: c(!hasDownloads ? 'block' : 'hidden') }, 'No downloads for this session'),
+      h('div', { class: c(!hasDownloads ? 'block' : 'hidden') }, t['pages:downloads.noDownloads']),
       h(
         'div',
         { class: c(hasDownloads ? 'block' : 'hidden') },
@@ -42,8 +50,8 @@ const { isPage = false } = Astro.props;
               h(
                 'div',
                 { class: c('grid', gridCols, 'gap-2', 'text-xs', 'opacity-50', 'mb-1', 'px-1') },
-                h('span', null, 'Name'),
-                h('span', null, 'Date'),
+                h('span', null, t['pages:downloads.name']),
+                h('span', null, t['pages:downloads.date']),
                 h('span', { class: c('text-right') }, '%'),
                 h('span', null),
               ),
@@ -101,7 +109,7 @@ const { isPage = false } = Astro.props;
                   class: c('btn', 'btn-sm', 'btn-outline'),
                   onclick: () => abDownloads.openPage(winId),
                 },
-                'View All',
+                t['pages:downloads.viewAll'],
               ),
             ]
           : []),
@@ -114,7 +122,7 @@ const { isPage = false } = Astro.props;
               abModal.closeContextual(winId);
             },
           },
-          'Clear Completed',
+          t['pages:downloads.clearCompleted'],
         ),
       ),
     );

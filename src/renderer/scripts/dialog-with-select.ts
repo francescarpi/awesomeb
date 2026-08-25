@@ -13,6 +13,8 @@ export async function dialogWithSelect(
     onAccept?: (optionId: string) => void;
   },
 ) {
+  const t = await abI18n.t(winId, [{ key: 'ok' }, { key: 'cancel' }]);
+
   const dialog = document.createElement('dialog');
   dialog.classList.add('modal');
 
@@ -41,12 +43,12 @@ export async function dialogWithSelect(
 
   const acceptButton = document.createElement('button');
   acceptButton.classList.add('btn', 'btn-sm', 'btn-primary');
-  acceptButton.textContent = await abI18n.t(winId, 'ok');
+  acceptButton.textContent = t['ok'];
   acceptButton.value = 'ok';
 
   const cancelButton = document.createElement('button');
   cancelButton.classList.add('btn', 'btn-sm');
-  cancelButton.textContent = await abI18n.t(winId, 'cancel');
+  cancelButton.textContent = t['cancel'];
   cancelButton.value = 'cancel';
 
   actionsForm.appendChild(cancelButton);

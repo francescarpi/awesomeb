@@ -47,5 +47,68 @@
     "current": "Actual",
     "new": "Nueva",
     "failed": "Oops... algo fue mal :("
+  },
+  "downloads": {
+    "title": "Descargas",
+    "noDownloads": "No hay descargas para esta sesión",
+    "viewAll": "Ver todas",
+    "clearCompleted": "Limpiar completadas",
+    "name": "Nombre",
+    "date": "Fecha"
+  },
+  "debug": {
+    "title": "Depuración",
+    "wcTitle": "Listado de todos los contenidos web registrados con información útil sobre cada uno. Recuerda que puedes filtrar y ordenar.",
+    "filterByWindow": "Filtrar por ventana",
+    "searchTitleURL": "Busca por título, URL o PID...",
+    "order": {
+      "no": "Sin orden",
+      "mem": "Memoria",
+      "cpu": "CPU"
+    },
+    "wcTableColumns": {
+      "win": "Vent.",
+      "pid": "PID",
+      "title": "Título/URL",
+      "visible": "Visible",
+      "profile": "Perfil",
+      "preloads": "Preloads",
+      "memory": "Memoria",
+      "cpu": "CPU"
+    },
+    "tiTitle": "Datos de índice de pestañas para todas las pestañas en todas las ventanas/escritorios.",
+    "tiTableColumns": {
+      "tabIndex": "Índice",
+      "window": "Ventana",
+      "desktop": "Escritorio",
+      "tabContainer": "Contenedor de pest.",
+      "tabId": "Id pestaña",
+      "tabTitle": "Título pestaña"
+    }
+  },
+  "desktopTheme": {
+    "title": "Tema del escritorio",
+    "placeholder": "Filtra y selecciona un tema..."
+  },
+  "duplicateTab": {
+    "title": "Duplicar una pestaña",
+    "placeholder1": "Selecciona una pestaña",
+    "placeholder2": "Selecciona un perfil",
+    "placeholder3": "Selecciona un destino"
+  },
+  "editURL": {
+    "title": "Editar la URL",
+    "option1Title": "Editar la URL completa",
+    "url": "URL Completa",
+    "option2Title": "Editar la URL por partes",
+    "protocol": "Protocolo",
+    "hostname": "Nombre del host",
+    "port": "Puerto",
+    "pathname": "Pathname",
+    "hash": "Hash",
+    "queryParams": "Queryparams",
+    "add": "Añadir",
+    "key": "Clave",
+    "value": "Valor"
   }
 }

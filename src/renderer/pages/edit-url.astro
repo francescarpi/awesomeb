@@ -4,7 +4,7 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal width="800px">
-  <Title>Edit URL</Title>
+  <Title title="pages:editURL.title" />
   <div id="content"></div>
 </Modal>
 
@@ -32,7 +32,23 @@ import Title from '#/components/common/Title.astro';
     ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
     : tabsEntitites.find((d) => d.selected)!;
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const t = await abI18n.t(winId, [
+    { key: 'pages:editURL.option1Title' },
+    { key: 'pages:editURL.option2Title' },
+    { key: 'pages:editURL.url' },
+    { key: 'pages:editURL.protocol' },
+    { key: 'pages:editURL.hostname' },
+    { key: 'pages:editURL.port' },
+    { key: 'pages:editURL.pathname' },
+    { key: 'pages:editURL.hash' },
+    { key: 'pages:editURL.queryParams' },
+    { key: 'pages:editURL.add' },
+    { key: 'pages:editURL.key' },
+    { key: 'pages:editURL.value' },
+  ]);
+
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => {
       const fullURLEl = document.getElementById('fullURL') as HTMLInputElement;
       abCommands.perform(winId, 'edit-url', {
@@ -146,8 +162,8 @@ import Title from '#/components/common/Title.astro';
         h(
           'div',
           { class: c('flex', 'flex-col', 'gap-2') },
-          h('h1', null, 'Modify full URL'),
-          input('fullURL', 'Full URL', state.fullURL, {
+          h('h1', null, t['pages:editURL.option1Title']),
+          input('fullURL', t['pages:editURL.url'], state.fullURL, {
             onInput: parseFullURL,
             autofocus: true,
             select: true,
@@ -156,50 +172,50 @@ import Title from '#/components/common/Title.astro';
         h(
           'div',
           { class: c('flex', 'flex-col', 'gap-2', 'mt-3') },
-          h('h1', null, 'Modify URL parts'),
+          h('h1', null, t['pages:editURL.option1Title']),
           input('protocol', 'Protocol', state.protocol, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('hostname', 'Hostname', state.hostname, {
+          input('hostname', t['pages:editURL.hostname'], state.hostname, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('port', 'Port', state.port, {
+          input('port', t['pages:editURL.port'], state.port, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('pathname', 'Pathname', state.pathname, {
+          input('pathname', t['pages:editURL.pathname'], state.pathname, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          input('hash', 'Hash', state.hash, {
+          input('hash', t['pages:editURL.hash'], state.hash, {
             onInput: () => {
               syncStateFromDOM();
               updateFullURL();
             },
           }),
-          h('h2', { class: c('text-sm') }, 'Query Parameters'),
+          h('h2', { class: c('text-sm') }, t['pages:editURL.queryParams']),
           h(
             'div',
             { class: c('grid', 'grid-cols-[auto_auto_20px]', 'gap-2', 'items-center') },
             ...state.queryParams
               .map((param, index) => [
-                input(`key_${index}`, 'Key', param.key, {
+                input(`key_${index}`, t['pages:editURL.key'], param.key, {
                   onInput: (value) => {
                     state.queryParams[index].key = value;
                     updateFullURL();
                   },
                 }),
-                input(`value_${index}`, 'Value', param.value, {
+                input(`value_${index}`, t['pages:editURL.value'], param.value, {
                   onInput: (value) => {
                     state.queryParams[index].value = value;
                     updateFullURL();
@@ -231,7 +247,7 @@ import Title from '#/components/common/Title.astro';
                   renderer.update(buildVDOM(urlState));
                 },
               },
-              '+ Add',
+              t['pages:editURL.add'],
             ),
           ),
         ),

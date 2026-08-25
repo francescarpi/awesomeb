@@ -88,11 +88,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   const detailsTemplate = document.getElementById('details-template') as HTMLTemplateElement;
 
   // Texts
-  const saveText = await abI18n.t(winId, 'save');
-  const moveText = await abI18n.t(winId, 'move');
-  const deleteText = await abI18n.t(winId, 'delete');
-  const deleteConfirm = await abI18n.t(winId, 'pages:bookmarks.deleteConfirm');
-  const selectNewParent = await abI18n.t(winId, 'pages:bookmarks.selectNewParent');
+  const t = await abI18n.t(winId, [
+    { key: 'save' },
+    { key: 'move' },
+    { key: 'delete' },
+    { key: 'pages:bookmarks.deleteConfirm' },
+    { key: 'pages:bookmarks.selectNewParent' },
+  ]);
 
   // =============================================================================
   // INITIALIZATION
@@ -189,13 +191,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     // Get action buttons
     const saveButton = detailsElement.querySelector('.save') as HTMLButtonElement;
-    saveButton.textContent = saveText;
+    saveButton.textContent = t['save'];
 
     const deleteButton = detailsElement.querySelector('.delete') as HTMLButtonElement;
-    deleteButton.textContent = deleteText;
+    deleteButton.textContent = t['delete'];
 
     const moveButton = detailsElement.querySelector('.move') as HTMLButtonElement;
-    moveButton.textContent = moveText;
+    moveButton.textContent = t['move'];
 
     // Clear previous details
     bookmarkDetails.innerHTML = '';
@@ -249,7 +251,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     bookmark: IBookmark,
   ) {
     button.addEventListener('click', async () => {
-      await dialogConfirm(winId, deleteConfirm, {
+      await dialogConfirm(winId, t['pages:bookmarks.deleteConfirm'], {
         onAccept: () => {
           const newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
           abBookmarks.update(newBookmarks).then(() => {
@@ -275,7 +277,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         ...bookmarksToOptions(bookmarks, bookmark.id, 1),
       ];
 
-      await dialogWithSelect(winId, selectNewParent, options, {
+      await dialogWithSelect(winId, t['pages:bookmarks.selectNewParent'], options, {
         onAccept: (selectedFolderId) => {
           let newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
 

@@ -3,12 +3,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 import DownloadsList from '#/components/downloads/DownloadsList.astro';
 ---
 
-<BlackBgWithTitle title="Downloads">
+<BlackBgWithTitle title="pages:downloads.title">
   <div class="pr-1">
     <DownloadsList isPage />
   </div>
 </BlackBgWithTitle>
 
 <script>
-  document.title = 'Downloads';
+  import { getSearchParams } from '#/scripts';
+  const { winId } = getSearchParams();
+  const t = await abI18n.t(winId, [{ key: 'pages:downloads.title' }]);
+  document.title = t['pages:downloads.title'];
 </script>

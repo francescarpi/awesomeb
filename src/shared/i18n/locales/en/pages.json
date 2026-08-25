@@ -47,5 +47,68 @@
     "current": "Current",
     "new": "New",
     "failed": "Oops... something went wrong :("
+  },
+  "downloads": {
+    "title": "Downloads",
+    "noDownloads": "No downloads for this session",
+    "viewAll": "View all",
+    "clearCompleted": "Clear completed",
+    "name": "Name",
+    "date": "Date"
+  },
+  "debug": {
+    "title": "Debugging",
+    "wcTitle": "Listing of all registered web contents with useful information about each one. Remember you can filter and sort.",
+    "filterByWindow": "Filter by window",
+    "searchTitleURL": "Search by title, URL or PID...",
+    "order": {
+      "no": "No order",
+      "mem": "Memory",
+      "cpu": "CPU"
+    },
+    "wcTableColumns": {
+      "win": "Win.",
+      "pid": "PID",
+      "title": "Title/URL",
+      "visible": "Visible",
+      "profile": "Profile",
+      "preloads": "Preloads",
+      "memory": "Memory",
+      "cpu": "CPU"
+    },
+    "tiTitle": "Tab index data for all tabs in all windows/desktops.",
+    "tiTableColumns": {
+      "tabIndex": "Index",
+      "window": "Window",
+      "desktop": "Desktop",
+      "tabContainer": "Tab container",
+      "tabId": "Tab Id",
+      "tabTitle": "Tab title"
+    }
+  },
+  "desktopTheme": {
+    "title": "Desktop theme",
+    "placeholder": "Filter and select a theme..."
+  },
+  "duplicateTab": {
+    "title": "Duplicate a tab",
+    "placeholder1": "Select a tab",
+    "placeholder2": "Select a profile",
+    "placeholder3": "Select a destination"
+  },
+  "editURL": {
+    "title": "Edit URL",
+    "option1Title": "Edit full URL",
+    "url": "Full URL",
+    "option2Title": "Edit URL by parts",
+    "protocol": "Protocol",
+    "hostname": "Hostname",
+    "port": "Port",
+    "pathname": "Pathname",
+    "hash": "Hash",
+    "queryParams": "Queryparams",
+    "add": "Add",
+    "key": "Key",
+    "value": "Value"
   }
 }

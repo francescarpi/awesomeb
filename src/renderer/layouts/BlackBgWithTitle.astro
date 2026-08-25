@@ -20,6 +20,11 @@ const { title } = Astro.props;
 <script>
   import { getSearchParams } from '#/scripts';
   const { winId } = getSearchParams();
+
   const h1 = document.querySelector('h1[data-title]') as HTMLElement;
-  h1.textContent = await abI18n.t(winId, h1.dataset.title as string);
+  const k = h1.dataset.title as string;
+
+  const t = await abI18n.t(winId, [{ key: k }]);
+
+  h1.textContent = t[k];
 </script>
