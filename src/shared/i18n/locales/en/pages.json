@@ -241,6 +241,10 @@
   "tabPreview": {
     "loading": "Loading site..."
   },
+  "tabSwitcher": {
+    "noTabs": "No tabs...",
+    "noDesktopName": "(no desktop name)"
+  },
   "settings": {
     "title": "Settings",
     "menu": {

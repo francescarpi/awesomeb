@@ -241,6 +241,10 @@
   "tabPreview": {
     "loading": "Carregant lloc..."
   },
+  "tabSwitcher": {
+    "noTabs": "Sense pestanyes...",
+    "noDesktopName": "(sense nom d'escriptori)"
+  },
   "settings": {
     "title": "Configuració",
     "menu": {

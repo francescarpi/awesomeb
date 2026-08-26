@@ -241,6 +241,10 @@
   "tabPreview": {
     "loading": "Cargando sitio..."
   },
+  "tabSwitcher": {
+    "noTabs": "Sin pestañas...",
+    "noDesktopName": "(sin nombre de escritorio)"
+  },
   "settings": {
     "title": "Configuración",
     "menu": {
