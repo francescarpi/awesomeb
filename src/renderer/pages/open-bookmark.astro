@@ -6,12 +6,12 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Open Bookmark</Title>
+  <Title title="pages:openBookmark.title" />
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Filter and select a bookmark..." id="list" />
-    <ListWithSearch placeholder="Select a profile..." id="partition" />
-    <ListWithSearch placeholder="Select a target" id="target" />
+    <ListWithSearch placeholder="pages:openBookmark.placeholder1" id="list" />
+    <ListWithSearch placeholder="pages:openBookmark.placeholder2" id="partition" />
+    <ListWithSearch placeholder="pages:openBookmark.placeholder3" id="target" />
   </div>
 </Modal>
 

@@ -110,5 +110,106 @@
     "add": "Add",
     "key": "Key",
     "value": "Value"
+  },
+  "extensions": {
+    "title": "Extensions",
+    "intro": "AwesomeB offers limited support for Chrome extensions. At this time, installation must be done manually: place your extensions in the following directory (<i>{{path}}</i>) and then click the Refresh Extensions button.",
+    "refresh": "Refresh Extensions",
+    "noExtensions": "No extensions found",
+    "noDescription": "No description",
+    "id": "ID",
+    "version": "Version"
+  },
+  "findInPage": {
+    "placeholder": "Find in page...",
+    "matches_one": "{{active}} of {{count}} match",
+    "matches_other": "{{active}} of {{count}} matches"
+  },
+  "history": {
+    "title": "History",
+    "searchHistory": "Search history",
+    "clearHistory": "Clear history",
+    "tableTitle": "Title",
+    "tableUrl": "URL",
+    "tableLastVisit": "Last visit",
+    "tableVisits": "Visits",
+    "reset": "Reset",
+    "confirmDelete": "Are you sure you want to clear all history?",
+    "deleteSelected": "Delete selected ({{count}})",
+    "confirmDeleteSelected": "Do you want to delete the {{count}} selected items?"
+  },
+  "layoutSize": {
+    "title": "Select a size",
+    "placeholder": "Select a size..."
+  },
+  "login": {
+    "title": "Login",
+    "message": "The site ({{host}}) requires a username and password to continue.",
+    "username": "Username",
+    "password": "Password"
+  },
+  "moveTab": {
+    "title": "Move Tab",
+    "placeholder1": "Select a tab...",
+    "placeholder2": "Select a destination..."
+  },
+  "newTab": {
+    "title": "New Tab",
+    "placeholder1": "Enter a query or a valid URL...",
+    "placeholder2": "Select a profile...",
+    "placeholder3": "Select a destination..."
+  },
+  "newWindow": {
+    "title": "New Window",
+    "placeholder": "Select a destination..."
+  },
+  "openBookmark": {
+    "title": "Open Bookmark",
+    "placeholder1": "Filter and select a bookmark...",
+    "placeholder2": "Select a profile...",
+    "placeholder3": "Select a destination..."
+  },
+  "openClosed": {
+    "title": "Open Closed Tab",
+    "placeholder": "Select a recently closed tab..."
+  },
+  "prompt": {
+    "message": "The site '{{host}}' says"
+  },
+  "quitting": {
+    "message": "Closing AwesomeB..."
+  },
+  "removeAllDividers": {
+    "title": "Remove all dividers from a desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
+  "removeDivider": {
+    "title": "Remove a divider from a tab container",
+    "placeholder": "Filter and select a tab container..."
+  },
+  "renameDesktop": {
+    "title": "Rename Desktop",
+    "shortName": "Short name",
+    "longName": "Long name"
+  },
+  "renameTab": {
+    "title": "Rename Tab",
+    "name": "Name"
+  },
+  "requestPermission": {
+    "title": "Grant permission",
+    "message": "The site <b>{{host}}</b> is requesting permission for <b>{{permission}}</b>."
+  },
+  "selectDesktop": {
+    "title": "Select Desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
+  "selectLayout": {
+    "title": "Select Layout",
+    "placeholder": "Select a layout..."
+  },
+  "selectTab": {
+    "title": "Select Tab",
+    "placeholder": "Filter and select a tab..."
   }
 }

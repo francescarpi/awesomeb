@@ -34,8 +34,15 @@ const { placeholder, id, className, oneColumn, title } = Astro.props;
 
   const { winId } = getSearchParams();
 
-  const input = document.querySelector('input[data-placeholder]') as HTMLInputElement;
-  const k = input.dataset.placeholder as string;
-  const t = await abI18n.t(winId, [{ key: k }]);
-  input.placeholder = t[k];
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[data-placeholder]');
+  const keys: { key: string }[] = [];
+  for (const input of inputs) {
+    keys.push({ key: input.dataset.placeholder as string });
+  }
+
+  const t = await abI18n.t(winId, keys);
+  for (const input of inputs) {
+    input.placeholder = t[input.dataset.placeholder as tring];
+    keys.push({ key: input.dataset.placeholder as string });
+  }
 </script>

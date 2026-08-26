@@ -110,5 +110,106 @@
     "add": "Añadir",
     "key": "Clave",
     "value": "Valor"
+  },
+  "extensions": {
+    "title": "Extensiones",
+    "intro": "AwesomeB ofrece soporte limitado para extensiones de Chrome. En este momento, la instalación debe realizarse manualmente: coloca tus extensiones en el siguiente directorio (<i>{{path}}</i>) y luego haz clic en el botón Actualizar extensiones.",
+    "refresh": "Actualizar extensiones",
+    "noExtensions": "No se han encontrado extensiones",
+    "noDescription": "Sin descripción",
+    "id": "ID",
+    "version": "Versión"
+  },
+  "findInPage": {
+    "placeholder": "Buscar en la página...",
+    "matches_one": "{{active}} de {{count}} resultado",
+    "matches_other": "{{active}} de {{count}} resultados"
+  },
+  "history": {
+    "title": "Historial",
+    "searchHistory": "Buscar en el historial",
+    "clearHistory": "Borrar historial",
+    "tableTitle": "Título",
+    "tableUrl": "URL",
+    "tableLastVisit": "Última visita",
+    "tableVisits": "Visitas",
+    "reset": "Resetear",
+    "confirmDelete": "¿Estás seguro que quieres borrar todo el historial?",
+    "deleteSelected": "Borrar seleccionados ({{count}})",
+    "confirmDeleteSelected": "¿Quieres borrar los {{count}} elementos seleccionados?"
+  },
+  "layoutSize": {
+    "title": "Seleccionar un tamaño",
+    "placeholder": "Selecciona un tamaño..."
+  },
+  "login": {
+    "title": "Acceso",
+    "message": "El sitio ({{host}}) requiere un nombre de usuario y contraseña para continuar.",
+    "username": "Usuario",
+    "password": "Contraseña"
+  },
+  "moveTab": {
+    "title": "Mover pestaña",
+    "placeholder1": "Selecciona la pestaña...",
+    "placeholder2": "Selecciona el destino..."
+  },
+  "newTab": {
+    "title": "Nueva pestaña",
+    "placeholder1": "Escribe una consulta o una URL válida...",
+    "placeholder2": "Selecciona un perfil...",
+    "placeholder3": "Selecciona un destino..."
+  },
+  "newWindow": {
+    "title": "Nueva ventana",
+    "placeholder": "Selecciona un destino..."
+  },
+  "openBookmark": {
+    "title": "Abrir un marcador",
+    "placeholder1": "Busca y selecciona un marcador...",
+    "placeholder2": "Selecciona un perfil...",
+    "placeholder3": "Selecciona un destino..."
+  },
+  "openClosed": {
+    "title": "Abrir una pestaña cerrada",
+    "placeholder": "Selecciona una pestaña cerrada recientemente..."
+  },
+  "prompt": {
+    "message": "El sitio '{{host}}' dice"
+  },
+  "quitting": {
+    "message": "Saliendo de AwesomeB..."
+  },
+  "removeAllDividers": {
+    "title": "Eliminar todos los divisores de un escritorio",
+    "placeholder": "Selecciona el escritorio..."
+  },
+  "removeDivider": {
+    "title": "Eliminar un divisor de un contenedor de pestañas",
+    "placeholder": "Selecciona el contenedor de pestaña..."
+  },
+  "renameDesktop": {
+    "title": "Renombrar un escritorio",
+    "shortName": "Nombre corto",
+    "longName": "Nombre largo"
+  },
+  "renameTab": {
+    "title": "Renombrar pestaña",
+    "name": "Nombre"
+  },
+  "requestPermission": {
+    "title": "Conceder permiso",
+    "message": "El sitio <b>{{host}}</b> solicita permiso para <b>{{permission}}</b>."
+  },
+  "selectDesktop": {
+    "title": "Seleccionar escritorio",
+    "placeholder": "Filtra y selecciona un escritorio..."
+  },
+  "selectLayout": {
+    "title": "Seleccionar diseño",
+    "placeholder": "Selecciona un diseño..."
+  },
+  "selectTab": {
+    "title": "Seleccionar pestaña",
+    "placeholder": "Filtra y selecciona una pestaña..."
   }
 }

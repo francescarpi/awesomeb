@@ -19,7 +19,11 @@ export function setupI18nIPC(browser: Browser) {
         null,
         (args) => typeof args.winId === 'number',
         [windowChecker, modalChecker],
-        [internalPageChecker.bind(null, 'bookmarks'), internalPageChecker.bind(null, 'downloads')],
+        [
+          internalPageChecker.bind(null, 'bookmarks'),
+          internalPageChecker.bind(null, 'downloads'),
+          internalPageChecker.bind(null, 'extensions'),
+        ],
       ),
     ],
     async ({ keys }) => {

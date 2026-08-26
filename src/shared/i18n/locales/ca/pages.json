@@ -110,5 +110,106 @@
     "add": "Afegeix",
     "key": "Clau",
     "value": "Valor"
+  },
+  "extensions": {
+    "title": "Extensions",
+    "intro": "AwesomeB ofereix suport limitat per a les extensions de Chrome. De moment, la instal·lació s'ha de fer manualment: col·loca les extensions al directori següent (<i>{{path}}</i>) i després fes clic al botó Actualitza les extensions.",
+    "refresh": "Actualitza les extensions",
+    "noExtensions": "No s'ha trobat cap extensió",
+    "noDescription": "Sense descripció",
+    "id": "ID",
+    "version": "Versió"
+  },
+  "findInPage": {
+    "placeholder": "Cerca a la pàgina...",
+    "matches_one": "{{active}} de {{count}} resultat",
+    "matches_other": "{{active}} de {{count}} resultats"
+  },
+  "history": {
+    "title": "Historial",
+    "searchHistory": "Cerca a l'historial",
+    "clearHistory": "Esborra l'historial",
+    "tableTitle": "Títol",
+    "tableUrl": "URL",
+    "tableLastVisit": "Última visita",
+    "tableVisits": "Visites",
+    "reset": "Restableix",
+    "confirmDelete": "Segur que vols esborrar tot l'historial?",
+    "deleteSelected": "Esborra els seleccionats ({{count}})",
+    "confirmDeleteSelected": "Vols esborrar els {{count}} elements seleccionats?"
+  },
+  "layoutSize": {
+    "title": "Selecciona una mida",
+    "placeholder": "Selecciona una mida..."
+  },
+  "login": {
+    "title": "Accés",
+    "message": "El lloc ({{host}}) requereix un nom d'usuari i una contrasenya per continuar.",
+    "username": "Usuari",
+    "password": "Contrasenya"
+  },
+  "moveTab": {
+    "title": "Mou la pestanya",
+    "placeholder1": "Selecciona la pestanya...",
+    "placeholder2": "Selecciona una destinació..."
+  },
+  "newTab": {
+    "title": "Pestanya nova",
+    "placeholder1": "Escriu una consulta o un URL vàlid...",
+    "placeholder2": "Selecciona un perfil...",
+    "placeholder3": "Selecciona una destinació..."
+  },
+  "newWindow": {
+    "title": "Finestra nova",
+    "placeholder": "Selecciona una destinació..."
+  },
+  "openBookmark": {
+    "title": "Obre un marcador",
+    "placeholder1": "Cerca i selecciona un marcador...",
+    "placeholder2": "Selecciona un perfil...",
+    "placeholder3": "Selecciona una destinació..."
+  },
+  "openClosed": {
+    "title": "Obre una pestanya tancada",
+    "placeholder": "Selecciona una pestanya tancada recentment..."
+  },
+  "prompt": {
+    "message": "El lloc '{{host}}' diu"
+  },
+  "quitting": {
+    "message": "Tancant AwesomeB..."
+  },
+  "removeAllDividers": {
+    "title": "Treu tots els divisors d'un escriptori",
+    "placeholder": "Filtra i selecciona un escriptori..."
+  },
+  "removeDivider": {
+    "title": "Treu un divisor del contenidor de pestanyes",
+    "placeholder": "Filtra i selecciona el contenidor de pestanyes..."
+  },
+  "renameDesktop": {
+    "title": "Reanomena l'escriptori",
+    "shortName": "Nom curt",
+    "longName": "Nom llarg"
+  },
+  "renameTab": {
+    "title": "Reanomena la pestanya",
+    "name": "Nom"
+  },
+  "requestPermission": {
+    "title": "Atorga permís",
+    "message": "El lloc <b>{{host}}</b> sol·licita permís per a <b>{{permission}}</b>."
+  },
+  "selectDesktop": {
+    "title": "Selecciona un escriptori",
+    "placeholder": "Filtra i selecciona un escriptori..."
+  },
+  "selectLayout": {
+    "title": "Selecciona el disseny",
+    "placeholder": "Selecciona un disseny..."
+  },
+  "selectTab": {
+    "title": "Selecciona la pestanya",
+    "placeholder": "Filtra i selecciona una pestanya..."
   }
 }
