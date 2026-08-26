@@ -24,7 +24,7 @@
     "description": "Changes the profile of the current tab."
   },
   "clearClosedTabs": {
-    "name": "Clear Closed Tabs",
+    "name": "Clear Closed Tabs History",
     "description": "Clear the list of recently closed tabs"
   },
   "closeTab": {

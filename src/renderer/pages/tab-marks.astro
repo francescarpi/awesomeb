@@ -37,13 +37,34 @@ import Base from '#/layouts/Base.astro';
   import { getSearchParams } from '#/scripts';
   import { ITabMark } from '~/types';
 
-  document.title = 'Tab marks';
-
   const { winId } = getSearchParams();
+
+  const t = await abI18n.t(winId, [
+    { key: 'pages:tabMarks.title' },
+    { key: 'pages:tabMarks.listening' },
+    { key: 'pages:tabMarks.availableMarks' },
+    { key: 'pages:tabMarks.noMarks' },
+    { key: 'pages:tabMarks.helpMark' },
+    { key: 'pages:tabMarks.helpDelete' },
+    { key: 'pages:tabMarks.helpDeleteAll' },
+    { key: 'pages:tabMarks.helpSelect' },
+  ]);
+
+  document.title = t['pages:tabMarks.title'];
+
   const shortVersion = document.getElementById('short-version')!;
   const fullVersion = document.getElementById('full-version')!;
   const noMarks = document.getElementById('no-marks')!;
   const marksContainer = document.getElementById('marks-container')!;
+
+  shortVersion.innerHTML = t['pages:tabMarks.listening'];
+  fullVersion.querySelector('p')!.textContent = t['pages:tabMarks.availableMarks'];
+  noMarks.textContent = t['pages:tabMarks.noMarks'];
+  const helpPs = fullVersion.querySelectorAll('.grid p');
+  helpPs[0].textContent = t['pages:tabMarks.helpMark'];
+  helpPs[1].textContent = t['pages:tabMarks.helpDelete'];
+  helpPs[2].textContent = t['pages:tabMarks.helpDeleteAll'];
+  helpPs[3].textContent = t['pages:tabMarks.helpSelect'];
 
   let markMode = false;
   let marks: ITabMark[] = [];

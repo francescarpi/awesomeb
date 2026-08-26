@@ -6,16 +6,37 @@ import ColorPicker from '@thednp/color-picker';
 
 const { init, selector } = ColorPicker;
 
+type Translations = Record<string, string>;
+
+const KEYS = [
+  'pages:settings.profiles.title',
+  'pages:settings.profiles.desc',
+  'pages:settings.profiles.name',
+  'pages:settings.profiles.color',
+  'pages:settings.profiles.add',
+  'pages:settings.profiles.restartNote',
+  'pages:settings.profiles.saveChanges',
+  'pages:settings.profiles.newProfile',
+];
+
 //-----------------------------------------------------------------------------
 export async function renderProfilesPage(
   config: IConfig,
 ): Promise<{ renderer: Renderer; callback: () => void }> {
+  const t = await abI18n.t(
+    -1,
+    KEYS.map((key) => ({ key })),
+  );
   const renderer = new Renderer(
-    buildGeneralBody(config.partitions, {
-      onSave: () => saveChanges(config),
-      onDelete: (name) => deletePartition(name, renderer, config),
-      onAdd: () => addPartition(renderer, config),
-    }),
+    buildGeneralBody(
+      config.partitions,
+      {
+        onSave: () => saveChanges(config),
+        onDelete: (name) => deletePartition(name, renderer, config, t),
+        onAdd: () => addPartition(renderer, config, t),
+      },
+      t,
+    ),
   );
 
   const callback = () => document.querySelectorAll(selector).forEach(init);
@@ -27,13 +48,14 @@ export async function renderProfilesPage(
 function buildGeneralBody(
   partitions: IConfigPartition[],
   callbacks: { onSave: () => Promise<void>; onDelete: (name: string) => void; onAdd: () => void },
+  t: Translations,
 ): VNode {
   return h(
     'div',
     { class: c('flex', 'flex-col', 'gap-2') },
     box(
-      'Profiles',
-      'Manage isolated CHrome profiles (partitions) with separate cookies, sessions, and storage for each workspace or user.',
+      t['pages:settings.profiles.title'],
+      t['pages:settings.profiles.desc'],
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
@@ -46,8 +68,12 @@ function buildGeneralBody(
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, 'Name'),
-              h('th', { class: c('text-left', 'px-1', 'w-25') }, 'Color'),
+              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.profiles.name']),
+              h(
+                'th',
+                { class: c('text-left', 'px-1', 'w-25') },
+                t['pages:settings.profiles.color'],
+              ),
               h('th', { class: c('w-13') }, ''),
             ),
           ),
@@ -89,7 +115,7 @@ function buildGeneralBody(
           h(
             'button',
             { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
-            'Add',
+            t['pages:settings.profiles.add'],
           ),
         ),
       ),
@@ -97,26 +123,22 @@ function buildGeneralBody(
     h(
       'div',
       { class: c('flex', 'justify-between') },
-      h(
-        'p',
-        {},
-        'To apply the new changes to the profiles, it is necessary to restart the browser.',
-      ),
+      h('p', {}, t['pages:settings.profiles.restartNote']),
       h(
         'button',
         { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
-        'Save changes',
+        t['pages:settings.profiles.saveChanges'],
       ),
     ),
   );
 }
 
 //-----------------------------------------------------------------------------
-function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
+function buildGeneralCallbacks(renderer: Renderer, config: IConfig, t: Translations) {
   return {
     onSave: () => saveChanges(config),
-    onDelete: (name: string) => deletePartition(name, renderer, config),
-    onAdd: () => addPartition(renderer, config),
+    onDelete: (name: string) => deletePartition(name, renderer, config, t),
+    onAdd: () => addPartition(renderer, config, t),
   };
 }
 
@@ -128,9 +150,9 @@ async function saveChanges(config: IConfig) {
 }
 
 //-----------------------------------------------------------------------------
-function deletePartition(name: string, renderer: Renderer, config: IConfig) {
+function deletePartition(name: string, renderer: Renderer, config: IConfig, t: Translations) {
   const partitions = getTablePartitions().filter((p) => p.name !== name);
-  renderer.update(buildGeneralBody(partitions, buildGeneralCallbacks(renderer, config)));
+  renderer.update(buildGeneralBody(partitions, buildGeneralCallbacks(renderer, config, t), t));
 }
 
 //-----------------------------------------------------------------------------
@@ -160,15 +182,16 @@ function getTablePartitions(): IConfigPartition[] {
 }
 
 //-----------------------------------------------------------------------------
-function addPartition(renderer: Renderer, config: IConfig) {
+function addPartition(renderer: Renderer, config: IConfig, t: Translations) {
+  const newSeed = t['pages:settings.profiles.newProfile'];
   const partitions = getTablePartitions();
-  if (partitions.some((p) => p.name === 'New')) {
+  if (partitions.some((p) => p.name === newSeed)) {
     return;
   }
 
-  const newPartitions: IConfigPartition[] = [...partitions, { name: 'New', color: '#ffffff' }];
+  const newPartitions: IConfigPartition[] = [...partitions, { name: newSeed, color: '#ffffff' }];
 
-  renderer.update(buildGeneralBody(newPartitions, buildGeneralCallbacks(renderer, config)), {
+  renderer.update(buildGeneralBody(newPartitions, buildGeneralCallbacks(renderer, config, t), t), {
     onUpdated: () => {
       const lastRow = (document.getElementById('partitions-table') as HTMLTableElement).tBodies[0]
         .lastElementChild as HTMLTableRowElement;

@@ -1,0 +1,369 @@
+{
+  "performCommand": {
+    "title": "Perform command",
+    "placeholder": "Start typing to search commands..."
+  },
+  "about": {
+    "developedBy": "Developed by {{name}} <i>({{email}})</i>",
+    "version": "Version {{version}}"
+  },
+  "addBookmark": {
+    "title": "Add bookmark",
+    "parentFolder": "Parent folder: {{id}}",
+    "inputTitle": "Title",
+    "inputURL": "URL",
+    "folderName": "Folder name"
+  },
+  "addDivider": {
+    "title": "Add divider",
+    "placeholder": "Start typing to search a tab container..."
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "deleteConfirm": "Are you sure you want to delete this bookmark?",
+    "selectNewParent": "Select the new parent folder"
+  },
+  "certificateInfo": {
+    "title": "Certificate information",
+    "commonName": "Common name",
+    "issuerCountry": "Issuer country",
+    "issuerOrganization": "Issuer organization",
+    "issuerCommonName": "Issuer common name",
+    "validFrom": "Valid from",
+    "validTo": "Valid until"
+  },
+  "changeTabProfile": {
+    "title": "Change tab profile",
+    "placeholder": "Select a new profile..."
+  },
+  "clearClosedTabs": {
+    "message": "Are you sure you want to clear the closed tabs history?"
+  },
+  "clientCertificate": {
+    "title": "Select a certificate",
+    "message": "The site <i>{{url}}</i> requests a client certificate for authentication. Choose a certificate to continue."
+  },
+  "appUpdater": {
+    "current": "Current",
+    "new": "New",
+    "failed": "Oops... something went wrong :("
+  },
+  "downloads": {
+    "title": "Downloads",
+    "noDownloads": "No downloads for this session",
+    "viewAll": "View all",
+    "clearCompleted": "Clear completed",
+    "name": "Name",
+    "date": "Date"
+  },
+  "debug": {
+    "title": "Debugging",
+    "wcTitle": "Listing of all registered web contents with useful information about each one. Remember you can filter and sort.",
+    "filterByWindow": "Filter by window",
+    "searchTitleURL": "Search by title, URL or PID...",
+    "order": {
+      "no": "No order",
+      "mem": "Memory",
+      "cpu": "CPU"
+    },
+    "wcTableColumns": {
+      "win": "Win.",
+      "pid": "PID",
+      "title": "Title/URL",
+      "visible": "Visible",
+      "profile": "Profile",
+      "preloads": "Preloads",
+      "memory": "Memory",
+      "cpu": "CPU"
+    },
+    "tiTitle": "Tab index data for all tabs in all windows/desktops.",
+    "tiTableColumns": {
+      "tabIndex": "Index",
+      "window": "Window",
+      "desktop": "Desktop",
+      "tabContainer": "Tab container",
+      "tabId": "Tab Id",
+      "tabTitle": "Tab title"
+    }
+  },
+  "desktopTheme": {
+    "title": "Desktop theme",
+    "placeholder": "Filter and select a theme..."
+  },
+  "duplicateTab": {
+    "title": "Duplicate a tab",
+    "placeholder1": "Select a tab",
+    "placeholder2": "Select a profile",
+    "placeholder3": "Select a destination"
+  },
+  "editURL": {
+    "title": "Edit URL",
+    "option1Title": "Edit full URL",
+    "url": "Full URL",
+    "option2Title": "Edit URL by parts",
+    "protocol": "Protocol",
+    "hostname": "Hostname",
+    "port": "Port",
+    "pathname": "Pathname",
+    "hash": "Hash",
+    "queryParams": "Queryparams",
+    "add": "Add",
+    "key": "Key",
+    "value": "Value"
+  },
+  "extensions": {
+    "title": "Extensions",
+    "intro": "AwesomeB offers limited support for Chrome extensions. At this time, installation must be done manually: place your extensions in the following directory (<i>{{path}}</i>) and then click the Refresh Extensions button.",
+    "refresh": "Refresh Extensions",
+    "noExtensions": "No extensions found",
+    "noDescription": "No description",
+    "id": "ID",
+    "version": "Version"
+  },
+  "findInPage": {
+    "placeholder": "Find in page...",
+    "matches_one": "{{active}} of {{count}} match",
+    "matches_other": "{{active}} of {{count}} matches"
+  },
+  "history": {
+    "title": "History",
+    "searchHistory": "Search history",
+    "clearHistory": "Clear history",
+    "tableTitle": "Title",
+    "tableUrl": "URL",
+    "tableLastVisit": "Last visit",
+    "tableVisits": "Visits",
+    "reset": "Reset",
+    "confirmDelete": "Are you sure you want to clear all history?",
+    "deleteSelected": "Delete selected ({{count}})",
+    "confirmDeleteSelected": "Do you want to delete the {{count}} selected items?"
+  },
+  "layoutSize": {
+    "title": "Select a size",
+    "placeholder": "Select a size..."
+  },
+  "login": {
+    "title": "Login",
+    "message": "The site ({{host}}) requires a username and password to continue.",
+    "username": "Username",
+    "password": "Password"
+  },
+  "moveTab": {
+    "title": "Move Tab",
+    "placeholder1": "Select a tab...",
+    "placeholder2": "Select a destination..."
+  },
+  "newTab": {
+    "title": "New Tab",
+    "placeholder1": "Enter a query or a valid URL...",
+    "placeholder2": "Select a profile...",
+    "placeholder3": "Select a destination..."
+  },
+  "newWindow": {
+    "title": "New Window",
+    "placeholder": "Select a destination..."
+  },
+  "openBookmark": {
+    "title": "Open Bookmark",
+    "placeholder1": "Filter and select a bookmark...",
+    "placeholder2": "Select a profile...",
+    "placeholder3": "Select a destination..."
+  },
+  "openClosed": {
+    "title": "Open Closed Tab",
+    "placeholder": "Select a recently closed tab..."
+  },
+  "prompt": {
+    "message": "The site '{{host}}' says"
+  },
+  "quitting": {
+    "message": "Closing AwesomeB..."
+  },
+  "removeAllDividers": {
+    "title": "Remove all dividers from a desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
+  "removeDivider": {
+    "title": "Remove a divider from a tab container",
+    "placeholder": "Filter and select a tab container..."
+  },
+  "renameDesktop": {
+    "title": "Rename Desktop",
+    "shortName": "Short name",
+    "longName": "Long name"
+  },
+  "renameTab": {
+    "title": "Rename Tab",
+    "name": "Name"
+  },
+  "requestPermission": {
+    "title": "Grant permission",
+    "message": "The site <b>{{host}}</b> is requesting permission for <b>{{permission}}</b>."
+  },
+  "selectDesktop": {
+    "title": "Select Desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
+  "selectLayout": {
+    "title": "Select Layout",
+    "placeholder": "Select a layout..."
+  },
+  "selectTab": {
+    "title": "Select Tab",
+    "placeholder": "Filter and select a tab..."
+  },
+  "suspendDesktop": {
+    "title": "Suspend Desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
+  "tabCertificateError": {
+    "title": "Cannot Connect to the Website",
+    "message": "The certificate for url <i>{{url}}</i> is invalid. As a result, the connection between your browser and the server is not properly encrypted, which could allow an attacker to intercept or steal sensitive data. Error code: <strong>{{error}}</strong>.",
+    "button": "I Understand the risks and choose to proceed anyway."
+  },
+  "tabFailLoad": {
+    "title": "Cannot Connect to the Website",
+    "message": "The page at <strong>{{url}}</strong> cannot be reached.",
+    "errorCode": "Error code:",
+    "error": "Error:",
+    "retry": "Retry"
+  },
+  "tabMarks": {
+    "title": "Tab Marks",
+    "listening": "Listening for mark. <b>Hold</b> to see more details...",
+    "availableMarks": "Available tab marks...",
+    "noMarks": "No marks...",
+    "helpMark": "Press \"m\" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)",
+    "helpDelete": "Delete the mark from the active tab",
+    "helpDeleteAll": "Delete all marks",
+    "helpSelect": "Select the tab marked with that letter (e.g., a, b, c, ...)"
+  },
+  "tabPreview": {
+    "loading": "Loading site..."
+  },
+  "tabSwitcher": {
+    "noTabs": "No tabs...",
+    "noDesktopName": "(no desktop name)"
+  },
+  "settings": {
+    "title": "Settings",
+    "menu": {
+      "general": "General",
+      "profiles": "Profiles",
+      "themes": "Themes",
+      "permissions": "Permissions",
+      "shortcuts": "Shortcuts"
+    },
+    "general": {
+      "saveChanges": "Save changes",
+      "info": {
+        "title": "Information",
+        "desc": "Here you can view information about the application version, the file path where configuration, session, history, etc., are stored, the underlying Chromium version, and the project repository.",
+        "appVersion": "App version:",
+        "chromeVersion": "Chrome version:",
+        "configFolder": "Config folder:",
+        "openFolder": "Open folder",
+        "githubRepo": "GitHub repository:"
+      },
+      "engines": {
+        "title": "Search Engines",
+        "desc": "Configuration for search engines",
+        "name": "Name",
+        "url": "URL",
+        "add": "Add",
+        "newEngine": "New Engine"
+      },
+      "downloads": {
+        "title": "Download Location",
+        "desc": "Set the default download location for files.",
+        "location": "Location",
+        "change": "Change"
+      },
+      "language": {
+        "title": "Language",
+        "desc": "Set the default app language.",
+        "restartNote": "* Restart is required after changing the language"
+      },
+      "historyRetention": {
+        "title": "History Retention",
+        "desc": "Number of days to keep browsing history.",
+        "manageHistory": "Manage history"
+      },
+      "closedTabsRetention": {
+        "title": "Closed Tabs Retention",
+        "desc": "Number of days to keep closed tabs history."
+      },
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
+    },
+    "profiles": {
+      "title": "Profiles",
+      "desc": "Manage isolated Chrome profiles (partitions) with separate cookies, sessions, and storage for each workspace or user.",
+      "name": "Name",
+      "color": "Color",
+      "add": "Add",
+      "restartNote": "To apply the new changes to the profiles, it is necessary to restart the browser.",
+      "saveChanges": "Save changes",
+      "newProfile": "New"
+    },
+    "themes": {
+      "custom": {
+        "title": "Themes",
+        "desc": "Manage custom themes to personalize the appearance of your desktops.",
+        "name": "Name",
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "degrees": "Degrees",
+        "add": "Add",
+        "newTheme": "New"
+      },
+      "uiTheme": {
+        "title": "UI Theme",
+        "desc": "Customize the look of the AwesomeB UI with themes created by the community."
+      },
+      "saveChanges": "Save changes"
+    },
+    "permissions": {
+      "securityLevel": {
+        "title": "Security Level",
+        "desc": "This setting determines the level of access granted to websites regarding your device's functionalities (sensors, APIs, etc.).<br/><br/><strong>Standard</strong>: Allows common permissions necessary for most web pages to function correctly.<br/><strong>Strict</strong>: Requires your explicit consent for every permission a website attempts to use, offering maximum privacy.",
+        "standard": "Standard",
+        "strict": "Strict"
+      },
+      "list": {
+        "title": "Permissions",
+        "desc": "Manage the permissions granted to websites on this device.",
+        "allow": "Allow",
+        "deny": "Deny"
+      },
+      "loading": "Loading..."
+    },
+    "shortcuts": {
+      "map": {
+        "title": "Default Map",
+        "desc": "Define a default keyboard layout that suits you best. You can then customize specific keys to your preferences."
+      },
+      "list": {
+        "title": "Shortcuts",
+        "desc": "Click on a shortcut key to change its combination. Press Escape to cancel."
+      },
+      "loading": "Loading...",
+      "pressKey": "Press a key..."
+    }
+  },
+  "welcome": {
+    "title": "Welcome to",
+    "initialSetup": "Initial Setup",
+    "searchEngineMessage": "For AwesomeB to function correctly, a search engine must be configured as a minimum prerequisite. Please provide the URL for your desired search engine:",
+    "example": "Example:",
+    "exampleCode": "Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}",
+    "namePlaceholder": "Name",
+    "urlPlaceholder": "URL",
+    "note": "Note: The search engines can be modified at a later point within the main configuration settings.",
+    "save": "Save and start using AwesomeB"
+  },
+  "window": {
+    "newTabSuffix": "open a new tab",
+    "commandsSuffix": "open the commands palette"
+  }
+}

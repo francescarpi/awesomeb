@@ -24,7 +24,7 @@
     "description": "Canvia el perfil de la pestanya actual."
   },
   "clearClosedTabs": {
-    "name": "Esborra les pestanyes tancades",
+    "name": "Esborra l'historial de les pestanyes tancades",
     "description": "Esborra la llista de pestanyes tancades recentment"
   },
   "closeTab": {

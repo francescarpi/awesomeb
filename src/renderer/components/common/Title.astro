@@ -1,5 +1,21 @@
 ---
+interface Props {
+  title?: string;
+}
 
+const { title } = Astro.props;
 ---
 
-<h1 class="text-lg mb-2 opacity-30"><slot /></h1>
+<h1 class="text-lg mb-2 opacity-30" data-title={title}><slot /></h1>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  const h1 = document.querySelector('h1[data-title]') as HTMLElement;
+  const k = h1.dataset.title as string;
+  const t = await abI18n.t(winId, [{ key: k }]);
+
+  h1.textContent = t[k];
+</script>

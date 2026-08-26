@@ -11,20 +11,19 @@ import Modal from '#/layouts/Modal.astro';
 
   const { winId } = getSearchParams();
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => abCommands.perform(winId, 'clear-closed-tabs'),
     onCancel: () => abModal.close(winId),
   });
+
+  const t = await abI18n.t(winId, [{ key: 'pages:clearClosedTabs.message' }]);
 
   new Renderer(
     h(
       'div',
       { classs: c('flex', 'flex-col', 'gap-3') },
-      h(
-        'p',
-        { class: c('text-md', 'my-6') },
-        'Are you sure you want to clear all closed tabs history?',
-      ),
+      h('p', { class: c('text-md', 'my-6') }, t['pages:clearClosedTabs.message']),
       h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
     ),
   ).render('container', { onRendered: registerBtnsEvents });

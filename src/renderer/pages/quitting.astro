@@ -3,5 +3,14 @@ import Modal from '#/layouts/Modal.astro';
 ---
 
 <Modal>
-  <div class="p-2 text-center">Closing AwesomeB...</div>
+  <div class="p-2 text-center" id="message">Closing AwesomeB...</div>
 </Modal>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  const t = await abI18n.t(winId, [{ key: 'pages:quitting.message' }]);
+  document.getElementById('message')!.textContent = t['pages:quitting.message'];
+</script>

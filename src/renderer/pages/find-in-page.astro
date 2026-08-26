@@ -13,10 +13,10 @@ import Layout from '#/layouts/Base.astro';
   import Previous from '#/icons/previous.svg?raw';
   import Next from '#/icons/next.svg?raw';
 
-  const { searchParams } = getSearchParams();
+  const { searchParams, winId } = getSearchParams();
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const renderer = new Renderer(render()).render('container');
+  const renderer = new Renderer(await render()).render('container');
 
   const { inputEl } = inputManager('search', {
     onAccept: (value) => abTabs.findInPageAction(tabId, 'next', value),
@@ -24,11 +24,19 @@ import Layout from '#/layouts/Base.astro';
     onChange: (value) => abTabs.findInPageAction(tabId, 'start', value),
   });
 
-  abTabs.onRefreshFindInPage((_event, result: IFindInPageResult | null) => {
-    renderer.update(render(result));
+  abTabs.onRefreshFindInPage(async (_event, result: IFindInPageResult | null) => {
+    renderer.update(await render(result));
   });
 
-  function render(result?: IFindInPageResult | null): VNode {
+  async function render(result?: IFindInPageResult | null): Promise<VNode> {
+    const t = await abI18n.t(winId, [
+      { key: 'pages:findInPage.placeholder' },
+      {
+        key: 'pages:findInPage.matches',
+        params: { count: result?.matches, active: result?.activeMatch },
+      },
+    ]);
+
     return h(
       'div',
       {
@@ -50,7 +58,7 @@ import Layout from '#/layouts/Base.astro';
         'input',
         {
           class: c('input', 'input-xs', 'text-base-content', 'rounded-full'),
-          placeholder: 'Find in page...',
+          placeholder: t['pages:findInPage.placeholder'],
           autofocus: true,
           onfocus: (event) => (event.target as HTMLInputElement).select(),
           id: 'search',
@@ -65,15 +73,7 @@ import Layout from '#/layouts/Base.astro';
         classNames: ['text-base-content'],
         onClick: () => abTabs.findInPageAction(tabId, 'next', inputEl.value),
       }),
-      result
-        ? h(
-            'div',
-            { class: c('text-sm', 'ml-4') },
-            `${result.activeMatch} of ${result.matches} ${
-              result.matches === 1 ? 'match' : 'matches'
-            }`,
-          )
-        : null,
+      result ? h('div', { class: c('text-sm', 'ml-4') }, t['pages:findInPage.matches']) : null,
     );
   }
 </script>

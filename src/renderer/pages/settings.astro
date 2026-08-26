@@ -4,7 +4,7 @@ import Menu from '#/components/settings/Menu.astro';
 import '@thednp/color-picker/color-picker.css';
 ---
 
-<BlackBgWithTitle title="Settings">
+<BlackBgWithTitle title="pages:settings.title">
   <Menu />
   <div id="settingsPageContent"></div>
 </BlackBgWithTitle>
@@ -12,7 +12,11 @@ import '@thednp/color-picker/color-picker.css';
 <script>
   import { settingsMenuItems } from '#/scripts';
 
-  document.title = 'Settings';
+  // No top-level await here: delaying script evaluation past DOMContentLoaded
+  // would leave the initial render without a listener.
+  abI18n.t(-1, [{ key: 'pages:settings.title' }]).then((pageTitle) => {
+    document.title = pageTitle['pages:settings.title'];
+  });
 
   async function renderContent() {
     const config = await abConfig.get();
@@ -23,7 +27,12 @@ import '@thednp/color-picker/color-picker.css';
     }
   }
 
-  document.addEventListener('DOMContentLoaded', renderContent);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderContent);
+  } else {
+    renderContent();
+  }
+
   window.addEventListener('app:navigate', renderContent);
 </script>
 

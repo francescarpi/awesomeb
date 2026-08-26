@@ -20,11 +20,15 @@ import Layout from '#/layouts/Base.astro';
   import { Rectangle } from 'electron';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
-  document.title = 'Window';
-
   const BORDER_WIDTH = 2;
 
   const { winId, searchParams } = getSearchParams();
+
+  const t = await abI18n.t(winId, [
+    { key: 'pages:window.newTabSuffix' },
+    { key: 'pages:window.commandsSuffix' },
+  ]);
+
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
   const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
   const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
@@ -60,8 +64,12 @@ import Layout from '#/layouts/Base.astro';
   async function refreshShortcutsHelp() {
     try {
       const map = await abShortcuts.active(winId);
-      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, 'open a new tab');
-      setHelpLine(helpCommandsTool, map.shortcuts.performCommand?.key, 'open the commands palette');
+      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, t['pages:window.newTabSuffix']);
+      setHelpLine(
+        helpCommandsTool,
+        map.shortcuts.performCommand?.key,
+        t['pages:window.commandsSuffix'],
+      );
     } catch (err) {
       console.error('Failed to load active shortcuts', err);
     }

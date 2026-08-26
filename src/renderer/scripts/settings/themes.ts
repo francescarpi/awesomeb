@@ -7,16 +7,41 @@ import { UI_THEMES } from '~/constants';
 
 const { init, selector } = ColorPicker;
 
+type Translations = Record<string, string>;
+
+const KEYS = [
+  'pages:settings.themes.custom.title',
+  'pages:settings.themes.custom.desc',
+  'pages:settings.themes.custom.name',
+  'pages:settings.themes.custom.primary',
+  'pages:settings.themes.custom.secondary',
+  'pages:settings.themes.custom.degrees',
+  'pages:settings.themes.custom.add',
+  'pages:settings.themes.custom.newTheme',
+  'pages:settings.themes.uiTheme.title',
+  'pages:settings.themes.uiTheme.desc',
+  'pages:settings.themes.saveChanges',
+];
+
 //-----------------------------------------------------------------------------
 export async function renderThemesPage(
   config: IConfig,
 ): Promise<{ renderer: Renderer; callback: () => void }> {
+  const t = await abI18n.t(
+    -1,
+    KEYS.map((key) => ({ key })),
+  );
   const renderer = new Renderer(
-    buildGeneralBody(config.themes, config.uiTheme, {
-      onSave: () => saveChanges(config),
-      onDelete: (name) => deleteTheme(name, renderer, config),
-      onAdd: () => addTheme(renderer, config),
-    }),
+    buildGeneralBody(
+      config.themes,
+      config.uiTheme,
+      {
+        onSave: () => saveChanges(config),
+        onDelete: (name) => deleteTheme(name, renderer, config, t),
+        onAdd: () => addTheme(renderer, config, t),
+      },
+      t,
+    ),
   );
 
   const callback = () => document.querySelectorAll(selector).forEach(init);
@@ -29,13 +54,14 @@ function buildGeneralBody(
   themes: IConfigTheme[],
   uiTheme: string,
   callbacks: { onSave: () => Promise<void>; onDelete: (name: string) => void; onAdd: () => void },
+  t: Translations,
 ): VNode {
   return h(
     'div',
     { class: c('flex', 'flex-col', 'gap-2') },
     box(
-      'Themes',
-      'Manage custom themes to personalize the appearance of your desktops.',
+      t['pages:settings.themes.custom.title'],
+      t['pages:settings.themes.custom.desc'],
       h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2') },
@@ -48,10 +74,14 @@ function buildGeneralBody(
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, 'Name'),
-              h('th', { class: c('text-left', 'px-1') }, 'Primary'),
-              h('th', { class: c('text-left', 'px-1') }, 'Secondary'),
-              h('th', { class: c('text-left', 'px-1') }, 'Degrees'),
+              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.name']),
+              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.primary']),
+              h(
+                'th',
+                { class: c('text-left', 'px-1') },
+                t['pages:settings.themes.custom.secondary'],
+              ),
+              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.degrees']),
               h('th', { class: c('w-13') }, ''),
             ),
           ),
@@ -115,14 +145,14 @@ function buildGeneralBody(
           h(
             'button',
             { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
-            'Add',
+            t['pages:settings.themes.custom.add'],
           ),
         ),
       ),
     ),
     box(
-      'UI Theme',
-      'Customize the look of the AwesomeB UI with themes created by the community.',
+      t['pages:settings.themes.uiTheme.title'],
+      t['pages:settings.themes.uiTheme.desc'],
       h(
         'select',
         { class: c('select', 'select-sm'), id: 'ui-theme-select', onchange: testUITheme },
@@ -137,18 +167,18 @@ function buildGeneralBody(
       h(
         'button',
         { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
-        'Save changes',
+        t['pages:settings.themes.saveChanges'],
       ),
     ),
   );
 }
 
 //-----------------------------------------------------------------------------
-function buildGeneralCallbacks(renderer: Renderer, config: IConfig) {
+function buildGeneralCallbacks(renderer: Renderer, config: IConfig, t: Translations) {
   return {
     onSave: () => saveChanges(config),
-    onDelete: (name: string) => deleteTheme(name, renderer, config),
-    onAdd: () => addTheme(renderer, config),
+    onDelete: (name: string) => deleteTheme(name, renderer, config, t),
+    onAdd: () => addTheme(renderer, config, t),
   };
 }
 
@@ -165,10 +195,10 @@ async function saveChanges(config: IConfig) {
 }
 
 //-----------------------------------------------------------------------------
-function deleteTheme(name: string, renderer: Renderer, config: IConfig) {
-  const themes = getTableThemes().filter((t) => t.name !== name);
+function deleteTheme(name: string, renderer: Renderer, config: IConfig, t: Translations) {
+  const themes = getTableThemes().filter((th) => th.name !== name);
   renderer.update(
-    buildGeneralBody(themes, config.uiTheme, buildGeneralCallbacks(renderer, config)),
+    buildGeneralBody(themes, config.uiTheme, buildGeneralCallbacks(renderer, config, t), t),
   );
 }
 
@@ -202,17 +232,18 @@ function getTableThemes(): IConfigTheme[] {
 }
 
 //-----------------------------------------------------------------------------
-function addTheme(renderer: Renderer, config: IConfig) {
+function addTheme(renderer: Renderer, config: IConfig, t: Translations) {
+  const newSeed = t['pages:settings.themes.custom.newTheme'];
   const themes = getTableThemes();
-  if (themes.some((t) => t.name === 'New')) return;
+  if (themes.some((th) => th.name === newSeed)) return;
 
   const newThemes: IConfigTheme[] = [
     ...themes,
-    { name: 'New', primary: '#000000', secondary: '#ffffff', degrees: 0 },
+    { name: newSeed, primary: '#000000', secondary: '#ffffff', degrees: 0 },
   ];
 
   renderer.update(
-    buildGeneralBody(newThemes, config.uiTheme, buildGeneralCallbacks(renderer, config)),
+    buildGeneralBody(newThemes, config.uiTheme, buildGeneralCallbacks(renderer, config, t), t),
     {
       onUpdated: () => {
         const lastRow = (document.getElementById('themes-table') as HTMLTableElement).tBodies[0]

@@ -4,7 +4,7 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal>
-  <Title>Grant permission</Title>
+  <Title title="pages:requestPermission.title" />
   <div id="content"></div>
 </Modal>
 
@@ -15,8 +15,12 @@ import Title from '#/components/common/Title.astro';
   const host = searchParams.get('host') as string;
   const permission = searchParams.get('permission') as string;
   const tabId = parseInt(searchParams.get('tabId')!, 10);
+  const t = await abI18n.t(winId, [
+    { key: 'pages:requestPermission.message', params: { host, permission } },
+  ]);
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => {
       abTabs.grantPermission(winId, tabId, true);
       abModal.close(winId);
@@ -32,7 +36,7 @@ import Title from '#/components/common/Title.astro';
       'div',
       { class: c('flex', 'flex-col', 'gap-2') },
       h('p', {
-        innerHTML: `The site <b>${host}</b> is requesting permission for <b>${permission}</b>.`,
+        innerHTML: t['pages:requestPermission.message'],
       }),
       h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
     ),
