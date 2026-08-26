@@ -211,5 +211,111 @@
   "selectTab": {
     "title": "Seleccionar pestaña",
     "placeholder": "Filtra y selecciona una pestaña..."
+  },
+  "settings": {
+    "title": "Configuración",
+    "menu": {
+      "general": "General",
+      "profiles": "Perfiles",
+      "themes": "Temas",
+      "permissions": "Permisos",
+      "shortcuts": "Atajos"
+    },
+    "general": {
+      "saveChanges": "Guardar cambios",
+      "info": {
+        "title": "Información",
+        "desc": "Aquí puedes ver información sobre la versión de la aplicación, la ruta donde se guardan la configuración, la sesión, el historial, etc., la versión de Chromium subyacente y el repositorio del proyecto.",
+        "appVersion": "Versión de la app:",
+        "chromeVersion": "Versión de Chrome:",
+        "configFolder": "Carpeta de configuración:",
+        "openFolder": "Abrir carpeta",
+        "githubRepo": "Repositorio de GitHub:"
+      },
+      "engines": {
+        "title": "Motores de búsqueda",
+        "desc": "Configuración de los motores de búsqueda",
+        "name": "Nombre",
+        "url": "URL",
+        "add": "Añadir",
+        "newEngine": "Nuevo motor"
+      },
+      "downloads": {
+        "title": "Ubicación de las descargas",
+        "desc": "Establece la ubicación predeterminada donde se descargarán los archivos.",
+        "location": "Ubicación",
+        "change": "Cambiar"
+      },
+      "language": {
+        "title": "Idioma",
+        "desc": "Establece el idioma de la aplicación.",
+        "restartNote": "* Es necesario reiniciar después de cambiar el idioma"
+      },
+      "historyRetention": {
+        "title": "Retención del historial",
+        "desc": "Número de días que se conserva el historial de navegación.",
+        "manageHistory": "Gestionar historial"
+      },
+      "closedTabsRetention": {
+        "title": "Retención de pestañas cerradas",
+        "desc": "Número de días que se conserva el historial de pestañas cerradas."
+      },
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días"
+    },
+    "profiles": {
+      "title": "Perfiles",
+      "desc": "Gestiona perfiles de Chrome aislados (particiones) con cookies, sesiones y almacenamiento independientes para cada espacio de trabajo o usuario.",
+      "name": "Nombre",
+      "color": "Color",
+      "add": "Añadir",
+      "restartNote": "Para aplicar los nuevos cambios a los perfiles, es necesario reiniciar el navegador.",
+      "saveChanges": "Guardar cambios",
+      "newProfile": "Nuevo"
+    },
+    "themes": {
+      "custom": {
+        "title": "Temas",
+        "desc": "Gestiona temas personalizados para adaptar la apariencia de tus escritorios.",
+        "name": "Nombre",
+        "primary": "Primario",
+        "secondary": "Secundario",
+        "degrees": "Grados",
+        "add": "Añadir",
+        "newTheme": "Nuevo"
+      },
+      "uiTheme": {
+        "title": "Tema de la interfaz",
+        "desc": "Personaliza el aspecto de la interfaz de AwesomeB con temas creados por la comunidad."
+      },
+      "saveChanges": "Guardar cambios"
+    },
+    "permissions": {
+      "securityLevel": {
+        "title": "Nivel de seguridad",
+        "desc": "Este ajuste determina el nivel de acceso concedido a los sitios web respecto a las funcionalidades de tu dispositivo (sensores, APIs, etc.).<br/><br/><strong>Estándar</strong>: permite los permisos habituales necesarios para que la mayoría de páginas web funcionen correctamente.<br/><strong>Estricto</strong>: requiere tu consentimiento explícito para cada permiso que un sitio web intente usar, ofreciendo máxima privacidad.",
+        "standard": "Estándar",
+        "strict": "Estricto"
+      },
+      "list": {
+        "title": "Permisos",
+        "desc": "Gestiona los permisos concedidos a los sitios web en este dispositivo.",
+        "allow": "Permitir",
+        "deny": "Denegar"
+      },
+      "loading": "Cargando..."
+    },
+    "shortcuts": {
+      "map": {
+        "title": "Mapa predeterminado",
+        "desc": "Define una distribución de teclado predeterminada que se adapte a ti. Después puedes personalizar teclas concretas a tu gusto."
+      },
+      "list": {
+        "title": "Atajos",
+        "desc": "Haz clic en una tecla de atajo para cambiar su combinación. Pulsa Escape para cancelar."
+      },
+      "loading": "Cargando...",
+      "pressKey": "Pulsa una tecla..."
+    }
   }
 }

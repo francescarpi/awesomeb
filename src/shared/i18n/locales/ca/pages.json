@@ -211,5 +211,111 @@
   "selectTab": {
     "title": "Selecciona la pestanya",
     "placeholder": "Filtra i selecciona una pestanya..."
+  },
+  "settings": {
+    "title": "Configuració",
+    "menu": {
+      "general": "General",
+      "profiles": "Perfils",
+      "themes": "Temes",
+      "permissions": "Permisos",
+      "shortcuts": "Dreceres"
+    },
+    "general": {
+      "saveChanges": "Desa els canvis",
+      "info": {
+        "title": "Informació",
+        "desc": "Aquí pots veure informació sobre la versió de l'aplicació, la ruta on es desen la configuració, la sessió, l'historial, etc., la versió de Chromium subjacent i el repositori del projecte.",
+        "appVersion": "Versió de l'app:",
+        "chromeVersion": "Versió de Chrome:",
+        "configFolder": "Carpeta de configuració:",
+        "openFolder": "Obre la carpeta",
+        "githubRepo": "Repositori de GitHub:"
+      },
+      "engines": {
+        "title": "Cercadors",
+        "desc": "Configuració dels cercadors",
+        "name": "Nom",
+        "url": "URL",
+        "add": "Afegeix",
+        "newEngine": "Cercador nou"
+      },
+      "downloads": {
+        "title": "Ubicació de les baixades",
+        "desc": "Estableix la ubicació per defecte on es baixaran els fitxers.",
+        "location": "Ubicació",
+        "change": "Canvia"
+      },
+      "language": {
+        "title": "Idioma",
+        "desc": "Estableix l'idioma de l'aplicació.",
+        "restartNote": "* Cal reiniciar després de canviar l'idioma"
+      },
+      "historyRetention": {
+        "title": "Retenció de l'historial",
+        "desc": "Nombre de dies durant els quals es conserva l'historial de navegació.",
+        "manageHistory": "Gestiona l'historial"
+      },
+      "closedTabsRetention": {
+        "title": "Retenció de les pestanyes tancades",
+        "desc": "Nombre de dies durant els quals es conserva l'historial de pestanyes tancades."
+      },
+      "days_one": "{{count}} dia",
+      "days_other": "{{count}} dies"
+    },
+    "profiles": {
+      "title": "Perfils",
+      "desc": "Gestiona perfils de Chrome aïllats (particions) amb galetes, sessions i emmagatzematge independents per a cada espai de treball o usuari.",
+      "name": "Nom",
+      "color": "Color",
+      "add": "Afegeix",
+      "restartNote": "Per aplicar els nous canvis als perfils, cal reiniciar el navegador.",
+      "saveChanges": "Desa els canvis",
+      "newProfile": "Nou"
+    },
+    "themes": {
+      "custom": {
+        "title": "Temes",
+        "desc": "Gestiona temes personalitzats per adaptar l'aparença dels teus escriptoris.",
+        "name": "Nom",
+        "primary": "Primari",
+        "secondary": "Secundari",
+        "degrees": "Graus",
+        "add": "Afegeix",
+        "newTheme": "Nou"
+      },
+      "uiTheme": {
+        "title": "Tema de la interfície",
+        "desc": "Personalitza l'aspecte de la interfície d'AwesomeB amb temes creats per la comunitat."
+      },
+      "saveChanges": "Desa els canvis"
+    },
+    "permissions": {
+      "securityLevel": {
+        "title": "Nivell de seguretat",
+        "desc": "Aquest paràmetre determina el nivell d'accés concedit als llocs web quant a les funcionalitats del teu dispositiu (sensors, API, etc.).<br/><br/><strong>Estàndard</strong>: permet els permisos habituals necessaris perquè la majoria de pàgines web funcionin correctament.<br/><strong>Estricte</strong>: requereix el teu consentiment explícit per a cada permís que un lloc web intenti utilitzar, oferint màxima privadesa.",
+        "standard": "Estàndard",
+        "strict": "Estricte"
+      },
+      "list": {
+        "title": "Permisos",
+        "desc": "Gestiona els permisos concedits als llocs web en aquest dispositiu.",
+        "allow": "Permet",
+        "deny": "Denega"
+      },
+      "loading": "Carregant..."
+    },
+    "shortcuts": {
+      "map": {
+        "title": "Mapa per defecte",
+        "desc": "Defineix una distribució de teclat per defecte que s'adapti a tu. Després pots personalitzar tecles concretes al teu gust."
+      },
+      "list": {
+        "title": "Dreceres",
+        "desc": "Fes clic a una tecla de drecera per canviar-ne la combinació. Prem Escape per cancel·lar."
+      },
+      "loading": "Carregant...",
+      "pressKey": "Prem una tecla..."
+    }
   }
 }

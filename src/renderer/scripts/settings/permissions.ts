@@ -9,20 +9,40 @@ import {
 } from '~/types';
 import Delete from '#/icons/delete.svg?raw';
 
+type Translations = Record<string, string>;
+
+const KEYS = [
+  'pages:settings.permissions.securityLevel.title',
+  'pages:settings.permissions.securityLevel.desc',
+  'pages:settings.permissions.securityLevel.standard',
+  'pages:settings.permissions.securityLevel.strict',
+  'pages:settings.permissions.list.title',
+  'pages:settings.permissions.list.desc',
+  'pages:settings.permissions.list.allow',
+  'pages:settings.permissions.list.deny',
+  'pages:settings.permissions.loading',
+];
+
 export async function renderPermissionsPage(config: IConfig): Promise<{
   renderer: Renderer;
   callback: () => void;
 }> {
+  const t = await abI18n.t(
+    -1,
+    KEYS.map((key) => ({ key })),
+  );
   const permissions = await abPermissions.get();
-  const permissionsRenderer = new Renderer(h('ul', {}, h('li', {}, 'Loading...')));
+  const permissionsRenderer = new Renderer(
+    h('ul', {}, h('li', {}, t['pages:settings.permissions.loading'])),
+  );
 
   const renderer = new Renderer(
     h(
       'div',
       {},
       box(
-        'Security Level',
-        "This setting determines the level of access granted to websites regarding your device's functionalities (sensors, APIs, etc.).<br/><br/><strong>Standard</strong>: Allows common permissions necessary for most web pages to function correctly.<br/><strong>Strict</strong>: Requires your explicit consent for every permission a website attempts to use, offering maximum privacy.",
+        t['pages:settings.permissions.securityLevel.title'],
+        t['pages:settings.permissions.securityLevel.desc'],
         h(
           'div',
           {},
@@ -35,19 +55,19 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
             h(
               'option',
               { selected: config.permissionsType === 'standard', value: 'standard' },
-              'Standard',
+              t['pages:settings.permissions.securityLevel.standard'],
             ),
             h(
               'option',
               { selected: config.permissionsType === 'strict', value: 'strict' },
-              'Strict',
+              t['pages:settings.permissions.securityLevel.strict'],
             ),
           ),
         ),
       ),
       box(
-        'Permissions',
-        'Manage the permissions required for the extension to function properly.',
+        t['pages:settings.permissions.list.title'],
+        t['pages:settings.permissions.list.desc'],
         h('div', { id: 'permissions-list', class: c('text-sm') }),
       ),
     ),
@@ -55,7 +75,7 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
 
   const callback = () => {
     permissionsRenderer.render('permissions-list');
-    updatePermissionsList(permissionsRenderer, permissions);
+    updatePermissionsList(permissionsRenderer, permissions, t);
   };
 
   return { renderer, callback };
@@ -82,7 +102,11 @@ async function savePermission(
   await abPermissions.save(newPermissions);
 }
 
-function renderPermissionsList(permissions: TPermissions, renderer: Renderer): VNode {
+function renderPermissionsList(
+  permissions: TPermissions,
+  renderer: Renderer,
+  t: Translations,
+): VNode {
   const sortedKeys = Object.keys(permissions).sort();
   return h(
     'ul',
@@ -103,7 +127,7 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
                 'div',
                 { class: c('flex', 'gap-2', 'items-center') },
                 btnIcon(Delete, {
-                  onClick: () => deletePermission(key, perm, permissions, renderer),
+                  onClick: () => deletePermission(key, perm, permissions, renderer, t),
                   doubleConfirmation: true,
                   classNames: ['w-4'],
                 }),
@@ -114,14 +138,14 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
                   radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-allow`,
-                    'Allow',
+                    t['pages:settings.permissions.list.allow'],
                     value,
                     savePermission.bind(null, key, perm, true, permissions),
                   ),
                   radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-deny`,
-                    'Deny',
+                    t['pages:settings.permissions.list.deny'],
                     !value,
                     savePermission.bind(null, key, perm, false, permissions),
                   ),
@@ -135,8 +159,8 @@ function renderPermissionsList(permissions: TPermissions, renderer: Renderer): V
   );
 }
 
-function updatePermissionsList(renderer: Renderer, permissions: TPermissions) {
-  renderer.update(renderPermissionsList(permissions, renderer));
+function updatePermissionsList(renderer: Renderer, permissions: TPermissions, t: Translations) {
+  renderer.update(renderPermissionsList(permissions, renderer, t));
 }
 
 async function deletePermission(
@@ -144,6 +168,7 @@ async function deletePermission(
   perm: TPermission,
   permissions: TPermissions,
   renderer: Renderer,
+  t: Translations,
 ) {
   if (!permissions[host]) return;
 
@@ -156,7 +181,7 @@ async function deletePermission(
   }
 
   await abPermissions.save(permissions);
-  updatePermissionsList(renderer, permissions);
+  updatePermissionsList(renderer, permissions, t);
 }
 
 async function updateSecurityLevel(e: Event, config: IConfig) {

@@ -23,6 +23,7 @@ export function setupI18nIPC(browser: Browser) {
           internalPageChecker.bind(null, 'bookmarks'),
           internalPageChecker.bind(null, 'downloads'),
           internalPageChecker.bind(null, 'extensions'),
+          internalPageChecker.bind(null, 'settings'),
         ],
       ),
     ],

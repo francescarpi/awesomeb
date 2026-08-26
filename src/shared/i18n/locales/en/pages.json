@@ -211,5 +211,111 @@
   "selectTab": {
     "title": "Select Tab",
     "placeholder": "Filter and select a tab..."
+  },
+  "settings": {
+    "title": "Settings",
+    "menu": {
+      "general": "General",
+      "profiles": "Profiles",
+      "themes": "Themes",
+      "permissions": "Permissions",
+      "shortcuts": "Shortcuts"
+    },
+    "general": {
+      "saveChanges": "Save changes",
+      "info": {
+        "title": "Information",
+        "desc": "Here you can view information about the application version, the file path where configuration, session, history, etc., are stored, the underlying Chromium version, and the project repository.",
+        "appVersion": "App version:",
+        "chromeVersion": "Chrome version:",
+        "configFolder": "Config folder:",
+        "openFolder": "Open folder",
+        "githubRepo": "GitHub repository:"
+      },
+      "engines": {
+        "title": "Search Engines",
+        "desc": "Configuration for search engines",
+        "name": "Name",
+        "url": "URL",
+        "add": "Add",
+        "newEngine": "New Engine"
+      },
+      "downloads": {
+        "title": "Download Location",
+        "desc": "Set the default download location for files.",
+        "location": "Location",
+        "change": "Change"
+      },
+      "language": {
+        "title": "Language",
+        "desc": "Set the default app language.",
+        "restartNote": "* Restart is required after changing the language"
+      },
+      "historyRetention": {
+        "title": "History Retention",
+        "desc": "Number of days to keep browsing history.",
+        "manageHistory": "Manage history"
+      },
+      "closedTabsRetention": {
+        "title": "Closed Tabs Retention",
+        "desc": "Number of days to keep closed tabs history."
+      },
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
+    },
+    "profiles": {
+      "title": "Profiles",
+      "desc": "Manage isolated Chrome profiles (partitions) with separate cookies, sessions, and storage for each workspace or user.",
+      "name": "Name",
+      "color": "Color",
+      "add": "Add",
+      "restartNote": "To apply the new changes to the profiles, it is necessary to restart the browser.",
+      "saveChanges": "Save changes",
+      "newProfile": "New"
+    },
+    "themes": {
+      "custom": {
+        "title": "Themes",
+        "desc": "Manage custom themes to personalize the appearance of your desktops.",
+        "name": "Name",
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "degrees": "Degrees",
+        "add": "Add",
+        "newTheme": "New"
+      },
+      "uiTheme": {
+        "title": "UI Theme",
+        "desc": "Customize the look of the AwesomeB UI with themes created by the community."
+      },
+      "saveChanges": "Save changes"
+    },
+    "permissions": {
+      "securityLevel": {
+        "title": "Security Level",
+        "desc": "This setting determines the level of access granted to websites regarding your device's functionalities (sensors, APIs, etc.).<br/><br/><strong>Standard</strong>: Allows common permissions necessary for most web pages to function correctly.<br/><strong>Strict</strong>: Requires your explicit consent for every permission a website attempts to use, offering maximum privacy.",
+        "standard": "Standard",
+        "strict": "Strict"
+      },
+      "list": {
+        "title": "Permissions",
+        "desc": "Manage the permissions granted to websites on this device.",
+        "allow": "Allow",
+        "deny": "Deny"
+      },
+      "loading": "Loading..."
+    },
+    "shortcuts": {
+      "map": {
+        "title": "Default Map",
+        "desc": "Define a default keyboard layout that suits you best. You can then customize specific keys to your preferences."
+      },
+      "list": {
+        "title": "Shortcuts",
+        "desc": "Click on a shortcut key to change its combination. Press Escape to cancel."
+      },
+      "loading": "Loading...",
+      "pressKey": "Press a key..."
+    }
   }
 }
