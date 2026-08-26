@@ -9,5 +9,10 @@
     "splitIntoSelectedTab": "Dividir en pestanya seleccionada",
     "window": "Finestra {{id}}",
     "desktop": "Escriptori: \"{{label}}\""
-  }
+  },
+  "ok": "D'acord",
+  "cancel": "Cancel·la",
+  "save": "Desa",
+  "move": "Mou",
+  "delete": "Elimina"
 }

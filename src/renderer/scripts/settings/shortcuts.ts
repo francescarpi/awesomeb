@@ -3,6 +3,17 @@ import type { IConfig, IShortcut, TShortcutId, TShortcutMapId } from '~/types';
 import { acceleratorToDisplay, keyEventToAccelerator } from '~/utils/shortcuts';
 import { box } from './common';
 
+type Translations = Record<string, string>;
+
+const KEYS = [
+  'pages:settings.shortcuts.map.title',
+  'pages:settings.shortcuts.map.desc',
+  'pages:settings.shortcuts.list.title',
+  'pages:settings.shortcuts.list.desc',
+  'pages:settings.shortcuts.loading',
+  'pages:settings.shortcuts.pressKey',
+];
+
 // Capture state — which shortcut is being edited and its keydown handler
 let capturingId: TShortcutId | null = null;
 let captureHandler: ((event: KeyboardEvent) => void) | null = null;
@@ -28,15 +39,16 @@ function startCapture(
   shortcutId: TShortcutId,
   renderer: Renderer,
   shortcuts: Record<TShortcutId, IShortcut>,
+  t: Translations,
 ) {
   clearCapture();
   capturingId = shortcutId;
-  updateShortcutsList(renderer, shortcuts);
+  updateShortcutsList(renderer, shortcuts, t);
 
   captureHandler = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       clearCapture();
-      updateShortcutsList(renderer, shortcuts);
+      updateShortcutsList(renderer, shortcuts, t);
       return;
     }
 
@@ -45,7 +57,7 @@ function startCapture(
 
     shortcuts[shortcutId].key = accelerator;
     clearCapture();
-    updateShortcutsList(renderer, shortcuts);
+    updateShortcutsList(renderer, shortcuts, t);
     abShortcuts.override(mapId, shortcutId, accelerator);
   };
 
@@ -57,6 +69,10 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
   renderer: Renderer;
   callback: () => void;
 }> {
+  const t = await abI18n.t(
+    -1,
+    KEYS.map((key) => ({ key })),
+  );
   const maps = await abShortcuts.maps();
   mapId = config.shortcutMap;
   const shortcuts = maps[config.shortcutMap].shortcuts;
@@ -66,15 +82,17 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
     if (shortcuts[id]) shortcuts[id].key = key;
   }
 
-  const shortcutsRenderer = new Renderer(h('ul', {}, h('li', {}, 'Loading...')));
+  const shortcutsRenderer = new Renderer(
+    h('ul', {}, h('li', {}, t['pages:settings.shortcuts.loading'])),
+  );
 
   const renderer = new Renderer(
     h(
       'div',
       {},
       box(
-        'Default Map',
-        'Define a default keyboard layout that suits you best. You can then customize specific keys to your preferences.',
+        t['pages:settings.shortcuts.map.title'],
+        t['pages:settings.shortcuts.map.desc'],
         h(
           'select',
           { class: c('select', 'select-sm', 'w-40'), onchange: () => {} },
@@ -84,8 +102,8 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
         ),
       ),
       box(
-        'Shortcuts',
-        'Click on a shortcut key to change its combination. Press Escape to cancel.',
+        t['pages:settings.shortcuts.list.title'],
+        t['pages:settings.shortcuts.list.desc'],
         h('div', { id: 'shortcuts-list', class: c('text-sm') }),
       ),
     ),
@@ -93,14 +111,18 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
 
   const callback = () => {
     shortcutsRenderer.render('shortcuts-list');
-    updateShortcutsList(shortcutsRenderer, shortcuts);
+    updateShortcutsList(shortcutsRenderer, shortcuts, t);
   };
 
   return { renderer, callback };
 }
 
 /** Groups shortcuts by their group field, sorts within each group, and renders */
-function updateShortcutsList(renderer: Renderer, shortcuts: Record<TShortcutId, IShortcut>) {
+function updateShortcutsList(
+  renderer: Renderer,
+  shortcuts: Record<TShortcutId, IShortcut>,
+  t: Translations,
+) {
   // Group entries by EShortcutGroup, keeping the id so we can target updates
   const entries = Object.entries(shortcuts) as [TShortcutId, IShortcut][];
   const grouped = entries.reduce(
@@ -140,13 +162,13 @@ function updateShortcutsList(renderer: Renderer, shortcuts: Record<TShortcutId, 
                   ? h(
                       'span',
                       { class: c('badge', 'badge-warning', 'w-36', 'py-3.5') },
-                      'Press a key...',
+                      t['pages:settings.shortcuts.pressKey'],
                     )
                   : h(
                       'button',
                       {
                         class: c('btn', 'btn-sm', 'btn-ghost', 'border', 'w-36'),
-                        onclick: () => startCapture(id, renderer, shortcuts),
+                        onclick: () => startCapture(id, renderer, shortcuts, t),
                       },
                       acceleratorToDisplay(sc.key),
                     ),

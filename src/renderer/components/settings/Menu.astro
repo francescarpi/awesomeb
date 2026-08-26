@@ -7,9 +7,21 @@
 <script>
   import { Renderer, h, c, type VNode, settingsMenuItems } from '#/scripts';
 
-  const renderer = new Renderer(renderMenu()).render('settings-menu');
+  /** Locale is static per session (changing it requires an app restart), so the
+   * menu translations are fetched once and reused across navigation re-renders. */
+  const cache: { t?: Record<string, string> } = {};
 
-  function renderMenu(): VNode {
+  let renderer: Renderer;
+
+  async function buildMenu(): Promise<VNode> {
+    if (!cache.t) {
+      cache.t = await abI18n.t(
+        -1,
+        settingsMenuItems.map((item) => ({ key: item.nameKey })),
+      );
+    }
+    const t = cache.t;
+
     return h(
       'ul',
       {
@@ -25,18 +37,20 @@
               onclick: () => handleNavItemClick(item.hash[0]),
               class: c(item.hash.includes(window.location.hash) && 'menu-active'),
             },
-            item.name,
+            t[item.nameKey],
           ),
         ),
       ),
     );
   }
 
-  function handleNavItemClick(hash: string) {
+  async function handleNavItemClick(hash: string) {
     window.history.pushState({}, '', hash);
-    renderer.update(renderMenu());
+    renderer.update(await buildMenu());
     window.dispatchEvent(new CustomEvent('app:navigate'));
   }
 
-  document.addEventListener('DOMContentLoaded', renderMenu);
+  (async () => {
+    renderer = new Renderer(await buildMenu()).render('settings-menu');
+  })();
 </script>

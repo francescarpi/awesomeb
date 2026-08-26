@@ -10,14 +10,23 @@ import Layout from '#/layouts/Base.astro';
   import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
   import alert from '#/icons/alert.svg?raw';
 
-  const { searchParams } = getSearchParams();
+  const { searchParams, winId } = getSearchParams();
   const url = searchParams.get('url');
   const code = searchParams.get('code');
   const description = searchParams.get('description');
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const [btns, registerBtnsEvents] = confirmButtons({
-    confirmText: 'Retry',
+  const t = await abI18n.t(winId, [
+    { key: 'pages:tabFailLoad.title' },
+    { key: 'pages:tabFailLoad.message', params: { url } },
+    { key: 'pages:tabFailLoad.errorCode' },
+    { key: 'pages:tabFailLoad.error' },
+    { key: 'pages:tabFailLoad.retry' },
+  ]);
+
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
+    confirmText: t['pages:tabFailLoad.retry'],
     onConfirm: () => {
       abTabs.retryFailed(tabId);
     },
@@ -47,13 +56,11 @@ import Layout from '#/layouts/Base.astro';
           innerHTML: alert,
           class: c('w-30', 'h-30', 'text-error', '[&>svg]:w-full', '[&>svg]:h-full'),
         }),
-        h('h6', { class: c('font-bold') }, 'Cannot Connect to the Website'),
+        h('h6', { class: c('font-bold') }, t['pages:tabFailLoad.title']),
         h(
           'p',
           { class: c('w-full', 'truncate', 'text-center', 'px-10') },
-          'The page at ',
-          h('strong', null, url),
-          ' cannot be reached.',
+          t['pages:tabFailLoad.message'],
         ),
         h(
           'div',
@@ -67,8 +74,14 @@ import Layout from '#/layouts/Base.astro';
               'max-w-md',
             ),
           },
-          h('p', null, 'Error code: ', h('span', { class: 'code' }, code)),
-          h('p', null, 'Error: ', h('span', { class: 'description' }, description)),
+          h('p', null, t['pages:tabFailLoad.errorCode'], ' ', h('span', { class: 'code' }, code)),
+          h(
+            'p',
+            null,
+            t['pages:tabFailLoad.error'],
+            ' ',
+            h('span', { class: 'description' }, description),
+          ),
         ),
         ...btns,
       ),

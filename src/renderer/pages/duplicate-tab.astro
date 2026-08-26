@@ -6,12 +6,12 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Duplicate Tab</Title>
+  <Title title="pages:duplicateTab.title" />
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Select tab..." id="tab" />
-    <ListWithSearch placeholder="Select a profile..." id="partition" />
-    <ListWithSearch placeholder="Select a target" id="target" />
+    <ListWithSearch placeholder="pages:duplicateTab.placeholder1" id="tab" />
+    <ListWithSearch placeholder="pages:duplicateTab.placeholder2" id="partition" />
+    <ListWithSearch placeholder="pages:duplicateTab.placeholder3" id="target" />
   </div>
 </Modal>
 

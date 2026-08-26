@@ -4,7 +4,7 @@ import Title from '#/components/common/Title.astro';
 ---
 
 <Modal>
-  <Title>Login</Title>
+  <Title title="pages:login.title" />
   <div id="content"></div>
 </Modal>
 
@@ -16,7 +16,14 @@ import Title from '#/components/common/Title.astro';
   const realm = searchParams.get('realm') as string;
   const tabId = parseInt(searchParams.get('tabId') as string, 10);
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const t = await abI18n.t(winId, [
+    { key: 'pages:login.message', params: { host } },
+    { key: 'pages:login.username' },
+    { key: 'pages:login.password' },
+  ]);
+
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => performLogin(),
     onCancel: () => performCancel(),
   });
@@ -25,17 +32,17 @@ import Title from '#/components/common/Title.astro';
     h(
       'div',
       { class: c('flex', 'flex-col', 'gap-4') },
-      h('p', null, `The site (${host}) requires a username and password to continue.`),
+      h('p', null, t['pages:login.message']),
       h('p', { class: c(!realm || realm.trim() === '' ? 'hidden' : '') }, realm),
       h('input', {
         class: c('input', 'input-sm', 'w-full'),
-        placeholder: 'Username',
+        placeholder: t['pages:login.username'],
         autofocus: true,
         id: 'username',
       }),
       h('input', {
         class: c('input', 'input-sm', 'w-full'),
-        placeholder: 'Password',
+        placeholder: t['pages:login.password'],
         type: 'password',
         id: 'password',
       }),

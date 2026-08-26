@@ -92,7 +92,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
-      label: t('menu:contextTab.suspended'),
+      label: t('menu:contextTab.suspend'),
       icon: getIcon(EIcon.Suspend),
       enabled: !tab.suspended,
       click: async () => {

@@ -15,7 +15,8 @@ import Modal from '#/layouts/Modal.astro';
   const url = new URL(searchParams.get('url') as string);
   const defaultValue = searchParams.get('defaultValue');
 
-  const [btns, registerBtnsEvents] = confirmButtons({
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
     onConfirm: () => {
       abPrompts.response(
         winId,
@@ -25,11 +26,15 @@ import Modal from '#/layouts/Modal.astro';
     onCancel: () => abPrompts.response(winId, null),
   });
 
+  const t = await abI18n.t(winId, [
+    { key: 'pages:prompt.message', params: { host: url.hostname } },
+  ]);
+
   new Renderer(
     h(
       'div',
       { classs: c('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: c('text-lg') }, `${url.hostname} says`),
+      h('h1', { class: c('text-lg') }, t['pages:prompt.message']),
       h(
         'fieldset',
         { class: c('fieldset', 'mb-6') },

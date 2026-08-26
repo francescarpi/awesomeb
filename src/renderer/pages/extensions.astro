@@ -2,7 +2,7 @@
 import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
-<BlackBgWithTitle title="Extensions">
+<BlackBgWithTitle title="pages:extensions.title">
   <div id="content"></div>
   <div id="extensions" class="mt-4"></div>
 </BlackBgWithTitle>
@@ -18,13 +18,22 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   const resp = await abExtensions.get();
 
+  const t = await abI18n.t(-1, [
+    { key: 'pages:extensions.intro', params: { path: resp.path } },
+    { key: 'pages:extensions.refresh' },
+    { key: 'pages:extensions.noExtensions' },
+    { key: 'pages:extensions.noDescription' },
+    { key: 'pages:extensions.id' },
+    { key: 'pages:extensions.version' },
+  ]);
+
   // Update the info section with instructions and refresh button
   infoRenderer.update(
     h(
       'div',
       { class: c('flex', 'gap-2') },
       h('p', {
-        innerHTML: `AwesomeB offers limited support for Chrome extensions. At this time, installation must be done manually: place your extensions in the following directory (<i>${resp.path}</i>) and then click the Refresh Extensions button.`,
+        innerHTML: t['pages:extensions.intro'],
       }),
       h(
         'button',
@@ -35,7 +44,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             renderExtensions(resp.extensions);
           },
         },
-        'Refresh Extensions',
+        t['pages:extensions.refresh'],
       ),
     ),
   );
@@ -46,7 +55,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   function renderExtensions(extensions: IExtension[]) {
     if (extensions.length === 0) {
-      extensionsRenderer.update(h('p', null, 'No extensions found.'));
+      extensionsRenderer.update(h('p', null, t['pages:extensions.noExtensions']));
       return;
     }
 
@@ -74,7 +83,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         const descp = h(
           'p',
           { class: c('text-sm', 'text-gray-400', 'mt-1') },
-          ext.manifest.description || 'No description',
+          ext.manifest.description || t['pages:extensions.noDescription'],
         );
 
         const footer = h(
@@ -83,9 +92,13 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h(
             'span',
             { class: c('text-xs', 'text-gray-500', 'w-full') },
-            `Version: ${ext.manifest.version}`,
+            `${t['pages:extensions.version']}: ${ext.manifest.version}`,
           ),
-          h('span', { class: c('text-xs', 'text-gray-500', 'w-full') }, `ID: ${ext.id}`),
+          h(
+            'span',
+            { class: c('text-xs', 'text-gray-500', 'w-full') },
+            `${t['pages:extensions.id']}: ${ext.id}`,
+          ),
         );
 
         return h('div', { class: c('bg-white/10', 'p-2', 'rounded') }, header, descp, footer);

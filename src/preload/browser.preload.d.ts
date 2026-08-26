@@ -252,4 +252,12 @@ declare global {
     install: (winId: TWindowId) => void;
     download: (winId: TWindowId) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abI18n: {
+    t: (
+      winId: TWindowId,
+      keys: { key: string; params?: Record<string, unknown> }[],
+    ) => Promise<{ key: string; value: string }>;
+  };
 }
