@@ -11,6 +11,12 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
   const renderer = new Renderer(h('div', null)).render('content');
 
+  const t = await abI18n.t(winId, [
+    { key: 'pages:appUpdater.current' },
+    { key: 'pages:appUpdater.new' },
+    { key: 'pages:appUpdater.failed' },
+  ]);
+
   const data = await abAppUpdater.versionAvailable(winId);
   if (data) {
     renderer.update(
@@ -20,8 +26,8 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
         h(
           'div',
           { class: c('flex', 'items-center', 'justify-between', 'mb-4') },
-          h('span', null, 'Current:', h('strong', null, ` ${data.current}`)),
-          h('span', null, 'New:', h('strong', null, ` ${data.version}`)),
+          h('span', null, t['pages:appUpdater.current'], h('strong', null, ` ${data.current}`)),
+          h('span', null, t['pages:appUpdater.new'], h('strong', null, ` ${data.version}`)),
           h(
             'button',
             {
@@ -37,7 +43,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
       ),
     );
   } else {
-    renderer.update(h('div', null, 'Oops... something went wrong :('));
+    renderer.update(h('div', null, t['pages:appUpdater.failed']));
   }
 </script>
 

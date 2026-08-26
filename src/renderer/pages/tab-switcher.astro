@@ -10,9 +10,12 @@ import Base from '../layouts/Base.astro';
   import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
   import type { ITabSwitcherTab } from '~/types';
 
-  document.title = 'Tab switcher';
-
   const { winId } = getSearchParams();
+
+  const tI18n = await abI18n.t(winId, [
+    { key: 'pages:tabSwitcher.noTabs' },
+    { key: 'pages:tabSwitcher.noDesktopName' },
+  ]);
 
   let selectedIndex = 0;
   let tabsList: ITabSwitcherTab[] = await abTabSwitcher.get(winId);
@@ -46,11 +49,11 @@ import Base from '../layouts/Base.astro';
           ),
         },
         ...(tabsList.length > 0
-          ? tabsList.map((t, idx) =>
+          ? tabsList.map((tab, idx) =>
               h(
                 'div',
                 {
-                  'data-tab-id': t.id.toString(),
+                  'data-tab-id': tab.id.toString(),
                   class: c(
                     'ab-tab',
                     'grid',
@@ -68,24 +71,24 @@ import Base from '../layouts/Base.astro';
                 h(
                   'div',
                   { class: c('flex', 'flex-col', 'w-full', 'min-w-0', '-mt-1.5') },
-                  h('span', { class: c('truncate', 'w-full') }, t.title),
+                  h('span', { class: c('truncate', 'w-full') }, tab.title),
                   h(
                     'span',
                     { class: c('text-[10px]', '-mt-1') },
-                    t.desktopName || '(no desktop name)',
+                    tab.desktopName || tI18n['pages:tabSwitcher.noDesktopName'],
                   ),
                 ),
                 h(
                   'span',
                   {
                     class: c('w-4', 'h-4'),
-                    style: { backgroundColor: t.partitionColor || '#000' },
+                    style: { backgroundColor: tab.partitionColor || '#000' },
                   },
                   '',
                 ),
               ),
             )
-          : 'No tabs...'),
+          : tI18n['pages:tabSwitcher.noTabs']),
       ),
     );
   }

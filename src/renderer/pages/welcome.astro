@@ -10,6 +10,18 @@ import Layout from '#/layouts/Base.astro';
   import { Renderer, h, c, input } from '#/scripts';
   import logo from '#/assets/icon.png';
 
+  const t = await abI18n.t(-1, [
+    { key: 'pages:welcome.title' },
+    { key: 'pages:welcome.initialSetup' },
+    { key: 'pages:welcome.searchEngineMessage' },
+    { key: 'pages:welcome.example' },
+    { key: 'pages:welcome.exampleCode' },
+    { key: 'pages:welcome.namePlaceholder' },
+    { key: 'pages:welcome.urlPlaceholder' },
+    { key: 'pages:welcome.note' },
+    { key: 'pages:welcome.save' },
+  ]);
+
   abWelcome.ready();
 
   const renderer = new Renderer(
@@ -31,13 +43,14 @@ import Layout from '#/layouts/Base.astro';
       h(
         'p',
         { class: c('text-white', 'text-2xl', 'mt-4', 'absolute', 'font-mono', 'welcome') },
-        'Welcome to ',
+        t['pages:welcome.title'],
+        ' ',
         h('b', null, 'AwesomeB(rowser)'),
       ),
       h(
         'button',
         { class: c('btn', 'btn-sm', 'absolute', 'initial'), onclick: handleSetup },
-        'Initial Setup',
+        t['pages:welcome.initialSetup'],
       ),
     ),
   ).render('container');
@@ -60,39 +73,31 @@ import Layout from '#/layouts/Base.astro';
           ),
         },
         h('div', { class: c('aurora') }),
-        h(
-          'p',
-          { class: c('px-4', 'text-center') },
-          'For AwesomeB to function correctly, a search engine must be configured as a minimum prerequisite. Please provide the URL for your desired search engine:',
-        ),
+        h('p', { class: c('px-4', 'text-center') }, t['pages:welcome.searchEngineMessage']),
         h(
           'div',
           { class: c('flex', 'flex-col') },
-          h('p', { class: c('px-4', 'text-center') }, 'Example:'),
+          h('p', { class: c('px-4', 'text-center') }, t['pages:welcome.example']),
           h('code', {
             class: c('px-4', 'text-center', 'text-xs'),
-            innerHTML: 'Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}',
+            innerHTML: t['pages:welcome.exampleCode'],
           }),
         ),
         h(
           'div',
           { class: c('w-100', 'flex', 'flex-col', 'gap-2') },
-          input('searchEngineName', 'Name', '', {
+          input('searchEngineName', t['pages:welcome.namePlaceholder'], '', {
             autofocus: true,
             required: true,
             onInput: () => checkInputsValids(),
           }),
-          input('searchEngine', 'URL', '', {
+          input('searchEngine', t['pages:welcome.urlPlaceholder'], '', {
             required: true,
             type: 'url',
             onInput: () => checkInputsValids(),
           }),
         ),
-        h(
-          'small',
-          { class: c('px-4', 'text-center') },
-          'Note: The search engines can be modified at a later point within the main configuration settings.',
-        ),
+        h('small', { class: c('px-4', 'text-center') }, t['pages:welcome.note']),
         h(
           'button',
           {
@@ -104,7 +109,7 @@ import Layout from '#/layouts/Base.astro';
               abWelcome.addSearchEnginedAndInitiate(nameInput.value, urlInput.value);
             },
           },
-          'Save and start using AwesomeB',
+          t['pages:welcome.save'],
         ),
       ),
     );

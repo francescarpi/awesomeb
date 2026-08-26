@@ -11,7 +11,7 @@ const { placeholder, id, className, oneColumn, title } = Astro.props;
 ---
 
 <div class={`h-full grid grid-rows-[40px_auto] gap-3 relative ${className}`} id={id}>
-  <input class="input input-sm w-full" placeholder={placeholder} autofocus />
+  <input class="input input-sm w-full" data-placeholder={placeholder} autofocus />
   {title && <h2 class="absolute left-0 bottom-6.25 text-[9px] px-2 w-full text-center">{title}</h2>}
   <ul class="menu block overflow-y-auto mb-11 w-full">
     <li>
@@ -28,3 +28,21 @@ const { placeholder, id, className, oneColumn, title } = Astro.props;
     </li>
   </template>
 </div>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+
+  const { winId } = getSearchParams();
+
+  const inputs = document.querySelectorAll<HTMLInputElement>('input[data-placeholder]');
+  const keys: { key: string }[] = [];
+  for (const input of inputs) {
+    keys.push({ key: input.dataset.placeholder as string });
+  }
+
+  const t = await abI18n.t(winId, keys);
+  for (const input of inputs) {
+    input.placeholder = t[input.dataset.placeholder as tring];
+    keys.push({ key: input.dataset.placeholder as string });
+  }
+</script>

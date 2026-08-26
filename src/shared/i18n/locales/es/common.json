@@ -9,5 +9,10 @@
     "splitIntoSelectedTab": "Dividir en pestaña seleccionada",
     "window": "Ventana {{id}}",
     "desktop": "Escritorio: \"{{label}}\""
-  }
+  },
+  "ok": "Aceptar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "move": "Mover",
+  "delete": "Eliminar"
 }

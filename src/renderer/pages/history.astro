@@ -2,7 +2,7 @@
 import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
-<BlackBgWithTitle title="History">
+<BlackBgWithTitle title="pages:history.title">
   <div id="content"></div>
 </BlackBgWithTitle>
 
@@ -12,7 +12,19 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import dayjs from 'dayjs';
   import Search from '#/icons/search.svg?raw';
 
-  document.title = 'History';
+  const t = await abI18n.t(-1, [
+    { key: 'pages:history.title' },
+    { key: 'pages:history.searchHistory' },
+    { key: 'pages:history.clearHistory' },
+    { key: 'pages:history.tableTitle' },
+    { key: 'pages:history.tableUrl' },
+    { key: 'pages:history.tableLastVisit' },
+    { key: 'pages:history.tableVisits' },
+    { key: 'pages:history.reset' },
+    { key: 'pages:history.confirmDelete' },
+  ]);
+
+  document.title = t['pages:history.title'];
 
   let currentPage = 1;
   let currentQuery = '';
@@ -38,7 +50,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h('input', {
             id: 'history-search-input',
             type: 'text',
-            placeholder: 'Search history...',
+            placeholder: t['pages:history.searchHistory'],
             class: c('input', 'input-sm', 'input-bordered', 'w-full', 'pl-8'),
             onKeydown: (e) => {
               if ((e as KeyboardEvent).key === 'Enter') {
@@ -71,7 +83,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               loadPage(1);
             },
           },
-          'Reset',
+          t['pages:history.reset'],
         ),
       ),
       h('div', { id: 'header-actions', class: c('flex', 'gap-2', 'items-center', 'min-h-[2rem]') }),
@@ -98,24 +110,29 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     renderPagination();
   }
 
-  function renderHeaderActions() {
+  async function renderHeaderActions() {
     const buttons: VNode[] = [];
 
     if (selectedUrls.size > 0) {
+      const t2 = await abI18n.t(-1, [
+        { key: 'pages:history.deleteSelected', params: { count: selectedUrls.size } },
+        { key: 'pages:history.confirmDeleteSelected', params: { count: selectedUrls.size } },
+      ]);
+
       buttons.push(
         h(
           'button',
           {
             class: c('btn', 'btn-sm', 'btn-error'),
             onClick: async () => {
-              if (window.confirm(`Delete ${selectedUrls.size} selected item(s)?`)) {
+              if (window.confirm(t2['pages:history.confirmDeleteSelected'])) {
                 await abVisitHistory.deleteUrls([...selectedUrls]);
                 selectedUrls.clear();
                 loadPage(currentPage);
               }
             },
           },
-          `Delete Selected (${selectedUrls.size})`,
+          t2['pages:history.deleteSelected'],
         ),
       );
     }
@@ -126,14 +143,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         {
           class: c('btn', 'btn-sm', 'btn-error', 'btn-outline'),
           onClick: async () => {
-            if (window.confirm('Are you sure you want to clear all history?')) {
+            if (window.confirm(t['pages:history.confirmDelete'])) {
               await abVisitHistory.deleteAll();
               selectedUrls.clear();
               loadPage(1);
             }
           },
         },
-        'Clear History',
+        t['pages:history.clearHistory'],
       ),
     );
 
@@ -173,10 +190,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 },
               }),
             ),
-            h('th', null, 'Title'),
-            h('th', null, 'URL'),
-            h('th', { class: c('w-40') }, 'Last Visit'),
-            h('th', { class: c('w-20', 'text-center') }, 'Visits'),
+            h('th', null, t['pages:history.tableTitle']),
+            h('th', null, t['pages:history.tableUrl']),
+            h('th', { class: c('w-40') }, t['pages:history.tableLastVisit']),
+            h('th', { class: c('w-20', 'text-center') }, t['pages:history.tableVisits']),
             h('th', { class: c('w-20') }),
           ),
         ),

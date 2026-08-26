@@ -6,11 +6,11 @@ import Pagination from '#/components/common/Pagination.astro';
 ---
 
 <Modal width="500px" height="600px">
-  <Title>Move Tab</Title>
+  <Title title="pages:moveTab.title" />
   <div class="h-full">
     <Pagination />
-    <ListWithSearch placeholder="Select a tab..." id="tab" />
-    <ListWithSearch placeholder="Select a target" id="target" />
+    <ListWithSearch placeholder="pages:moveTab.placeholder1" id="tab" />
+    <ListWithSearch placeholder="pages:moveTab.placeholder2" id="target" />
   </div>
 </Modal>
 
