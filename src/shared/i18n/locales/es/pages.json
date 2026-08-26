@@ -221,6 +221,13 @@
     "message": "El certificado para la url <i>{{url}}</i> no es válido. Como resultado, la conexión entre tu navegador y el servidor no está debidamente cifrada, lo que podría permitir a un atacante interceptar o robar datos sensibles. Código de error: <strong>{{error}}</strong>.",
     "button": "Entiendo los riesgos y deseo continuar de todos modos."
   },
+  "tabFailLoad": {
+    "title": "No se puede conectar al sitio web",
+    "message": "La página en <strong>{{url}}</strong> no se puede acceder.",
+    "errorCode": "Código de error:",
+    "error": "Error:",
+    "retry": "Reintentar"
+  },
   "settings": {
     "title": "Configuración",
     "menu": {

@@ -221,6 +221,13 @@
     "message": "The certificate for url <i>{{url}}</i> is invalid. As a result, the connection between your browser and the server is not properly encrypted, which could allow an attacker to intercept or steal sensitive data. Error code: <strong>{{error}}</strong>.",
     "button": "I Understand the risks and choose to proceed anyway."
   },
+  "tabFailLoad": {
+    "title": "Cannot Connect to the Website",
+    "message": "The page at <strong>{{url}}</strong> cannot be reached.",
+    "errorCode": "Error code:",
+    "error": "Error:",
+    "retry": "Retry"
+  },
   "settings": {
     "title": "Settings",
     "menu": {
