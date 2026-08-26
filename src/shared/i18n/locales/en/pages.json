@@ -228,6 +228,16 @@
     "error": "Error:",
     "retry": "Retry"
   },
+  "tabMarks": {
+    "title": "Tab Marks",
+    "listening": "Listening for mark. <b>Hold</b> to see more details...",
+    "availableMarks": "Available tab marks...",
+    "noMarks": "No marks...",
+    "helpMark": "Press \"m\" followed by a letter to mark the active tab (e.g., ma, mb, mc, ...)",
+    "helpDelete": "Delete the mark from the active tab",
+    "helpDeleteAll": "Delete all marks",
+    "helpSelect": "Select the tab marked with that letter (e.g., a, b, c, ...)"
+  },
   "settings": {
     "title": "Settings",
     "menu": {

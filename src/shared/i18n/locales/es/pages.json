@@ -228,6 +228,16 @@
     "error": "Error:",
     "retry": "Reintentar"
   },
+  "tabMarks": {
+    "title": "Marcas de pestaña",
+    "listening": "Escuchando marca. <b>Mantén</b> para ver más detalles...",
+    "availableMarks": "Marcas disponibles...",
+    "noMarks": "Sin marcas...",
+    "helpMark": "Pulsa \"m\" seguido de una letra para marcar la pestaña activa (ej., ma, mb, mc, ...)",
+    "helpDelete": "Eliminar la marca de la pestaña activa",
+    "helpDeleteAll": "Eliminar todas las marcas",
+    "helpSelect": "Seleccionar la pestaña marcada con esa letra (ej., a, b, c, ...)"
+  },
   "settings": {
     "title": "Configuración",
     "menu": {

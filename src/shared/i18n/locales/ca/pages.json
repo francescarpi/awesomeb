@@ -228,6 +228,16 @@
     "error": "Error:",
     "retry": "Torna-ho a provar"
   },
+  "tabMarks": {
+    "title": "Marques de pestanya",
+    "listening": "Escoltant marca. <b>Mantingues</b> per a veure més detalls...",
+    "availableMarks": "Marques disponibles...",
+    "noMarks": "Sense marques...",
+    "helpMark": "Prem \"m\" seguit d'una lletra per a marcar la pestanya activa (ex., ma, mb, mc, ...)",
+    "helpDelete": "Elimina la marca de la pestanya activa",
+    "helpDeleteAll": "Elimina totes les marques",
+    "helpSelect": "Selecciona la pestanya marcada amb aquesta lletra (ex., a, b, c, ...)"
+  },
   "settings": {
     "title": "Configuració",
     "menu": {
