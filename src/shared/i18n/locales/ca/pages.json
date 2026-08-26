@@ -212,6 +212,10 @@
     "title": "Selecciona la pestanya",
     "placeholder": "Filtra i selecciona una pestanya..."
   },
+  "suspendDesktop": {
+    "title": "Suspen l'escriptori",
+    "placeholder": "Filtra i selecciona un escriptori..."
+  },
   "settings": {
     "title": "Configuració",
     "menu": {

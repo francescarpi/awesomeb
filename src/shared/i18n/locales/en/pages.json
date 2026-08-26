@@ -212,6 +212,10 @@
     "title": "Select Tab",
     "placeholder": "Filter and select a tab..."
   },
+  "suspendDesktop": {
+    "title": "Suspend Desktop",
+    "placeholder": "Filter and select a desktop..."
+  },
   "settings": {
     "title": "Settings",
     "menu": {

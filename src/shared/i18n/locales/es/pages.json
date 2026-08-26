@@ -212,6 +212,10 @@
     "title": "Seleccionar pestaña",
     "placeholder": "Filtra y selecciona una pestaña..."
   },
+  "suspendDesktop": {
+    "title": "Suspender escritorio",
+    "placeholder": "Filtra y selecciona un escritorio..."
+  },
   "settings": {
     "title": "Configuración",
     "menu": {
