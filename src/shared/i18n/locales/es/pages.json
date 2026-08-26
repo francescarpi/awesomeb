@@ -350,5 +350,20 @@
       "loading": "Cargando...",
       "pressKey": "Pulsa una tecla..."
     }
+  },
+  "welcome": {
+    "title": "Bienvenido a",
+    "initialSetup": "Configuración inicial",
+    "searchEngineMessage": "Para que AwesomeB funcione correctamente, se debe configurar un motor de búsqueda como requisito mínimo. Por favor, proporciona la URL de tu motor de búsqueda deseado:",
+    "example": "Ejemplo:",
+    "exampleCode": "Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}",
+    "namePlaceholder": "Nombre",
+    "urlPlaceholder": "URL",
+    "note": "Nota: Los motores de búsqueda pueden modificarse más tarde en la configuración principal.",
+    "save": "Guardar y empezar a usar AwesomeB"
+  },
+  "window": {
+    "newTabSuffix": "abrir una nueva pestaña",
+    "commandsSuffix": "abrir la paleta de comandos"
   }
 }

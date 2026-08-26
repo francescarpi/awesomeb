@@ -350,5 +350,20 @@
       "loading": "Carregant...",
       "pressKey": "Prem una tecla..."
     }
+  },
+  "welcome": {
+    "title": "Benvingut a",
+    "initialSetup": "Configuració inicial",
+    "searchEngineMessage": "Perquè AwesomeB funcioni correctament, s'ha de configurar un cercador com a requisit mínim. Si us plau, proporciona la URL del teu cercador desitjat:",
+    "example": "Exemple:",
+    "exampleCode": "Name: Moogle<br/>URL: https://www.moogle.com/search?q={query}",
+    "namePlaceholder": "Nom",
+    "urlPlaceholder": "URL",
+    "note": "Nota: Els cercadors es poden modificar més endavant dins de la configuració principal.",
+    "save": "Desa i comença a usar AwesomeB"
+  },
+  "window": {
+    "newTabSuffix": "obrir una pestanya nova",
+    "commandsSuffix": "obrir la paleta d'ordres"
   }
 }
