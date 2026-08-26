@@ -238,6 +238,9 @@
     "helpDeleteAll": "Elimina totes les marques",
     "helpSelect": "Selecciona la pestanya marcada amb aquesta lletra (ex., a, b, c, ...)"
   },
+  "tabPreview": {
+    "loading": "Carregant lloc..."
+  },
   "settings": {
     "title": "Configuració",
     "menu": {

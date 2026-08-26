@@ -238,6 +238,9 @@
     "helpDeleteAll": "Eliminar todas las marcas",
     "helpSelect": "Seleccionar la pestaña marcada con esa letra (ej., a, b, c, ...)"
   },
+  "tabPreview": {
+    "loading": "Cargando sitio..."
+  },
   "settings": {
     "title": "Configuración",
     "menu": {

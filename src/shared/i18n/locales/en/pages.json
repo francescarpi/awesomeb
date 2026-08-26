@@ -238,6 +238,9 @@
     "helpDeleteAll": "Delete all marks",
     "helpSelect": "Select the tab marked with that letter (e.g., a, b, c, ...)"
   },
+  "tabPreview": {
+    "loading": "Loading site..."
+  },
   "settings": {
     "title": "Settings",
     "menu": {
