@@ -17,7 +17,7 @@ export function setupI18nIPC(browser: Browser) {
     [
       conditionalChecker.bind(
         null,
-        (args) => typeof args.winId === 'number',
+        (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
         [windowChecker, modalChecker],
         [
           internalPageChecker.bind(null, 'bookmarks'),

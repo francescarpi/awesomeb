@@ -216,6 +216,11 @@
     "title": "Suspender escritorio",
     "placeholder": "Filtra y selecciona un escritorio..."
   },
+  "tabCertificateError": {
+    "title": "No se puede conectar al sitio web",
+    "message": "El certificado para la url <i>{{url}}</i> no es válido. Como resultado, la conexión entre tu navegador y el servidor no está debidamente cifrada, lo que podría permitir a un atacante interceptar o robar datos sensibles. Código de error: <strong>{{error}}</strong>.",
+    "button": "Entiendo los riesgos y deseo continuar de todos modos."
+  },
   "settings": {
     "title": "Configuración",
     "menu": {

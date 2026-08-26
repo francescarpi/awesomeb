@@ -216,6 +216,11 @@
     "title": "Suspen l'escriptori",
     "placeholder": "Filtra i selecciona un escriptori..."
   },
+  "tabCertificateError": {
+    "title": "No es pot connectar al lloc web",
+    "message": "El certificat per a la url <i>{{url}}</i> no és vàlid. Com a resultat, la connexió entre el teu navegador i el servidor no està degudament xifrada, la qual cosa podria permetre que un atacant intercepti o robi dades sensibles. Codi d'error: <strong>{{error}}</strong>.",
+    "button": "Entenc els riscos i vull continuar igualment."
+  },
   "settings": {
     "title": "Configuració",
     "menu": {
