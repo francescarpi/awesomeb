@@ -46,6 +46,9 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
   const { winId, searchParams } = getSearchParams();
 
+  const t = await abI18n.t(winId, [{ key: 'pages:sidebar.title' }]);
+  document.title = t['pages:sidebar.title'];
+
   const colorPrimary = searchParams.get('colorPrimary');
   const colorSecondary = searchParams.get('colorSecondary');
   const degrees = searchParams.get('degrees');

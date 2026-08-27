@@ -1,0 +1,51 @@
+{
+  "urlCopied": {
+    "title": "URL Copied"
+  },
+  "settingsSaved": {
+    "title": "Settings Saved",
+    "body": "Your settings have been saved successfully."
+  },
+  "bookmarkAdded": {
+    "title": "Bookmark Added",
+    "body": "Bookmark added successfully"
+  },
+  "bookmarksUpdated": {
+    "title": "Bookmarks Updated",
+    "body": "Bookmarks updated successfully"
+  },
+  "permissionSaved": {
+    "title": "Permission Saved",
+    "body": "Your permission has been saved successfully."
+  },
+  "shortcutUpdated": {
+    "title": "Shortcut Updated",
+    "body": "Shortcut \"{{label}}\" updated to {{key}}"
+  },
+  "sessionSaved": {
+    "title": "Session Saved",
+    "body": "Session saved successfully"
+  },
+  "closedTabsCleared": {
+    "title": "Closed Tabs Cleared",
+    "body": "The list of recently closed tabs has been cleared."
+  },
+  "versionCopied": {
+    "title": "Version Copied",
+    "body": "Version \"{{version}}\" copied to clipboard"
+  },
+  "pasteAndGo": {
+    "empty": {
+      "title": "Paste & Go",
+      "body": "Clipboard is empty"
+    },
+    "invalid": {
+      "title": "Paste & Go",
+      "body": "No valid URL found in clipboard"
+    }
+  },
+  "downloadCompleted": {
+    "title": "Download Completed",
+    "body": "File \"{{fileName}}\" has been downloaded successfully."
+  }
+}

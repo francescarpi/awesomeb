@@ -16,6 +16,11 @@ import Title from '#/components/common/Title.astro';
   const tabId = searchParams.get('tabId') as string;
   const t = await abI18n.t(winId, [{ key: 'pages:renameTab.name' }]);
 
+  const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
+  const selectedTab = tabId
+    ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
+    : tabsEntitites.find((d) => d.selected)!;
+
   const [btns, registerBtnsEvents] = await confirmButtons({
     winId,
     onConfirm: () => {
@@ -30,11 +35,6 @@ import Title from '#/components/common/Title.astro';
       abModal.close(winId);
     },
   });
-
-  const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
-  const selectedTab = tabId
-    ? tabsEntitites.find((d: ITabEntity) => d.id === tabId)!
-    : tabsEntitites.find((d) => d.selected)!;
 
   new Renderer(
     h(
