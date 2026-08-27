@@ -364,6 +364,38 @@
   },
   "window": {
     "newTabSuffix": "obrir una pestanya nova",
-    "commandsSuffix": "obrir la paleta d'ordres"
+    "commandsSuffix": "obrir la paleta d'ordres",
+    "title": "Finestra"
+  },
+  "tabSwitcher": {
+    "noTabs": "Sense pestanyes...",
+    "noDesktopName": "(sense nom d'escriptori)",
+    "title": "Selector de pestanyes"
+  },
+  "sidebar": {
+    "title": "Barra lateral"
+  },
+  "urlbar": {
+    "title": "Barra d'URL"
+  },
+  "bookmarks": {
+    "title": "Adreces d'interès",
+    "deleteConfirm": "Segur que vols eliminar aquesta adreça d'interès?",
+    "selectNewParent": "Selecciona la nova carpeta pare",
+    "root": "Arrel"
+  },
+  "certificateInfo": {
+    "title": "Informació del certificat",
+    "commonName": "Nom comú",
+    "issuerCountry": "País emissor",
+    "issuerOrganization": "Organització emissora",
+    "issuerCommonName": "Nom comú de l'emissor",
+    "validFrom": "Vàlid des de",
+    "validTo": "Vàlid fins",
+    "failed": "No s'ha pogut obtenir la informació del certificat."
+  },
+  "tabContainers": {
+    "collapsedTabs_one": "({{count}} pestanya col·lapsada)",
+    "collapsedTabs_other": "({{count}} pestanyes col·lapsades)"
   }
 }

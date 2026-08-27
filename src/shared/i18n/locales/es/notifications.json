@@ -1,0 +1,51 @@
+{
+  "urlCopied": {
+    "title": "URL copiada"
+  },
+  "settingsSaved": {
+    "title": "Configuración guardada",
+    "body": "Tu configuración se ha guardado correctamente."
+  },
+  "bookmarkAdded": {
+    "title": "Marcador añadido",
+    "body": "Marcador añadido correctamente"
+  },
+  "bookmarksUpdated": {
+    "title": "Marcadores actualizados",
+    "body": "Marcadores actualizados correctamente"
+  },
+  "permissionSaved": {
+    "title": "Permiso guardado",
+    "body": "Tu permiso se ha guardado correctamente."
+  },
+  "shortcutUpdated": {
+    "title": "Atajo actualizado",
+    "body": "Atajo \"{{label}}\" actualizado a {{key}}"
+  },
+  "sessionSaved": {
+    "title": "Sesión guardada",
+    "body": "Sesión guardada correctamente"
+  },
+  "closedTabsCleared": {
+    "title": "Pestañas cerradas limpiadas",
+    "body": "La lista de pestañas cerradas recientemente se ha borrado."
+  },
+  "versionCopied": {
+    "title": "Versión copiada",
+    "body": "Versión \"{{version}}\" copiada al portapapeles"
+  },
+  "pasteAndGo": {
+    "empty": {
+      "title": "Pegar e ir",
+      "body": "El portapapeles está vacío"
+    },
+    "invalid": {
+      "title": "Pegar e ir",
+      "body": "No se encontró ninguna URL válida en el portapapeles"
+    }
+  },
+  "downloadCompleted": {
+    "title": "Descarga completada",
+    "body": "El archivo \"{{fileName}}\" se ha descargado correctamente."
+  }
+}

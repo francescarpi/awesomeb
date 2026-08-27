@@ -18,11 +18,11 @@
 
   // Tab containers...
   const tabContainers = await abTabs.getTabContainers(winId);
-  const renderer = new Renderer(renderTabContainers(tabContainers)).render('tabContainers');
+  const renderer = new Renderer(await renderTabContainers(tabContainers)).render('tabContainers');
 
-  abTabs.onRefreshTabContainers((_event, tabContainers) =>
-    renderer.update(renderTabContainers(tabContainers)),
-  );
+  abTabs.onRefreshTabContainers((_event, tabContainers) => {
+    renderTabContainers(tabContainers).then((vnode) => renderer.update(vnode));
+  });
 
   // Selected desktop...
   const desktops = (await abEntities.fetch(winId, 'desktops')) as IDesktopEntity[];
@@ -39,72 +39,79 @@
   }
 
   // ----------------------------------------------------------------------
-  function renderTabContainers(tabContainers: ITabContainer[]): VNode {
+  async function renderTabContainers(tabContainers: ITabContainer[]): Promise<VNode> {
     return h(
       'div', // Container
       {
         class: c('flex', 'flex-col', 'gap-1.5', 'select-none'),
         style: 'app-region: no-drag;',
       },
-      ...tabContainers.map((tc) =>
-        h(
-          'div', // Tab Container
-          {
-            class: c(
-              'hidden',
-              tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
-              tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
-              'flex-col',
-            ),
-          },
-          h(
-            'div',
-            {
-              class: c('items-center', 'gap-1', 'flex'),
-            },
-            h(
-              'span', // Tab container shortcut (is a number between 1 and 9)
-              { class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5') },
-              tc.shortcut?.toString(),
-            ),
-            h(
-              'div', // Tab container's tabs list (in vertical)
-              {
-                class: c(
-                  'flex',
-                  'flex-col',
-                  'w-full',
-                  'mx-1',
-                  tc.isSplit && 'border border-white/20 border-dashed rounded',
-                ),
-              },
-              ...tc.tabs.map((t) => renderTab(t)),
-            ),
-          ),
-          ...tc.children.map((tcc) =>
-            h(
-              'div',
-              { class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
-              ...tcc.tabs.map((tcct) => renderTab(tcct)),
-            ),
-          ),
-          h(
-            'div',
+      ...(await Promise.all(
+        tabContainers.map(async (tc) => {
+          const openCount = tc.children.filter((t) => !t.isClosed).length;
+          const r = await abI18n.t(winId, [
+            { key: 'pages:tabContainers.collapsedTabs', params: { count: openCount } },
+          ]);
+          const collapsedText = r['pages:tabContainers.collapsedTabs'];
+
+          return h(
+            'div', // Tab Container
             {
               class: c(
-                !tc.collapseChildren ? 'hidden' : 'hidden sidebar:block',
-                'text-xs',
-                'ml-4',
-                'text-white/40',
+                'hidden',
+                tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
+                tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
+                'flex-col',
               ),
             },
-            (() => {
-              const openCount = tc.children.filter((t) => !t.isClosed).length;
-              return `(${openCount} ${openCount === 1 ? 'tab' : 'tabs'} collapsed)`;
-            })(),
-          ),
-        ),
-      ),
+            h(
+              'div',
+              {
+                class: c('items-center', 'gap-1', 'flex'),
+              },
+              h(
+                'span', // Tab container shortcut (is a number between 1 and 9)
+                {
+                  class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5'),
+                },
+                tc.shortcut?.toString(),
+              ),
+              h(
+                'div', // Tab container's tabs list (in vertical)
+                {
+                  class: c(
+                    'flex',
+                    'flex-col',
+                    'w-full',
+                    'mx-1',
+                    tc.isSplit && 'border border-white/20 border-dashed rounded',
+                  ),
+                },
+                ...tc.tabs.map((t) => renderTab(t)),
+              ),
+            ),
+            ...tc.children.map((tcc) =>
+              h(
+                'div',
+                { class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
+                ...tcc.tabs.map((tcct) => renderTab(tcct)),
+              ),
+            ),
+            h(
+              'div',
+              {
+                class: c(
+                  !tc.collapseChildren ? 'hidden' : 'hidden sidebar:block',
+                  'text-xs',
+                  'ml-4',
+                  'text-white/40',
+                ),
+              },
+              collapsedText,
+            ),
+          );
+        }),
+      )),
     );
   }
 

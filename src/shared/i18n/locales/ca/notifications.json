@@ -1,0 +1,51 @@
+{
+  "urlCopied": {
+    "title": "URL copiada"
+  },
+  "settingsSaved": {
+    "title": "Configuració desada",
+    "body": "La teva configuració s'ha desat correctament."
+  },
+  "bookmarkAdded": {
+    "title": "Marcador afegit",
+    "body": "Marcador afegit correctament"
+  },
+  "bookmarksUpdated": {
+    "title": "Marcadors actualitzats",
+    "body": "Marcadors actualitzats correctament"
+  },
+  "permissionSaved": {
+    "title": "Permís desat",
+    "body": "El teu permís s'ha desat correctament."
+  },
+  "shortcutUpdated": {
+    "title": "Drecera actualitzada",
+    "body": "Drecera \"{{label}}\" actualitzada a {{key}}"
+  },
+  "sessionSaved": {
+    "title": "Sessió desada",
+    "body": "Sessió desada correctament"
+  },
+  "closedTabsCleared": {
+    "title": "Pestanyes tancades netejades",
+    "body": "La llista de pestanyes tancades recentment s'ha esborrat."
+  },
+  "versionCopied": {
+    "title": "Versió copiada",
+    "body": "Versió \"{{version}}\" copiada al porta-retalls"
+  },
+  "pasteAndGo": {
+    "empty": {
+      "title": "Enganxar i anar",
+      "body": "El porta-retalls està buit"
+    },
+    "invalid": {
+      "title": "Enganxar i anar",
+      "body": "No s'ha trobat cap URL vàlida al porta-retalls"
+    }
+  },
+  "downloadCompleted": {
+    "title": "Baixada completada",
+    "body": "El fitxer \"{{fileName}}\" s'ha baixat correctament."
+  }
+}

@@ -16,14 +16,20 @@ export const Command: ICommand<ICommandParams> = {
     const clipboardText = clipboard.readText().trim();
 
     if (!clipboardText) {
-      notification('Paste & Go', 'Clipboard is empty');
+      notification(
+        t('notifications:pasteAndGo.empty.title'),
+        t('notifications:pasteAndGo.empty.body'),
+      );
       return;
     }
 
     const { valid, url } = isValidUrl(clipboardText);
 
     if (!valid) {
-      notification('Paste & Go', 'No valid URL found in clipboard');
+      notification(
+        t('notifications:pasteAndGo.invalid.title'),
+        t('notifications:pasteAndGo.invalid.body'),
+      );
       return;
     }
 

@@ -42,7 +42,6 @@ const { placeholder, id, className, oneColumn, title } = Astro.props;
 
   const t = await abI18n.t(winId, keys);
   for (const input of inputs) {
-    input.placeholder = t[input.dataset.placeholder as tring];
-    keys.push({ key: input.dataset.placeholder as string });
+    input.placeholder = t[input.dataset.placeholder as string];
   }
 </script>

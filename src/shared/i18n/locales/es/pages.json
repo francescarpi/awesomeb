@@ -364,6 +364,38 @@
   },
   "window": {
     "newTabSuffix": "abrir una nueva pestaña",
-    "commandsSuffix": "abrir la paleta de comandos"
+    "commandsSuffix": "abrir la paleta de comandos",
+    "title": "Ventana"
+  },
+  "tabSwitcher": {
+    "noTabs": "Sin pestañas...",
+    "noDesktopName": "(sin nombre de escritorio)",
+    "title": "Selector de pestañas"
+  },
+  "sidebar": {
+    "title": "Barra lateral"
+  },
+  "urlbar": {
+    "title": "Barra de URL"
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "deleteConfirm": "¿Estás seguro que quieres eliminar este marcador?",
+    "selectNewParent": "Selecciona la nueva carpeta padre",
+    "root": "Raíz"
+  },
+  "certificateInfo": {
+    "title": "Información del certificado",
+    "commonName": "Nombre común",
+    "issuerCountry": "País emisor",
+    "issuerOrganization": "Organización emisora",
+    "issuerCommonName": "Nombre común del emisor",
+    "validFrom": "Válido desde",
+    "validTo": "Válido hasta",
+    "failed": "No se pudo obtener la información del certificado."
+  },
+  "tabContainers": {
+    "collapsedTabs_one": "({{count}} pestaña colapsada)",
+    "collapsedTabs_other": "({{count}} pestañas colapsadas)"
   }
 }

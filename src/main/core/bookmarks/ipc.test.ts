@@ -1,8 +1,10 @@
-import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
+import { describe, expect, test, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import i18next from 'i18next';
 import { ipcMain, type IpcMain, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
 import { Browser, bookmarks, partitions } from '@/core';
 import * as helpers from '@/core/browser/helpers';
 import { setupBookmarksIPC } from './ipc';
+import { initI18n } from '~/i18n';
 import { EBookmarkType, type IBookmark } from '~/types';
 
 type InvokeHandler = (event: IpcMainInvokeEvent, args: Record<string, unknown>) => Promise<unknown>;
@@ -25,6 +27,9 @@ function makeUrlBookmark(overrides: Partial<IBookmark> = {}): IBookmark {
     ...overrides,
   } as IBookmark;
 }
+
+beforeAll(initI18n);
+afterAll(() => i18next.changeLanguage('en'));
 
 describe('Bookmarks IPC', () => {
   let browser: Browser;

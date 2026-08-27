@@ -20,6 +20,8 @@ import Layout from '#/layouts/Base.astro';
   import { Rectangle } from 'electron';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
+  document.title = 'Window';
+
   const BORDER_WIDTH = 2;
 
   const { winId, searchParams } = getSearchParams();
@@ -27,7 +29,10 @@ import Layout from '#/layouts/Base.astro';
   const t = await abI18n.t(winId, [
     { key: 'pages:window.newTabSuffix' },
     { key: 'pages:window.commandsSuffix' },
+    { key: 'pages:window.title' },
   ]);
+
+  document.title = t['pages:window.title'];
 
   const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
   const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
