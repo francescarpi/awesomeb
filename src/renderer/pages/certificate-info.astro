@@ -21,6 +21,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:certificateInfo.issuerCommonName' },
     { key: 'pages:certificateInfo.validFrom' },
     { key: 'pages:certificateInfo.validTo' },
+    { key: 'pages:certificateInfo.failed' },
   ]);
 
   const renderer = new Renderer(
@@ -56,7 +57,7 @@ import Title from '#/components/common/Title.astro';
       const vnode = h(
         'div',
         { class: c('flex', 'flex-col', 'gap-2', 'items-center', 'justify-center', 'h-[220px]') },
-        h('p', { class: c('text-error', 'text-sm') }, 'Failed to get the certificate info.'),
+        h('p', { class: c('text-error', 'text-sm') }, t['pages:certificateInfo.failed']),
         ...btns,
       );
       renderer.update(vnode, { onUpdated: registerBtnsEvents });

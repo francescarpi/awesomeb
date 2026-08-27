@@ -1,5 +1,6 @@
 import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo } from '~/types';
 import { Browser, Window, Desktop, Tab, TabContainer, notification } from '@/core';
+import { t } from '~/i18n';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
 import { UIPageView } from '@/ui';
@@ -297,8 +298,8 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('downloads:completed', async (download: Download) => {
     notification(
-      'Download Completed',
-      `File "${download.fileName}" has been downloaded successfully.`,
+      t('notifications:downloadCompleted.title'),
+      t('notifications:downloadCompleted.body', { fileName: download.fileName }),
       () => download.open(),
     );
   });

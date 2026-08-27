@@ -18,6 +18,9 @@ export const Command: ICommand<ICommandParams> = {
     for (const tab of browser.closedTabs) {
       browser.permanentlyCloseTab(tab.desktop, tab.tabContainer, tab.tab.id);
     }
-    notification('Closed tabs cleared', 'The list of recently closed tabs has been cleared.');
+    notification(
+      t('notifications:closedTabsCleared.title'),
+      t('notifications:closedTabsCleared.body'),
+    );
   },
 };

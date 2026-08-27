@@ -26,6 +26,6 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
     clipboard.writeText(targetTab.url);
-    notification('URL Copied', targetTab.url);
+    notification(t('notifications:urlCopied.title'), targetTab.url);
   },
 };

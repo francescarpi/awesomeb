@@ -1,4 +1,5 @@
 import { Browser, config, notification, type Window } from '@/core';
+import { t } from '~/i18n';
 import { createHandler, internalPageChecker, viewChecker, windowChecker } from '@/utils';
 import { getShortcutMaps } from './index';
 import { getActiveMap } from './helpers';
@@ -38,7 +39,10 @@ export function setupShortcutsIPC(browser: Browser) {
       await browser.refreshMainMenu();
       browser.toRenderer.broadcast('shortcuts:changed', { shortcutId, key });
 
-      notification(`Shortcut "${map.shortcuts[shortcutId].label}" updated`, `New key: ${key}`);
+      notification(
+        t('notifications:shortcutUpdated.title', { label: map.shortcuts[shortcutId].label }),
+        t('notifications:shortcutUpdated.body', { key }),
+      );
     },
   );
 

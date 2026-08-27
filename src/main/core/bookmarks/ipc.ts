@@ -1,4 +1,5 @@
 import { Browser, bookmarks, notification, Window } from '@/core';
+import { t } from '~/i18n';
 import { createHandler, windowChecker, internalPageChecker, modalChecker } from '@/utils';
 import { IBookmark } from '~/types';
 
@@ -18,7 +19,7 @@ export function setupBookmarksIPC(browser: Browser) {
     async ({ parentFolderId, title, url, newFolderName, win }) => {
       bookmarks.add(parentFolderId, title, url, newFolderName);
       win.modal.close();
-      notification('Bookmark Added', 'Bookmark added successfully');
+      notification(t('notifications:bookmarkAdded.title'), t('notifications:bookmarkAdded.body'));
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
     },
@@ -42,7 +43,10 @@ export function setupBookmarksIPC(browser: Browser) {
     [internalPageChecker.bind(null, 'bookmarks')],
     async ({ bookmarksList }) => {
       bookmarks.update(bookmarksList);
-      notification('Bookmarks Updated', 'Bookmarks updated successfully');
+      notification(
+        t('notifications:bookmarksUpdated.title'),
+        t('notifications:bookmarksUpdated.body'),
+      );
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
     },
