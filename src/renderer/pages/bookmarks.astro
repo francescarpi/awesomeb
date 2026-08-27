@@ -75,18 +75,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   const { winId } = getSearchParams();
 
-  // =============================================================================
-  // DOM ELEMENTS
-  // =============================================================================
-
-  document.title = 'Bookmarks';
-
-  const bookmarksTree = document.getElementById('bookmarks-tree') as HTMLElement;
-  const bookmarkDetails = document.getElementById('bookmark-details') as HTMLElement;
-  const folderTemplate = document.getElementById('folder-template') as HTMLTemplateElement;
-  const urlTemplate = document.getElementById('url-template') as HTMLTemplateElement;
-  const detailsTemplate = document.getElementById('details-template') as HTMLTemplateElement;
-
   // Texts
   const t = await abI18n.t(winId, [
     { key: 'save' },
@@ -94,7 +82,17 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     { key: 'delete' },
     { key: 'pages:bookmarks.deleteConfirm' },
     { key: 'pages:bookmarks.selectNewParent' },
+    { key: 'pages:bookmarks.root' },
+    { key: 'pages:bookmarks.title' },
   ]);
+
+  document.title = t['pages:bookmarks.title'];
+
+  const bookmarksTree = document.getElementById('bookmarks-tree') as HTMLElement;
+  const bookmarkDetails = document.getElementById('bookmark-details') as HTMLElement;
+  const folderTemplate = document.getElementById('folder-template') as HTMLTemplateElement;
+  const urlTemplate = document.getElementById('url-template') as HTMLTemplateElement;
+  const detailsTemplate = document.getElementById('details-template') as HTMLTemplateElement;
 
   // =============================================================================
   // INITIALIZATION
@@ -273,7 +271,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   ) {
     button.addEventListener('click', async () => {
       const options = [
-        { label: 'Root', value: 'root' },
+        { label: t['pages:bookmarks.root'], value: 'root' },
         ...bookmarksToOptions(bookmarks, bookmark.id, 1),
       ];
 

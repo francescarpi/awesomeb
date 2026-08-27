@@ -10,12 +10,17 @@ import Base from '../layouts/Base.astro';
   import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
   import type { ITabSwitcherTab } from '~/types';
 
+  document.title = 'Tab Switcher';
+
   const { winId } = getSearchParams();
 
   const tI18n = await abI18n.t(winId, [
     { key: 'pages:tabSwitcher.noTabs' },
     { key: 'pages:tabSwitcher.noDesktopName' },
+    { key: 'pages:tabSwitcher.title' },
   ]);
+
+  document.title = tI18n['pages:tabSwitcher.title'];
 
   let selectedIndex = 0;
   let tabsList: ITabSwitcherTab[] = await abTabSwitcher.get(winId);

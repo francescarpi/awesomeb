@@ -10,6 +10,6 @@ export const FALLBACK_LOCALE = 'en';
 
 export const SUPPORTED_LOCALES = Array.from(LOCALES.keys());
 
-export const NAMESPACES = ['common', 'menu', 'commands', 'pages'];
+export const NAMESPACES = ['common', 'menu', 'commands', 'pages', 'notifications'];
 
 export const DEFAULT_NAMESPACE = 'common';

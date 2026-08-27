@@ -12,6 +12,6 @@ export const Command: ICommand<ICommandParams> = {
   description: () => t('commands:saveSession.description'),
   async handler({ browser }) {
     browser.saveSession();
-    notification('Session Save', 'Session saved successfully');
+    notification(t('notifications:sessionSaved.title'), t('notifications:sessionSaved.body'));
   },
 };

@@ -1,4 +1,5 @@
 import { Browser, config, notification, getTheme } from '@/core';
+import { t } from '~/i18n';
 import {
   createHandler,
   internalPageChecker,
@@ -48,7 +49,7 @@ export function setupConfigIPC(browser: Browser) {
 
       browser.toRenderer.refreshConfig();
 
-      notification('Settings saved', 'Your settings have been saved successfully.');
+      notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
     },
   );
 
