@@ -18,20 +18,6 @@
     "title": "Afegeix un separador",
     "placeholder": "Escriu per a cercar un contenidor de pestanyes..."
   },
-  "bookmarks": {
-    "title": "Adreces d'interès",
-    "deleteConfirm": "Segur que vols eliminar aquesta adreça d'interès?",
-    "selectNewParent": "Selecciona la nova carpeta pare"
-  },
-  "certificateInfo": {
-    "title": "Informació del certificat",
-    "commonName": "Nom comú",
-    "issuerCountry": "País emissor",
-    "issuerOrganization": "Organització emissora",
-    "issuerCommonName": "Nom comú de l'emissor",
-    "validFrom": "Vàlid des de",
-    "validTo": "Vàlid fins"
-  },
   "changeTabProfile": {
     "title": "Canvia el perfil de la pestanya",
     "placeholder": "Selecciona un perfil nou..."
@@ -240,10 +226,6 @@
   },
   "tabPreview": {
     "loading": "Carregant lloc..."
-  },
-  "tabSwitcher": {
-    "noTabs": "Sense pestanyes...",
-    "noDesktopName": "(sense nom d'escriptori)"
   },
   "settings": {
     "title": "Configuració",
