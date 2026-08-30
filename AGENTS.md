@@ -1433,4 +1433,115 @@ await commandRegistry.execute('desktop-rename', { name: 'New Name' });
 
 ---
 
+## 🌐 Internationalization (i18n)
+
+AwesomeB supports multiple languages in both the **application UI** and **documentation**.
+
+### App Translation System (`src/shared/i18n/`)
+
+Built with **i18next** and **i18next-fs-backend**. Translations are loaded at build time from JSON files.
+
+#### Structure
+
+```
+src/shared/i18n/
+├── constants.ts          # Locale & namespace definitions
+├── types.ts              # TypeScript types (Locale, Namespace)
+├── i18n.ts               # Initialization & t() function
+├── ipc.ts                # IPC handlers for language switching
+└── locales/
+    ├── en/               # English (default)
+    │   ├── common.json
+    │   ├── menu.json
+    │   ├── commands.json
+    │   ├── pages.json
+    │   └── notifications.json
+    ├── es/               # Spanish
+    │   └── ...
+    └── ca/               # Catalan
+        └── ...
+```
+
+#### Key Files
+
+| File | Purpose |
+|------|---------|
+| `constants.ts` | Defines `LOCALES` Map, `SUPPORTED_LOCALES`, `NAMESPACES`, `DEFAULT_LOCALE` |
+| `types.ts` | Exports `Locale` and `Namespace` types derived from constants |
+| `i18n.ts` | Initializes i18next; exports `t(key, params)`, `isLocale()`, `detectSystemLocale()` |
+| `ipc.ts` | Handles `i18n:change-language` and `i18n:get-locales` IPC calls |
+
+#### Adding a New Language to the App
+
+1. **Update `constants.ts`** — Add entry to `LOCALES` Map (ISO 639-1 code → native name)
+2. **Create locale directory** — `src/shared/i18n/locales/{code}/`
+3. **Add 5 namespace files** — Copy from `en/` and translate values:
+   - `common.json` — Buttons, dialogs, generic UI
+   - `menu.json` — Application menu items
+   - `commands.json` — Command palette names/descriptions
+   - `pages.json` — Page-specific strings
+   - `notifications.json` — Toast/notification messages
+4. **Run `pnpm tscheck`** — Verify TypeScript types update correctly
+
+#### Language Detection & Switching
+
+- **Startup**: `detectSystemLocale()` reads `app.getLocale()`, falls back to `DEFAULT_LOCALE`
+- **Persistence**: User selection saved in config (`config.get('locale')`)
+- **Runtime change**: `ipcRenderer.invoke('i18n:change-language', newLocale)` triggers reload
+
+### Documentation Translation System (`docs/`)
+
+Built with **Astro Starlight** multilingual support. Default locale is `root` (English).
+
+#### Structure
+
+```
+docs/src/content/docs/
+├── index.mdx              # English (root)
+├── overview.mdx
+├── ...
+├── es/                    # Spanish
+│   ├── index.mdx
+│   ├── overview.mdx
+│   └── ...
+└── ca/                    # Catalan
+    ├── index.mdx
+    ├── overview.mdx
+    └── ...
+```
+
+#### Configuration
+
+`docs/astro.config.mjs` defines:
+- `locales` object with `root`, `es`, `ca`
+- `sidebar` with `translations` per item for each locale
+
+#### Adding a New Language to Docs
+
+1. **Update `docs/astro.config.mjs`** — Add locale to `locales` object
+2. **Create directory** — `docs/src/content/docs/{code}/`
+3. **Translate ALL pages** — Every `.mdx` in `root/` must exist in new locale (no stubs)
+4. **Update sidebar translations** — Add `translations` for every sidebar item
+5. **Run `pnpm dev` in `docs/`** — Verify language switcher and navigation
+
+### ISO 639-1 Language Codes
+
+Use standard two-letter codes:
+- `en` — English
+- `es` — Spanish
+- `ca` — Catalan
+- `fr` — French
+- `de` — German
+- `pt` — Portuguese
+- `it` — Italian
+- `ja` — Japanese
+- `ko` — Korean
+- `zh` — Chinese
+
+### Complete Checklist for New Language
+
+See `TRANSLATORS.md` for the full step-by-step guide.
+
+---
+
 This comprehensive documentation provides AI agents with all necessary context for developing, debugging, and extending the AwesomeB application. The modular architecture, type-safe communication patterns, and extensive command system make it a robust foundation for continued development.
