@@ -25,7 +25,7 @@ export const Command: ICommand<ICommandParams> = {
       scopeLog.warn('No active tab or URL to copy');
       return;
     }
-    clipboard.writeText(targetTab.url);
+    await clipboard.writeText(targetTab.url);
     notification(t('notifications:urlCopied.title'), targetTab.url);
   },
 };
