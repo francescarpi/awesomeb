@@ -136,6 +136,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abDownloads: {
     onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => void;
+    onCompleted: (callback: (event: IpcRendererEvent) => void) => void;
     openPage: (winId: TWindowId) => void;
     action: (
       savePath: string,
