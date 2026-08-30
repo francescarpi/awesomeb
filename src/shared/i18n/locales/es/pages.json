@@ -364,7 +364,8 @@
     "title": "Marcadores",
     "deleteConfirm": "¿Estás seguro que quieres eliminar este marcador?",
     "selectNewParent": "Selecciona la nueva carpeta padre",
-    "root": "Raíz"
+    "root": "Raíz",
+    "noBookmarks": "No hay marcadores..."
   },
   "certificateInfo": {
     "title": "Información del certificado",
