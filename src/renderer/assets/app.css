@@ -15,3 +15,23 @@
 #sidebarContainer.dragable {
   app-region: drag;
 }
+
+@keyframes downloads-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  70% {
+    transform: translateY(-2px);
+  }
+}
+
+.icon-bounce {
+  animation: downloads-bounce 0.8s ease;
+}
