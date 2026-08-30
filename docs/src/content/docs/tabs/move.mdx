@@ -4,7 +4,9 @@ title: Move a tab
 
 import FeatureAccess from '../../../components/FeatureAccess.astro'
 
-<FeatureAccess entity="move a tab up/down" macOS="Cmd+Opt+[ or Cmd+Opt+]" command="Move Tab Container Up/Down" menu={['Tabs', 'Move tab up/down']}/>
+<FeatureAccess entity="move a tab up" macOS="Cmd+Opt+]" command="moveTabContainerUp" menu="tabs.moveUp" />
+
+<FeatureAccess entity="move a tab down" macOS="Cmd+Opt+[" command="moveTabContainerDown" menu="tabs.moveDown" />
 
 :::note
 Remember that when you move a tab up or down, you're not moving a single tab, but the *tab container*.
@@ -12,6 +14,6 @@ Remember that when you move a tab up or down, you're not moving a single tab, bu
 
 Also, you can move a tab to a new desktop or window.
 
-<FeatureAccess entity="move a tab to a target" command="Move Tab" contextMenu="Move..." />
+<FeatureAccess entity="move a tab to a target" command="moveTab" contextMenu="contextTab.move" />
 
 *Targets* are explained [here](/tabs/new/#target-selection).

@@ -4,7 +4,7 @@ title: Editar la URL
 
 import FeatureAccess from '../../../../components/FeatureAccess.astro'
 
-<FeatureAccess entity="editar la URL" macOS="Cmd+e" command="Edit URL" menu={['Edit', 'Edit URL']}/>
+<FeatureAccess entity="editar la URL" macOS="Cmd+e" command="editUrl" menu="edit.editUrl" />
 
 També podràs editar-la fent clic sobre la barra d'adreces. Sé que el comportament no és l'esperat, ja que normalment esperaries un camp de text lliure.
 
@@ -17,4 +17,4 @@ Veuràs un modal amb dues opcions de modificació:
 
 ## Enganxar i anar
 
-<FeatureAccess entity="enganxar i anar" command="Paste & Go" menu={['File', 'Paste and go']}/>
+<FeatureAccess entity="enganxar i anar" command="tabNewFromClipboard" menu="file.pasteAndGo" />
