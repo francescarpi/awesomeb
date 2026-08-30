@@ -2,11 +2,12 @@
 title: Añadir
 ---
 
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
 Como se ha comentado en el apartado general, puedes tener entre 5 y 9 escritorios (ni más ni menos). Por defecto hay 5.
 
-Para añadir o eliminar, tienes los siguientes comandos disponibles:
+<FeatureAccess entity="añadir escritorio" command="addDesktop" />
 
-* Add Desktop
-* Remove Desktop
+<FeatureAccess entity="borrar escritorio" command="removeDesktop" />
 
 ![Añadir escritorio](../../../../assets/desktop-add.png)

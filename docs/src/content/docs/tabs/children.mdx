@@ -2,13 +2,16 @@
 title: Child tabs
 ---
 
+import { getMenuItems } from '../../../../scripts/i18n';
+export const menu = await getMenuItems('en', 'contextTab.openTargetBlankAsChild')
+
 Imagine the following scenario.
 
 In the *sidebar* you have three tabs: Jira, Tab 2, Tab 3. Jira opens all tickets as `target="_blank"`. This means new tabs will be created at the end, after Tab 3.
 
 This is very inconvenient because the tabs end up disorganized, and that's why the following feature exists.
 
-Open the context menu and select the option **Open target blank links as a child...**.
+Open the context menu and select the option **{menu[0]}**.
 
 ![Enable child tabs](../../../assets/tab-child-1.jpeg)
 

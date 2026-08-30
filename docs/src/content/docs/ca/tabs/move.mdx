@@ -4,7 +4,9 @@ title: Moure una pestanya
 
 import FeatureAccess from '../../../../components/FeatureAccess.astro'
 
-<FeatureAccess entity="moure una pestanya amunt/avall" macOS="Cmd+Opt+[ o Cmd+Opt+]" command="Move Tab Container Up/Down" menu={['Tabs', 'Move tab up/down']}/>
+<FeatureAccess entity="moure una pestanya amunt" macOS="Cmd+Opt+]" command="moveTabContainerUp" menu="tabs.moveUp" />
+
+<FeatureAccess entity="moure una pestanya avall" macOS="Cmd+Opt+[" command="moveTabContainerDown" menu="tabs.moveDown" />
 
 :::note
 Recorda que quan es mou amunt o avall, no estàs movent únicament una pestanya, sinó el *tab container*.
@@ -12,6 +14,6 @@ Recorda que quan es mou amunt o avall, no estàs movent únicament una pestanya,
 
 D'altra banda, també és possible moure una pestanya a un nou escriptori o a una nova finestra.
 
-<FeatureAccess entity="moure una pestanya a un target" command="Move Tab" contextMenu="Move..." />
+<FeatureAccess entity="moure una pestanya a un target" command="moveTab" contextMenu="contextTab.move" />
 
 Els *targets* s'expliquen [aquí](/ca/tabs/new/#selecci%C3%B3-del-target).
