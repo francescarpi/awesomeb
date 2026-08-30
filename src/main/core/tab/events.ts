@@ -198,15 +198,13 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('update-target-url', (_event, url) => {
     const tabData = browser.getTab(tab.id);
-    if (!tabData) {
+    if (!tabData || tabData.tab.webContents === undefined) {
       return;
     }
 
     if (url) {
-      if (!tabData.tab.webContents.isDestroyed()) {
-        tabData.tab.webContents.send('tab:url-info-show', { url });
-      }
-    } else if (!tabData.tab.webContents.isDestroyed()) {
+      tabData.tab.webContents.send('tab:url-info-show', { url });
+    } else {
       tabData.tab.webContents.send('tab:url-info-hide');
     }
   });
