@@ -199,8 +199,8 @@ const mockElectron = vi.hoisted(() => {
       uninterceptProtocol: noopFn,
     },
     clipboard: {
-      readText: (): string => '',
-      writeText: noopFn,
+      readText: async (): Promise<string> => '',
+      writeText: async (): Promise<void> => {},
       readImage: noopFn,
       writeImage: noopFn,
       readHTML: (): string => '',
@@ -209,9 +209,9 @@ const mockElectron = vi.hoisted(() => {
       writeRTF: noopFn,
       readBookmark: noopFn,
       writeBookmark: noopFn,
-      clear: noopFn,
+      clear: (): void => {},
       availableFormats: (): string[] => [],
-      has: (): boolean => false,
+      has: async (): Promise<boolean> => false,
     },
     nativeImage: {
       createEmpty: (): unknown => ({
