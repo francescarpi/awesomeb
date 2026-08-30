@@ -299,6 +299,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('downloads:completed', async (download: Download) => {
+    browser.toRenderer.refreshDownloadCompleted();
     notification(
       t('notifications:downloadCompleted.title'),
       t('notifications:downloadCompleted.body', { fileName: download.fileName }),

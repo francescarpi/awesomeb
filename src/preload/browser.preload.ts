@@ -207,6 +207,9 @@ const abDownloads = {
   onRefresh: (callback: (event: IpcRendererEvent, data: IDownloads) => void) => {
     ipcRenderer.on('downloads:refresh', callback);
   },
+  onCompleted: (callback: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('downloads:completed', callback);
+  },
   openPage: (winId: TWindowId) => {
     ipcRenderer.send('downloads:open-page', { winId });
   },

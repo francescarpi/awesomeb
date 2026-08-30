@@ -82,6 +82,13 @@ export class BrowserToRenderer {
     }
   }
 
+  refreshDownloadCompleted() {
+    for (const window of this._browser.windows) {
+      const sidebar = window.getView<Sidebar>('sidebar')!;
+      sidebar.send('downloads:completed');
+    }
+  }
+
   refreshTabSwitcher(window: Window) {
     const tabSwitcher = window.getView<TabSwitcher>('tab-switcher')!;
     tabSwitcher.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
