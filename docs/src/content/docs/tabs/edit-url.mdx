@@ -4,7 +4,7 @@ title: Edit URL
 
 import FeatureAccess from '../../../components/FeatureAccess.astro'
 
-<FeatureAccess entity="edit URL" macOS="Cmd+e" command="Edit URL" menu={['Edit', 'Edit URL']}/>
+<FeatureAccess entity="edit URL" macOS="Cmd+e" command="editUrl" menu="edit.editUrl" />
 
 You can also edit it by clicking on the address bar. I know this isn't the expected behavior, since you'd normally expect a free-form text field.
 
@@ -17,4 +17,4 @@ You'll see a modal with two modification options:
 
 ## Paste and go
 
-<FeatureAccess entity="paste and go" command="Paste & Go" menu={['File', 'Paste and go']}/>
+<FeatureAccess entity="paste and go" command="tabNewFromClipboard" menu="file.pasteAndGo" />

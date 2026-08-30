@@ -1,5 +1,6 @@
 {
   "app": {
+    "label": "AwesomeB",
     "about": "Quant a {{appName}}",
     "preferences": "Preferències"
   },

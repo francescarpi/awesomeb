@@ -2,11 +2,13 @@
 title: Afegir
 ---
 
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
 Com s'ha comentat a l'apartat general, podem tenir entre 5 i 9 escriptoris (ni més ni menys). Per defecte n'hi ha 5.
 
-Per afegir-ne o treure'n hi ha les següents comandes disponibles:
+<FeatureAccess entity="afegir un escriptori" command="addDesktop" />
 
-* Add Desktop
-* Remove Desktop
+<FeatureAccess entity="esborrar un escriptori" command="removeDesktop" />
+
 
 ![Afegir escriptori](../../../../assets/desktop-add.png)

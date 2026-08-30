@@ -1,6 +1,10 @@
 ---
+
 title: Pestanyes filles
 ---
+
+import { getMenuItems } from '../../../../../scripts/i18n';
+export const menu = await getMenuItems('ca', 'contextTab.openTargetBlankAsChild')
 
 Imagina't el següent escenari.
 
@@ -8,7 +12,7 @@ Al *sidebar* hi tens tres pestanyes: Jira, Pestanya 2, Pestanya 3. Jira obre tot
 
 Això és molt incòmode perquè queden pestanyes desorganitzades i és per aquest motiu que existeix la següent funcionalitat.
 
-Obre el menú contextual i selecciona l'opció **Open target blank links as a child...**.
+Obre el menú contextual i selecciona l'opció **{menu[0]}**.
 
 ![Activar pestanyes filles](../../../../assets/tab-child-1.jpeg)
 
