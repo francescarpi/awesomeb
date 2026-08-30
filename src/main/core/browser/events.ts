@@ -197,6 +197,8 @@ export function registerBrowserEvents(browser: Browser) {
       }
 
       result.window.renderViews();
+
+      browser.toRenderer.refreshLayoutData(result.window);
     },
   );
 

@@ -118,10 +118,6 @@ export class Tab extends UIView {
       width = bounds.width - MARGIN * 2;
     }
 
-    if (this.findInPage) {
-      height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
-    }
-
     // Split tabs calculation
     if (selectedTab?.tabContainer.isSplit) {
       const tabNum = selectedTab.tabContainer.getVisibleTabPosition(this.id);
@@ -139,6 +135,10 @@ export class Tab extends UIView {
       y = positon.y;
       width = positon.width;
       height = positon.height;
+    }
+
+    if (this.findInPage) {
+      height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
     }
 
     if (this.isTabPreview) {
