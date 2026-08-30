@@ -18,20 +18,6 @@
     "title": "Add divider",
     "placeholder": "Start typing to search a tab container..."
   },
-  "bookmarks": {
-    "title": "Bookmarks",
-    "deleteConfirm": "Are you sure you want to delete this bookmark?",
-    "selectNewParent": "Select the new parent folder"
-  },
-  "certificateInfo": {
-    "title": "Certificate information",
-    "commonName": "Common name",
-    "issuerCountry": "Issuer country",
-    "issuerOrganization": "Issuer organization",
-    "issuerCommonName": "Issuer common name",
-    "validFrom": "Valid from",
-    "validTo": "Valid until"
-  },
   "changeTabProfile": {
     "title": "Change tab profile",
     "placeholder": "Select a new profile..."
@@ -240,10 +226,6 @@
   },
   "tabPreview": {
     "loading": "Loading site..."
-  },
-  "tabSwitcher": {
-    "noTabs": "No tabs...",
-    "noDesktopName": "(no desktop name)"
   },
   "settings": {
     "title": "Settings",
