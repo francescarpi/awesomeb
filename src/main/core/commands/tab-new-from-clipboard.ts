@@ -13,7 +13,7 @@ export const Command: ICommand<ICommandParams> = {
   description: () => t('commands:tabNewFromClipboard.description'),
   visibility: ({ window }) => !!window,
   async handler({ browser, window: _window }) {
-    const clipboardText = clipboard.readText().trim();
+    const clipboardText = (await clipboard.readText()).trim();
 
     if (!clipboardText) {
       notification(
