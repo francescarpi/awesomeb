@@ -1,4 +1,8 @@
 ---
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { getMenuItems } from '../../scripts/i18n';
+
 const { locale } = Astro.locals.starlightRoute;
 
 const trans: Record<string, Record<string, string>> = {
@@ -31,7 +35,7 @@ const trans: Record<string, Record<string, string>> = {
 
 interface Props {
   entity: string;
-  menu?: string[];
+  menu?: string;
   command?: string;
   macOS: string;
   contextMenu?: string;
@@ -40,33 +44,47 @@ interface Props {
 const { entity, menu, command, contextMenu } = Astro.props as Props;
 
 const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
-const txtMenu = trans.menu[locale || 'root'] || trans.menu.root;
+const txtMenu = trans.menu[locale || 'root'] || trans.menu.groot;
 const txtShortcut = trans.shortcut[locale || 'root'] || trans.shortcut.root;
 const txtCommand = trans.command[locale || 'root'] || trans.command.root;
 const txtContextMenu = trans.contextMenu[locale || 'root'] || trans.contextMenu.root;
+
+const contextMenuItems = await getMenuItems(locale, contextMenu);
+const menuItems = await getMenuItems(locale, menu);
+
+let commandName: undefined | string = undefined;
+if (command) {
+  const p = path.resolve(`../src/shared/i18n/locales/${locale || 'en'}/commands.json`);
+  const f = await fs.readFile(p, 'utf-8');
+  const d = JSON.parse(f);
+  const cmdData = d[command];
+  if (cmdData) {
+    commandName = cmdData.name;
+  }
+}
 ---
 
 <div class="feature-access">
   <div set:html={txtTitle.replace('$', entity)} />
   <ul class="feature-access-list">
     {
-      menu && (
+      menuItems.length > 0 && (
         <li>
-          <b>{txtMenu}</b>: {menu.join(' → ')}
+          <b>{txtMenu}</b>: {menuItems.join(' → ')}
         </li>
       )
     }
     {
-      command && (
+      commandName && (
         <li>
-          <b>{txtCommand}</b>: {command}
+          <b>{txtCommand}</b>: {commandName}
         </li>
       )
     }
     {
-      contextMenu && (
+      contextMenuItems.length > 0 && (
         <li>
-          <b>{txtContextMenu}</b>: {contextMenu}
+          <b>{txtContextMenu}</b>: {contextMenuItems[0]}
         </li>
       )
     }

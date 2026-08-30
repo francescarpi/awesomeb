@@ -2,11 +2,12 @@
 title: Add
 ---
 
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
 As mentioned in the general section, you can have between 5 and 9 desktops (no more, no less). By default there are 5.
 
-To add or remove, the following commands are available:
+<FeatureAccess entity="add desktop" command="addDesktop" />
 
-* Add Desktop
-* Remove Desktop
+<FeatureAccess entity="remove desktop" command="removeDesktop" />
 
 ![Add desktop](../../../assets/desktop-add.png)
