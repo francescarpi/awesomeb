@@ -8,18 +8,44 @@
   import { Renderer, h, btnIcon, getSearchParams, c } from '#/scripts';
   import IdleIcon from '#/icons/downloads.svg?raw';
   import AnimatedIcon from '#/icons/downloads-animated.svg?raw';
+  import CompletedIcon from '#/icons/downloads-completed.svg?raw';
 
   const { winId } = getSearchParams();
 
   const renderer = new Renderer(h('div', null)).render('downloads-content');
 
-  renderIcon(false);
+  let downloading = false;
+  let itemsCount = 0;
+  let completedFlash = false;
+  let completedFlashTimer: ReturnType<typeof setTimeout> | undefined;
+
+  renderIcon();
 
   abDownloads.onRefresh((_event, data) => {
-    renderIcon(data.downloading, data.activeCount);
+    downloading = data.downloading;
+    itemsCount = data.activeCount;
+    renderIcon();
   });
 
-  function renderIcon(downloading: boolean, itemsCount = 0) {
+  abDownloads.onCompleted(() => {
+    const iconEl = document.getElementById('downloads-icon');
+    if (completedFlash && iconEl) {
+      iconEl.classList.remove('icon-bounce');
+      void iconEl.offsetWidth;
+      iconEl.classList.add('icon-bounce');
+    } else {
+      completedFlash = true;
+      renderIcon();
+    }
+    clearTimeout(completedFlashTimer);
+    completedFlashTimer = setTimeout(() => {
+      completedFlash = false;
+      renderIcon();
+    }, 1600);
+  });
+
+  function renderIcon() {
+    const icon = completedFlash ? CompletedIcon : downloading ? AnimatedIcon : IdleIcon;
     renderer.update(
       h(
         'div',
@@ -48,8 +74,8 @@
           },
           itemsCount,
         ),
-        btnIcon(downloading ? AnimatedIcon : IdleIcon, {
-          classNames: ['text-white'],
+        btnIcon(icon, {
+          classNames: ['text-white', completedFlash && 'icon-bounce'],
           size: 5,
           id: 'downloads-icon',
           onClick: () => {
