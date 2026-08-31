@@ -3,13 +3,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="pages:bookmarks.title">
-  <div id="content" class="fixed top-16 bottom-4 right-4 left-4"></div>
+  <div id="content" class="h-full"></div>
 </BlackBgWithTitle>
 
 <script>
   import { type IBookmark, EBookmarkType, type IFolderBookmark } from '~/types';
   import { Renderer, h, c, type VNode, icon } from '#/scripts';
   import Folder from '#/icons/folder.svg?raw';
+  import Link from '#/icons/link.svg?raw';
   import ArrowDown from '#/icons/arrow-down.svg?raw';
 
   const t = await abI18n.t(-1, [
@@ -25,9 +26,17 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   document.title = t['pages:bookmarks.title'];
 
+  const state: { foldersOpened: string[]; folderSelected: IBookmark | null } = {
+    foldersOpened: [],
+    folderSelected: null,
+  };
+
   const renderer = new Renderer(h('div', null)).render('content');
+  let originalBookmarks: IBookmark[] = [];
 
   abBookmarks.get().then((bookmarks) => {
+    originalBookmarks = bookmarks;
+    selectFirstFolder();
     renderBookmarks(bookmarks);
   });
 
@@ -41,36 +50,96 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       h(
         'div',
         { class: c('grid', 'grid-cols-[290px_2fr]', 'gap-2', 'h-full') },
-        h('div', { class: c('bg-white/40', 'p-2') }, ...renderFolders(bookmarks)),
-        h('div', {}, 'Content'),
+        h(
+          'div',
+          { class: c('bg-white/40', 'p-2', 'rounded') },
+          ...renderFolders(filterFolders(bookmarks)),
+        ),
+        h('div', {}, renderContent()),
       ),
     );
   }
 
-  function renderFolders(items: IBookmark[], level: number = 0): VNode[] {
+  function renderContent(): VNode {
+    if (!state.folderSelected) {
+      return h('div', {}, '');
+    }
+
+    return h(
+      'div',
+      { class: c('mx-auto') },
+      ...state.folderSelected.children.map((child: IBookmark) =>
+        h(
+          'div',
+          { class: c('flex', 'gap-2', 'items-center') },
+          h(
+            'div',
+            {},
+            icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+          ),
+          h('div', {}, child.title),
+        ),
+      ),
+    );
+  }
+
+  function renderFolders(folders: IFolderBookmark[], level: number = 0): VNode[] {
     const response: VNode[] = [];
 
-    for (const item of items) {
-      if (item.type === EBookmarkType.Url) {
-        continue;
-      }
-
-      const hasFolders = item.children.some((c) => c.type === EBookmarkType.Folder);
+    for (const folder of folders) {
+      const children = filterFolders(folder.children);
+      const hasChildren = children.length > 0;
+      const selected = state.folderSelected?.id === folder.id;
 
       response.push(
         h(
           'div',
-          { class: c(`ml-[${level}rem]`, 'mb-2', 'flex', 'items-center', 'gap-1') },
-          h('div', { class: c(!hasFolders && 'invisible') }, icon(ArrowDown, 'text-black', '7')),
+          {
+            class: c(
+              'mb-1',
+              'flex',
+              'items-center',
+              'gap-1',
+              'cursor-pointer',
+              'rounded',
+              selected ? 'bg-primary text-primary-content' : 'hover:bg-black/10',
+            ),
+            onclick: () => {
+              state.folderSelected = folder;
+              refresh();
+            },
+          },
+          h(
+            'div',
+            {
+              class: c(!hasChildren && 'invisible', `ml-[${level}rem]`),
+            },
+            icon(ArrowDown, 'text-black', '7'),
+          ),
           h('div', {}, icon(Folder, 'text-black', '4')),
-          h('div', {}, item.title),
+          h('div', {}, folder.title),
         ),
       );
 
-      if (item.children.length > 0) {
-        response.push(...renderFolders(item.children, level + 1));
+      if (children.length > 0) {
+        response.push(...renderFolders(children, level + 1));
       }
     }
     return response;
+  }
+
+  function refresh() {
+    renderBookmarks(originalBookmarks);
+  }
+
+  function filterFolders(bookmarks: IBookmark[]): IFolderBookmark[] {
+    return bookmarks.filter((b) => b.type === EBookmarkType.Folder);
+  }
+
+  function selectFirstFolder() {
+    const folders = filterFolders(originalBookmarks);
+    if (folders.length) {
+      state.folderSelected = folders[0];
+    }
   }
 </script>
