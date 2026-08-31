@@ -7,7 +7,7 @@ export function setupVisitHistoryIPC(browser: Browser) {
     'visit-history:get',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'history')],
+    [internalPageChecker.bind(null, ['history'])],
     async ({ page, query }) => {
       const pageNum = page ?? 1;
       const pageSize = 15;
@@ -38,7 +38,7 @@ export function setupVisitHistoryIPC(browser: Browser) {
     'visit-history:delete-all',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'history')],
+    [internalPageChecker.bind(null, ['history'])],
     async () => {
       visitHistory.deleteAll();
       return { success: true };
@@ -49,7 +49,7 @@ export function setupVisitHistoryIPC(browser: Browser) {
     'visit-history:delete-urls',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'history')],
+    [internalPageChecker.bind(null, ['history'])],
     async ({ urls }) => {
       visitHistory.deleteUrls(urls);
       return { success: true };

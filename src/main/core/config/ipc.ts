@@ -5,7 +5,7 @@ import {
   internalPageChecker,
   viewChecker,
   windowChecker,
-  conditionalChecker,
+  multiConditional,
   welcomeWindowChecker,
 } from '@/utils';
 import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
@@ -19,13 +19,16 @@ export function setupConfigIPC(browser: Browser) {
     'handle',
     browser,
     [
-      conditionalChecker.bind(
-        null,
-        (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
-        [windowChecker, viewChecker.bind(null, ['window'])],
+      multiConditional(
         [
-          internalPageChecker.bind(null, 'settings'),
-          internalPageChecker.bind(null, 'bookmarks'),
+          [
+            (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
+            [windowChecker, viewChecker.bind(null, ['window'])],
+          ],
+        ],
+        [
+          internalPageChecker.bind(null, ['settings']),
+          internalPageChecker.bind(null, ['bookmarks']),
           welcomeWindowChecker,
         ],
       ),
@@ -40,7 +43,7 @@ export function setupConfigIPC(browser: Browser) {
     'config:save',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({ config: newConfig }) => {
       config.save(newConfig);
 
@@ -63,7 +66,7 @@ export function setupConfigIPC(browser: Browser) {
     'config:select-download-folder',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({ tabData }) => {
       const result = await dialog.showOpenDialog(tabData.window.bw, {
         defaultPath: config.getProperty('downloadsFolder'),
@@ -79,7 +82,7 @@ export function setupConfigIPC(browser: Browser) {
     'config:get-config-folder',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({}) => {
       const data: IConfigInfo = {
         version: app.getVersion(),
@@ -96,7 +99,7 @@ export function setupConfigIPC(browser: Browser) {
     'config:open-config-folder',
     'on',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({}) => {
       shell.showItemInFolder(userDataPath());
     },

@@ -9,7 +9,7 @@ export function setupPermissionsIPC(browser: Browser) {
     'permissions:get',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({}) => {
       return permissions.all;
     },
@@ -20,7 +20,7 @@ export function setupPermissionsIPC(browser: Browser) {
     'permissions:save',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({ permissions: perms }) => {
       permissions.saveAll(perms);
       notification(

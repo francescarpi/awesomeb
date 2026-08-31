@@ -52,7 +52,7 @@ export function setupBrowserIPC(browser: Browser) {
     'debug:webcontents',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'debug')],
+    [internalPageChecker.bind(null, ['debug'])],
     async ({}) => {
       return browser.renderer.debugWebContents();
     },
@@ -63,7 +63,7 @@ export function setupBrowserIPC(browser: Browser) {
     'debug:tabindex',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'debug')],
+    [internalPageChecker.bind(null, ['debug'])],
     async ({}) => {
       return browser.renderer.debugTabIndex();
     },
