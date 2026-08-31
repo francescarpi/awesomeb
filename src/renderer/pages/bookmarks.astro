@@ -8,11 +8,21 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
 <script>
   import { type IBookmark, EBookmarkType, type IFolderBookmark } from '~/types';
-  import { Renderer, h, c, type VNode, icon, btnIcon, editBookmark } from '#/scripts';
+  import {
+    Renderer,
+    h,
+    c,
+    type VNode,
+    icon,
+    btnIcon,
+    editBookmark,
+    dialogConfirm,
+  } from '#/scripts';
   import Folder from '#/icons/folder.svg?raw';
   import Link from '#/icons/link.svg?raw';
   import ArrowDown from '#/icons/arrow-down.svg?raw';
   import Edit from '#/icons/edit.svg?raw';
+  import Delete from '#/icons/delete.svg?raw';
 
   const t = await abI18n.t(-1, [
     { key: 'save' },
@@ -23,6 +33,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     { key: 'pages:bookmarks.root' },
     { key: 'pages:bookmarks.title' },
     { key: 'pages:bookmarks.noBookmarks' },
+    { key: 'pages:bookmarks.root' },
   ]);
 
   document.title = t['pages:bookmarks.title'];
@@ -35,11 +46,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   const renderer = new Renderer(h('div', null)).render('content');
   let originalBookmarks: IBookmark[] = [];
 
-  abBookmarks.get().then((bookmarks) => {
-    originalBookmarks = bookmarks;
-    selectFirstFolder();
-    renderBookmarks(bookmarks);
-  });
+  await reload();
 
   function renderBookmarks(bookmarks: IBookmark[]) {
     if (bookmarks.length === 0) {
@@ -75,31 +82,48 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           { class: c('flex', 'flex-col') },
           h(
             'div',
-            { class: c('flex', 'gap-2', 'items-center') },
+            { class: c('flex', 'gap-2', 'items-center', 'justify-between') },
             h(
               'div',
-              {},
-              icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+              { class: c('flex', 'items-center', 'gap-2') },
+              h(
+                'div',
+                {},
+                icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+              ),
+              h('div', {}, child.title),
             ),
-            h('div', {}, child.title),
             h(
               'div',
-              {},
+              { class: c('flex', 'gap-1') },
               btnIcon(Edit, {
                 size: 4,
-                onClick: async () =>
+                onClick: async () => {
                   await editBookmark(child, async (result) => {
                     child.title = result.title;
                     if (child.type === EBookmarkType.Url && result.url) {
                       child.url = result.url;
                     }
-                    await abBookmarks.update(originalBookmarks);
+                    await updateBookmarks(originalBookmarks);
                     refresh();
-                  }),
+                  });
+                },
+              }),
+              btnIcon(Delete, {
+                size: 4,
+                onClick: async () => {
+                  await dialogConfirm(t['pages:bookmarks.deleteConfirm'], {
+                    onAccept: async () => {
+                      const newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+                      await updateBookmarks(newBookmarks);
+                      reload();
+                    },
+                  });
+                },
               }),
             ),
           ),
-          h('small', { class: c('ml-6.5', 'opacity-50') }, child.url),
+          h('small', { class: c('ml-6.5', 'opacity-50', 'truncate', 'w-[300px]') }, child.url),
         ),
       ),
     );
@@ -150,6 +174,24 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     return response;
   }
 
+  async function reload() {
+    const bookmarks = await abBookmarks.get();
+    const bookmarksWithRoot = [
+      {
+        id: 'root',
+        title: t['pages:bookmarks.root'],
+        type: EBookmarkType.Folder,
+        children: bookmarks,
+      },
+    ];
+
+    originalBookmarks = bookmarksWithRoot;
+
+    selectFirstFolder();
+
+    refresh();
+  }
+
   function refresh() {
     renderBookmarks(originalBookmarks);
   }
@@ -163,5 +205,23 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     if (folders.length) {
       state.folderSelected = folders[0];
     }
+  }
+
+  function deleteBookmarkInList(bookmarks: IBookmark[], id: string): IBookmark[] {
+    return bookmarks
+      .filter((bookmark) => bookmark.id !== id)
+      .map((bookmark) => {
+        if (bookmark.type === EBookmarkType.Folder) {
+          return {
+            ...bookmark,
+            children: deleteBookmarkInList(bookmark.children, id),
+          };
+        }
+        return bookmark;
+      });
+  }
+
+  async function updateBookmarks(bookmarks: IBookmark[]) {
+    await abBookmarks.update(bookmarks[0].children);
   }
 </script>

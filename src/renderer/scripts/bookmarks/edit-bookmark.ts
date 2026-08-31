@@ -50,7 +50,7 @@ export async function editBookmark(
     modalBox.appendChild(urlInput);
   }
 
-  const btnsContainer = Object.assign(document.createElement('div'), {
+  const actions = Object.assign(document.createElement('div'), {
     className: 'flex gap-2 mt-2 justify-end',
   });
 
@@ -68,9 +68,9 @@ export async function editBookmark(
     onclick: () => dialog.close('ok'),
   });
 
-  btnsContainer.appendChild(btnCancel);
-  btnsContainer.appendChild(btnOk);
-  modalBox.appendChild(btnsContainer);
+  actions.appendChild(btnCancel);
+  actions.appendChild(btnOk);
+  modalBox.appendChild(actions);
 
   dialog.appendChild(modalBox);
   document.body.appendChild(dialog);

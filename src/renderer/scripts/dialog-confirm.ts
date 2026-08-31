@@ -1,44 +1,38 @@
-import type { TWindowId } from '~/types';
-
 export async function dialogConfirm(
-  winId: TWindowId,
   message: string,
   props?: {
     onAccept?: () => void;
   },
 ) {
-  const t = await abI18n.t(winId, [{ key: 'ok' }, { key: 'cancel' }]);
+  const t = await abI18n.t(-1, [{ key: 'ok' }, { key: 'cancel' }]);
 
-  const dialog = document.createElement('dialog');
-  dialog.classList.add('modal');
+  const dialog = Object.assign(document.createElement('dialog'), { className: 'modal' });
+  const modalBox = Object.assign(document.createElement('div'), { className: 'modal-box' });
+  const messageEl = Object.assign(document.createElement('p'), {
+    className: 'pb-4',
+    textContent: message,
+  });
 
-  const modalBox = document.createElement('div');
-  modalBox.classList.add('modal-box');
+  const actions = Object.assign(document.createElement('div'), {
+    className: 'flex gap-2 mt-2 justify-end',
+  });
 
-  const messageEl = document.createElement('p');
-  messageEl.classList.add('pb-4');
-  messageEl.textContent = message;
+  const cancel = Object.assign(document.createElement('button'), {
+    className: 'btn btn-sm',
+    textContent: t['cancel'],
+    value: 'cancel',
+    onclick: () => dialog.close(),
+  });
 
-  const actions = document.createElement('div');
-  actions.classList.add('modal-actions');
+  const ok = Object.assign(document.createElement('button'), {
+    className: 'btn btn-sm btn-primary',
+    textContent: t['ok'],
+    value: 'ok',
+    onclick: () => dialog.close('ok'),
+  });
 
-  const actionsForm = document.createElement('form');
-  actionsForm.method = 'dialog';
-  actionsForm.classList.add('flex', 'justify-end', 'gap-2');
-
-  const acceptButton = document.createElement('button');
-  acceptButton.classList.add('btn', 'btn-sm', 'btn-primary');
-  acceptButton.textContent = t['ok'];
-  acceptButton.value = 'ok';
-
-  const cancelButton = document.createElement('button');
-  cancelButton.classList.add('btn', 'btn-sm');
-  cancelButton.textContent = t['cancel'];
-  cancelButton.value = 'cancel';
-
-  actionsForm.appendChild(cancelButton);
-  actionsForm.appendChild(acceptButton);
-  actions.appendChild(actionsForm);
+  actions.appendChild(cancel);
+  actions.appendChild(ok);
 
   modalBox.appendChild(messageEl);
   modalBox.appendChild(actions);
