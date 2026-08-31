@@ -35,6 +35,7 @@ export function setupBookmarksIPC(browser: Browser) {
       return browser.renderer.bookmarks();
     },
   );
+
   //--------------------------------------------------------------------------------------
   createHandler<{ bookmarksList: IBookmark[] }>(
     'bookmarks:update',
@@ -49,6 +50,20 @@ export function setupBookmarksIPC(browser: Browser) {
       );
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ bookmarkId: string }>(
+    'bookmarks:open',
+    'on',
+    browser,
+    [internalPageChecker.bind(null, 'bookmarks')],
+    async ({ bookmarkId }) => {
+      const bookmark = bookmarks.find(bookmarkId);
+      if (bookmark) {
+        browser.openURL(bookmark.url, { selectTab: true });
+      }
     },
   );
 }

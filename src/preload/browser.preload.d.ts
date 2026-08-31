@@ -123,6 +123,7 @@ declare global {
     ) => void;
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
+    open: (bookmarkId: string) => Promise<void>;
   };
 
   //--------------------------------------------------------------------------------------

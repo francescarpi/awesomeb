@@ -184,6 +184,9 @@ const abBookmarks = {
   update: async (bookmarksList: IBookmark[]) => {
     await ipcRenderer.invoke('bookmarks:update', { bookmarksList });
   },
+  open: async (bookmarkId: string) => {
+    ipcRenderer.send('bookmarks:open', { bookmarkId });
+  },
 };
 
 //--------------------------------------------------------------------------------------

@@ -150,7 +150,23 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               }),
             ),
           ),
-          h('small', { class: c('ml-6.5', 'opacity-50', 'truncate', 'w-[300px]') }, child.url),
+          h(
+            'a',
+            {
+              class: c(
+                'ml-6.5',
+                'opacity-50',
+                'truncate',
+                'w-[300px]',
+                'cursor-pointer',
+                'text-sm',
+              ),
+              onclick: () => {
+                abBookmarks.open(child.id);
+              },
+            },
+            child.url,
+          ),
         ),
       ),
     );
