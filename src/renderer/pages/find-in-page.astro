@@ -13,7 +13,7 @@ import Layout from '#/layouts/Base.astro';
   import Previous from '#/icons/previous.svg?raw';
   import Next from '#/icons/next.svg?raw';
 
-  const { searchParams, winId } = getSearchParams();
+  const { searchParams } = getSearchParams();
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
   const renderer = new Renderer(await render()).render('container');
@@ -29,7 +29,7 @@ import Layout from '#/layouts/Base.astro';
   });
 
   async function render(result?: IFindInPageResult | null): Promise<VNode> {
-    const t = await abI18n.t(winId, [
+    const t = await abI18n.t({ tabId }, [
       { key: 'pages:findInPage.placeholder' },
       {
         key: 'pages:findInPage.matches',

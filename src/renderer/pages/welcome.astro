@@ -10,7 +10,7 @@ import Layout from '#/layouts/Base.astro';
   import { Renderer, h, c, input } from '#/scripts';
   import logo from '#/assets/icon.png';
 
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'pages:welcome.title' },
     { key: 'pages:welcome.initialSetup' },
     { key: 'pages:welcome.searchEngineMessage' },

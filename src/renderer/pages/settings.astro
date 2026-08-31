@@ -14,7 +14,7 @@ import '@thednp/color-picker/color-picker.css';
 
   // No top-level await here: delaying script evaluation past DOMContentLoaded
   // would leave the initial render without a listener.
-  abI18n.t(-1, [{ key: 'pages:settings.title' }]).then((pageTitle) => {
+  abI18n.t({}, [{ key: 'pages:settings.title' }]).then((pageTitle) => {
     document.title = pageTitle['pages:settings.title'];
   });
 

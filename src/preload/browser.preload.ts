@@ -421,7 +421,10 @@ const abAppUpdater = {
 const i18nCache = new Map<string, string>();
 
 const abI18n = {
-  t: async (winId: TWindowId, keys: { key: string; params?: Record<string, unknown> }[]) => {
+  t: async (
+    params: { winId?: TWindowId; tabId?: TTabId },
+    keys: { key: string; params?: Record<string, unknown> }[],
+  ) => {
     const cacheKey = (k: string, p?: Record<string, unknown>) => `${k}:${JSON.stringify(p ?? {})}`;
 
     const hits = new Map<string, string>();
@@ -439,7 +442,12 @@ const abI18n = {
 
     let resolved: Record<string, string> = {};
     if (misses.length > 0) {
-      resolved = await ipcRenderer.invoke('i18n:t', { winId, keys: misses });
+      const props = params.winId
+        ? { winId: params.winId }
+        : params.tabId
+          ? { tabId: params.tabId }
+          : {};
+      resolved = await ipcRenderer.invoke('i18n:t', { ...props, keys: misses });
       for (const entry of misses) {
         if (entry.key in resolved) {
           i18nCache.set(cacheKey(entry.key, entry.params), resolved[entry.key]);

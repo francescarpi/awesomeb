@@ -4,9 +4,10 @@ import {
   windowChecker,
   modalChecker,
   internalPageChecker,
-  conditionalChecker,
-  findInPageChecker,
+  multiConditional,
   welcomeWindowChecker,
+  tabChecker,
+  findInPageChecker,
 } from '@/utils';
 import { t } from '~/i18n';
 
@@ -17,17 +18,25 @@ export function setupI18nIPC(browser: Browser) {
     'handle',
     browser,
     [
-      conditionalChecker.bind(
-        null,
-        (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
-        [windowChecker, modalChecker],
+      multiConditional(
         [
-          internalPageChecker.bind(null, 'bookmarks'),
-          internalPageChecker.bind(null, 'downloads'),
-          internalPageChecker.bind(null, 'extensions'),
-          internalPageChecker.bind(null, 'settings'),
+          [
+            (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
+            [windowChecker, modalChecker],
+          ],
+          [(args) => typeof args.tabId === 'number', [tabChecker, findInPageChecker]],
+        ],
+        [
+          internalPageChecker.bind(null, [
+            'bookmarks',
+            'downloads',
+            'extensions',
+            'settings',
+            'urlbar',
+            'debug',
+            'history',
+          ]),
           welcomeWindowChecker,
-          findInPageChecker,
         ],
       ),
     ],

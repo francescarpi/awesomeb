@@ -20,7 +20,7 @@ import logo from '../assets/icon.png';
   const renderer = new Renderer(h('div', null)).render('content');
   const data = await abBrowser.about(winId);
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     {
       key: 'pages:about.developedBy',
       params: {

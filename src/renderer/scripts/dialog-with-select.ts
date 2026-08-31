@@ -10,7 +10,7 @@ export async function dialogWithSelect(
     onAccept?: (optionId: string) => void;
   },
 ) {
-  const t = await abI18n.t(-1, [{ key: 'ok' }, { key: 'cancel' }]);
+  const t = await abI18n.t({}, [{ key: 'ok' }, { key: 'cancel' }]);
 
   const dialog = Object.assign(document.createElement('dialog'), { className: 'modal' });
   const modalBox = Object.assign(document.createElement('div'), { className: 'modal-box' });

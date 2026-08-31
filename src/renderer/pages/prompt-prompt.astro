@@ -26,7 +26,7 @@ import Modal from '#/layouts/Modal.astro';
     onCancel: () => abPrompts.response(winId, null),
   });
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:prompt.message', params: { host: url.hostname } },
   ]);
 

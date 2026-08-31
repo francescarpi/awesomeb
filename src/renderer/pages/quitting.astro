@@ -11,6 +11,6 @@ import Modal from '#/layouts/Modal.astro';
 
   const { winId } = getSearchParams();
 
-  const t = await abI18n.t(winId, [{ key: 'pages:quitting.message' }]);
+  const t = await abI18n.t({ winId }, [{ key: 'pages:quitting.message' }]);
   document.getElementById('message')!.textContent = t['pages:quitting.message'];
 </script>

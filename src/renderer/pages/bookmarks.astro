@@ -27,7 +27,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import Delete from '#/icons/delete.svg?raw';
   import Move from '#/icons/move.svg?raw';
 
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'save' },
     { key: 'move' },
     { key: 'delete' },

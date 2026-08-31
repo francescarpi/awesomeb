@@ -4,7 +4,7 @@ export async function editBookmark(
   bookmark: IBookmark,
   handleAccept: (result: { title: string; url?: string }) => void,
 ) {
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'ok' },
     { key: 'cancel' },
     { key: 'pages:bookmarks.edit.title' },
