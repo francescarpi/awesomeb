@@ -6,6 +6,7 @@ import {
   viewChecker,
   windowChecker,
   conditionalChecker,
+  welcomeWindowChecker,
 } from '@/utils';
 import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
 import { dialog, app, shell } from 'electron';
@@ -22,7 +23,11 @@ export function setupConfigIPC(browser: Browser) {
         null,
         (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
         [windowChecker, viewChecker.bind(null, ['window'])],
-        [internalPageChecker.bind(null, 'settings'), internalPageChecker.bind(null, 'bookmarks')],
+        [
+          internalPageChecker.bind(null, 'settings'),
+          internalPageChecker.bind(null, 'bookmarks'),
+          welcomeWindowChecker,
+        ],
       ),
     ],
     async ({}) => {

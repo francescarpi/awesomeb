@@ -6,6 +6,7 @@ import {
   internalPageChecker,
   conditionalChecker,
   findInPageChecker,
+  welcomeWindowChecker,
 } from '@/utils';
 import { t } from '~/i18n';
 
@@ -25,7 +26,7 @@ export function setupI18nIPC(browser: Browser) {
           internalPageChecker.bind(null, 'downloads'),
           internalPageChecker.bind(null, 'extensions'),
           internalPageChecker.bind(null, 'settings'),
-          internalPageChecker.bind(null, 'welcome'),
+          welcomeWindowChecker,
           findInPageChecker,
         ],
       ),

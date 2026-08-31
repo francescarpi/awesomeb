@@ -24,7 +24,7 @@ export function createHandler<T extends object>(
   const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
 
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
-    scopeLog.info(`[${channel}] received with props: `, rawArgs);
+    scopeLog.info(`[${channel}] received from "${event.sender?.getURL?.()}" with props: `, rawArgs);
 
     const args = { ...rawArgs, event } as T;
 
@@ -49,6 +49,7 @@ export function createHandler<T extends object>(
         let anyPassed = false;
         for (const altChecker of checker) {
           const result = altChecker(browser, event, args);
+          scopeLog.debug(`Result of checker: ${altChecker.name} is ${Boolean(result)}`);
           if (result !== null) {
             Object.assign(args, result);
             anyPassed = true;
