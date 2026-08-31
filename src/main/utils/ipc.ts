@@ -38,7 +38,7 @@ export function createHandler<T extends object>(
           scopeLog.warn(`[${channel}] conditionalChecker failed`);
           return;
         }
-        resolvedCheckers.push(() => conditionalResult);
+        resolvedCheckers.push(conditionalResult);
       } else {
         resolvedCheckers.push(checker);
       }

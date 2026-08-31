@@ -9,6 +9,7 @@ export * from './string';
 export * from './settings';
 export * from './button-manager';
 export * from './edit-url';
+export * from './bookmarks';
 
 export { dialogWithSelect, type IOption } from './dialog-with-select';
 export { inputManager, type TSetValue, type TSetDefault } from './inputs';

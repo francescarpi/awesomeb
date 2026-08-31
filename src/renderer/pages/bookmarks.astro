@@ -8,10 +8,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
 <script>
   import { type IBookmark, EBookmarkType, type IFolderBookmark } from '~/types';
-  import { Renderer, h, c, type VNode, icon } from '#/scripts';
+  import { Renderer, h, c, type VNode, icon, btnIcon, editBookmark } from '#/scripts';
   import Folder from '#/icons/folder.svg?raw';
   import Link from '#/icons/link.svg?raw';
   import ArrowDown from '#/icons/arrow-down.svg?raw';
+  import Edit from '#/icons/edit.svg?raw';
 
   const t = await abI18n.t(-1, [
     { key: 'save' },
@@ -67,17 +68,38 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
     return h(
       'div',
-      { class: c('mx-auto') },
+      { class: c('mx-auto', 'flex', 'flex-col', 'gap-2', 'bg-white/40', 'rounded', 'p-2') },
       ...state.folderSelected.children.map((child: IBookmark) =>
         h(
           'div',
-          { class: c('flex', 'gap-2', 'items-center') },
+          { class: c('flex', 'flex-col') },
           h(
             'div',
-            {},
-            icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+            { class: c('flex', 'gap-2', 'items-center') },
+            h(
+              'div',
+              {},
+              icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+            ),
+            h('div', {}, child.title),
+            h(
+              'div',
+              {},
+              btnIcon(Edit, {
+                size: 4,
+                onClick: async () =>
+                  await editBookmark(child, async (result) => {
+                    child.title = result.title;
+                    if (child.type === EBookmarkType.Url && result.url) {
+                      child.url = result.url;
+                    }
+                    await abBookmarks.update(originalBookmarks);
+                    refresh();
+                  }),
+              }),
+            ),
           ),
-          h('div', {}, child.title),
+          h('small', { class: c('ml-6.5', 'opacity-50') }, child.url),
         ),
       ),
     );

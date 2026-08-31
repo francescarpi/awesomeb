@@ -20,9 +20,9 @@ export function setupConfigIPC(browser: Browser) {
     [
       conditionalChecker.bind(
         null,
-        (args) => typeof args.winId === 'number',
+        (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
         [windowChecker, viewChecker.bind(null, ['window'])],
-        [internalPageChecker.bind(null, 'settings')],
+        [internalPageChecker.bind(null, 'settings'), internalPageChecker.bind(null, 'bookmarks')],
       ),
     ],
     async ({}) => {

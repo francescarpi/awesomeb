@@ -365,7 +365,12 @@
     "deleteConfirm": "Are you sure you want to delete this bookmark?",
     "selectNewParent": "Select the new parent folder",
     "root": "Root",
-    "noBookmarks": "No bookmarks..."
+    "noBookmarks": "No bookmarks...",
+    "edit": {
+      "title": "Edit bookmark",
+      "inputTitlePlaceholder": "Title",
+      "inputTitleURL": "URL"
+    }
   },
   "certificateInfo": {
     "title": "Certificate information",

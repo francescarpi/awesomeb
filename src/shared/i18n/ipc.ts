@@ -5,6 +5,7 @@ import {
   modalChecker,
   internalPageChecker,
   conditionalChecker,
+  findInPageChecker,
 } from '@/utils';
 import { t } from '~/i18n';
 
@@ -25,14 +26,16 @@ export function setupI18nIPC(browser: Browser) {
           internalPageChecker.bind(null, 'extensions'),
           internalPageChecker.bind(null, 'settings'),
           internalPageChecker.bind(null, 'welcome'),
+          findInPageChecker,
         ],
       ),
     ],
     async ({ keys }) => {
-      return keys.reduce((acc, curr) => {
+      const result = keys.reduce((acc, curr) => {
         acc[curr.key] = t(curr.key, curr.params);
         return acc;
       }, {});
+      return result;
     },
   );
 }
