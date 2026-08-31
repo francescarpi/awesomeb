@@ -17,12 +17,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     btnIcon,
     editBookmark,
     dialogConfirm,
+    dialogWithSelect,
+    type IOption,
   } from '#/scripts';
   import Folder from '#/icons/folder.svg?raw';
   import Link from '#/icons/link.svg?raw';
   import ArrowDown from '#/icons/arrow-down.svg?raw';
   import Edit from '#/icons/edit.svg?raw';
   import Delete from '#/icons/delete.svg?raw';
+  import Move from '#/icons/move.svg?raw';
 
   const t = await abI18n.t(-1, [
     { key: 'save' },
@@ -69,8 +72,12 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   }
 
   function renderContent(): VNode {
-    if (!state.folderSelected) {
-      return h('div', {}, '');
+    if (!state.folderSelected || state.folderSelected.children.length === 0) {
+      return h(
+        'div',
+        { class: c('mx-auto', 'flex', 'flex-col', 'gap-2', 'bg-white/40', 'rounded', 'p-2') },
+        t['pages:bookmarks.noBookmarks'],
+      );
     }
 
     return h(
@@ -106,6 +113,26 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                     }
                     await updateBookmarks(originalBookmarks);
                     refresh();
+                  });
+                },
+              }),
+              btnIcon(Move, {
+                size: 4,
+                onClick: async () => {
+                  const options = bookmarksToOptions(originalBookmarks, child.id, 1);
+                  await dialogWithSelect(t['pages:bookmarks.selectNewParent'], options, {
+                    onAccept: async (selectedFolderId: string) => {
+                      let newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+
+                      if (selectedFolderId === 'root') {
+                        newBookmarks.push(child);
+                      } else {
+                        newBookmarks = addBookmarkToParent(newBookmarks, selectedFolderId, child);
+                      }
+
+                      await updateBookmarks(newBookmarks);
+                      reload();
+                    },
                   });
                 },
               }),
@@ -148,6 +175,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               'gap-1',
               'cursor-pointer',
               'rounded',
+              'select-none',
               selected ? 'bg-primary text-primary-content' : 'hover:bg-black/10',
             ),
             onclick: () => {
@@ -223,5 +251,45 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   async function updateBookmarks(bookmarks: IBookmark[]) {
     await abBookmarks.update(bookmarks[0].children);
+  }
+
+  function bookmarksToOptions(bookmarks: IBookmark[], ignoreId: string, level: number): IOption[] {
+    let options: IOption[] = [];
+
+    for (const bookmark of bookmarks) {
+      if (bookmark.id === ignoreId) {
+        continue;
+      }
+
+      if (bookmark.type === EBookmarkType.Folder) {
+        options.push({
+          label: `${'--'.repeat(level ?? 0)} ${bookmark.title}`,
+          value: bookmark.id,
+        });
+        options = options.concat(bookmarksToOptions(bookmark.children, ignoreId, (level ?? 0) + 1));
+      }
+    }
+    return options;
+  }
+
+  function addBookmarkToParent(
+    bookmarks: IBookmark[],
+    parentId: string,
+    newBookmark: IBookmark,
+  ): IBookmark[] {
+    return bookmarks.map((bookmark) => {
+      if (bookmark.id === parentId && bookmark.type === EBookmarkType.Folder) {
+        return {
+          ...bookmark,
+          children: [...bookmark.children, newBookmark],
+        };
+      } else if (bookmark.type === EBookmarkType.Folder) {
+        return {
+          ...bookmark,
+          children: addBookmarkToParent(bookmark.children, parentId, newBookmark),
+        };
+      }
+      return bookmark;
+    });
   }
 </script>
