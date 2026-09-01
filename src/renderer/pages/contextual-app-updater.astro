@@ -11,7 +11,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
   const renderer = new Renderer(h('div', null)).render('content');
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:appUpdater.current' },
     { key: 'pages:appUpdater.new' },
     { key: 'pages:appUpdater.failed' },

@@ -54,7 +54,7 @@ export async function renderGeneralPage(config: IConfig): Promise<{
   callback: () => void;
 }> {
   const t = await abI18n.t(
-    -1,
+    { winId: -1 },
     KEYS.map((key) => ({ key })),
   );
   const renderer = new Renderer(

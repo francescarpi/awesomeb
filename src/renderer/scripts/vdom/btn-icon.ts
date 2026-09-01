@@ -21,7 +21,7 @@ export function btnIcon(
     {
       class: c(
         'text-base-content',
-        'hover:bg-white/30',
+        'hover:bg-white',
         'cursor-pointer',
         'rounded',
         'flex',

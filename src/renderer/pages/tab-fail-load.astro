@@ -16,7 +16,7 @@ import Layout from '#/layouts/Base.astro';
   const description = searchParams.get('description');
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:tabFailLoad.title' },
     { key: 'pages:tabFailLoad.message', params: { url } },
     { key: 'pages:tabFailLoad.errorCode' },

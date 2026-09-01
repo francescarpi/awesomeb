@@ -40,7 +40,7 @@ const { placeholder, id, className, oneColumn, title } = Astro.props;
     keys.push({ key: input.dataset.placeholder as string });
   }
 
-  const t = await abI18n.t(winId, keys);
+  const t = await abI18n.t({ winId }, keys);
   for (const input of inputs) {
     input.placeholder = t[input.dataset.placeholder as string];
   }

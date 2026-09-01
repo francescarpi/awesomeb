@@ -13,7 +13,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
   import type { IDebugWebContent, IDebugTabIndex } from '~/types';
 
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'pages:debug.title' },
     { key: 'pages:debug.wcTitle' },
     { key: 'pages:debug.filterByWindow' },

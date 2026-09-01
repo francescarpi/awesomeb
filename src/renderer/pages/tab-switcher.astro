@@ -14,7 +14,7 @@ import Base from '../layouts/Base.astro';
 
   const { winId } = getSearchParams();
 
-  const tI18n = await abI18n.t(winId, [
+  const tI18n = await abI18n.t({ winId }, [
     { key: 'pages:tabSwitcher.noTabs' },
     { key: 'pages:tabSwitcher.noDesktopName' },
     { key: 'pages:tabSwitcher.title' },

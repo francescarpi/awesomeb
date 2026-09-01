@@ -19,7 +19,7 @@ import Title from '#/components/common/Title.astro';
   const parentName = searchParams.get('parentName') as string;
   const createFolder = (searchParams.get('createFolder') as string) === 'true';
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:addBookmark.parentFolder', params: { id: parentName } },
     { key: 'pages:addBookmark.inputTitle' },
     { key: 'pages:addBookmark.inputURL' },
