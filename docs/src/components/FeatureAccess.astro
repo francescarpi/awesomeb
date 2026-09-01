@@ -2,6 +2,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getMenuItems } from '../../scripts/i18n';
+import { getShortcutEntry } from '../../scripts/shortcuts';
+import { acceleratorToDisplay, isMacPlatform } from '../../../src/shared/utils/shortcuts';
 
 const { locale } = Astro.locals.starlightRoute;
 
@@ -37,11 +39,11 @@ interface Props {
   entity: string;
   menu?: string;
   command?: string;
-  macOS: string;
+  shortcut?: string;
   contextMenu?: string;
 }
 
-const { entity, menu, command, contextMenu } = Astro.props as Props;
+const { entity, menu, command, shortcut, contextMenu } = Astro.props as Props;
 
 const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
 const txtMenu = trans.menu[locale || 'root'] || trans.menu.groot;
@@ -62,6 +64,9 @@ if (command) {
     commandName = cmdData.name;
   }
 }
+
+const shortcutMaps = shortcut ? await getShortcutEntry(shortcut) : [];
+const platform = isMacPlatform() ? 'mac' : 'win';
 ---
 
 <div class="feature-access">
@@ -82,21 +87,19 @@ if (command) {
       )
     }
     {
-      contextMenuItems.length > 0 && (
+      shortcutMaps.length > 0 && (
         <li>
-          <b>{txtContextMenu}</b>: {contextMenuItems[0]}
+          <b>{txtShortcut}</b>:{' '}
+          {shortcutMaps
+            .map((e) => `${e.map}: ${acceleratorToDisplay(e.shortcut, platform)}`)
+            .join(' · ')}
         </li>
       )
     }
     {
-      Astro.props.macOS && (
+      contextMenuItems.length > 0 && (
         <li>
-          <b>{txtShortcut}</b>:
-          <ul class="feature-access-list">
-            <li>
-              macOS: <code dir="auto">{Astro.props.macOS}</code>
-            </li>
-          </ul>
+          <b>{txtContextMenu}</b>: {contextMenuItems[0]}
         </li>
       )
     }
