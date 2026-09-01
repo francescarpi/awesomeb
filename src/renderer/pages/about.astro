@@ -3,12 +3,12 @@ import Modal from '#/layouts/Modal.astro';
 import logo from '../assets/icon.png';
 ---
 
-<Modal width="400px" height="300px">
+<Modal width="400px" height="320px">
   <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
-    <img src={logo.src} alt="AwesomeB" width="64" height="64" />
+    <img src={logo.src} alt="AwesomeB" width="64" height="64" class="mt-2" />
     <b>AwesomeB(rowser)</b>
     <p class="text-sm" id="developedBy"></p>
-    <div id="content"></div>
+    <div id="content" class="h-38"></div>
   </div>
 </Modal>
 
