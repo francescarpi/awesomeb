@@ -15,7 +15,7 @@ import Title from '#/components/common/Title.astro';
   const host = searchParams.get('host') as string;
   const permission = searchParams.get('permission') as string;
   const tabId = parseInt(searchParams.get('tabId')!, 10);
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:requestPermission.message', params: { host, permission } },
   ]);
 

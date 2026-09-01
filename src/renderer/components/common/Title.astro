@@ -15,7 +15,7 @@ const { title } = Astro.props;
 
   const h1 = document.querySelector('h1[data-title]') as HTMLElement;
   const k = h1.dataset.title as string;
-  const t = await abI18n.t(winId, [{ key: k }]);
+  const t = await abI18n.t({ winId }, [{ key: k }]);
 
   h1.textContent = t[k];
 </script>

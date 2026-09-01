@@ -12,7 +12,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import dayjs from 'dayjs';
   import Search from '#/icons/search.svg?raw';
 
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'pages:history.title' },
     { key: 'pages:history.searchHistory' },
     { key: 'pages:history.clearHistory' },
@@ -114,7 +114,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     const buttons: VNode[] = [];
 
     if (selectedUrls.size > 0) {
-      const t2 = await abI18n.t(-1, [
+      const t2 = await abI18n.t({}, [
         { key: 'pages:history.deleteSelected', params: { count: selectedUrls.size } },
         { key: 'pages:history.confirmDeleteSelected', params: { count: selectedUrls.size } },
       ]);

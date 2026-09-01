@@ -364,7 +364,13 @@
     "title": "Adreces d'interès",
     "deleteConfirm": "Segur que vols eliminar aquesta adreça d'interès?",
     "selectNewParent": "Selecciona la nova carpeta pare",
-    "root": "Arrel"
+    "root": "Arrel",
+    "noBookmarks": "No hi ha cap adreça d'interès...",
+    "edit": {
+      "title": "Editar adreça d'interès",
+      "inputTitlePlaceholder": "Títol",
+      "inputTitleURL": "URL"
+    }
   },
   "certificateInfo": {
     "title": "Informació del certificat",

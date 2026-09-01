@@ -123,6 +123,7 @@ declare global {
     ) => void;
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
+    open: (bookmarkId: string) => Promise<void>;
   };
 
   //--------------------------------------------------------------------------------------
@@ -257,7 +258,7 @@ declare global {
   //--------------------------------------------------------------------------------------
   const abI18n: {
     t: (
-      winId: TWindowId,
+      params: { winId?: TWindowId; tabId?: TTabId },
       keys: { key: string; params?: Record<string, unknown> }[],
     ) => Promise<{ key: string; value: string }>;
   };

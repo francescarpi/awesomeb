@@ -12,6 +12,6 @@ import DownloadsList from '#/components/downloads/DownloadsList.astro';
 <script>
   import { getSearchParams } from '#/scripts';
   const { winId } = getSearchParams();
-  const t = await abI18n.t(winId, [{ key: 'pages:downloads.title' }]);
+  const t = await abI18n.t({ winId }, [{ key: 'pages:downloads.title' }]);
   document.title = t['pages:downloads.title'];
 </script>

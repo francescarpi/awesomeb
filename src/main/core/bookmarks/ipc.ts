@@ -30,17 +30,18 @@ export function setupBookmarksIPC(browser: Browser) {
     'bookmarks:get',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'bookmarks')],
+    [internalPageChecker.bind(null, ['bookmarks'])],
     async ({}) => {
       return browser.renderer.bookmarks();
     },
   );
+
   //--------------------------------------------------------------------------------------
   createHandler<{ bookmarksList: IBookmark[] }>(
     'bookmarks:update',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'bookmarks')],
+    [internalPageChecker.bind(null, ['bookmarks'])],
     async ({ bookmarksList }) => {
       bookmarks.update(bookmarksList);
       notification(
@@ -49,6 +50,20 @@ export function setupBookmarksIPC(browser: Browser) {
       );
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ bookmarkId: string }>(
+    'bookmarks:open',
+    'on',
+    browser,
+    [internalPageChecker.bind(null, ['bookmarks'])],
+    async ({ bookmarkId }) => {
+      const bookmark = bookmarks.find(bookmarkId);
+      if (bookmark) {
+        browser.openURL(bookmark.url, { selectTab: true });
+      }
     },
   );
 }

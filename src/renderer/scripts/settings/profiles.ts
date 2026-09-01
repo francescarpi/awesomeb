@@ -24,7 +24,7 @@ export async function renderProfilesPage(
   config: IConfig,
 ): Promise<{ renderer: Renderer; callback: () => void }> {
   const t = await abI18n.t(
-    -1,
+    { winId: -1 },
     KEYS.map((key) => ({ key })),
   );
   const renderer = new Renderer(

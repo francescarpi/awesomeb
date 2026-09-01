@@ -16,7 +16,7 @@
   async function buildMenu(): Promise<VNode> {
     if (!cache.t) {
       cache.t = await abI18n.t(
-        -1,
+        { winId: -1 },
         settingsMenuItems.map((item) => ({ key: item.nameKey })),
       );
     }

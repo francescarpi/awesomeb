@@ -15,7 +15,7 @@ import Layout from '#/layouts/Base.astro';
   const error = searchParams.get('error')!;
   const tabId = parseInt(searchParams.get('tabId')!, 10);
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:tabCertificateError.title' },
     { key: 'pages:tabCertificateError.message', params: { url, error } },
     { key: 'pages:tabCertificateError.button' },
