@@ -330,7 +330,8 @@
         "desc": "Haz clic en una tecla de atajo para cambiar su combinación. Pulsa Escape para cancelar."
       },
       "loading": "Cargando...",
-      "pressKey": "Pulsa una tecla..."
+      "pressKey": "Pulsa una tecla...",
+      "conflictsWith": "Entra en conflicto con: {{shortcuts}}"
     }
   },
   "welcome": {
