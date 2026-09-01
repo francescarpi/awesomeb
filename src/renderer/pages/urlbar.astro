@@ -23,6 +23,6 @@ import SplitMenu from '#/components/urlbar/SplitMenu.astro';
   import { getSearchParams } from '#/scripts';
 
   const { winId } = getSearchParams();
-  const t = await abI18n.t(winId, [{ key: 'pages:urlbar.title' }]);
+  const t = await abI18n.t({ winId }, [{ key: 'pages:urlbar.title' }]);
   document.title = t['pages:urlbar.title'];
 </script>

@@ -19,7 +19,9 @@ import Title from '#/components/common/Title.astro';
     return { fingerprint, subject };
   });
 
-  const t = await abI18n.t(winId, [{ key: 'pages:clientCertificate.message', params: { url } }]);
+  const t = await abI18n.t({ winId }, [
+    { key: 'pages:clientCertificate.message', params: { url } },
+  ]);
 
   const [btns, registerBtnsEvents] = await confirmButtons({
     winId,

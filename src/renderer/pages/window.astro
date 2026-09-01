@@ -26,7 +26,7 @@ import Layout from '#/layouts/Base.astro';
 
   const { winId, searchParams } = getSearchParams();
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:window.newTabSuffix' },
     { key: 'pages:window.commandsSuffix' },
     { key: 'pages:window.title' },

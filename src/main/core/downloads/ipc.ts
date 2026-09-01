@@ -4,7 +4,7 @@ import {
   createHandler,
   windowChecker,
   viewChecker,
-  conditionalChecker,
+  multiConditional,
   internalPageChecker,
 } from '@/utils';
 import { INTERNAL_PROTOCOL } from '~/constants';
@@ -43,11 +43,14 @@ export function setupDownloadsIPC(browser: Browser) {
     'on',
     browser,
     [
-      conditionalChecker.bind(
-        null,
-        (args) => typeof args.winId === 'number',
-        [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
-        [internalPageChecker.bind(null, 'downloads')],
+      multiConditional(
+        [
+          [
+            (args) => typeof args.winId === 'number',
+            [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+          ],
+        ],
+        [internalPageChecker.bind(null, ['downloads'])],
       ),
     ],
     async ({ savePath, action }) => {
@@ -83,11 +86,14 @@ export function setupDownloadsIPC(browser: Browser) {
     'handle',
     browser,
     [
-      conditionalChecker.bind(
-        null,
-        (args) => typeof args.winId === 'number',
-        [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
-        [internalPageChecker.bind(null, 'downloads')],
+      multiConditional(
+        [
+          [
+            (args) => typeof args.winId === 'number',
+            [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+          ],
+        ],
+        [internalPageChecker.bind(null, ['downloads'])],
       ),
     ],
     async () => {

@@ -12,7 +12,16 @@ const scopeLog = log.scope('IPCEventManager');
 //--------------------------------------------------------------------------------
 type CheckerFn = Function; // eslint-disable-line
 type CheckerGroup = CheckerFn[];
-type Checker = CheckerFn | CheckerGroup;
+type Criteria = (args: Record<string, unknown>) => boolean;
+type ConditionalResolver = {
+  kind: 'conditional';
+  resolve: (args: Record<string, unknown>) => CheckerFn[] | null;
+};
+type Checker = CheckerFn | CheckerGroup | ConditionalResolver;
+
+function isConditionalResolver(checker: Checker): checker is ConditionalResolver {
+  return (checker as ConditionalResolver).kind === 'conditional';
+}
 
 export function createHandler<T extends object>(
   channel: string,
@@ -24,21 +33,21 @@ export function createHandler<T extends object>(
   const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
 
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
-    scopeLog.info(`[${channel}] received with props: `, rawArgs);
+    scopeLog.info(`[${channel}] received from "${event.sender?.getURL?.()}" with props: `, rawArgs);
 
     const args = { ...rawArgs, event } as T;
 
-    const resolvedCheckers: Checker[] = [];
+    const resolvedCheckers: (CheckerFn | CheckerGroup)[] = [];
     for (const checker of checkers) {
       if (Array.isArray(checker)) {
         resolvedCheckers.push(checker);
-      } else if (checker.name === 'bound conditionalChecker') {
-        const conditionalResult = checker(args);
+      } else if (isConditionalResolver(checker)) {
+        const conditionalResult = checker.resolve(args as Record<string, unknown>);
         if (conditionalResult === null) {
-          scopeLog.warn(`[${channel}] conditionalChecker failed`);
+          scopeLog.warn(`[${channel}] conditional resolver failed`);
           return;
         }
-        resolvedCheckers.push(() => conditionalResult);
+        resolvedCheckers.push(conditionalResult);
       } else {
         resolvedCheckers.push(checker);
       }
@@ -49,6 +58,7 @@ export function createHandler<T extends object>(
         let anyPassed = false;
         for (const altChecker of checker) {
           const result = altChecker(browser, event, args);
+          scopeLog.debug(`Result of checker: ${altChecker.name} is ${Boolean(result)}`);
           if (result !== null) {
             Object.assign(args, result);
             anyPassed = true;
@@ -75,13 +85,16 @@ export function createHandler<T extends object>(
 
 //--------------------------------------------------------------------------------
 export function internalPageChecker(
-  page: string,
+  pages: string[],
   browser: Browser,
   event: IpcMainInvokeEvent,
   _args: Record<string, unknown>,
 ): { tabData: IWinDesConTab } | null {
+  const validUrls = pages.map((p) => `${INTERNAL_PROTOCOL}://${p}/`);
+
   for (const tabData of browser.tabs) {
-    if (tabData.tab.url && tabData.tab.url.startsWith(`${INTERNAL_PROTOCOL}://${page}/`)) {
+    const url = tabData.tab.url;
+    if (url && validUrls.some((validUrl) => url.startsWith(validUrl))) {
       if (tabData.tab.webContentsId === event.sender.id) {
         return { tabData };
       }
@@ -326,13 +339,19 @@ export function certificateErrorChecker(
 }
 
 //--------------------------------------------------------------------------------
-export function conditionalChecker(
-  criteriaFn: (args: Record<string, unknown>) => boolean,
-  checker1: CheckerFn[],
-  checker2: CheckerFn[],
-  args: Record<string, unknown>,
-): CheckerFn[] {
-  return criteriaFn(args) ? checker1 : checker2;
+export function multiConditional(
+  branches: [Criteria, CheckerFn[]][],
+  defaultCheckers: CheckerFn[],
+): ConditionalResolver {
+  return {
+    kind: 'conditional',
+    resolve: (args) => {
+      for (const [criteria, checkers] of branches) {
+        if (criteria(args)) return checkers;
+      }
+      return defaultCheckers;
+    },
+  };
 }
 
 //--------------------------------------------------------------------------------

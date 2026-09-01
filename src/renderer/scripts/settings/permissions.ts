@@ -28,7 +28,7 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
   callback: () => void;
 }> {
   const t = await abI18n.t(
-    -1,
+    { winId: -1 },
     KEYS.map((key) => ({ key })),
   );
   const permissions = await abPermissions.get();

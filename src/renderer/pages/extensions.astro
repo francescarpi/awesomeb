@@ -18,7 +18,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   const resp = await abExtensions.get();
 
-  const t = await abI18n.t(-1, [
+  const t = await abI18n.t({}, [
     { key: 'pages:extensions.intro', params: { path: resp.path } },
     { key: 'pages:extensions.refresh' },
     { key: 'pages:extensions.noExtensions' },

@@ -11,7 +11,7 @@ export function setupShortcutsIPC(browser: Browser) {
     'shortcuts:maps',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({}) => {
       return getShortcutMaps();
     },
@@ -22,7 +22,7 @@ export function setupShortcutsIPC(browser: Browser) {
     'shortcuts:override',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'settings')],
+    [internalPageChecker.bind(null, ['settings'])],
     async ({ mapId: id, shortcutId, key }) => {
       const map = getShortcutMaps()[id];
       if (!map) throw new Error(`Shortcut map "${id}" not found`);
@@ -55,7 +55,7 @@ export function setupShortcutsIPC(browser: Browser) {
       [
         windowChecker,
         viewChecker.bind(null, ['window']),
-        internalPageChecker.bind(null, 'settings'),
+        internalPageChecker.bind(null, ['settings']),
       ],
     ],
     async ({}) => {

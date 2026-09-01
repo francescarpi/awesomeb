@@ -17,7 +17,7 @@ import Modal from '#/layouts/Modal.astro';
     onCancel: () => abModal.close(winId),
   });
 
-  const t = await abI18n.t(winId, [{ key: 'pages:clearClosedTabs.message' }]);
+  const t = await abI18n.t({ winId }, [{ key: 'pages:clearClosedTabs.message' }]);
 
   new Renderer(
     h(

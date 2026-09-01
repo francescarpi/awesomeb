@@ -22,7 +22,7 @@ const { isPage = false } = Astro.props;
   const isPage = root.dataset.isPage === 'true';
   const { winId } = getSearchParams();
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:downloads.noDownloads' },
     { key: 'pages:downloads.viewAll' },
     { key: 'pages:downloads.clearCompleted' },

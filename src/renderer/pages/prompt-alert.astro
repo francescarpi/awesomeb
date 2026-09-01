@@ -19,7 +19,7 @@ import Modal from '#/layouts/Modal.astro';
     onConfirm: () => abPrompts.response(winId, undefined),
   });
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:prompt.message', params: { host: url.hostname } },
   ]);
 

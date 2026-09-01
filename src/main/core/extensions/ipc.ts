@@ -17,7 +17,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:get',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'extensions')],
+    [internalPageChecker.bind(null, ['extensions'])],
     async () => browser.renderer.extensions(),
   );
 
@@ -26,7 +26,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:refresh',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'extensions')],
+    [internalPageChecker.bind(null, ['extensions'])],
     async () => {
       browser.extensions.refresh();
       return browser.renderer.extensions();
@@ -38,7 +38,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:toggle',
     'handle',
     browser,
-    [internalPageChecker.bind(null, 'extensions')],
+    [internalPageChecker.bind(null, ['extensions'])],
     async ({ id: extensionId }) => {
       browser.extensions.toggle(extensionId);
       return browser.renderer.extensions();

@@ -3,80 +3,31 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="pages:bookmarks.title">
-  <div class="flex gap-2">
-    <!-- Bookmarks tree navigation (left panel) -->
-    <div id="bookmarks-tree" class="w-75 flex flex-col gap-2 p-2 overflow-y-auto border-r"></div>
-
-    <!-- Selected bookmark details panel (right panel) -->
-    <div id="bookmark-details" class="p-4 w-full"></div>
-  </div>
+  <div id="content" class="h-full"></div>
 </BlackBgWithTitle>
 
-<!-- Template for folder bookmark items -->
-<template id="folder-template">
-  <div class="flex flex-col gap-1">
-    <div class="flex">
-      <!-- Folder title button -->
-      <button class="btn btn-sm btn-ghost block flex-1 truncate text-left"></button>
-      <!-- Toggle expand/collapse button -->
-      <button class="btn btn-sm btn-ghost flex">
-        <!-- Chevron down icon (collapsed state) -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-          ><path
-            fill="currentColor"
-            d="M11.625 14.913q-.175-.063-.325-.213l-4.6-4.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l3.9 3.9l3.9-3.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-4.6 4.6q-.15.15-.325.213t-.375.062t-.375-.062"
-          ></path></svg
-        >
-        <!-- Chevron up icon (expanded state) -->
-        <svg
-          class="hidden"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          ><path
-            fill="currentColor"
-            d="m12 10.8l-3.9 3.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"
-          ></path></svg
-        >
-      </button>
-    </div>
-    <!-- Container for folder children -->
-    <div class="folder-content"></div>
-  </div>
-</template>
-
-<!-- Template for URL bookmark items -->
-<template id="url-template">
-  <div>
-    <button class="btn btn-sm btn-ghost block w-full truncate text-left"></button>
-  </div>
-</template>
-
-<!-- Template for bookmark details editor -->
-<template id="details-template">
-  <div class="flex flex-col gap-4">
-    <input class="input input-sm w-full" placeholder="Title..." />
-    <input class="input input-sm w-full" placeholder="Url..." />
-    <input type="hidden" />
-    <div class="flex justify-between gap-2">
-      <button class="btn btn-sm delete">Delete</button>
-      <div class="flex gap-2">
-        <button class="btn btn-sm move">Move</button>
-        <button class="btn btn-sm btn-primary save">Save</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
-  import { IBookmark, IFolderBookmark, IUrlBookmark, EBookmarkType } from '~/types';
-  import { dialogConfirm, dialogWithSelect, type IOption, getSearchParams } from '#/scripts';
+  import { type IBookmark, EBookmarkType, type IFolderBookmark } from '~/types';
+  import {
+    Renderer,
+    h,
+    c,
+    type VNode,
+    icon,
+    btnIcon,
+    editBookmark,
+    dialogConfirm,
+    dialogWithSelect,
+    type IOption,
+  } from '#/scripts';
+  import Folder from '#/icons/folder.svg?raw';
+  import Link from '#/icons/link.svg?raw';
+  import ArrowDown from '#/icons/arrow-down.svg?raw';
+  import Edit from '#/icons/edit.svg?raw';
+  import Delete from '#/icons/delete.svg?raw';
+  import Move from '#/icons/move.svg?raw';
 
-  const { winId } = getSearchParams();
-
-  // Texts
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({}, [
     { key: 'save' },
     { key: 'move' },
     { key: 'delete' },
@@ -84,270 +35,237 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     { key: 'pages:bookmarks.selectNewParent' },
     { key: 'pages:bookmarks.root' },
     { key: 'pages:bookmarks.title' },
+    { key: 'pages:bookmarks.noBookmarks' },
+    { key: 'pages:bookmarks.root' },
   ]);
 
   document.title = t['pages:bookmarks.title'];
 
-  const bookmarksTree = document.getElementById('bookmarks-tree') as HTMLElement;
-  const bookmarkDetails = document.getElementById('bookmark-details') as HTMLElement;
-  const folderTemplate = document.getElementById('folder-template') as HTMLTemplateElement;
-  const urlTemplate = document.getElementById('url-template') as HTMLTemplateElement;
-  const detailsTemplate = document.getElementById('details-template') as HTMLTemplateElement;
+  const state: { foldersOpened: string[]; folderSelected: IBookmark | null } = {
+    foldersOpened: [],
+    folderSelected: null,
+  };
 
-  // =============================================================================
-  // INITIALIZATION
-  // =============================================================================
+  const renderer = new Renderer(h('div', null)).render('content');
+  let originalBookmarks: IBookmark[] = [];
 
-  abBookmarks.get().then((bookmarks) => {
-    renderBookmarks(bookmarks);
-  });
+  await reload();
 
-  // =============================================================================
-  // RENDERING FUNCTIONS
-  // =============================================================================
-
-  /**
-   * Renders the complete bookmarks tree in the left panel
-   */
   function renderBookmarks(bookmarks: IBookmark[]) {
-    bookmarksTree.innerHTML = '';
-
-    for (const bookmark of bookmarks) {
-      if (bookmark.type === 'folder') {
-        renderBookmarkFolder(bookmarks, bookmark, bookmarksTree);
-      } else {
-        renderBookmarkUrl(bookmarks, bookmark, bookmarksTree);
-      }
-    }
-  }
-
-  /**
-   * Renders a folder bookmark item with expand/collapse functionality
-   */
-  function renderBookmarkFolder(
-    bookmarks: IBookmark[],
-    folder: IFolderBookmark,
-    container: HTMLElement,
-  ) {
-    const folderElement = folderTemplate.content.cloneNode(true) as HTMLElement;
-    const titleButton = folderElement.querySelector('button:nth-child(1)') as HTMLButtonElement;
-    const toggleButton = folderElement.querySelector('button:nth-child(2)') as HTMLButtonElement;
-    const folderContent = folderElement.querySelector('.folder-content') as HTMLElement;
-    const chevronDown = toggleButton.querySelector('svg:nth-child(1)') as HTMLElement;
-    const chevronUp = toggleButton.querySelector('svg:nth-child(2)') as HTMLElement;
-
-    // Set folder title and click handler to show details
-    titleButton.textContent = folder.title;
-    titleButton.addEventListener('click', () => renderSelectedBookmark(bookmarks, folder));
-
-    // Toggle expand/collapse on button click
-    toggleButton.addEventListener('click', () => {
-      folderContent.classList.toggle('hidden');
-      chevronDown.classList.toggle('hidden');
-      chevronUp.classList.toggle('hidden');
-    });
-
-    // Recursively render folder children
-    if (folder.children) {
-      folderContent.classList.add('pl-5', 'hidden');
-
-      for (const child of folder.children) {
-        if (child.type === 'folder') {
-          renderBookmarkFolder(bookmarks, child, folderContent);
-        } else {
-          renderBookmarkUrl(bookmarks, child, folderContent);
-        }
-      }
+    if (bookmarks.length === 0) {
+      renderer.update(h('div', {}, t['pages:bookmarks.noBookmarks']));
+      return;
     }
 
-    container.appendChild(folderElement);
-  }
-
-  /**
-   * Renders a URL bookmark item
-   */
-  function renderBookmarkUrl(bookmarks: IBookmark[], url: IUrlBookmark, container: HTMLElement) {
-    const urlElement = urlTemplate.content.cloneNode(true) as HTMLElement;
-    const button = urlElement.querySelector('button') as HTMLButtonElement;
-
-    button.textContent = url.title;
-    button.addEventListener('click', () => renderSelectedBookmark(bookmarks, url));
-
-    container.appendChild(urlElement);
-  }
-
-  /**
-   * Renders the details panel for the selected bookmark (right panel)
-   */
-  function renderSelectedBookmark(bookmarks: IBookmark[], bookmark: IBookmark) {
-    const detailsElement = detailsTemplate.content.cloneNode(true) as HTMLElement;
-
-    // Get form elements
-    const titleInput = detailsElement.querySelector('input:nth-child(1)') as HTMLInputElement;
-    const urlInput = detailsElement.querySelector('input:nth-child(2)') as HTMLInputElement;
-    const bookmarkIdInput = detailsElement.querySelector('input:nth-child(3)') as HTMLInputElement;
-
-    // Get action buttons
-    const saveButton = detailsElement.querySelector('.save') as HTMLButtonElement;
-    saveButton.textContent = t['save'];
-
-    const deleteButton = detailsElement.querySelector('.delete') as HTMLButtonElement;
-    deleteButton.textContent = t['delete'];
-
-    const moveButton = detailsElement.querySelector('.move') as HTMLButtonElement;
-    moveButton.textContent = t['move'];
-
-    // Clear previous details
-    bookmarkDetails.innerHTML = '';
-
-    // Populate form based on bookmark type
-    bookmarkIdInput.value = bookmark.id;
-    titleInput.value = bookmark.title;
-
-    if (bookmark.type === 'folder') {
-      urlInput.value = '';
-      urlInput.classList.add('hidden');
-    } else {
-      urlInput.value = bookmark.url;
-      urlInput.disabled = false;
-    }
-
-    // Setup event handlers
-    setupSaveHandler(saveButton, bookmarks);
-    setupDeleteHandler(deleteButton, bookmarks, bookmark);
-    setupMoveHandler(moveButton, bookmarks, bookmark);
-
-    bookmarkDetails.appendChild(detailsElement);
-  }
-
-  /**
-   * Clears the bookmark details panel
-   */
-  function clearSelectedBookmark() {
-    bookmarkDetails.innerHTML = '';
-  }
-
-  // =============================================================================
-  // EVENT HANDLERS
-  // =============================================================================
-
-  /**
-   * Sets up the save button click handler
-   */
-  function setupSaveHandler(button: HTMLButtonElement, bookmarks: IBookmark[]) {
-    button.addEventListener('click', () => {
-      saveActiveBookmark(bookmarks);
-    });
-  }
-
-  /**
-   * Sets up the delete button click handler with confirmation dialog
-   */
-  function setupDeleteHandler(
-    button: HTMLButtonElement,
-    bookmarks: IBookmark[],
-    bookmark: IBookmark,
-  ) {
-    button.addEventListener('click', async () => {
-      await dialogConfirm(winId, t['pages:bookmarks.deleteConfirm'], {
-        onAccept: () => {
-          const newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
-          abBookmarks.update(newBookmarks).then(() => {
-            renderBookmarks(newBookmarks);
-            clearSelectedBookmark();
-          });
-        },
-      });
-    });
-  }
-
-  /**
-   * Sets up the move button click handler with folder selection dialog
-   */
-  function setupMoveHandler(
-    button: HTMLButtonElement,
-    bookmarks: IBookmark[],
-    bookmark: IBookmark,
-  ) {
-    button.addEventListener('click', async () => {
-      const options = [
-        { label: t['pages:bookmarks.root'], value: 'root' },
-        ...bookmarksToOptions(bookmarks, bookmark.id, 1),
-      ];
-
-      await dialogWithSelect(winId, t['pages:bookmarks.selectNewParent'], options, {
-        onAccept: (selectedFolderId) => {
-          let newBookmarks = deleteBookmarkInList(bookmarks, bookmark.id);
-
-          if (selectedFolderId === 'root') {
-            newBookmarks.push(bookmark);
-          } else {
-            newBookmarks = addBookmarkToParent(newBookmarks, selectedFolderId, bookmark);
-          }
-
-          abBookmarks.update(newBookmarks).then(() => {
-            renderBookmarks(newBookmarks);
-            clearSelectedBookmark();
-          });
-        },
-      });
-    });
-  }
-
-  // =============================================================================
-  // DATA MANIPULATION FUNCTIONS
-  // =============================================================================
-
-  /**
-   * Saves the currently edited bookmark
-   */
-  function saveActiveBookmark(bookmarks: IBookmark[]) {
-    const titleInput = bookmarkDetails.querySelector('input:nth-child(1)') as HTMLInputElement;
-    const urlInput = bookmarkDetails.querySelector('input:nth-child(2)') as
-      HTMLInputElement | undefined;
-    const idInput = bookmarkDetails.querySelector('input:nth-child(3)') as HTMLInputElement;
-
-    const newBookmarks = updateBookmarkInList(
-      bookmarks,
-      idInput.value,
-      titleInput.value,
-      urlInput?.value,
+    renderer.update(
+      h(
+        'div',
+        { class: c('grid', 'grid-cols-[290px_2fr]', 'gap-2', 'h-full') },
+        h(
+          'div',
+          { class: c('bg-white/40', 'p-2', 'rounded') },
+          ...renderFolders(filterFolders(bookmarks)),
+        ),
+        h('div', { class: c('min-w-0') }, renderContent()),
+      ),
     );
-
-    abBookmarks.update(newBookmarks).then(() => {
-      renderBookmarks(newBookmarks);
-    });
   }
 
-  /**
-   * Updates a bookmark in the list by ID (recursive)
-   */
-  function updateBookmarkInList(
-    bookmarks: IBookmark[],
-    id: string,
-    title: string,
-    url?: string,
-  ): IBookmark[] {
-    return bookmarks.map((bookmark) => {
-      if (bookmark.id === id) {
-        return {
-          ...bookmark,
-          title,
-          ...(bookmark.type === EBookmarkType.Url && url ? { url } : {}),
-        };
-      } else if (bookmark.type === EBookmarkType.Folder) {
-        return {
-          ...bookmark,
-          children: updateBookmarkInList(bookmark.children, id, title, url),
-        };
+  function renderContent(): VNode {
+    if (!state.folderSelected || state.folderSelected.children.length === 0) {
+      return h(
+        'div',
+        { class: c('mx-auto', 'flex', 'flex-col', 'gap-2', 'bg-white/40', 'rounded', 'p-2') },
+        t['pages:bookmarks.noBookmarks'],
+      );
+    }
+
+    return h(
+      'div',
+      {
+        class: c(
+          'mx-auto',
+          'w-full',
+          'min-w-0',
+          'flex',
+          'flex-col',
+          'gap-2',
+          'bg-white/40',
+          'rounded',
+          'p-2',
+        ),
+      },
+      ...state.folderSelected.children.map((child: IBookmark) =>
+        h(
+          'div',
+          { class: c('flex', 'flex-col', 'w-full', 'min-w-0') },
+          h(
+            'div',
+            { class: c('flex', 'gap-2', 'items-center', 'justify-between') },
+            h(
+              'div',
+              { class: c('flex', 'items-center', 'gap-2') },
+              h(
+                'div',
+                {},
+                icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+              ),
+              h('div', {}, child.title),
+            ),
+            h(
+              'div',
+              { class: c('flex', 'gap-1') },
+              btnIcon(Edit, {
+                size: 4,
+                onClick: async () => {
+                  await editBookmark(child, async (result) => {
+                    child.title = result.title;
+                    if (child.type === EBookmarkType.Url && result.url) {
+                      child.url = result.url;
+                    }
+                    await updateBookmarks(originalBookmarks);
+                    refresh();
+                  });
+                },
+              }),
+              btnIcon(Move, {
+                size: 4,
+                onClick: async () => {
+                  const options = bookmarksToOptions(originalBookmarks, child.id, 1);
+                  await dialogWithSelect(t['pages:bookmarks.selectNewParent'], options, {
+                    onAccept: async (selectedFolderId: string) => {
+                      let newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+
+                      if (selectedFolderId === 'root') {
+                        newBookmarks.push(child);
+                      } else {
+                        newBookmarks = addBookmarkToParent(newBookmarks, selectedFolderId, child);
+                      }
+
+                      await updateBookmarks(newBookmarks);
+                      reload();
+                    },
+                  });
+                },
+              }),
+              btnIcon(Delete, {
+                size: 4,
+                onClick: async () => {
+                  await dialogConfirm(t['pages:bookmarks.deleteConfirm'], {
+                    onAccept: async () => {
+                      const newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+                      await updateBookmarks(newBookmarks);
+                      reload();
+                    },
+                  });
+                },
+              }),
+            ),
+          ),
+          h(
+            'a',
+            {
+              class: c(
+                'block',
+                'w-full',
+                'ml-6.5',
+                'opacity-50',
+                'truncate',
+                'cursor-pointer',
+                'text-sm',
+                'pr-16',
+              ),
+              title: child.url,
+              onclick: () => {
+                abBookmarks.open(child.id);
+              },
+            },
+            child.url,
+          ),
+        ),
+      ),
+    );
+  }
+
+  function renderFolders(folders: IFolderBookmark[], level: number = 0): VNode[] {
+    const response: VNode[] = [];
+
+    for (const folder of folders) {
+      const children = filterFolders(folder.children);
+      const hasChildren = children.length > 0;
+      const selected = state.folderSelected?.id === folder.id;
+
+      response.push(
+        h(
+          'div',
+          {
+            class: c(
+              'mb-1',
+              'flex',
+              'items-center',
+              'gap-1',
+              'cursor-pointer',
+              'rounded',
+              'select-none',
+              selected ? 'bg-primary text-primary-content' : 'hover:bg-black/10',
+            ),
+            onclick: () => {
+              state.folderSelected = folder;
+              refresh();
+            },
+          },
+          h(
+            'div',
+            {
+              class: c(!hasChildren && 'invisible', `ml-[${level}rem]`),
+            },
+            icon(ArrowDown, 'text-black', '7'),
+          ),
+          h('div', {}, icon(Folder, 'text-black', '4')),
+          h('div', {}, folder.title),
+        ),
+      );
+
+      if (children.length > 0) {
+        response.push(...renderFolders(children, level + 1));
       }
-      return bookmark;
-    });
+    }
+    return response;
   }
 
-  /**
-   * Deletes a bookmark from the list by ID (recursive)
-   */
+  async function reload() {
+    const bookmarks = await abBookmarks.get();
+    const bookmarksWithRoot = [
+      {
+        id: 'root',
+        title: t['pages:bookmarks.root'],
+        type: EBookmarkType.Folder,
+        children: bookmarks,
+      },
+    ];
+
+    originalBookmarks = bookmarksWithRoot;
+
+    selectFirstFolder();
+
+    refresh();
+  }
+
+  function refresh() {
+    renderBookmarks(originalBookmarks);
+  }
+
+  function filterFolders(bookmarks: IBookmark[]): IFolderBookmark[] {
+    return bookmarks.filter((b) => b.type === EBookmarkType.Folder);
+  }
+
+  function selectFirstFolder() {
+    const folders = filterFolders(originalBookmarks);
+    if (folders.length) {
+      state.folderSelected = folders[0];
+    }
+  }
+
   function deleteBookmarkInList(bookmarks: IBookmark[], id: string): IBookmark[] {
     return bookmarks
       .filter((bookmark) => bookmark.id !== id)
@@ -362,9 +280,29 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       });
   }
 
-  /**
-   * Adds a bookmark to a parent folder (recursive)
-   */
+  async function updateBookmarks(bookmarks: IBookmark[]) {
+    await abBookmarks.update(bookmarks[0].children);
+  }
+
+  function bookmarksToOptions(bookmarks: IBookmark[], ignoreId: string, level: number): IOption[] {
+    let options: IOption[] = [];
+
+    for (const bookmark of bookmarks) {
+      if (bookmark.id === ignoreId) {
+        continue;
+      }
+
+      if (bookmark.type === EBookmarkType.Folder) {
+        options.push({
+          label: `${'--'.repeat(level ?? 0)} ${bookmark.title}`,
+          value: bookmark.id,
+        });
+        options = options.concat(bookmarksToOptions(bookmark.children, ignoreId, (level ?? 0) + 1));
+      }
+    }
+    return options;
+  }
+
   function addBookmarkToParent(
     bookmarks: IBookmark[],
     parentId: string,
@@ -384,33 +322,5 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       }
       return bookmark;
     });
-  }
-
-  // =============================================================================
-  // UTILITY FUNCTIONS
-  // =============================================================================
-
-  /**
-   * Converts bookmarks tree to a flat list of folder options for selection
-   * (used in the move dialog)
-   */
-  function bookmarksToOptions(bookmarks: IBookmark[], ignoreId: string, level: number): IOption[] {
-    let options: IOption[] = [];
-
-    for (const bookmark of bookmarks) {
-      if (bookmark.id === ignoreId) {
-        continue;
-      }
-
-      if (bookmark.type === EBookmarkType.Folder) {
-        options.push({
-          label: `${'--'.repeat(level ?? 0)} ${bookmark.title}`,
-          value: bookmark.id,
-        });
-        options = options.concat(bookmarksToOptions(bookmark.children, ignoreId, (level ?? 0) + 1));
-      }
-    }
-
-    return options;
   }
 </script>

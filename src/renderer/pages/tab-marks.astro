@@ -39,7 +39,7 @@ import Base from '#/layouts/Base.astro';
 
   const { winId } = getSearchParams();
 
-  const t = await abI18n.t(winId, [
+  const t = await abI18n.t({ winId }, [
     { key: 'pages:tabMarks.title' },
     { key: 'pages:tabMarks.listening' },
     { key: 'pages:tabMarks.availableMarks' },

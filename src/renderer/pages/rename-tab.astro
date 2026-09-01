@@ -14,7 +14,7 @@ import Title from '#/components/common/Title.astro';
 
   const { winId, searchParams } = getSearchParams();
   const tabId = searchParams.get('tabId') as string;
-  const t = await abI18n.t(winId, [{ key: 'pages:renameTab.name' }]);
+  const t = await abI18n.t({ winId }, [{ key: 'pages:renameTab.name' }]);
 
   const tabsEntitites = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
   const selectedTab = tabId
