@@ -17,7 +17,7 @@ describe('getActiveMap', () => {
 
   test('returns the default map when there are no overrides', () => {
     const map = getActiveMap();
-    expect(map.id).toBe('generic-iso');
+    expect(map.id).toBe('generic-ansi');
     expect(map.shortcuts.performCommand.key).toBe('CmdOrCtrl+P');
     expect(map.shortcuts.newTab.key).toBe('CmdOrCtrl+T');
   });
@@ -39,7 +39,7 @@ describe('getActiveMap', () => {
     const map = getActiveMap();
     map.shortcuts.performCommand.key = 'CmdOrCtrl+Z';
 
-    expect(getShortcutMaps()['generic-iso'].shortcuts.performCommand.key).toBe('CmdOrCtrl+P');
+    expect(getShortcutMaps()['generic-ansi'].shortcuts.performCommand.key).toBe('CmdOrCtrl+P');
     expect(getShortcut('performCommand').key).toBe('CmdOrCtrl+P');
   });
 

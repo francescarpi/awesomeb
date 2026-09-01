@@ -2,6 +2,7 @@ import { h, Renderer, c } from '#/scripts';
 import type { IConfig, IShortcut, TShortcutId, TShortcutMapId } from '~/types';
 import { acceleratorToDisplay, keyEventToAccelerator } from '~/utils/shortcuts';
 import { box } from './common';
+import { DEFAULT_SHORTCUTS_MAP } from '~/constants';
 
 type Translations = Record<string, string>;
 
@@ -17,7 +18,7 @@ const KEYS = [
 // Capture state — which shortcut is being edited and its keydown handler
 let capturingId: TShortcutId | null = null;
 let captureHandler: ((event: KeyboardEvent) => void) | null = null;
-let mapId: TShortcutMapId = 'generic-iso';
+let mapId: TShortcutMapId = DEFAULT_SHORTCUTS_MAP;
 
 /** Removes the keydown listener and resets capture state */
 function clearCapture() {
@@ -64,6 +65,18 @@ function startCapture(
   document.addEventListener('keydown', captureHandler, true);
 }
 
+export async function getShortcuts(config: IConfig) {
+  const maps = await abShortcuts.maps();
+  const shortcuts = { ...maps[config.shortcutMap].shortcuts };
+
+  // Apply any previously saved overrides on top of the map defaults
+  for (const [id, key] of Object.entries(config.shortcutsOverrides ?? {})) {
+    if (shortcuts[id]) shortcuts[id].key = key;
+  }
+
+  return { shortcuts, maps };
+}
+
 /** Loads shortcuts from the map, applies saved overrides, and builds the page */
 export async function renderShortcutsPage(config: IConfig): Promise<{
   renderer: Renderer;
@@ -73,14 +86,9 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
     { winId: -1 },
     KEYS.map((key) => ({ key })),
   );
-  const maps = await abShortcuts.maps();
-  mapId = config.shortcutMap;
-  const shortcuts = maps[config.shortcutMap].shortcuts;
 
-  // Apply any previously saved overrides on top of the map defaults
-  for (const [id, key] of Object.entries(config.shortcutsOverrides ?? {})) {
-    if (shortcuts[id]) shortcuts[id].key = key;
-  }
+  const { shortcuts, maps } = await getShortcuts(config);
+  mapId = config.shortcutMap;
 
   const shortcutsRenderer = new Renderer(
     h('ul', {}, h('li', {}, t['pages:settings.shortcuts.loading'])),
@@ -95,7 +103,15 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
         t['pages:settings.shortcuts.map.desc'],
         h(
           'select',
-          { class: c('select', 'select-sm', 'w-40'), onchange: () => {} },
+          {
+            class: c('select', 'select-sm', 'w-40'),
+            onchange: async (e) => {
+              const newConfig = { ...config, shortcutMap: (e.target as HTMLSelectElement).value };
+              const cfg = await abConfig.save(newConfig);
+              const { shortcuts } = await getShortcuts(cfg);
+              updateShortcutsList(shortcutsRenderer, shortcuts, t);
+            },
+          },
           ...Object.entries(maps).map(([id, map]) =>
             h('option', { value: id, selected: config.shortcutMap === id }, map.name),
           ),
