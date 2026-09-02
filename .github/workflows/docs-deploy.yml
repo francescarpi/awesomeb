@@ -30,6 +30,7 @@ jobs:
           sparse-checkout: |
             docs
             src/shared/i18n/locales
+            src/main/core/shortcuts/maps
           sparse-checkout-cone-mode: false
 
       - name: Fetch latest release metadata

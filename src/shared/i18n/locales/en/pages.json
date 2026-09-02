@@ -330,7 +330,8 @@
         "desc": "Click on a shortcut key to change its combination. Press Escape to cancel."
       },
       "loading": "Loading...",
-      "pressKey": "Press a key..."
+      "pressKey": "Press a key...",
+      "conflictsWith": "Conflicts with: {{shortcuts}}"
     }
   },
   "welcome": {

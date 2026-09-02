@@ -2,25 +2,28 @@
 title: Navegar
 ---
 
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
 Per a accedir a un escriptori concret, com que estan numerats, ho pots fer amb:
 
-* macOS: `Shift+Cmd+<index>`
+<FeatureAccess entity="accedir al primer escriptori" shortcut="selectDesktop1" />
+
+<FeatureAccess entity="accedir al segon escriptori" shortcut="selectDesktop2" />
+
+... i així fins a l'últim.
 
 ## Anterior/Següent
 
 Si et vols moure entre els escriptoris:
 
-* macOS: `Shift+Cmd+[` o `Shift+Cmd+]`
+<FeatureAccess entity="escriptori anterior" shortcut="previousDesktop" command="previousDesktop" />
 
-També tens disponibles les comandes:
-
-* Next Desktop
-* Previous Desktop
+<FeatureAccess entity="escriptori següent" shortcut="nextDesktop" command="nextDesktop" />
 
 ## Cercar un escriptori
 
 Amb la següent drecera t'apareix un modal amb tots els escriptoris:
 
-* macOS: `Cmd+d`
+<FeatureAccess entity="cercar un escriptori" shortcut="findDesktop" />
 
 ![Cercar un escriptori](../../../../assets/desktop-navigate.png)

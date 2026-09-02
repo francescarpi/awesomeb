@@ -2,25 +2,28 @@
 title: Navegar
 ---
 
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
 Para acceder a un escritorio concreto, como están numerados, lo puedes hacer con:
 
-* macOS: `Shift+Cmd+<index>`
+<FeatureAccess entity="acceder al primer escritorio" shortcut="selectDesktop1" />
+
+<FeatureAccess entity="acceder al segundo escritorio" shortcut="selectDesktop2" />
+
+... y así hasta el último.
 
 ## Anterior/Siguiente
 
 Si quieres moverte entre los escritorios:
 
-* macOS: `Shift+Cmd+[` o `Shift+Cmd+]`
+<FeatureAccess entity="escritorio anterior" shortcut="previousDesktop" command="previousDesktop" />
 
-También tienes disponibles los comandos:
-
-* Next Desktop
-* Previous Desktop
+<FeatureAccess entity="escritorio siguiente" shortcut="nextDesktop" command="nextDesktop" />
 
 ## Buscar un escritorio
 
 Con la siguiente combinación de teclas te aparece un modal con todos los escritorios:
 
-* macOS: `Cmd+d`
+<FeatureAccess entity="buscar un escritorio" shortcut="findDesktop" />
 
 ![Buscar un escritorio](../../../../assets/desktop-navigate.png)

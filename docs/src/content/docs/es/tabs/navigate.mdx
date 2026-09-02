@@ -2,6 +2,8 @@
 title: Navegar
 ---
 
+import FeatureAccess from '../../../../components/FeatureAccess.astro'
+
 Aquí encontrarás las diferentes formas que tienes para navegar entre pestañas.
 
 Antes de nada, necesitas conocer el concepto de **tab container**.
@@ -12,7 +14,11 @@ Un *tab container* es un contenedor que puede tener varias pestañas. Por ejempl
 
 Cada *tab container* está enumerado(1) entre el 1 y el 9. Este número/índice te permitirá navegar directamente a él con la combinación de teclas:
 
-* macOS: `Cmd+<index>`
+<FeatureAccess entity="acceder a la primera pestaña" shortcut="selectTab1" />
+
+<FeatureAccess entity="acceder a la segunda pestaña" shortcut="selectTab2" />
+
+... y así hasta la **9**.
 
 :::note
 Si accedes a una pestaña donde ya estás, volverás a la pestaña anterior. Por ejemplo: si estás en la pestaña 3, accedes a la 1 y vuelves a acceder a la 1, volverás a la 3.
@@ -22,15 +28,19 @@ Si accedes a una pestaña donde ya estás, volverás a la pestaña anterior. Por
 
 Si quieres moverte entre la pestaña anterior y la siguiente:
 
-* macOS: `Cmd+[` o `Cmd+]`
+<FeatureAccess entity="pestaña anterior" shortcut="previousTab" />
+
+<FeatureAccess entity="pestaña siguiente" shortcut="nextTab" />
 
 :::note
 Estas combinaciones son las de por defecto siempre y cuando tengas la configuración de `Generic ISO`.
 :::
 
-## Tab switcher
+## Selector de pestañas
 
-El *tab switcher* es el típico componente que, al pulsar `Ctrl+Tab` o `Ctrl+Shift+Tab`, te muestra un listado con las pestañas abiertas para navegar entre ellas.
+El *tab switcher* es el típico componente que te muestra un listado con las pestañas abiertas para navegar entre ellas.
+
+<FeatureAccess entity="selector de pestañas" shortcut="tabSwitcher" />
 
 ![Selector de pestañas](../../../../assets/nav-tab-2.png)
 
@@ -42,7 +52,7 @@ Las pestañas están ordenadas por la hora del último acceso. Así podrás alte
 
 Con la siguiente combinación de teclas te aparece un modal con todas las pestañas (activas y suspendidas):
 
-* macOS: `Cmd+.`
+<FeatureAccess entity="buscar una pestaña" shortcut="findTab" />
 
 ![Buscar una pestaña](../../../../assets/nav-tab-3.png)
 
@@ -54,7 +64,7 @@ Con la siguiente combinación de teclas te aparece un modal con todas las pesta�
 
 Con el siguiente atajo aparece (abajo a la derecha) una pequeña caja de información:
 
-* macOS: `Cmd+;`
+<FeatureAccess entity="marcas" shortcut="tabMarks" />
 
 Una vez abierta, puedes (sin dejar de pulsar `Cmd`):
 
@@ -71,14 +81,14 @@ Si estás en un escritorio (por ejemplo el 2) y en el 1 hay una pestaña que req
 
 Pulsando el siguiente atajo irás directamente a la pestaña:
 
-* macOS: `Cmd+u`
+<FeatureAccess entity="pestaña que requiere atención" shortcut="selectTabAttention" />
 
 La pestaña afectada tendrá un icono de alerta, en rojo.
 
 ![Pestaña requiere atención](../../../../assets/nav-tab-6.png)
 
 :::note
-Estando en la pestaña que ha requerido atención, si vuelves a pulsar `Cmd+u` volverás a la pestaña previa de donde venías.
+Estando en la pestaña que ha requerido atención, si vuelves a pulsar el mismo atajo volverás a la pestaña previa de donde venías.
 :::
 
 :::note
@@ -89,4 +99,4 @@ Una pestaña que requiere atención significa que ha cambiado su *favicon*, tít
 
 También hay una combinación de teclas específica para alternar rápidamente (sin utilizar el tab switcher) entre la última pestaña utilizada:
 
-* macOS: `Cmd+'`
+<FeatureAccess entity="la anterior pestaña visitada" shortcut="previousVisited" />

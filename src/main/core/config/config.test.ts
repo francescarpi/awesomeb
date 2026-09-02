@@ -30,7 +30,7 @@ describe('Config', () => {
   test('constructor with valid defaults succeeds', () => {
     const config = new Config();
     expect(config).toBeDefined();
-    expect(config.getProperty('shortcutMap')).toBe('generic-iso');
+    expect(config.getProperty('shortcutMap')).toBe('generic-ansi');
   });
 
   test('constructor with corrupted disk config falls back to defaults', () => {
@@ -44,14 +44,14 @@ describe('Config', () => {
         downloadsFolder: '/tmp',
         themes: [],
         permissionsType: 'standard',
-        shortcutMap: 'generic-iso',
+        shortcutMap: 'generic-ansi',
         shortcutsOverrides: {},
       }),
     );
 
     const config = new Config();
     expect(config).toBeDefined();
-    expect(config.getProperty('shortcutMap')).toBe('generic-iso');
+    expect(config.getProperty('shortcutMap')).toBe('generic-ansi');
   });
 
   test('getProperty validates on read', () => {
@@ -65,7 +65,7 @@ describe('Config', () => {
   test('config getter validates on read', () => {
     const config = new Config();
     const fullConfig = config.config;
-    expect(fullConfig.shortcutMap).toBe('generic-iso');
+    expect(fullConfig.shortcutMap).toBe('generic-ansi');
   });
 
   test('save rejects invalid config', () => {

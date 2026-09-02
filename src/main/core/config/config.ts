@@ -4,7 +4,7 @@ import path from 'path';
 import os from 'os';
 import { EPermissionConfigType } from '~/types';
 import { ConfigScheme, type IConfig, type IConfigSearchEngine } from './schemes';
-import { DEFAULT_UI_THEME } from '~/constants';
+import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
 
 export class Config extends Store<IConfig> {
@@ -15,7 +15,7 @@ export class Config extends Store<IConfig> {
       downloadsFolder: path.join(os.homedir(), 'Downloads'),
       themes: [],
       permissionsType: EPermissionConfigType.Standard,
-      shortcutMap: 'generic-iso',
+      shortcutMap: DEFAULT_SHORTCUTS_MAP,
       shortcutsOverrides: {},
       historyRetentionDays: 7,
       closedTabsRetentionDays: 7,

@@ -2,6 +2,8 @@
 title: Navigate
 ---
 
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
 Here you'll find the different ways you have to navigate between tabs.
 
 First of all, though, you need to know the concept of **tab container**.
@@ -12,7 +14,11 @@ A *tab container* is a container that can hold several tabs. For example, if you
 
 Each *tab container* is numbered(1) from 1 to 9. This number/index will let you navigate to it directly with the key combination:
 
-* macOS: `Cmd+<index>`
+<FeatureAccess entity="access the first tab" shortcut="selectTab1" />
+
+<FeatureAccess entity="access the second tab" shortcut="selectTab2" />
+
+... and so on up to **9**.
 
 :::note
 If you access a tab where you already are, you'll return to the previous tab. For example: if you're on tab 3, you access 1 and access 1 again, you'll return to 3.
@@ -22,7 +28,9 @@ If you access a tab where you already are, you'll return to the previous tab. Fo
 
 If you want to move between the previous and next tab:
 
-* macOS: `Cmd+[` or `Cmd+]`
+<FeatureAccess entity="previous tab" shortcut="previousTab" />
+
+<FeatureAccess entity="next tab" shortcut="nextTab" />
 
 :::note
 These combinations are the default ones as long as you have the `Generic ISO` configuration.
@@ -30,7 +38,9 @@ These combinations are the default ones as long as you have the `Generic ISO` co
 
 ## Tab switcher
 
-The *tab switcher* is the typical component that, when you press `Ctrl+Tab` or `Ctrl+Shift+Tab`, shows you a list of the open tabs to navigate between them.
+The *tab switcher* is the typical component that shows you a list of the open tabs to navigate between them.
+
+<FeatureAccess entity="tab switcher" shortcut="tabSwitcher" />
 
 ![Tab switcher](../../../assets/nav-tab-2.png)
 
@@ -42,7 +52,7 @@ Tabs are ordered by the time of last access. This way you can easily toggle betw
 
 With the following key combination a modal appears with all tabs (active and suspended):
 
-* macOS: `Cmd+.`
+<FeatureAccess entity="search for a tab" shortcut="findTab" />
 
 ![Search for a tab](../../../assets/nav-tab-3.png)
 
@@ -54,7 +64,7 @@ With the following key combination a modal appears with all tabs (active and sus
 
 With the following shortcut, a small information box appears (bottom right):
 
-* macOS: `Cmd+;`
+<FeatureAccess entity="marks" shortcut="tabMarks" />
 
 Once open, you can (without releasing `Cmd`):
 
@@ -71,14 +81,14 @@ If you're on a desktop (for example 2) and on 1 there is a tab that requires att
 
 Pressing the following shortcut will take you directly to the tab:
 
-* macOS: `Cmd+u`
+<FeatureAccess entity="tab that requires attention" shortcut="selectTabAttention" />
 
 The affected tab will have an alert icon, in red.
 
 ![Tab requires attention](../../../assets/nav-tab-6.png)
 
 :::note
-Being on the tab that required attention, if you press `Cmd+u` again you'll return to the previous tab you came from.
+Being on the tab that required attention, if you press the same shortcut again you'll return to the previous tab you came from.
 :::
 
 :::note
@@ -89,4 +99,4 @@ A tab that requires attention means it has changed its *favicon*, title, or emit
 
 There's also a specific key combination to quickly toggle (without using the tab switcher) between the last used tab:
 
-* macOS: `Cmd+'`
+<FeatureAccess entity="last visited tab" shortcut="previousVisited" />

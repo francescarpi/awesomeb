@@ -46,7 +46,7 @@ describe('Shortcuts IPC', () => {
       const handler = handlers.get('shortcuts:active')!;
       // windowChecker picks up winId
       const result = (await handler(fakeEvent, { winId: 1 })) as { id: string };
-      expect(result.id).toBe('generic-iso');
+      expect(result.id).toBe('generic-ansi');
     });
 
     test('returns the active map with overrides applied', async () => {
@@ -77,7 +77,7 @@ describe('Shortcuts IPC', () => {
       // Instead, this test verifies the wiring: the broadcast method exists and is
       // exposed, and the helper returns a fresh clone.
       const map = getActiveMap();
-      expect(map.id).toBe('generic-iso');
+      expect(map.id).toBe('generic-ansi');
       expect(typeof browser.toRenderer.broadcast).toBe('function');
     });
   });

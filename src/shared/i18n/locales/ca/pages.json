@@ -330,7 +330,8 @@
         "desc": "Fes clic a una tecla de drecera per canviar-ne la combinació. Prem Escape per cancel·lar."
       },
       "loading": "Carregant...",
-      "pressKey": "Prem una tecla..."
+      "pressKey": "Prem una tecla...",
+      "conflictsWith": "Entra en conflicte amb: {{shortcuts}}"
     }
   },
   "welcome": {
