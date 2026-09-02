@@ -54,9 +54,9 @@ const { backgroundColor, borderRadius, noDrag } = Astro.props;
   import { getSearchParams } from '#/scripts';
   import type { IConfig } from '~/types';
 
-  const { winId } = getSearchParams();
+  const { winId, tabId } = getSearchParams();
 
-  const config = await abConfig.get(winId);
+  const config = await abConfig.get({ winId, tabId });
   applyTheme(config);
 
   abConfig.refresh((_e, config) => {

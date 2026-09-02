@@ -272,8 +272,8 @@ const abCertificates = {
 
 //--------------------------------------------------------------------------------------
 const abConfig = {
-  get: (winId?: TWindowId) => {
-    return ipcRenderer.invoke('config:get', { winId });
+  get: (params: { winId?: TWindowId; tabId?: TTabId }) => {
+    return ipcRenderer.invoke('config:get', params);
   },
   getConfigInfo: () => {
     return ipcRenderer.invoke('config:get-config-folder', {});

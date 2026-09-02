@@ -7,6 +7,8 @@ import {
   windowChecker,
   multiConditional,
   welcomeWindowChecker,
+  findInPageChecker,
+  tabChecker,
 } from '@/utils';
 import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
 import { dialog, app, shell } from 'electron';
@@ -24,6 +26,10 @@ export function setupConfigIPC(browser: Browser) {
           [
             (args) => typeof args.winId === 'number' && (args.winId as number) !== -1,
             [windowChecker, viewChecker.bind(null, ['window'])],
+          ],
+          [
+            (args) => typeof args.tabId === 'number' && (args.tabId as number) !== -1,
+            [tabChecker, findInPageChecker],
           ],
         ],
         [
