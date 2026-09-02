@@ -3,7 +3,8 @@ import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { HandlerDetails, WebContents, Certificate } from 'electron';
-import { windowOpenHadler, Browser, parseFavicon } from '@/core';
+import { windowOpenHadler, Browser, parseFavicon, TabContainer } from '@/core';
+import type { IWinDesConTab } from '~/types';
 
 const scopeLog = log.scope('TabEvents');
 
@@ -13,6 +14,27 @@ function checkIfRequireAttention(browser: Browser, tab: Tab) {
   if (tabResult) {
     tab.setRequireAttention(selectedDesktopResult?.desktop.id !== tabResult.desktop.id);
   }
+}
+
+export function findOpenTabsAsChildContainer(
+  tabData: IWinDesConTab | null,
+): TabContainer | undefined {
+  if (!tabData) {
+    return undefined;
+  }
+
+  const rootContainer = rootContainerOf(tabData.tabContainer);
+  const hasFlag = rootContainer.tabs.some((t) => t.openTabsAsChild);
+
+  return hasFlag ? rootContainer : undefined;
+}
+
+function rootContainerOf(container: TabContainer): TabContainer {
+  let current: TabContainer = container;
+  while (current.parent !== null) {
+    current = current.parent;
+  }
+  return current;
 }
 
 export function registerTabEvents(browser: Browser, tab: Tab) {
@@ -212,7 +234,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.setWindowOpenHandler((details: HandlerDetails) => {
     const tabData = browser.getTab(tab.id);
-    const parentTabContainer = tabData && tab.openTabsAsChild ? tabData.tabContainer : undefined;
+    const parentTabContainer = findOpenTabsAsChildContainer(tabData);
     return windowOpenHadler(browser, details, parentTabContainer);
   });
 
