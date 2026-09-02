@@ -175,7 +175,7 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abConfig: {
-    get: (winId?: TWindowId) => Promise<IConfig>;
+    get: (params: { winId?: TWindowId; tabId?: TTabId }) => Promise<IConfig>;
     getConfigInfo: () => Promise<IConfigInfo>;
     openConfigFolder: () => Promise<void>;
     save: (config: IConfig) => Promise<IConfig>;

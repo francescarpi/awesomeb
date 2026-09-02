@@ -19,7 +19,7 @@ import '@thednp/color-picker/color-picker.css';
   });
 
   async function renderContent() {
-    const config = await abConfig.get();
+    const config = await abConfig.get({});
     const menuItem = settingsMenuItems.find((item) => item.hash.includes(window.location.hash));
     if (menuItem) {
       const { renderer, callback } = await menuItem.rendererFnc(config);
