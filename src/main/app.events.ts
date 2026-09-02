@@ -43,6 +43,11 @@ export function registerAppEvents(browser: Browser) {
   app.on('login', (event, webContents, _request, authInfo, callback) => {
     event.preventDefault();
 
+    if (!webContents) {
+      scopeLog.error('No webcontents found');
+      return;
+    }
+
     const result = browser.getTabByWebContentsId(webContents.id);
     if (!result) {
       scopeLog.warn(`Login event for unknown webContents id: ${webContents.id}`);
