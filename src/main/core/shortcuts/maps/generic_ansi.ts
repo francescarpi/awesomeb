@@ -3,11 +3,11 @@ import { t } from '~/i18n';
 
 export function getShortcuts(): IShortcutMap {
   return {
-    id: 'generic-iso',
-    name: 'Generic ISO',
+    id: 'generic-ansi',
+    name: 'Generic ANSI',
     shortcuts: {
       preferences: {
-        key: "Shift+CmdOrCtrl+'",
+        key: 'CmdOrCtrl+,',
         label: t('menu:app.preferences'),
         group: EShortcutGroup.General,
       },
@@ -87,12 +87,12 @@ export function getShortcuts(): IShortcutMap {
         group: EShortcutGroup.TabManagement,
       },
       moveTabUp: {
-        key: 'CmdOrCtrl+Alt+.',
+        key: 'CmdOrCtrl+Alt+]',
         label: t('menu:tabs.moveUp'),
         group: EShortcutGroup.TabManagement,
       },
       moveTabDown: {
-        key: 'CmdOrCtrl+Alt+,',
+        key: 'CmdOrCtrl+Alt+[',
         label: t('menu:tabs.moveDown'),
         group: EShortcutGroup.TabManagement,
       },
@@ -142,17 +142,17 @@ export function getShortcuts(): IShortcutMap {
         group: EShortcutGroup.TabNavigation,
       },
       previousTab: {
-        key: 'CmdOrCtrl+,',
+        key: 'CmdOrCtrl+]',
         label: t('menu:tabs.previous'),
         group: EShortcutGroup.TabNavigation,
       },
       nextTab: {
-        key: 'CmdOrCtrl+.',
+        key: 'CmdOrCtrl+[',
         label: t('menu:tabs.next'),
         group: EShortcutGroup.TabNavigation,
       },
       findTab: {
-        key: 'CmdOrCtrl+<',
+        key: 'CmdOrCtrl+.',
         label: t('menu:tabs.find'),
         group: EShortcutGroup.TabNavigation,
       },
@@ -242,12 +242,12 @@ export function getShortcuts(): IShortcutMap {
         group: EShortcutGroup.Desktops,
       },
       previousDesktop: {
-        key: 'Shift+CmdOrCtrl+,',
+        key: 'Shift+CmdOrCtrl+[',
         label: t('menu:desktops.previous'),
         group: EShortcutGroup.Desktops,
       },
       nextDesktop: {
-        key: 'Shift+CmdOrCtrl+.',
+        key: 'Shift+CmdOrCtrl+]',
         label: t('menu:desktops.next'),
         group: EShortcutGroup.Desktops,
       },

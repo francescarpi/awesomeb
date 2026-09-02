@@ -2,6 +2,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getMenuItems } from '../../scripts/i18n';
+import { getShortcutEntry } from '../../scripts/shortcuts';
+import { acceleratorToDisplay } from '../../../src/shared/utils/shortcuts';
 
 const { locale } = Astro.locals.starlightRoute;
 
@@ -37,11 +39,11 @@ interface Props {
   entity: string;
   menu?: string;
   command?: string;
-  macOS: string;
+  shortcut?: string;
   contextMenu?: string;
 }
 
-const { entity, menu, command, contextMenu } = Astro.props as Props;
+const { entity, menu, command, shortcut, contextMenu } = Astro.props as Props;
 
 const txtTitle = trans.titles[locale || 'root'] || trans.titles.root;
 const txtMenu = trans.menu[locale || 'root'] || trans.menu.groot;
@@ -62,6 +64,8 @@ if (command) {
     commandName = cmdData.name;
   }
 }
+
+const shortcutMaps = shortcut ? await getShortcutEntry(shortcut) : [];
 ---
 
 <div class="feature-access">
@@ -82,28 +86,36 @@ if (command) {
       )
     }
     {
+      shortcutMaps.length > 0 && (
+        <li>
+          <b>{txtShortcut}</b>:{' '}
+          {shortcutMaps.map((e, i) => (
+            <>
+              {i > 0 && ' · '}
+              {e.map}:{' '}
+              <span
+                class="shortcut-display"
+                data-mac={acceleratorToDisplay(e.shortcut, 'mac')}
+                data-win={acceleratorToDisplay(e.shortcut, 'win')}
+              >
+                {e.shortcut}
+              </span>
+            </>
+          ))}
+        </li>
+      )
+    }
+    {
       contextMenuItems.length > 0 && (
         <li>
           <b>{txtContextMenu}</b>: {contextMenuItems[0]}
         </li>
       )
     }
-    {
-      Astro.props.macOS && (
-        <li>
-          <b>{txtShortcut}</b>:
-          <ul class="feature-access-list">
-            <li>
-              macOS: <code dir="auto">{Astro.props.macOS}</code>
-            </li>
-          </ul>
-        </li>
-      )
-    }
   </ul>
 </div>
 
-<style>
+<style is:global>
   .feature-access {
     background-color: var(--sl-color-blue-low);
     padding: 1rem;
@@ -116,4 +128,23 @@ if (command) {
   .feature-access-list li {
     margin-top: 0;
   }
+
+  .shortcut-key {
+    display: inline;
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--sl-color-gray-6);
+    border-radius: 0.25rem;
+    border: none;
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLSpanElement>('span.shortcut-display').forEach((el) => {
+    const isMac = /mac/i.test(navigator.platform);
+    const display = isMac ? el.dataset.mac : el.dataset.win;
+    if (display) {
+      el.innerHTML = `<span class="shortcut-key">${display}</span>`;
+    }
+  });
+</script>
