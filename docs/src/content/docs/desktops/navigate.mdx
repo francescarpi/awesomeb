@@ -2,25 +2,28 @@
 title: Navigate
 ---
 
+import FeatureAccess from '../../../components/FeatureAccess.astro'
+
 To access a specific desktop, since they are numbered, you can do it with:
 
-* macOS: `Shift+Cmd+<index>`
+<FeatureAccess entity="access the first desktop" shortcut="selectDesktop1" />
+
+<FeatureAccess entity="access the second desktop" shortcut="selectDesktop2" />
+
+... and so on up to the last one.
 
 ## Previous/Next
 
 If you want to move between desktops:
 
-* macOS: `Shift+Cmd+[` or `Shift+Cmd+]`
+<FeatureAccess entity="previous desktop" shortcut="previousDesktop" command="previousDesktop" />
 
-You also have the following commands available:
-
-* Next Desktop
-* Previous Desktop
+<FeatureAccess entity="next desktop" shortcut="nextDesktop" command="nextDesktop" />
 
 ## Search for a desktop
 
 With the following key combination a modal appears with all desktops:
 
-* macOS: `Cmd+d`
+<FeatureAccess entity="search for a desktop" shortcut="findDesktop" />
 
 ![Search for a desktop](../../../assets/desktop-navigate.png)

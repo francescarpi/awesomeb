@@ -56,8 +56,11 @@ export function setupConfigIPC(browser: Browser) {
       }
 
       browser.toRenderer.refreshConfig();
+      browser.refreshMainMenu();
 
       notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+
+      return config.config;
     },
   );
 

@@ -1,6 +1,7 @@
 import type { IShortcut, IShortcutMap } from '~/types';
 import { config } from '@/core';
 import { getShortcutMaps } from './index';
+import { DEFAULT_SHORTCUTS_MAP } from '~/constants';
 
 export function getShortcut(id: string): IShortcut {
   const map = getDefaultMap();
@@ -12,7 +13,7 @@ export function getShortcut(id: string): IShortcut {
 }
 
 export function getDefaultMap(): IShortcutMap {
-  const id = config.get('shortcutMap') || 'generic-iso';
+  const id = config.get('shortcutMap') || DEFAULT_SHORTCUTS_MAP;
   const map = getShortcutMaps()[id];
   if (!map) {
     throw new Error(`Shortcut map with id "${id}" not found.`);
