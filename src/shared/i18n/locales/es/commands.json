@@ -282,5 +282,9 @@
   "zoomReset": {
     "name": "Restablecer zoom",
     "description": "Restablece el zoom predeterminado de la pestaña seleccionada"
+  },
+  "bookmarksManage": {
+    "name": "Gestionar marcadores",
+    "description": "Abre la página de gestión de marcadores"
   }
 }

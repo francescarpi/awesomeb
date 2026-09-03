@@ -282,5 +282,9 @@
   "zoomReset": {
     "name": "Zoom Reset",
     "description": "Reset default zoom of selected tab"
+  },
+  "bookmarksManage": {
+    "name": "Manage Bookmarks",
+    "description": "Open the bookmarks management page"
   }
 }
