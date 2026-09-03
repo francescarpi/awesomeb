@@ -145,6 +145,10 @@ async function fetchFaviconUsingNet(url: string): Promise<string> {
     request.on('response', (response) => {
       const contentType = (response.headers['content-type'] as string) || 'image/png';
 
+      if (['text/html'].includes(contentType)) {
+        reject();
+      }
+
       response.on('data', (chunk) => {
         chunks.push(chunk);
       });
