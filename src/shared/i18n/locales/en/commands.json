@@ -286,5 +286,9 @@
   "bookmarksManage": {
     "name": "Manage Bookmarks",
     "description": "Open the bookmarks management page"
+  },
+  "viewTabSource": {
+    "name": "View Page Source",
+    "description": "View the page source"
   }
 }

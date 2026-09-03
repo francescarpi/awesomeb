@@ -1,5 +1,5 @@
 import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo } from '~/types';
-import { Browser, Window, Desktop, Tab, TabContainer, notification } from '@/core';
+import { Browser, Window, Desktop, Tab, TabContainer, notification, isViewSourceUrl } from '@/core';
 import { t } from '~/i18n';
 import log from 'electron-log';
 import { refreshUrlBarOrTab } from './events.herlpers';
@@ -120,13 +120,19 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
-    tab.loadHistoryOrURL().then(() => {
+    const refreshIfSelected = () => {
       if (window.selectedTab?.tab.id === tab.id) {
         browser.toRenderer.refreshShowSplitMenu(window);
         browser.toRenderer.refreshTabNavigation(window, tab);
         browser.toRenderer.refreshURLBar(window, tab);
       }
-    });
+    };
+
+    if (isViewSourceUrl(tab.url)) {
+      tab.loadURL(tab.url!).then(refreshIfSelected);
+    }
+
+    tab.loadHistoryOrURL().then(refreshIfSelected);
   });
 
   //--------------------------------------------------------------------------------------

@@ -34,6 +34,14 @@ export function tabWebContentsMenu(
     actions.copyImageAddress({}),
     actions.saveImage({}),
     actions.separator(),
+    actions.learnSpelling(),
+    actions.separator(),
+    {
+      label: t('menu:contextWebContents.viewSource'),
+      click: () => {
+        browser.performCommand(tabData.window, 'view-tab-source', {});
+      },
+    },
     actions.inspect(),
   ];
 

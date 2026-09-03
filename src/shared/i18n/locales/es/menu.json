@@ -102,6 +102,7 @@
     "openInFollowingTab": "Abrir enlace en la siguiente pestaña",
     "openInBackgroundTab": "Abrir enlace en nueva pestaña en segundo plano",
     "openInSplitView": "Abrir enlace en vista dividida",
-    "openIn": "Abrir enlace en…"
+    "openIn": "Abrir enlace en…",
+    "viewSource": "Ver el código fuente de la página"
   }
 }
