@@ -117,6 +117,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               { class: c('flex', 'gap-1') },
               btnIcon(Edit, {
                 size: 4,
+                classNames: ['hover:bg-white!'],
                 onClick: async () => {
                   await editBookmark(child, async (result) => {
                     child.title = result.title;
@@ -130,6 +131,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               }),
               btnIcon(Move, {
                 size: 4,
+                classNames: ['hover:bg-white!'],
                 onClick: async () => {
                   const options = bookmarksToOptions(originalBookmarks, child.id, 1);
                   await dialogWithSelect(t['pages:bookmarks.selectNewParent'], options, {
@@ -150,6 +152,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               }),
               btnIcon(Delete, {
                 size: 4,
+                classNames: ['hover:bg-white!'],
                 onClick: async () => {
                   await dialogConfirm(t['pages:bookmarks.deleteConfirm'], {
                     onAccept: async () => {
