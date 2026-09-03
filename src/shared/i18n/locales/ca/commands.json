@@ -282,5 +282,9 @@
   "zoomReset": {
     "name": "Restableix el zoom",
     "description": "Restableix el zoom predeterminat de la pestanya seleccionada"
+  },
+  "bookmarksManage": {
+    "name": "Gestiona marcadors",
+    "description": "Obre la pàgina de gestió de marcadors"
   }
 }

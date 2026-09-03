@@ -132,7 +132,48 @@ cp docs/src/content/docs/overview.mdx docs/src/content/docs/fr/overview.mdx
 
 **All sidebar items at all nesting levels require translations.**
 
-### Step 5: Verify Documentation Build
+### Step 4: Update Sidebar Translations
+
+**File:** `docs/astro.config.mjs` — every sidebar item needs a `translations` entry for the new locale:
+
+```javascript
+{
+  label: 'Start here',
+  translations: { 'ca': 'Comença aquí', 'es': 'Empieza aquí', 'fr': 'Commencez ici' },
+  items: [
+    { label: 'Overview', translations: { 'ca': 'Visió general', 'es': 'Visión general', 'fr': 'Aperçu' }, slug: 'overview' },
+    // ... every item needs the new locale
+  ]
+}
+```
+
+**All sidebar items at all nesting levels require translations.**
+
+### Step 5: Update the `awesomeb-docs-check` Skill
+
+**File:** `.opencode/skills/awesomeb-docs-check/SKILL.md`
+
+The pre-commit docs check skill hardcodes the three locales in its **Three-Locale Requirement** table. If you add a new language and don't update it, the skill won't verify coverage for the new locale on future commits.
+
+1. Open `SKILL.md` and find the **Three-Locale Requirement** table:
+
+```markdown
+| Locale | Path |
+|---|---|
+| English (root) | `docs/src/content/docs/<page>` |
+| Spanish | `docs/src/content/docs/es/<page>` |
+| Catalan | `docs/src/content/docs/ca/<page>` |
+```
+
+2. Add a row for the new locale:
+
+```markdown
+| French | `docs/src/content/docs/fr/<page>` |
+```
+
+3. `allowed-tools` already includes everything needed; no other changes required.
+
+### Step 6: Verify Documentation Build
 
 ```bash
 cd docs
