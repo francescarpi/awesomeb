@@ -141,8 +141,8 @@ importers:
         specifier: 4.3.3
         version: 4.3.3
       tsc-alias:
-        specifier: 1.9.3
-        version: 1.9.3
+        specifier: 1.9.4
+        version: 1.9.4
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -3980,8 +3980,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  tsc-alias@1.9.3:
-    resolution: {integrity: sha512-GKrkA/K5hwae80rlfJRazukMMMIUsIHRyb75lbEp+qaUP57sYmur2Z05dosZNBspByX3ZrxbLHkMRgLfVuUcYg==}
+  tsc-alias@1.9.4:
+    resolution: {integrity: sha512-vfhh/N9xQ6oRgdAvuXVbhHSsNtbk+D4LFbJ9YrFPTTP9evGAvf2Xc3MQ7lTVmnJNN+FnuoKHn3524CKDzFYOag==}
     engines: {node: '>=16.20.2'}
     hasBin: true
 
@@ -8466,7 +8466,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  tsc-alias@1.9.3:
+  tsc-alias@1.9.4:
     dependencies:
       chokidar: 3.6.0
       commander: 9.5.0
