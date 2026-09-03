@@ -102,6 +102,7 @@
     "openInFollowingTab": "Open link in following tab",
     "openInBackgroundTab": "Open link in new background tab",
     "openInSplitView": "Open link in split view",
-    "openIn": "Open link in ..."
+    "openIn": "Open link in ...",
+    "viewSource": "View the page source"
   }
 }

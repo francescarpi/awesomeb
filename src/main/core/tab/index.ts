@@ -6,3 +6,4 @@ export { FindInPage } from './find-in-page';
 export { FailLoad } from './fail-load';
 export { TabPreview } from './tab-preview';
 export { Layouts, LAYOUT_SIZES } from './layouts';
+export * from './helpers';
