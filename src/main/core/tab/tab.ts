@@ -15,6 +15,7 @@ import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
 import { MARGIN, Sidebar, UIView, URLBar } from '@/ui';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
+import { isViewSourceUrl } from './helpers';
 
 const scopeLog = log.scope('Tab');
 
@@ -171,7 +172,7 @@ export class Tab extends UIView {
   }
 
   setTitle(title: string): boolean {
-    if (this._title === title) {
+    if (this._title === title || isViewSourceUrl(this.url)) {
       return false;
     }
 
@@ -199,7 +200,7 @@ export class Tab extends UIView {
   }
 
   setUrl(url: string) {
-    if (this._url === url || url === 'about:blank') {
+    if (this._url === url || url === 'about:blank' || isViewSourceUrl(this.url)) {
       return;
     }
 

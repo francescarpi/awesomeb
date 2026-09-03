@@ -286,5 +286,9 @@
   "bookmarksManage": {
     "name": "Gestiona marcadors",
     "description": "Obre la pàgina de gestió de marcadors"
+  },
+  "viewTabSource": {
+    "name": "Codi font de la pàgina",
+    "description": "Veure el codi font de la pàgina"
   }
 }

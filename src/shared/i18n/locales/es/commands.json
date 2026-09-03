@@ -286,5 +286,9 @@
   "bookmarksManage": {
     "name": "Gestionar marcadores",
     "description": "Abre la página de gestión de marcadores"
+  },
+  "viewTabSource": {
+    "name": "Ver código fuente de la página",
+    "description": "Ver el código fuente de la página"
   }
 }
