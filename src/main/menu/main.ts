@@ -613,10 +613,10 @@ async function bookmarksMenu(
         label: t('menu:bookmarks.manage'),
         icon: getIcon(EIcon.Bookmarks),
         enabled: !!window,
-        click: () => {
-          browser.openURL(`${INTERNAL_PROTOCOL}://bookmarks`, {
-            selectTab: true,
-          });
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'manage-bookmarks', {});
+          }
         },
       },
       {
