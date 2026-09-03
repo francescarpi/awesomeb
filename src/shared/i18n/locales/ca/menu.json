@@ -102,6 +102,7 @@
     "openInFollowingTab": "Obre l'enllaç en la següent pestanya",
     "openInBackgroundTab": "Obre l'enllaç en una pestanya nova en segon pla",
     "openInSplitView": "Obre l'enllaç en vista dividida",
-    "openIn": "Obre l'enllaç a…"
+    "openIn": "Obre l'enllaç a…",
+    "viewSource": "Veure el codi font de la pàgina"
   }
 }

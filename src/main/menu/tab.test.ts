@@ -115,6 +115,7 @@ describe('tabWebContentsMenu - Open link in split view availability', () => {
       copyImage: item,
       copyImageAddress: item,
       saveImage: item,
+      learnSpelling: item,
       inspect: item,
     } as unknown as Actions;
   }
