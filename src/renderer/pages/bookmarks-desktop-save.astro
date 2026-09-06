@@ -1,0 +1,196 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+---
+
+<Modal width="600px" height="500px">
+  <Title title="pages:bookmarksDesktopToBookmarks.title" />
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { Renderer, h, getSearchParams, type VNode, confirmButtons } from '#/scripts';
+  import type { ITabEntity } from '~/types';
+
+  const { winId } = getSearchParams();
+
+  const t = await abI18n.t({ winId }, [
+    { key: 'common:loading' },
+    { key: 'pages:bookmarksDesktopToBookmarks.intro' },
+    { key: 'pages:bookmarksDesktopToBookmarks.where' },
+    { key: 'pages:bookmarksDesktopToBookmarks.placeholder' },
+    { key: 'pages:bookmarksDesktopToBookmarks.close' },
+    { key: 'pages:bookmarks.root' },
+  ]);
+
+  const renderer = new Renderer(h('div', { class: 'text-sm' }, t['common:loading'])).render(
+    'content',
+  );
+
+  const allTabs = await abEntities.fetch<ITabEntity>(winId, 'tabs');
+  const desktops = await abEntities.fetch<ITabEntity>(winId, 'desktops');
+  const bookmarks = await abEntities.fetch<ITabEntity>(winId, 'bookmarks');
+  const desktop = desktops.find((d) => d.selected)!;
+  const tabs = allTabs.filter((t) => t.desktopId === parseInt(desktop.id));
+  const bookmarksFolders = bookmarks.reduce<string[]>(
+    (prev, curr) => {
+      if (!prev.includes(curr.extra as string)) {
+        prev.push(curr.extra as string);
+      }
+      return prev;
+    },
+    [t['pages:bookmarks.root']],
+  );
+
+  const [btns, registerBtnsEvents] = await confirmButtons({
+    winId,
+    confirmDisabled: true,
+    onConfirm: () => {
+      // const tabs = getSelectedTabs();
+      abModal.close(winId);
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+  });
+
+  renderer.update(
+    h(
+      'div',
+      { class: 'flex flex-col gap-3' },
+      h('p', {}, t['pages:bookmarksDesktopToBookmarks.intro']),
+      h(
+        'div',
+        { class: 'w-full bg-base-300 rounded-md p-4 h-[240px] overflow-y-auto' },
+        h(
+          'div',
+          { class: 'mb-3 flex flex-col gap-2' },
+          h(
+            'div',
+            {},
+            renderRow(`d-${desktop.id}`, desktop.label, function (this: HTMLInputElement) {
+              document
+                .querySelectorAll<HTMLInputElement>(`input[value^="${this.value}"]`)
+                .forEach((input) => (input.checked = this.checked));
+              checkConfirmButtonStatus();
+            }),
+          ),
+          h(
+            'div',
+            { class: 'ml-4 flex flex-col gap-2' },
+            ...tabs.map((tab) =>
+              renderRow(
+                `d-${tab.desktopId}-t-${tab.id}`,
+                tab.label,
+                function (this: HTMLInputElement) {
+                  const desktopId = this.value.split('-')[1];
+                  document.querySelector<HTMLInputElement>(
+                    `input[value="d-${desktopId}"]`,
+                  )!.checked = false;
+                  checkConfirmButtonStatus();
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+      h(
+        'div',
+        { class: 'flex flex-col gap-2' },
+        h('span', {}, t['pages:bookmarksDesktopToBookmarks.where']),
+        h(
+          'div',
+          { class: 'flex gap-2' },
+          h(
+            'select',
+            {
+              id: 'folders',
+              class: 'select select-sm',
+              value: undefined,
+              onchange: function (this: HTMLSelectElement) {
+                checkConfirmButtonStatus();
+              },
+            },
+            ...bookmarksFolders.map((folder) => h('option', {}, folder)),
+          ),
+          h(
+            'input',
+            {
+              id: 'new-folder-name',
+              class: 'input input-sm',
+              placeholder: t['pages:bookmarksDesktopToBookmarks.placeholder'],
+              autofocus: true,
+              onkeyup: () => {
+                checkConfirmButtonStatus();
+              },
+            },
+            '',
+          ),
+        ),
+      ),
+      h(
+        'div',
+        { class: 'flex justify-end' },
+        h(
+          'label',
+          { class: 'flex gap-2 items-center cursor-pointer text-sm' },
+          h(
+            'input',
+            {
+              type: 'checkbox',
+              class: 'checkbox checkbox-sm',
+              checked: false,
+              id: 'close-tabs',
+            },
+            '',
+          ),
+          t['pages:bookmarksDesktopToBookmarks.close'],
+        ),
+      ),
+      h('div', { class: 'flex gap-2 justify-end' }, ...btns),
+    ),
+    { onUpdated: registerBtnsEvents },
+  );
+
+  function renderRow(value: string, label: string, onClick?: () => void): VNode {
+    return h(
+      'label',
+      { class: 'flex gap-2 items-center cursor-pointer text-sm' },
+      h(
+        'input',
+        {
+          type: 'checkbox',
+          class: 'checkbox checkbox-sm',
+          checked: false,
+          value,
+          onClick,
+        },
+        '',
+      ),
+      label,
+    );
+  }
+
+  function getSelectedTabs(): number[] {
+    const pat = /^d-\d+-t-\d+$/;
+    return [...document.querySelectorAll<HTMLInputElement>('input:checked')]
+      .filter((el) => pat.test(el.value))
+      .map((el) => parseInt(el.value.split('-')[3]));
+  }
+
+  function getFolder(): { createFolder: boolean; parentFolder: string; newFolderName: string } {
+    const parentFolder = document.querySelector<HTMLSelectElement>('select#folders')!.value;
+    const createFolder = parentFolder.trim().length > 0;
+    const folderName = document.querySelector<HTMLInputElement>('input#new-collection-name')!.value;
+
+    return { createFolder, newFolderName: folderName, parentFolder };
+  }
+
+  function checkConfirmButtonStatus() {
+    // const tabs = getSelectedTabs();
+    // const collection = getFolder();
+    // const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
+    // const disabled = tabs.length === 0 || (collection.createCollection && !collection.value.trim());
+    // btn.disabled = disabled;
+  }
+</script>

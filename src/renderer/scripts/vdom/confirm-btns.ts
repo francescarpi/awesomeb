@@ -10,11 +10,15 @@ export async function confirmButtons({
   confirmText,
   onConfirm,
   onCancel,
+  confirmDisabled = false,
+  cancelDisabled = false,
 }: {
   winId: TWindowId;
   confirmText?: string;
   onConfirm: () => void;
   onCancel?: () => void;
+  confirmDisabled?: boolean;
+  cancelDisabled?: boolean;
 }): Promise<[VNode[], () => void]> {
   const t = await abI18n.t({ winId }, [{ key: 'ok' }, { key: 'cancel' }]);
   const confText = confirmText || t['ok'];
@@ -41,7 +45,7 @@ export async function confirmButtons({
 
   const cancel = h(
     'button',
-    { class: c('btn', 'btn-sm'), onclick: onCancel },
+    { class: c('btn', 'btn-sm'), onclick: onCancel, disabled: cancelDisabled, id: 'cancel' },
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
@@ -55,7 +59,12 @@ export async function confirmButtons({
 
   const ok = h(
     'button',
-    { class: c('btn', 'btn-sm', 'btn-primary'), onclick: onConfirm },
+    {
+      class: c('btn', 'btn-sm', 'btn-primary'),
+      onclick: onConfirm,
+      disabled: confirmDisabled,
+      id: 'confirm',
+    },
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },

@@ -386,5 +386,12 @@
   "tabContainers": {
     "collapsedTabs_one": "({{count}} pestanya col·lapsada)",
     "collapsedTabs_other": "({{count}} pestanyes col·lapsades)"
+  },
+  "bookmarksDesktopToBookmarks": {
+    "title": "Desa als marcadors",
+    "intro": "Selecciona les pestanyes que vols desar als marcadors",
+    "where": "Selecciona la carpeta pare:",
+    "placeholder": "Nom de la carpeta",
+    "close": "Tancar les pestanyes després de desar-les"
   }
 }

@@ -271,6 +271,7 @@ export class BrowserRenderer {
         suspended: item.tab.suspended,
         extra: `Desktop: ${item.desktop.label}`,
         isDimmed: item.tab.suspended,
+        desktopId: item.desktop.id,
       }));
   }
 
