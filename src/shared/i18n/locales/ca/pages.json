@@ -390,8 +390,9 @@
   "bookmarksDesktopToBookmarks": {
     "title": "Desa als marcadors",
     "intro": "Selecciona les pestanyes que vols desar als marcadors",
-    "where": "Selecciona la carpeta pare:",
-    "placeholder": "Nom de la carpeta",
-    "close": "Tancar les pestanyes després de desar-les"
+    "rootFolder": "Selecciona una carpeta pare:",
+    "createFolder": "Crear carpeta filla sota el pare seleccionat",
+    "folderName": "Nom de la carpeta",
+    "close": "Tanca les pestanyes després de desar-les"
   }
 }

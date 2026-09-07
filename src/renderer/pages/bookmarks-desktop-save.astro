@@ -3,7 +3,7 @@ import Modal from '#/layouts/Modal.astro';
 import Title from '#/components/common/Title.astro';
 ---
 
-<Modal width="600px" height="500px">
+<Modal width="600px" height="550px">
   <Title title="pages:bookmarksDesktopToBookmarks.title" />
   <div id="content"></div>
 </Modal>
@@ -17,8 +17,9 @@ import Title from '#/components/common/Title.astro';
   const t = await abI18n.t({ winId }, [
     { key: 'common:loading' },
     { key: 'pages:bookmarksDesktopToBookmarks.intro' },
-    { key: 'pages:bookmarksDesktopToBookmarks.where' },
-    { key: 'pages:bookmarksDesktopToBookmarks.placeholder' },
+    { key: 'pages:bookmarksDesktopToBookmarks.rootFolder' },
+    { key: 'pages:bookmarksDesktopToBookmarks.createFolder' },
+    { key: 'pages:bookmarksDesktopToBookmarks.folderName' },
     { key: 'pages:bookmarksDesktopToBookmarks.close' },
     { key: 'pages:bookmarks.root' },
   ]);
@@ -97,40 +98,64 @@ import Title from '#/components/common/Title.astro';
       h(
         'div',
         { class: 'flex flex-col gap-2' },
-        h('span', {}, t['pages:bookmarksDesktopToBookmarks.where']),
+        h('span', {}, t['pages:bookmarksDesktopToBookmarks.rootFolder']),
         h(
           'div',
           { class: 'flex gap-2' },
           h(
             'select',
             {
-              id: 'folders',
-              class: 'select select-sm',
+              id: 'parentFolder',
+              class: 'select select-sm w-full',
               value: undefined,
-              onchange: function (this: HTMLSelectElement) {
-                checkConfirmButtonStatus();
-              },
             },
             ...bookmarksFolders.map((folder) => h('option', {}, folder)),
-          ),
-          h(
-            'input',
-            {
-              id: 'new-folder-name',
-              class: 'input input-sm',
-              placeholder: t['pages:bookmarksDesktopToBookmarks.placeholder'],
-              autofocus: true,
-              onkeyup: () => {
-                checkConfirmButtonStatus();
-              },
-            },
-            '',
           ),
         ),
       ),
       h(
         'div',
-        { class: 'flex justify-end' },
+        { class: 'flex gap-2' },
+        h(
+          'label',
+          { class: 'flex gap-2 items-center cursor-pointer text-sm' },
+          h(
+            'input',
+            {
+              type: 'checkbox',
+              class: 'checkbox checkbox-sm',
+              checked: false,
+              id: 'create-folder',
+              onchange: function () {
+                const input = document.querySelector('input#child-folder')!;
+                if (this.checked) {
+                  input.classList.remove('invisible');
+                } else {
+                  input.classList.add('invisible');
+                }
+                checkConfirmButtonStatus();
+              },
+            },
+            '',
+          ),
+          t['pages:bookmarksDesktopToBookmarks.createFolder'],
+        ),
+        h(
+          'input',
+          {
+            id: 'child-folder',
+            class: 'input input-sm invisible',
+            placeholder: t['pages:bookmarksDesktopToBookmarks.folderName'],
+            onkeyup: () => {
+              checkConfirmButtonStatus();
+            },
+          },
+          '',
+        ),
+      ),
+      h(
+        'div',
+        {},
         h(
           'label',
           { class: 'flex gap-2 items-center cursor-pointer text-sm' },
@@ -178,19 +203,17 @@ import Title from '#/components/common/Title.astro';
       .map((el) => parseInt(el.value.split('-')[3]));
   }
 
-  function getFolder(): { createFolder: boolean; parentFolder: string; newFolderName: string } {
-    const parentFolder = document.querySelector<HTMLSelectElement>('select#folders')!.value;
-    const createFolder = parentFolder.trim().length > 0;
-    const folderName = document.querySelector<HTMLInputElement>('input#new-collection-name')!.value;
-
-    return { createFolder, newFolderName: folderName, parentFolder };
+  function getFolder(): { parentFolder: string; createChild: boolean; childName: string } {
+    const parentFolder = document.querySelector<HTMLSelectElement>('select#parentFolder')!.value;
+    const createChild = document.querySelector<HTMLInputElement>('input#create-folder')!.checked;
+    const childName = document.querySelector<HTMLInputElement>('input#child-folder')!.value.trim();
+    return { parentFolder, createChild, childName };
   }
 
   function checkConfirmButtonStatus() {
-    // const tabs = getSelectedTabs();
-    // const collection = getFolder();
-    // const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
-    // const disabled = tabs.length === 0 || (collection.createCollection && !collection.value.trim());
-    // btn.disabled = disabled;
+    const tabs = getSelectedTabs();
+    const folder = getFolder();
+    const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
+    btn.disabled = tabs.length === 0 || (folder.createChild && folder.childName.length === 0);
   }
 </script>

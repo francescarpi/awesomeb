@@ -14,5 +14,6 @@
   "cancel": "Cancelar",
   "save": "Guardar",
   "move": "Mover",
-  "delete": "Eliminar"
+  "delete": "Eliminar",
+  "loading": "Cargando..."
 }
