@@ -180,4 +180,81 @@ describe('Bookmarks', () => {
     expect(plainB).toBeDefined();
     expect(plainB?.path).toEqual(['Work']);
   });
+
+  test('add() creates folder when newFolder does not exist in destination', () => {
+    const bookmarks = new Bookmarks();
+    bookmarks.add('root', 'Site', 'https://site.com', 'My Folder');
+
+    expect(bookmarks.all.length).toBe(1);
+    const folder = bookmarks.all[0];
+    expect(folder.type).toBe('folder');
+    if (folder.type === 'folder') {
+      expect(folder.title).toBe('My Folder');
+      expect(folder.children.length).toBe(1);
+      expect(folder.children[0].type).toBe('url');
+    }
+  });
+
+  test('add() reuses existing folder (case-insensitive) instead of creating a duplicate', () => {
+    const bookmarks = new Bookmarks();
+    const existing = createTestFolderBookmark({ id: 'existing', title: 'Trabajo' });
+    bookmarks.update([existing]);
+
+    bookmarks.add('root', 'Site', 'https://site.com', 'trabajo');
+
+    expect(bookmarks.all.length).toBe(1);
+    const folder = bookmarks.find('existing');
+    expect(folder).not.toBeNull();
+    if (folder?.type === 'folder') {
+      expect(folder.title).toBe('Trabajo');
+      expect(folder.children.length).toBe(1);
+      expect(folder.children[0].type).toBe('url');
+    }
+  });
+
+  test('add() reuses exact-case match folder', () => {
+    const bookmarks = new Bookmarks();
+    const existing = createTestFolderBookmark({ id: 'f1', title: 'Sub' });
+    const parent = createTestFolderBookmark({ id: 'parent', children: [existing] });
+    bookmarks.update([parent]);
+
+    bookmarks.add('parent', 'Site', 'https://site.com', 'Sub');
+
+    const parentFolder = bookmarks.find('parent');
+    if (parentFolder?.type === 'folder') {
+      expect(parentFolder.children.length).toBe(1);
+      const sub = parentFolder.children[0];
+      expect(sub.type).toBe('folder');
+      if (sub.type === 'folder') {
+        expect(sub.title).toBe('Sub');
+        expect(sub.children.length).toBe(1);
+        expect(sub.children[0].type).toBe('url');
+      }
+    }
+  });
+
+  test('add() reuses existing folder inside non-root parent', () => {
+    const bookmarks = new Bookmarks();
+    const innerFolder = createTestFolderBookmark({ id: 'inner', title: 'Links' });
+    const parent = createTestFolderBookmark({ id: 'parent', children: [innerFolder] });
+    bookmarks.update([parent]);
+
+    bookmarks.add('parent', 'Site', 'https://site.com', 'links');
+
+    const parentFolder = bookmarks.find('parent');
+    if (parentFolder?.type === 'folder') {
+      expect(parentFolder.children.length).toBe(1);
+      if (parentFolder.children[0].type === 'folder') {
+        expect(parentFolder.children[0].title).toBe('Links');
+        expect(parentFolder.children[0].children.length).toBe(1);
+      }
+    }
+  });
+
+  test('add() returns false when parent folder does not exist', () => {
+    const bookmarks = new Bookmarks();
+    const result = bookmarks.add('nonexistent', 'Site', 'https://site.com', 'New Folder');
+    expect(result).toBe(true);
+    expect(bookmarks.all.length).toBe(0);
+  });
 });

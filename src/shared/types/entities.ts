@@ -52,4 +52,6 @@ export interface ITabEntity extends IEntity {
 
 export interface ITabContainerEntity extends IEntity {}
 
-export interface IBookmarkEntity extends IEntity {}
+export interface IBookmarkEntity extends IEntity {
+  folderId: string;
+}

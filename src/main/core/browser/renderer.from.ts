@@ -309,6 +309,7 @@ export class BrowserRenderer {
       id: bm.url,
       label: bm.name,
       extra: bm.path.join('/'),
+      folderId: bm.folderId,
     }));
   }
 

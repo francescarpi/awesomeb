@@ -10,7 +10,7 @@ import Title from '#/components/common/Title.astro';
 
 <script>
   import { Renderer, h, getSearchParams, type VNode, confirmButtons } from '#/scripts';
-  import type { ITabEntity } from '~/types';
+  import type { ITabEntity, IBookmarkEntity, TTabId } from '~/types';
 
   const { winId } = getSearchParams();
 
@@ -30,25 +30,28 @@ import Title from '#/components/common/Title.astro';
 
   const allTabs = await abEntities.fetch<ITabEntity>(winId, 'tabs');
   const desktops = await abEntities.fetch<ITabEntity>(winId, 'desktops');
-  const bookmarks = await abEntities.fetch<ITabEntity>(winId, 'bookmarks');
+  const bookmarks = await abEntities.fetch<IBookmarkEntity>(winId, 'bookmarks');
   const desktop = desktops.find((d) => d.selected)!;
   const tabs = allTabs.filter((t) => t.desktopId === parseInt(desktop.id));
-  const bookmarksFolders = bookmarks.reduce<string[]>(
+  const bookmarksFolders = bookmarks.reduce<{ path: string; id: string }[]>(
     (prev, curr) => {
-      if (!prev.includes(curr.extra as string)) {
-        prev.push(curr.extra as string);
+      if (!prev.find((i) => i.path === (curr.extra as string))) {
+        prev.push({ path: curr.extra as string, id: curr.folderId });
       }
       return prev;
     },
-    [t['pages:bookmarks.root']],
+    [{ path: t['pages:bookmarks.root'], id: 'root' }],
   );
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const [btns, registerBtnsEvents, setLoading] = await confirmButtons({
     winId,
     confirmDisabled: true,
-    onConfirm: () => {
-      // const tabs = getSelectedTabs();
-      abModal.close(winId);
+    onConfirm: async () => {
+      const tabs = getSelectedTabs();
+      const folder = getFolder();
+      setLoading(true);
+      console.log(tabs, folder);
+      // abModal.close(winId);
     },
     onCancel: () => {
       abModal.close(winId);
@@ -109,7 +112,7 @@ import Title from '#/components/common/Title.astro';
               class: 'select select-sm w-full',
               value: undefined,
             },
-            ...bookmarksFolders.map((folder) => h('option', {}, folder)),
+            ...bookmarksFolders.map((folder) => h('option', { value: folder.id }, folder.path)),
           ),
         ),
       ),
@@ -196,24 +199,34 @@ import Title from '#/components/common/Title.astro';
     );
   }
 
-  function getSelectedTabs(): number[] {
+  function getSelectedTabs(): { id: TTabId; url: string; title: string }[] {
     const pat = /^d-\d+-t-\d+$/;
     return [...document.querySelectorAll<HTMLInputElement>('input:checked')]
       .filter((el) => pat.test(el.value))
-      .map((el) => parseInt(el.value.split('-')[3]));
+      .map((el) => {
+        const tabId = el.value.split('-')[3];
+        const tab = allTabs.find((t) => t.id === tabId)!;
+        return {
+          id: parseInt(tabId),
+          title: tab.label,
+          url: tab.url as string,
+        };
+      });
   }
 
-  function getFolder(): { parentFolder: string; createChild: boolean; childName: string } {
-    const parentFolder = document.querySelector<HTMLSelectElement>('select#parentFolder')!.value;
+  function getFolder(): { parentFolderId: string; createChild: boolean; newFolderName: string } {
+    const parentFolderId = document.querySelector<HTMLSelectElement>('select#parentFolder')!.value;
     const createChild = document.querySelector<HTMLInputElement>('input#create-folder')!.checked;
-    const childName = document.querySelector<HTMLInputElement>('input#child-folder')!.value.trim();
-    return { parentFolder, createChild, childName };
+    const newFolderName = document
+      .querySelector<HTMLInputElement>('input#child-folder')!
+      .value.trim();
+    return { parentFolderId, createChild, newFolderName };
   }
 
   function checkConfirmButtonStatus() {
     const tabs = getSelectedTabs();
     const folder = getFolder();
     const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
-    btn.disabled = tabs.length === 0 || (folder.createChild && folder.childName.length === 0);
+    btn.disabled = tabs.length === 0 || (folder.createChild && folder.newFolderName.length === 0);
   }
 </script>
