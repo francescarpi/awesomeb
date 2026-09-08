@@ -12,7 +12,7 @@ import Title from '#/components/common/Title.astro';
   import { Renderer, h, getSearchParams, type VNode, confirmButtons } from '#/scripts';
   import type { ITabEntity, IBookmarkEntity, TTabId } from '~/types';
 
-  const { winId } = getSearchParams();
+  const { winId, searchParams } = getSearchParams();
 
   const t = await abI18n.t({ winId }, [
     { key: 'common:loading' },
@@ -29,10 +29,10 @@ import Title from '#/components/common/Title.astro';
   );
 
   const allTabs = await abEntities.fetch<ITabEntity>(winId, 'tabs');
-  const desktops = await abEntities.fetch<ITabEntity>(winId, 'desktops');
   const bookmarks = await abEntities.fetch<IBookmarkEntity>(winId, 'bookmarks');
-  const desktop = desktops.find((d) => d.selected)!;
-  const tabs = allTabs.filter((t) => t.desktopId === parseInt(desktop.id));
+  const desktopId = searchParams.get('desktopId') ?? '';
+  const desktopLabel = searchParams.get('desktopLabel') ?? '';
+  const tabs = desktopId ? allTabs.filter((t) => t.desktopId === parseInt(desktopId)) : [];
   const bookmarksFolders = bookmarks.reduce<{ path: string; id: string }[]>(
     (prev, curr) => {
       if (!prev.find((i) => i.path === (curr.extra as string))) {
@@ -89,7 +89,7 @@ import Title from '#/components/common/Title.astro';
           h(
             'div',
             {},
-            renderRow(`d-${desktop.id}`, desktop.label, function (this: HTMLInputElement) {
+            renderRow(`d-${desktopId}`, desktopLabel, function (this: HTMLInputElement) {
               document
                 .querySelectorAll<HTMLInputElement>(`input[value^="${this.value}"]`)
                 .forEach((input) => (input.checked = this.checked));

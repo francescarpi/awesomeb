@@ -65,6 +65,7 @@
   },
   "contextDesktop": {
     "suspendAllTabs": "Suspen totes les pestanyes",
+    "addTabsToBookmarks": "Desa les pestanyes de l'escriptori als marcadors",
     "rename": "Canvia el nom",
     "changeTheme": "Canvia el tema",
     "moveLeft": "Mou a l'esquerra",

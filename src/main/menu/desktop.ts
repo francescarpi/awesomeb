@@ -17,6 +17,17 @@ export function desktopMenu(browser: Browser, window: Window, desktop: Desktop):
     },
     { type: 'separator' },
     {
+      label: t('menu:contextDesktop.addTabsToBookmarks'),
+      enabled: desktop.hasTabs,
+      icon: getIcon(EIcon.Bookmarks),
+      click: () => {
+        window.modal.open('bookmarks-desktop-save', {
+          query: { desktopId: desktop.id.toString(), desktopLabel: desktop.label },
+        });
+      },
+    },
+    { type: 'separator' },
+    {
       label: t('menu:contextDesktop.rename'),
       icon: getIcon(EIcon.Edit),
       click: () => {
