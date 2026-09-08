@@ -52,7 +52,7 @@ export function input(
         autofocus: opts?.autofocus,
         onInput,
         onFocus,
-        class: c('text-base-content'),
+        class: 'text-base-content',
         type: opts?.type || 'text',
         required,
         maxLength: opts?.maxLength,

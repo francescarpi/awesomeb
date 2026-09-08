@@ -92,27 +92,27 @@ async function buildGeneralBody(
 ): Promise<VNode> {
   return h(
     'div',
-    { class: c('flex', 'flex-col', 'gap-2') },
+    { class: 'flex flex-col gap-2' },
     await renderConfigFolder(t),
     renderSearchEngines(engines, callbacks.onAdd, callbacks.onDelete, t),
     h(
       'div',
-      { class: c('flex', 'gap-2') },
+      { class: 'flex gap-2' },
       renderDownloadLocation(config, downloadLocation, callbacks.onSelectDownloadLocation, t),
       renderLocale(config, t),
     ),
     h(
       'div',
-      { class: c('flex', 'gap-2') },
+      { class: 'flex gap-2' },
       renderHistoryRetention(config, t),
       renderClosedTabsRetention(config, t),
     ),
     h(
       'div',
-      { class: c('flex', 'justify-end') },
+      { class: 'flex justify-end' },
       h(
         'button',
-        { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
+        { class: 'btn btn-sm btn-primary', onclick: callbacks.onSave },
         t['pages:settings.general.saveChanges'],
       ),
     ),
@@ -137,40 +137,40 @@ async function renderConfigFolder(t: Translations): Promise<VNode> {
     t['pages:settings.general.info.desc'],
     h(
       'div',
-      { class: c('text-md', 'flex', 'flex-col', 'gap-2') },
+      { class: 'text-md flex flex-col gap-2' },
       h(
         'div',
-        { class: c('flex', 'gap-2') },
+        { class: 'flex gap-2' },
         h('span', null, t['pages:settings.general.info.appVersion']),
-        h('span', { class: c('font-bold') }, info.version),
+        h('span', { class: 'font-bold' }, info.version),
       ),
       h(
         'div',
-        { class: c('flex', 'gap-2') },
+        { class: 'flex gap-2' },
         h('span', null, t['pages:settings.general.info.chromeVersion']),
-        h('span', { class: c('font-bold') }, info.chromeVersion),
+        h('span', { class: 'font-bold' }, info.chromeVersion),
       ),
       h(
         'div',
-        { class: c('flex', 'gap-2', 'items-center') },
+        { class: 'flex gap-2 items-center' },
         h('span', null, t['pages:settings.general.info.configFolder']),
-        h('span', { class: c('font-bold') }, info.configPath),
+        h('span', { class: 'font-bold' }, info.configPath),
         h(
           'button',
-          { class: c('btn', 'btn-xs'), onclick: () => abConfig.openConfigFolder() },
+          { class: 'btn btn-xs', onclick: () => abConfig.openConfigFolder() },
           t['pages:settings.general.info.openFolder'],
         ),
       ),
       info.repoUrl
         ? h(
             'div',
-            { class: c('flex', 'gap-2', 'items-center') },
+            { class: 'flex gap-2 items-center' },
             h('span', null, t['pages:settings.general.info.githubRepo']),
             h(
               'a',
               {
                 href: info.repoUrl,
-                class: c('font-bold', 'link', 'link-hover'),
+                class: 'font-bold link link-hover',
                 target: '_blank',
                 rel: 'noopener noreferrer',
               },
@@ -191,16 +191,16 @@ function renderSearchEngines(
 ): VNode {
   const engines = h(
     'table',
-    { class: c('table'), id: 'search-engines-table' },
+    { class: 'table', id: 'search-engines-table' },
     h(
       'thead',
       {},
       h(
         'tr',
         {},
-        h('th', { class: c('text-left', 'px-1') }, t['pages:settings.general.engines.name']),
-        h('th', { class: c('text-left', 'px-1') }, t['pages:settings.general.engines.url']),
-        h('th', { class: c('w-13') }, ''),
+        h('th', { class: 'text-left px-1' }, t['pages:settings.general.engines.name']),
+        h('th', { class: 'text-left px-1' }, t['pages:settings.general.engines.url']),
+        h('th', { class: 'w-13' }, ''),
       ),
     ),
     h(
@@ -214,24 +214,24 @@ function renderSearchEngines(
           },
           h(
             'td',
-            { class: c('p-0.5') },
+            { class: 'p-0.5' },
             h(
               'input',
               {
                 value: engine.label,
-                class: c('input', 'input-sm', 'w-full'),
+                class: 'input input-sm w-full',
               },
               '',
             ),
           ),
           h(
             'td',
-            { class: c('p-0.5') },
+            { class: 'p-0.5' },
             h(
               'input',
               {
                 value: engine.url,
-                class: c('input', 'input-sm', 'w-full'),
+                class: 'input input-sm w-full',
                 type: 'url',
               },
               '',
@@ -255,14 +255,14 @@ function renderSearchEngines(
     t['pages:settings.general.engines.desc'],
     h(
       'div',
-      { class: c('text-sm', 'flex', 'flex-col', 'gap-2') },
+      { class: 'text-sm flex flex-col gap-2' },
       engines,
       h(
         'div',
-        { class: c('flex', 'justify-between') },
+        { class: 'flex justify-between' },
         h(
           'button',
-          { class: c('btn', 'btn-sm', 'btn-outline'), onclick: handleAdd },
+          { class: 'btn btn-sm btn-outline', onclick: handleAdd },
           t['pages:settings.general.engines.add'],
         ),
       ),
@@ -282,7 +282,7 @@ function renderDownloadLocation(
     t['pages:settings.general.downloads.desc'],
     h(
       'div',
-      { class: c('flex', 'gap-2', 'items-center') },
+      { class: 'flex gap-2 items-center' },
       input(
         'downloads-location',
         t['pages:settings.general.downloads.location'],
@@ -294,7 +294,7 @@ function renderDownloadLocation(
       ),
       h(
         'button',
-        { class: c('btn', 'btn-sm', 'btn-primary'), onClick: handleChange },
+        { class: 'btn btn-sm btn-primary', onClick: handleChange },
         t['pages:settings.general.downloads.change'],
       ),
     ),
@@ -308,12 +308,12 @@ function renderLocale(config: IConfig, t: Translations): VNode {
     t['pages:settings.general.language.desc'],
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
+      { class: 'flex flex-col gap-2' },
       h(
         'select',
         {
           id: 'app-locale',
-          class: c('select', 'select-sm', 'select-bordered', 'w-32'),
+          class: 'select select-sm select-bordered w-32',
         },
         ...SUPPORTED_LOCALES.map((locale) =>
           h(
@@ -340,12 +340,12 @@ function renderHistoryRetention(config: IConfig, t: Translations): VNode {
     t['pages:settings.general.historyRetention.desc'],
     h(
       'div',
-      { class: c('flex', 'gap-2') },
+      { class: 'flex gap-2' },
       h(
         'select',
         {
           id: 'history-retention-days',
-          class: c('select', 'select-sm', 'select-bordered', 'w-32'),
+          class: 'select select-sm select-bordered w-32',
         },
         ...RETENTION_OPTIONS.map((days) =>
           h(
@@ -362,7 +362,7 @@ function renderHistoryRetention(config: IConfig, t: Translations): VNode {
         'a',
         {
           href: `${INTERNAL_PROTOCOL}://history/`,
-          class: c('btn', 'btn-sm', 'btn-ghost'),
+          class: 'btn btn-sm btn-ghost',
           target: '_blank',
         },
         t['pages:settings.general.historyRetention.manageHistory'],
@@ -380,12 +380,12 @@ function renderClosedTabsRetention(config: IConfig, t: Translations): VNode {
     t['pages:settings.general.closedTabsRetention.desc'],
     h(
       'div',
-      { class: c('flex', 'gap-2') },
+      { class: 'flex gap-2' },
       h(
         'select',
         {
           id: 'closed-tabs-retention-days',
-          class: c('select', 'select-sm', 'select-bordered', 'w-32'),
+          class: 'select select-sm select-bordered w-32',
         },
         ...RETENTION_OPTIONS.map((days) =>
           h(

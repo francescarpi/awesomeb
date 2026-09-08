@@ -5,7 +5,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 <ContextualModal width="w-[500px]" />
 
 <script>
-  import { getSearchParams, Renderer, c, h } from '#/scripts';
+  import { getSearchParams, Renderer, h } from '#/scripts';
 
   const { winId } = getSearchParams();
 
@@ -25,13 +25,13 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
         {},
         h(
           'div',
-          { class: c('flex', 'items-center', 'justify-between', 'mb-4') },
+          { class: 'flex items-center justify-between mb-4' },
           h('span', null, t['pages:appUpdater.current'], h('strong', null, ` ${data.current}`)),
           h('span', null, t['pages:appUpdater.new'], h('strong', null, ` ${data.version}`)),
           h(
             'button',
             {
-              class: c('btn', 'btn-primary', 'btn-sm'),
+              class: 'btn btn-primary btn-sm',
               onclick: () => {
                 abAppUpdater.download(winId);
               },
@@ -39,7 +39,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
             'Update now',
           ),
         ),
-        h('div', { class: c('h-90', 'overflow-y-auto'), innerHTML: data.releaseNotes }),
+        h('div', { class: 'h-90 overflow-y-auto', innerHTML: data.releaseNotes }),
       ),
     );
   } else {

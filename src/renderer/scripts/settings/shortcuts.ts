@@ -1,4 +1,4 @@
-import { h, Renderer, c } from '#/scripts';
+import { h, Renderer } from '#/scripts';
 import type { IConfig, IShortcut, TShortcutId, TShortcutMapId } from '~/types';
 import { acceleratorToDisplay, keyEventToAccelerator } from '~/utils/shortcuts';
 import { box } from './common';
@@ -130,7 +130,7 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
         h(
           'select',
           {
-            class: c('select', 'select-sm', 'w-40'),
+            class: 'select select-sm w-40',
             onchange: async (e) => {
               const newConfig = { ...config, shortcutMap: (e.target as HTMLSelectElement).value };
               const cfg = await abConfig.save(newConfig);
@@ -146,7 +146,7 @@ export async function renderShortcutsPage(config: IConfig): Promise<{
       box(
         t['pages:settings.shortcuts.list.title'],
         t['pages:settings.shortcuts.list.desc'],
-        h('div', { id: 'shortcuts-list', class: c('text-sm') }),
+        h('div', { id: 'shortcuts-list', class: 'text-sm' }),
       ),
     ),
   );
@@ -186,12 +186,12 @@ function updateShortcutsList(
   renderer.update(
     h(
       'div',
-      { class: c('columns-3') },
+      { class: 'columns-3' },
       ...sortedGroups.flatMap((groupKey) =>
         h(
           'div',
-          { class: c('mb-2', 'bg-base-content/5', 'p-2', 'rounded') },
-          h('span', { class: c('font-bold', 'text-base-content') }, groupKey),
+          { class: 'mb-2 bg-base-content/5 p-2 rounded' },
+          h('span', { class: 'font-bold text-base-content' }, groupKey),
           h(
             'div',
             {},
@@ -201,18 +201,18 @@ function updateShortcutsList(
               // Base column: label + capture button side by side
               const row = h(
                 'div',
-                { class: c('flex', 'items-center', 'justify-start', 'min-w-0') },
-                h('span', { title: sc.label, class: c('w-55', 'truncate', 'min-w-0') }, sc.label),
+                { class: 'flex items-center justify-start min-w-0' },
+                h('span', { title: sc.label, class: 'w-55 truncate min-w-0' }, sc.label),
                 isCapturing
                   ? h(
                       'span',
-                      { class: c('badge', 'badge-warning', 'w-36', 'py-3.5') },
+                      { class: 'badge badge-warning w-36 py-3.5' },
                       t['pages:settings.shortcuts.pressKey'],
                     )
                   : h(
                       'button',
                       {
-                        class: c('btn', 'btn-sm', 'btn-ghost', 'border', 'w-36'),
+                        class: 'btn btn-sm btn-ghost border w-36',
                         onclick: () => startCapture(id, renderer, shortcuts, t),
                       },
                       acceleratorToDisplay(sc.key),
@@ -222,21 +222,15 @@ function updateShortcutsList(
               return conflicting
                 ? h(
                     'div',
-                    { class: c('bg-error/20', 'rounded', 'px-2', 'pt-1', 'pb-2', 'mb-2', 'ml-4') },
+                    { class: 'bg-error/20 rounded px-2 pt-1 pb-2 mb-2 ml-4' },
                     row,
                     h(
                       'div',
-                      { class: c('flex', 'justify-start', 'mt-1') },
+                      { class: 'flex justify-start mt-1' },
                       h(
                         'span',
                         {
-                          class: c(
-                            'badge',
-                            'badge-error',
-                            'badge-sm',
-                            'text-left',
-                            'whitespace-normal',
-                          ),
+                          class: 'badge badge-error badge-sm text-left whitespace-normal',
                         },
                         t['pages:settings.shortcuts.conflictsWith'].replace(
                           '{{shortcuts}}',
@@ -245,11 +239,7 @@ function updateShortcutsList(
                       ),
                     ),
                   )
-                : h(
-                    'div',
-                    { class: c('flex', 'items-center', 'justify-start', 'mb-2', 'ml-4') },
-                    row,
-                  );
+                : h('div', { class: 'flex items-center justify-start mb-2 ml-4' }, row);
             }),
           ),
         ),
