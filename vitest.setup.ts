@@ -64,6 +64,7 @@ const mockElectron = vi.hoisted(() => {
       on: noopFn,
       once: noopFn,
       off: noopFn,
+      requestSingleInstanceLock: (): boolean => true,
       quit: noopFn,
       exit: noopFn,
       setAppUserModelId: noopFn,

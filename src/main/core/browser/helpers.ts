@@ -19,6 +19,7 @@ import {
 import log from 'electron-log';
 import { MAX_SPLIT_TABS } from '~/constants';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const scopeLog = log.scope('BrowserHelper');
 
@@ -67,6 +68,14 @@ export function isValidUrl(url: string): { valid: boolean; url: string } {
   } catch {
     return { valid: false, url };
   }
+}
+
+export function filePathToURL(filePath: string): string | null {
+  if (!filePath || filePath.trim() === '') {
+    return null;
+  }
+
+  return pathToFileURL(filePath.trim()).toString();
 }
 
 function computeJustAfterId(
