@@ -271,6 +271,8 @@ export class BrowserRenderer {
         suspended: item.tab.suspended,
         extra: `Desktop: ${item.desktop.label}`,
         isDimmed: item.tab.suspended,
+        desktopId: item.desktop.id,
+        windowId: window.id,
       }));
   }
 
@@ -308,6 +310,7 @@ export class BrowserRenderer {
       id: bm.url,
       label: bm.name,
       extra: bm.path.join('/'),
+      folderId: bm.folderId,
     }));
   }
 

@@ -76,6 +76,7 @@ import * as tabContainerToggleCollapseChildren from './tabcontainer-toggle-colla
 import * as appCopyVersion from './app-copy-version';
 import * as bookmakrsManage from './bookmarks-manage';
 import * as tabViewSource from './tab-view-source';
+import * as bookmarksAddDesktop from './bookmarks-add-desktop';
 
 const COMMANDS = {
   [windowMinimize.TRIGGER]: windowMinimize.Command,
@@ -151,6 +152,7 @@ const COMMANDS = {
   [appCopyVersion.TRIGGER]: appCopyVersion.Command,
   [bookmakrsManage.TRIGGER]: bookmakrsManage.Command,
   [tabViewSource.TRIGGER]: tabViewSource.Command,
+  [bookmarksAddDesktop.TRIGGER]: bookmarksAddDesktop.Command,
 };
 
 export type TCommandTrigger = keyof typeof COMMANDS;

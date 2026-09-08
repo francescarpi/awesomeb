@@ -28,7 +28,7 @@ import Title from '#/components/common/Title.astro';
 
   const [btns, registerBtnsEvents] = await confirmButtons({
     winId,
-    onConfirm: () => {
+    onConfirm: async () => {
       const folderNameInput = document.getElementById('folder-name') as HTMLInputElement;
       const titleInput = document.getElementById('title') as HTMLInputElement;
       const urlInput = document.getElementById('url') as HTMLInputElement;
@@ -36,15 +36,24 @@ import Title from '#/components/common/Title.astro';
       const titleValue = titleInput.value.trim();
       const urlValue = urlInput.value.trim();
 
+      let added = false;
       if (createFolder) {
         const folderNameValue = folderNameInput.value.trim();
         if (titleValue && urlValue && folderNameValue) {
-          abBookmarks.add(winId, parentId, titleValue, urlValue, folderNameValue);
+          await abBookmarks.add(winId, parentId, folderNameValue, [
+            { title: titleValue, url: urlValue },
+          ]);
+          added = true;
         }
       } else {
         if (titleValue && urlValue) {
-          abBookmarks.add(winId, parentId, titleValue, urlValue, null);
+          await abBookmarks.add(winId, parentId, null, [{ title: titleValue, url: urlValue }]);
+          added = true;
         }
+      }
+
+      if (added) {
+        abModal.close(winId);
       }
     },
     onCancel: () => {

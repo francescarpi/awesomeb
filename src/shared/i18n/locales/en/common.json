@@ -14,5 +14,6 @@
   "cancel": "Cancel",
   "save": "Save",
   "move": "Move",
-  "delete": "Delete"
+  "delete": "Delete",
+  "loading": "Loading..."
 }

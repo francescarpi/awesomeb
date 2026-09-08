@@ -290,5 +290,9 @@
   "viewTabSource": {
     "name": "Ver código fuente de la página",
     "description": "Ver el código fuente de la página"
+  },
+  "bookmarksAddDesktop": {
+    "name": "Guardar pestañas del escritorio",
+    "description": "Guarda las pestañas del escritorio en marcadores"
   }
 }

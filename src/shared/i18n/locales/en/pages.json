@@ -386,5 +386,13 @@
   "tabContainers": {
     "collapsedTabs_one": "({{count}} tab collapsed)",
     "collapsedTabs_other": "({{count}} tabs collapsed)"
+  },
+  "bookmarksDesktopToBookmarks": {
+    "title": "Save to bookmarks",
+    "intro": "Select the tabs you want to save to bookmarks",
+    "rootFolder": "Select a parent folder:",
+    "createFolder": "Create child folder under the selected parent",
+    "folderName": "Folder name",
+    "close": "Close the tabs after saving them"
   }
 }
