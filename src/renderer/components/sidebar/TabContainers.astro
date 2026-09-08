@@ -43,7 +43,7 @@
     return h(
       'div', // Container
       {
-        class: c('flex', 'flex-col', 'gap-1.5', 'select-none'),
+        class: 'flex flex-col gap-1.5 select-none',
         style: 'app-region: no-drag;',
       },
       ...(await Promise.all(
@@ -67,12 +67,12 @@
             h(
               'div',
               {
-                class: c('items-center', 'gap-1', 'flex'),
+                class: 'items-center gap-1 flex',
               },
               h(
                 'span', // Tab container shortcut (is a number between 1 and 9)
                 {
-                  class: c('text-xs', 'pl-1', 'text-white/20', 'hidden', 'sidebar:block', 'w-1.5'),
+                  class: 'text-xs pl-1 text-white/20 hidden sidebar:block w-1.5',
                 },
                 tc.shortcut?.toString(),
               ),
@@ -177,16 +177,16 @@
       h(
         'div', // Title + indicators container
         {
-          class: c('hidden', 'sidebar:flex', 'flex-col', 'min-w-0'),
+          class: 'hidden sidebar:flex flex-col min-w-0',
         },
         h(
           'span', // Title
-          { class: c('text-sm', 'overflow-hidden', 'text-ellipsis', 'text-nowrap') },
+          { class: 'text-sm overflow-hidden text-ellipsis text-nowrap' },
           t.title,
         ),
         h(
           'div', // Indicators container
-          { class: c('flex', 'gap-1') },
+          { class: 'flex gap-1' },
           highlightIcon(TabPreview, t.hasTabPreview, 'text-white'),
           highlightIcon(Muted, t.isMuted, 'text-white'),
           highlightIcon(Warning, t.requireAttention, 'text-red-500'),
@@ -194,17 +194,11 @@
       ),
       h(
         'div', // Partition and actions container
-        { class: c('hidden', 'sidebar:flex', 'justify-end') },
+        { class: 'hidden sidebar:flex justify-end' },
         h(
           'div', // Partition/Profile color
           {
-            class: c(
-              'w-1',
-              'h-5',
-              'mr-1',
-              'group-hover/suspended:hidden',
-              'group-hover/active:hidden',
-            ),
+            class: 'w-1 h-5 mr-1 group-hover/suspended:hidden group-hover/active:hidden',
             style: { backgroundColor: t.partition.color },
           },
           '',

@@ -1,4 +1,4 @@
-import { h, Renderer, type VNode, c, btnIcon } from '#/scripts';
+import { h, Renderer, type VNode, btnIcon } from '#/scripts';
 import type { IConfig, IConfigPartition } from '~/types';
 import { box, inputColorPicker } from './common';
 import Delete from '#/icons/delete.svg?raw';
@@ -52,29 +52,25 @@ function buildGeneralBody(
 ): VNode {
   return h(
     'div',
-    { class: c('flex', 'flex-col', 'gap-2') },
+    { class: 'flex flex-col gap-2' },
     box(
       t['pages:settings.profiles.title'],
       t['pages:settings.profiles.desc'],
       h(
         'div',
-        { class: c('flex', 'flex-col', 'gap-2') },
+        { class: 'flex flex-col gap-2' },
         h(
           'table',
-          { class: c('table'), id: 'partitions-table' },
+          { class: 'table', id: 'partitions-table' },
           h(
             'thead',
             {},
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.profiles.name']),
-              h(
-                'th',
-                { class: c('text-left', 'px-1', 'w-25') },
-                t['pages:settings.profiles.color'],
-              ),
-              h('th', { class: c('w-13') }, ''),
+              h('th', { class: 'text-left px-1' }, t['pages:settings.profiles.name']),
+              h('th', { class: 'text-left px-1 w-25' }, t['pages:settings.profiles.color']),
+              h('th', { class: 'w-13' }, ''),
             ),
           ),
           h(
@@ -86,17 +82,17 @@ function buildGeneralBody(
                 {},
                 h(
                   'td',
-                  { class: c('p-0.5') },
+                  { class: 'p-0.5' },
                   h(
                     'input',
                     {
                       value: partition.name,
-                      class: c('input', 'input-sm', 'w-full'),
+                      class: 'input input-sm w-full',
                     },
                     '',
                   ),
                 ),
-                h('td', { class: c('px-1') }, inputColorPicker(partition.color)),
+                h('td', { class: 'px-1' }, inputColorPicker(partition.color)),
                 h(
                   'td',
                   {},
@@ -111,10 +107,10 @@ function buildGeneralBody(
         ),
         h(
           'div',
-          { class: c('flex', 'justify-between') },
+          { class: 'flex justify-between' },
           h(
             'button',
-            { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
+            { class: 'btn btn-sm btn-outline', onclick: callbacks.onAdd },
             t['pages:settings.profiles.add'],
           ),
         ),
@@ -122,11 +118,11 @@ function buildGeneralBody(
     ),
     h(
       'div',
-      { class: c('flex', 'justify-between') },
+      { class: 'flex justify-between' },
       h('p', {}, t['pages:settings.profiles.restartNote']),
       h(
         'button',
-        { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
+        { class: 'btn btn-sm btn-primary', onclick: callbacks.onSave },
         t['pages:settings.profiles.saveChanges'],
       ),
     ),

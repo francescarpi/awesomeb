@@ -52,7 +52,7 @@ const { isPage = false } = Astro.props;
                 { class: c('grid', gridCols, 'gap-2', 'text-xs', 'opacity-50', 'mb-1', 'px-1') },
                 h('span', null, t['pages:downloads.name']),
                 h('span', null, t['pages:downloads.date']),
-                h('span', { class: c('text-right') }, '%'),
+                h('span', { class: 'text-right' }, '%'),
                 h('span', null),
               ),
             ]
@@ -86,8 +86,8 @@ const { isPage = false } = Astro.props;
               inProgress
                 ? h(
                     'div',
-                    { class: c('flex', 'items-center', 'gap-1', 'justify-end') },
-                    h('span', { class: c('loading', 'loading-spinner', 'loading-xs') }),
+                    { class: 'flex items-center gap-1 justify-end' },
+                    h('span', { class: 'loading loading-spinner loading-xs' }),
                     `${item.progress}%`,
                   )
                 : h('div', { class: c('text-right', paused && 'opacity-30') }, `${item.progress}%`),
@@ -100,13 +100,13 @@ const { isPage = false } = Astro.props;
       ),
       h(
         'div',
-        { class: c('mt-4', 'flex', 'gap-2') },
+        { class: 'mt-4 flex gap-2' },
         ...(!isPage
           ? [
               h(
                 'button',
                 {
-                  class: c('btn', 'btn-sm', 'btn-outline'),
+                  class: 'btn btn-sm btn-outline',
                   onclick: () => abDownloads.openPage(winId),
                 },
                 t['pages:downloads.viewAll'],
@@ -133,7 +133,7 @@ const { isPage = false } = Astro.props;
       case EDownloadStatus.InProgress:
         return h(
           'div',
-          { class: c('flex', 'gap-1', 'items-center') },
+          { class: 'flex gap-1 items-center' },
           btnIcon(Pause, {
             classNames: ['text-warning', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'pause', winId),
@@ -151,7 +151,7 @@ const { isPage = false } = Astro.props;
       case EDownloadStatus.Paused:
         return h(
           'div',
-          { class: c('flex', 'gap-1') },
+          { class: 'flex gap-1' },
           btnIcon(Resume, {
             classNames: ['text-base-content', 'w-5', 'h-5'],
             onClick: () => abDownloads.action(item.savePath, 'resume', winId),

@@ -24,7 +24,7 @@
   function renderDesktops(desktops: IDesktop[]): VNode {
     return h(
       'div',
-      { class: c('grid', 'grid-cols-1', 'sidebar:grid-cols-5', 'items-center', 'gap-2') },
+      { class: 'grid grid-cols-1 sidebar:grid-cols-5 items-center gap-2' },
       ...desktops.map((desktop) =>
         h(
           'div',

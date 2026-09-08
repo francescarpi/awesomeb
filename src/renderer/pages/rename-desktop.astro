@@ -9,7 +9,7 @@ import Title from '#/components/common/Title.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, c, input, getSearchParams, confirmButtons } from '#/scripts';
+  import { Renderer, h, input, getSearchParams, confirmButtons } from '#/scripts';
   import { IDesktopEntity } from '~/types';
 
   const { winId, searchParams } = getSearchParams();
@@ -44,14 +44,14 @@ import Title from '#/components/common/Title.astro';
   new Renderer(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
+      { class: 'flex flex-col gap-2' },
       input('shortName', t['pages:renameDesktop.shortName'], selectedDesktop.shortName || '', {
         maxLength: 4,
       }),
       input('longName', t['pages:renameDesktop.longName'], selectedDesktop.longName || '', {
         maxLength: 30,
       }),
-      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+      h('div', { class: 'flex justify-end gap-2 mt-4' }, ...btns),
     ),
   ).render('content', {
     onRendered: () => {

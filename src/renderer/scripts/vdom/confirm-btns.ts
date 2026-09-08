@@ -1,7 +1,6 @@
 import type { VNode } from './types';
 import type { TWindowId } from '~/types';
 import { h } from './vdom';
-import { c } from './classnames';
 import enter from '#/icons/return.svg?raw';
 import esc from '#/icons/escape.svg?raw';
 
@@ -45,13 +44,13 @@ export async function confirmButtons({
 
   const cancel = h(
     'button',
-    { class: c('btn', 'btn-sm'), onclick: onCancel, disabled: cancelDisabled, id: 'cancel' },
+    { class: 'btn btn-sm', onclick: onCancel, disabled: cancelDisabled, id: 'cancel' },
     h(
       'div',
-      { class: c('flex', 'gap-1', 'items-center') },
+      { class: 'flex gap-1 items-center' },
       cancelText,
       h('div', {
-        class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
+        class: 'icon [&>svg]:w-full [&>svg]:h-full w-4 h-4',
         innerHTML: esc,
       }),
     ),
@@ -60,18 +59,18 @@ export async function confirmButtons({
   const ok = h(
     'button',
     {
-      class: c('btn', 'btn-sm', 'btn-primary'),
+      class: 'btn btn-sm btn-primary',
       onclick: onConfirm,
       disabled: confirmDisabled,
       id: 'confirm',
     },
     h(
       'div',
-      { class: c('flex', 'gap-1', 'items-center') },
+      { class: 'flex gap-1 items-center' },
       h('span', { class: 'loading loading-xs hidden' }, ''),
       confText,
       h('div', {
-        class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
+        class: 'icon [&>svg]:w-full [&>svg]:h-full w-4 h-4',
         innerHTML: enter,
       }),
     ),

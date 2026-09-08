@@ -60,13 +60,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     renderer.update(
       h(
         'div',
-        { class: c('grid', 'grid-cols-[290px_2fr]', 'gap-2', 'h-full') },
-        h(
-          'div',
-          { class: c('bg-white/40', 'p-2', 'rounded') },
-          ...renderFolders(filterFolders(bookmarks)),
-        ),
-        h('div', { class: c('min-w-0') }, renderContent()),
+        { class: 'grid grid-cols-[290px_2fr] gap-2 h-full' },
+        h('div', { class: 'bg-white/40 p-2 rounded' }, ...renderFolders(filterFolders(bookmarks))),
+        h('div', { class: 'min-w-0' }, renderContent()),
       ),
     );
   }
@@ -75,7 +71,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     if (!state.folderSelected || state.folderSelected.children.length === 0) {
       return h(
         'div',
-        { class: c('mx-auto', 'flex', 'flex-col', 'gap-2', 'bg-white/40', 'rounded', 'p-2') },
+        { class: 'mx-auto flex flex-col gap-2 bg-white/40 rounded p-2' },
         t['pages:bookmarks.noBookmarks'],
       );
     }
@@ -83,28 +79,18 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     return h(
       'div',
       {
-        class: c(
-          'mx-auto',
-          'w-full',
-          'min-w-0',
-          'flex',
-          'flex-col',
-          'gap-2',
-          'bg-white/40',
-          'rounded',
-          'p-2',
-        ),
+        class: 'mx-auto w-full min-w-0 flex flex-col gap-2 bg-white/40 rounded p-2',
       },
       ...state.folderSelected.children.map((child: IBookmark) =>
         h(
           'div',
-          { class: c('flex', 'flex-col', 'w-full', 'min-w-0') },
+          { class: 'flex flex-col w-full min-w-0' },
           h(
             'div',
-            { class: c('flex', 'gap-2', 'items-center', 'justify-between') },
+            { class: 'flex gap-2 items-center justify-between' },
             h(
               'div',
-              { class: c('flex', 'items-center', 'gap-2') },
+              { class: 'flex items-center gap-2' },
               h(
                 'div',
                 {},
@@ -114,7 +100,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             ),
             h(
               'div',
-              { class: c('flex', 'gap-1') },
+              { class: 'flex gap-1' },
               btnIcon(Edit, {
                 size: 4,
                 classNames: ['hover:bg-white!'],
@@ -168,16 +154,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           h(
             'a',
             {
-              class: c(
-                'block',
-                'w-full',
-                'ml-6.5',
-                'opacity-50',
-                'truncate',
-                'cursor-pointer',
-                'text-sm',
-                'pr-16',
-              ),
+              class: 'block w-full ml-6.5 opacity-50 truncate cursor-pointer text-sm pr-16',
               title: child.url,
               onclick: () => {
                 abBookmarks.open(child.id);

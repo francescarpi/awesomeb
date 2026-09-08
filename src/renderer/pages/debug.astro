@@ -10,7 +10,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 </BlackBgWithTitle>
 
 <script>
-  import { Renderer, h, c, type VNode, bool, radioBtn } from '#/scripts';
+  import { Renderer, h, type VNode, bool, radioBtn } from '#/scripts';
   import type { IDebugWebContent, IDebugTabIndex } from '~/types';
 
   const t = await abI18n.t({}, [
@@ -126,7 +126,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
   function renderWCs(): VNode {
     if (state.error) {
-      return h('div', { class: c('p-4', 'text-error') }, `Error: ${state.error}`);
+      return h('div', { class: 'p-4 text-error' }, `Error: ${state.error}`);
     }
 
     let displayWcs = [...state.rawWcs];
@@ -158,26 +158,26 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     return h(
       'div',
       null,
-      h('p', { class: c('text-sm', 'mb-4') }, t['pages:debug.wcTitle']),
+      h('p', { class: 'text-sm mb-4' }, t['pages:debug.wcTitle']),
       h(
         'div',
         {
-          class: c('mb-2', 'px-1', 'flex', 'justify-between', 'items-center', 'gap-2', 'flex-wrap'),
+          class: 'mb-2 px-1 flex justify-between items-center gap-2 flex-wrap',
         },
         h(
           'div',
-          { class: c('flex', 'gap-2') },
-          h('div', { id: 'select-placeholder', class: c('w-40') }),
+          { class: 'flex gap-2' },
+          h('div', { id: 'select-placeholder', class: 'w-40' }),
           h('input', {
             type: 'text',
             placeholder: t['pages:debug.searchTitleURL'],
-            class: c('input', 'input-sm', 'w-80'),
+            class: 'input input-sm w-80',
             oninput: onSearchInput,
           }),
         ),
         h(
           'div',
-          { class: c('flex', 'items-center', 'gap-2') },
+          { class: 'flex items-center gap-2' },
           radioBtn(
             'performance',
             'none',
@@ -205,32 +205,28 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
       h(
         'div',
-        { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
+        { class: 'border rounded border-base-content/30 overflow-x-auto w-full' },
         h(
           'table',
-          { class: c('table', 'table-sm') },
+          { class: 'table table-sm' },
           h(
             'thead',
             null,
             h(
               'tr',
               null,
-              h('th', { class: c('w-10', 'font-mono') }, t['pages:debug.wcTableColumns.win']),
-              h('th', { class: c('w-16', 'font-mono') }, t['pages:debug.wcTableColumns.pid']),
+              h('th', { class: 'w-10 font-mono' }, t['pages:debug.wcTableColumns.win']),
+              h('th', { class: 'w-16 font-mono' }, t['pages:debug.wcTableColumns.pid']),
               h('th', null, t['pages:debug.wcTableColumns.title']),
-              h('th', { class: c('text-center', 'w-20') }, t['pages:debug.wcTableColumns.visible']),
-              h('th', { class: c('text-left', 'w-40') }, t['pages:debug.wcTableColumns.profile']),
-              h('th', { class: c('text-left', 'w-48') }, t['pages:debug.wcTableColumns.preloads']),
+              h('th', { class: 'text-center w-20' }, t['pages:debug.wcTableColumns.visible']),
+              h('th', { class: 'text-left w-40' }, t['pages:debug.wcTableColumns.profile']),
+              h('th', { class: 'text-left w-48' }, t['pages:debug.wcTableColumns.preloads']),
               h(
                 'th',
-                { class: c('text-right', 'w-24', 'font-mono') },
+                { class: 'text-right w-24 font-mono' },
                 t['pages:debug.wcTableColumns.memory'],
               ),
-              h(
-                'th',
-                { class: c('text-right', 'w-24', 'font-mono') },
-                t['pages:debug.wcTableColumns.cpu'],
-              ),
+              h('th', { class: 'text-right w-24 font-mono' }, t['pages:debug.wcTableColumns.cpu']),
             ),
           ),
           h(
@@ -240,15 +236,15 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               h(
                 'tr',
                 null,
-                h('td', { class: c('text-center', 'font-mono') }, view.winId),
-                h('td', { class: c('font-mono') }, view.pid),
+                h('td', { class: 'text-center font-mono' }, view.winId),
+                h('td', { class: 'font-mono' }, view.pid),
                 h(
                   'td',
                   null,
                   h(
                     'div',
                     {
-                      class: c('max-w-md', 'truncate'),
+                      class: 'max-w-md truncate',
                       title: `${view.title}\n${view.url}`,
                     },
                     view.title || view.url,
@@ -257,11 +253,11 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h('td', { align: 'center' }, bool(view.visible, { colorized: true })),
                 h(
                   'td',
-                  { class: c('text-left') },
+                  { class: 'text-left' },
                   `${view.partition.name} (${view.partition.persistent ? 'disk' : 'memory'})`,
                 ),
                 h('td', {
-                  class: c('text-left', 'truncate', 'max-w-xs'),
+                  class: 'text-left truncate max-w-xs',
                   innerHTML:
                     view.preloads
                       .map((p) => `${p.filePath.split(/[\\\\\\/]/).pop()} (${p.type})`)
@@ -270,7 +266,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h(
                   'td',
                   {
-                    class: c('text-right', 'font-mono'),
+                    class: 'text-right font-mono',
                     title: `Raw: ${view.memoryValue}`,
                   },
                   view.memory,
@@ -278,7 +274,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 h(
                   'td',
                   {
-                    class: c('text-right', 'font-mono', 'whitespace-nowrap'),
+                    class: 'text-right font-mono whitespace-nowrap',
                     title: `Raw: ${view.cpuValue}`,
                   },
                   view.cpu,
@@ -299,7 +295,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   const placeholder = document.getElementById('select-placeholder');
   if (placeholder) {
     staticSelect = document.createElement('select');
-    staticSelect.className = c('select', 'select-sm', 'w-40');
+    staticSelect.className = 'select select-sm w-40';
     staticSelect.addEventListener('change', onFilterChange);
 
     const defaultOpt = document.createElement('option');
@@ -345,14 +341,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   function renderTabIndex(): VNode {
     return h(
       'div',
-      { class: c('mt-3') },
-      h('p', { class: c('text-sm', 'mb-2') }, t['pages:debug.tiTitle']),
+      { class: 'mt-3' },
+      h('p', { class: 'text-sm mb-2' }, t['pages:debug.tiTitle']),
       h(
         'div',
-        { class: c('border', 'rounded', 'border-base-content/30', 'overflow-x-auto', 'w-full') },
+        { class: 'border rounded border-base-content/30 overflow-x-auto w-full' },
         h(
           'table',
-          { class: c('table', 'table-sm') },
+          { class: 'table table-sm' },
           h(
             'thead',
             null,

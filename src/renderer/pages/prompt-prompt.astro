@@ -7,7 +7,7 @@ import Modal from '#/layouts/Modal.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, c, getSearchParams, confirmButtons, input } from '#/scripts';
+  import { Renderer, h, getSearchParams, confirmButtons, input } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
 
@@ -33,15 +33,15 @@ import Modal from '#/layouts/Modal.astro';
   new Renderer(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: c('text-lg') }, t['pages:prompt.message']),
+      { class: 'flex flex-col gap-3' },
+      h('h1', { class: 'text-lg' }, t['pages:prompt.message']),
       h(
         'fieldset',
-        { class: c('fieldset', 'mb-6') },
-        h('legend', { class: c('fieldset-legend') }, message),
+        { class: 'fieldset mb-6' },
+        h('legend', { class: 'fieldset-legend' }, message),
         input('prompt-input', '', defaultValue || ''),
       ),
-      h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
+      h('div', { class: 'flex justify-center gap-3' }, ...btns),
     ),
   ).render('container', {
     onRendered: () => {

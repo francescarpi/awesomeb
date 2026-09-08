@@ -13,7 +13,7 @@ import logo from '../assets/icon.png';
 </Modal>
 
 <script>
-  import { getSearchParams, Renderer, h, c, confirmButtons } from '#/scripts';
+  import { getSearchParams, Renderer, h, confirmButtons } from '#/scripts';
   import Copy from '#/icons/copy.svg?raw';
 
   const { winId } = getSearchParams();
@@ -49,20 +49,13 @@ import logo from '../assets/icon.png';
   renderer.update(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-4') },
+      { class: 'flex flex-col gap-4' },
       h(
         'div',
-        { class: c('flex', 'items-center', 'gap-2') },
-        h('p', { class: c('text-xs') }, t['pages:about.version']),
+        { class: 'flex items-center gap-2' },
+        h('p', { class: 'text-xs' }, t['pages:about.version']),
         h('div', {
-          class: c(
-            'w-3.5',
-            'h-3.5',
-            '[&>svg]:w-full',
-            '[&>svg]:h-full',
-            'cursor-pointer',
-            'hover:text-blue-700',
-          ),
+          class: 'w-3.5 h-3.5 [&>svg]:w-full [&>svg]:h-full cursor-pointer hover:text-blue-700',
           innerHTML: Copy,
           onclick: () => {
             abCommands.perform(winId, 'copy-version');
@@ -72,7 +65,7 @@ import logo from '../assets/icon.png';
       h(
         'a',
         {
-          class: c('text-xs', 'text-blue-700'),
+          class: 'text-xs text-blue-700',
           href: '#',
           onclick: () => {
             abCommands.perform(winId, 'new-tab', {
