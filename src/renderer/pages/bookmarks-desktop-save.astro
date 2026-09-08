@@ -32,43 +32,53 @@ import Title from '#/components/common/Title.astro';
   const bookmarks = await abEntities.fetch<IBookmarkEntity>(winId, 'bookmarks');
   const desktopId = searchParams.get('desktopId') ?? '';
   const desktopLabel = searchParams.get('desktopLabel') ?? '';
-  const tabs = desktopId ? allTabs.filter((t) => t.desktopId === parseInt(desktopId)) : [];
-  const bookmarksFolders = bookmarks.reduce<{ path: string; id: string }[]>(
-    (prev, curr) => {
-      if (!prev.find((i) => i.path === (curr.extra as string))) {
-        prev.push({ path: curr.extra as string, id: curr.folderId });
-      }
-      return prev;
-    },
-    [{ path: t['pages:bookmarks.root'], id: 'root' }],
-  );
+  const tabs = desktopId
+    ? allTabs.filter((t) => t.desktopId === parseInt(desktopId) && t.windowId === winId)
+    : [];
+  const bookmarksFolders = bookmarks
+    .filter((b) => b.folderId)
+    .reduce<{ path: string; id: string }[]>(
+      (prev, curr) => {
+        if (!prev.find((i) => i.path === (curr.extra as string))) {
+          prev.push({ path: curr.extra as string, id: curr.folderId });
+        }
+        return prev;
+      },
+      [{ path: t['pages:bookmarks.root'], id: 'root' }],
+    );
 
   const [btns, registerBtnsEvents, setLoading] = await confirmButtons({
     winId,
     confirmDisabled: true,
     onConfirm: async () => {
-      const tabs = getSelectedTabs();
-      const folder = getFolder();
-      setLoading(true);
+      try {
+        const tabs = getSelectedTabs();
+        const folder = getFolder();
+        setLoading(true);
 
-      await abBookmarks.add(
-        winId,
-        folder.parentFolderId,
-        folder.createFolder && folder.newFolderName && folder.newFolderName.length > 0
-          ? folder.newFolderName
-          : null,
-        tabs.map((tab) => ({ title: tab.title, url: tab.url })),
-      );
-
-      const closeTabs = document.querySelector<HTMLInputElement>('input#close-tabs')!.checked;
-      if (closeTabs) {
-        await abTabs.close(
+        await abBookmarks.add(
           winId,
-          tabs.map((t) => t.id),
+          folder.parentFolderId,
+          folder.createFolder && folder.newFolderName && folder.newFolderName.length > 0
+            ? folder.newFolderName
+            : null,
+          tabs.map((tab) => ({ title: tab.title, url: tab.url })),
         );
-      }
 
-      abModal.close(winId);
+        const closeTabs = document.querySelector<HTMLInputElement>('input#close-tabs')!.checked;
+        if (closeTabs) {
+          await abTabs.close(
+            winId,
+            tabs.map((t) => t.id),
+          );
+        }
+
+        abModal.close(winId);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     },
     onCancel: () => {
       abModal.close(winId);
@@ -228,7 +238,8 @@ import Title from '#/components/common/Title.astro';
           title: tab.label,
           url: tab.url as string,
         };
-      });
+      })
+      .filter((tab) => !!tab.url);
   }
 
   function getFolder(): { parentFolderId: string; createFolder: boolean; newFolderName: string } {

@@ -1,4 +1,5 @@
 import { TDesktopId } from './desktop';
+import { TWindowId } from './window';
 
 export type TEntityType =
   | 'commands'
@@ -48,6 +49,7 @@ export interface ITabEntity extends IEntity {
   partitionColor: string;
   suspended: boolean;
   desktopId: TDesktopId;
+  windowId: TWindowId;
 }
 
 export interface ITabContainerEntity extends IEntity {}

@@ -272,6 +272,7 @@ export class BrowserRenderer {
         extra: `Desktop: ${item.desktop.label}`,
         isDimmed: item.tab.suspended,
         desktopId: item.desktop.id,
+        windowId: window.id,
       }));
   }
 
