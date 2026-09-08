@@ -31,22 +31,22 @@ import Title from '#/components/common/Title.astro';
   new Renderer(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-4') },
+      { class: 'flex flex-col gap-4' },
       h('p', null, t['pages:login.message']),
       h('p', { class: c(!realm || realm.trim() === '' ? 'hidden' : '') }, realm),
       h('input', {
-        class: c('input', 'input-sm', 'w-full'),
+        class: 'input input-sm w-full',
         placeholder: t['pages:login.username'],
         autofocus: true,
         id: 'username',
       }),
       h('input', {
-        class: c('input', 'input-sm', 'w-full'),
+        class: 'input input-sm w-full',
         placeholder: t['pages:login.password'],
         type: 'password',
         id: 'password',
       }),
-      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+      h('div', { class: 'flex justify-end gap-2 mt-4' }, ...btns),
     ),
   ).render('content', {
     onRendered: registerBtnsEvents,

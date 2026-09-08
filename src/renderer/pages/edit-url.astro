@@ -12,7 +12,6 @@ import Title from '#/components/common/Title.astro';
   import {
     Renderer,
     h,
-    c,
     confirmButtons,
     getSearchParams,
     input,
@@ -155,13 +154,13 @@ import Title from '#/components/common/Title.astro';
   const buildVDOM = (state: typeof urlState) => {
     return h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
+      { class: 'flex flex-col gap-2' },
       h(
         'div',
-        { class: c('flex', 'flex-col', 'gap-2') },
+        { class: 'flex flex-col gap-2' },
         h(
           'div',
-          { class: c('flex', 'flex-col', 'gap-2') },
+          { class: 'flex flex-col gap-2' },
           h('h1', null, t['pages:editURL.option1Title']),
           input('fullURL', t['pages:editURL.url'], state.fullURL, {
             onInput: parseFullURL,
@@ -171,7 +170,7 @@ import Title from '#/components/common/Title.astro';
         ),
         h(
           'div',
-          { class: c('flex', 'flex-col', 'gap-2', 'mt-3') },
+          { class: 'flex flex-col gap-2 mt-3' },
           h('h1', null, t['pages:editURL.option1Title']),
           input('protocol', 'Protocol', state.protocol, {
             onInput: () => {
@@ -203,10 +202,10 @@ import Title from '#/components/common/Title.astro';
               updateFullURL();
             },
           }),
-          h('h2', { class: c('text-sm') }, t['pages:editURL.queryParams']),
+          h('h2', { class: 'text-sm' }, t['pages:editURL.queryParams']),
           h(
             'div',
-            { class: c('grid', 'grid-cols-[auto_auto_20px]', 'gap-2', 'items-center') },
+            { class: 'grid grid-cols-[auto_auto_20px] gap-2 items-center' },
             ...state.queryParams
               .map((param, index) => [
                 input(`key_${index}`, t['pages:editURL.key'], param.key, {
@@ -240,7 +239,7 @@ import Title from '#/components/common/Title.astro';
             h(
               'button',
               {
-                class: c('btn', 'btn-sm', 'btn-ghost'),
+                class: 'btn btn-sm btn-ghost',
                 onClick: () => {
                   state.queryParams.push({ key: '', value: '' });
                   updateFullURL();
@@ -252,7 +251,7 @@ import Title from '#/components/common/Title.astro';
           ),
         ),
       ),
-      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+      h('div', { class: 'flex justify-end gap-2 mt-4' }, ...btns),
     );
   };
 

@@ -1,4 +1,4 @@
-import { h, Renderer, c, btnIcon, type VNode, radioBtn } from '#/scripts';
+import { h, Renderer, btnIcon, type VNode, radioBtn } from '#/scripts';
 import { box } from './common';
 import {
   type IConfig,
@@ -49,7 +49,7 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
           h(
             'select',
             {
-              class: c('select', 'select-sm', 'w-40'),
+              class: 'select select-sm w-40',
               onchange: (e) => updateSecurityLevel(e, config),
             },
             h(
@@ -68,7 +68,7 @@ export async function renderPermissionsPage(config: IConfig): Promise<{
       box(
         t['pages:settings.permissions.list.title'],
         t['pages:settings.permissions.list.desc'],
-        h('div', { id: 'permissions-list', class: c('text-sm') }),
+        h('div', { id: 'permissions-list', class: 'text-sm' }),
       ),
     ),
   );
@@ -114,18 +114,18 @@ function renderPermissionsList(
     ...sortedKeys.map((key) =>
       h(
         'li',
-        { class: c('mb-4') },
-        h('strong', { class: c('text-base-content') }, key),
+        { class: 'mb-4' },
+        h('strong', { class: 'text-base-content' }, key),
         h(
           'ul',
-          { class: c('ml-4') },
+          { class: 'ml-4' },
           ...sortedPermissions(permissions[key]).map(([perm, value]) =>
             h(
               'li',
-              { class: c('mb-2') },
+              { class: 'mb-2' },
               h(
                 'div',
-                { class: c('flex', 'gap-2', 'items-center') },
+                { class: 'flex gap-2 items-center' },
                 btnIcon(Delete, {
                   onClick: () => deletePermission(key, perm, permissions, renderer, t),
                   doubleConfirmation: true,
@@ -134,7 +134,7 @@ function renderPermissionsList(
                 h('span', {}, perm),
                 h(
                   'div',
-                  { class: c('ml-4', 'flex', 'gap-2', 'items-center') },
+                  { class: 'ml-4 flex gap-2 items-center' },
                   radioBtn(
                     `${key}-${perm}`,
                     `${key}-${perm}-allow`,

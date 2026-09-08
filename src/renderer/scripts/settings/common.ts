@@ -1,21 +1,19 @@
-import { h, type VNode, c } from '#/scripts';
+import { h, type VNode } from '#/scripts';
 
 export function box(title: string, desc: string, ...content: VNode[]): VNode {
   return h(
     'div',
-    { class: c('border', 'rounded-[var(--radius-box)]', 'p-2', 'relative', 'mb-6', 'w-full') },
+    {
+      class: 'border rounded-[var(--radius-box)] p-2 relative mb-6 w-full',
+    },
     h(
       'span',
       {
-        class: c('text-base-content'),
+        class: 'text-base-content',
       },
       title,
     ),
-    h(
-      'p',
-      { class: c('text-sm', 'text-base-content', 'text-sm', 'mt-2', 'mb-4'), innerHTML: desc },
-      '',
-    ),
+    h('p', { class: 'text-sm text-base-content text-sm mt-2 mb-4', innerHTML: desc }, ''),
     ...content,
   );
 }
@@ -29,7 +27,7 @@ export function inputColorPicker(color: string): VNode {
       {
         'data-function': 'color-picker',
         'data-format': 'hex',
-        class: c('w-full', 'rounded', 'px-4', 'text-center', 'h-[30px]'),
+        class: 'w-full rounded px-4 text-center h-[30px]',
         value: color,
       },
       '',

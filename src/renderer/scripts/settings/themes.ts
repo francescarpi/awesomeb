@@ -1,4 +1,4 @@
-import { h, Renderer, c, type VNode, btnIcon } from '#/scripts';
+import { h, Renderer, type VNode, btnIcon } from '#/scripts';
 import type { IConfig, IConfigTheme } from '~/types';
 import { box, inputColorPicker } from './common';
 import Delete from '#/icons/delete.svg?raw';
@@ -58,31 +58,27 @@ function buildGeneralBody(
 ): VNode {
   return h(
     'div',
-    { class: c('flex', 'flex-col', 'gap-2') },
+    { class: 'flex flex-col gap-2' },
     box(
       t['pages:settings.themes.custom.title'],
       t['pages:settings.themes.custom.desc'],
       h(
         'div',
-        { class: c('flex', 'flex-col', 'gap-2') },
+        { class: 'flex flex-col gap-2' },
         h(
           'table',
-          { class: c('table'), id: 'themes-table' },
+          { class: 'table', id: 'themes-table' },
           h(
             'thead',
             {},
             h(
               'tr',
               {},
-              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.name']),
-              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.primary']),
-              h(
-                'th',
-                { class: c('text-left', 'px-1') },
-                t['pages:settings.themes.custom.secondary'],
-              ),
-              h('th', { class: c('text-left', 'px-1') }, t['pages:settings.themes.custom.degrees']),
-              h('th', { class: c('w-13') }, ''),
+              h('th', { class: 'text-left px-1' }, t['pages:settings.themes.custom.name']),
+              h('th', { class: 'text-left px-1' }, t['pages:settings.themes.custom.primary']),
+              h('th', { class: 'text-left px-1' }, t['pages:settings.themes.custom.secondary']),
+              h('th', { class: 'text-left px-1' }, t['pages:settings.themes.custom.degrees']),
+              h('th', { class: 'w-13' }, ''),
             ),
           ),
           h(
@@ -94,24 +90,24 @@ function buildGeneralBody(
                 { 'data-name': theme.name },
                 h(
                   'td',
-                  { class: c('p-0.5') },
+                  { class: 'p-0.5' },
                   h(
                     'input',
                     {
                       value: theme.name,
-                      class: c('input', 'input-sm', 'w-full'),
+                      class: 'input input-sm w-full',
                     },
                     '',
                   ),
                 ),
-                h('td', { class: c('p-0.5') }, inputColorPicker(theme.primary)),
-                h('td', { class: c('p-0.5') }, inputColorPicker(theme.secondary)),
+                h('td', { class: 'p-0.5' }, inputColorPicker(theme.primary)),
+                h('td', { class: 'p-0.5' }, inputColorPicker(theme.secondary)),
                 h(
                   'td',
-                  { class: c('px-1') },
+                  { class: 'px-1' },
                   h(
                     'div',
-                    { class: c('flex', 'items-center') },
+                    { class: 'flex items-center' },
                     h(
                       'input',
                       {
@@ -120,11 +116,11 @@ function buildGeneralBody(
                         max: 360,
                         value: theme.degrees,
                         oninput: updateDegrees,
-                        class: c('range', 'range-sm'),
+                        class: 'range range-sm',
                       },
                       '',
                     ),
-                    h('span', { class: c('ml-2', 'w-13') }, `${theme.degrees}°`),
+                    h('span', { class: 'ml-2 w-13' }, `${theme.degrees}°`),
                   ),
                 ),
                 h(
@@ -141,10 +137,10 @@ function buildGeneralBody(
         ),
         h(
           'div',
-          { class: c('flex', 'justify-between') },
+          { class: 'flex justify-between' },
           h(
             'button',
-            { class: c('btn', 'btn-sm', 'btn-outline'), onclick: callbacks.onAdd },
+            { class: 'btn btn-sm btn-outline', onclick: callbacks.onAdd },
             t['pages:settings.themes.custom.add'],
           ),
         ),
@@ -155,7 +151,7 @@ function buildGeneralBody(
       t['pages:settings.themes.uiTheme.desc'],
       h(
         'select',
-        { class: c('select', 'select-sm'), id: 'ui-theme-select', onchange: testUITheme },
+        { class: 'select select-sm', id: 'ui-theme-select', onchange: testUITheme },
         ...UI_THEMES.map((theme) =>
           h('option', { value: theme, selected: uiTheme === theme }, theme),
         ),
@@ -163,10 +159,10 @@ function buildGeneralBody(
     ),
     h(
       'div',
-      { class: c('flex', 'justify-end') },
+      { class: 'flex justify-end' },
       h(
         'button',
-        { class: c('btn', 'btn-sm', 'btn-primary'), onclick: callbacks.onSave },
+        { class: 'btn btn-sm btn-primary', onclick: callbacks.onSave },
         t['pages:settings.themes.saveChanges'],
       ),
     ),

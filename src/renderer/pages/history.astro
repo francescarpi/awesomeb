@@ -40,42 +40,34 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   mainRenderer.update(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
+      { class: 'flex flex-col gap-2' },
       h(
         'div',
-        { class: c('flex', 'gap-2', 'items-center', 'mb-4') },
+        { class: 'flex gap-2 items-center mb-4' },
         h(
           'div',
-          { class: c('relative', 'w-full', 'mx-1') },
+          { class: 'relative w-full mx-1' },
           h('input', {
             id: 'history-search-input',
-            type: 'text',
-            placeholder: t['pages:history.searchHistory'],
-            class: c('input', 'input-sm', 'input-bordered', 'w-full', 'pl-8'),
-            onKeydown: (e) => {
-              if ((e as KeyboardEvent).key === 'Enter') {
-                currentQuery = (e.target as HTMLInputElement).value;
+            placeholder: t['pages:history.searchPlaceholder'],
+            value: currentQuery,
+            onInput: (e) => {
+              currentQuery = (e.target as HTMLInputElement).value;
+              if (currentQuery.length > 0) {
                 loadPage(1);
               }
             },
+            class: 'input input-sm input-bordered w-full pl-8',
           }),
           h('div', {
-            class: c(
-              'absolute',
-              'left-2',
-              'top-3',
-              '-translate-y-1/2',
-              'w-[18px]',
-              'h-[18px]',
-              'text-base-content/50',
-            ),
+            class: 'absolute left-2 top-3 -translate-y-1/2 w-[18px] h-[18px] text-base-content/50',
             innerHTML: Search,
           }),
         ),
         h(
           'button',
           {
-            class: c('btn', 'btn-sm', 'btn-ghost'),
+            class: 'btn btn-sm btn-ghost',
             onClick: () => {
               const input = document.getElementById('history-search-input') as HTMLInputElement;
               if (input) input.value = '';
@@ -86,9 +78,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
           t['pages:history.reset'],
         ),
       ),
-      h('div', { id: 'header-actions', class: c('flex', 'gap-2', 'items-center', 'min-h-[2rem]') }),
+      h('div', { id: 'header-actions', class: 'flex gap-2 items-center min-h-[2rem]' }),
       h('div', { id: 'table' }),
-      h('div', { id: 'pagination', class: c('flex', 'justify-center', 'mt-4') }),
+      h('div', { id: 'pagination', class: 'flex justify-center mt-4' }),
     ),
     {
       onUpdated: async () => {
@@ -123,7 +115,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
         h(
           'button',
           {
-            class: c('btn', 'btn-sm', 'btn-error'),
+            class: 'btn btn-sm btn-error',
             onClick: async () => {
               if (window.confirm(t2['pages:history.confirmDeleteSelected'])) {
                 await abVisitHistory.deleteUrls([...selectedUrls]);
@@ -141,7 +133,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       h(
         'button',
         {
-          class: c('btn', 'btn-sm', 'btn-error', 'btn-outline'),
+          class: 'btn btn-sm btn-error btn-outline',
           onClick: async () => {
             if (window.confirm(t['pages:history.confirmDelete'])) {
               await abVisitHistory.deleteAll();
@@ -154,9 +146,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
     );
 
-    headerActionsRenderer.update(
-      h('div', { class: c('flex', 'gap-2', 'items-center') }, ...buttons),
-    );
+    headerActionsRenderer.update(h('div', { class: 'flex gap-2 items-center' }, ...buttons));
   }
 
   function renderTable(items: IHistoryItem[]) {
@@ -165,7 +155,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     tableRenderer.update(
       h(
         'table',
-        { class: c('table', 'w-full', 'table-fixed') },
+        { class: 'table w-full table-fixed' },
         h(
           'thead',
           null,
@@ -174,10 +164,10 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             null,
             h(
               'th',
-              { class: c('w-12') },
+              { class: 'w-12' },
               h('input', {
                 type: 'checkbox',
-                class: c('checkbox', 'checkbox-sm'),
+                class: 'checkbox checkbox-sm',
                 checked: allSelected,
                 onChange: (e) => {
                   const checked = (e.target as HTMLInputElement).checked;
@@ -192,9 +182,9 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             ),
             h('th', null, t['pages:history.tableTitle']),
             h('th', null, t['pages:history.tableUrl']),
-            h('th', { class: c('w-40') }, t['pages:history.tableLastVisit']),
-            h('th', { class: c('w-20', 'text-center') }, t['pages:history.tableVisits']),
-            h('th', { class: c('w-20') }),
+            h('th', { class: 'w-40' }, t['pages:history.tableLastVisit']),
+            h('th', { class: 'w-20 text-center' }, t['pages:history.tableVisits']),
+            h('th', { class: 'w-20' }),
           ),
         ),
         h(
@@ -209,7 +199,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                 null,
                 h('input', {
                   type: 'checkbox',
-                  class: c('checkbox', 'checkbox-sm'),
+                  class: 'checkbox checkbox-sm',
                   checked: selectedUrls.has(v.url),
                   onChange: (e) => {
                     const checked = (e.target as HTMLInputElement).checked;
@@ -220,14 +210,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
                   },
                 }),
               ),
-              h('td', { class: c('truncate'), title: v.title }, v.title),
+              h('td', { class: 'truncate', title: v.title }, v.title),
               h(
                 'td',
-                { class: c('truncate') },
-                h('a', { href: v.url, class: c('link'), title: v.url }, v.url),
+                { class: 'truncate' },
+                h('a', { href: v.url, class: 'link', title: v.url }, v.url),
               ),
               h('td', null, dayjs(v.lastVisitTime).format('YYYY-MM-DD HH:mm')),
-              h('td', { class: c('text-center') }, v.visitCount),
+              h('td', { class: 'text-center' }, v.visitCount),
               h('td', null),
             ),
           ),
@@ -274,9 +264,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     // Page numbers
     visiblePages.forEach((page) => {
       if (page === '...') {
-        buttons.push(
-          h('button', { class: c('join-item', 'btn', 'btn-sm', 'btn-disabled') }, '...'),
-        );
+        buttons.push(h('button', { class: 'join-item btn btn-sm btn-disabled' }, '...'));
       } else {
         buttons.push(
           h(
@@ -303,6 +291,6 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       ),
     );
 
-    paginationRenderer.update(h('div', { class: c('join') }, ...buttons));
+    paginationRenderer.update(h('div', { class: 'join' }, ...buttons));
   }
 </script>
