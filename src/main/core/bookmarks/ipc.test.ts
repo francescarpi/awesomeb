@@ -13,9 +13,6 @@ const handlers = new Map<string, InvokeHandler>();
 const onHandlers = new Map<string, OnListener>();
 
 const fakeEvent = { sender: { id: 1 } } as unknown as IpcMainInvokeEvent;
-const fakeOnEvent = { sender: { id: 1 } } as unknown as IpcMainEvent;
-
-type OnHandler = (event: IpcMainEvent, args: Record<string, unknown>) => Promise<unknown>;
 
 function makeUrlBookmark(overrides: Partial<IBookmark> = {}): IBookmark {
   return {
@@ -67,8 +64,8 @@ describe('Bookmarks IPC', () => {
     vi.restoreAllMocks();
   });
 
-  test('bookmarks:add handler is registered', () => {
-    expect(onHandlers.has('bookmarks:add')).toBe(true);
+  test('bookmarks:add handler is registered as handler', () => {
+    expect(handlers.has('bookmarks:add')).toBe(true);
   });
 
   test('bookmarks:update handler is registered', () => {
@@ -83,13 +80,12 @@ describe('Bookmarks IPC', () => {
     expect(invalidateSpy).not.toHaveBeenCalled();
     expect(bookmarks.all.length).toBe(0);
 
-    const handler = onHandlers.get('bookmarks:add') as unknown as OnHandler;
-    await handler(fakeOnEvent, {
+    const handler = handlers.get('bookmarks:add')!;
+    await handler(fakeEvent, {
       winId: 1,
       parentFolderId: 'root',
-      title: 'New Bookmark',
-      url: 'https://new.example.com',
       newFolderName: null,
+      entries: [{ title: 'New Bookmark', url: 'https://new.example.com' }],
     });
 
     expect(bookmarks.all.length).toBe(1);
@@ -126,13 +122,12 @@ describe('Bookmarks IPC', () => {
     const win = browser.getWindow(1)!;
     expect(win.modal.id).toBeNull();
 
-    const handler = onHandlers.get('bookmarks:add') as unknown as OnHandler;
-    const result = await handler(fakeOnEvent, {
+    const handler = handlers.get('bookmarks:add')!;
+    const result = await handler(fakeEvent, {
       winId: 1,
       parentFolderId: 'root',
-      title: 'Wont be added',
-      url: 'https://wont.example.com',
       newFolderName: null,
+      entries: [{ title: 'Wont be added', url: 'https://wont.example.com' }],
     });
 
     expect(result).toBeUndefined();

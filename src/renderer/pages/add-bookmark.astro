@@ -39,11 +39,11 @@ import Title from '#/components/common/Title.astro';
       if (createFolder) {
         const folderNameValue = folderNameInput.value.trim();
         if (titleValue && urlValue && folderNameValue) {
-          abBookmarks.add(winId, parentId, titleValue, urlValue, folderNameValue);
+          abBookmarks.add(winId, parentId, folderNameValue, [{ title: titleValue, url: urlValue }]);
         }
       } else {
         if (titleValue && urlValue) {
-          abBookmarks.add(winId, parentId, titleValue, urlValue, null);
+          abBookmarks.add(winId, parentId, null, [{ title: titleValue, url: urlValue }]);
         }
       }
     },

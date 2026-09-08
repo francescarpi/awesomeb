@@ -50,8 +50,19 @@ import Title from '#/components/common/Title.astro';
       const tabs = getSelectedTabs();
       const folder = getFolder();
       setLoading(true);
-      console.log(tabs, folder);
-      // abModal.close(winId);
+
+      await abBookmarks.add(
+        winId,
+        folder.parentFolderId,
+        folder.createFolder && folder.newFolderName && folder.newFolderName.length > 0
+          ? folder.newFolderName
+          : null,
+        tabs.map((tab) => ({ title: tab.title, url: tab.url })),
+      );
+
+      // TODO Pending close tabs
+
+      abModal.close(winId);
     },
     onCancel: () => {
       abModal.close(winId);
@@ -214,19 +225,19 @@ import Title from '#/components/common/Title.astro';
       });
   }
 
-  function getFolder(): { parentFolderId: string; createChild: boolean; newFolderName: string } {
+  function getFolder(): { parentFolderId: string; createFolder: boolean; newFolderName: string } {
     const parentFolderId = document.querySelector<HTMLSelectElement>('select#parentFolder')!.value;
-    const createChild = document.querySelector<HTMLInputElement>('input#create-folder')!.checked;
+    const createFolder = document.querySelector<HTMLInputElement>('input#create-folder')!.checked;
     const newFolderName = document
       .querySelector<HTMLInputElement>('input#child-folder')!
       .value.trim();
-    return { parentFolderId, createChild, newFolderName };
+    return { parentFolderId, createFolder, newFolderName };
   }
 
   function checkConfirmButtonStatus() {
     const tabs = getSelectedTabs();
     const folder = getFolder();
     const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
-    btn.disabled = tabs.length === 0 || (folder.createChild && folder.newFolderName.length === 0);
+    btn.disabled = tabs.length === 0 || (folder.createFolder && folder.newFolderName.length === 0);
   }
 </script>

@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import { userDataPath } from '@/paths';
-import { EBookmarkType, IPlainBookmark, type IBookmark } from '~/types';
+import { EBookmarkType, IPlainBookmark, type IBookmark, type IBookmarkEntry } from '~/types';
 import { BookmarksStoreScheme, type IBookmarks } from './schemes';
 import { validateStore } from '@/core/validation';
 
@@ -51,19 +51,6 @@ export class Bookmarks {
     return null;
   }
 
-  private _findChildFolder(folderId: string, name: string): IBookmark | null {
-    const parent = folderId === 'root' ? null : this.find(folderId);
-    if (parent && parent.type !== EBookmarkType.Folder) return null;
-    const target = parent ? parent.children : this.all;
-    const normalized = name.toLowerCase();
-    return (
-      target.find(
-        (bookmark) =>
-          bookmark.type === EBookmarkType.Folder && bookmark.title.toLowerCase() === normalized,
-      ) ?? null
-    );
-  }
-
   private _generatePlainList(
     initialBookmarks?: IBookmark[],
     initialUrls?: IPlainBookmark[],
@@ -92,43 +79,29 @@ export class Bookmarks {
     return urls;
   }
 
-  add(folderId: string, title: string, url: string, newFolder: string | null): boolean {
-    let targetFolderId = folderId;
+  add(folderId: string, newFolder: string | null, entries: IBookmarkEntry[]): boolean {
+    const urlBookmarks: IBookmark[] = entries.map((entry) => ({
+      id: crypto.randomUUID(),
+      type: EBookmarkType.Url,
+      url: entry.url,
+      title: entry.title,
+      dateAdded: Date.now(),
+    }));
 
-    if (newFolder) {
-      const existing = this._findChildFolder(targetFolderId, newFolder);
-      if (existing) {
-        targetFolderId = existing.id;
-        newFolder = null;
-      }
-    }
+    const toAdd: IBookmark[] = newFolder
+      ? [
+          {
+            id: crypto.randomUUID(),
+            type: EBookmarkType.Folder,
+            title: newFolder,
+            dateAdded: Date.now(),
+            children: urlBookmarks,
+          },
+        ]
+      : urlBookmarks;
 
-    const newBookmark: IBookmark = newFolder
-      ? {
-          id: crypto.randomUUID(),
-          type: EBookmarkType.Folder,
-          title: newFolder,
-          dateAdded: Date.now(),
-          children: [
-            {
-              id: crypto.randomUUID(),
-              type: EBookmarkType.Url,
-              url,
-              title,
-              dateAdded: Date.now(),
-            },
-          ],
-        }
-      : {
-          id: crypto.randomUUID(),
-          type: EBookmarkType.Url,
-          url,
-          title,
-          dateAdded: Date.now(),
-        };
-
-    if (targetFolderId === 'root') {
-      const updatedBookmarks = [...this.all, newBookmark];
+    if (folderId === 'root') {
+      const updatedBookmarks = [...this.all, ...toAdd];
       BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
       this._store.set('bookmarks', updatedBookmarks);
       return true;
@@ -137,10 +110,10 @@ export class Bookmarks {
     const addBookmarkToFolder = (bookmarks: IBookmark[]): IBookmark[] => {
       return bookmarks.map((bookmark) => {
         if (bookmark.type === EBookmarkType.Folder) {
-          if (bookmark.id === targetFolderId) {
+          if (bookmark.id === folderId) {
             return {
               ...bookmark,
-              children: [...bookmark.children, newBookmark],
+              children: [...bookmark.children, ...toAdd],
             };
           } else {
             return {

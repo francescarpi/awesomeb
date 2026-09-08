@@ -77,20 +77,22 @@ describe('Bookmarks', () => {
     expect(data).toEqual([]);
   });
 
-  test('add() adds valid bookmark to root', () => {
+  test('add() adds valid bookmarks to root', () => {
     const bookmarks = new Bookmarks();
-    const result = bookmarks.add('root', 'Test', 'https://test.com', null);
+    const result = bookmarks.add('root', null, [{ title: 'Test', url: 'https://test.com' }]);
     expect(result).toBe(true);
     expect(bookmarks.all.length).toBe(1);
     expect(bookmarks.all[0].title).toBe('Test');
   });
 
-  test('add() adds valid bookmark to folder', () => {
+  test('add() adds valid bookmarks to folder', () => {
     const bookmarks = new Bookmarks();
     const folder = createTestFolderBookmark({ id: 'folder-1' });
     bookmarks.update([folder]);
 
-    const result = bookmarks.add('folder-1', 'Nested', 'https://nested.com', null);
+    const result = bookmarks.add('folder-1', null, [
+      { title: 'Nested', url: 'https://nested.com' },
+    ]);
     expect(result).toBe(true);
 
     const found = bookmarks.find('folder-1');
@@ -181,9 +183,9 @@ describe('Bookmarks', () => {
     expect(plainB?.path).toEqual(['Work']);
   });
 
-  test('add() creates folder when newFolder does not exist in destination', () => {
+  test('add() creates folder when newFolder is provided', () => {
     const bookmarks = new Bookmarks();
-    bookmarks.add('root', 'Site', 'https://site.com', 'My Folder');
+    bookmarks.add('root', 'My Folder', [{ title: 'Site', url: 'https://site.com' }]);
 
     expect(bookmarks.all.length).toBe(1);
     const folder = bookmarks.all[0];
@@ -195,65 +197,24 @@ describe('Bookmarks', () => {
     }
   });
 
-  test('add() reuses existing folder (case-insensitive) instead of creating a duplicate', () => {
+  test('add() creates folder with multiple entries', () => {
     const bookmarks = new Bookmarks();
-    const existing = createTestFolderBookmark({ id: 'existing', title: 'Trabajo' });
-    bookmarks.update([existing]);
+    bookmarks.add('root', 'My Folder', [
+      { title: 'Site', url: 'https://site.com' },
+      { title: 'Docs', url: 'https://docs.com' },
+    ]);
 
-    bookmarks.add('root', 'Site', 'https://site.com', 'trabajo');
-
-    expect(bookmarks.all.length).toBe(1);
-    const folder = bookmarks.find('existing');
-    expect(folder).not.toBeNull();
-    if (folder?.type === 'folder') {
-      expect(folder.title).toBe('Trabajo');
-      expect(folder.children.length).toBe(1);
-      expect(folder.children[0].type).toBe('url');
+    const folder = bookmarks.all[0];
+    expect(folder.type).toBe('folder');
+    if (folder.type === 'folder') {
+      expect(folder.children.length).toBe(2);
+      expect(folder.children.map((c) => c.title)).toEqual(['Site', 'Docs']);
     }
   });
 
-  test('add() reuses exact-case match folder', () => {
+  test('add() returns true even when parent folder does not exist', () => {
     const bookmarks = new Bookmarks();
-    const existing = createTestFolderBookmark({ id: 'f1', title: 'Sub' });
-    const parent = createTestFolderBookmark({ id: 'parent', children: [existing] });
-    bookmarks.update([parent]);
-
-    bookmarks.add('parent', 'Site', 'https://site.com', 'Sub');
-
-    const parentFolder = bookmarks.find('parent');
-    if (parentFolder?.type === 'folder') {
-      expect(parentFolder.children.length).toBe(1);
-      const sub = parentFolder.children[0];
-      expect(sub.type).toBe('folder');
-      if (sub.type === 'folder') {
-        expect(sub.title).toBe('Sub');
-        expect(sub.children.length).toBe(1);
-        expect(sub.children[0].type).toBe('url');
-      }
-    }
-  });
-
-  test('add() reuses existing folder inside non-root parent', () => {
-    const bookmarks = new Bookmarks();
-    const innerFolder = createTestFolderBookmark({ id: 'inner', title: 'Links' });
-    const parent = createTestFolderBookmark({ id: 'parent', children: [innerFolder] });
-    bookmarks.update([parent]);
-
-    bookmarks.add('parent', 'Site', 'https://site.com', 'links');
-
-    const parentFolder = bookmarks.find('parent');
-    if (parentFolder?.type === 'folder') {
-      expect(parentFolder.children.length).toBe(1);
-      if (parentFolder.children[0].type === 'folder') {
-        expect(parentFolder.children[0].title).toBe('Links');
-        expect(parentFolder.children[0].children.length).toBe(1);
-      }
-    }
-  });
-
-  test('add() returns false when parent folder does not exist', () => {
-    const bookmarks = new Bookmarks();
-    const result = bookmarks.add('nonexistent', 'Site', 'https://site.com', 'New Folder');
+    const result = bookmarks.add('nonexistent', null, [{ title: 'Site', url: 'https://site.com' }]);
     expect(result).toBe(true);
     expect(bookmarks.all.length).toBe(0);
   });

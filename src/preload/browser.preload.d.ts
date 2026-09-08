@@ -32,6 +32,7 @@ import type {
   TMediaAction,
   IAppUpdaterInfo,
   IConfigInfo,
+  IBookmarkEntry,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -117,10 +118,9 @@ declare global {
     add: (
       winId: TWindowId,
       parentFolderId: string,
-      title: string,
-      url: string,
       newFolderName: string | null,
-    ) => void;
+      entries: IBookmarkEntry[],
+    ) => Promise<void>;
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
     open: (bookmarkId: string) => Promise<void>;
