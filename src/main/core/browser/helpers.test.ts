@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach } from 'vitest';
-import { Browser, partitions } from '@/core';
+import { Browser, filePathToURL, isValidUrl, partitions } from '@/core';
 import { MAX_SPLIT_TABS } from '~/constants';
 
 describe('parseTarget - justAfter positioning', () => {
@@ -170,5 +170,28 @@ describe('parseTarget - split-tab capacity', () => {
     expect(fourth!.tabContainer.id).toBe(container.id);
     expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
     expect(container.tabs.length).toBe(4);
+  });
+});
+
+describe('filePathToURL', () => {
+  test('converts a plain absolute path to a file:// URL', () => {
+    expect(filePathToURL('/Users/foo/Desktop/index.html')).toBe(
+      'file:///Users/foo/Desktop/index.html',
+    );
+  });
+
+  test('percent-encodes spaces in the path', () => {
+    expect(filePathToURL('/Users/foo/my file.html')).toBe('file:///Users/foo/my%20file.html');
+  });
+
+  test('returns null for empty or whitespace-only input', () => {
+    expect(filePathToURL('')).toBeNull();
+    expect(filePathToURL('   ')).toBeNull();
+  });
+});
+
+describe('isValidUrl - file protocol', () => {
+  test('accepts a file:// URL', () => {
+    expect(isValidUrl('file:///Users/foo/index.html').valid).toBe(true);
   });
 });
