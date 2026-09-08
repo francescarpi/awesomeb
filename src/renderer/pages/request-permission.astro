@@ -9,7 +9,7 @@ import Title from '#/components/common/Title.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+  import { Renderer, h, getSearchParams, confirmButtons } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
   const host = searchParams.get('host') as string;
@@ -34,11 +34,11 @@ import Title from '#/components/common/Title.astro';
   new Renderer(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-2') },
+      { class: 'flex flex-col gap-2' },
       h('p', {
         innerHTML: t['pages:requestPermission.message'],
       }),
-      h('div', { class: c('flex', 'justify-end', 'gap-2', 'mt-4') }, ...btns),
+      h('div', { class: 'flex justify-end gap-2 mt-4' }, ...btns),
     ),
   ).render('content', { onRendered: registerBtnsEvents });
 </script>

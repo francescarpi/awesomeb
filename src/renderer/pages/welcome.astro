@@ -7,7 +7,7 @@ import Layout from '#/layouts/Base.astro';
 </Layout>
 
 <script>
-  import { Renderer, h, c, input } from '#/scripts';
+  import { Renderer, h, input } from '#/scripts';
   import logo from '#/assets/icon.png';
 
   const t = await abI18n.t({}, [
@@ -28,28 +28,20 @@ import Layout from '#/layouts/Base.astro';
     h(
       'div',
       {
-        class: c(
-          'bg-black',
-          'fixed',
-          'inset-0',
-          'flex',
-          'flex-col',
-          'justify-center',
-          'items-center',
-        ),
+        class: 'bg-black fixed inset-0 flex flex-col justify-center items-center',
       },
-      h('div', { class: c('aurora'), 'aria-hidden': 'true' }),
+      h('div', { class: 'aurora', 'aria-hidden': 'true' }),
       h('img', { src: logo.src, alt: 'AwesomeB' }),
       h(
         'p',
-        { class: c('text-white', 'text-2xl', 'mt-4', 'absolute', 'font-mono', 'welcome') },
+        { class: 'text-white text-2xl mt-4 absolute font-mono welcome' },
         t['pages:welcome.title'],
         ' ',
         h('b', null, 'AwesomeB(rowser)'),
       ),
       h(
         'button',
-        { class: c('btn', 'btn-sm', 'absolute', 'initial'), onclick: handleSetup },
+        { class: 'btn btn-sm absolute initial', onclick: handleSetup },
         t['pages:welcome.initialSetup'],
       ),
     ),
@@ -60,32 +52,23 @@ import Layout from '#/layouts/Base.astro';
       h(
         'div',
         {
-          class: c(
-            'bg-black',
-            'fixed',
-            'inset-0',
-            'text-white',
-            'flex',
-            'flex-col',
-            'justify-center',
-            'items-center',
-            'gap-4',
-          ),
+          class:
+            'bg-black fixed inset-0 text-white flex flex-col justify-center items-center gap-4',
         },
-        h('div', { class: c('aurora') }),
-        h('p', { class: c('px-4', 'text-center') }, t['pages:welcome.searchEngineMessage']),
+        h('div', { class: 'aurora' }),
+        h('p', { class: 'px-4 text-center' }, t['pages:welcome.searchEngineMessage']),
         h(
           'div',
-          { class: c('flex', 'flex-col') },
-          h('p', { class: c('px-4', 'text-center') }, t['pages:welcome.example']),
+          { class: 'flex flex-col' },
+          h('p', { class: 'px-4 text-center' }, t['pages:welcome.example']),
           h('code', {
-            class: c('px-4', 'text-center', 'text-xs'),
+            class: 'px-4 text-center text-xs',
             innerHTML: t['pages:welcome.exampleCode'],
           }),
         ),
         h(
           'div',
-          { class: c('w-100', 'flex', 'flex-col', 'gap-2') },
+          { class: 'w-100 flex flex-col gap-2' },
           input('searchEngineName', t['pages:welcome.namePlaceholder'], '', {
             autofocus: true,
             required: true,
@@ -97,11 +80,11 @@ import Layout from '#/layouts/Base.astro';
             onInput: () => checkInputsValids(),
           }),
         ),
-        h('small', { class: c('px-4', 'text-center') }, t['pages:welcome.note']),
+        h('small', { class: 'px-4 text-center' }, t['pages:welcome.note']),
         h(
           'button',
           {
-            class: c('btn', 'btn-sm', 'mt-4'),
+            class: 'btn btn-sm mt-4',
             disabled: true,
             onclick: () => {
               const nameInput = document.getElementById('searchEngineName') as HTMLInputElement;

@@ -7,7 +7,7 @@ import Layout from '#/layouts/Base.astro';
 </Layout>
 
 <script>
-  import { Renderer, h, c, inputManager, getSearchParams, type VNode, btnIcon } from '#/scripts';
+  import { Renderer, h, inputManager, getSearchParams, type VNode, btnIcon } from '#/scripts';
   import type { IFindInPageResult } from '~/types';
   import Close from '#/icons/close.svg?raw';
   import Previous from '#/icons/previous.svg?raw';
@@ -40,15 +40,7 @@ import Layout from '#/layouts/Base.astro';
     return h(
       'div',
       {
-        class: c(
-          'flex',
-          'items-center',
-          'gap-2',
-          'p-2',
-          'bg-base-200',
-          'rounded-xl',
-          'text-base-content',
-        ),
+        class: 'flex items-center gap-2 p-2 bg-base-200 rounded-xl text-base-content',
       },
       btnIcon(Close, {
         classNames: ['text-base-content'],
@@ -57,7 +49,7 @@ import Layout from '#/layouts/Base.astro';
       h(
         'input',
         {
-          class: c('input', 'input-xs', 'text-base-content', 'rounded-full'),
+          class: 'input input-xs text-base-content rounded-full',
           placeholder: t['pages:findInPage.placeholder'],
           autofocus: true,
           onfocus: (event) => (event.target as HTMLInputElement).select(),
@@ -73,7 +65,7 @@ import Layout from '#/layouts/Base.astro';
         classNames: ['text-base-content'],
         onClick: () => abTabs.findInPageAction(tabId, 'next', inputEl.value),
       }),
-      result ? h('div', { class: c('text-sm', 'ml-4') }, t['pages:findInPage.matches']) : null,
+      result ? h('div', { class: 'text-sm ml-4' }, t['pages:findInPage.matches']) : null,
     );
   }
 </script>

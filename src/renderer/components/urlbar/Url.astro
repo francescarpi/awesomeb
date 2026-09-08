@@ -28,7 +28,7 @@
 
     return h(
       'div',
-      { class: c('flex', 'gap-2', 'items-center', 'w-full', 'h-full') },
+      { class: 'flex gap-2 items-center w-full h-full' },
       h('span', { class: c('loading', 'loading-spinner', 'loading-xs', !loading && 'hidden') }),
       h('div', {
         innerHTML: safe,
@@ -60,7 +60,7 @@
         ),
       }),
       h('input', {
-        class: c('rounded-lg', 'text-sm', 'pr-2', 'cursor-pointer', 'w-full', 'outline-none'),
+        class: 'rounded-lg text-sm pr-2 cursor-pointer w-full outline-none',
         value: url,
         readonly: true,
         onclick: () => {

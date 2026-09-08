@@ -7,7 +7,7 @@ import Modal from '#/layouts/Modal.astro';
 </Modal>
 
 <script>
-  import { Renderer, h, c, getSearchParams, confirmButtons } from '#/scripts';
+  import { Renderer, h, getSearchParams, confirmButtons } from '#/scripts';
 
   const { searchParams, winId } = getSearchParams();
 
@@ -27,10 +27,10 @@ import Modal from '#/layouts/Modal.astro';
   new Renderer(
     h(
       'div',
-      { class: c('flex', 'flex-col', 'gap-3') },
-      h('h1', { class: c('text-lg') }, t['pages:prompt.message']),
-      h('p', { class: c('text-md', 'my-6') }, message),
-      h('div', { class: c('flex', 'justify-center', 'gap-3') }, ...btns),
+      { class: 'flex flex-col gap-3' },
+      h('h1', { class: 'text-lg' }, t['pages:prompt.message']),
+      h('p', { class: 'text-md my-6' }, message),
+      h('div', { class: 'flex justify-center gap-3' }, ...btns),
     ),
   ).render('container', { onRendered: registerBtnsEvents });
 </script>
