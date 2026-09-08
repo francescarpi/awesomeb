@@ -290,5 +290,9 @@
   "viewTabSource": {
     "name": "View Page Source",
     "description": "View the page source"
+  },
+  "bookmarksAddDesktop": {
+    "name": "Save Desktop Tabs",
+    "description": "Save the desktop tabs to bookmarks"
   }
 }

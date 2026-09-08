@@ -9,3 +9,8 @@ export type {
   IFolderBookmark,
   IPlainBookmark,
 } from '@/core/bookmarks/schemes';
+
+export interface IBookmarkEntry {
+  title: string;
+  url: string;
+}

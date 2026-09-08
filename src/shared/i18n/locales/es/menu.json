@@ -65,6 +65,7 @@
   },
   "contextDesktop": {
     "suspendAllTabs": "Suspender todas las pestañas",
+    "addTabsToBookmarks": "Guardar pestañas del escritorio en marcadores",
     "rename": "Renombrar",
     "changeTheme": "Cambiar tema",
     "moveLeft": "Mover a la izquierda",

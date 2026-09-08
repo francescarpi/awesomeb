@@ -31,6 +31,7 @@ import type {
   IMediaSession,
   TMediaAction,
   IAppUpdaterInfo,
+  IBookmarkEntry,
 } from '~/types';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
@@ -152,6 +153,9 @@ const abTabs = {
   onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => {
     ipcRenderer.on('tab:has-split', callback);
   },
+  close: async (winId: TWindowId, tabIds: TTabId[]) => {
+    return await ipcRenderer.invoke('tabs:close', { winId, tabIds });
+  },
 };
 
 //--------------------------------------------------------------------------------------
@@ -169,14 +173,18 @@ const abUrlBar = {
 
 //--------------------------------------------------------------------------------------
 const abBookmarks = {
-  add: (
+  add: async (
     winId: TWindowId,
     parentFolderId: string,
-    title: string,
-    url: string,
     newFolderName: string | null,
+    entries: IBookmarkEntry[],
   ) => {
-    ipcRenderer.send('bookmarks:add', { winId, parentFolderId, title, url, newFolderName });
+    return await ipcRenderer.invoke('bookmarks:add', {
+      winId,
+      parentFolderId,
+      newFolderName,
+      entries,
+    });
   },
   get: async (): Promise<IBookmark[]> => {
     return await ipcRenderer.invoke('bookmarks:get');

@@ -65,6 +65,7 @@
   },
   "contextDesktop": {
     "suspendAllTabs": "Suspend all tabs",
+    "addTabsToBookmarks": "Save desktop tabs to bookmarks",
     "rename": "Rename",
     "changeTheme": "Change theme",
     "moveLeft": "Move left",

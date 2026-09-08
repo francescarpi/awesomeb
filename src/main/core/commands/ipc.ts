@@ -30,7 +30,14 @@ export function setupCommandsIPC(browser: Browser) {
 
       if (comesFromPerformCommand && command.modal) {
         // Show command page...
-        win.modal.open(command.modal.page, command.modal.props);
+        const query = {
+          ...(command.modal.props?.query || {}),
+        };
+        const selectedDesktop = win.selectedDesktop;
+        query['desktopId'] = selectedDesktop.id.toString();
+        query['desktopLabel'] = selectedDesktop.label;
+
+        win.modal.open(command.modal.page, { ...command.modal.props, query });
         return;
       }
 

@@ -1,3 +1,6 @@
+import { TDesktopId } from './desktop';
+import { TWindowId } from './window';
+
 export type TEntityType =
   | 'commands'
   | 'desktops'
@@ -45,8 +48,12 @@ export interface ITabEntity extends IEntity {
   lastAccessed: number;
   partitionColor: string;
   suspended: boolean;
+  desktopId: TDesktopId;
+  windowId: TWindowId;
 }
 
 export interface ITabContainerEntity extends IEntity {}
 
-export interface IBookmarkEntity extends IEntity {}
+export interface IBookmarkEntity extends IEntity {
+  folderId: string;
+}
