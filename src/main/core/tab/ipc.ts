@@ -9,7 +9,7 @@ import {
   modalChecker,
 } from '@/utils';
 import { FindInPageOptions, Certificate, type IpcMainInvokeEvent } from 'electron';
-import type { IWinDesConTab, TFindInPageAction, TTabPreviewAction } from '~/types';
+import type { IWinDesConTab, TFindInPageAction, TTabPreviewAction, TTabId } from '~/types';
 import log from 'electron-log';
 import { CertificateError } from '@/core/tab/certificate-error';
 
@@ -220,6 +220,26 @@ export function setupTabIPC(browser: Browser) {
     [windowChecker],
     async ({ win }) => {
       return browser.renderer.tabSwitcherData(win);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window; tabIds: TTabId[] }>(
+    'tabs:close',
+    'handle',
+    browser,
+    [windowChecker],
+    async ({ win, tabIds }) => {
+      const selected = win.selectedTab;
+
+      await Promise.all(tabIds.map((id) => browser.closeTab(id, { emit: false })));
+
+      if (selected && tabIds.includes(selected.tab.id)) {
+        const next = win.getLastAccessedTab({ desktop: selected.desktop, ignore: tabIds });
+        if (next) await win.selectTab(next.tab.id);
+      }
+
+      browser.eventsChannel.emit('window:tab-did-close', win);
     },
   );
 }

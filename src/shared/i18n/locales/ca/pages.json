@@ -386,5 +386,13 @@
   "tabContainers": {
     "collapsedTabs_one": "({{count}} pestanya col·lapsada)",
     "collapsedTabs_other": "({{count}} pestanyes col·lapsades)"
+  },
+  "bookmarksDesktopToBookmarks": {
+    "title": "Desa als marcadors",
+    "intro": "Selecciona les pestanyes que vols desar als marcadors",
+    "rootFolder": "Selecciona una carpeta pare:",
+    "createFolder": "Crear carpeta filla sota el pare seleccionat",
+    "folderName": "Nom de la carpeta",
+    "close": "Tanca les pestanyes després de desar-les"
   }
 }

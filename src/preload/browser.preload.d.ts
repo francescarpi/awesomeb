@@ -32,6 +32,7 @@ import type {
   TMediaAction,
   IAppUpdaterInfo,
   IConfigInfo,
+  IBookmarkEntry,
 } from '~/types';
 import { IpcRendererEvent } from 'electron';
 
@@ -101,6 +102,7 @@ declare global {
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
     tabPreviewAction: (parentTabId: TTabId, action: TTabPreviewAction) => void;
     onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => void;
+    close: (winId: TWindowId, tabIds: TTabId[]) => Promise<void>;
   };
 
   //--------------------------------------------------------------------------------------
@@ -117,10 +119,9 @@ declare global {
     add: (
       winId: TWindowId,
       parentFolderId: string,
-      title: string,
-      url: string,
       newFolderName: string | null,
-    ) => void;
+      entries: IBookmarkEntry[],
+    ) => Promise<void>;
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
     open: (bookmarkId: string) => Promise<void>;

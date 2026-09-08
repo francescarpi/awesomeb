@@ -7,18 +7,16 @@ export function setupBookmarksIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
   createHandler<{
     parentFolderId: string;
-    title: string;
-    url: string;
     newFolderName: string | null;
+    entries: { title: string; url: string }[];
     win: Window;
   }>(
     'bookmarks:add',
-    'on',
+    'handle',
     browser,
     [windowChecker, modalChecker],
-    async ({ parentFolderId, title, url, newFolderName, win }) => {
-      bookmarks.add(parentFolderId, title, url, newFolderName);
-      win.modal.close();
+    async ({ parentFolderId, newFolderName, entries }) => {
+      bookmarks.add(parentFolderId, newFolderName, entries);
       notification(t('notifications:bookmarkAdded.title'), t('notifications:bookmarkAdded.body'));
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();

@@ -19,9 +19,6 @@ export const Command: ICommand<ICommandParams> = {
   description: () => t('commands:renameDesktop.description'),
   modal: {
     page: 'rename-desktop',
-    props: {
-      height: 150,
-    },
   },
   visibility: ({ window }) => !!window,
   async handler({ window, params }) {

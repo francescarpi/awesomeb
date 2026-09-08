@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import { userDataPath } from '@/paths';
-import { EBookmarkType, IPlainBookmark, type IBookmark } from '~/types';
+import { EBookmarkType, IPlainBookmark, type IBookmark, type IBookmarkEntry } from '~/types';
 import { BookmarksStoreScheme, type IBookmarks } from './schemes';
 import { validateStore } from '@/core/validation';
 
@@ -79,33 +79,29 @@ export class Bookmarks {
     return urls;
   }
 
-  add(folderId: string, title: string, url: string, newFolder: string | null): boolean {
-    const newBookmark: IBookmark = newFolder
-      ? {
-          id: crypto.randomUUID(),
-          type: EBookmarkType.Folder,
-          title: newFolder,
-          dateAdded: Date.now(),
-          children: [
-            {
-              id: crypto.randomUUID(),
-              type: EBookmarkType.Url,
-              url,
-              title,
-              dateAdded: Date.now(),
-            },
-          ],
-        }
-      : {
-          id: crypto.randomUUID(),
-          type: EBookmarkType.Url,
-          url,
-          title,
-          dateAdded: Date.now(),
-        };
+  add(folderId: string, newFolder: string | null, entries: IBookmarkEntry[]): boolean {
+    const urlBookmarks: IBookmark[] = entries.map((entry) => ({
+      id: crypto.randomUUID(),
+      type: EBookmarkType.Url,
+      url: entry.url,
+      title: entry.title,
+      dateAdded: Date.now(),
+    }));
+
+    const toAdd: IBookmark[] = newFolder
+      ? [
+          {
+            id: crypto.randomUUID(),
+            type: EBookmarkType.Folder,
+            title: newFolder,
+            dateAdded: Date.now(),
+            children: urlBookmarks,
+          },
+        ]
+      : urlBookmarks;
 
     if (folderId === 'root') {
-      const updatedBookmarks = [...this.all, newBookmark];
+      const updatedBookmarks = [...this.all, ...toAdd];
       BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
       this._store.set('bookmarks', updatedBookmarks);
       return true;
@@ -117,7 +113,7 @@ export class Bookmarks {
           if (bookmark.id === folderId) {
             return {
               ...bookmark,
-              children: [...bookmark.children, newBookmark],
+              children: [...bookmark.children, ...toAdd],
             };
           } else {
             return {

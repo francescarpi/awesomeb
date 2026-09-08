@@ -10,12 +10,16 @@ export async function confirmButtons({
   confirmText,
   onConfirm,
   onCancel,
+  confirmDisabled = false,
+  cancelDisabled = false,
 }: {
   winId: TWindowId;
   confirmText?: string;
   onConfirm: () => void;
   onCancel?: () => void;
-}): Promise<[VNode[], () => void]> {
+  confirmDisabled?: boolean;
+  cancelDisabled?: boolean;
+}): Promise<[VNode[], () => void, (value: boolean) => void]> {
   const t = await abI18n.t({ winId }, [{ key: 'ok' }, { key: 'cancel' }]);
   const confText = confirmText || t['ok'];
   const cancelText = t['cancel'];
@@ -41,7 +45,7 @@ export async function confirmButtons({
 
   const cancel = h(
     'button',
-    { class: c('btn', 'btn-sm'), onclick: onCancel },
+    { class: c('btn', 'btn-sm'), onclick: onCancel, disabled: cancelDisabled, id: 'cancel' },
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
@@ -55,10 +59,16 @@ export async function confirmButtons({
 
   const ok = h(
     'button',
-    { class: c('btn', 'btn-sm', 'btn-primary'), onclick: onConfirm },
+    {
+      class: c('btn', 'btn-sm', 'btn-primary'),
+      onclick: onConfirm,
+      disabled: confirmDisabled,
+      id: 'confirm',
+    },
     h(
       'div',
       { class: c('flex', 'gap-1', 'items-center') },
+      h('span', { class: 'loading loading-xs hidden' }, ''),
       confText,
       h('div', {
         class: c('icon', '[&>svg]:w-full', '[&>svg]:h-full', 'w-4', 'h-4'),
@@ -69,5 +79,18 @@ export async function confirmButtons({
 
   const btns = onCancel ? [cancel, ok] : [ok];
 
-  return [btns, registerEvents];
+  const setLoading = (value: boolean) => {
+    const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
+    const loading = btn.querySelector('span.loading')!;
+
+    if (value) {
+      loading.classList.remove('hidden');
+      btn.disabled = true;
+    } else {
+      loading.classList.add('hidden');
+      btn.disabled = false;
+    }
+  };
+
+  return [btns, registerEvents, setLoading];
 }
