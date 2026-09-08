@@ -15,9 +15,8 @@ export function setupBookmarksIPC(browser: Browser) {
     'handle',
     browser,
     [windowChecker, modalChecker],
-    async ({ parentFolderId, newFolderName, entries, win }) => {
+    async ({ parentFolderId, newFolderName, entries }) => {
       bookmarks.add(parentFolderId, newFolderName, entries);
-      win.modal.close();
       notification(t('notifications:bookmarkAdded.title'), t('notifications:bookmarkAdded.body'));
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();

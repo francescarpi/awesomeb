@@ -153,6 +153,9 @@ const abTabs = {
   onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => {
     ipcRenderer.on('tab:has-split', callback);
   },
+  close: async (winId: TWindowId, tabIds: TTabId[]) => {
+    return await ipcRenderer.invoke('tabs:close', { winId, tabIds });
+  },
 };
 
 //--------------------------------------------------------------------------------------

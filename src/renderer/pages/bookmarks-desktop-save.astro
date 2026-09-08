@@ -60,7 +60,13 @@ import Title from '#/components/common/Title.astro';
         tabs.map((tab) => ({ title: tab.title, url: tab.url })),
       );
 
-      // TODO Pending close tabs
+      const closeTabs = document.querySelector<HTMLInputElement>('input#close-tabs')!.checked;
+      if (closeTabs) {
+        await abTabs.close(
+          winId,
+          tabs.map((t) => t.id),
+        );
+      }
 
       abModal.close(winId);
     },

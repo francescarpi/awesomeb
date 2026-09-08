@@ -102,6 +102,7 @@ declare global {
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
     tabPreviewAction: (parentTabId: TTabId, action: TTabPreviewAction) => void;
     onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => void;
+    close: (winId: TWindowId, tabIds: TTabId[]) => Promise<void>;
   };
 
   //--------------------------------------------------------------------------------------
