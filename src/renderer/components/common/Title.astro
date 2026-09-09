@@ -6,7 +6,9 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<h1 class="text-lg mb-2 opacity-30" data-title={title}><slot /></h1>
+<h1 class="text-lg mb-2 opacity-30" data-title={title}>
+  <slot />
+</h1>
 
 <script>
   import { getSearchParams } from '#/scripts';
