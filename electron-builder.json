@@ -20,7 +20,8 @@
     "notarize": true
   },
   "dmg": {
-    "artifactName": "${name}-${version}-${arch}.${ext}"
+    "artifactName": "${name}-${version}-${arch}.${ext}",
+    "filesystem": "APFS"
   },
   "win": {
     "target": "nsis"
