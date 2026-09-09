@@ -14,7 +14,9 @@ const { width = 'w-87.5' } = Astro.props;
     class={`bg-base-200 text-base-content ${width} absolute rounded-lg p-2 hidden border border-base-content dropshadow-md`}
     id="wrapper"
   >
-    <div id="content" class="text-sm p-4"><slot /></div>
+    <div id="content" class="text-sm p-4">
+      <slot />
+    </div>
   </div>
 </Base>
 
