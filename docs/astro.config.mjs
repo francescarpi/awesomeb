@@ -119,6 +119,13 @@ export default defineConfig({
           ],
         },
         { label: 'Auto update', translations: { 'ca': 'Actualitzacions automàtiques', 'es': 'Actualizaciones automáticas' }, slug: 'autoupdate' },
+        {
+          label: 'Developers',
+          translations: { 'ca': 'Desenvolupadors', 'es': 'Desarrolladores' },
+          items: [
+            { label: 'Multiple instances', translations: { 'ca': 'Instàncies múltiples', 'es': 'Instancias múltiples' }, slug: 'instances' },
+          ],
+        },
       ]
     }),
   ],

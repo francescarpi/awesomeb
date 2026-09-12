@@ -2,6 +2,7 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { app } from 'electron';
+import { dataConfigFolderName, resolveInstanceTag } from '@/instance';
 
 export const PRELOAD_FOLDER = path.join(__dirname, '..', 'preload');
 
@@ -11,15 +12,20 @@ export const EXTENSION_PRELOAD = path.join(PRELOAD_FOLDER, 'extension.preload.js
 
 export const RENDERER_FOLDER = path.join(__dirname, '..', 'renderer');
 
-const APP_CONFIG_FOLDER = process.env.ELECTRON_RENDERER_URL ? '.awesomeb.dev' : '.awesomeb';
+function appConfigFolder(): string {
+  const tag = resolveInstanceTag(process.argv, process.env);
+  const isDev = !!process.env.ELECTRON_RENDERER_URL;
+  return dataConfigFolderName(tag, isDev);
+}
 
 export function userDataPath(): string {
   // Use process.pid to isolate test stores per Vitest worker/process
   // This prevents cross-test contamination in watch mode or parallel runs
+  const folder = appConfigFolder();
   const userDataPath =
     process.env.TEST === 'true'
-      ? path.join('/tmp', APP_CONFIG_FOLDER, String(process.pid))
-      : path.join(os.homedir(), APP_CONFIG_FOLDER);
+      ? path.join('/tmp', folder, String(process.pid))
+      : path.join(os.homedir(), folder);
 
   if (!fs.existsSync(userDataPath)) {
     fs.mkdirSync(userDataPath, { recursive: true });

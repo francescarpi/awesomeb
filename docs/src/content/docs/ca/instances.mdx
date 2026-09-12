@@ -1,0 +1,35 @@
+---
+title: Instàncies múltiples
+---
+
+Per defecte, **AwesomeB** és una aplicació d'instància única: si un segon procés s'inicia mentre ja n'hi ha un en execució, entrega els URL que hagi rebut i es tanca, enfocant la finestra existent.
+
+Pots desactivar aquest comportament per a processos concrets etiquetant la instància amb un nom. Les instàncies amb **tags diferents** corren en paral·lel; les instàncies amb **el mateix tag** continuen respectant la regla d'instància única.
+
+El tag ve de la bandera de línia d'ordres `--instance-name=<tag>`, o de la variable d'entorn `AB_INSTANCE_NAME`. La línia d'ordres té prioritat sobre la variable d'entorn.
+
+## Builds de desenvolupament
+
+El build de desenvolupament (`pnpm dev`) sempre corre amb el tag `dev` de manera automàtica, així conviu amb una release empaquetada sense cap bandera extra:
+
+- `AwesomeB --instance-name=feina` — instància release etiquetada `feina`
+- `AB_INSTANCE_NAME=feina pnpm dev` — instància dev etiquetada `feina`
+- `pnpm dev -- --instance-name=feina` — el mateix, a través de l'script de dev
+
+## On guarda les dades cada instància
+
+El tag acota tant el userData d'Electron (que també governa el lock d'instància única) com la carpeta de dades pròpia de l'aplicació:
+
+| Tag            | userData d'Electron | Carpeta de dades de l'aplicació |
+| -------------- | ------------------- | ------------------------------- |
+| (cap, release) | `AwesomeB`          | `~/.awesomeb`                   |
+| `dev`          | `AwesomeB dev`      | `~/.awesomeb.dev`               |
+| `feina`        | `AwesomeB feina`    | `~/.awesomeb-feina`             |
+
+Les galetes, la memòria cau i les dades de perfil són per tag: dues instàncies etiquetades mai no comparteixen una sessió de navegació.
+
+:::note
+La primera vegada que llançis un build de desenvolupament després d'actualitzar a aquesta versió, arrenca amb una sessió de navegació neta (galetes i memòria cau), perquè ara queda aïllat de la release en una carpeta dedicada.
+:::
+
+Els tags es validen: només lletres, números, `-` i `_`, fins a 32 caràcters. Els tags invàlids s'ignoren i el procés cau a la instància per defecte.
