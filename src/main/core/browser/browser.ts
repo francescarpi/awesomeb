@@ -1,6 +1,7 @@
 import {
   getCommand,
   TCommandTrigger,
+  config,
   Window,
   Session,
   IWindowProps,
@@ -89,6 +90,8 @@ export class Browser {
 
       newWindow.selectDesktop(winStore.selectedDesktopId);
     }
+
+    this.trimClosedTabs();
 
     await this.refreshMainMenu();
   }
@@ -690,6 +693,8 @@ export class Browser {
       this.eventsChannel.emit('window:tab-did-close', window);
     }
 
+    this.trimClosedTabs();
+
     return true;
   }
 
@@ -791,6 +796,27 @@ export class Browser {
     });
 
     return closedTabs[0];
+  }
+
+  /**
+   * Bound the closed-tabs history to `closedTabsMaxLength` (default 30). Each
+   * soft-closed tab keeps its session data in memory and is re-serialized on
+   * every closedTabs() read, so an unbounded list would grow without limit
+   * within a session and on every restore. The oldest closed tabs beyond the
+   * cap are permanently dropped (their containers empty out and detach).
+   */
+  trimClosedTabs() {
+    const maxLength = config.getProperty('closedTabsMaxLength');
+    const closedTabs = this.closedTabs;
+    if (closedTabs.length <= maxLength) {
+      return;
+    }
+
+    closedTabs.sort((a, b) => (a.tab.closedAt || 0) - (b.tab.closedAt || 0));
+    const overflow = closedTabs.length - maxLength;
+    for (const closedTab of closedTabs.slice(0, overflow)) {
+      this.permanentlyCloseTab(closedTab.desktop, closedTab.tabContainer, closedTab.tab.id);
+    }
   }
 
   saveSession() {

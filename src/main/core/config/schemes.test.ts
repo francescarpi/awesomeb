@@ -17,6 +17,7 @@ const validConfig = {
   shortcutsOverrides: { 'tab-next': 'Ctrl+Tab' },
   historyRetentionDays: 7,
   closedTabsRetentionDays: 7,
+  closedTabsMaxLength: 30,
   uiTheme: 'cupcake',
 };
 

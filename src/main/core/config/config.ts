@@ -19,6 +19,7 @@ export class Config extends Store<IConfig> {
       shortcutsOverrides: {},
       historyRetentionDays: 7,
       closedTabsRetentionDays: 7,
+      closedTabsMaxLength: 30,
       uiTheme: DEFAULT_UI_THEME,
       // locale is set on first run via initI18n() based on the OS locale
       locale: undefined,
