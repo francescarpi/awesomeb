@@ -22,6 +22,25 @@ const RENDERER_URL = process.env.ASTRO_URL ?? 'http://localhost:4321';
 const children = [];
 let exiting = false;
 
+// Every dev build runs as a tagged "dev" instance so it can coexist with a
+// packaged release (they share Electron's single-instance lock otherwise).
+// Override with: pnpm dev -- --instance-name=<tag>  (or AB_INSTANCE_NAME=...).
+function parseInstanceName(argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg.startsWith('--instance-name=')) {
+      return arg.slice('--instance-name='.length);
+    }
+    if (arg === '--instance-name') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('-')) return next;
+    }
+  }
+  return null;
+}
+
+const instanceName = parseInstanceName(process.argv) ?? process.env.AB_INSTANCE_NAME ?? 'dev';
+
 function startChild(name, command, args, extraEnv = {}) {
   const child = spawn(command, args, {
     stdio: 'inherit',
@@ -78,5 +97,6 @@ process.on('SIGTERM', () => shutdown(0));
 
   startChild('electron-vite', 'npx', ['electron-vite', 'dev'], {
     ELECTRON_RENDERER_URL: RENDERER_URL,
+    AB_INSTANCE_NAME: instanceName,
   });
 })();
