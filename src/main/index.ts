@@ -30,6 +30,7 @@ import {
   setupAppUpdaterIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
+import { applyInstanceScope, resolveInstanceTag } from '@/instance';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
 import { registerAppEvents } from './app.events';
 import { registerOpenHandlers, attachOpenURL, discardPendingOpenURLs } from './app.open';
@@ -44,6 +45,8 @@ setupAbout();
 setupFeatures();
 electronDl();
 setupProtocols();
+
+applyInstanceScope(resolveInstanceTag(process.argv, process.env));
 
 const gotTheLock = app.requestSingleInstanceLock();
 

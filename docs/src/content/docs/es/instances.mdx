@@ -1,0 +1,35 @@
+---
+title: Instancias múltiples
+---
+
+Por defecto, **AwesomeB** es una aplicación de instancia única: si un segundo proceso arranca mientras ya hay uno en ejecución, entrega las URLs que haya recibido y se cierra, enfocando la ventana existente.
+
+Podés desactivar este comportamiento para procesos concretos etiquetando la instancia con un nombre. Las instancias con **tags distintos** corren en paralelo; las instancias con **el mismo tag** siguen respetando la regla de instancia única.
+
+El tag viene del flag de línea de comandos `--instance-name=<tag>`, o de la variable de entorno `AB_INSTANCE_NAME`. La línea de comandos tiene prioridad sobre la variable de entorno.
+
+## Builds de desarrollo
+
+El build de desarrollo (`pnpm dev`) siempre corre con el tag `dev` de forma automática, así convive con una release empaquetada sin ningún flag extra:
+
+- `AwesomeB --instance-name=trabajo` — instancia release etiquetada `trabajo`
+- `AB_INSTANCE_NAME=trabajo pnpm dev` — instancia dev etiquetada `trabajo`
+- `pnpm dev -- --instance-name=trabajo` — lo mismo, a través del script de dev
+
+## Dónde guarda los datos cada instancia
+
+El tag acota tanto el userData de Electron (que también gobierna el lock de instancia única) como la carpeta de datos propia de la app:
+
+| Tag                | userData de Electron | Carpeta de datos de la app |
+| ------------------ | -------------------- | -------------------------- |
+| (ninguno, release) | `AwesomeB`           | `~/.awesomeb`              |
+| `dev`              | `AwesomeB dev`       | `~/.awesomeb.dev`          |
+| `trabajo`          | `AwesomeB trabajo`   | `~/.awesomeb-trabajo`      |
+
+Las cookies, la caché y los datos de perfil son por tag: dos instancias etiquetadas nunca comparten una sesión de navegación.
+
+:::note
+La primera vez que lances un build de desarrollo después de actualizar a esta versión, arranca con una sesión de navegación limpia (cookies y caché), porque ahora queda aislado de la release en una carpeta dedicada.
+:::
+
+Los tags se validan: solo letras, números, `-` y `_`, hasta 32 caracteres. Los tags inválidos se ignoran y el proceso cae a la instancia por defecto.
