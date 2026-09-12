@@ -35,6 +35,7 @@ import type {
 } from '~/types';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
+import { resolveBundleKey, type I18nBundle } from '~/i18n/resolver';
 
 //--------------------------------------------------------------------------------------
 const abModal = {
@@ -426,6 +427,42 @@ const abAppUpdater = {
 };
 
 //--------------------------------------------------------------------------------------
+type RendererI18nBundle = { locale: string; namespaces: I18nBundle };
+
+let i18nBundle: RendererI18nBundle | null = null;
+let i18nBundlePromise: Promise<RendererI18nBundle | null> | null = null;
+
+// Fetches the renderer namespaces (pages + common) once per window; subsequent
+// abI18n.t calls resolve locally and never touch the main process.
+async function ensureI18nBundle(params: {
+  winId?: TWindowId;
+  tabId?: TTabId;
+}): Promise<RendererI18nBundle | null> {
+  if (i18nBundle !== null) return i18nBundle;
+  if (i18nBundlePromise === null) {
+    const props = params.winId
+      ? { winId: params.winId }
+      : params.tabId
+        ? { tabId: params.tabId }
+        : {};
+    i18nBundlePromise = ipcRenderer
+      .invoke('i18n:get-bundle', props)
+      .then((bundle: RendererI18nBundle) => {
+        i18nBundle = bundle;
+        return bundle;
+      })
+      .catch((error) => {
+        console.error('[abI18n] failed to fetch renderer bundle, falling back to i18n:t', error);
+        i18nBundlePromise = null;
+        return null;
+      });
+  }
+  return i18nBundlePromise;
+}
+
+// Only survives for keys the bundle does not cover (should be ~none in
+// practice); parametrized keys now resolve against the bundle, so this cache
+// no longer grows unbounded as it did pre-bundle.
 const i18nCache = new Map<string, string>();
 
 const abI18n = {
@@ -435,37 +472,50 @@ const abI18n = {
   ) => {
     const cacheKey = (k: string, p?: Record<string, unknown>) => `${k}:${JSON.stringify(p ?? {})}`;
 
-    const hits = new Map<string, string>();
+    const result: Record<string, string> = {};
     const misses: { key: string; params?: Record<string, unknown> }[] = [];
 
-    for (const entry of keys) {
-      const ck = cacheKey(entry.key, entry.params);
-      const cached = i18nCache.get(ck);
-      if (cached) {
-        hits.set(entry.key, cached);
-      } else {
-        misses.push(entry);
+    const bundle = await ensureI18nBundle(params);
+    if (bundle !== null) {
+      for (const entry of keys) {
+        const local = resolveBundleKey(bundle.namespaces, bundle.locale, entry.key, entry.params);
+        if (local !== undefined) {
+          result[entry.key] = local;
+        } else {
+          misses.push(entry);
+        }
       }
+    } else {
+      misses.push(...keys);
     }
 
-    let resolved: Record<string, string> = {};
     if (misses.length > 0) {
       const props = params.winId
         ? { winId: params.winId }
         : params.tabId
           ? { tabId: params.tabId }
           : {};
-      resolved = await ipcRenderer.invoke('i18n:t', { ...props, keys: misses });
+      const unresolved: { key: string; params?: Record<string, unknown> }[] = [];
       for (const entry of misses) {
-        if (entry.key in resolved) {
-          i18nCache.set(cacheKey(entry.key, entry.params), resolved[entry.key]);
+        const ck = cacheKey(entry.key, entry.params);
+        const cached = i18nCache.get(ck);
+        if (cached !== undefined) {
+          result[entry.key] = cached;
+        } else {
+          unresolved.push(entry);
+        }
+      }
+      if (unresolved.length > 0) {
+        const resolved = await ipcRenderer.invoke('i18n:t', { ...props, keys: unresolved });
+        for (const entry of unresolved) {
+          if (entry.key in resolved) {
+            i18nCache.set(cacheKey(entry.key, entry.params), resolved[entry.key]);
+            result[entry.key] = resolved[entry.key];
+          }
         }
       }
     }
 
-    const result: Record<string, string> = {};
-    for (const [k, v] of hits) result[k] = v;
-    Object.assign(result, resolved);
     return result;
   },
 };

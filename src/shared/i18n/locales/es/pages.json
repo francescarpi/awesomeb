@@ -114,6 +114,7 @@
   "history": {
     "title": "Historial",
     "searchHistory": "Buscar en el historial",
+    "searchPlaceholder": "Buscar en el historial...",
     "clearHistory": "Borrar historial",
     "tableTitle": "Título",
     "tableUrl": "URL",

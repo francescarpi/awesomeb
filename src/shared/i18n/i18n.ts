@@ -9,11 +9,19 @@ import {
 } from './constants';
 import { app } from 'electron';
 import Backend from 'i18next-fs-backend';
+import log from 'electron-log';
 import path from 'path';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { config } from '@/core';
-import type { Locale } from './types';
+import type { Locale, Namespace } from './types';
+
+const scopeLog = log.scope('I18n');
+
+// The only namespaces the renderer consumes through abI18n.t (see the
+// performance audit: 48 call sites, all in pages/common). Bundling just these
+// keeps the once-per-window transfer small (~13 KB).
+const RENDERER_NAMESPACES: Namespace[] = ['pages', 'common'];
 
 /** vitest.setup.ts exports TEST=true before any import; the real app never does. */
 function isTestEnv(): boolean {
@@ -98,4 +106,32 @@ export function isLocale(locale: string): locale is Locale {
 export function detectSystemLocale(rawLocale: string): Locale {
   const appLocale = rawLocale.split('-')[0];
   return appLocale !== undefined && isLocale(appLocale) ? appLocale : DEFAULT_LOCALE;
+}
+
+/** Active locale as recognized by the app (falls back to the default). */
+export function currentLocale(): Locale {
+  return isLocale(i18next.language) ? i18next.language : DEFAULT_LOCALE;
+}
+
+/**
+ * Namespace bundle for the renderer (pages + common) for a given locale,
+ * read straight from disk — the same files the i18next-fs-backend lazy-loads.
+ * Returning the parsed JSON keeps the response small and deterministic
+ * regardless of which namespaces have been requested by t() so far.
+ */
+export function getRendererBundle(lng: Locale = currentLocale()): {
+  locale: Locale;
+  namespaces: Record<Namespace, Record<string, unknown>>;
+} {
+  const namespaces = {} as Record<Namespace, Record<string, unknown>>;
+  for (const ns of RENDERER_NAMESPACES) {
+    const file = path.join(app.getAppPath(), 'dist-electron/locales', lng, `${ns}.json`);
+    try {
+      namespaces[ns] = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
+    } catch (err) {
+      scopeLog.error(`Could not read renderer locale bundle ${lng}/${ns}.json`, err);
+      namespaces[ns] = {};
+    }
+  }
+  return { locale: lng, namespaces };
 }

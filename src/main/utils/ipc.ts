@@ -33,7 +33,10 @@ export function createHandler<T extends object>(
   const ipcMethod = method === 'handle' ? ipcMain.handle.bind(ipcMain) : ipcMain.on.bind(ipcMain);
 
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
-    scopeLog.info(`[${channel}] received from "${event.sender?.getURL?.()}" with props: `, rawArgs);
+    scopeLog.debug(
+      `[${channel}] received from "${event.sender?.getURL?.()}" with props: `,
+      rawArgs,
+    );
 
     const args = { ...rawArgs, event } as T;
 
