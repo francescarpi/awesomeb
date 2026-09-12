@@ -1,5 +1,6 @@
 import { app, autoUpdater } from 'electron';
 import { Browser } from '@/core';
+import { flushVisitHistory } from '@/core/visit-history/browser-hooks';
 import log from 'electron-log';
 
 const scopeLog = log.scope('AppEvents');
@@ -23,6 +24,7 @@ export function registerAppEvents(browser: Browser) {
     }
 
     setTimeout(async () => {
+      flushVisitHistory();
       browser.saveSession();
 
       const extensions = browser.extensions.active;

@@ -1,6 +1,7 @@
 import { Browser, Window, Tab, config } from '@/core';
 import { visitHistory } from './index';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { debounce } from '~/utils/debounce';
 import type { TransitionType } from './schemes';
 
 function shouldRecord(tab: Tab): boolean {
@@ -23,17 +24,26 @@ function recordUrl(tab: Tab, transition: TransitionType) {
   visitHistory.cleanupOldEntries(retentionDays);
 }
 
+// Collapse rapid navigation bursts (redirects, SPA route changes) into a
+// single visit-history write per quiet period. Flushed on quit so the last
+// pending visit is never lost.
+const debouncedRecordUrl = debounce(recordUrl, 750);
+
+export function flushVisitHistory(): void {
+  debouncedRecordUrl.flush();
+}
+
 export function registerVisitHistoryHooks(browser: Browser) {
   // Hook 1: All URL changes (did-navigate, did-navigate-in-page)
   browser.eventsChannel.on('tab:url-did-change', (tab: Tab) => {
     if (!shouldRecord(tab)) return;
-    recordUrl(tab, 'link');
+    debouncedRecordUrl(tab, 'link');
   });
 
   // Hook 2: User intentionally opened a new URL (new-tab, openURL, etc.)
   browser.eventsChannel.on('browser:url-opened', (window: Window) => {
     const tab = window.selectedTab?.tab;
     if (!tab || !shouldRecord(tab)) return;
-    recordUrl(tab, 'typed');
+    debouncedRecordUrl(tab, 'typed');
   });
 }
