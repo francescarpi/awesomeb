@@ -191,4 +191,96 @@ describe('Renderer', () => {
       expect(childTab.windowId).toBeDefined();
     });
   });
+
+  describe('tabContainers - closed tabs', () => {
+    test('excludes a soft-closed tab from the top-level tabs array', async () => {
+      const open = await browser.openURL('http://open.com', { selectTab: true });
+      expect(open).not.toBeNull();
+      const closed = await browser.openURL('http://closed.com', { targetId: 'split-tab' });
+      expect(closed).not.toBeNull();
+      await browser.closeTab(closed!.tab.id);
+
+      const rendered = browser.renderer.tabContainers(window);
+      const container = rendered.find((tc) => tc.id === open!.tabContainer.id);
+      expect(container).toBeDefined();
+      expect(container!.tabs.map((t) => t.id)).toEqual([open!.tab.id]);
+
+      // Closed-tab metadata (id, title, url) is absent from the payload.
+      const allTopLevelTabs = rendered.flatMap((tc) => tc.tabs);
+      expect(allTopLevelTabs.some((t) => t.id === closed!.tab.id)).toBe(false);
+      expect(allTopLevelTabs.map((t) => t.url)).not.toContain('http://closed.com/');
+      expect(allTopLevelTabs.some((t) => t.title.includes('closed'))).toBe(false);
+    });
+
+    test('excludes a soft-closed tab from a nested child container', async () => {
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      expect(parent).not.toBeNull();
+      const openChild = await browser.openURL('http://child-open.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      expect(openChild).not.toBeNull();
+      const closedChild = await browser.openURL('http://child-closed.com', {
+        parentTabContainer: parent!.tabContainer,
+        targetId: 'split-tab',
+      });
+      expect(closedChild).not.toBeNull();
+      await browser.closeTab(closedChild!.tab.id);
+
+      const rendered = browser.renderer.tabContainers(window);
+      const parentRendered = rendered.find((tc) => tc.id === parent!.tabContainer.id);
+      expect(parentRendered).toBeDefined();
+      const childRendered = parentRendered!.children[0];
+      expect(childRendered.tabs.map((t) => t.id)).toEqual([openChild!.tab.id]);
+    });
+
+    test('open tabs keep full metadata in top-level and nested containers', async () => {
+      const top1 = await browser.openURL('http://top1.com');
+      expect(top1).not.toBeNull();
+      const top2 = await browser.openURL('http://top2.com');
+      expect(top2).not.toBeNull();
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      expect(parent).not.toBeNull();
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      expect(child).not.toBeNull();
+
+      const rendered = browser.renderer.tabContainers(window);
+      const allTabs = rendered.flatMap((tc) => [...tc.tabs, ...tc.children.flatMap((c) => c.tabs)]);
+
+      expect(allTabs.length).toBe(4);
+      for (const tab of allTabs) {
+        expect(tab.isClosed).toBe(false);
+        expect(tab.id).toBeDefined();
+        expect(typeof tab.title).toBe('string');
+        expect(tab.url).toBeTruthy();
+        expect(tab.partition.name).toBeDefined();
+        expect(tab.desktopId).toBeDefined();
+        expect(tab.windowId).toBeDefined();
+      }
+    });
+
+    test('reopening a closed tab restores it to the payload on the next full refresh', async () => {
+      const open = await browser.openURL('http://open.com', { selectTab: true });
+      expect(open).not.toBeNull();
+      const closed = await browser.openURL('http://closed.com', { targetId: 'split-tab' });
+      expect(closed).not.toBeNull();
+      await browser.closeTab(closed!.tab.id);
+
+      const preReopen = browser.renderer.tabContainers(window);
+      const preReopenTabIds = preReopen.flatMap((tc) => tc.tabs.map((t) => t.id));
+      expect(preReopenTabIds).not.toContain(closed!.tab.id);
+
+      // Reopen flow: openClosedTab → selectTab → 'window:selected-tab-did-change'
+      // → refreshTabContainers (full refresh, same serializer).
+      window.openClosedTab(closed!.tab.id);
+
+      const reopened = browser.renderer.tabContainers(window);
+      const reopenedTab = reopened.flatMap((tc) => tc.tabs).find((t) => t.id === closed!.tab.id);
+      expect(reopenedTab).toBeDefined();
+      expect(reopenedTab!.isClosed).toBe(false);
+      expect(reopenedTab!.url).toBe('http://closed.com/');
+    });
+  });
 });

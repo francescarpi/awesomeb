@@ -26,6 +26,7 @@ import {
   config,
   setupWelcomeIPC,
   clearExpiredClosedTabs,
+  CLOSED_TABS_PURGE_INTERVAL_MS,
   setupMediaIPC,
   setupAppUpdaterIPC,
 } from '@/core';
@@ -109,5 +110,6 @@ if (!gotTheLock) {
     }
 
     setTimeout(() => clearExpiredClosedTabs(browser), 5000);
+    setInterval(() => clearExpiredClosedTabs(browser), CLOSED_TABS_PURGE_INTERVAL_MS);
   });
 }
