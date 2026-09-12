@@ -38,6 +38,15 @@ export class BrowserToRenderer {
     sidebar.send('tabs:refresh', tabContainers);
   }
 
+  refreshOneTab(window: Window, desktop: Desktop, tab: Tab) {
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    const selectedTabContainer = desktop.selectedTabContainer;
+    sidebar.send(
+      'tabs:refresh-one',
+      this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
+    );
+  }
+
   refreshURLBar(window: Window, tab: Tab | null) {
     const urlbar = window.getView<URLBar>('urlbar')!;
     urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));

@@ -2,7 +2,7 @@ import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo } from '~/types';
 import { Browser, Window, Desktop, Tab, TabContainer, notification, isViewSourceUrl } from '@/core';
 import { t } from '~/i18n';
 import log from 'electron-log';
-import { refreshUrlBarOrTab } from './events.herlpers';
+import { refreshUrlBarOrTab, refreshTabAttentionState } from './events.herlpers';
 import { UIPageView } from '@/ui';
 import { Download } from '../downloads/download';
 
@@ -255,13 +255,7 @@ export function registerBrowserEvents(browser: Browser) {
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tab:require-attention-did-change', async (tab: Tab) => {
-    const tabResult = browser.getTab(tab.id);
-    if (!tabResult) {
-      return;
-    }
-    browser.toRenderer.refreshDesktops(tabResult.window);
-    browser.toRenderer.refreshTabContainers(tabResult.window);
-    await browser.refreshMainMenu();
+    refreshTabAttentionState(browser, tab);
   });
 
   //--------------------------------------------------------------------------------------

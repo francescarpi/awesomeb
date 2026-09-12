@@ -16,11 +16,25 @@
   const { winId } = getSearchParams();
 
   // Tab containers...
-  const tabContainers = await abTabs.getTabContainers(winId);
-  const renderer = new Renderer(await renderTabContainers(tabContainers)).render('tabContainers');
+  let currentTabContainers = await abTabs.getTabContainers(winId);
+  const renderer = new Renderer(await renderTabContainers(currentTabContainers)).render(
+    'tabContainers',
+  );
 
   abTabs.onRefreshTabContainers((_event, tabContainers) => {
+    currentTabContainers = tabContainers;
     renderTabContainers(tabContainers).then((vnode) => renderer.update(vnode));
+  });
+
+  // Single-tab updates: keep the snapshot in sync and let the VDOM diff apply
+  // only the changed tab instead of re-serializing the whole tree from main.
+  abTabs.onRefreshOne((_event, tab) => {
+    const updated = updateTabInContainers(currentTabContainers, tab);
+    if (!updated) {
+      return;
+    }
+    currentTabContainers = updated;
+    renderTabContainers(currentTabContainers).then((vnode) => renderer.update(vnode));
   });
 
   // Selected desktop...
@@ -114,10 +128,33 @@
     );
   }
 
+  // Stable handlers used by every tab row. They read the tab id from a data
+  // attribute instead of capturing it in a closure, so the VDOM sees the same
+  // function reference on every rebuild and does not re-register the listeners.
+  function selectTabFromEvent(e: Event) {
+    const tabId = tabIdFromEvent(e);
+    if (tabId !== null) {
+      abCommands.perform(winId, 'select-tab', { tabId });
+    }
+  }
+
+  function openTabMenuFromEvent(e: Event) {
+    const tabId = tabIdFromEvent(e);
+    if (tabId !== null) {
+      abMenu.contextMenu(winId, 'tab', { tabId });
+    }
+  }
+
+  function tabIdFromEvent(e: Event): number | null {
+    const raw = (e.currentTarget as HTMLElement | null)?.dataset.tabId;
+    return raw === undefined ? null : Number(raw);
+  }
+
   function renderTab(t: ITab): VNode {
     return h(
       'div', // Tab
       {
+        'data-tab-id': String(t.id),
         class: c(
           'py-1.5',
           'cursor-pointer',
@@ -132,8 +169,8 @@
           t.suspended ? 'group/suspended opacity-50' : 'group/active',
           t.isClosed && 'hidden',
         ),
-        onclick: () => abCommands.perform(winId, 'select-tab', { tabId: t.id }),
-        oncontextmenu: () => abMenu.contextMenu(winId, 'tab', { tabId: t.id }),
+        onclick: selectTabFromEvent,
+        oncontextmenu: openTabMenuFromEvent,
       },
       h(
         'span', // Loading spinner
@@ -236,5 +273,38 @@
       },
       '',
     );
+  }
+
+  // Immutable-ish in-place merge: returns a shallow-copied tree with the given
+  // tab replaced by id, or null when the tab is not present in the tree.
+  function updateTabInContainers(containers: ITabContainer[], tab: ITab): ITabContainer[] | null {
+    let found = false;
+
+    const result = containers.map((tc) => {
+      const tabIndex = tc.tabs.findIndex((t) => t.id === tab.id);
+      if (tabIndex !== -1) {
+        found = true;
+        const tabs = [...tc.tabs];
+        tabs[tabIndex] = tab;
+        return { ...tc, tabs };
+      }
+
+      let childFound = false;
+      const children = tc.children.map((tcc) => {
+        const childTabIndex = tcc.tabs.findIndex((t) => t.id === tab.id);
+        if (childTabIndex !== -1) {
+          childFound = true;
+          found = true;
+          const tabs = [...tcc.tabs];
+          tabs[childTabIndex] = tab;
+          return { ...tcc, tabs };
+        }
+        return tcc;
+      });
+
+      return childFound ? { ...tc, children } : tc;
+    });
+
+    return found ? result : null;
   }
 </script>
