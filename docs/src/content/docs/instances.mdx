@@ -1,0 +1,35 @@
+---
+title: Multiple instances
+---
+
+By default, **AwesomeB** is a single-instance application: if a second process starts while one is already running, it hands over any URLs it received and quits, focusing the existing window.
+
+You can opt out of this behavior for specific processes by tagging the instance with a name. Instances with **different tags** run side by side; instances with the **same tag** still respect the single-instance rule.
+
+The tag comes from the `--instance-name=<tag>` command-line flag, or the `AB_INSTANCE_NAME` environment variable. The command line wins over the environment variable.
+
+## Development builds
+
+The dev build (`pnpm dev`) always runs as the `dev` tag automatically, so it coexists with a packaged release without any extra flags:
+
+- `AwesomeB --instance-name=work` — release instance tagged `work`
+- `AB_INSTANCE_NAME=work pnpm dev` — dev instance tagged `work`
+- `pnpm dev -- --instance-name=work` — the same, through the dev script
+
+## Where each instance stores its data
+
+The tag scopes both Electron's userData (which also drives the single-instance lock) and the app's own data folder:
+
+| Tag             | Electron userData | App data folder    |
+| --------------- | ----------------- | ------------------ |
+| (none, release) | `AwesomeB`        | `~/.awesomeb`      |
+| `dev`           | `AwesomeB dev`    | `~/.awesomeb.dev`  |
+| `work`          | `AwesomeB work`   | `~/.awesomeb-work` |
+
+Cookies, cache, and profile data are per-tag: two tagged instances never share a browsing session.
+
+:::note
+The first time you launch a dev build after updating to this version, it starts with a clean browsing session (cookies and cache), because it is now isolated from the release in a dedicated folder.
+:::
+
+Tags are validated: only letters, numbers, `-` and `_`, up to 32 characters. Invalid tags are ignored and the process falls back to the default instance.
