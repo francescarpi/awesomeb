@@ -3,11 +3,14 @@ import { Browser } from '@/core';
 import path from 'path';
 import { EDownloadStatus } from '~/types';
 
+const PROGRESS_UPDATE_DEBOUNCE_MS = 300;
+
 export class Download {
   private _status: EDownloadStatus = EDownloadStatus.Idle;
   private _receivedBytes: number = 0;
   private _visited: boolean = false;
   private _createdAt: number = Date.now();
+  private _progressUpdateScheduled: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly _browser: Browser,
@@ -20,6 +23,7 @@ export class Download {
     }
 
     this._status = status;
+    this.clearProgressUpdate();
     this._browser.eventsChannel.emit('downloads:updated');
 
     if (status === EDownloadStatus.Completed) {
@@ -37,7 +41,27 @@ export class Download {
     }
 
     this._receivedBytes = bytes;
-    this._browser.eventsChannel.emit('downloads:updated');
+    this.scheduleProgressUpdate();
+  }
+
+  private scheduleProgressUpdate() {
+    if (this._progressUpdateScheduled) {
+      return;
+    }
+
+    this._progressUpdateScheduled = setTimeout(() => {
+      this._progressUpdateScheduled = null;
+      this._browser.eventsChannel.emit('downloads:updated');
+    }, PROGRESS_UPDATE_DEBOUNCE_MS);
+  }
+
+  private clearProgressUpdate() {
+    if (!this._progressUpdateScheduled) {
+      return;
+    }
+
+    clearTimeout(this._progressUpdateScheduled);
+    this._progressUpdateScheduled = null;
   }
 
   get receivedBytes(): number {
@@ -50,6 +74,7 @@ export class Download {
     }
 
     this._visited = visited;
+    this.clearProgressUpdate();
     this._browser.eventsChannel.emit('downloads:updated');
   }
 
@@ -78,16 +103,19 @@ export class Download {
 
   cancel() {
     this._item.cancel();
+    this.clearProgressUpdate();
     this._browser.eventsChannel.emit('downloads:updated');
   }
 
   pause() {
     this._item.pause();
+    this.clearProgressUpdate();
     this._browser.eventsChannel.emit('downloads:updated');
   }
 
   resume() {
     this._item.resume();
+    this.clearProgressUpdate();
     this._browser.eventsChannel.emit('downloads:updated');
   }
 
