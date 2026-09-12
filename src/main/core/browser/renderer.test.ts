@@ -1,5 +1,6 @@
-import { beforeAll, expect, test, describe, beforeEach } from 'vitest';
+import { beforeAll, expect, test, describe, beforeEach, vi } from 'vitest';
 import { Browser, partitions, Window } from '@/core';
+import type { UIView } from '@/ui';
 import { initI18n } from '~/i18n';
 
 beforeAll(async () => {
@@ -87,6 +88,56 @@ describe('Renderer', () => {
     const tabEntry = data.find((t) => t.id === tabId);
     expect(tabEntry).toBeDefined();
     expect(tabEntry!.desktopName).toBe('My Work');
+  });
+
+  describe('Renderer.refreshTabSwitcher gating', () => {
+    test('refreshTabSwitcher is a no-op while the switcher view is hidden', () => {
+      const tabSwitcher = window.getView<UIView>('tab-switcher')!;
+      const sendSpy = vi.spyOn(tabSwitcher, 'send');
+      const visibleSpy = vi.spyOn(tabSwitcher, 'visible', 'get').mockReturnValue(false);
+
+      browser.toRenderer.refreshTabSwitcher(window);
+
+      expect(sendSpy).not.toHaveBeenCalled();
+
+      visibleSpy.mockRestore();
+      sendSpy.mockRestore();
+    });
+
+    test('refreshTabSwitcher emits while the switcher view is visible', async () => {
+      const result = await browser.openURL('http://example.com');
+      expect(result).not.toBeNull();
+
+      const tabSwitcher = window.getView<UIView>('tab-switcher')!;
+      const sendSpy = vi.spyOn(tabSwitcher, 'send');
+
+      browser.toRenderer.refreshTabSwitcher(window);
+
+      expect(sendSpy).toHaveBeenCalledTimes(1);
+      expect(sendSpy).toHaveBeenCalledWith('tabswitcher:refresh', expect.any(Array));
+
+      sendSpy.mockRestore();
+    });
+
+    test('refreshTabSwitcher returns silently when the view is missing', () => {
+      const getViewSpy = vi.spyOn(window, 'getView').mockReturnValue(null);
+
+      expect(() => browser.toRenderer.refreshTabSwitcher(window)).not.toThrow();
+
+      getViewSpy.mockRestore();
+    });
+
+    test('showTabSwitcher refreshes the switcher exactly once on open', () => {
+      const tabSwitcher = window.getView<UIView>('tab-switcher')!;
+      const sendSpy = vi.spyOn(tabSwitcher, 'send');
+
+      window.showTabSwitcher();
+
+      expect(sendSpy).toHaveBeenCalledTimes(1);
+      expect(sendSpy).toHaveBeenCalledWith('tabswitcher:refresh', expect.any(Array));
+
+      sendSpy.mockRestore();
+    });
   });
 
   describe('Renderer.tabContainers - children', () => {

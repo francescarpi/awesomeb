@@ -99,7 +99,12 @@ export class BrowserToRenderer {
   }
 
   refreshTabSwitcher(window: Window) {
-    const tabSwitcher = window.getView<TabSwitcher>('tab-switcher')!;
+    // No-op when the switcher view is missing or hidden: a hidden re-render
+    // would trigger the renderer's full list re-render + per-tab favicon IPC
+    // round-trips for an invisible view. The showTabSwitcher override in the
+    // core Window refreshes it exactly on the hidden→visible transition.
+    const tabSwitcher = window.getView<TabSwitcher>('tab-switcher');
+    if (!tabSwitcher || !tabSwitcher.visible) return;
     tabSwitcher.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
 
