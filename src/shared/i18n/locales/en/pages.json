@@ -80,7 +80,12 @@
     "title": "Duplicate a tab",
     "placeholder1": "Select a tab",
     "placeholder2": "Select a profile",
-    "placeholder3": "Select a destination"
+    "placeholder3": "Select a destination",
+    "pageLabels": {
+      "tab": "Tab",
+      "partition": "Profile",
+      "target": "Destination"
+    }
   },
   "editURL": {
     "title": "Edit URL",
@@ -138,13 +143,22 @@
   "moveTab": {
     "title": "Move Tab",
     "placeholder1": "Select a tab...",
-    "placeholder2": "Select a destination..."
+    "placeholder2": "Select a destination...",
+    "pageLabels": {
+      "tab": "Tab",
+      "target": "Destination"
+    }
   },
   "newTab": {
     "title": "New Tab",
     "placeholder1": "Enter a query or a valid URL...",
     "placeholder2": "Select a profile...",
-    "placeholder3": "Select a destination..."
+    "placeholder3": "Select a destination...",
+    "pageLabels": {
+      "query": "Search",
+      "partition": "Profile",
+      "target": "Destination"
+    }
   },
   "newWindow": {
     "title": "New Window",
@@ -154,7 +168,12 @@
     "title": "Open Bookmark",
     "placeholder1": "Filter and select a bookmark...",
     "placeholder2": "Select a profile...",
-    "placeholder3": "Select a destination..."
+    "placeholder3": "Select a destination...",
+    "pageLabels": {
+      "list": "Bookmark",
+      "partition": "Profile",
+      "target": "Destination"
+    }
   },
   "openClosed": {
     "title": "Open Closed Tab",

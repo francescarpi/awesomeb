@@ -15,5 +15,13 @@
   "save": "Save",
   "move": "Move",
   "delete": "Delete",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "pagination": {
+    "pageOf": "Page {{current}} of {{total}}: {{label}}",
+    "legend": "<kbd>{{next}}</kbd> / <kbd>{{prev}}</kbd>",
+    "ariaLabel": "Pagination",
+    "goToPage": "Go to {{label}}",
+    "nextShortcut": "Tab",
+    "prevShortcut": "Shift+Tab"
+  }
 }

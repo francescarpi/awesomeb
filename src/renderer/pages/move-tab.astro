@@ -8,36 +8,34 @@ import Pagination from '#/components/common/Pagination.astro';
 <Modal width="500px" height="600px">
   <Title title="pages:moveTab.title" />
   <div class="h-full">
-    <Pagination />
+    <Pagination
+      pages={[
+        { id: 'tab', labelKey: 'pages:moveTab.pageLabels.tab' },
+        { id: 'target', labelKey: 'pages:moveTab.pageLabels.target' },
+      ]}
+    />
     <ListWithSearch placeholder="pages:moveTab.placeholder1" id="tab" />
     <ListWithSearch placeholder="pages:moveTab.placeholder2" id="target" />
   </div>
 </Modal>
 
 <script>
-  import { paginatorManager, listWithSearchManager, getSearchParams } from '#/scripts';
+  import { listWithSearchManager, getSearchParams, getPaginatorAsync } from '#/scripts';
   import { IEntity, IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
-    'pagesIndicator',
-    ['tab', 'target'],
-  );
-
-  refreshPageVisibility();
-  refreshPageIndicator();
+  const { nextPage, previousPage } = await getPaginatorAsync('pagesIndicator');
 
   let tab: IEntity | null = null;
   let target: IPartitionEntity | null = null;
 
-  // ------------------------------------------------------
   listWithSearchManager('tab', {
     entity: 'tabs',
     onEscape: () => abModal.close(winId),
     onTab: () => nextPage(),
     onShiftTab: () => previousPage(),
-    onChange: async (_inputValue, entity, _inputEl) => {
+    onChange: async (_inputValue, entity) => {
       tab = entity as IEntity;
     },
     onAccept: () => {
@@ -50,7 +48,6 @@ import Pagination from '#/components/common/Pagination.astro';
     },
   });
 
-  // ------------------------------------------------------
   listWithSearchManager('target', {
     entity: 'targets',
     onEscape: () => abModal.close(winId),
