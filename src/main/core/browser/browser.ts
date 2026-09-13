@@ -45,7 +45,6 @@ export class Browser {
   private _welcomeWindow: WelcomeWindow | null = null;
   private _menuRefreshScheduled = false;
   private _bookmarksMenuCache: MenuItemConstructorOptions[] | null = null;
-  private _bookmarksMenuRevision = 0;
 
   public readonly eventsChannel = new EventEmitter();
   public readonly renderer = new BrowserRenderer(this);
@@ -169,15 +168,13 @@ export class Browser {
   }
 
   invalidateBookmarksMenuCache(): void {
-    this._bookmarksMenuRevision++;
     this._bookmarksMenuCache = null;
   }
 
   async getBookmarksSubMenu(window: Window | null): Promise<MenuItemConstructorOptions[]> {
-    // Cache is keyed on the bookmarks revision instead of the window id:
-    // the submenu content is window-agnostic, so focus/blur cycles no longer
-    // rebuild favicons. Invalidation bumps the revision and clears the cache
-    // together, so a non-null cache implies the revision is unchanged.
+    // Cache is keyed on nullness instead of the window id: the submenu content
+    // is window-agnostic, so focus/blur cycles no longer rebuild favicons.
+    // Invalidation clears the cache, so a non-null cache is always valid.
     if (this._bookmarksMenuCache !== null) {
       return this._bookmarksMenuCache;
     }
