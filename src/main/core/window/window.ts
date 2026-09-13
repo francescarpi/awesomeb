@@ -416,6 +416,14 @@ export class Window extends UIWindow {
     super.toggleMaximizeArea(window);
   }
 
+  showTabSwitcher() {
+    super.showTabSwitcher();
+    // Refresh on the hidden→visible transition: the switcher view is created
+    // hidden and both callers (menu accelerator, Ctrl+Tab keydown) already
+    // guard on !isTabSwitcherVisible, so this fires exactly once per open.
+    this.browser.toRenderer.refreshTabSwitcher(this);
+  }
+
   get tabsRequireAttention(): IDesConTab[] {
     const tabs = this.tabs.filter((conTab) => conTab.tab.requireAttention);
     return tabs;

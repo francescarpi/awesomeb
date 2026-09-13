@@ -1,5 +1,6 @@
-import { expect, test, describe, beforeEach, afterEach } from 'vitest';
+import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
 import { Config } from './config';
+import { ConfigScheme } from './schemes';
 import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
@@ -129,5 +130,63 @@ describe('Config', () => {
     const newConfig = { ...config.config, permissionsType: 'strict' as const };
     config.save(newConfig);
     expect(config.isStandardPermissions).toBe(false);
+  });
+
+  test('getProperty caches the validated store: second read does not re-parse', () => {
+    const config = new Config();
+    const parseSpy = vi.spyOn(ConfigScheme, 'parse');
+
+    config.getProperty('shortcutMap');
+    expect(parseSpy).toHaveBeenCalledTimes(1);
+
+    config.getProperty('shortcutMap');
+    expect(parseSpy).toHaveBeenCalledTimes(1);
+
+    parseSpy.mockRestore();
+  });
+
+  test('save() invalidates the cache: next read re-parses the new config once', () => {
+    const config = new Config();
+    const parseSpy = vi.spyOn(ConfigScheme, 'parse');
+
+    config.getProperty('shortcutMap');
+    expect(parseSpy).toHaveBeenCalledTimes(1);
+
+    const newConfig = { ...config.config, shortcutMap: 'macos' };
+    config.save(newConfig);
+
+    // save() validates its input (+1) and invalidates the cache via the raw
+    // 'change' event; the next read re-parses once (+1), then stays cached.
+    expect(config.getProperty('shortcutMap')).toBe('macos');
+    expect(parseSpy).toHaveBeenCalledTimes(3);
+
+    expect(config.getProperty('shortcutMap')).toBe('macos');
+    expect(parseSpy).toHaveBeenCalledTimes(3);
+
+    parseSpy.mockRestore();
+  });
+
+  test('config.set() (Conf base method) invalidates the cache: next read re-parses once', () => {
+    const config = new Config();
+    const parseSpy = vi.spyOn(ConfigScheme, 'parse');
+
+    expect(config.getProperty('closedTabsRetentionDays')).toBe(7);
+    expect(parseSpy).toHaveBeenCalledTimes(1);
+
+    config.set('closedTabsRetentionDays', 0);
+    expect(config.getProperty('closedTabsRetentionDays')).toBe(0);
+    expect(parseSpy).toHaveBeenCalledTimes(2);
+
+    parseSpy.mockRestore();
+  });
+
+  test('config getter returns a shallow copy: mutation does not poison the cache', () => {
+    const config = new Config();
+
+    const firstCopy = config.config;
+    firstCopy.shortcutMap = 'mutated';
+
+    expect(config.config.shortcutMap).toBe('generic-ansi');
+    expect(config.getProperty('shortcutMap')).toBe('generic-ansi');
   });
 });

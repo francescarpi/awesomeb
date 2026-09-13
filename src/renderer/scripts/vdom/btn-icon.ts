@@ -10,29 +10,50 @@ export function btnIcon(
     doubleConfirmation?: boolean;
     size?: number;
     id?: string;
+    dataAction?: string;
   },
 ): VNode {
-  const { onClick, classNames, doubleConfirmation, size } = props || { size: 5.5 };
+  const { onClick, classNames, doubleConfirmation, size, dataAction } = props || { size: 5.5 };
   let numClicks = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  const buttonClass = c(
+    'text-base-content',
+    'hover:bg-white/30',
+    'cursor-pointer',
+    'rounded',
+    'flex',
+    'items-center',
+    'justify-center',
+    '[&>svg]:w-full',
+    '[&>svg]:h-full',
+    `w-${size}`,
+    `h-${size}`,
+    ...(classNames || []),
+  );
+
+  // Delegation mode: single-confirm call sites (TabContainers Close/Minus)
+  // supply a stable module-level handler that reads data-tab-id / data-action
+  // at event time. Skip the per-call wrapper closure entirely so the VDOM sees
+  // the SAME onClick ref across rebuilds — zero listener churn.
+  if (dataAction && !doubleConfirmation) {
+    return h(
+      'div',
+      {
+        class: buttonClass,
+        id: props?.id,
+        'data-action': dataAction,
+        innerHTML: icon,
+        onClick,
+      },
+      '',
+    );
+  }
 
   return h(
     'div',
     {
-      class: c(
-        'text-base-content',
-        'hover:bg-white/30',
-        'cursor-pointer',
-        'rounded',
-        'flex',
-        'items-center',
-        'justify-center',
-        '[&>svg]:w-full',
-        '[&>svg]:h-full',
-        `w-${size}`,
-        `h-${size}`,
-        ...(classNames || []),
-      ),
+      class: buttonClass,
       id: props?.id,
       innerHTML: icon,
       onClick: (e: Event) => {

@@ -5,7 +5,15 @@
 
 <script>
   import { type IDesktop } from '~/types';
-  import { getSearchParams, h, type VNode, c, Renderer } from '#/scripts';
+  import {
+    getSearchParams,
+    h,
+    type VNode,
+    c,
+    Renderer,
+    selectDesktopFromEvent,
+    desktopMenuFromEvent,
+  } from '#/scripts';
 
   const { winId } = getSearchParams();
 
@@ -28,6 +36,8 @@
         h(
           'div',
           {
+            key: desktop.id,
+            'data-desktop-id': String(desktop.id),
             class: c(
               'group',
               'relative',
@@ -61,11 +71,8 @@
                 desktop.requireAttention && 'bg-red-500/20 border-error',
               ),
               style: 'app-region: no-drag;',
-              onclick: () => abDesktops.select(winId, desktop.id),
-              oncontextmenu: () =>
-                abMenu.contextMenu(winId, 'desktop', {
-                  desktopId: desktop.id,
-                }),
+              onclick: selectDesktopFromEvent,
+              oncontextmenu: desktopMenuFromEvent,
             },
             h(
               'span',
