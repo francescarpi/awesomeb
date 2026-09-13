@@ -43,16 +43,21 @@ export function resolveBundleKey(
   params?: Record<string, unknown>,
 ): string | undefined {
   const sep = key.indexOf(':');
-  if (sep === -1) return undefined;
+  // Short key (no namespace prefix) — default to the 'common' namespace,
+  // matching i18next's defaultNS behavior. This covers bare keys like
+  // 'ok', 'cancel', 'save', 'delete' used by confirm-btns, dialogs, etc.
+  const namespace: string = sep === -1 ? 'common' : key.slice(0, sep);
+  const path: string = sep === -1 ? key : key.slice(sep + 1);
+  if (!path) return undefined;
 
-  const namespace = bundle[key.slice(0, sep)];
-  if (!namespace) return undefined;
+  const ns = bundle[namespace];
+  if (!ns) return undefined;
 
-  const segments = key.slice(sep + 1).split('.');
+  const segments = path.split('.');
   const leaf = segments.pop();
   if (!leaf) return undefined;
 
-  let node: unknown = namespace;
+  let node: unknown = ns;
   for (const segment of segments) {
     if (typeof node !== 'object' || node === null || !(segment in node)) {
       return undefined;

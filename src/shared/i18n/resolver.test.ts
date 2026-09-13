@@ -21,6 +21,11 @@ const bundle: I18nBundle = {
       collapsedTabs_other: '({{count}} tabs collapsed)',
     },
   },
+  common: {
+    ok: 'OK',
+    cancel: 'Cancel',
+    greeting: 'Hello {{name}}',
+  },
 };
 
 // The real English bundle, as read by initI18nForTests — proves the resolver
@@ -113,13 +118,22 @@ describe('resolveBundleKey', () => {
     expect(resolveBundleKey(bundle, 'en', 'menu:app.about')).toBeUndefined();
   });
 
-  test('returns undefined for keys without a namespace prefix', () => {
+  test('returns undefined for keys without a namespace prefix when not in common', () => {
     expect(resolveBundleKey(bundle, 'en', 'history.title')).toBeUndefined();
   });
 
   test('returns undefined for unknown keys', () => {
     expect(resolveBundleKey(bundle, 'en', 'pages:this.key.does.not.exist')).toBeUndefined();
     expect(resolveBundleKey(bundle, 'en', 'pages:history.title.nope')).toBeUndefined();
+  });
+
+  test('resolves a bare key (no namespace prefix) from the common namespace', () => {
+    expect(resolveBundleKey(bundle, 'en', 'ok')).toBe('OK');
+    expect(resolveBundleKey(bundle, 'en', 'cancel')).toBe('Cancel');
+  });
+
+  test('interpolates a bare key from the common namespace', () => {
+    expect(resolveBundleKey(bundle, 'en', 'greeting', { name: 'World' })).toBe('Hello World');
   });
 
   test('resolves the real English pages bundle', () => {

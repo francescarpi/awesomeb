@@ -429,8 +429,16 @@ const abAppUpdater = {
 //--------------------------------------------------------------------------------------
 type RendererI18nBundle = { locale: string; namespaces: I18nBundle };
 
+/** Max consecutive bundle IPC failures before giving up and routing every
+ * subsequent abI18n.t call to the per-key i18n:t fallback permanently. A
+ * transient failure (e.g. a single race during the main process boot) is
+ * recovered on the next call; a permanent failure (corrupted locale file,
+ * missing handler) stops wasting IPC round trips. */
+const MAX_BUNDLE_FETCH_ATTEMPTS = 3;
+
 let i18nBundle: RendererI18nBundle | null = null;
 let i18nBundlePromise: Promise<RendererI18nBundle | null> | null = null;
+let bundleFetchAttempts = 0;
 
 // Fetches the renderer namespaces (pages + common) once per window; subsequent
 // abI18n.t calls resolve locally and never touch the main process.
@@ -439,6 +447,10 @@ async function ensureI18nBundle(params: {
   tabId?: TTabId;
 }): Promise<RendererI18nBundle | null> {
   if (i18nBundle !== null) return i18nBundle;
+  if (bundleFetchAttempts >= MAX_BUNDLE_FETCH_ATTEMPTS) {
+    // Permanent failure — stop retrying, every key falls back to i18n:t.
+    return null;
+  }
   if (i18nBundlePromise === null) {
     const props = params.winId
       ? { winId: params.winId }
@@ -452,7 +464,17 @@ async function ensureI18nBundle(params: {
         return bundle;
       })
       .catch((error) => {
-        console.error('[abI18n] failed to fetch renderer bundle, falling back to i18n:t', error);
+        bundleFetchAttempts++;
+        if (bundleFetchAttempts >= MAX_BUNDLE_FETCH_ATTEMPTS) {
+          console.warn(
+            '[abI18n] bundle fetch failed',
+            MAX_BUNDLE_FETCH_ATTEMPTS,
+            'times, falling back to i18n:t permanently for this window',
+            error,
+          );
+        } else {
+          console.error('[abI18n] failed to fetch renderer bundle, retrying', error);
+        }
         i18nBundlePromise = null;
         return null;
       });
