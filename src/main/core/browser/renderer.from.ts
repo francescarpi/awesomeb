@@ -193,13 +193,17 @@ export class BrowserRenderer {
           selected: selectedTabContainer?.id === tc.id,
           divider: tc.divider,
           isClosed: tc.isClosed,
-          tabs: tc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+          tabs: tc.tabs
+            .filter((t) => !t.isClosed)
+            .map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
           isSplit: tc.hasSplitTabs,
           collapseChildren: tc.childrenCollapsed,
           children: tc.children.map((tcc) => ({
             id: tcc.id,
             selected: selectedTabContainer?.id === tcc.id,
-            tabs: tcc.tabs.map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
+            tabs: tcc.tabs
+              .filter((t) => !t.isClosed)
+              .map((tab) => this.tab(window, desktop, selectedTabContainer, tab)),
             desktopId: desktop.id,
             isClosed: tcc.isClosed,
             isSplit: tcc.hasSplitTabs,

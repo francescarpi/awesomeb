@@ -25,14 +25,13 @@ import {
   setupVisitHistoryIPC,
   config,
   setupWelcomeIPC,
-  clearExpiredClosedTabs,
   setupMediaIPC,
   setupAppUpdaterIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { applyInstanceScope, resolveInstanceTag } from '@/instance';
 import { setupLogs, setupAbout, setupFeatures } from './boot';
-import { registerAppEvents } from './app.events';
+import { registerAppEvents, startClosedTabsPurge } from './app.events';
 import { registerOpenHandlers, attachOpenURL, discardPendingOpenURLs } from './app.open';
 import { setupMenuIPC } from '@/menu';
 import electronDl from 'electron-dl';
@@ -108,6 +107,6 @@ if (!gotTheLock) {
       discardPendingOpenURLs();
     }
 
-    setTimeout(() => clearExpiredClosedTabs(browser), 5000);
+    startClosedTabsPurge(browser);
   });
 }

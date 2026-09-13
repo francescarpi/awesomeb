@@ -2,7 +2,12 @@
 // vdom.ts — Minimal Virtual DOM in TypeScript
 // =============================================================================
 
-import type { VNodeProps, VNodeChild, VNode, Patch } from './types';
+import type { VNodeProps, VNodeChild, VNode, Patch, ChildrenOp } from './types';
+
+// Side-channel property names tracked on real DOM elements. The element is
+// the only place that outlives a VNode, so we stash state needed for diff
+// against the previous render there.
+const VDOM_STYLE_KEY = '__vdom_prev_style';
 
 // ---------------------------------------------------------------------------
 // h — Hyperscript factory
@@ -19,7 +24,9 @@ import type { VNodeProps, VNodeChild, VNode, Patch } from './types';
  */
 export function h(tag: string, props: VNodeProps | null, ...rawChildren: VNodeChild[]): VNode {
   const children = flattenChildren(rawChildren);
-  return { tag, props: props ?? {}, children };
+  // `key` is a diff hint, not a real prop — strip it so it never reaches setProp.
+  const { key, ...rest } = props ?? {};
+  return { tag, props: rest, children, key: key as string | number | undefined };
 }
 
 function flattenChildren(raw: VNodeChild[]): (VNode | string)[] {
@@ -135,28 +142,153 @@ function diffChildren(oldChildren: (VNode | string)[], newChildren: (VNode | str
   const maxLen = Math.max(oldChildren.length, newChildren.length);
   if (maxLen === 0) return { type: 'NONE' };
 
-  const patches: (Patch | null)[] = [];
-  let hasChanges = false;
+  // Keyed path (opt-in): any key present anywhere, no duplicate keys, and the
+  // pre-scan says matched old indices stay strictly increasing. Otherwise the
+  // proven index-based (positional) path is used — byte-identical behavior.
+  if (oldChildren.some(isKeyed) || newChildren.some(isKeyed)) {
+    if (
+      !hasDuplicateKeys(oldChildren) &&
+      !hasDuplicateKeys(newChildren) &&
+      preScanStrictlyIncreasing(oldChildren, newChildren)
+    ) {
+      const keyed = diffChildrenKeyed(oldChildren, newChildren);
+      if (keyed !== null) return keyed;
+    }
+    // Fall through to the unkeyed path on fallback conditions.
+  }
 
-  for (let i = 0; i < oldChildren.length; i++) {
-    if (i < newChildren.length) {
-      const p = diff(oldChildren[i], newChildren[i]);
-      patches.push(p.type === 'NONE' ? null : p);
-      if (p.type !== 'NONE') hasChanges = true;
+  return diffChildrenUnkeyed(oldChildren, newChildren);
+}
+
+/** Positional index-based diff — the pre-keyed behavior, kept byte-identical. */
+function diffChildrenUnkeyed(
+  oldChildren: (VNode | string)[],
+  newChildren: (VNode | string)[],
+): Patch {
+  const ops: ChildrenOp[] = [];
+  const min = Math.min(oldChildren.length, newChildren.length);
+
+  for (let i = 0; i < min; i++) {
+    const p = diff(oldChildren[i], newChildren[i]);
+    if (p.type !== 'NONE') ops.push({ op: 'patch', index: i, patch: p });
+  }
+
+  // Surplus old children → remove ops (applied end→start by the patcher).
+  for (let i = newChildren.length; i < oldChildren.length; i++) {
+    ops.push({ op: 'remove', index: i });
+  }
+
+  // Surplus new children → insert ops at their absolute index.
+  for (let i = oldChildren.length; i < newChildren.length; i++) {
+    ops.push({ op: 'insert', index: i, vnode: newChildren[i] });
+  }
+
+  if (ops.length === 0) return { type: 'NONE' };
+  return { type: 'CHILDREN', ops };
+}
+
+/**
+ * Keyed diff — children carrying a `key` match by key and stay in place;
+ * unkeyed children compare positionally at the current cursor. Returns
+ * `null` when a guard condition forces the unkeyed positional fallback.
+ */
+function diffChildrenKeyed(
+  oldChildren: (VNode | string)[],
+  newChildren: (VNode | string)[],
+): Patch | null {
+  const oldKeyMap = new Map<string | number, number>();
+  oldChildren.forEach((child, i) => {
+    if (isKeyed(child)) oldKeyMap.set(child.key, i);
+  });
+
+  const usedOld: boolean[] = new Array(oldChildren.length).fill(false);
+  const ops: ChildrenOp[] = [];
+  let cursor = 0;
+
+  for (const child of newChildren) {
+    if (isKeyed(child)) {
+      const j = oldKeyMap.get(child.key);
+      if (j !== undefined && !usedOld[j]) {
+        // Keyed match → patch in place at its old index (tag mismatch → REPLACE
+        // comes out of diff() naturally, keeping the position).
+        while (cursor < j) {
+          if (!usedOld[cursor]) ops.push({ op: 'remove', index: cursor });
+          cursor++;
+        }
+        cursor = j + 1;
+        usedOld[j] = true;
+        const p = diff(oldChildren[j], child);
+        if (p.type !== 'NONE') ops.push({ op: 'patch', index: j, patch: p });
+      } else {
+        // Key absent → insert at the cursor. The cursor deliberately does NOT
+        // advance: consecutive unmatched-keyed inserts share the same slot and
+        // the patcher's ascending stable phase-2 applies them in emitted order,
+        // each anchored before the first surviving original node at j >= index
+        // (model-array patcher is order-independent by construction).
+        ops.push({ op: 'insert', index: cursor, vnode: child });
+      }
     } else {
-      // Extra old children will be removed
-      patches.push(null);
+      // Unkeyed → positional comparison at the cursor.
+      if (cursor < oldChildren.length) {
+        // Guard: an unkeyed child consuming a keyed slot that a later keyed
+        // child still expects → fall back to pure positional diff.
+        if (isKeyed(oldChildren[cursor]) && !usedOld[cursor]) {
+          return null;
+        }
+        const p = diff(oldChildren[cursor], child);
+        if (p.type !== 'NONE') ops.push({ op: 'patch', index: cursor, patch: p });
+        usedOld[cursor] = true;
+        cursor++;
+      } else {
+        ops.push({ op: 'insert', index: cursor, vnode: child });
+      }
     }
   }
 
-  const toAppend = newChildren.slice(oldChildren.length);
-  const toRemove = Math.max(0, oldChildren.length - newChildren.length);
-
-  if (!hasChanges && toAppend.length === 0 && toRemove === 0) {
-    return { type: 'NONE' };
+  // Leftover unconsumed old children → remove ops.
+  for (let i = cursor; i < oldChildren.length; i++) {
+    if (!usedOld[i]) ops.push({ op: 'remove', index: i });
   }
 
-  return { type: 'CHILDREN', patches, append: toAppend, remove: toRemove };
+  if (ops.length === 0) return { type: 'NONE' };
+  return { type: 'CHILDREN', ops };
+}
+
+function isKeyed(child: VNode | string): child is VNode & { key: string | number } {
+  return typeof child !== 'string' && child.key !== undefined;
+}
+
+function hasDuplicateKeys(children: (VNode | string)[]): boolean {
+  const seen = new Set<string | number>();
+  for (const child of children) {
+    if (!isKeyed(child)) continue;
+    if (seen.has(child.key)) return true;
+    seen.add(child.key);
+  }
+  return false;
+}
+
+/** Reorder detection: matched old indices for keyed new children must be
+ * strictly increasing, else the list was reordered and we fall back to the
+ * positional (content-per-position) path — zero DOM moves. */
+function preScanStrictlyIncreasing(
+  oldChildren: (VNode | string)[],
+  newChildren: (VNode | string)[],
+): boolean {
+  const oldKeyMap = new Map<string | number, number>();
+  oldChildren.forEach((child, i) => {
+    if (isKeyed(child)) oldKeyMap.set(child.key, i);
+  });
+
+  let last = -1;
+  for (const child of newChildren) {
+    if (!isKeyed(child)) continue;
+    const j = oldKeyMap.get(child.key);
+    if (j === undefined) continue; // not matched — treated as insert, does not affect order
+    if (j <= last) return false;
+    last = j;
+  }
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -203,25 +335,46 @@ export function patch(el: HTMLElement | Text, p: Patch): HTMLElement | Text {
 
     case 'CHILDREN': {
       const element = el as HTMLElement;
-      const childNodes = Array.from(element.childNodes) as (HTMLElement | Text)[];
+      // Model array = fixed-length snapshot of the ORIGINAL child list. All
+      // ops use old-space indices against it, so live-DOM drift is impossible.
+      const model = Array.from(element.childNodes) as (HTMLElement | Text | null)[];
 
-      // Patch existing children
-      for (let i = 0; i < p.patches.length; i++) {
-        const childPatch = p.patches[i];
-        if (childPatch && childNodes[i]) {
-          patch(childNodes[i], childPatch);
+      // Phase 1 — remove ops end→start (removing from the live childNodes
+      // shifts later indices, so we must go from the highest index down).
+      const removes = p.ops
+        .filter((op): op is Extract<ChildrenOp, { op: 'remove' }> => op.op === 'remove')
+        .sort((a, b) => b.index - a.index);
+      for (const op of removes) {
+        const node = model[op.index];
+        if (node) element.removeChild(node);
+        model[op.index] = null;
+      }
+
+      // Phase 2 — patch + insert ops ascending (order-independent: anchors
+      // reference surviving original-space nodes).
+      const phase2 = p.ops.filter((op) => op.op !== 'remove').sort((a, b) => a.index - b.index);
+      for (const op of phase2) {
+        if (op.op === 'patch') {
+          const node = model[op.index];
+          if (node) {
+            // REPLACE returns the new node — write it back so later inserts
+            // anchor to the *replaced* node, not the stale original.
+            model[op.index] = patch(node, op.patch) as HTMLElement | Text;
+          } else if (process.env.NODE_ENV !== 'production') {
+            // A patch op whose index was already nulled by a prior remove.
+            // diff() never emits this combination in normal use; warn loudly
+            // in dev so a future refactor that does is caught immediately.
+            console.warn(
+              '[vdom] patch op at index',
+              op.index,
+              'was orphaned by a prior remove in the same patch',
+            );
+          }
+        } else {
+          // Insert: anchor = first surviving model entry at j >= index.
+          const anchor = firstSurviving(model, op.index);
+          element.insertBefore(render(op.vnode), anchor ?? null);
         }
-      }
-
-      // Remove surplus old children (from the end)
-      for (let i = 0; i < p.remove; i++) {
-        const last = element.lastChild;
-        if (last) element.removeChild(last);
-      }
-
-      // Append new children
-      for (const newChild of p.append) {
-        element.appendChild(render(newChild));
       }
 
       return el;
@@ -255,9 +408,11 @@ function setProp(el: HTMLElement, key: string, value: VNodeProps[string]): void 
   }
 
   if (key.startsWith('on') && typeof value === 'function') {
-    // Remove any previously registered listener of the same type
+    // Identity guard: same handler ref re-rendered → skip remove/add churn.
     const eventType = key.slice(2).toLowerCase();
     const prev = (el as any).__vdom_listeners?.[eventType];
+    if (prev === value) return;
+    // Remove any previously registered listener of the same type
     if (prev) el.removeEventListener(eventType, prev);
     el.addEventListener(eventType, value as EventListener);
     if (!(el as any).__vdom_listeners) (el as any).__vdom_listeners = {};
@@ -265,8 +420,22 @@ function setProp(el: HTMLElement, key: string, value: VNodeProps[string]): void 
     return;
   }
 
-  if (key === 'style' && typeof value === 'object') {
-    Object.assign(el.style, value);
+  if (key === 'style' && typeof value === 'object' && value !== null) {
+    // Diff against the previous style object tracked on the element. Without
+    // this, properties removed in the new VNode linger on the DOM (Object.assign
+    // only adds/updates) — made worse by row memoization, where one rendered
+    // style could outlive the VNode that produced it.
+    const prev = (el as any)[VDOM_STYLE_KEY] as Record<string, unknown> | undefined;
+    const next = value as Record<string, unknown>;
+    if (prev) {
+      for (const k of Object.keys(prev)) {
+        if (!(k in next)) {
+          (el.style as unknown as Record<string, string>)[k] = '';
+        }
+      }
+    }
+    Object.assign(el.style, next);
+    (el as any)[VDOM_STYLE_KEY] = next;
     return;
   }
 
@@ -294,7 +463,24 @@ function removeProp(el: HTMLElement, key: string): void {
     }
     return;
   }
+  if (key === 'style') {
+    el.removeAttribute('style');
+    delete (el as any)[VDOM_STYLE_KEY];
+    return;
+  }
   el.removeAttribute(key);
+}
+
+/** First surviving (non-null) entry in the model at j >= from, used as the
+ * `insertBefore` anchor for insert ops. */
+function firstSurviving(
+  model: (HTMLElement | Text | null)[],
+  from: number,
+): HTMLElement | Text | null {
+  for (let i = from; i < model.length; i++) {
+    if (model[i] !== null) return model[i];
+  }
+  return null;
 }
 
 export class Renderer {

@@ -8,6 +8,8 @@ import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
 
 export class Config extends Store<IConfig> {
+  private _validatedStore: IConfig | null = null;
+
   constructor() {
     const defaults: IConfig = {
       searchEngines: [],
@@ -19,6 +21,7 @@ export class Config extends Store<IConfig> {
       shortcutsOverrides: {},
       historyRetentionDays: 7,
       closedTabsRetentionDays: 7,
+      closedTabsMaxLength: 30,
       uiTheme: DEFAULT_UI_THEME,
       // locale is set on first run via initI18n() based on the OS locale
       locale: undefined,
@@ -35,12 +38,25 @@ export class Config extends Store<IConfig> {
 
     // Validate what electron-store loaded from disk, fall back to defaults if corrupted
     this.store = validateStore(ConfigScheme, this.store, 'Config', defaults);
+
+    // Invalidate the in-memory cache on ANY store write (save(), config.set(),
+    // delete(), clear(), this.store = ...): conf dispatches a raw 'change'
+    // event on every write (conf@15 dist/source/index.js:266). The raw
+    // EventTarget listener avoids the disk re-read that onDidAnyChange() does.
+    this.events.addEventListener('change', () => {
+      this._validatedStore = null;
+    });
+  }
+
+  private get validatedStore(): IConfig {
+    if (this._validatedStore === null) {
+      this._validatedStore = ConfigScheme.parse(this.store);
+    }
+    return this._validatedStore;
   }
 
   getProperty<K extends keyof IConfig>(key: K): IConfig[K] {
-    // Validate the entire store on every read
-    ConfigScheme.parse(this.store);
-    return this.get(key);
+    return this.validatedStore[key];
   }
 
   get defaultSearchEngine(): IConfigSearchEngine {
@@ -53,9 +69,12 @@ export class Config extends Store<IConfig> {
   }
 
   get config(): IConfig {
-    // Validate before returning
-    ConfigScheme.parse(this.store);
-    return this.store;
+    // Fresh shallow copy — top-level mutation hits the copy, not the cache or
+    // the underlying store. NESTED mutation (arrays/objects like
+    // shortcutsOverrides, searchEngines) still mutates the cache and the
+    // underlying store — callers that need to mutate nested fields must call
+    // save() afterwards to fire the 'change' event and invalidate the cache.
+    return { ...this.validatedStore };
   }
 
   save(config: IConfig) {

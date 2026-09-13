@@ -23,6 +23,9 @@ import { pathToFileURL } from 'node:url';
 
 const scopeLog = log.scope('BrowserHelper');
 
+/** How often the periodic closed-tabs retention purge runs (1 hour). */
+export const CLOSED_TABS_PURGE_INTERVAL_MS = 3_600_000;
+
 export function parseQuery(query: string, searchEngineCode?: TSearchEngineCode): string | null {
   const { valid, url } = isValidUrl(query);
   let parsedURL: string = url;
@@ -304,6 +307,10 @@ export function getPartitionInfo(ses: Session): { persistent: boolean; name: str
 }
 
 export function clearExpiredClosedTabs(browser: Browser) {
+  if (!browser.hasClosedTabs) {
+    return;
+  }
+
   const now = Date.now();
   const closedTabs = browser.closedTabs;
   let totalTabsClosed = 0;

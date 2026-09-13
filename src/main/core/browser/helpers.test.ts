@@ -1,5 +1,12 @@
-import { expect, test, describe, beforeEach } from 'vitest';
-import { Browser, filePathToURL, isValidUrl, partitions } from '@/core';
+import { afterEach, expect, test, describe, beforeEach, vi } from 'vitest';
+import {
+  Browser,
+  filePathToURL,
+  isValidUrl,
+  partitions,
+  config,
+  clearExpiredClosedTabs,
+} from '@/core';
 import { MAX_SPLIT_TABS } from '~/constants';
 
 describe('parseTarget - justAfter positioning', () => {
@@ -193,5 +200,73 @@ describe('filePathToURL', () => {
 describe('isValidUrl - file protocol', () => {
   test('accepts a file:// URL', () => {
     expect(isValidUrl('file:///Users/foo/index.html').valid).toBe(true);
+  });
+});
+
+describe('clearExpiredClosedTabs', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    config.set('closedTabsRetentionDays', 7);
+  });
+
+  test('permanently closes soft-closed tabs older than closedTabsRetentionDays', async () => {
+    config.set('closedTabsRetentionDays', 0);
+
+    const nowSpy = vi.spyOn(Date, 'now');
+    const closedAt = new Date('2026-01-01T00:00:00.000Z').getTime();
+    nowSpy.mockReturnValue(closedAt);
+
+    const result = await browser.openURL('http://expired.com');
+    expect(result).not.toBeNull();
+    await browser.closeTab(result!.tab.id);
+    expect(browser.closedTabs.length).toBe(1);
+
+    const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+    nowSpy.mockReturnValue(closedAt + 60 * 60 * 1000); // +1h → beyond the 0-day retention
+
+    clearExpiredClosedTabs(browser);
+
+    expect(browser.closedTabs.length).toBe(0);
+    expect(browser.getTab(result!.tab.id)).toBeNull();
+
+    // The purge is silent: no renderer push / refresh events are emitted.
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  test('keeps fresh soft-closed tabs younger than the retention window', async () => {
+    const nowSpy = vi.spyOn(Date, 'now');
+    const closedAt = new Date('2026-01-01T00:00:00.000Z').getTime();
+    nowSpy.mockReturnValue(closedAt);
+
+    const result = await browser.openURL('http://fresh.com');
+    expect(result).not.toBeNull();
+    await browser.closeTab(result!.tab.id);
+    expect(browser.closedTabs.length).toBe(1);
+
+    nowSpy.mockReturnValue(closedAt + 24 * 60 * 60 * 1000); // +1 day < default 7-day retention
+
+    clearExpiredClosedTabs(browser);
+
+    expect(browser.closedTabs.length).toBe(1);
+    const entry = browser.getTab(result!.tab.id);
+    expect(entry).not.toBeNull();
+    expect(entry!.tab.isClosed).toBe(true);
+  });
+
+  test('early-exits without scanning when there are no closed tabs', async () => {
+    const permanentlyCloseTabSpy = vi.spyOn(browser, 'permanentlyCloseTab');
+
+    clearExpiredClosedTabs(browser);
+
+    expect(browser.closedTabs.length).toBe(0);
+    expect(permanentlyCloseTabSpy).not.toHaveBeenCalled();
   });
 });

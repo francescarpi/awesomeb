@@ -261,6 +261,6 @@ declare global {
     t: (
       params: { winId?: TWindowId; tabId?: TTabId },
       keys: { key: string; params?: Record<string, unknown> }[],
-    ) => Promise<{ key: string; value: string }>;
+    ) => Promise<Record<string, string>>;
   };
 }
