@@ -80,7 +80,12 @@
     "title": "Duplicar una pestaña",
     "placeholder1": "Selecciona una pestaña",
     "placeholder2": "Selecciona un perfil",
-    "placeholder3": "Selecciona un destino"
+    "placeholder3": "Selecciona un destino",
+    "pageLabels": {
+      "tab": "Pestaña",
+      "partition": "Perfil",
+      "target": "Destino"
+    }
   },
   "editURL": {
     "title": "Editar la URL",
@@ -138,13 +143,22 @@
   "moveTab": {
     "title": "Mover pestaña",
     "placeholder1": "Selecciona la pestaña...",
-    "placeholder2": "Selecciona el destino..."
+    "placeholder2": "Selecciona el destino...",
+    "pageLabels": {
+      "tab": "Pestaña",
+      "target": "Destino"
+    }
   },
   "newTab": {
     "title": "Nueva pestaña",
     "placeholder1": "Escribe una consulta o una URL válida...",
     "placeholder2": "Selecciona un perfil...",
-    "placeholder3": "Selecciona un destino..."
+    "placeholder3": "Selecciona un destino...",
+    "pageLabels": {
+      "query": "Buscar",
+      "partition": "Perfil",
+      "target": "Destino"
+    }
   },
   "newWindow": {
     "title": "Nueva ventana",
@@ -154,7 +168,12 @@
     "title": "Abrir un marcador",
     "placeholder1": "Busca y selecciona un marcador...",
     "placeholder2": "Selecciona un perfil...",
-    "placeholder3": "Selecciona un destino..."
+    "placeholder3": "Selecciona un destino...",
+    "pageLabels": {
+      "list": "Marcador",
+      "partition": "Perfil",
+      "target": "Destino"
+    }
   },
   "openClosed": {
     "title": "Abrir una pestaña cerrada",
