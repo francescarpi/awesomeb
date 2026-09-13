@@ -80,7 +80,12 @@
     "title": "Duplica una pestanya",
     "placeholder1": "Selecciona una pestanya",
     "placeholder2": "Selecciona un perfil",
-    "placeholder3": "Selecciona una destinació"
+    "placeholder3": "Selecciona una destinació",
+    "pageLabels": {
+      "tab": "Pestanya",
+      "partition": "Perfil",
+      "target": "Destinació"
+    }
   },
   "editURL": {
     "title": "Edita l'URL",
@@ -138,13 +143,22 @@
   "moveTab": {
     "title": "Mou la pestanya",
     "placeholder1": "Selecciona la pestanya...",
-    "placeholder2": "Selecciona una destinació..."
+    "placeholder2": "Selecciona una destinació...",
+    "pageLabels": {
+      "tab": "Pestanya",
+      "target": "Destinació"
+    }
   },
   "newTab": {
     "title": "Pestanya nova",
     "placeholder1": "Escriu una consulta o un URL vàlid...",
     "placeholder2": "Selecciona un perfil...",
-    "placeholder3": "Selecciona una destinació..."
+    "placeholder3": "Selecciona una destinació...",
+    "pageLabels": {
+      "query": "Cerca",
+      "partition": "Perfil",
+      "target": "Destinació"
+    }
   },
   "newWindow": {
     "title": "Finestra nova",
@@ -154,7 +168,12 @@
     "title": "Obre un marcador",
     "placeholder1": "Cerca i selecciona un marcador...",
     "placeholder2": "Selecciona un perfil...",
-    "placeholder3": "Selecciona una destinació..."
+    "placeholder3": "Selecciona una destinació...",
+    "pageLabels": {
+      "list": "Marcador",
+      "partition": "Perfil",
+      "target": "Destinació"
+    }
   },
   "openClosed": {
     "title": "Obre una pestanya tancada",

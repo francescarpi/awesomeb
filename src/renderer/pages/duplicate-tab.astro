@@ -8,7 +8,13 @@ import Pagination from '#/components/common/Pagination.astro';
 <Modal width="500px" height="600px">
   <Title title="pages:duplicateTab.title" />
   <div class="h-full">
-    <Pagination />
+    <Pagination
+      pages={[
+        { id: 'tab', labelKey: 'pages:duplicateTab.pageLabels.tab' },
+        { id: 'partition', labelKey: 'pages:duplicateTab.pageLabels.partition' },
+        { id: 'target', labelKey: 'pages:duplicateTab.pageLabels.target' },
+      ]}
+    />
     <ListWithSearch placeholder="pages:duplicateTab.placeholder1" id="tab" />
     <ListWithSearch placeholder="pages:duplicateTab.placeholder2" id="partition" />
     <ListWithSearch placeholder="pages:duplicateTab.placeholder3" id="target" />
@@ -16,18 +22,12 @@ import Pagination from '#/components/common/Pagination.astro';
 </Modal>
 
 <script>
-  import { listWithSearchManager, paginatorManager, getSearchParams } from '#/scripts';
+  import { listWithSearchManager, getSearchParams, getPaginatorAsync } from '#/scripts';
   import { IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
-    'pagesIndicator',
-    ['tab', 'partition', 'target'],
-  );
-
-  refreshPageVisibility();
-  refreshPageIndicator();
+  const { nextPage, previousPage } = await getPaginatorAsync('pagesIndicator');
 
   const { getSelected: getTab } = await listWithSearchManager('tab', {
     entity: 'tabs',

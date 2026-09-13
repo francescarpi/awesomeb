@@ -8,7 +8,13 @@ import Pagination from '#/components/common/Pagination.astro';
 <Modal width="500px" height="600px">
   <Title title="pages:openBookmark.title" />
   <div class="h-full">
-    <Pagination />
+    <Pagination
+      pages={[
+        { id: 'list', labelKey: 'pages:openBookmark.pageLabels.list' },
+        { id: 'partition', labelKey: 'pages:openBookmark.pageLabels.partition' },
+        { id: 'target', labelKey: 'pages:openBookmark.pageLabels.target' },
+      ]}
+    />
     <ListWithSearch placeholder="pages:openBookmark.placeholder1" id="list" />
     <ListWithSearch placeholder="pages:openBookmark.placeholder2" id="partition" />
     <ListWithSearch placeholder="pages:openBookmark.placeholder3" id="target" />
@@ -16,18 +22,12 @@ import Pagination from '#/components/common/Pagination.astro';
 </Modal>
 
 <script>
-  import { getSearchParams, listWithSearchManager, paginatorManager } from '#/scripts';
+  import { getSearchParams, listWithSearchManager, getPaginatorAsync } from '#/scripts';
   import { IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
-    'pagesIndicator',
-    ['list', 'partition', 'target'],
-  );
-
-  refreshPageVisibility();
-  refreshPageIndicator();
+  const { nextPage, previousPage } = await getPaginatorAsync('pagesIndicator');
 
   const { getSelected: getBookmark } = await listWithSearchManager('list', {
     entity: 'bookmarks',
@@ -58,7 +58,6 @@ import Pagination from '#/components/common/Pagination.astro';
     onAccept: () => handleSelect(),
   });
 
-  // ------------------------------------------------------
   function handleSelect() {
     const query = getBookmark()!.id;
     const partitionId = getPartition()!.id;

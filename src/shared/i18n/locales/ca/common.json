@@ -15,5 +15,13 @@
   "save": "Desa",
   "move": "Mou",
   "delete": "Elimina",
-  "loading": "Carregant..."
+  "loading": "Carregant...",
+  "pagination": {
+    "pageOf": "Pàgina {{current}} de {{total}}: {{label}}",
+    "legend": "<kbd>{{next}}</kbd> / <kbd>{{prev}}</kbd>",
+    "ariaLabel": "Paginació",
+    "goToPage": "Anar a {{label}}",
+    "nextShortcut": "Tab",
+    "prevShortcut": "Maj+Tab"
+  }
 }

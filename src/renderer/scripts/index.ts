@@ -1,5 +1,5 @@
 export { listWithSearchManager } from './list-with-search';
-export { paginatorManager } from './paginator';
+export { paginatorManager, getPaginator, getPaginatorAsync } from './paginator';
 export { getSearchParams } from './url';
 export { dialogConfirm } from './dialog-confirm';
 export * from './buttons';
