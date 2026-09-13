@@ -917,6 +917,74 @@ describe('Browser', () => {
     });
   });
 
+  describe('Browser.closed-tabs history is bounded (trimClosedTabs)', () => {
+    async function openAndCount(
+      total: number,
+    ): Promise<NonNullable<Awaited<ReturnType<typeof browser.openURL>>>[]> {
+      const opened: NonNullable<Awaited<ReturnType<typeof browser.openURL>>>[] = [];
+      for (let i = 0; i < total; i++) {
+        const result = await browser.openURL(`http://bound${i}.com`);
+        expect(result).not.toBeNull();
+        opened.push(result!);
+      }
+      return opened;
+    }
+
+    test('keeps every closed tab when under the cap', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const opened = await openAndCount(10);
+
+      for (const result of opened) {
+        await browser.closeTab(result.tab.id);
+      }
+
+      expect(browser.closedTabs.length).toBe(10);
+    });
+
+    test('drops the oldest closed tab once the cap is exceeded (30 by default)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const opened = await openAndCount(35);
+
+      const oldestIds = opened.slice(0, 5).map((result) => result.tab.id);
+      const newestIds = opened.slice(-5).map((result) => result.tab.id);
+
+      for (const result of opened) {
+        await browser.closeTab(result.tab.id);
+      }
+
+      // The list is bounded: the 5 oldest are permanently gone, the rest remain.
+      expect(browser.closedTabs.length).toBe(30);
+      for (const id of oldestIds) {
+        expect(browser.getTab(id)).toBeNull();
+      }
+      for (const id of newestIds) {
+        const entry = browser.getTab(id);
+        expect(entry).not.toBeNull();
+        expect(entry!.tab.isClosed).toBe(true);
+      }
+    });
+
+    test('mostRecentlyClosedTab still returns the newest entry after trimming', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const opened = await openAndCount(35);
+      const lastTabId = opened[opened.length - 1]!.tab.id;
+
+      for (const result of opened) {
+        await browser.closeTab(result.tab.id);
+      }
+
+      // Several closings land in the same millisecond; the meaningful
+      // invariant is that it returns a tab with the greatest closedAt.
+      const mostRecent = browser.mostRecentlyClosedTab;
+      const maxClosedAt = Math.max(...browser.closedTabs.map((r) => r.tab.closedAt ?? 0));
+      expect(mostRecent).not.toBeNull();
+      expect(mostRecent!.tab.closedAt).toBe(maxClosedAt);
+
+      // The very last tab closed survives the trim (only the oldest are dropped).
+      expect(browser.getTab(lastTabId)).not.toBeNull();
+    });
+  });
+
   describe('windowOpenHadler (parentTabContainer)', () => {
     function makeDetails(overrides: Partial<HandlerDetails> = {}): HandlerDetails {
       return {
