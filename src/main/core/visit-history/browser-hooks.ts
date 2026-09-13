@@ -1,7 +1,8 @@
 import { Browser, Window, Tab, config } from '@/core';
 import { visitHistory } from './index';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import { debounce } from '~/utils/debounce';
+import { debounce, type DebouncedFunction } from '~/utils/debounce';
+import type { TTabId } from '~/types';
 import type { TransitionType } from './schemes';
 
 function shouldRecord(tab: Tab): boolean {
@@ -24,26 +25,39 @@ function recordUrl(tab: Tab, transition: TransitionType) {
   visitHistory.cleanupOldEntries(retentionDays);
 }
 
-// Collapse rapid navigation bursts (redirects, SPA route changes) into a
-// single visit-history write per quiet period. Flushed on quit so the last
-// pending visit is never lost.
-const debouncedRecordUrl = debounce(recordUrl, 750);
+// Per-tab debounce: collapse rapid navigation bursts (redirects, SPA route
+// changes) into a single visit-history write per quiet period, per tab.
+// Multi-tab concurrency is preserved — a navigation burst in tab A does not
+// drop a concurrent navigation in tab B. The map grows up to one entry per
+// ever-navigated tab; closed tabs keep their entry until next restart (the
+// debouncer only holds a 750ms timer, so the leak is bounded by activity, not
+// lifetime). Flushed on quit so the last pending visit is never lost.
+const debouncersByTab = new Map<TTabId, DebouncedFunction<typeof recordUrl>>();
+
+function debouncerFor(tabId: TTabId): DebouncedFunction<typeof recordUrl> {
+  let d = debouncersByTab.get(tabId);
+  if (!d) {
+    d = debounce(recordUrl, 750);
+    debouncersByTab.set(tabId, d);
+  }
+  return d;
+}
 
 export function flushVisitHistory(): void {
-  debouncedRecordUrl.flush();
+  for (const d of debouncersByTab.values()) d.flush();
 }
 
 export function registerVisitHistoryHooks(browser: Browser) {
   // Hook 1: All URL changes (did-navigate, did-navigate-in-page)
   browser.eventsChannel.on('tab:url-did-change', (tab: Tab) => {
     if (!shouldRecord(tab)) return;
-    debouncedRecordUrl(tab, 'link');
+    debouncerFor(tab.id)(tab, 'link');
   });
 
   // Hook 2: User intentionally opened a new URL (new-tab, openURL, etc.)
   browser.eventsChannel.on('browser:url-opened', (window: Window) => {
     const tab = window.selectedTab?.tab;
     if (!tab || !shouldRecord(tab)) return;
-    debouncedRecordUrl(tab, 'typed');
+    debouncerFor(tab.id)(tab, 'typed');
   });
 }
