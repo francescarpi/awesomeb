@@ -121,7 +121,7 @@ export function currentLocale(): Locale {
  */
 export function getRendererBundle(lng: Locale = currentLocale()): {
   locale: Locale;
-  namespaces: Record<Namespace, Record<string, unknown>>;
+  namespaces: Record<(typeof RENDERER_NAMESPACES)[number], Record<string, unknown>>;
 } {
   const namespaces = {} as Record<Namespace, Record<string, unknown>>;
   for (const ns of RENDERER_NAMESPACES) {
