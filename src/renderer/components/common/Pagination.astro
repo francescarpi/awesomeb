@@ -1,4 +1,72 @@
 ---
+export interface PaginationPage {
+  /** DOM id of the page container (matches the page's HTML element id). */
+  id: string;
+  /** i18n key for the semantic label of this page, e.g. `pages:newTab.pageLabels.query`. */
+  labelKey: string;
+}
+
+export interface Props {
+  pages: PaginationPage[];
+}
+
+const { pages } = Astro.props;
+const pagesJson = JSON.stringify(pages);
 ---
 
-<div id="pagesIndicator" class="absolute top-4 right-4"></div>
+<div
+  id="pagesIndicator"
+  data-pagination-pages={pagesJson}
+  class="absolute top-2 right-2 flex flex-col items-end gap-0.5 text-xs pointer-events-none [&_button]:pointer-events-auto"
+></div>
+
+<script>
+  import { paginatorManager } from '#/scripts/paginator';
+  import { getSearchParams } from '#/scripts/url';
+
+  const { winId } = getSearchParams();
+  const indicator = document.getElementById('pagesIndicator');
+  if (!indicator) {
+    // No pagination on this page; nothing to do.
+  } else {
+    const pages = JSON.parse(indicator.dataset.paginationPages ?? '[]') as Array<{
+      id: string;
+      labelKey: string;
+    }>;
+
+    const commonKeys = [
+      'common:pagination.pageOf',
+      'common:pagination.legend',
+      'common:pagination.ariaLabel',
+      'common:pagination.goToPage',
+      'common:pagination.nextShortcut',
+      'common:pagination.prevShortcut',
+    ];
+    const labelKeys = pages.map((p) => p.labelKey);
+
+    const t = await abI18n.t(
+      { winId },
+      [...commonKeys, ...labelKeys].map((key) => ({ key })),
+    );
+
+    const instance = paginatorManager(
+      'pagesIndicator',
+      pages.map((p) => p.id),
+      {
+        labels: pages.map((p) => t[p.labelKey] ?? p.id),
+        shortcuts: {
+          next: t['common:pagination.nextShortcut'],
+          prev: t['common:pagination.prevShortcut'],
+        },
+        pageOfTpl: t['common:pagination.pageOf'],
+        legendTpl: t['common:pagination.legend'],
+        ariaLabel: t['common:pagination.ariaLabel'],
+        goToPageLabel: (label) =>
+          (t['common:pagination.goToPage'] ?? '').replace('{{label}}', label),
+      },
+    );
+
+    instance.refreshPageVisibility();
+    instance.refreshPageIndicator();
+  }
+</script>

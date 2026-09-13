@@ -8,7 +8,13 @@ import Pagination from '#/components/common/Pagination.astro';
 <Modal width="700px" height="600px">
   <Title title="pages:newTab.title" />
   <div class="h-full">
-    <Pagination />
+    <Pagination
+      pages={[
+        { id: 'query', labelKey: 'pages:newTab.pageLabels.query' },
+        { id: 'partition', labelKey: 'pages:newTab.pageLabels.partition' },
+        { id: 'target', labelKey: 'pages:newTab.pageLabels.target' },
+      ]}
+    />
     <ListWithSearch placeholder="pages:newTab.placeholder1" oneColumn id="query" />
     <ListWithSearch placeholder="pages:newTab.placeholder2" id="partition" />
     <ListWithSearch placeholder="pages:newTab.placeholder3" id="target" />
@@ -19,22 +25,15 @@ import Pagination from '#/components/common/Pagination.astro';
   import {
     listWithSearchManager,
     getSearchParams,
-    paginatorManager,
+    getPaginatorAsync,
     highlightString,
   } from '#/scripts';
   import { IPartitionEntity } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const { nextPage, previousPage, refreshPageVisibility, refreshPageIndicator } = paginatorManager(
-    'pagesIndicator',
-    ['query', 'partition', 'target'],
-  );
+  const { nextPage, previousPage } = await getPaginatorAsync('pagesIndicator');
 
-  refreshPageVisibility();
-  refreshPageIndicator();
-
-  // ------------------------------------------------------
   const { getSelected: getSearchEngine, inputEl: queryEl } = await listWithSearchManager('query', {
     entity: 'searchEngines',
     filtering: false,
@@ -79,7 +78,6 @@ import Pagination from '#/components/common/Pagination.astro';
     onAccept: () => handleSelect(),
   });
 
-  // ------------------------------------------------------
   function handleSelect() {
     if (queryEl.value.trim().length > 0) {
       const partitionId = getPartition()!.id;
