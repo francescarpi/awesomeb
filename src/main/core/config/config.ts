@@ -69,8 +69,11 @@ export class Config extends Store<IConfig> {
   }
 
   get config(): IConfig {
-    // Fresh shallow copy — mutating consumers (e.g. shortcuts/ipc.ts) hit the
-    // copy, not the cache or the underlying store.
+    // Fresh shallow copy — top-level mutation hits the copy, not the cache or
+    // the underlying store. NESTED mutation (arrays/objects like
+    // shortcutsOverrides, searchEngines) still mutates the cache and the
+    // underlying store — callers that need to mutate nested fields must call
+    // save() afterwards to fire the 'change' event and invalidate the cache.
     return { ...this.validatedStore };
   }
 

@@ -12,6 +12,15 @@ const scopeLog = log.scope('BrowserEventsHelpers');
  * macrotask. Instead of pushing a refresh round per event, we queue the touched
  * tab per window and flush once on the next tick, sending a lightweight
  * per-tab update (`tabs:refresh-one`) rather than the whole tab tree.
+ *
+ * Design note (W1 of issue #355): only the single-tab path is coalesced here.
+ * Structural refreshes (`refreshTabContainers`, `refreshDesktops`,
+ * `refreshURLBar`, `refreshTabNavigation`, `refreshTabSwitcher`, `refreshMainMenu`)
+ * stay synchronous on their respective structural events — coalescing them
+ * would either drop ordering guarantees or require a much wider re-architecture
+ * of the renderer state machine. The 4–6 full tree re-serializations per
+ * navigation reported in the audit come from the per-tab burst, not from
+ * structural events, so the single-tab coalesce covers the actual hot path.
  */
 
 interface PendingWindowRefresh {
@@ -29,6 +38,10 @@ export function refreshUrlBarOrTab(browser: Browser, tab: Tab) {
     scopeLog.warn('Could not find tab with id', tab.id, 'to refresh URL bar or tab');
     return;
   }
+
+  // Soft-closed tabs are filtered out of the sidebar push payload, so the
+  // renderer cannot merge a refresh-one for them. Skip the wasted IPC.
+  if (result.tab.isClosed) return;
 
   queueRefresh(browser, {
     windowId: result.window.id,

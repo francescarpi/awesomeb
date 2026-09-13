@@ -41,6 +41,10 @@ export class BrowserToRenderer {
   refreshOneTab(window: Window, desktop: Desktop, tab: Tab) {
     const sidebar = window.getView<Sidebar>('sidebar')!;
     const selectedTabContainer = desktop.selectedTabContainer;
+    // No selected container → no `selected` flag to compute. Skip the IPC
+    // rather than sending a refresh that would mark every other tab as
+    // unselected for one tick (the next tabs:refresh will correct it).
+    if (!selectedTabContainer) return;
     sidebar.send(
       'tabs:refresh-one',
       this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
