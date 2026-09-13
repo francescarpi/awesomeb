@@ -51,4 +51,6 @@ export const DEFAULT_UI_THEME = 'cupcake';
 
 export const MAX_SPLIT_TABS = 3;
 
+export const MAX_TAB_NAME_LENGTH = 50;
+
 export const DEFAULT_SHORTCUTS_MAP = 'generic-ansi';
