@@ -6,7 +6,7 @@ import {
   selectDesktopFromEvent,
   desktopMenuFromEvent,
 } from './desktop-handlers';
-import type { VNode, VNodeProps } from './types';
+import type { VNode, VNodeProps, Patch } from './types';
 
 const asElem = (n: VNode | string): HTMLElement | Text => render(n);
 const asEl = (n: VNode | string): HTMLElement => render(n) as HTMLElement;
@@ -1153,5 +1153,74 @@ describe('Renderer + renderTab memo (Phase 3.4, refresh-one flow)', () => {
     expect(v1After).toBe(v1First);
     expect((v1After.children[0] as VNode).children[0]).toBe(titleBefore);
     expect(container.querySelectorAll('.memo-title')[0].textContent).toBe('One');
+  });
+});
+
+describe('style diff (L2 vdom)', () => {
+  let container: HTMLElement;
+
+  beforeEach(() => {
+    container = document.getElementById('root')!;
+    container.innerHTML = '';
+  });
+
+  afterEach(() => {
+    container.innerHTML = '';
+  });
+
+  test('removed style properties are cleared from the DOM, not just overwritten', () => {
+    const renderer = new Renderer(h('div', { style: { color: 'red', fontSize: '14px' } }));
+    renderer.render('root', { replace: true });
+    const real = container.querySelector('div')!;
+
+    expect(real.style.color).toBe('red');
+    expect(real.style.fontSize).toBe('14px');
+
+    renderer.update(h('div', { style: { color: 'blue' } }));
+
+    expect(real.style.color).toBe('blue');
+    // The old fontSize must NOT linger — this is the regression the style
+    // diff guards against (Object.assign alone would leave it).
+    expect(real.style.fontSize).toBe('');
+  });
+
+  test('style={null} clears all inline styles', () => {
+    const renderer = new Renderer(h('div', { style: { color: 'red', fontSize: '14px' } }));
+    renderer.render('root', { replace: true });
+    const real = container.querySelector('div')!;
+
+    expect(real.style.color).toBe('red');
+
+    // Re-render with style={null} — goes through removeProp('style'), which
+    // must clear the style attribute AND the VDOM_STYLE_KEY side-channel.
+    renderer.update(h('div', { style: null as never }));
+
+    expect(real.getAttribute('style')).toBeNull();
+    expect((real as unknown as Record<string, unknown>).__vdom_prev_style).toBeUndefined();
+  });
+});
+
+describe('CHILDREN patch drift warnings (L3 vdom)', () => {
+  test('warns in dev when a patch op is orphaned by a prior remove at the same index', () => {
+    // Build a patch with both a remove and a patch at index 0 in the same
+    // children list — diff() never emits this combination in normal use.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const el = render(h('div', null, h('span', null, 'A')));
+    const patchOp: Patch = {
+      type: 'CHILDREN',
+      ops: [
+        { op: 'remove', index: 0 },
+        { op: 'patch', index: 0, patch: { type: 'TEXT', newText: 'B' } },
+      ],
+    };
+    patch(el, patchOp);
+    expect(warnSpy).toHaveBeenCalled();
+    const callArgs = warnSpy.mock.calls[0] as unknown[];
+    const firstArg = callArgs[0] as string;
+    expect(firstArg).toContain('[vdom]');
+    expect(firstArg).toContain('patch op at index');
+    expect(callArgs).toContain(0);
+    expect(callArgs.some((a) => typeof a === 'string' && a.includes('orphaned'))).toBe(true);
+    warnSpy.mockRestore();
   });
 });

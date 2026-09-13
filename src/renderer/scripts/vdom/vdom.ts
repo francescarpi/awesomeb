@@ -4,6 +4,11 @@
 
 import type { VNodeProps, VNodeChild, VNode, Patch, ChildrenOp } from './types';
 
+// Side-channel property names tracked on real DOM elements. The element is
+// the only place that outlives a VNode, so we stash state needed for diff
+// against the previous render there.
+const VDOM_STYLE_KEY = '__vdom_prev_style';
+
 // ---------------------------------------------------------------------------
 // h — Hyperscript factory
 // ---------------------------------------------------------------------------
@@ -355,6 +360,15 @@ export function patch(el: HTMLElement | Text, p: Patch): HTMLElement | Text {
             // REPLACE returns the new node — write it back so later inserts
             // anchor to the *replaced* node, not the stale original.
             model[op.index] = patch(node, op.patch) as HTMLElement | Text;
+          } else if (process.env.NODE_ENV !== 'production') {
+            // A patch op whose index was already nulled by a prior remove.
+            // diff() never emits this combination in normal use; warn loudly
+            // in dev so a future refactor that does is caught immediately.
+            console.warn(
+              '[vdom] patch op at index',
+              op.index,
+              'was orphaned by a prior remove in the same patch',
+            );
           }
         } else {
           // Insert: anchor = first surviving model entry at j >= index.
@@ -406,8 +420,22 @@ function setProp(el: HTMLElement, key: string, value: VNodeProps[string]): void 
     return;
   }
 
-  if (key === 'style' && typeof value === 'object') {
-    Object.assign(el.style, value);
+  if (key === 'style' && typeof value === 'object' && value !== null) {
+    // Diff against the previous style object tracked on the element. Without
+    // this, properties removed in the new VNode linger on the DOM (Object.assign
+    // only adds/updates) — made worse by row memoization, where one rendered
+    // style could outlive the VNode that produced it.
+    const prev = (el as any)[VDOM_STYLE_KEY] as Record<string, unknown> | undefined;
+    const next = value as Record<string, unknown>;
+    if (prev) {
+      for (const k of Object.keys(prev)) {
+        if (!(k in next)) {
+          (el.style as unknown as Record<string, string>)[k] = '';
+        }
+      }
+    }
+    Object.assign(el.style, next);
+    (el as any)[VDOM_STYLE_KEY] = next;
     return;
   }
 
@@ -433,6 +461,11 @@ function removeProp(el: HTMLElement, key: string): void {
       el.removeEventListener(eventType, prev);
       delete (el as any).__vdom_listeners[eventType];
     }
+    return;
+  }
+  if (key === 'style') {
+    el.removeAttribute('style');
+    delete (el as any)[VDOM_STYLE_KEY];
     return;
   }
   el.removeAttribute(key);
