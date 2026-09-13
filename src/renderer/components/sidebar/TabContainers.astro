@@ -15,6 +15,12 @@
 
   const { winId } = getSearchParams();
 
+  // Memo shared by every renderTab call (see renderTab below). Declared BEFORE
+  // the first renderTabContainers() invocation: the initial render at module
+  // top runs ahead of the rest of the top-level body, so a memo declared further
+  // down would still be in the temporal dead zone when the first rows render.
+  const tabMemo = new WeakMap<ITab, VNode>();
+
   // Tab containers...
   let currentTabContainers = await abTabs.getTabContainers(winId);
   const renderer = new Renderer(await renderTabContainers(currentTabContainers)).render(
@@ -70,6 +76,7 @@
           return h(
             'div', // Tab Container
             {
+              key: tc.id,
               class: c(
                 'hidden',
                 tc.isClosed ? 'hidden' : `group-[.desktop-${tc.desktopId}]:flex`,
@@ -106,7 +113,10 @@
             ...tc.children.map((tcc) =>
               h(
                 'div',
-                { class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden') },
+                {
+                  key: tcc.id,
+                  class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden'),
+                },
                 ...tcc.tabs.map((tcct) => renderTab(tcct)),
               ),
             ),
@@ -145,16 +155,53 @@
     }
   }
 
+  // Single-confirm action buttons (Close/Minus) route through stable handlers
+  // too: they read the row's tab id via closest() at event time, and the
+  // btnIcon delegation mode forwards data-action so the row's select handler
+  // never fires (each of these stops propagation first).
+  function closeTabFromEvent(e: Event) {
+    e.stopPropagation();
+    const tabId = tabIdFromEvent(e);
+    if (tabId !== null) {
+      abCommands.perform(winId, 'close-tab', { tabId });
+    }
+  }
+
+  function suspendTabFromEvent(e: Event) {
+    e.stopPropagation();
+    const tabId = tabIdFromEvent(e);
+    if (tabId !== null) {
+      abCommands.perform(winId, 'suspend-tab', { tabId });
+    }
+  }
+
   function tabIdFromEvent(e: Event): number | null {
-    const raw = (e.currentTarget as HTMLElement | null)?.dataset.tabId;
+    const row = (e.currentTarget as HTMLElement | null)?.closest(
+      '[data-tab-id]',
+    ) as HTMLElement | null;
+    const raw = row?.dataset.tabId;
     return raw === undefined ? null : Number(raw);
   }
 
+  // Memoize each tab's VNode by tab object reference (tabMemo declared at the
+  // top of the module, before the first renderTabContainers() call). All other
+  // tabs untouched by updateTabInContainers hit the memo and the diff collapses
+  // their subtrees to NONE. Memoized VNodes are never mutated in place.
+
   function renderTab(t: ITab): VNode {
+    const hit = tabMemo.get(t);
+    if (hit) return hit;
+    const v = buildTabVNode(t);
+    tabMemo.set(t, v);
+    return v;
+  }
+
+  function buildTabVNode(t: ITab): VNode {
     return h(
       'div', // Tab
       {
         'data-tab-id': String(t.id),
+        key: t.id,
         class: c(
           'py-1.5',
           'cursor-pointer',
@@ -242,16 +289,14 @@
         btnIcon(Close, {
           classNames: ['text-white', 'hidden', 'group-hover/suspended:block'],
           size: 5,
-          onClick: () => {
-            abCommands.perform(winId, 'close-tab', { tabId: t.id });
-          },
+          dataAction: 'close-tab',
+          onClick: closeTabFromEvent,
         }),
         btnIcon(Minus, {
           classNames: ['text-white', 'hidden', 'group-hover/active:block'],
           size: 5,
-          onClick: () => {
-            abCommands.perform(winId, 'suspend-tab', { tabId: t.id });
-          },
+          dataAction: 'suspend-tab',
+          onClick: suspendTabFromEvent,
         }),
       ),
     );

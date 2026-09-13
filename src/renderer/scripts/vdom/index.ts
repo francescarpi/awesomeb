@@ -1,6 +1,7 @@
 export * from './vdom';
 export * from './classnames';
 export * from './btn-icon';
+export * from './desktop-handlers';
 export * from './input';
 export * from './confirm-btns';
 export * from './bool';
