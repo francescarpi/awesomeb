@@ -1,10 +1,5 @@
 import { Partition, history, Browser, Window } from '@/core';
-import {
-  ITabProps,
-  TBasicAuthCallback,
-  TCertificateCallback,
-  TPermissionRequestCallback,
-} from './types';
+import { ITabProps, TBasicAuthCallback, TCertificateCallback, TPermissionRequest } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
 import { registerTabEvents } from './events';
@@ -35,7 +30,7 @@ export class Tab extends UIView {
   private _clientCertificatesAndCallback: [Certificate[], TCertificateCallback] | null = null;
   private _safe: boolean = true;
   private _certificateError: CertificateError | null = null;
-  private _requestPermission: [string, string, TPermissionRequestCallback] | null = null;
+  private readonly _permissionRequests: TPermissionRequest[] = [];
   private _parent: Tab | null = null;
   private _preview: TabPreview | null = null;
   private _eventsRegistered: boolean = false;
@@ -469,12 +464,16 @@ export class Tab extends UIView {
     this.browser.eventsChannel.emit('tab:certificate-error-did-change', this, false);
   }
 
-  setRequestPermission(data: [string, string, TPermissionRequestCallback] | null) {
-    this._requestPermission = data;
+  addPermissionRequest(data: TPermissionRequest) {
+    this._permissionRequests.push(data);
   }
 
-  get requestPermission(): [string, string, TPermissionRequestCallback] | null {
-    return this._requestPermission;
+  resolvePermissionRequest() {
+    this._permissionRequests.shift();
+  }
+
+  get requestPermission(): TPermissionRequest | null {
+    return this._permissionRequests[0] || null;
   }
 
   get parentTab(): Tab | null {
