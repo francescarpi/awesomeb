@@ -23,11 +23,9 @@ import Title from '#/components/common/Title.astro';
     winId,
     onConfirm: () => {
       abTabs.grantPermission(winId, tabId, true);
-      abModal.close(winId);
     },
     onCancel: () => {
       abTabs.grantPermission(winId, tabId, false);
-      abModal.close(winId);
     },
   });
 
