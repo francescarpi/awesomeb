@@ -56,6 +56,53 @@ describe('Tab.setZoom', () => {
   });
 });
 
+describe('Tab permission requests', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  test('queues permission requests in arrival order', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tab = result!.tab;
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+
+    tab.addPermissionRequest(['openExternal', 'example.com', 'http://example.com', firstCallback]);
+    tab.addPermissionRequest(['storage', 'example.com', 'http://example.com', secondCallback]);
+
+    expect(tab.requestPermission).toEqual([
+      'openExternal',
+      'example.com',
+      'http://example.com',
+      firstCallback,
+    ]);
+
+    tab.resolvePermissionRequest();
+
+    expect(tab.requestPermission).toEqual([
+      'storage',
+      'example.com',
+      'http://example.com',
+      secondCallback,
+    ]);
+  });
+
+  test('returns null after resolving the last permission request', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tab = result!.tab;
+    const callback = vi.fn();
+
+    tab.addPermissionRequest(['storage', 'example.com', 'http://example.com', callback]);
+    tab.resolvePermissionRequest();
+
+    expect(tab.requestPermission).toBeNull();
+  });
+});
+
 describe('Tab.resume', () => {
   let browser: Browser;
 
