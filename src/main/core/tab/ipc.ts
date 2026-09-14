@@ -171,11 +171,29 @@ export function setupTabIPC(browser: Browser) {
         return;
       }
 
-      const [permission, host, callback] = tab.tab.requestPermission;
+      const request = tab.tab.requestPermission;
+      const permission = request[0];
+      const host = request[1];
+      const callback = request[3];
 
       callback(value);
       permissions.set(host, permission, value);
-      tab.tab.setRequestPermission(null);
+      tab.tab.resolvePermissionRequest();
+      win.modal.close();
+
+      const nextRequest = tab.tab.requestPermission;
+      if (!nextRequest) {
+        return;
+      }
+
+      win.modal.open('request-permission', {
+        query: {
+          permission: nextRequest[0],
+          host: nextRequest[1],
+          url: nextRequest[2],
+          tabId: tab.tab.id.toString(),
+        },
+      });
     },
   );
 

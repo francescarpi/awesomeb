@@ -152,7 +152,12 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
       tabResult.window.selectTab(tabResult.tab.id);
     }
 
-    tabResult.tab.setRequestPermission([permission, host, callback]);
+    const hasPendingRequest = tabResult.tab.requestPermission !== null;
+    tabResult.tab.addPermissionRequest([permission, host, url, callback]);
+
+    if (hasPendingRequest) {
+      return;
+    }
 
     tabResult.window.modal.open('request-permission', {
       query: {
