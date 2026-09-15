@@ -66,18 +66,15 @@ export default defineConfig({
     build: {
       minify: MINIFY ? 'esbuild' : false,
       outDir: 'dist-electron/preload',
-      externalizeDeps: true,
+      // Sandboxed preloads cannot require dependencies from node_modules;
+      // bundle third-party imports into each standalone preload instead.
+      externalizeDeps: false,
+      isolatedEntries: true,
       rollupOptions: {
         input: {
           'browser.preload': resolve('src/preload/browser.preload.ts'),
           'tab.preload': resolve('src/preload/tab.preload.ts'),
           'extension.preload': resolve('src/preload/extension.preload.ts'),
-        },
-        output: {
-          // electron-vite 6 / Vite 8 still supports this. The modern
-          // replacement (codeSplitting: false) refuses to work with multiple
-          // inputs, so we keep the deprecated option until toolchain catches up.
-          inlineDynamicImports: false,
         },
       },
     },

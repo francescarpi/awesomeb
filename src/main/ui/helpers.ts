@@ -3,14 +3,18 @@ import path from 'path';
 import { RENDERER_FOLDER } from '@/paths';
 import { config } from '@/core/config';
 import { DEFAULT_UI_THEME } from '~/constants';
+import { currentLocale, getRendererBundleHash } from '~/i18n/i18n';
 import log from 'electron-log';
 
 const scopeLog = log.scope('UIHelpers');
 
 export async function loadPage(wc: WebContents, page: string, query: Record<string, string> = {}) {
+  const locale = currentLocale();
   const finalQuery = {
     theme: config.getProperty('uiTheme') ?? DEFAULT_UI_THEME,
     ...query,
+    i18nLocale: locale,
+    i18nHash: getRendererBundleHash(locale),
   };
 
   if (process.env.ELECTRON_RENDERER_URL) {
