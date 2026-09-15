@@ -3,28 +3,24 @@ import Layout from '#/layouts/Base.astro';
 ---
 
 <Layout>
-  <div class="fixed inset-0">
-    <div id="selectedTab" class="border-2 border-dotted absolute rounded-[14px]"></div>
-    <div
-      id="no-tabs-info"
-      class="bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm"
-    >
-      <p id="helpNewTab" class="hidden"></p>
-      <p id="helpCommandsTool" class="hidden"></p>
-    </div>
-  </div>
+  <div id="window-container"></div>
+  <!-- <div class="fixed inset-0"> -->
+  <!--   <div id="selectedTab" class="border-2 border-dotted absolute rounded-[14px]"></div> -->
+  <!--   <div -->
+  <!--     id="no-tabs-info" -->
+  <!--     class="bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm" -->
+  <!--   > -->
+  <!--     <p id="helpNewTab" class="hidden"></p> -->
+  <!--     <p id="helpCommandsTool" class="hidden"></p> -->
+  <!--   </div> -->
+  <!-- </div> -->
 </Layout>
 
 <script>
-  import { getSearchParams } from '#/scripts';
-  import { Rectangle } from 'electron';
-  import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
+  import { getSearchParams, type VNode, h, Renderer } from '#/scripts';
+  import type { ITheme } from '~/types';
 
-  document.title = 'Window';
-
-  const BORDER_WIDTH = 2;
-
-  const { winId, searchParams } = getSearchParams();
+  const { winId } = getSearchParams();
 
   const t = await abI18n.t({ winId }, [
     { key: 'pages:window.newTabSuffix' },
@@ -34,91 +30,125 @@ import Layout from '#/layouts/Base.astro';
 
   document.title = t['pages:window.title'];
 
-  const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
-  const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
-  const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
-  const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
-
-  const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
-  const areaMaximized = searchParams.get('areaMaximized') === 'true';
-
-  refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
+  const renderer = new Renderer(h('div', {})).render('window-container');
+  const state: { theme: ITheme; areaMaximized: boolean; sidebarCollapsed: boolean } = {
+    theme: { primary: '#2b7fff', secondary: '#1c398e', degrees: 238 },
+    areaMaximized: false,
+    sidebarCollapsed: false,
+  };
 
   abDesktops.getTheme(winId).then((theme) => {
-    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
-    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+    state.theme = theme;
+    renderer.update(renderContent());
     abWindow.readyToShow(winId);
   });
 
   abDesktops.onThemeRefresh((_e, theme) => {
-    const rootContainer = document.querySelector('.rootContainer') as HTMLDivElement;
-    rootContainer.style.backgroundImage = `linear-gradient(${theme.degrees}deg, ${theme.primary}, ${theme.secondary})`;
+    state.theme = theme;
+    renderer.update(renderContent());
   });
 
-  function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffix: string) {
-    if (!key) {
-      el.classList.add('hidden');
-      el.textContent = '';
-      return;
-    }
-    const platform = isMacPlatform() ? 'mac' : 'win';
-    el.textContent = `${acceleratorToDisplay(key, platform)} ${suffix}`;
-    el.classList.remove('hidden');
+  function renderContent(): VNode {
+    const left = state.areaMaximized ? 5 : state.sidebarCollapsed ? 40 : 254;
+    const top = state.areaMaximized ? 5 : state.sidebarCollapsed ? 34 : 34;
+
+    return h(
+      'div',
+      {
+        class: 'fixed inset-0',
+        style: `background-image: linear-gradient(${state.theme.degrees}deg, ${state.theme.primary}, ${state.theme.secondary})`,
+      },
+      h('div', { class: 'border-2 border-dotted absolute rounded-[14px]' }, ''),
+      h(
+        'div',
+        {
+          class: `bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm left-[${left}px] top-[${top}px]`,
+        },
+        '',
+      ),
+    );
   }
 
-  async function refreshShortcutsHelp() {
-    try {
-      const map = await abShortcuts.active(winId);
-      setHelpLine(helpNewTab, map.shortcuts.newTab?.key, t['pages:window.newTabSuffix']);
-      setHelpLine(
-        helpCommandsTool,
-        map.shortcuts.performCommand?.key,
-        t['pages:window.commandsSuffix'],
-      );
-    } catch (err) {
-      console.error('Failed to load active shortcuts', err);
-    }
-  }
+  // const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
+  // const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
+  // const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
+  // const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
+  //
+  // const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
+  // const areaMaximized = searchParams.get('areaMaximized') === 'true';
+  //
+  // refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
 
-  refreshShortcutsHelp();
-  abShortcuts.onChange(() => {
-    refreshShortcutsHelp();
-  });
+  // import { Rectangle } from 'electron';
+  // import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
+  //
+  // const BORDER_WIDTH = 2;
 
-  abWindow.onRefreshLayoutData((_e, data) => {
-    refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
-
-    const visibilityClass = data.hasVisibleTabs ? 'add' : 'remove';
-    helpNewTab.classList[visibilityClass]('hidden');
-    helpCommandsTool.classList[visibilityClass]('hidden');
-
-    refreshSelectedTabBounds(data.selectedTabBounds, data.selectedTabPartitionColor);
-  });
-
-  function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
-    if (areaMaximized) {
-      noTabsInfo.style.left = '5px';
-      noTabsInfo.style.top = '5px';
-    } else if (sidebarCollapsed) {
-      noTabsInfo.style.left = '40px';
-      noTabsInfo.style.top = '34px';
-    } else {
-      noTabsInfo.style.left = '254px';
-      noTabsInfo.style.top = '34px';
-    }
-  }
-
-  function refreshSelectedTabBounds(bounds: Rectangle | null, color: string | null) {
-    if (!bounds) {
-      selectedTab.classList.add('hidden');
-      return;
-    }
-
-    selectedTab.classList.remove('hidden');
-    selectedTab.style.left = `${bounds.x - BORDER_WIDTH}px`;
-    selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
-    selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
-    selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
-    selectedTab.style.borderColor = color || 'yellow';
-  }
+  //
+  // function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffix: string) {
+  //   if (!key) {
+  //     el.classList.add('hidden');
+  //     el.textContent = '';
+  //     return;
+  //   }
+  //   const platform = isMacPlatform() ? 'mac' : 'win';
+  //   el.textContent = `${acceleratorToDisplay(key, platform)} ${suffix}`;
+  //   el.classList.remove('hidden');
+  // }
+  //
+  // async function refreshShortcutsHelp() {
+  //   try {
+  //     const map = await abShortcuts.active(winId);
+  //     setHelpLine(helpNewTab, map.shortcuts.newTab?.key, t['pages:window.newTabSuffix']);
+  //     setHelpLine(
+  //       helpCommandsTool,
+  //       map.shortcuts.performCommand?.key,
+  //       t['pages:window.commandsSuffix'],
+  //     );
+  //   } catch (err) {
+  //     console.error('Failed to load active shortcuts', err);
+  //   }
+  // }
+  //
+  // refreshShortcutsHelp();
+  // abShortcuts.onChange(() => {
+  //   refreshShortcutsHelp();
+  // });
+  //
+  // abWindow.onRefreshLayoutData((_e, data) => {
+  //   refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
+  //
+  //   const visibilityClass = data.hasVisibleTabs ? 'add' : 'remove';
+  //   helpNewTab.classList[visibilityClass]('hidden');
+  //   helpCommandsTool.classList[visibilityClass]('hidden');
+  //
+  //   refreshSelectedTabBounds(data.selectedTabBounds, data.selectedTabPartitionColor);
+  // });
+  //
+  // function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
+  //   if (areaMaximized) {
+  //     noTabsInfo.style.left = '5px';
+  //     noTabsInfo.style.top = '5px';
+  //   } else if (sidebarCollapsed) {
+  //     noTabsInfo.style.left = '40px';
+  //     noTabsInfo.style.top = '34px';
+  //   } else {
+  //     noTabsInfo.style.left = '254px';
+  //     noTabsInfo.style.top = '34px';
+  //   }
+  // }
+  //
+  // function refreshSelectedTabBounds(bounds: Rectangle | null, color: string | null) {
+  //   if (!bounds) {
+  //     selectedTab.classList.add('hidden');
+  //     return;
+  //   }
+  //
+  //   selectedTab.classList.remove('hidden');
+  //   selectedTab.style.left = `${bounds.x - BORDER_WIDTH}px`;
+  //   selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
+  //   selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
+  //   selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
+  //   selectedTab.style.borderColor = color || 'yellow';
+  // }
 </script>
