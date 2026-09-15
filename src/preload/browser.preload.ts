@@ -35,7 +35,8 @@ import type {
 } from '~/types';
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
-import { resolveBundleKey, type I18nBundle } from '~/i18n/resolver';
+import i18next from 'i18next';
+import type { Resource, i18n as I18nInstance } from 'i18next';
 
 //--------------------------------------------------------------------------------------
 const abModal = {
@@ -427,7 +428,11 @@ const abAppUpdater = {
 };
 
 //--------------------------------------------------------------------------------------
-type RendererI18nBundle = { locale: string; namespaces: I18nBundle };
+type I18nBundle = Record<string, Record<string, unknown>>;
+type RendererI18nBundle = { locale: string; hash: string; namespaces: I18nBundle };
+type I18nCacheMetadata = { locale: string; hash: string };
+
+const I18N_STORAGE_KEY = 'awesomeb:i18n-bundle';
 
 /** Max consecutive bundle IPC failures before giving up and routing every
  * subsequent abI18n.t call to the per-key i18n:t fallback permanently. A
@@ -437,8 +442,67 @@ type RendererI18nBundle = { locale: string; namespaces: I18nBundle };
 const MAX_BUNDLE_FETCH_ATTEMPTS = 3;
 
 let i18nBundle: RendererI18nBundle | null = null;
+let preloadI18n: I18nInstance | null = null;
 let i18nBundlePromise: Promise<RendererI18nBundle | null> | null = null;
 let bundleFetchAttempts = 0;
+
+function getI18nCacheMetadata(): I18nCacheMetadata | null {
+  if (typeof window === 'undefined') return null;
+
+  const params = new URLSearchParams(window.location.search);
+  const locale = params.get('i18nLocale');
+  const hash = params.get('i18nHash');
+  return locale && hash ? { locale, hash } : null;
+}
+
+function readCachedI18nBundle(metadata: I18nCacheMetadata): RendererI18nBundle | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const serialized = window.localStorage.getItem(I18N_STORAGE_KEY);
+    if (!serialized) return null;
+
+    const cached = JSON.parse(serialized) as Partial<RendererI18nBundle>;
+    if (
+      cached.locale !== metadata.locale ||
+      cached.hash !== metadata.hash ||
+      cached.namespaces === undefined
+    ) {
+      return null;
+    }
+
+    return cached as RendererI18nBundle;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedI18nBundle(bundle: RendererI18nBundle): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(I18N_STORAGE_KEY, JSON.stringify(bundle));
+  } catch {
+    // Storage is an optional optimization; IPC remains the source of truth.
+  }
+}
+
+async function createPreloadI18n(bundle: RendererI18nBundle): Promise<I18nInstance> {
+  const instance = i18next.createInstance();
+  await instance.init({
+    lng: bundle.locale,
+    fallbackLng: false,
+    supportedLngs: [bundle.locale],
+    ns: Object.keys(bundle.namespaces),
+    defaultNS: 'common',
+    interpolation: { escapeValue: false },
+    returnNull: false,
+    resources: {
+      [bundle.locale]: bundle.namespaces,
+    } as Resource,
+  });
+  return instance;
+}
 
 // Fetches the renderer namespaces (pages + common) once per window; subsequent
 // abI18n.t calls resolve locally and never touch the main process.
@@ -452,6 +516,22 @@ async function ensureI18nBundle(params: {
     return null;
   }
   if (i18nBundlePromise === null) {
+    const metadata = getI18nCacheMetadata();
+    const cached = metadata ? readCachedI18nBundle(metadata) : null;
+    if (cached !== null) {
+      i18nBundlePromise = createPreloadI18n(cached)
+        .then((instance) => {
+          preloadI18n = instance;
+          i18nBundle = cached;
+          return cached;
+        })
+        .catch(() => {
+          i18nBundlePromise = null;
+          return null;
+        });
+      return i18nBundlePromise;
+    }
+
     const props = params.winId
       ? { winId: params.winId }
       : params.tabId
@@ -459,8 +539,10 @@ async function ensureI18nBundle(params: {
         : {};
     i18nBundlePromise = ipcRenderer
       .invoke('i18n:get-bundle', props)
-      .then((bundle: RendererI18nBundle) => {
+      .then(async (bundle: RendererI18nBundle) => {
+        preloadI18n = await createPreloadI18n(bundle);
         i18nBundle = bundle;
+        writeCachedI18nBundle(bundle);
         return bundle;
       })
       .catch((error) => {
@@ -500,9 +582,8 @@ const abI18n = {
     const bundle = await ensureI18nBundle(params);
     if (bundle !== null) {
       for (const entry of keys) {
-        const local = resolveBundleKey(bundle.namespaces, bundle.locale, entry.key, entry.params);
-        if (local !== undefined) {
-          result[entry.key] = local;
+        if (preloadI18n?.exists(entry.key, entry.params)) {
+          result[entry.key] = preloadI18n.t(entry.key, entry.params);
         } else {
           misses.push(entry);
         }
