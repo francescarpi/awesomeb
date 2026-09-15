@@ -3,6 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Mock state captured before the preload module is imported.
 const ipcInvoke = vi.fn();
 const exposed: Record<string, unknown> = {};
+const storage = new Map<string, string>();
+const storageMock = {
+  getItem: (key: string) => storage.get(key) ?? null,
+  setItem: (key: string, value: string) => storage.set(key, value),
+  removeItem: (key: string) => storage.delete(key),
+  clear: () => storage.clear(),
+};
 
 vi.mock('electron', () => ({
   contextBridge: {
@@ -40,10 +47,12 @@ function abI18n(): {
 
 function makeBundle(locale = 'en'): {
   locale: string;
+  hash: string;
   namespaces: Record<string, Record<string, unknown>>;
 } {
   return {
     locale,
+    hash: 'test-hash',
     namespaces: {
       pages: {
         history: { title: 'History', searchPlaceholder: 'Search in history...' },
@@ -52,6 +61,8 @@ function makeBundle(locale = 'en'): {
         ok: 'OK',
         cancel: 'Cancel',
         greeting: 'Hello {{name}}',
+        items_one: '{{count}} item',
+        items_other: '{{count}} items',
       },
     },
   };
@@ -59,11 +70,17 @@ function makeBundle(locale = 'en'): {
 
 describe('preload i18n glue (abI18n.t)', () => {
   beforeEach(async () => {
+    storage.clear();
+    vi.stubGlobal('window', {
+      location: { search: '?i18nLocale=en&i18nHash=test-hash' },
+      localStorage: storageMock,
+    });
     await loadPreload();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('first call fetches the bundle via i18n:get-bundle and caches it', async () => {
@@ -97,6 +114,32 @@ describe('preload i18n glue (abI18n.t)', () => {
     await abI18n().t({}, [{ key: 'pages:history.searchPlaceholder' }]);
 
     expect(bundleCalls).toBe(1);
+  });
+
+  it('reuses a matching bundle from localStorage without bundle IPC', async () => {
+    const bundle = makeBundle();
+    storage.set('awesomeb:i18n-bundle', JSON.stringify(bundle));
+    ipcInvoke.mockImplementation(() => Promise.reject(new Error('IPC should not be called')));
+
+    const result = await abI18n().t({}, [{ key: 'pages:history.title' }]);
+
+    expect(result['pages:history.title']).toBe('History');
+    expect(ipcInvoke).not.toHaveBeenCalled();
+  });
+
+  it('ignores a cached bundle when the content hash changes', async () => {
+    const staleBundle = { ...makeBundle(), hash: 'old-hash' };
+    const currentBundle = makeBundle();
+    storage.set('awesomeb:i18n-bundle', JSON.stringify(staleBundle));
+    ipcInvoke.mockImplementation((channel: string) => {
+      if (channel === 'i18n:get-bundle') return Promise.resolve(currentBundle);
+      return Promise.resolve({});
+    });
+
+    const result = await abI18n().t({}, [{ key: 'pages:history.title' }]);
+
+    expect(result['pages:history.title']).toBe('History');
+    expect(ipcInvoke).toHaveBeenCalledWith('i18n:get-bundle', expect.anything());
   });
 
   it('keys missing from the bundle fall back to the per-key i18n:t IPC', async () => {
@@ -155,6 +198,21 @@ describe('preload i18n glue (abI18n.t)', () => {
 
     expect(result.ok).toBe('OK');
     expect(result.greeting).toBe('Hello World');
+    expect(ipcInvoke).not.toHaveBeenCalledWith('i18n:t', expect.anything());
+  });
+
+  it('uses i18next plural resolution from the bundle', async () => {
+    const bundle = makeBundle();
+    ipcInvoke.mockImplementation((channel: string) => {
+      if (channel === 'i18n:get-bundle') return Promise.resolve(bundle);
+      return Promise.resolve({});
+    });
+
+    const singular = await abI18n().t({}, [{ key: 'items', params: { count: 1 } }]);
+    const plural = await abI18n().t({}, [{ key: 'items', params: { count: 3 } }]);
+
+    expect(singular.items).toBe('1 item');
+    expect(plural.items).toBe('3 items');
     expect(ipcInvoke).not.toHaveBeenCalledWith('i18n:t', expect.anything());
   });
 
