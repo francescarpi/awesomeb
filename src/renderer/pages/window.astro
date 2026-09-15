@@ -4,23 +4,19 @@ import Layout from '#/layouts/Base.astro';
 
 <Layout>
   <div id="window-container"></div>
-  <!-- <div class="fixed inset-0"> -->
-  <!--   <div id="selectedTab" class="border-2 border-dotted absolute rounded-[14px]"></div> -->
-  <!--   <div -->
-  <!--     id="no-tabs-info" -->
-  <!--     class="bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm" -->
-  <!--   > -->
-  <!--     <p id="helpNewTab" class="hidden"></p> -->
-  <!--     <p id="helpCommandsTool" class="hidden"></p> -->
-  <!--   </div> -->
-  <!-- </div> -->
 </Layout>
 
 <script>
-  import { getSearchParams, type VNode, h, Renderer } from '#/scripts';
-  import type { ITheme } from '~/types';
+  import { getSearchParams, h, Renderer, c } from '#/scripts';
+  import type { ITheme, ILayoutData } from '~/types';
+  import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
-  const { winId } = getSearchParams();
+  interface IWindowState extends ILayoutData {
+    theme: ITheme;
+    shortcuts: string[];
+  }
+
+  const { winId, searchParams } = getSearchParams();
 
   const t = await abI18n.t({ winId }, [
     { key: 'pages:window.newTabSuffix' },
@@ -30,125 +26,100 @@ import Layout from '#/layouts/Base.astro';
 
   document.title = t['pages:window.title'];
 
+  const BORDER_WIDTH = 2;
+
   const renderer = new Renderer(h('div', {})).render('window-container');
-  const state: { theme: ITheme; areaMaximized: boolean; sidebarCollapsed: boolean } = {
+  let state: IWindowState = {
     theme: { primary: '#2b7fff', secondary: '#1c398e', degrees: 238 },
-    areaMaximized: false,
-    sidebarCollapsed: false,
+    areaMaximized: searchParams.get('areaMaximized') === 'true',
+    sidebarCollapsed: searchParams.get('sidebarCollapsed') === 'true',
+    hasVisibleTabs: false,
+    selectedTabBounds: null,
+    selectedTabPartitionColor: null,
+    shortcuts: [],
   };
 
   abDesktops.getTheme(winId).then((theme) => {
     state.theme = theme;
-    renderer.update(renderContent());
+    renderContent();
     abWindow.readyToShow(winId);
   });
 
   abDesktops.onThemeRefresh((_e, theme) => {
     state.theme = theme;
-    renderer.update(renderContent());
+    renderContent();
   });
 
-  function renderContent(): VNode {
+  abWindow.onRefreshLayoutData((_e, data: ILayoutData) => {
+    state = { ...state, ...data };
+    renderContent();
+  });
+
+  let shortcutsRequestVersion = 0;
+
+  loadShortcuts();
+  abShortcuts.onChange(() => {
+    loadShortcuts();
+  });
+
+  function renderContent() {
     const left = state.areaMaximized ? 5 : state.sidebarCollapsed ? 40 : 254;
     const top = state.areaMaximized ? 5 : state.sidebarCollapsed ? 34 : 34;
+    const style = state.selectedTabBounds
+      ? `left: ${state.selectedTabBounds.x - BORDER_WIDTH}px; top: ${state.selectedTabBounds.y - BORDER_WIDTH}px; width: ${state.selectedTabBounds.width + BORDER_WIDTH * 2}px; height: ${state.selectedTabBounds.height + BORDER_WIDTH * 2}px; border-color: ${state.selectedTabPartitionColor || 'yellow'};`
+      : '';
 
-    return h(
+    const content = h(
       'div',
       {
         class: 'fixed inset-0',
         style: `background-image: linear-gradient(${state.theme.degrees}deg, ${state.theme.primary}, ${state.theme.secondary})`,
       },
-      h('div', { class: 'border-2 border-dotted absolute rounded-[14px]' }, ''),
+      h('div', {
+        class: c(
+          'border-2',
+          'border-dotted',
+          'bg-white',
+          'absolute',
+          'rounded-[14px]',
+          !state.selectedTabBounds && 'hidden',
+        ),
+        style,
+      }),
       h(
         'div',
         {
-          class: `bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm left-[${left}px] top-[${top}px]`,
+          class:
+            'bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm',
+          style: `left: ${left}px; top: ${top}px;`,
         },
-        '',
+        ...state.shortcuts.map((s) => h('p', { class: c(state.hasVisibleTabs && 'hidden') }, s)),
       ),
     );
+
+    renderer.update(content);
   }
 
-  // const noTabsInfo = document.getElementById('no-tabs-info') as HTMLDivElement;
-  // const helpNewTab = document.getElementById('helpNewTab') as HTMLParagraphElement;
-  // const helpCommandsTool = document.getElementById('helpCommandsTool') as HTMLParagraphElement;
-  // const selectedTab = document.getElementById('selectedTab') as HTMLDivElement;
-  //
-  // const sidebarCollapsed = searchParams.get('sidebarCollapsed') === 'true';
-  // const areaMaximized = searchParams.get('areaMaximized') === 'true';
-  //
-  // refreshNoTabsInfo(sidebarCollapsed, areaMaximized);
+  async function loadShortcuts() {
+    const requestVersion = ++shortcutsRequestVersion;
 
-  // import { Rectangle } from 'electron';
-  // import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
-  //
-  // const BORDER_WIDTH = 2;
+    try {
+      const map = await abShortcuts.active(winId);
 
-  //
-  // function setHelpLine(el: HTMLParagraphElement, key: string | undefined, suffix: string) {
-  //   if (!key) {
-  //     el.classList.add('hidden');
-  //     el.textContent = '';
-  //     return;
-  //   }
-  //   const platform = isMacPlatform() ? 'mac' : 'win';
-  //   el.textContent = `${acceleratorToDisplay(key, platform)} ${suffix}`;
-  //   el.classList.remove('hidden');
-  // }
-  //
-  // async function refreshShortcutsHelp() {
-  //   try {
-  //     const map = await abShortcuts.active(winId);
-  //     setHelpLine(helpNewTab, map.shortcuts.newTab?.key, t['pages:window.newTabSuffix']);
-  //     setHelpLine(
-  //       helpCommandsTool,
-  //       map.shortcuts.performCommand?.key,
-  //       t['pages:window.commandsSuffix'],
-  //     );
-  //   } catch (err) {
-  //     console.error('Failed to load active shortcuts', err);
-  //   }
-  // }
-  //
-  // refreshShortcutsHelp();
-  // abShortcuts.onChange(() => {
-  //   refreshShortcutsHelp();
-  // });
-  //
-  // abWindow.onRefreshLayoutData((_e, data) => {
-  //   refreshNoTabsInfo(data.sidebarCollapsed, data.areaMaximized);
-  //
-  //   const visibilityClass = data.hasVisibleTabs ? 'add' : 'remove';
-  //   helpNewTab.classList[visibilityClass]('hidden');
-  //   helpCommandsTool.classList[visibilityClass]('hidden');
-  //
-  //   refreshSelectedTabBounds(data.selectedTabBounds, data.selectedTabPartitionColor);
-  // });
-  //
-  // function refreshNoTabsInfo(sidebarCollapsed: boolean, areaMaximized: boolean) {
-  //   if (areaMaximized) {
-  //     noTabsInfo.style.left = '5px';
-  //     noTabsInfo.style.top = '5px';
-  //   } else if (sidebarCollapsed) {
-  //     noTabsInfo.style.left = '40px';
-  //     noTabsInfo.style.top = '34px';
-  //   } else {
-  //     noTabsInfo.style.left = '254px';
-  //     noTabsInfo.style.top = '34px';
-  //   }
-  // }
-  //
-  // function refreshSelectedTabBounds(bounds: Rectangle | null, color: string | null) {
-  //   if (!bounds) {
-  //     selectedTab.classList.add('hidden');
-  //     return;
-  //   }
-  //
-  //   selectedTab.classList.remove('hidden');
-  //   selectedTab.style.left = `${bounds.x - BORDER_WIDTH}px`;
-  //   selectedTab.style.top = `${bounds.y - BORDER_WIDTH}px`;
-  //   selectedTab.style.width = `${bounds.width + BORDER_WIDTH * 2}px`;
-  //   selectedTab.style.height = `${bounds.height + BORDER_WIDTH * 2}px`;
-  //   selectedTab.style.borderColor = color || 'yellow';
-  // }
+      if (requestVersion !== shortcutsRequestVersion) return;
+
+      const platform = isMacPlatform() ? 'mac' : 'win';
+      const shortcuts = [map.shortcuts.newTab, map.shortcuts.performCommand].filter((shortcut) =>
+        shortcut?.key?.trim(),
+      );
+
+      state.shortcuts = shortcuts.map(
+        (shortcut) => `${acceleratorToDisplay(shortcut.key, platform)} ${shortcut.label}`,
+      );
+
+      renderContent();
+    } catch (error) {
+      console.error('Failed to load active shortcuts', error);
+    }
+  }
 </script>
