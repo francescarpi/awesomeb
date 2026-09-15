@@ -94,8 +94,8 @@ importers:
         specifier: 10.0.5
         version: 10.0.5
       daisyui:
-        specifier: 5.7.37
-        version: 5.7.37
+        specifier: 5.7.38
+        version: 5.7.38
       electron:
         specifier: 44.3.0
         version: 44.3.0
@@ -2197,8 +2197,8 @@ packages:
     resolution: {integrity: sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0, npm: '>=7.0.0'}
 
-  daisyui@5.7.37:
-    resolution: {integrity: sha512-PVcdAcL0ni6/wmcNwvldARZuO0HdzxtjVEAT86ie9GMgFjwmqIWeXsPaM2/eYqLb4WMexqj146C5Z1xmzZDnjg==}
+  daisyui@5.7.38:
+    resolution: {integrity: sha512-ef3RIbteKVmlQ10ak0l4mu8F70pBJ2UBjDJNsA2vWlpNdErpHqfxddxK2ckNNYd7vQvTqP4a1A1vSsunlCGVOw==}
 
   data-urls@7.0.0:
     resolution: {integrity: sha512-23XHcCF+coGYevirZceTVD7NdJOqVn+49IHyxgszm+JIiHLoB2TkmPtsYkNWT1pvRSGkc35L6NHs0yHkN2SumA==}
@@ -6701,7 +6701,7 @@ snapshots:
     dependencies:
       css-tree: 2.2.1
 
-  daisyui@5.7.37: {}
+  daisyui@5.7.38: {}
 
   data-urls@7.0.0(@noble/hashes@2.2.0):
     dependencies:
