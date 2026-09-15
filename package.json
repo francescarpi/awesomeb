@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.14.2-alpha",
+  "version": "0.14.3-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -70,7 +70,7 @@
     "typescript-eslint": "8.70.0",
     "vite": "8.3.0",
     "vite-plugin-static-copy": "4.1.1",
-    "vitest": "5.0.0"
+    "vitest": "5.0.1"
   },
   "dependencies": {
     "@electron-webauthn/macos": "1.3.1",
