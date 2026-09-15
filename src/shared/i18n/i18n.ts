@@ -11,6 +11,7 @@ import { app } from 'electron';
 import Backend from 'i18next-fs-backend';
 import log from 'electron-log';
 import path from 'path';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { config } from '@/core';
@@ -113,6 +114,25 @@ export function currentLocale(): Locale {
   return isLocale(i18next.language) ? i18next.language : DEFAULT_LOCALE;
 }
 
+function hashRendererBundle(lng: Locale): string {
+  const hash = createHash('sha256');
+  for (const ns of RENDERER_NAMESPACES) {
+    const file = path.join(app.getAppPath(), 'dist-electron/locales', lng, `${ns}.json`);
+    try {
+      hash.update(ns);
+      hash.update(readFileSync(file, 'utf8'));
+    } catch {
+      hash.update(`${ns}:missing`);
+    }
+  }
+  return hash.digest('hex');
+}
+
+/** Content fingerprint used by renderer views to validate their persisted bundle. */
+export function getRendererBundleHash(lng: Locale = currentLocale()): string {
+  return hashRendererBundle(lng);
+}
+
 /**
  * Namespace bundle for the renderer (pages + common) for a given locale,
  * read straight from disk — the same files the i18next-fs-backend lazy-loads.
@@ -121,17 +141,23 @@ export function currentLocale(): Locale {
  */
 export function getRendererBundle(lng: Locale = currentLocale()): {
   locale: Locale;
+  hash: string;
   namespaces: Record<(typeof RENDERER_NAMESPACES)[number], Record<string, unknown>>;
 } {
   const namespaces = {} as Record<Namespace, Record<string, unknown>>;
+  const hash = createHash('sha256');
   for (const ns of RENDERER_NAMESPACES) {
     const file = path.join(app.getAppPath(), 'dist-electron/locales', lng, `${ns}.json`);
     try {
-      namespaces[ns] = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
+      const contents = readFileSync(file, 'utf8');
+      hash.update(ns);
+      hash.update(contents);
+      namespaces[ns] = JSON.parse(contents) as Record<string, unknown>;
     } catch (err) {
       scopeLog.error(`Could not read renderer locale bundle ${lng}/${ns}.json`, err);
+      hash.update(`${ns}:missing`);
       namespaces[ns] = {};
     }
   }
-  return { locale: lng, namespaces };
+  return { locale: lng, hash: hash.digest('hex'), namespaces };
 }
