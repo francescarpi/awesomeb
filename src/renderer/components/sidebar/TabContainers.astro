@@ -212,17 +212,32 @@
           'sidebar:grid-cols-[24px_auto_25px]',
           'sidebar:rounded-tl',
           'sidebar:rounded-bl',
-          t.selected ? 'bg-white/20' : 'hover:bg-white/10',
+          'relative',
+          !t.selected && 'hover:bg-white/10',
           t.suspended ? 'group/suspended opacity-50' : 'group/active',
           t.isClosed && 'hidden',
         ),
         onclick: selectTabFromEvent,
         oncontextmenu: openTabMenuFromEvent,
       },
+      h('div', {
+        class: c(
+          'absolute',
+          'inset-0',
+          'bg-white/20',
+          'transition-opacity',
+          'duration-200',
+          'pointer-events-none',
+          'z-0',
+          t.selected ? 'opacity-100' : 'opacity-0',
+        ),
+      }),
       h(
         'span', // Loading spinner
         {
           class: c(
+            'relative',
+            'z-10',
             'loading',
             'loading-spinner',
             'loading-xs',
@@ -242,6 +257,8 @@
           src: t.favicon || Favicon.src,
           onerror: `this.onerror=null;this.src="${Favicon.src}";`,
           class: c(
+            'relative',
+            'z-10',
             'w-5',
             'h-5',
             'sidebar:w-[16px]',
@@ -260,7 +277,7 @@
       h(
         'div', // Title + indicators container
         {
-          class: 'hidden sidebar:flex flex-col min-w-0',
+          class: 'relative z-10 hidden sidebar:flex flex-col min-w-0',
         },
         h(
           'span', // Title
@@ -277,7 +294,7 @@
       ),
       h(
         'div', // Partition and actions container
-        { class: 'hidden sidebar:flex justify-end' },
+        { class: 'relative z-10 hidden sidebar:flex justify-end' },
         h(
           'div', // Partition/Profile color
           {
