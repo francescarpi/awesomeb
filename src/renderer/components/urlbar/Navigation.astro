@@ -19,11 +19,17 @@ import ButtonIcon from '../../components/common/ButtonIcon.astro';
     handleClick: () => {
       abCommands.perform(winId, 'go-back');
     },
+    onHoldClick: () => {
+      abMenu.contextMenu(winId, 'tab-history', { direction: 'back' });
+    },
   });
 
   const { disable: disableForward, enable: enableForward } = buttonManager('forward', {
     handleClick: () => {
       abCommands.perform(winId, 'go-forward');
+    },
+    onHoldClick: () => {
+      abMenu.contextMenu(winId, 'tab-history', { direction: 'forward' });
     },
   });
 

@@ -6,6 +6,7 @@ import { desktopMenu } from './desktop';
 import { mainMenu } from './main';
 import { tabMenu } from './tab';
 import { splitMenu } from './split';
+import { tabHistoryMenu } from './tab-history';
 
 const scopeLog = log.scope('MenuIPC');
 
@@ -57,6 +58,17 @@ export function setupMenuIPC(browser: Browser) {
             return;
           }
           const menu = splitMenu(browser, win, tabContainer);
+          menu.popup({ window: win.bw });
+          break;
+        }
+        case 'tab-history': {
+          const selectedTab = win.selectedTab;
+          if (!selectedTab) {
+            scopeLog.warn('No selected tab when opening tab history');
+            return;
+          }
+
+          const menu = tabHistoryMenu();
           menu.popup({ window: win.bw });
           break;
         }
