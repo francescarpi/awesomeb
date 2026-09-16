@@ -19,7 +19,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'edit-url',
   },
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ params, browser }) {
     const { tabId, url } = params;
     const result = browser.getTab(tabId);

@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:manageHistory.name'),
   description: () => t('commands:manageHistory.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ browser }) {
     browser.openURL(`${INTERNAL_PROTOCOL}://history/`, { selectTab: true });
   },

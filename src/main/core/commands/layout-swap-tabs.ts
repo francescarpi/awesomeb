@@ -12,7 +12,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:swapTabs.name'),
   description: () => t('commands:swapTabs.description'),
-  visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
+  visible: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   async handler({ tabContainer }) {
     if (!tabContainer) {
       scopeLog.warn(`No tab container found for ${TRIGGER} command`);

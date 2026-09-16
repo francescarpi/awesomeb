@@ -18,7 +18,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: TRIGGER,
   },
-  visibility: ({ desktop }) => (desktop ? desktop.tabContainers.length > 0 : false),
+  visible: ({ desktop }) => (desktop ? desktop.tabContainers.length > 0 : false),
   async handler({ params, window }) {
     const desktop = window.getDesktop(params.desktopId);
     if (!desktop) {

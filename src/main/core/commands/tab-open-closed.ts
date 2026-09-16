@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'open-closed',
   },
-  visibility: ({ browser }) => browser.hasClosedTabs,
+  visible: ({ browser }) => browser.hasClosedTabs,
   async handler({ params, browser }) {
     const tab = browser.getTab(parseInt(params.id, 10));
     if (!tab) {

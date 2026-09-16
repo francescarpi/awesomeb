@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:minimizeWindow.name'),
   description: () => t('commands:minimizeWindow.description'),
-  visibility: ({ window }) => !!window && !window.bw.isMinimized(),
+  visible: ({ window }) => !!window && !window.bw.isMinimized(),
   async handler({ window }) {
     window.bw.minimize();
   },

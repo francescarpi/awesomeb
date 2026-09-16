@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:addDesktop.name'),
   description: () => t('commands:addDesktop.description'),
-  visibility: ({ window }) => !!window && window.desktops.length < MAX_DESKTOPS,
+  visible: ({ window }) => !!window && window.desktops.length < MAX_DESKTOPS,
   async handler({ window }) {
     window.createDesktop(window.desktops.length + 1);
   },

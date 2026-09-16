@@ -18,7 +18,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: TRIGGER,
   },
-  visibility: ({ desktop }) => (desktop ? desktop.tabContainers.length > 0 : false),
+  visible: ({ desktop }) => (desktop ? desktop.tabContainers.length > 0 : false),
   async handler({ params, browser }) {
     const tabContainerResult = browser.getTabContainer(params.tabContainerId);
     if (!tabContainerResult) {

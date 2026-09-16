@@ -14,7 +14,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:changeLayoutSize.name'),
   description: () => t('commands:changeLayoutSize.description'),
-  visibility: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
+  visible: ({ tabContainer }) => (tabContainer && tabContainer.isSplit ? true : false),
   modal: {
     page: 'layout-size',
   },

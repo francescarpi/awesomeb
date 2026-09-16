@@ -15,7 +15,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'select-desktop',
   },
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window, params }) {
     // TODO if desktopId is the selected one, back to previous desktop
 

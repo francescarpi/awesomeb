@@ -7,7 +7,7 @@ export interface ICommand<T, R = void> {
   name: () => string;
   description: () => string;
   modal?: ICommandModal;
-  visibility?: (params: {
+  visible?: (params: {
     window: Window | null;
     desktop: Desktop | null;
     tabContainer: TabContainer | null;

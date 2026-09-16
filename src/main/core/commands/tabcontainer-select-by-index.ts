@@ -14,7 +14,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:selectTabcontainerByIndex.name'),
   description: () => t('commands:selectTabcontainerByIndex.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window, desktop, params, tabContainer: selectedTabContainer }) {
     const tabContainer = desktop.getTabContainerByIndex(params.index - 1);
     if (!tabContainer) {
