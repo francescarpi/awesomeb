@@ -138,6 +138,22 @@ describe('Renderer', () => {
 
       sendSpy.mockRestore();
     });
+
+    test('desktop selection refreshes the visible switcher', async () => {
+      await browser.openURL('http://desktop-one.example.com');
+      window.selectDesktop(2);
+      await browser.openURL('http://desktop-two.example.com');
+
+      window.showTabSwitcher();
+      const tabSwitcher = window.getView<UIView>('tab-switcher')!;
+      const sendSpy = vi.spyOn(tabSwitcher, 'send');
+
+      window.selectDesktop(1);
+
+      expect(sendSpy).toHaveBeenCalledWith('tabswitcher:refresh', expect.any(Array));
+
+      sendSpy.mockRestore();
+    });
   });
 
   describe('Renderer.tabContainers - children', () => {
