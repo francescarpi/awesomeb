@@ -660,6 +660,22 @@ describe('Window Selecdt Tab', () => {
     expect(tab.lastAccessed).toBeGreaterThan(initialLastAccessed);
   });
 
+  test('should update lastAccessed for the selected tab of the target desktop', async () => {
+    const firstResult = await browser.openURL('http://first.example.com');
+    await window.selectTab(firstResult!.tab.id);
+    window.selectDesktop(2);
+    const secondResult = await browser.openURL('http://second.example.com');
+    await window.selectTab(secondResult!.tab.id);
+
+    const firstTabUpdateSpy = vi.spyOn(firstResult!.tab, 'updateLastAccessed');
+    const secondTabUpdateSpy = vi.spyOn(secondResult!.tab, 'updateLastAccessed');
+
+    window.selectDesktop(1);
+
+    expect(firstTabUpdateSpy).toHaveBeenCalledTimes(1);
+    expect(secondTabUpdateSpy).not.toHaveBeenCalled();
+  });
+
   test('should emit window:selected-tab-did-change event', async () => {
     const result = await browser.openURL('http://example.com');
     const { tab } = result!;
