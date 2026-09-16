@@ -67,13 +67,26 @@
                 'flex',
                 'select-none',
                 'overflow-hidden',
-                desktop.selected && 'bg-white/20',
                 desktop.requireAttention && 'bg-red-500/20 border-error',
               ),
               style: 'app-region: no-drag;',
               onclick: selectDesktopFromEvent,
               oncontextmenu: desktopMenuFromEvent,
             },
+            h('div', {
+              class: c(
+                'pointer-events-none',
+                'absolute',
+                'inset-0',
+                'rounded-full',
+                'bg-white/20',
+                'transition-opacity',
+                'duration-200',
+                'ease-out',
+                'motion-reduce:transition-none',
+                desktop.selected ? 'opacity-100' : 'opacity-0',
+              ),
+            }),
             h(
               'span',
               {

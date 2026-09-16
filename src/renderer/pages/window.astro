@@ -91,7 +91,7 @@ import Layout from '#/layouts/Base.astro';
         'div',
         {
           class:
-            'bg-white/20 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm',
+            'bg-white/20 border border-white/30 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm',
           style: `left: ${left}px; top: ${top}px;`,
         },
         ...state.shortcuts.map((s) => h('p', { class: c(state.hasVisibleTabs && 'hidden') }, s)),
