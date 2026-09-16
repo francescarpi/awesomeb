@@ -55,6 +55,10 @@
     "name": "Copia la versió",
     "description": "Copia la versió de l'App al porta-retalls"
   },
+  "checkForUpdates": {
+    "name": "Comprova si hi ha actualitzacions",
+    "description": "Comprova si hi ha disponible una versió nova de l'aplicació"
+  },
   "debugPage": {
     "name": "Pàgina de depuració",
     "description": "Obre la pàgina de depuració."

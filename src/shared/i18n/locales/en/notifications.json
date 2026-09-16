@@ -47,5 +47,9 @@
   "downloadCompleted": {
     "title": "Download Completed",
     "body": "File \"{{fileName}}\" has been downloaded successfully."
+  },
+  "updatesCheckComplete": {
+    "title": "Updates",
+    "body": "No updates are available."
   }
 }

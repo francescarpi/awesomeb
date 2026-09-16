@@ -47,5 +47,9 @@
   "downloadCompleted": {
     "title": "Baixada completada",
     "body": "El fitxer \"{{fileName}}\" s'ha baixat correctament."
+  },
+  "updatesCheckComplete": {
+    "title": "Actualitzacions",
+    "body": "No hi ha actualitzacions disponibles."
   }
 }

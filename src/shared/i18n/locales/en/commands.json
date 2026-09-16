@@ -55,6 +55,10 @@
     "name": "Copy Version",
     "description": "Copy App version to the clipboard"
   },
+  "checkForUpdates": {
+    "name": "Check for Updates",
+    "description": "Check if a new version of the app is available"
+  },
   "debugPage": {
     "name": "Debug Page",
     "description": "Open the debug page."
