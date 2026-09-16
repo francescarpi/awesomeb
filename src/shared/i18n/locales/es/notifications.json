@@ -47,5 +47,9 @@
   "downloadCompleted": {
     "title": "Descarga completada",
     "body": "El archivo \"{{fileName}}\" se ha descargado correctamente."
+  },
+  "updatesCheckComplete": {
+    "title": "Actualizaciones",
+    "body": "No hay actualizaciones disponibles."
   }
 }

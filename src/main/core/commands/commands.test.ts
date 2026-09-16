@@ -31,6 +31,7 @@ import * as urlEdit from './url-edit';
 import * as urlCopy from './url-copy';
 import * as tabcontainerMoveUp from './tabcontainer-move-up';
 import * as tabcontainerMoveDown from './tabcontainer-move-down';
+import * as appCheckForUpdates from './app-check-for-updates';
 
 describe('Commands', () => {
   let browser: Browser;
@@ -664,6 +665,41 @@ describe('Commands', () => {
   });
 
   describe('Command Visibility', () => {
+    test('check-for-updates: should ask the browser updater to check', async () => {
+      const window = browser.activeWindow!;
+      const checkForUpdatesSpy = vi.spyOn(browser.appUpdater, 'checkForUpdates');
+
+      await browser.performCommand(window, appCheckForUpdates.TRIGGER);
+
+      expect(checkForUpdatesSpy).toHaveBeenCalledWith(true);
+    });
+
+    test('check-for-updates: should be visible when no update check is pending', () => {
+      expect(
+        appCheckForUpdates.Command.visibility!({
+          browser,
+          window: null,
+          desktop: null,
+          tabContainer: null,
+          tab: null,
+        }),
+      ).toBe(true);
+    });
+
+    test('check-for-updates: should be hidden while checking for updates', () => {
+      vi.spyOn(browser.appUpdater, 'isChecking', 'get').mockReturnValue(true);
+
+      expect(
+        appCheckForUpdates.Command.visibility!({
+          browser,
+          window: null,
+          desktop: null,
+          tabContainer: null,
+          tab: null,
+        }),
+      ).toBe(false);
+    });
+
     test('window-minimize: should be visible when window is not minimized', () => {
       const window = browser.activeWindow!;
       vi.spyOn(window.bw, 'isMinimized').mockReturnValue(false);
@@ -757,6 +793,7 @@ describe('Commands', () => {
         tabHistoryBack.Command,
         tabHistoryForward.Command,
         urlEdit.Command,
+        appCheckForUpdates.Command,
       ];
 
       commands.forEach((command) => {

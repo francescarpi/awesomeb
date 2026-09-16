@@ -55,6 +55,10 @@
     "name": "Copiar versión",
     "description": "Copia la versión de la App al portapapeles"
   },
+  "checkForUpdates": {
+    "name": "Buscar actualizaciones",
+    "description": "Comprueba si hay una nueva versión de la aplicación disponible"
+  },
   "debugPage": {
     "name": "Página de depuración",
     "description": "Abre la página de depuración."
