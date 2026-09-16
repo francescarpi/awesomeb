@@ -74,6 +74,7 @@ import * as tabToggleOpenTabsAschild from './tab-toggle-open-tabs-as-child';
 import * as tabCloseChildren from './tab-close-children';
 import * as tabContainerToggleCollapseChildren from './tabcontainer-toggle-collapse-children';
 import * as appCopyVersion from './app-copy-version';
+import * as appCheckForUpdates from './app-check-for-updates';
 import * as bookmakrsManage from './bookmarks-manage';
 import * as tabViewSource from './tab-view-source';
 import * as bookmarksAddDesktop from './bookmarks-add-desktop';
@@ -150,6 +151,7 @@ const COMMANDS = {
   [tabToggleOpenTabsAschild.TRIGGER]: tabToggleOpenTabsAschild.Command,
   [tabContainerToggleCollapseChildren.TRIGGER]: tabContainerToggleCollapseChildren.Command,
   [appCopyVersion.TRIGGER]: appCopyVersion.Command,
+  [appCheckForUpdates.TRIGGER]: appCheckForUpdates.Command,
   [bookmakrsManage.TRIGGER]: bookmakrsManage.Command,
   [tabViewSource.TRIGGER]: tabViewSource.Command,
   [bookmarksAddDesktop.TRIGGER]: bookmarksAddDesktop.Command,
