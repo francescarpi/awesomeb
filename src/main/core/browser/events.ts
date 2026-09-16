@@ -33,14 +33,17 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'window:selected-desktop-did-change',
     async (window: Window, desktop: Desktop) => {
+      const selectedTab = desktop.selectedTab;
+
       browser.toRenderer.refreshDesktops(window);
       browser.toRenderer.refreshSelectedDesktop(window);
       browser.toRenderer.refreshThemes(window, desktop);
       browser.toRenderer.refreshTabContainers(window);
-      browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
-      browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
+      browser.toRenderer.refreshURLBar(window, selectedTab?.tab || null);
+      browser.toRenderer.refreshTabNavigation(window, selectedTab?.tab || undefined);
       browser.toRenderer.refreshExtensions(window);
       browser.toRenderer.refreshMediaSession(window);
+      browser.toRenderer.refreshTabSwitcher(window);
 
       window.renderViews();
 

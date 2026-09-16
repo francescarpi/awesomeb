@@ -68,6 +68,12 @@ export class Window extends UIWindow {
     }
 
     this._selectedDesktopId = deskIds[newIndex];
+
+    const selectedTab = this.selectedTab;
+    if (selectedTab) {
+      selectedTab.tab.updateLastAccessed();
+    }
+
     this.browser.eventsChannel.emit(
       'window:selected-desktop-did-change',
       this,
