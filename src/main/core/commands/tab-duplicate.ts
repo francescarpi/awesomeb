@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'duplicate-tab',
   },
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ browser, params }) {
     browser.duplicateTab(params.tabId, {
       partitionId: params.partitionId,

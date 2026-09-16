@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:findInPage.name'),
   description: () => t('commands:findInPage.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {
       tab.startFindInPage();

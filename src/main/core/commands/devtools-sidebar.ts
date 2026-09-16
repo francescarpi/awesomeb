@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:devtoolsSidebar.name'),
   description: () => t('commands:devtoolsSidebar.description'),
-  visibility: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
+  visible: ({}) => Boolean(process.env.ELECTRON_RENDERER_URL),
   async handler({ window }) {
     if (window) {
       const view = window.getView<Sidebar>('sidebar')!;

@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:toggleSidebar.name'),
   description: () => t('commands:toggleSidebar.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window }) {
     window.toggleSidebar(window);
   },

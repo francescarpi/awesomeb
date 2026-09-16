@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:stopTab.name'),
   description: () => t('commands:stopTab.description'),
-  visibility: ({ tab }) => !!tab && tab.webContentsLoading,
+  visible: ({ tab }) => !!tab && tab.webContentsLoading,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {

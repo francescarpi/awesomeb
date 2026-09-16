@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:checkForUpdates.name'),
   description: () => t('commands:checkForUpdates.description'),
-  visibility: ({ browser }) => !browser.appUpdater.isChecking,
+  visible: ({ browser }) => !browser.appUpdater.isChecking,
   async handler({ browser }) {
     browser.appUpdater.checkForUpdates(true);
   },

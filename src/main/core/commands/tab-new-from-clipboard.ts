@@ -11,7 +11,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:tabNewFromClipboard.name'),
   description: () => t('commands:tabNewFromClipboard.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ browser, window: _window }) {
     const clipboardText = (await clipboard.readText()).trim();
 

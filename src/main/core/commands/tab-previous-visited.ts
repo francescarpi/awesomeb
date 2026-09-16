@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:previousVisitedTab.name'),
   description: () => t('commands:previousVisitedTab.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ window, tab }) {
     if (!tab) return;
 

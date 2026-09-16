@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:moveTabContainerDown.name'),
   description: () => t('commands:moveTabContainerDown.description'),
-  visibility: ({ tabContainer }) => !!tabContainer,
+  visible: ({ tabContainer }) => !!tabContainer,
   async handler({ desktop, tabContainer }) {
     if (tabContainer) {
       desktop.moveTabContainer(tabContainer.id, 'down');

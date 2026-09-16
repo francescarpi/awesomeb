@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:suspendTab.name'),
   description: () => t('commands:suspendTab.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToSuspend = getTab(browser, tab, params?.tabId);
     if (!tabToSuspend) {

@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:bookmarksManage.name'),
   description: () => t('commands:bookmarksManage.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ browser }) {
     browser.openURL(`${INTERNAL_PROTOCOL}://bookmarks`, {
       selectTab: true,
