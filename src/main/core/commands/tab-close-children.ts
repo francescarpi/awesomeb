@@ -13,7 +13,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:closeTabChildren.name'),
   description: () => t('commands:closeTabChildren.description'),
-  visibility: ({ tabContainer }) => !!tabContainer && tabContainer.hasChildren,
+  visible: ({ tabContainer }) => !!tabContainer && tabContainer.hasChildren,
   async handler({ browser, window, tabContainer, params }) {
     const target = getTabContainer(window, tabContainer, params?.tabContainerId);
     if (!target) return;

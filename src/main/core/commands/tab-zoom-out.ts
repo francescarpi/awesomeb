@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:zoomOut.name'),
   description: () => t('commands:zoomOut.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {
       tab.setZoom('out');

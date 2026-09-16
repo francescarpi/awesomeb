@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:goBack.name'),
   description: () => t('commands:goBack.description'),
-  visibility: ({ tab }) => !!tab && tab.canGoBack,
+  visible: ({ tab }) => !!tab && tab.canGoBack,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {

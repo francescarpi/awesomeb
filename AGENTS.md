@@ -1349,7 +1349,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'my-command-page', // Optional modal page
   },
-  visibility: ({ window, tab }) => {
+  visible: ({ window, tab }) => {
     // Define when command is visible/available
     return !!window && !!tab;
   },

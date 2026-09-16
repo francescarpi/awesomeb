@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:nextDesktop.name'),
   description: () => t('commands:nextDesktop.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window }) {
     window.selectDesktop('next');
   },

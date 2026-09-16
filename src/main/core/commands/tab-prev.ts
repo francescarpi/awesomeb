@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:previousTab.name'),
   description: () => t('commands:previousTab.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window }) {
     window.selectTab('prev', { sameDesktop: true });
   },

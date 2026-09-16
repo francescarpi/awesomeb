@@ -10,7 +10,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:removeDesktop.name'),
   description: () => t('commands:removeDesktop.description'),
-  visibility: ({ window, desktop }) =>
+  visible: ({ window, desktop }) =>
     !!window && !!desktop && !desktop.hasTabs && window.desktops.length > MIN_DESKTOPS,
   async handler({ window, desktop }) {
     window.closeDesktop(desktop.id);

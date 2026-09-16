@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:toggleOpenTabsAsChild.name'),
   description: () => t('commands:toggleOpenTabsAsChild.description'),
-  visibility: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
+  visible: ({ tab, tabContainer }) => !!tab && !!tabContainer && tabContainer.parent === null,
   async handler({ tab, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);
     if (!targetTab) {

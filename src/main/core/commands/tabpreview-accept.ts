@@ -12,7 +12,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:acceptTabPreview.name'),
   description: () => t('commands:acceptTabPreview.description'),
-  visibility: ({ tab }) => !!tab?.tabPreview,
+  visible: ({ tab }) => !!tab?.tabPreview,
   async handler({ browser, tab }) {
     if (!tab) {
       scopeLog.warn('No tab found ');

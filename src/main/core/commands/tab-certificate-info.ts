@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:certificateInfo.name'),
   description: () => t('commands:certificateInfo.description'),
-  visibility: ({ tab }) => !!tab && tab.safe,
+  visible: ({ tab }) => !!tab && tab.safe,
   modal: {
     page: 'certificate-info',
   },

@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:selectFirstTabRequireAttention.name'),
   description: () => t('commands:selectFirstTabRequireAttention.description'),
-  visibility: ({ window }) => (window ? window.tabsRequireAttention.length > 0 : false),
+  visible: ({ window }) => (window ? window.tabsRequireAttention.length > 0 : false),
   async handler({ window, tab }) {
     const nextTab = window.tabsRequireAttention[0];
     if (!nextTab) {

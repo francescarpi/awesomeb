@@ -13,7 +13,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'clear-closed-tabs',
   },
-  visibility: ({ browser }) => browser.hasClosedTabs,
+  visible: ({ browser }) => browser.hasClosedTabs,
   async handler({ browser }) {
     for (const tab of browser.closedTabs) {
       browser.permanentlyCloseTab(tab.desktop, tab.tabContainer, tab.tab.id);

@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:bookmarksAddDesktop.name'),
   description: () => t('commands:bookmarksAddDesktop.description'),
-  visibility: ({ desktop }) => desktop !== null && desktop.hasTabs,
+  visible: ({ desktop }) => desktop !== null && desktop.hasTabs,
   modal: {
     page: 'bookmarks-desktop-save',
   },

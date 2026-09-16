@@ -18,7 +18,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:copyUrl.name'),
   description: () => t('commands:copyUrl.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab, window, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);
     if (!targetTab || !targetTab.url || !window) {
