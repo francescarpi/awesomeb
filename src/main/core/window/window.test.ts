@@ -1238,17 +1238,17 @@ describe('Window Close Desktop', () => {
     test('add-desktop command visibility is false at max desktops', () => {
       const command = getCommand('add-desktop');
       expect(command).not.toBeNull();
-      expect(command!.visibility).toBeDefined();
+      expect(command!.visible).toBeDefined();
 
       const visibilityArgs = { browser, window, desktop: null, tabContainer: null, tab: null };
 
-      expect(command!.visibility!(visibilityArgs)).toBe(true);
+      expect(command!.visible!(visibilityArgs)).toBe(true);
 
       for (let i = MIN_DESKTOPS + 1; i <= MAX_DESKTOPS; i++) {
         window.createDesktop(i);
       }
 
-      expect(command!.visibility!(visibilityArgs)).toBe(false);
+      expect(command!.visible!(visibilityArgs)).toBe(false);
     });
   });
 });

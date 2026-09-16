@@ -18,7 +18,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: 'new-tab',
   },
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ browser, params, window }) {
     window.modal.close();
 

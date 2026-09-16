@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:moveDesktopLeft.name'),
   description: () => t('commands:moveDesktopLeft.description'),
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ window, desktop }) {
     window.moveDesktop(desktop.id, 'left');
   },

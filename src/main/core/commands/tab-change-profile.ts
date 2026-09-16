@@ -17,7 +17,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:changeTabProfile.name'),
   description: () => t('commands:changeTabProfile.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   modal: {
     page: 'change-tab-profile',
   },

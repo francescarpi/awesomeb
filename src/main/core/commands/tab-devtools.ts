@@ -9,7 +9,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:devtools.name'),
   description: () => t('commands:devtools.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab }) {
     if (tab) {
       tab.webContents.openDevTools();

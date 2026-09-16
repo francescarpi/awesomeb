@@ -12,7 +12,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:viewTabSource.name'),
   description: () => t('commands:viewTabSource.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab, browser }) {
     if (!tab || !tab.url) {
       scopeLog.warn('No tab or url');

@@ -18,7 +18,7 @@ export const Command: ICommand<ICommandParams> = {
   modal: {
     page: TRIGGER,
   },
-  visibility: ({ window }) => !!window,
+  visible: ({ window }) => !!window,
   async handler({ params, window, browser }) {
     const desktop = window.getDesktop(params.desktopId);
     if (!desktop) {

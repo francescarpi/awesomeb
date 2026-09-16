@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:toggleMute.name'),
   description: () => t('commands:toggleMute.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ tab, browser, params }) {
     const targetTab = getTab(browser, tab, params?.tabId);
     if (!targetTab) {

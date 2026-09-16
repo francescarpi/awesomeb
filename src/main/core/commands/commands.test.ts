@@ -676,7 +676,7 @@ describe('Commands', () => {
 
     test('check-for-updates: should be visible when no update check is pending', () => {
       expect(
-        appCheckForUpdates.Command.visibility!({
+        appCheckForUpdates.Command.visible!({
           browser,
           window: null,
           desktop: null,
@@ -690,7 +690,7 @@ describe('Commands', () => {
       vi.spyOn(browser.appUpdater, 'isChecking', 'get').mockReturnValue(true);
 
       expect(
-        appCheckForUpdates.Command.visibility!({
+        appCheckForUpdates.Command.visible!({
           browser,
           window: null,
           desktop: null,
@@ -704,7 +704,7 @@ describe('Commands', () => {
       const window = browser.activeWindow!;
       vi.spyOn(window.bw, 'isMinimized').mockReturnValue(false);
 
-      const visibility = windowMinimize.Command.visibility!({
+      const visibility = windowMinimize.Command.visible!({
         browser,
         window,
         desktop: window.selectedDesktop,
@@ -719,7 +719,7 @@ describe('Commands', () => {
       const window = browser.activeWindow!;
       vi.spyOn(window.bw, 'isMinimized').mockReturnValue(true);
 
-      const visibility = windowMinimize.Command.visibility!({
+      const visibility = windowMinimize.Command.visible!({
         browser,
         window,
         desktop: window.selectedDesktop,
@@ -743,7 +743,7 @@ describe('Commands', () => {
       // Select the tab to make it active
       await window.selectTab(tab.id);
 
-      const visibility = tabClose.Command.visibility!({
+      const visibility = tabClose.Command.visible!({
         browser,
         window,
         desktop,
@@ -757,7 +757,7 @@ describe('Commands', () => {
     test('tab-close: should be hidden when no tab exists', () => {
       const window = browser.activeWindow!;
 
-      const visibility = tabClose.Command.visibility!({
+      const visibility = tabClose.Command.visible!({
         browser,
         window,
         desktop: window.selectedDesktop,

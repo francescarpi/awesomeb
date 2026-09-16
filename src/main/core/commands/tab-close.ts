@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:closeTab.name'),
   description: () => t('commands:closeTab.description'),
-  visibility: ({ tab }) => !!tab,
+  visible: ({ tab }) => !!tab,
   async handler({ browser, window, tab, params }) {
     const tabToClose = getTab(browser, tab, params?.tabId);
     if (!tabToClose) {

@@ -16,7 +16,7 @@ export const Command: ICommand<ICommandParams> = {
   trigger: TRIGGER,
   name: () => t('commands:goForward.name'),
   description: () => t('commands:goForward.description'),
-  visibility: ({ tab }) => !!tab && tab.canGoForward,
+  visible: ({ tab }) => !!tab && tab.canGoForward,
   async handler({ browser, tab, params }) {
     const tabToReload = getTab(browser, tab, params?.tabId);
     if (!tabToReload) {
