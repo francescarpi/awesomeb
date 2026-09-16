@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.14.5-alpha",
+  "version": "0.14.6-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
