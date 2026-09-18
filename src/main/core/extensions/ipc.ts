@@ -1,5 +1,5 @@
 import { Browser, Window } from '@/core';
-import { TExtensionId, TWindowId, TPartitionId, IWinDesConTab, IExtension } from '~/types';
+import { TExtensionId, TWindowId, IWinDesConTab, IExtension } from '~/types';
 import log from 'electron-log';
 import {
   internalPageChecker,
@@ -7,6 +7,7 @@ import {
   viewChecker,
   extensionChecker,
   windowChecker,
+  windowActiveChecker,
 } from '@/utils';
 
 const scopeLog = log.scope('ExtensionsIPC');
@@ -77,7 +78,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:ini-popup',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['extension-popup'])],
+    [windowActiveChecker, viewChecker.bind(null, ['extension-popup'])],
     async ({ win, width, height }) => {
       browser.extensions.iniPopup(win, width, height);
     },
@@ -87,19 +88,22 @@ export function setupExtensionsIPC(browser: Browser) {
   createHandler<{
     win: Window;
     extension: IExtension;
-    winId: TWindowId;
-    partitionId: TPartitionId;
-    extensionId: TExtensionId;
     action: { method: string; args: Record<string, unknown> };
   }>(
     'extensions:crx-message',
     'handle',
     browser,
-    [windowChecker, extensionChecker],
-    async ({ win, partitionId, extension, action }) => {
+    [windowActiveChecker, extensionChecker],
+    async ({ win, extension, action }) => {
+      const selectedTab = browser.selectedTab;
+      if (!selectedTab) {
+        scopeLog.warn('No selected tab');
+        return;
+      }
+
       return await browser.extensions.chrome.dispatch(
         win,
-        partitionId,
+        selectedTab.tab.partition.id,
         extension.id,
         action.method,
         action.args,

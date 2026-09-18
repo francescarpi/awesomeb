@@ -163,6 +163,16 @@ export async function loadExtensionToSession(ses: Session, extension: IExtension
       scopeLog.debug(`Extension ${extension.id} has been loaded in session ${sessionName(ses)}`);
     }
   });
+
+  // ses.serviceWorkers.on('console-message', (_event, details) => {
+  //   scopeLog.debug('[SW console]', {
+  //     message: details.message,
+  //     sourceUrl: details.sourceUrl,
+  //     line: details.lineNumber,
+  //     level: details.level,
+  //     versionId: details.versionId,
+  //   });
+  // });
 }
 
 export function unloadExtensionFromSession(ses: Session, extensionId: TExtensionId) {

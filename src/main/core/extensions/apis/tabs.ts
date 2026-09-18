@@ -22,9 +22,13 @@ export class ChromeTabs {
       return [];
     }
 
-    const response = tabs.map((tabData, idx) =>
+    let response = tabs.map((tabData, idx) =>
       tabToChromeTab(window, tabData, idx, tabData.tab.id === selectedTab?.tab.id),
     );
+
+    if (props.active) {
+      response = response.filter((t) => t.active);
+    }
 
     return response;
   }

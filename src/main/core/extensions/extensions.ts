@@ -122,14 +122,14 @@ export class Extensions {
 
     const popup = new ExtensionPopup(this._browser, partition, x, y);
     const popupUrl = extension.manifest.action?.default_popup
-      ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`
-      : `chrome-extension://${extensionId}/?partitionId=${partition.id}&winId=${window.id}`;
+      ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}`
+      : `chrome-extension://${extensionId}/`;
 
     popup.webContents.loadURL(popupUrl);
 
     window.addView(popup);
 
-    // popup.webContents.openDevTools({ mode: 'detach' });
+    popup.webContents.openDevTools({ mode: 'detach' });
 
     window.renderViews();
   }

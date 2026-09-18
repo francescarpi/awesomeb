@@ -60,6 +60,9 @@ if (!gotTheLock) {
     partitions.init();
 
     const browser = new Browser();
+
+    setupExtensionsIPC(browser);
+
     const extPromises = new Set<Promise<void>>();
 
     for (const partition of partitions.allForExtensions) {
@@ -89,7 +92,6 @@ if (!gotTheLock) {
     setupTabMarksIpc(browser);
     setupCertificatesIPC(browser);
     setupConfigIPC(browser);
-    setupExtensionsIPC(browser);
     setupPromptsIpc(browser);
     setupWebauthIpc(browser);
     setupPermissionsIPC(browser);

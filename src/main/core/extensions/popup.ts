@@ -53,8 +53,6 @@ export class ExtensionPopup extends UIView {
         url.searchParams as unknown as Record<string, string>,
       );
     });
-
-    // this.webContents.openDevTools({ mode: 'detach' });
   }
 
   refreshBounds(window: Window) {
