@@ -128,6 +128,20 @@ export function windowChecker(
 }
 
 //--------------------------------------------------------------------------------
+export function windowActiveChecker(
+  browser: Browser,
+  _event: IpcMainInvokeEvent,
+  _args: Record<string, unknown>,
+): { win: Window } | null {
+  const win = browser.activeWindow;
+  if (!win) {
+    scopeLog.warn('[WindowActiveChecker] There is not any active window');
+    return null;
+  }
+  return { win };
+}
+
+//--------------------------------------------------------------------------------
 export function viewChecker(
   viewsIds: string[],
   _browser: Browser,

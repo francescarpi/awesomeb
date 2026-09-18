@@ -33,11 +33,12 @@ export class ExtensionPopup extends UIView {
       session: partition.ses,
       backgroundColor: '#fff',
       visible: false,
+      preferredSizeMode: true,
     });
 
     this.webContents.on('did-finish-load', () => {
       this.webContents.insertCSS(
-        'body { border: 1px solid rgba(0,0,0,0.5); box-sizing: border-box; height: 100vh; margin: 0 !important; }',
+        'body { border: 1px solid rgba(0,0,0,0.5); box-sizing: border-box; margin: 0 !important; }',
       );
 
       this.webContents.setWindowOpenHandler((details: HandlerDetails) => {
@@ -53,8 +54,6 @@ export class ExtensionPopup extends UIView {
         url.searchParams as unknown as Record<string, string>,
       );
     });
-
-    // this.webContents.openDevTools({ mode: 'detach' });
   }
 
   refreshBounds(window: Window) {

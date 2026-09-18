@@ -1,4 +1,4 @@
-import { Browser, bookmarks } from '@/core';
+import { Browser, bookmarks, Window } from '@/core';
 import {
   type TExtensionId,
   type TPartitionId,

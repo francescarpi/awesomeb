@@ -10,6 +10,7 @@ export interface IViewProps {
   backgroundColor?: string;
   session?: Session;
   visible?: boolean;
+  preferredSizeMode?: boolean;
 }
 
 export interface IPageViewProps extends IViewProps {
