@@ -28,16 +28,11 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
-    const url = affectedTab.url;
-    if (!url) {
-      scopeLog.warn('Tab has no URL.');
+    if (!params?.partitionId) {
+      scopeLog.warn('No partition available.');
       return;
     }
 
-    browser.closeTab(affectedTab.id);
-    browser.openURL(url, {
-      partitionId: params?.partitionId,
-      selectTab: true,
-    });
+    await browser.replaceTab(affectedTab.id, params.partitionId);
   },
 };

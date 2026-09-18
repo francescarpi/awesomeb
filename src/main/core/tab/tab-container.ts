@@ -41,6 +41,29 @@ export class TabContainer {
     this._tabs.set(tab.id, tab);
   }
 
+  replaceTab(tabId: TTabId, replacement: Tab): boolean {
+    if (!this._tabs.has(tabId) || (replacement.id !== tabId && this._tabs.has(replacement.id))) {
+      return false;
+    }
+
+    const selected = this._selectedTabId === tabId;
+    const tabs = this.tabs;
+    const index = tabs.findIndex((tab) => tab.id === tabId);
+    tabs[index] = replacement;
+
+    // Rebuild the Map so the replacement keeps the original insertion order.
+    this._tabs.clear();
+    for (const tab of tabs) {
+      this._tabs.set(tab.id, tab);
+    }
+
+    if (selected) {
+      this._selectedTabId = replacement.id;
+    }
+
+    return true;
+  }
+
   get divider(): boolean {
     return this._divider;
   }

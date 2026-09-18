@@ -189,6 +189,18 @@ export function registerBrowserEvents(browser: Browser) {
     browser.refreshMainMenu();
   });
 
+  // A profile change replaces a tab without going through the close/open flow.
+  browser.eventsChannel.on('browser:tab-did-replace', async (window: Window, tab: Tab) => {
+    browser.toRenderer.refreshTabSwitcher(window);
+    browser.toRenderer.refreshTabContainers(window);
+    browser.toRenderer.refreshURLBar(window, window.selectedTab?.tab || null);
+    browser.toRenderer.refreshDesktops(window);
+    browser.toRenderer.refreshExtensions(window);
+    browser.toRenderer.refreshLayoutData(window);
+    browser.toRenderer.refreshTabNavigation(window, tab);
+    browser.refreshMainMenu();
+  });
+
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on(
     'tab:find-in-page-visibility-did-change',
