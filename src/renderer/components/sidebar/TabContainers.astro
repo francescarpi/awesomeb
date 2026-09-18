@@ -29,7 +29,22 @@
 
   abTabs.onRefreshTabContainers((_event, tabContainers) => {
     currentTabContainers = tabContainers;
-    renderTabContainers(tabContainers).then((vnode) => renderer.update(vnode));
+    renderTabContainers(tabContainers).then((vnode) =>
+      renderer.update(vnode, {
+        onUpdated: () => {
+          const selectedTab = tabContainers
+            .flatMap((tc) => [...tc.tabs, ...tc.children.flatMap((tcc) => tcc.tabs)])
+            .find((tab) => tab.selected);
+          if (!selectedTab) {
+            return;
+          }
+          document
+            .getElementById('tabContainers')
+            ?.querySelector<HTMLElement>(`[data-tab-id="${selectedTab.id}"]`)
+            ?.scrollIntoView({ block: 'nearest' });
+        },
+      }),
+    );
   });
 
   // Single-tab updates: keep the snapshot in sync and let the VDOM diff apply
