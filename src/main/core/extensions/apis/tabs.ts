@@ -6,6 +6,39 @@ import log from 'electron-log';
 
 const scopeLog = log.scope('ChromeTabs');
 
+const supportedTabURLProtocols = new Set([
+  'http:',
+  'https:',
+  'file:',
+  'about:',
+  'ab:',
+  'chrome-extension:',
+]);
+
+export function buildTabURL(
+  extensionId: TExtensionId,
+  url: string | undefined,
+  partitionId: TPartitionId,
+  windowId: number,
+): string | null {
+  const extensionURL = new URL(`chrome-extension://${extensionId}/`);
+
+  let parsedURL: URL;
+  try {
+    parsedURL = new URL(url ?? '', extensionURL);
+  } catch {
+    return null;
+  }
+
+  if (!supportedTabURLProtocols.has(parsedURL.protocol)) {
+    return null;
+  }
+
+  parsedURL.searchParams.set('partitionId', partitionId);
+  parsedURL.searchParams.set('winId', String(windowId));
+  return parsedURL.toString();
+}
+
 export class ChromeTabs {
   constructor(private readonly _browser: Browser) {}
 
@@ -45,7 +78,12 @@ export class ChromeTabs {
       return undefined;
     }
 
-    const url = `chrome-extension://${extensionId}/${props.url}?partitionId=${partitionId}&winId=${window.id}`;
+    const url = buildTabURL(extensionId, props.url, partitionId, window.id);
+    if (!url) {
+      scopeLog.warn('Unsupported or invalid tab URL:', props.url);
+      return undefined;
+    }
+
     const response = await this._browser.openURL(url, {
       partitionId,
       selectTab: true,
