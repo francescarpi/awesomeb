@@ -125,6 +125,25 @@ export class Extensions {
       ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}`
       : `chrome-extension://${extensionId}/`;
 
+    popup.webContents.on('preferred-size-changed', (_event, size) => {
+      const width = Math.ceil(size.width);
+      const height = Math.ceil(size.height);
+
+      if (
+        !Number.isFinite(width) ||
+        !Number.isFinite(height) ||
+        width <= 0 ||
+        height <= 0 ||
+        (popup.width === width && popup.height === height)
+      ) {
+        return;
+      }
+
+      popup.setSize(width, height);
+      popup.refreshBounds(window);
+      popup.setVisible(true);
+    });
+
     popup.webContents.loadURL(popupUrl);
 
     window.addView(popup);

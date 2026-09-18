@@ -11,6 +11,7 @@ export class UIView {
 
   private readonly _borderRadius: number;
   private readonly _backgroundColor: string;
+  private readonly _preferredSizeMode: boolean;
 
   private _session: Session;
 
@@ -20,6 +21,7 @@ export class UIView {
   ) {
     this._borderRadius = props?.borderRadius || 0;
     this._backgroundColor = props?.backgroundColor || '#00000000';
+    this._preferredSizeMode = props?.preferredSizeMode ?? false;
     this._session = props?.session || partitions.internal.ses;
 
     this._webContentsView = this._createWebContentsView();
@@ -37,6 +39,7 @@ export class UIView {
         sandbox: true,
         webSecurity: true,
         transparent: true,
+        enablePreferredSizeMode: this._preferredSizeMode,
         session: this._session,
       },
     });

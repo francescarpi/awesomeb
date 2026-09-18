@@ -19,10 +19,16 @@ contextBridge.executeInMainWorld({
 
     // Ini extension popup
     if (typeof document !== 'undefined') {
-      document.addEventListener('DOMContentLoaded', () => {
-        const clientRect = document.body.getBoundingClientRect();
-        const width = Math.ceil(clientRect.width);
-        const height = Math.ceil(clientRect.height);
+      document.addEventListener('DOMContentLoaded', async () => {
+        const elements = [document.documentElement, document.body].filter(
+          (element): element is HTMLElement => element !== null,
+        );
+        const width = Math.ceil(
+          Math.max(...elements.flatMap((element) => [element.scrollWidth, element.offsetWidth])),
+        );
+        const height = Math.ceil(
+          Math.max(...elements.flatMap((element) => [element.scrollHeight, element.offsetHeight])),
+        );
         iniPopup(width, height);
       });
     }
