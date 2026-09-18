@@ -129,7 +129,7 @@ export class Extensions {
 
     window.addView(popup);
 
-    popup.webContents.openDevTools({ mode: 'detach' });
+    // popup.webContents.openDevTools({ mode: 'detach' });
 
     window.renderViews();
   }
@@ -156,10 +156,13 @@ export class Extensions {
       return;
     }
 
-    const icon = loadIcon(
-      extension.manifestPath,
-      details.path ? path.join('popup', details.path as string) : undefined,
-    );
+    let iconPath: string | undefined;
+
+    if (typeof details.path === 'string') {
+      iconPath = path.join('popup', details.path);
+    }
+
+    const icon = loadIcon(extension.manifestPath, iconPath);
 
     if (icon) {
       const newExtension = {

@@ -1,4 +1,10 @@
-import { ChromeTabs, ChromeAction, ChromeBookmarks, ChromePermissions } from './apis';
+import {
+  ChromeTabs,
+  ChromeAction,
+  ChromeBookmarks,
+  ChromePermissions,
+  ChromeCookies,
+} from './apis';
 import { Browser, Window } from '@/core';
 import { TExtensionId, TPartitionId } from '~/types';
 
@@ -11,6 +17,7 @@ export class Chrome {
     action: ChromeAction;
     bookmarks: ChromeBookmarks;
     permissions: ChromePermissions;
+    cookies: ChromeCookies;
   };
 
   constructor(private readonly _browser: Browser) {
@@ -19,6 +26,7 @@ export class Chrome {
       action: new ChromeAction(_browser),
       bookmarks: new ChromeBookmarks(_browser),
       permissions: new ChromePermissions(_browser),
+      cookies: new ChromeCookies(_browser),
     };
   }
 

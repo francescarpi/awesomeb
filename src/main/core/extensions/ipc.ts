@@ -1,5 +1,6 @@
 import { Browser, Window } from '@/core';
 import { TExtensionId, TWindowId, IWinDesConTab, IExtension } from '~/types';
+import { type IpcMainServiceWorkerInvokeEvent, type Session } from 'electron';
 import log from 'electron-log';
 import {
   internalPageChecker,
@@ -110,4 +111,70 @@ export function setupExtensionsIPC(browser: Browser) {
       );
     },
   );
+}
+
+export function setupExtensionsServiceWorkerIPC(browser: Browser, ses: Session) {
+  const registeredWorkers = new WeakSet<object>();
+
+  const registerForVersion = (versionId: number) => {
+    const worker = ses.serviceWorkers.getWorkerFromVersionID(versionId);
+    if (!worker) return;
+    if (registeredWorkers.has(worker)) return;
+
+    registeredWorkers.add(worker);
+    worker.ipc.handle(
+      'extensions:crx-message',
+      async (
+        _event: IpcMainServiceWorkerInvokeEvent,
+        rawArgs: {
+          extensionId?: TExtensionId;
+          action?: { method: string; args: Record<string, unknown> };
+        },
+      ) => {
+        const { extensionId, action } = rawArgs;
+        const win = browser.activeWindow;
+        if (!win || !extensionId || !action) {
+          scopeLog.warn('[extensions:crx-message] Invalid service worker request');
+          return;
+        }
+
+        const expectedPrefix = `chrome-extension://${extensionId}/`;
+        if (!worker.scriptURL.startsWith(expectedPrefix)) {
+          scopeLog.warn('[extensions:crx-message] Service worker URL does not match extension ID', {
+            expectedPrefix,
+            actual: worker.scriptURL,
+          });
+          return;
+        }
+
+        const extension = browser.extensions.getExtension(extensionId);
+        if (!extension) {
+          scopeLog.warn(`[extensions:crx-message] No extension found with ID ${extensionId}`);
+          return;
+        }
+
+        const selectedTab = browser.selectedTab;
+        if (!selectedTab) {
+          scopeLog.warn('[extensions:crx-message] No selected tab');
+          return;
+        }
+
+        return await browser.extensions.chrome.dispatch(
+          win,
+          selectedTab.tab.partition.id,
+          extension.id,
+          action.method,
+          action.args,
+        );
+      },
+    );
+  };
+
+  ses.serviceWorkers.on('running-status-changed', (details) => {
+    if (details.runningStatus === 'running') registerForVersion(details.versionId);
+  });
+
+  for (const versionId of Object.keys(ses.serviceWorkers.getAllRunning())) {
+    registerForVersion(Number(versionId));
+  }
 }

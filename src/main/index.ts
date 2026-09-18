@@ -15,6 +15,7 @@ import {
   setupCertificatesIPC,
   setupConfigIPC,
   setupExtensionsIPC,
+  setupExtensionsServiceWorkerIPC,
   partitions,
   setupPromptsIpc,
   registerSessionEvents,
@@ -55,18 +56,19 @@ if (!gotTheLock) {
   registerOpenHandlers();
 
   app.whenReady().then(async () => {
+    // Register extension IPC before any asynchronous startup work can load an extension.
+    const browser = new Browser();
+    setupExtensionsIPC(browser);
+
     await initI18n();
 
     partitions.init();
-
-    const browser = new Browser();
-
-    setupExtensionsIPC(browser);
 
     const extPromises = new Set<Promise<void>>();
 
     for (const partition of partitions.allForExtensions) {
       registerSessionEvents(browser, partition.ses);
+      setupExtensionsServiceWorkerIPC(browser, partition.ses);
       for (const ext of browser.extensions.active) {
         extPromises.add(loadExtensionToSession(partition.ses, ext));
       }
