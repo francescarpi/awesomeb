@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import log from 'electron-log';
 import { Session } from 'electron';
+import { lookup as lookupMimeType } from 'mime-types';
 import { sessionName } from '@/core';
 
 const scopeLog = log.scope('ExtensionsHelper');
@@ -94,19 +95,53 @@ export function loadIcon(
   manifestPath: string,
   icon: string | { [index: number]: string } | undefined,
 ): string | null {
-  let iconPath = icon;
-  if (typeof iconPath === 'object') {
-    iconPath = iconPath['48'] || iconPath['32'] || iconPath['16'];
+  let iconPath: string | undefined;
+  if (typeof icon === 'object') {
+    iconPath = icon['48'] || icon['32'] || icon['16'];
     if (!iconPath) {
       return null;
     }
+  } else {
+    iconPath = icon;
   }
 
   if (!iconPath) {
     return null;
   }
 
-  const fullPath = path.join(manifestPath, iconPath as string);
+  const extensionRoot = path.resolve(manifestPath);
+  let iconRelativePath: string;
+
+  if (/^[a-z][a-z\d+.-]*:/i.test(iconPath)) {
+    let iconUrl: URL;
+    try {
+      iconUrl = new URL(iconPath);
+    } catch {
+      scopeLog.warn(`Invalid icon URL: ${iconPath}`);
+      return null;
+    }
+
+    if (iconUrl.protocol !== 'chrome-extension:' || !iconUrl.hostname) {
+      scopeLog.warn(`Unsupported icon URL scheme: ${iconPath}`);
+      return null;
+    }
+
+    try {
+      iconRelativePath = decodeURIComponent(iconUrl.pathname).replace(/^\/+/, '');
+    } catch {
+      scopeLog.warn(`Invalid encoded icon URL path: ${iconPath}`);
+      return null;
+    }
+  } else {
+    iconRelativePath = iconPath;
+  }
+
+  const fullPath = path.resolve(extensionRoot, iconRelativePath);
+  if (fullPath !== extensionRoot && !fullPath.startsWith(`${extensionRoot}${path.sep}`)) {
+    scopeLog.warn(`Icon path escapes extension directory: ${iconPath}`);
+    return null;
+  }
+
   if (!fs.existsSync(fullPath)) {
     scopeLog.warn(`Icon file not found at ${fullPath}`);
     return null;
@@ -114,7 +149,8 @@ export function loadIcon(
   try {
     const imageBuffer = fs.readFileSync(fullPath);
     const b64encoded = imageBuffer.toString('base64');
-    return `data:image/png;base64,${b64encoded}`;
+    const mimeType = lookupMimeType(fullPath) || 'image/png';
+    return `data:${mimeType};base64,${b64encoded}`;
   } catch (err) {
     scopeLog.error(`Error reading icon file at ${fullPath}`, err);
     return null;
@@ -163,6 +199,16 @@ export async function loadExtensionToSession(ses: Session, extension: IExtension
       scopeLog.debug(`Extension ${extension.id} has been loaded in session ${sessionName(ses)}`);
     }
   });
+
+  // ses.serviceWorkers.on('console-message', (_event, details) => {
+  //   scopeLog.debug('[SW console]', {
+  //     message: details.message,
+  //     sourceUrl: details.sourceUrl,
+  //     line: details.lineNumber,
+  //     level: details.level,
+  //     versionId: details.versionId,
+  //   });
+  // });
 }
 
 export function unloadExtensionFromSession(ses: Session, extensionId: TExtensionId) {

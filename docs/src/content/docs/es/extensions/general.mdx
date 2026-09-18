@@ -8,6 +8,18 @@ title: Extensiones
 ¡Cuidado! Todavía están *work in progress* y son bastante inestables. No están implementadas todas las APIs ni hay integración con el *Chrome Store*.
 :::
 
+### Comportamiento de las APIs disponibles
+
+Las siguientes APIs de extensiones están disponibles con estos comportamientos:
+
+* `tabs.query({ active: true })` devolverá solo las pestañas activas.
+* `tabs.query` devolverá su resultado y podrá invocar opcionalmente un callback con las pestañas.
+* `cookies.getAll` devolverá las cookies y podrá invocar opcionalmente un callback con ellas.
+* `tabs.create` abrirá sin cambios las URL absolutas `http://` y `https://`.
+* Las URL relativas que reciba `tabs.create` se resolverán respecto al origen de la extensión.
+* Los parámetros de consulta de AwesomeB, `partitionId` y `winId`, se añadirán de forma segura antes de cualquier fragmento de la URL.
+* `tabs.create` rechazará los esquemas de URL no compatibles.
+
 :::note
 Sé que existen algunas librerías para incorporar extensiones a *Electron*, así como para descargarlas del *Chrome Store*, pero hay algunas limitaciones de licencias y he preferido hacer mi propia implementación.
 :::

@@ -122,8 +122,27 @@ export class Extensions {
 
     const popup = new ExtensionPopup(this._browser, partition, x, y);
     const popupUrl = extension.manifest.action?.default_popup
-      ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}?partitionId=${partition.id}&winId=${window.id}`
-      : `chrome-extension://${extensionId}/?partitionId=${partition.id}&winId=${window.id}`;
+      ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}`
+      : `chrome-extension://${extensionId}/`;
+
+    popup.webContents.on('preferred-size-changed', (_event, size) => {
+      const width = Math.ceil(size.width);
+      const height = Math.ceil(size.height);
+
+      if (
+        !Number.isFinite(width) ||
+        !Number.isFinite(height) ||
+        width <= 0 ||
+        height <= 0 ||
+        (popup.width === width && popup.height === height)
+      ) {
+        return;
+      }
+
+      popup.setSize(width, height);
+      popup.refreshBounds(window);
+      popup.setVisible(true);
+    });
 
     popup.webContents.loadURL(popupUrl);
 
@@ -156,10 +175,13 @@ export class Extensions {
       return;
     }
 
-    const icon = loadIcon(
-      extension.manifestPath,
-      details.path ? path.join('popup', details.path as string) : undefined,
-    );
+    let iconPath: string | undefined;
+
+    if (typeof details.path === 'string') {
+      iconPath = path.join('popup', details.path);
+    }
+
+    const icon = loadIcon(extension.manifestPath, iconPath);
 
     if (icon) {
       const newExtension = {
