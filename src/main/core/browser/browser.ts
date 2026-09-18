@@ -19,7 +19,15 @@ import {
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
 import { Tab } from '@/core/tab/tab';
-import { IWinDes, IWinDesCon, IWinDesConTab, TTabContainerId, TTabId, TWindowId } from '~/types';
+import {
+  IWinDes,
+  IWinDesCon,
+  IWinDesConTab,
+  TPartitionId,
+  TTabContainerId,
+  TTabId,
+  TWindowId,
+} from '~/types';
 import { mainMenu, minimumMenu, bookmarkSubMenu } from '@/menu';
 import { Menu, BrowserWindow, type MenuItemConstructorOptions } from 'electron';
 import EventEmitter from 'events';
@@ -242,6 +250,56 @@ export class Browser {
     return this.openURL(tabResult.tab.url, props);
   }
 
+  async replaceTab(tabId: TTabId, partitionId: TPartitionId): Promise<IWinDesConTab | null> {
+    if (partitionId === partitions.internal.id) {
+      return null;
+    }
+
+    const result = this.getTab(tabId);
+    if (!result || !result.tab.url) {
+      return null;
+    }
+
+    const { tab: oldTab, tabContainer, window, desktop } = result;
+    const url = oldTab.url;
+    if (!url || tabContainer.getTab(oldTab.id) !== oldTab) {
+      return null;
+    }
+    const partition = url.startsWith(`${INTERNAL_PROTOCOL}://`)
+      ? partitions.internal
+      : partitions.get(partitionId) || partitions.default;
+    const wasSelected = tabContainer.selectedTab?.id === oldTab.id;
+    const replacement = new Tab(this, this.idGenerator.nextTabId, {
+      partition,
+      suspended: false,
+      url,
+      customTitle: oldTab.customTitle,
+      openTabsAsChild: oldTab.openTabsAsChild,
+    });
+
+    if (!tabContainer.replaceTab(oldTab.id, replacement)) {
+      replacement.closeWebContents();
+      return null;
+    }
+
+    this._disposeTabResources(oldTab, window, true);
+    history.delete(oldTab.id);
+
+    this._indexTab(window, desktop, tabContainer, replacement);
+    window.addView(replacement);
+    window.renderViews();
+
+    if (wasSelected) {
+      tabContainer.selectTab(replacement.id);
+      desktop.selectTabContainer(tabContainer.id);
+    }
+
+    this.eventsChannel.emit('browser:tab-did-replace', window, replacement);
+    replacement.loadURL(replacement.url!);
+
+    return { window, desktop, tabContainer, tab: replacement };
+  }
+
   async openURL(query: string, props?: IOpenUrlProps): Promise<IWinDesConTab | null> {
     scopeLog.info(`Opening URL with query: ${query}`);
 
@@ -413,6 +471,22 @@ export class Browser {
       }
       this._tabIndex.delete(tabId);
     }
+  }
+
+  private _disposeTabResources(tab: Tab, window: Window, removeFromIndex = false): void {
+    if (removeFromIndex) {
+      this._unindexTab(tab.id);
+    }
+    tab.clearFailLoad();
+    tab.eventsRegistered = false;
+
+    const hasTabView = window.hasView(tab.viewId);
+    window.removeAllTabViews(tab.id);
+    if (!hasTabView && !tab.isDestroyed) {
+      tab.closeWebContents();
+    }
+
+    this.mediaManager.removeSession(tab.id);
   }
 
   private _indexTabContainer(window: Window, desktop: Desktop, tabContainer: TabContainer): void {
@@ -663,19 +737,13 @@ export class Browser {
       tab.markAsClosed();
     }
 
-    tab.closeWebContents();
-    tab.clearFailLoad();
-    tab.eventsRegistered = false;
-
     if (tabContainer.isClosed) {
       desktop.selectTabContainer(null);
       tabContainer.selectTab(null);
     }
 
-    window.removeAllTabViews(tab.id);
+    this._disposeTabResources(tab, window);
     window.renderViews();
-
-    this.mediaManager.removeSession(tab.id);
 
     // Soft-close keeps the container in parent.children (it just goes
     // isClosed). The container is only detached from its parent when
