@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, vi } from 'vitest';
-import { Browser, partitions, Window, Desktop, TabContainer } from '@/core';
+import { Browser, partitions, Window, Desktop, Tab, TabContainer } from '@/core';
 
 describe('TabContainer.parent', () => {
   let browser: Browser;
@@ -153,6 +153,33 @@ describe('TabContainer.addChild / TabContainer.children', () => {
       return typeof channel === 'string' && channel.startsWith('tabcontainer:');
     });
     expect(tabcontainerEvents).toEqual([]);
+  });
+});
+
+describe('TabContainer.replaceTab', () => {
+  test('replaces a tab in place and preserves selection', () => {
+    const browser = new Browser();
+    partitions.init();
+    const window = browser.createWindow(1, { withDesktops: true });
+    const desktop = window.selectedDesktop;
+    const tc = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const first = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://first.com',
+    });
+    const selected = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://selected.com',
+    });
+    const replacement = new Tab(browser, browser.idGenerator.nextTabId, {
+      partition: partitions.private,
+      url: 'http://selected.com',
+    });
+    tc.selectTab(selected.id);
+
+    expect(tc.replaceTab(selected.id, replacement)).toBe(true);
+    expect(tc.tabs.map((tab) => tab.id)).toEqual([first.id, replacement.id]);
+    expect(tc.selectedTab).toBe(replacement);
   });
 });
 

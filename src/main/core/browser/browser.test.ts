@@ -264,6 +264,87 @@ describe('Browser', () => {
     expect(duplicateResult!.tab.partition.id).toBe(partitions.private.id);
   });
 
+  test('replaceTab preserves container order, selection, and requested partition', async () => {
+    const w = browser.createWindow(1, { withDesktops: true });
+    const first = await browser.openURL('http://first.com', { selectTab: true });
+    const target = await browser.openURL('http://target.com', { selectTab: true });
+    const last = await browser.openURL('http://last.com', { selectTab: true });
+    expect(first && target && last).toBeTruthy();
+
+    const desktop = w.selectedDesktop;
+    const originalContainer = target!.tabContainer;
+    const originalTabId = target!.tab.id;
+    const oldWebContents = target!.tab.webContents;
+    const closeWebContentsSpy = vi.spyOn(oldWebContents, 'close');
+    const removeSessionSpy = vi.spyOn(browser.mediaManager, 'removeSession');
+    await w.selectTab(originalTabId);
+    await browser.replaceTab(originalTabId, partitions.private.id);
+
+    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+      first!.tabContainer.id,
+      originalContainer.id,
+      last!.tabContainer.id,
+    ]);
+    expect(originalContainer.tabs).toHaveLength(1);
+    expect(originalContainer.tabs[0].partition.id).toBe(partitions.private.id);
+    expect(originalContainer.selectedTab).toBe(originalContainer.tabs[0]);
+    expect(desktop.selectedTabContainer).toBe(originalContainer);
+    expect(browser.getTab(originalTabId)).toBeNull();
+    expect(browser.closedTabs.some((entry) => entry.tab.id === originalTabId)).toBe(false);
+    expect(closeWebContentsSpy).toHaveBeenCalledTimes(1);
+    expect(w.hasView(target!.tab.viewId)).toBe(false);
+    expect(removeSessionSpy).toHaveBeenCalledWith(originalTabId);
+  });
+
+  test('replaceTab preserves an unselected tab position without changing selection', async () => {
+    const w = browser.createWindow(1, { withDesktops: true });
+    const selected = await browser.openURL('http://selected.com', { selectTab: true });
+    const target = await browser.openURL('http://target.com');
+    expect(selected && target).toBeTruthy();
+
+    const desktop = w.selectedDesktop;
+    const originalContainer = target!.tabContainer;
+    const originalTabId = target!.tab.id;
+    const result = await browser.replaceTab(originalTabId, partitions.private.id);
+
+    expect(result).not.toBeNull();
+    expect(originalContainer.tabs[0].partition.id).toBe(partitions.private.id);
+    expect(originalContainer.selectedTab).toBeNull();
+    expect(desktop.selectedTabContainer).toBe(selected!.tabContainer);
+    expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+      selected!.tabContainer.id,
+      originalContainer.id,
+    ]);
+  });
+
+  test('replaceTab does not mutate an invalid or URL-less tab', async () => {
+    const w = browser.createWindow(1, { withDesktops: true });
+    const desktop = w.selectedDesktop;
+    const tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const tab = tabContainer.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+    });
+    const tabIds = tabContainer.tabs.map((entry) => entry.id);
+
+    expect(await browser.replaceTab(tab.id, partitions.private.id)).toBeNull();
+    expect(await browser.replaceTab(999999, partitions.private.id)).toBeNull();
+    expect(tabContainer.tabs.map((entry) => entry.id)).toEqual(tabIds);
+    expect(tabContainer.getTab(tab.id)).toBe(tab);
+  });
+
+  test('replaceTab rejects the internal partition for normal URLs', async () => {
+    browser.createWindow(1, { withDesktops: true });
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+
+    const originalTab = result!.tab;
+    const originalUrl = originalTab.url;
+    expect(await browser.replaceTab(originalTab.id, partitions.internal.id)).toBeNull();
+    expect(browser.getTab(originalTab.id)?.tab).toBe(originalTab);
+    expect(originalTab.url).toBe(originalUrl);
+    expect(originalTab.partition.id).toBe(partitions.default.id);
+  });
+
   test('duplicate a tab to a new window preserves the source tab partition (issue #200)', async () => {
     browser.createWindow(1, { withDesktops: true });
     const result = await browser.openURL('http://example.com', {

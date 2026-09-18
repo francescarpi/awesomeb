@@ -330,7 +330,6 @@ export class Window extends UIWindow {
   removeAllTabViews(tabId: TTabId) {
     for (const view of this.views) {
       if (view.viewId.startsWith(`tab-${tabId}#`)) {
-        view.closeWebContents();
         this.removeView(view.viewId);
       }
     }
