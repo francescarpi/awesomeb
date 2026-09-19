@@ -1,6 +1,8 @@
-import { expect, test, describe, beforeEach, afterEach } from 'vitest';
+import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
 import { Extensions } from './extensions';
-import { Browser } from '@/core';
+import { Browser, partitions } from '@/core';
+import { ExtensionPopup } from './popup';
+import { webContents } from 'electron';
 import { userDataPath, extensionsPath } from '@/paths';
 import path from 'path';
 import fs from 'fs';
@@ -160,5 +162,74 @@ describe('Extensions', () => {
   test('getExtension() returns null for missing extension', () => {
     const extensions = new Extensions(browser);
     expect(extensions.getExtension('non-existent')).toBeNull();
+  });
+
+  test('limits preferred size changes to one additional change per burst', () => {
+    vi.useFakeTimers();
+    partitions.init();
+
+    let onPreferredSizeChanged:
+      ((event: unknown, size: { width: number; height: number }) => void) | undefined;
+    const webContentsOn = vi.spyOn(webContents, 'on') as any;
+    webContentsOn.mockImplementation((...args: any[]) => {
+      const [event, listener] = args;
+      if (event === 'preferred-size-changed') {
+        onPreferredSizeChanged = listener;
+      }
+      return webContents;
+    });
+
+    const setSize = vi.spyOn(ExtensionPopup.prototype, 'setSize');
+    const registerPreferredSizeEvent = vi.spyOn(
+      ExtensionPopup.prototype,
+      'registerPreferredSizeEvent',
+    );
+    vi.spyOn(ExtensionPopup.prototype, 'refreshBounds').mockImplementation(() => {});
+    vi.spyOn(ExtensionPopup.prototype, 'setVisible');
+
+    const filePath = getExtensionsFilePath();
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify({ extensions: { 'test-ext': createValidExtensionJson('test-ext') } }),
+    );
+
+    const extensions = new Extensions(browser);
+    const window = {
+      id: 1,
+      addView: vi.fn(),
+      getView: () => ({ bounds: { width: 100 } }),
+      renderViews: vi.fn(),
+      removeView: vi.fn(),
+    };
+
+    extensions.openPopup('test-ext', window as never, partitions.internal, 0, 0);
+
+    expect(registerPreferredSizeEvent).toHaveBeenCalledWith(window);
+    expect(onPreferredSizeChanged).toBeDefined();
+
+    onPreferredSizeChanged!(null, { width: 0, height: 100 });
+    onPreferredSizeChanged!(null, { width: Number.NaN, height: 100 });
+    expect(setSize).not.toHaveBeenCalled();
+
+    onPreferredSizeChanged!(null, { width: 225, height: 100 });
+    onPreferredSizeChanged!(null, { width: 300, height: 150 });
+    onPreferredSizeChanged!(null, { width: 400, height: 200 });
+
+    expect(setSize).toHaveBeenCalledTimes(2);
+
+    vi.advanceTimersByTime(100);
+    onPreferredSizeChanged!(null, { width: 500, height: 250 });
+    expect(setSize).toHaveBeenCalledTimes(3);
+
+    extensions.closePopup(window as never);
+    extensions.openPopup('test-ext', window as never, partitions.internal, 0, 0);
+    expect(onPreferredSizeChanged).toBeDefined();
+    onPreferredSizeChanged!(null, { width: 600, height: 300 });
+    onPreferredSizeChanged!(null, { width: 700, height: 350 });
+    expect(setSize).toHaveBeenCalledTimes(5);
+
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 });
