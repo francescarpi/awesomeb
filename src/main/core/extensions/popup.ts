@@ -2,6 +2,8 @@ import { UIPageView, UIView, Sidebar, loadPage } from '@/ui';
 import { Window, Partition, windowOpenHadler, Browser } from '@/core';
 import { TWindowId } from '~/types';
 import { type HandlerDetails } from 'electron';
+import { MAX_PREFERRED_SIZE_CHANGES, PREFERRED_SIZE_BURST_QUIET_PERIOD } from './constants';
+import type { PopupPreferredSizeGuard } from './types';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
@@ -23,6 +25,8 @@ export class ExtensionPopupOverlay extends UIPageView {
 }
 
 export class ExtensionPopup extends UIView {
+  private preferredSizeGuard?: PopupPreferredSizeGuard;
+
   constructor(
     browser: Browser,
     partition: Partition,
@@ -54,6 +58,52 @@ export class ExtensionPopup extends UIView {
         url.searchParams as unknown as Record<string, string>,
       );
     });
+  }
+
+  registerPreferredSizeEvent(window: Window) {
+    this.resetPopupPreferredSizeGuard();
+
+    this.webContents.on('preferred-size-changed', (_event, size) => {
+      const width = Math.ceil(size.width);
+      const height = Math.ceil(size.height);
+
+      if (
+        !Number.isFinite(width) ||
+        !Number.isFinite(height) ||
+        width <= 0 ||
+        height <= 0 ||
+        (this.width === width && this.height === height)
+      ) {
+        return;
+      }
+
+      const guard = this.preferredSizeGuard || { changes: 0 };
+      this.preferredSizeGuard = guard;
+
+      if (guard.quietPeriodTimeout) {
+        clearTimeout(guard.quietPeriodTimeout);
+      }
+      guard.quietPeriodTimeout = setTimeout(() => {
+        guard.changes = 0;
+        guard.quietPeriodTimeout = undefined;
+      }, PREFERRED_SIZE_BURST_QUIET_PERIOD);
+
+      if (guard.changes >= MAX_PREFERRED_SIZE_CHANGES) {
+        return;
+      }
+
+      this.setSize(width, height);
+      this.refreshBounds(window);
+      this.setVisible(true);
+      guard.changes += 1;
+    });
+  }
+
+  private resetPopupPreferredSizeGuard() {
+    if (this.preferredSizeGuard?.quietPeriodTimeout) {
+      clearTimeout(this.preferredSizeGuard.quietPeriodTimeout);
+    }
+    this.preferredSizeGuard = undefined;
   }
 
   refreshBounds(window: Window) {
