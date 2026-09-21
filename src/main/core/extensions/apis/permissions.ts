@@ -10,9 +10,14 @@ export class ChromePermissions {
     _window: Window,
     _partitionId: TPartitionId,
     _extensionId: TExtensionId,
-    args: { permissions?: string[] },
+    args: chrome.permissions.Permissions,
   ): Promise<boolean> {
-    const requested = new Set(args.permissions ?? []);
+    if (args.origins) {
+      // TODO Pending to know how to evaluate the origins...
+      return true;
+    }
+
+    const requested = new Set(args.permissions || []);
     for (const perm of requested) {
       if (!this.SUPPORTED_PERMISSIONS.has(perm)) {
         return false;
@@ -25,7 +30,7 @@ export class ChromePermissions {
     _window: Window,
     _partitionId: TPartitionId,
     _extensionId: TExtensionId,
-    args: { permissions?: string[] },
+    args: chrome.permissions.Permissions,
   ): Promise<boolean> {
     return this.contains(_window, _partitionId, _extensionId, args);
   }
@@ -34,7 +39,7 @@ export class ChromePermissions {
     _window: Window,
     _partitionId: TPartitionId,
     _extensionId: TExtensionId,
-    _args: { permissions?: string[] },
+    _args: chrome.permissions.Permissions,
   ): Promise<boolean> {
     return true;
   }

@@ -98,6 +98,9 @@ contextBridge.executeInMainWorld({
         reload: async (tabData: number | undefined | chrome.tabs.ReloadProperties) => {
           await crxMessage(extensionId, 'tabs.reload', { tabData });
         },
+        getCurrent: async (): Promise<chrome.tabs.Tab | undefined> => {
+          return await crxMessage(extensionId, 'tabs.getCurrent', {});
+        },
         onCreated: createChromeEventApi('tabs.onCreated'),
         onUpdated: createChromeEventApi('tabs.onUpdated'),
         onRemoved: createChromeEventApi('tabs.onRemoved'),
@@ -185,9 +188,11 @@ contextBridge.executeInMainWorld({
           permissions: chrome.permissions.Permissions,
           callback?: (result: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.contains', {
+          const result = await crxMessage<boolean>(
+            extensionId,
+            'permissions.contains',
             permissions,
-          });
+          );
           if (callback) {
             callback(result);
           }
@@ -197,9 +202,7 @@ contextBridge.executeInMainWorld({
           permissions: chrome.permissions.Permissions,
           callback?: (granted: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.request', {
-            permissions,
-          });
+          const result = await crxMessage<boolean>(extensionId, 'permissions.request', permissions);
           if (callback) {
             callback(result);
           }
@@ -209,9 +212,7 @@ contextBridge.executeInMainWorld({
           permissions: chrome.permissions.Permissions,
           callback?: (removed: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.remove', {
-            permissions,
-          });
+          const result = await crxMessage<boolean>(extensionId, 'permissions.remove', permissions);
           if (callback) {
             callback(result);
           }

@@ -134,4 +134,12 @@ export class ChromeTabs {
 
     tab.tab.reload();
   }
+
+  async getCurrent(): Promise<chrome.tabs.Tab | undefined> {
+    const selected = this._browser.selectedTab;
+    if (!selected) {
+      return undefined;
+    }
+    return tabToChromeTab(selected.window, selected, 0, true);
+  }
 }
