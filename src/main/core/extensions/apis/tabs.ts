@@ -1,6 +1,6 @@
 import { Browser, Window } from '@/core';
 import { tabToChromeTab } from './helpers';
-import { TExtensionId, TPartitionId, TTabId } from '~/types';
+import type { TExtensionId, IExtension, TPartitionId, TTabId } from '~/types';
 import { ITabUpdate } from './types';
 import log from 'electron-log';
 
@@ -45,7 +45,7 @@ export class ChromeTabs {
   async query(
     window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     props: chrome.tabs.QueryInfo,
   ): Promise<chrome.tabs.Tab[]> {
     const tabs = props.currentWindow ? window.tabs : this._browser.tabs;
@@ -69,7 +69,7 @@ export class ChromeTabs {
   async create(
     window: Window,
     partitionId: TPartitionId,
-    extensionId: TExtensionId,
+    extension: IExtension,
     props: chrome.tabs.CreateProperties,
   ): Promise<chrome.tabs.Tab | undefined> {
     const selectedTab = window.selectedTab;
@@ -78,7 +78,7 @@ export class ChromeTabs {
       return undefined;
     }
 
-    const url = buildTabURL(extensionId, props.url, partitionId, window.id);
+    const url = buildTabURL(extension.id, props.url, partitionId, window.id);
     if (!url) {
       scopeLog.warn('Unsupported or invalid tab URL:', props.url);
       return undefined;
@@ -107,7 +107,7 @@ export class ChromeTabs {
   async update(
     window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     props: ITabUpdate,
   ) {
     if (props.active) {
@@ -119,7 +119,7 @@ export class ChromeTabs {
   async reload(
     window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     props: { tabData?: TTabId | chrome.tabs.ReloadProperties },
   ): Promise<void> {
     const tab =

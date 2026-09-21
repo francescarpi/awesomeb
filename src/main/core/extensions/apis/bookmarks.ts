@@ -1,9 +1,9 @@
 import { Browser, bookmarks, Window } from '@/core';
 import {
-  type TExtensionId,
   type TPartitionId,
   type IBookmark,
   type IFolderBookmark,
+  type IExtension,
   EBookmarkType,
 } from '~/types';
 
@@ -13,7 +13,7 @@ export class ChromeBookmarks {
   async getTree(
     _window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
     const buildTree = (
       bookmarks: IBookmark[],
@@ -44,7 +44,7 @@ export class ChromeBookmarks {
   async get(
     _window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     idOrIdList: string | [string, ...string[]],
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
     const ids = typeof idOrIdList === 'string' ? [idOrIdList] : idOrIdList;

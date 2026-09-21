@@ -1,44 +1,42 @@
 import { Browser, Window } from '@/core';
-import { TPartitionId, TExtensionId } from '~/types';
+import type { TPartitionId, IExtension } from '~/types';
 
 export class ChromePermissions {
-  private readonly SUPPORTED_PERMISSIONS = new Set(['bookmarks', 'tabs']);
-
   constructor(_browser: Browser) {}
 
   async contains(
     _window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    extension: IExtension,
     args: chrome.permissions.Permissions,
   ): Promise<boolean> {
-    if (args.origins) {
-      // TODO Pending to know how to evaluate the origins...
-      return true;
-    }
+    const hasPermissions =
+      args.permissions && extension.manifest.permissions
+        ? args.permissions.every((p) => extension.manifest.permissions!.includes(p))
+        : true;
 
-    const requested = new Set(args.permissions || []);
-    for (const perm of requested) {
-      if (!this.SUPPORTED_PERMISSIONS.has(perm)) {
-        return false;
-      }
-    }
-    return requested.size > 0;
+    const hasOrigins =
+      args.origins && extension.manifest.origins
+        ? args.origins.every((p) => extension.manifest.origins!.includes(p))
+        : true;
+
+    return hasPermissions && hasOrigins;
   }
 
   async request(
     _window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
-    args: chrome.permissions.Permissions,
+    _extension: IExtension,
+    _args: chrome.permissions.Permissions,
   ): Promise<boolean> {
-    return this.contains(_window, _partitionId, _extensionId, args);
+    // TODO: Pendint to implement
+    return true;
   }
 
   async remove(
     _window: Window,
     _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     _args: chrome.permissions.Permissions,
   ): Promise<boolean> {
     return true;

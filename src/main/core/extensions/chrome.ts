@@ -37,6 +37,12 @@ export class Chrome {
     action: string,
     args: Record<string, unknown>,
   ): Promise<unknown> {
+    const extension = this._browser.extensions.getExtension(extensionId);
+    if (!extension) {
+      scopeLog.error(`Extension with id ${extensionId} does not exist`);
+      return;
+    }
+
     const actionParts = action.split('.');
     if (actionParts.length !== 2) {
       scopeLog.warn(`Invalid action format: ${action}`);
@@ -59,7 +65,7 @@ export class Chrome {
     const response = await (instance[method] as CallableFunction)(
       window,
       partitionId,
-      extensionId,
+      extension,
       ...Object.values(args),
     );
 
