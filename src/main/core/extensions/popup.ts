@@ -1,6 +1,6 @@
 import { UIPageView, UIView, Sidebar, loadPage } from '@/ui';
 import { Window, Partition, windowOpenHadler, Browser } from '@/core';
-import { TWindowId } from '~/types';
+import { TExtensionId, TWindowId } from '~/types';
 import { type HandlerDetails } from 'electron';
 import { MAX_PREFERRED_SIZE_CHANGES, PREFERRED_SIZE_BURST_QUIET_PERIOD } from './constants';
 import type { PopupPreferredSizeGuard } from './types';
@@ -32,6 +32,7 @@ export class ExtensionPopup extends UIView {
     partition: Partition,
     private readonly x: number,
     private readonly y: number,
+    public readonly extensionId: TExtensionId,
   ) {
     super('extension-popup', {
       session: partition.ses,

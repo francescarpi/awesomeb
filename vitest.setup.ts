@@ -37,6 +37,7 @@ const mockElectron = vi.hoisted(() => {
     isLoading: (): boolean => false,
     getURL: (): string => '',
     getTitle: (): string => '',
+    once: noopFn,
     executeJavaScript: (): Promise<unknown> => Promise.resolve(),
     capturePage: (): Promise<unknown> => Promise.resolve({}),
     printToPDF: (): Promise<Buffer> => Promise.resolve(Buffer.from('')),

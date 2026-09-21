@@ -14,12 +14,14 @@ import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
 import path from 'path';
 import { validateStore } from '@/core/validation';
+import { RuntimeBus } from './runtime-bus';
 
 const scopeLog = log.scope('Extensions');
 
 export class Extensions {
   private readonly _store: Store<IExtensionsStore>;
   public readonly chrome: Chrome;
+  public readonly runtimeBus = new RuntimeBus();
 
   constructor(private readonly _browser: Browser) {
     this.chrome = new Chrome(_browser);
@@ -120,7 +122,7 @@ export class Extensions {
     const overlay = new ExtensionPopupOverlay(window.id);
     window.addView(overlay);
 
-    const popup = new ExtensionPopup(this._browser, partition, x, y);
+    const popup = new ExtensionPopup(this._browser, partition, x, y, extensionId);
     const popupUrl = extension.manifest.action?.default_popup
       ? `chrome-extension://${extensionId}/${extension.manifest.action.default_popup}`
       : `chrome-extension://${extensionId}/`;
@@ -131,12 +133,19 @@ export class Extensions {
 
     window.addView(popup);
 
-    // popup.webContents.openDevTools({ mode: 'detach' });
+    popup.webContents.openDevTools({ mode: 'detach' });
+
+    this.runtimeBus.registerPopup(extensionId, popup.webContents);
 
     window.renderViews();
   }
 
   closePopup(window: Window) {
+    const extensionId = window.getView<ExtensionPopup>('extension-popup')?.extensionId;
+    const popupWc = window.getView<ExtensionPopup>('extension-popup')?.webContents;
+    if (extensionId && popupWc) {
+      this.runtimeBus.unregisterPopup(extensionId, popupWc);
+    }
     window.removeView('extension-popup-overlay');
     window.removeView('extension-popup');
   }

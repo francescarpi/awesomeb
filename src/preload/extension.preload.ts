@@ -12,6 +12,12 @@ contextBridge.executeInMainWorld({
       eventName: string,
       callback: (event: IpcRendererEvent, params: T) => void,
     ) => void,
+    crxRuntimeSendMessage: (
+      targetExtensionId: string | undefined,
+      message: unknown,
+      senderContext: 'background' | 'popup' | 'content-script',
+      responseCallback?: (response: unknown) => void,
+    ) => Promise<unknown>,
   ) => {
     if (!isExtension) {
       return;
@@ -48,6 +54,37 @@ contextBridge.executeInMainWorld({
 
     const extensionId = chrome.runtime?.id;
 
+    /**
+     * Returns a Chrome-API-compatible Event object stub. `addListener` registers the
+     * callback via the existing `extensions:crx-event:${eventName}` IPC channel so
+     * that future event delivery from main will reach existing listeners without
+     * requiring a preload re-register. `removeListener`, `hasListener`, and
+     * `hasListeners` are no-ops — extension reload clears listeners and main never
+     * queries listener presence today.
+     */
+    function createChromeEventApi(eventName: string) {
+      return {
+        addListener(cb: (...args: unknown[]) => void) {
+          crxEvent(eventName, (_e: unknown, params: unknown) => {
+            if (params && typeof params === 'object') {
+              cb(...Object.values(params as Record<string, unknown>));
+            } else {
+              cb();
+            }
+          });
+        },
+        removeListener(_cb: (...args: unknown[]) => void) {
+          /* no-op: extension reload clears listeners */
+        },
+        hasListener(_cb: (...args: unknown[]) => void) {
+          return false;
+        },
+        hasListeners() {
+          return false;
+        },
+      };
+    }
+
     const apis = {
       tabs: {
         query: async (info: chrome.tabs.QueryInfo, callback?: CallableFunction) => {
@@ -75,6 +112,16 @@ contextBridge.executeInMainWorld({
         reload: async (tabData: number | undefined | chrome.tabs.ReloadProperties) => {
           await crxMessage(extensionId, 'tabs.reload', { tabData });
         },
+        onCreated: createChromeEventApi('tabs.onCreated'),
+        onUpdated: createChromeEventApi('tabs.onUpdated'),
+        onRemoved: createChromeEventApi('tabs.onRemoved'),
+        onMoved: createChromeEventApi('tabs.onMoved'),
+        onDetached: createChromeEventApi('tabs.onDetached'),
+        onAttached: createChromeEventApi('tabs.onAttached'),
+        onActivated: createChromeEventApi('tabs.onActivated'),
+        onHighlighted: createChromeEventApi('tabs.onHighlighted'),
+        onReplaced: createChromeEventApi('tabs.onReplaced'),
+        onZoomChange: createChromeEventApi('tabs.onZoomChange'),
       },
       cookies: {
         getAll: async (
@@ -116,39 +163,13 @@ contextBridge.executeInMainWorld({
             idOrIdList,
           );
         },
-        onChanged: (
-          callback: (id: string, changeInfo: { title: string; url?: string }) => void,
-        ) => {
-          crxEvent<{ id: string; changeInfo: { title: string; url?: string } }>(
-            'bookmarks.onChanged',
-            (_event, params) => {
-              callback(params.id, params.changeInfo);
-            },
-          );
-        },
-        onMoved: (
-          callback: (
-            id: string,
-            moveInfo: {
-              parentId: string;
-              index: number;
-              oldParentId: string;
-              oldIndex: number;
-            },
-          ) => void,
-        ) => {
-          crxEvent<{
-            id: string;
-            moveInfo: {
-              parentId: string;
-              index: number;
-              oldParentId: string;
-              oldIndex: number;
-            };
-          }>('bookmarks.onMoved', (_event, params) => {
-            callback(params.id, params.moveInfo);
-          });
-        },
+        onChanged: createChromeEventApi('bookmarks.onChanged'),
+        onCreated: createChromeEventApi('bookmarks.onCreated'),
+        onRemoved: createChromeEventApi('bookmarks.onRemoved'),
+        onMoved: createChromeEventApi('bookmarks.onMoved'),
+        onChildrenReordered: createChromeEventApi('bookmarks.onChildrenReordered'),
+        onImportBegan: createChromeEventApi('bookmarks.onImportBegan'),
+        onImportEnded: createChromeEventApi('bookmarks.onImportEnded'),
       },
       permissions: {
         contains: async (
@@ -188,6 +209,127 @@ contextBridge.executeInMainWorld({
           return result;
         },
       },
+      tabGroups: {
+        query: async (_options: unknown) => [],
+        get: async (_groupId: number) => null,
+        move: async (_groupId: number, _moveProperties: unknown) => {},
+        update: async (_groupId: number, _updateProperties: unknown) => {},
+        onCreated: createChromeEventApi('tabGroups.onCreated'),
+        onMoved: createChromeEventApi('tabGroups.onMoved'),
+        onRemoved: createChromeEventApi('tabGroups.onRemoved'),
+        onUpdated: createChromeEventApi('tabGroups.onUpdated'),
+      },
+      history: {
+        search: async (_query: unknown) => [],
+        getVisits: async (_url: string) => [],
+        onVisited: createChromeEventApi('history.onVisited'),
+        onVisitRemoved: createChromeEventApi('history.onVisitRemoved'),
+      },
+      alarms: {
+        get: async (_name?: string) => null,
+        getAll: async () => [],
+        clear: async (_name: string) => true,
+        create: async (_name: string, _alarmInfo: unknown) => {},
+        onAlarm: createChromeEventApi('alarms.onAlarm'),
+      },
+      runtime: {
+        onStartup: createChromeEventApi('runtime.onStartup'),
+        onInstalled: createChromeEventApi('runtime.onInstalled'),
+        onSuspend: createChromeEventApi('runtime.onSuspend'),
+        onSuspendCanceled: createChromeEventApi('runtime.onSuspendCanceled'),
+        onUpdateAvailable: createChromeEventApi('runtime.onUpdateAvailable'),
+        onConnect: createChromeEventApi('runtime.onConnect'),
+        onConnectExternal: createChromeEventApi('runtime.onConnectExternal'),
+        onMessageExternal: createChromeEventApi('runtime.onMessageExternal'),
+        onRestartRequired: createChromeEventApi('runtime.onRestartRequired'),
+        sendMessage: (
+          extensionIdOrMsg: string | unknown,
+          messageOrCb?: unknown,
+          cbOrOptions?: unknown,
+          maybeCallback?: unknown,
+        ) => {
+          let targetExtensionId: string | undefined;
+          let message: unknown;
+          let responseCallback: ((response: unknown) => void) | undefined;
+
+          if (typeof extensionIdOrMsg === 'string') {
+            targetExtensionId = extensionIdOrMsg;
+            message = messageOrCb;
+            if (typeof cbOrOptions === 'function') {
+              responseCallback = cbOrOptions as (response: unknown) => void;
+            } else if (typeof maybeCallback === 'function') {
+              responseCallback = maybeCallback as (response: unknown) => void;
+            }
+          } else {
+            message = extensionIdOrMsg;
+            if (typeof messageOrCb === 'function') {
+              responseCallback = messageOrCb as (response: unknown) => void;
+            }
+          }
+
+          const senderContext: 'background' | 'popup' | 'content-script' =
+            process.type === 'service-worker' ? 'background' : 'popup';
+
+          return crxRuntimeSendMessage(targetExtensionId, message, senderContext, responseCallback);
+        },
+        onMessage: {
+          addListener(
+            cb: (
+              message: unknown,
+              sender: { id: string },
+              sendResponse: (response: unknown) => void,
+            ) => void,
+          ) {
+            crxEvent<{
+              message: unknown;
+              sender: { id: string };
+              senderContext: string;
+            }>('runtime.onMessage', (_e, params) => {
+              // TODO: wire async sendResponse routing via `extensions:runtime-send-response`
+              // in a follow-up — Floccus does not use sendResponse today.
+              const sendResponse = (_response: unknown): void => {
+                console.warn(
+                  '[awesomeb] runtime.sendResponse not yet supported — wire this in a follow-up',
+                );
+              };
+              cb(params?.message, params?.sender ?? { id: extensionId ?? '' }, sendResponse);
+            });
+          },
+          removeListener(_cb: (...args: unknown[]) => void) {
+            /* no-op: extension reload clears listeners */
+          },
+          hasListener(_cb: (...args: unknown[]) => void) {
+            return false;
+          },
+          hasListeners() {
+            return false;
+          },
+        },
+      },
+      storage: {
+        local: {
+          get: async (_keys: unknown) => ({}),
+          set: async (_items: unknown) => {},
+          remove: async (_keys: unknown) => {},
+          clear: async () => {},
+          getKeys: async () => [],
+          getBytesInUse: async (_keys?: unknown) => 0,
+        },
+        sync: {
+          get: async (_keys: unknown) => ({}),
+          set: async (_items: unknown) => {},
+          remove: async (_keys: unknown) => {},
+          clear: async () => {},
+          getKeys: async () => [],
+          getBytesInUse: async (_keys?: unknown) => 0,
+        },
+        managed: {
+          get: async (_keys: unknown) => ({}),
+          getKeys: async () => [],
+          getBytesInUse: async (_keys?: unknown) => 0,
+        },
+        onChanged: createChromeEventApi('storage.onChanged'),
+      },
     };
 
     for (const target of targets) {
@@ -221,6 +363,43 @@ contextBridge.executeInMainWorld({
     },
     (eventName: string, callback: (event: IpcRendererEvent, params: unknown) => void) => {
       ipcRenderer.on(`extensions:crx-event:${eventName}`, callback);
+    },
+    (
+      targetExtensionId: string | undefined,
+      message: unknown,
+      senderContext: 'background' | 'popup' | 'content-script',
+      responseCallback?: (response: unknown) => void,
+    ): Promise<unknown> => {
+      const responseKey = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const extId = targetExtensionId || globalThis.chrome?.runtime?.id;
+
+      const responsePromise = new Promise<unknown>((resolve) => {
+        ipcRenderer.once(
+          `extensions:crx-runtime-response:${responseKey}`,
+          (_event: unknown, response: unknown) => {
+            resolve(response);
+          },
+        );
+      });
+
+      const invokePromise = ipcRenderer
+        .invoke('extensions:runtime-send-message', {
+          extensionId: extId,
+          message,
+          responseKey,
+          senderContext,
+        })
+        .catch((err: unknown) => {
+          console.warn('[awesomeb] runtime.sendMessage failed:', err);
+          return undefined;
+        });
+
+      const settled = Promise.race<unknown>([responsePromise, invokePromise]).then((value) => {
+        if (responseCallback) responseCallback(value);
+        return value;
+      });
+
+      return settled;
     },
   ],
 });
