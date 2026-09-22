@@ -157,7 +157,7 @@ export function setupExtensionsServiceWorkerIPC(browser: Browser, ses: Session) 
   };
 
   ses.serviceWorkers.on('running-status-changed', (details) => {
-    if (details.runningStatus === 'running') registerForVersion(details.versionId);
+    if (details.runningStatus === 'starting') registerForVersion(details.versionId);
   });
 
   for (const versionId of Object.keys(ses.serviceWorkers.getAllRunning())) {
