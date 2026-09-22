@@ -41,6 +41,12 @@ export class Bookmarks {
 
   find(id: string, bookmarks?: IBookmark[]): IBookmark | null {
     const items = bookmarks ?? this.all;
+
+    if (id === '0') {
+      // 0 == 'root'
+      return [items];
+    }
+
     for (const item of items) {
       if (item.id === id) return item;
       if (item.type === EBookmarkType.Folder) {

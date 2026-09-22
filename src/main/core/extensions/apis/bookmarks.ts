@@ -34,6 +34,18 @@ export class ChromeBookmarks {
     ];
   }
 
+  async getSubTree(
+    _window: Window,
+    _extension: IExtension,
+    id: string,
+  ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
+    const root = bookmarks.find(id);
+    if (root) {
+      return root;
+    }
+    return [];
+  }
+
   async get(
     _window: Window,
     _extension: IExtension,

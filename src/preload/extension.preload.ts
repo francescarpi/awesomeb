@@ -166,6 +166,20 @@ contextBridge.executeInMainWorld({
             'bookmarks.getTree',
           );
         },
+        getSubTree: async (
+          id: string,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
+          const resp = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            extensionId,
+            'bookmarks.getSubTree',
+            id,
+          );
+          if (callback) {
+            callback(resp);
+          }
+          return resp;
+        },
         get: async (
           idOrIdList: string | [string, ...string[]],
         ): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
