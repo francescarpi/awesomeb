@@ -1,5 +1,5 @@
 import { Browser, Window } from '@/core';
-import type { TPartitionId, IExtension } from '~/types';
+import type { IExtension } from '~/types';
 import log from 'electron-log';
 
 const scopeLog = log.scope('ChromeCookies');
@@ -9,7 +9,6 @@ export class ChromeCookies {
 
   async getAll(
     window: Window,
-    _partitionId: TPartitionId,
     _extension: IExtension,
     props: chrome.cookies.GetAllDetails,
   ): Promise<chrome.cookies.Cookie[]> {

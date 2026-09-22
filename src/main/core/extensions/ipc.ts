@@ -96,15 +96,8 @@ export function setupExtensionsIPC(browser: Browser) {
     browser,
     [windowActiveChecker, extensionChecker],
     async ({ win, extension, action }) => {
-      const selectedTab = browser.selectedTab;
-      if (!selectedTab) {
-        scopeLog.warn('No selected tab');
-        return;
-      }
-
       return await browser.extensions.chrome.dispatch(
         win,
-        selectedTab.tab.partition.id,
         extension.id,
         action.method,
         action.args,
@@ -153,15 +146,8 @@ export function setupExtensionsServiceWorkerIPC(browser: Browser, ses: Session) 
           return;
         }
 
-        const selectedTab = browser.selectedTab;
-        if (!selectedTab) {
-          scopeLog.warn('[extensions:crx-message] No selected tab');
-          return;
-        }
-
         return await browser.extensions.chrome.dispatch(
           win,
-          selectedTab.tab.partition.id,
           extension.id,
           action.method,
           action.args,

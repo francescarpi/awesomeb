@@ -1,12 +1,11 @@
 import { Browser, Window } from '@/core';
-import type { TPartitionId, IExtension } from '~/types';
+import type { IExtension } from '~/types';
 
 export class ChromePermissions {
   constructor(_browser: Browser) {}
 
   async contains(
     _window: Window,
-    _partitionId: TPartitionId,
     extension: IExtension,
     args: chrome.permissions.Permissions,
   ): Promise<boolean> {
@@ -25,7 +24,6 @@ export class ChromePermissions {
 
   async request(
     _window: Window,
-    _partitionId: TPartitionId,
     _extension: IExtension,
     _args: chrome.permissions.Permissions,
   ): Promise<boolean> {
@@ -35,7 +33,6 @@ export class ChromePermissions {
 
   async remove(
     _window: Window,
-    _partitionId: TPartitionId,
     _extension: IExtension,
     _args: chrome.permissions.Permissions,
   ): Promise<boolean> {

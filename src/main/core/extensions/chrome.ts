@@ -6,7 +6,7 @@ import {
   ChromeCookies,
 } from './apis';
 import { Browser, Window } from '@/core';
-import { TExtensionId, TPartitionId } from '~/types';
+import { TExtensionId } from '~/types';
 
 import log from 'electron-log';
 const scopeLog = log.scope('Chrome');
@@ -32,7 +32,6 @@ export class Chrome {
 
   async dispatch(
     window: Window,
-    partitionId: TPartitionId,
     extensionId: TExtensionId,
     action: string,
     args: Record<string, unknown>,
@@ -64,7 +63,6 @@ export class Chrome {
     scopeLog.info(`Dispatching ${api}.${method} with args:`, args);
     const response = await (instance[method] as CallableFunction)(
       window,
-      partitionId,
       extension,
       ...Object.values(args),
     );
