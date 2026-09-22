@@ -248,6 +248,7 @@ contextBridge.executeInMainWorld({
           method,
           args,
         },
+        callerUrl: typeof location !== 'undefined' ? location.href : null,
       });
     },
     (eventName: string, callback: (event: IpcRendererEvent, params: unknown) => void) => {

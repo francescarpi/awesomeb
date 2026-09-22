@@ -8,7 +8,8 @@ export class ChromeAction {
     _window: Window,
     extension: IExtension,
     details: chrome.action.TabIconDetails,
+    callerUrl?: string,
   ): Promise<void> {
-    this.browser.extensions.updateIcon(extension.id, details);
+    this.browser.extensions.updateIcon(extension.id, details, callerUrl);
   }
 }

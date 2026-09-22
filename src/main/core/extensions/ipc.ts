@@ -90,17 +90,19 @@ export function setupExtensionsIPC(browser: Browser) {
     win: Window;
     extension: IExtension;
     action: { method: string; args: Record<string, unknown> };
+    callerUrl?: string | null;
   }>(
     'extensions:crx-message',
     'handle',
     browser,
     [windowActiveChecker, extensionChecker],
-    async ({ win, extension, action }) => {
+    async ({ win, extension, action, callerUrl }) => {
       return await browser.extensions.chrome.dispatch(
         win,
         extension.id,
         action.method,
         action.args,
+        callerUrl ?? undefined,
       );
     },
   );
@@ -151,6 +153,7 @@ export function setupExtensionsServiceWorkerIPC(browser: Browser, ses: Session) 
           extension.id,
           action.method,
           action.args,
+          worker.scriptURL,
         );
       },
     );

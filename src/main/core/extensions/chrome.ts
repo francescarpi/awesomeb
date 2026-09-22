@@ -7,6 +7,7 @@ import {
 } from './apis';
 import { Browser, Window } from '@/core';
 import { TExtensionId } from '~/types';
+import { sanitizeCallerUrl } from './helpers';
 
 import log from 'electron-log';
 const scopeLog = log.scope('Chrome');
@@ -35,6 +36,7 @@ export class Chrome {
     extensionId: TExtensionId,
     action: string,
     args: Record<string, unknown>,
+    callerUrl?: string,
   ): Promise<unknown> {
     const extension = this._browser.extensions.getExtension(extensionId);
     if (!extension) {
@@ -60,11 +62,14 @@ export class Chrome {
       return;
     }
 
+    const safeCallerUrl = sanitizeCallerUrl(callerUrl, extensionId);
+
     scopeLog.info(`Dispatching ${api}.${method} with args:`, args);
     const response = await (instance[method] as CallableFunction)(
       window,
       extension,
       ...Object.values(args),
+      safeCallerUrl,
     );
 
     return response;
