@@ -1,8 +1,40 @@
 import { Browser, bookmarks, Window } from '@/core';
-import { type IBookmark, type IFolderBookmark, type IExtension, EBookmarkType } from '~/types';
+import { type IBookmark, type IExtension } from '~/types';
+
+const ROOT_ID = 'root________';
 
 export class ChromeBookmarks {
   constructor(_browser: Browser) {}
+
+  private findTreeNode(
+    id: string,
+    tree: chrome.bookmarks.BookmarkTreeNode[],
+  ): chrome.bookmarks.BookmarkTreeNode[] {
+    for (const node of tree) {
+      if (node.id === id && node.children) {
+        return node.children;
+      } else if (node.children && node.children.length > 0) {
+        return this.findTreeNode(id, node.children);
+      }
+    }
+    return [];
+  }
+
+  private flattenTreeNode(
+    tree: chrome.bookmarks.BookmarkTreeNode[],
+    originalList?: chrome.bookmarks.BookmarkTreeNode[],
+  ): chrome.bookmarks.BookmarkTreeNode[] {
+    const list = originalList || [];
+    for (const node of tree) {
+      const { children, ...nodeWithoutChildren } = node;
+      list.push(nodeWithoutChildren);
+
+      if (children && children.length > 0) {
+        this.flattenTreeNode(children, list);
+      }
+    }
+    return list;
+  }
 
   async getTree(
     _window: Window,
@@ -12,24 +44,27 @@ export class ChromeBookmarks {
       bookmarks: IBookmark[],
       parentId: string,
     ): chrome.bookmarks.BookmarkTreeNode[] => {
-      return bookmarks
-        .filter((b): b is IFolderBookmark => b.type === EBookmarkType.Folder)
-        .map((folder) => ({
-          id: folder.id,
-          title: folder.title,
-          children: buildTree(folder.children, folder.id),
-          syncing: true,
-          dateAdded: folder.dateAdded,
-          parentId,
-        }));
+      if (!bookmarks) {
+        return [];
+      }
+      return bookmarks.map((folder) => ({
+        id: folder.id,
+        title: folder.title,
+        children: buildTree(folder.children, folder.id),
+        syncing: true,
+        dateAdded: folder.dateAdded,
+        url: folder.url,
+        parentId,
+      }));
     };
 
     return [
       {
-        id: '0',
+        id: ROOT_ID,
         syncing: false,
-        title: '',
-        children: buildTree(bookmarks.all, '0'),
+        title: 'Bookmarks Menu',
+        children: buildTree(bookmarks.all, ROOT_ID),
+        folderType: 'managed',
       },
     ];
   }
@@ -39,47 +74,20 @@ export class ChromeBookmarks {
     extension: IExtension,
     id: string,
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
-    if (id === '0') {
-      return await this.getTree(window, extension);
-    }
+    const tree = await this.getTree(window, extension);
 
-    const root = bookmarks.find(id);
-    if (root) {
-      return root;
-    }
-
-    return [];
+    const result = this.findTreeNode(id, tree);
+    return result;
   }
 
   async get(
-    _window: Window,
-    _extension: IExtension,
+    window: Window,
+    extension: IExtension,
     idOrIdList: string | [string, ...string[]],
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
     const ids = typeof idOrIdList === 'string' ? [idOrIdList] : idOrIdList;
-    const result: chrome.bookmarks.BookmarkTreeNode[] = [];
-
-    for (const id of ids) {
-      if (id === '0' || id === 'root________') {
-        result.push({
-          id: '0',
-          syncing: false,
-          title: '',
-        });
-        continue;
-      }
-
-      const found = bookmarks.find(id);
-      if (found) {
-        result.push({
-          id: found.id,
-          title: found.title,
-          syncing: true,
-          dateAdded: found.dateAdded,
-        });
-      }
-    }
-
+    const flatTree = this.flattenTreeNode(await this.getTree(window, extension));
+    const result = flatTree.filter((node) => ids.includes(node.id));
     return result;
   }
 }
