@@ -15,7 +15,7 @@ export class ChromeBookmarks {
   ): chrome.bookmarks.BookmarkTreeNode[] {
     for (const node of tree) {
       if (node.id === id && node.children) {
-        return node.children;
+        return [node];
       } else if (node.children && node.children.length > 0) {
         return this.findTreeNode(id, node.children);
       }
