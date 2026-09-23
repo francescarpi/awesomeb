@@ -104,7 +104,9 @@ export class ChromeBookmarks {
     extension: IExtension,
     idOrIdList: string | [string, ...string[]],
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
-    const ids = typeof idOrIdList === 'string' ? [idOrIdList] : idOrIdList;
+    const ids = (typeof idOrIdList === 'string' ? [idOrIdList] : idOrIdList).map((id) =>
+      id === 'root________' ? '0' : id,
+    );
     const flatTree = this.flattenTreeNode(await this.getTree(window, extension));
     const result = flatTree.filter((node) => ids.includes(node.id));
     return result;
