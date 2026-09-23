@@ -1,5 +1,5 @@
 import { Browser, bookmarks, Window } from '@/core';
-import { type IBookmark, type IExtension } from '~/types';
+import { EBookmarkType, type IBookmark, type IExtension } from '~/types';
 import { t } from '~/i18n';
 
 const ROOT_ID = '0';
@@ -50,14 +50,17 @@ export class ChromeBookmarks {
       if (!bookmarks) {
         return [];
       }
+
       return bookmarks.map((folder) => ({
         id: folder.id,
         title: folder.title,
-        children: buildTree(folder.children, folder.id),
-        syncing: true,
+        syncing: false,
         dateAdded: folder.dateAdded,
         url: folder.url,
         parentId,
+        ...(folder.type !== EBookmarkType.Url && {
+          children: buildTree(folder.children, folder.id),
+        }),
       }));
     };
 
