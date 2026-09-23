@@ -189,6 +189,20 @@ contextBridge.executeInMainWorld({
             idOrIdList,
           );
         },
+        create: async (
+          bookmark: chrome.bookmarks.CreateDetails,
+          callback?: (result: chrome.bookmarks.BookmarkTreeNode) => void,
+        ): Promise<chrome.bookmarks.BookmarkTreeNode> => {
+          const resp = await crxMessage<chrome.bookmarks.BookmarkTreeNode>(
+            extensionId,
+            'bookmarks.create',
+            bookmark,
+          );
+          if (callback) {
+            callback(resp);
+          }
+          return resp;
+        },
         onChanged: createChromeEventApi('bookmarks.onChanged'),
         onCreated: createChromeEventApi('bookmarks.onCreated'),
         onRemoved: createChromeEventApi('bookmarks.onRemoved'),

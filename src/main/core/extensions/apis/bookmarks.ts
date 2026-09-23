@@ -7,7 +7,7 @@ const BOOKMARKS_BAR_ID = '1';
 const OTHER_ID = '2';
 
 export class ChromeBookmarks {
-  constructor(_browser: Browser) {}
+  constructor(private readonly _browser: Browser) {}
 
   private findTreeNode(
     id: string,
@@ -39,31 +39,34 @@ export class ChromeBookmarks {
     return list;
   }
 
+  private iBookmarkToTreeNode(
+    bookmark: IBookmark,
+    parentId: string,
+  ): chrome.bookmarks.BookmarkTreeNode {
+    return {
+      id: bookmark.id,
+      title: bookmark.title,
+      syncing: false,
+      dateAdded: bookmark.dateAdded,
+      url: bookmark.url,
+      parentId,
+      ...(bookmark.type !== EBookmarkType.Url && {
+        children: this.buildTree(bookmark.children, bookmark.id),
+      }),
+    };
+  }
+  private buildTree(bookmarks: IBookmark[], parentId: string): chrome.bookmarks.BookmarkTreeNode[] {
+    if (!bookmarks) {
+      return [];
+    }
+
+    return bookmarks.map((bk) => this.iBookmarkToTreeNode(bk, parentId));
+  }
+
   async getTree(
     _window: Window,
     _extension: IExtension,
   ): Promise<chrome.bookmarks.BookmarkTreeNode[]> {
-    const buildTree = (
-      bookmarks: IBookmark[],
-      parentId: string,
-    ): chrome.bookmarks.BookmarkTreeNode[] => {
-      if (!bookmarks) {
-        return [];
-      }
-
-      return bookmarks.map((folder) => ({
-        id: folder.id,
-        title: folder.title,
-        syncing: false,
-        dateAdded: folder.dateAdded,
-        url: folder.url,
-        parentId,
-        ...(folder.type !== EBookmarkType.Url && {
-          children: buildTree(folder.children, folder.id),
-        }),
-      }));
-    };
-
     return [
       {
         id: ROOT_ID,
@@ -84,7 +87,7 @@ export class ChromeBookmarks {
             parentId: ROOT_ID,
             syncing: false,
             title: t('pages:extensions.otherBookmarks'),
-            children: buildTree(bookmarks.all, ROOT_ID),
+            children: this.buildTree(bookmarks.all, ROOT_ID),
           },
         ],
       },
@@ -113,5 +116,28 @@ export class ChromeBookmarks {
     const flatTree = this.flattenTreeNode(await this.getTree(window, extension));
     const result = flatTree.filter((node) => ids.includes(node.id));
     return result;
+  }
+
+  async create(
+    _window: Window,
+    _extension: IExtension,
+    bookmark: chrome.bookmarks.CreateDetails,
+  ): Promise<chrome.bookmarks.BookmarkTreeNode | null> {
+    const { parentId, title, url } = bookmark;
+    if (!parentId || !title) {
+      return null;
+    }
+
+    const isFolder = url === undefined;
+    const pId = [ROOT_ID, BOOKMARKS_BAR_ID, OTHER_ID].includes(parentId) ? 'root' : parentId;
+
+    const newBookmark = isFolder
+      ? bookmarks.addFolder(pId, title)
+      : bookmarks.add(pId, null, [{ title, url }]);
+
+    this._browser.invalidateBookmarksMenuCache();
+    this._browser.refreshMainMenu();
+
+    return this.iBookmarkToTreeNode(newBookmark, pId);
   }
 }

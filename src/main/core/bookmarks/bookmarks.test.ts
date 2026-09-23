@@ -80,7 +80,11 @@ describe('Bookmarks', () => {
   test('add() adds valid bookmarks to root', () => {
     const bookmarks = new Bookmarks();
     const result = bookmarks.add('root', null, [{ title: 'Test', url: 'https://test.com' }]);
-    expect(result).toBe(true);
+    expect(result.length).toBe(1);
+    expect(result[0].type).toBe('url');
+    if (result[0].type === 'url') {
+      expect(result[0].title).toBe('Test');
+    }
     expect(bookmarks.all.length).toBe(1);
     expect(bookmarks.all[0].title).toBe('Test');
   });
@@ -93,7 +97,11 @@ describe('Bookmarks', () => {
     const result = bookmarks.add('folder-1', null, [
       { title: 'Nested', url: 'https://nested.com' },
     ]);
-    expect(result).toBe(true);
+    expect(result.length).toBe(1);
+    expect(result[0].type).toBe('url');
+    if (result[0].type === 'url') {
+      expect(result[0].title).toBe('Nested');
+    }
 
     const found = bookmarks.find('folder-1');
     expect(found).not.toBeNull();
@@ -212,10 +220,10 @@ describe('Bookmarks', () => {
     }
   });
 
-  test('add() returns true even when parent folder does not exist', () => {
+  test('add() returns added bookmarks even when parent folder does not exist', () => {
     const bookmarks = new Bookmarks();
     const result = bookmarks.add('nonexistent', null, [{ title: 'Site', url: 'https://site.com' }]);
-    expect(result).toBe(true);
+    expect(result.length).toBe(1);
     expect(bookmarks.all.length).toBe(0);
   });
 });
