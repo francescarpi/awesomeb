@@ -109,7 +109,9 @@
     "noExtensions": "No se han encontrado extensiones",
     "noDescription": "Sin descripción",
     "id": "ID",
-    "version": "Versión"
+    "version": "Versión",
+    "bookmarksBar": "Barra de marcadores",
+    "otherBookmarks": "Otros marcadores"
   },
   "findInPage": {
     "placeholder": "Buscar en la página...",

@@ -1,7 +1,10 @@
 import { Browser, bookmarks, Window } from '@/core';
 import { type IBookmark, type IExtension } from '~/types';
+import { t } from '~/i18n';
 
-const ROOT_ID = 'root________';
+const ROOT_ID = '0';
+const BOOKMARKS_BAR_ID = '1';
+const OTHER_ID = '2';
 
 export class ChromeBookmarks {
   constructor(_browser: Browser) {}
@@ -62,9 +65,25 @@ export class ChromeBookmarks {
       {
         id: ROOT_ID,
         syncing: false,
-        title: 'Bookmarks Menu',
-        children: buildTree(bookmarks.all, ROOT_ID),
-        folderType: 'managed',
+        title: '',
+        children: [
+          {
+            id: BOOKMARKS_BAR_ID,
+            folderType: 'bookmarks-bar',
+            parentId: ROOT_ID,
+            syncing: false,
+            title: t('pages:extensions.bookmarksBar'),
+            children: [],
+          },
+          {
+            id: OTHER_ID,
+            folderType: 'other',
+            parentId: ROOT_ID,
+            syncing: false,
+            title: t('pages:extensions.otherBookmarks'),
+            children: buildTree(bookmarks.all, ROOT_ID),
+          },
+        ],
       },
     ];
   }
