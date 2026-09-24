@@ -48,6 +48,29 @@ contextBridge.executeInMainWorld({
 
     const extensionId = chrome.runtime?.id;
 
+    function createChromeEventApi(eventName: string) {
+      return {
+        addListener(cb: (...args: unknown[]) => void) {
+          crxEvent(eventName, (_e: unknown, params: unknown) => {
+            if (params && typeof params === 'object') {
+              cb(...Object.values(params as Record<string, unknown>));
+            } else {
+              cb();
+            }
+          });
+        },
+        removeListener(_cb: (...args: unknown[]) => void) {
+          /* no-op: extension reload clears listeners */
+        },
+        hasListener(_cb: (...args: unknown[]) => void) {
+          return false;
+        },
+        hasListeners() {
+          return false;
+        },
+      };
+    }
+
     const apis = {
       tabs: {
         query: async (info: chrome.tabs.QueryInfo, callback?: CallableFunction) => {
@@ -75,6 +98,42 @@ contextBridge.executeInMainWorld({
         reload: async (tabData: number | undefined | chrome.tabs.ReloadProperties) => {
           await crxMessage(extensionId, 'tabs.reload', { tabData });
         },
+        getCurrent: async (): Promise<chrome.tabs.Tab | undefined> => {
+          return await crxMessage(extensionId, 'tabs.getCurrent', {});
+        },
+        onCreated: createChromeEventApi('tabs.onCreated'),
+        onUpdated: createChromeEventApi('tabs.onUpdated'),
+        onRemoved: createChromeEventApi('tabs.onRemoved'),
+        onMoved: createChromeEventApi('tabs.onMoved'),
+        onDetached: createChromeEventApi('tabs.onDetached'),
+        onAttached: createChromeEventApi('tabs.onAttached'),
+        onActivated: createChromeEventApi('tabs.onActivated'),
+        onHighlighted: createChromeEventApi('tabs.onHighlighted'),
+        onReplaced: createChromeEventApi('tabs.onReplaced'),
+        onZoomChange: createChromeEventApi('tabs.onZoomChange'),
+      },
+      tabGroups: {
+        query: async (_options: unknown) => [],
+        get: async (_groupId: number) => null,
+        move: async (_groupId: number, _moveProperties: unknown) => {},
+        update: async (_groupId: number, _updateProperties: unknown) => {},
+        onCreated: createChromeEventApi('tabGroups.onCreated'),
+        onMoved: createChromeEventApi('tabGroups.onMoved'),
+        onRemoved: createChromeEventApi('tabGroups.onRemoved'),
+        onUpdated: createChromeEventApi('tabGroups.onUpdated'),
+      },
+      history: {
+        search: async (_query: unknown) => [],
+        getVisits: async (_url: string) => [],
+        onVisited: createChromeEventApi('history.onVisited'),
+        onVisitRemoved: createChromeEventApi('history.onVisitRemoved'),
+      },
+      alarms: {
+        get: async (_name?: string) => null,
+        getAll: async () => [],
+        clear: async (_name: string) => true,
+        create: async (_name: string, _alarmInfo: unknown) => {},
+        onAlarm: createChromeEventApi('alarms.onAlarm'),
       },
       cookies: {
         getAll: async (
@@ -107,6 +166,20 @@ contextBridge.executeInMainWorld({
             'bookmarks.getTree',
           );
         },
+        getSubTree: async (
+          id: string,
+          callback?: (results: chrome.bookmarks.BookmarkTreeNode[]) => void,
+        ): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
+          const resp = await crxMessage<chrome.bookmarks.BookmarkTreeNode[]>(
+            extensionId,
+            'bookmarks.getSubTree',
+            id,
+          );
+          if (callback) {
+            callback(resp);
+          }
+          return resp;
+        },
         get: async (
           idOrIdList: string | [string, ...string[]],
         ): Promise<chrome.bookmarks.BookmarkTreeNode[]> => {
@@ -116,48 +189,38 @@ contextBridge.executeInMainWorld({
             idOrIdList,
           );
         },
-        onChanged: (
-          callback: (id: string, changeInfo: { title: string; url?: string }) => void,
-        ) => {
-          crxEvent<{ id: string; changeInfo: { title: string; url?: string } }>(
-            'bookmarks.onChanged',
-            (_event, params) => {
-              callback(params.id, params.changeInfo);
-            },
+        create: async (
+          bookmark: chrome.bookmarks.CreateDetails,
+          callback?: (result: chrome.bookmarks.BookmarkTreeNode) => void,
+        ): Promise<chrome.bookmarks.BookmarkTreeNode> => {
+          const resp = await crxMessage<chrome.bookmarks.BookmarkTreeNode>(
+            extensionId,
+            'bookmarks.create',
+            bookmark,
           );
+          if (callback) {
+            callback(resp);
+          }
+          return resp;
         },
-        onMoved: (
-          callback: (
-            id: string,
-            moveInfo: {
-              parentId: string;
-              index: number;
-              oldParentId: string;
-              oldIndex: number;
-            },
-          ) => void,
-        ) => {
-          crxEvent<{
-            id: string;
-            moveInfo: {
-              parentId: string;
-              index: number;
-              oldParentId: string;
-              oldIndex: number;
-            };
-          }>('bookmarks.onMoved', (_event, params) => {
-            callback(params.id, params.moveInfo);
-          });
-        },
+        onChanged: createChromeEventApi('bookmarks.onChanged'),
+        onCreated: createChromeEventApi('bookmarks.onCreated'),
+        onRemoved: createChromeEventApi('bookmarks.onRemoved'),
+        onMoved: createChromeEventApi('bookmarks.onMoved'),
+        onChildrenReordered: createChromeEventApi('bookmarks.onChildrenReordered'),
+        onImportBegan: createChromeEventApi('bookmarks.onImportBegan'),
+        onImportEnded: createChromeEventApi('bookmarks.onImportEnded'),
       },
       permissions: {
         contains: async (
           permissions: chrome.permissions.Permissions,
           callback?: (result: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.contains', {
+          const result = await crxMessage<boolean>(
+            extensionId,
+            'permissions.contains',
             permissions,
-          });
+          );
           if (callback) {
             callback(result);
           }
@@ -167,9 +230,7 @@ contextBridge.executeInMainWorld({
           permissions: chrome.permissions.Permissions,
           callback?: (granted: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.request', {
-            permissions,
-          });
+          const result = await crxMessage<boolean>(extensionId, 'permissions.request', permissions);
           if (callback) {
             callback(result);
           }
@@ -179,9 +240,7 @@ contextBridge.executeInMainWorld({
           permissions: chrome.permissions.Permissions,
           callback?: (removed: boolean) => void,
         ) => {
-          const result = await crxMessage<boolean>(extensionId, 'permissions.remove', {
-            permissions,
-          });
+          const result = await crxMessage<boolean>(extensionId, 'permissions.remove', permissions);
           if (callback) {
             callback(result);
           }
@@ -217,6 +276,7 @@ contextBridge.executeInMainWorld({
           method,
           args,
         },
+        callerUrl: typeof location !== 'undefined' ? location.href : null,
       });
     },
     (eventName: string, callback: (event: IpcRendererEvent, params: unknown) => void) => {

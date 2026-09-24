@@ -23,6 +23,7 @@ export const ExtensionManifestScheme = z
     manifest_version: z.number(),
     name: z.string(),
     permissions: z.array(z.string()).optional(),
+    origins: z.array(z.string()).optional(),
     update_url: z.string().optional(),
     version: z.string(),
   })

@@ -32,7 +32,6 @@ import {
   Tab,
   TabContainer,
   Window,
-  bookmarks,
   partitions,
   Layouts,
   LAYOUT_SIZES,
@@ -44,10 +43,10 @@ import { webContentsMemoryAndCPU, getPartitionInfo } from './helpers';
 import { t } from '~/i18n';
 
 export class BrowserRenderer {
-  constructor(private readonly _browser: Browser) {}
+  constructor(private readonly browser: Browser) {}
 
   commandsEntities(): IEntity[] {
-    return getCommands(this._browser).map((cmd) => ({
+    return getCommands(this.browser).map((cmd) => ({
       id: cmd.trigger,
       label: cmd.name(),
       extra: cmd.description(),
@@ -97,7 +96,7 @@ export class BrowserRenderer {
   }
 
   partitionsEntities(): IPartitionEntity[] {
-    const selectedTabResult = this._browser.selectedTab;
+    const selectedTabResult = this.browser.selectedTab;
     return partitions.all.map((partition) => ({
       id: partition.id,
       label: partition.name,
@@ -156,7 +155,7 @@ export class BrowserRenderer {
       ...newWindowOption,
     ];
 
-    for (const win of this._browser.windows) {
+    for (const win of this.browser.windows) {
       result.push({
         id: `window-${win.id}`,
         label: t('targets.window', { id: win.id }),
@@ -258,7 +257,7 @@ export class BrowserRenderer {
   }
 
   tabsEntities(window: Window): ITabEntity[] {
-    const tabs = this._browser.tabs;
+    const tabs = this.browser.tabs;
     const selectedDesktop = window.selectedDesktop;
     const selectedTab = selectedDesktop.selectedTabContainer?.selectedTab;
 
@@ -310,7 +309,7 @@ export class BrowserRenderer {
   }
 
   bookmarksEntities(): IBookmarkEntity[] {
-    return bookmarks.plainList.map((bm) => ({
+    return this.browser.bookmarks.plainList.map((bm) => ({
       id: bm.url,
       label: bm.name,
       extra: bm.path.join('/'),
@@ -319,7 +318,7 @@ export class BrowserRenderer {
   }
 
   bookmarks(): IBookmark[] {
-    return bookmarks.all;
+    return this.browser.bookmarks.all;
   }
 
   tabNavigation(tab?: Tab): ITabNavigation {
@@ -343,7 +342,7 @@ export class BrowserRenderer {
   }
 
   downloads(): IDownloads {
-    const downloads = this._browser.downloads.all;
+    const downloads = this.browser.downloads.all;
     const downloadsLength = downloads.length;
 
     const progress =
@@ -388,7 +387,7 @@ export class BrowserRenderer {
   }
 
   closedTabsEntities(): IEntity[] {
-    return this._browser.closedTabs.map((tab) => ({
+    return this.browser.closedTabs.map((tab) => ({
       id: tab.tab.id.toString(),
       label: tab.tab.title,
       extra: dayjs(tab.tab.closedAt).format('YYYY-MM-DD HH:mm:ss'),
@@ -398,12 +397,12 @@ export class BrowserRenderer {
   extensions(active = false): IExtensions {
     return {
       path: extensionsPath(),
-      extensions: active ? this._browser.extensions.active : this._browser.extensions.all,
+      extensions: active ? this.browser.extensions.active : this.browser.extensions.all,
     };
   }
 
   layoutSizes(): IEntity[] {
-    const selectedTab = this._browser.selectedTab;
+    const selectedTab = this.browser.selectedTab;
 
     return LAYOUT_SIZES.map((size) => ({
       id: size.toString(),
@@ -413,7 +412,7 @@ export class BrowserRenderer {
   }
 
   layoutsEntities(): IEntity[] {
-    const selectedTab = this._browser.selectedTab;
+    const selectedTab = this.browser.selectedTab;
     const selectedLayoutId = selectedTab?.tabContainer.layout.id;
 
     return Object.values(Layouts).map((layout) => ({
@@ -439,7 +438,7 @@ export class BrowserRenderer {
   debugWebContents(): IDebugWebContent[] {
     const webContents: { wc: WebContents; winId: TWindowId; visible: boolean }[] = [];
 
-    for (const win of this._browser.windows) {
+    for (const win of this.browser.windows) {
       webContents.push({ winId: win.id, wc: win.bw.webContents, visible: true });
 
       const views = win.bw.getContentView().children as WebContentsView[];
@@ -465,7 +464,7 @@ export class BrowserRenderer {
   debugTabIndex(): IDebugTabIndex[] {
     const response: IDebugTabIndex[] = [];
 
-    for (const [idxTabId, tabData] of this._browser.tabIndex.entries()) {
+    for (const [idxTabId, tabData] of this.browser.tabIndex.entries()) {
       response.push({
         indexTabId: idxTabId,
         winId: tabData.window.id,

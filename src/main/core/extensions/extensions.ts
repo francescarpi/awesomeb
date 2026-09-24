@@ -12,7 +12,7 @@ import log from 'electron-log';
 import { Browser, partitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
-import path from 'path';
+import type { BookmarksChangePayload } from '@/core/bookmarks/types';
 import { validateStore } from '@/core/validation';
 
 const scopeLog = log.scope('Extensions');
@@ -151,7 +151,7 @@ export class Extensions {
     }
   }
 
-  updateIcon(extensionId: TExtensionId, details: chrome.action.TabIconDetails) {
+  updateIcon(extensionId: TExtensionId, details: chrome.action.TabIconDetails, callerUrl?: string) {
     const extension = this.getExtension(extensionId);
     if (!extension) {
       scopeLog.warn(`Extension with id ${extensionId} not found for updating icon`);
@@ -161,10 +161,10 @@ export class Extensions {
     let iconPath: string | undefined;
 
     if (typeof details.path === 'string') {
-      iconPath = path.join('popup', details.path);
+      iconPath = details.path;
     }
 
-    const icon = loadIcon(extension.manifestPath, iconPath);
+    const icon = loadIcon(extension.manifestPath, iconPath, callerUrl);
 
     if (icon) {
       const newExtension = {
@@ -195,5 +195,9 @@ export class Extensions {
         unloadExtensionFromSession(partition.ses, extension.id);
       }
     }
+  }
+
+  notifyBookmarksChanged(payload: BookmarksChangePayload): void {
+    this.chrome.bookmarks.notifyChanged(payload);
   }
 }

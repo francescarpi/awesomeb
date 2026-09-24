@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
-import { Browser, bookmarks, partitions, windowOpenHadler } from '@/core';
+import { Browser, partitions, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
 import { type HandlerDetails } from 'electron';
 import fs from 'fs';
@@ -1829,11 +1829,11 @@ describe('Browser', () => {
       browser = new Browser();
       partitions.init();
       browser.createWindow(1, { withDesktops: true });
-      bookmarks.update([]);
+      browser.bookmarks.update([]);
     });
 
     afterEach(() => {
-      bookmarks.update([]);
+      browser.bookmarks.update([]);
     });
 
     test('repeated calls with the same window return the same cached array reference', async () => {

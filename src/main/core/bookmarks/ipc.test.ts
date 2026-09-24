@@ -1,7 +1,7 @@
 import { describe, expect, test, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import i18next from 'i18next';
 import { ipcMain, type IpcMain, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
-import { Browser, bookmarks, partitions } from '@/core';
+import { Browser, partitions } from '@/core';
 import * as helpers from '@/core/browser/helpers';
 import { setupBookmarksIPC } from './ipc';
 import { initI18n } from '~/i18n';
@@ -35,6 +35,8 @@ describe('Bookmarks IPC', () => {
   let notificationSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    browser = new Browser();
+
     handlers.clear();
     onHandlers.clear();
 
@@ -46,7 +48,7 @@ describe('Bookmarks IPC', () => {
       return ipcMain;
     }) as never);
 
-    bookmarks.update([]);
+    browser.bookmarks.update([]);
     notificationSpy = vi.spyOn(helpers, 'notification').mockImplementation(() => {});
 
     browser = new Browser();
@@ -60,7 +62,7 @@ describe('Bookmarks IPC', () => {
   });
 
   afterEach(() => {
-    bookmarks.update([]);
+    browser.bookmarks.update([]);
     vi.restoreAllMocks();
   });
 
@@ -78,7 +80,7 @@ describe('Bookmarks IPC', () => {
 
     expect(refreshSpy).not.toHaveBeenCalled();
     expect(invalidateSpy).not.toHaveBeenCalled();
-    expect(bookmarks.all.length).toBe(0);
+    expect(browser.bookmarks.all.length).toBe(0);
 
     const handler = handlers.get('bookmarks:add')!;
     await handler(fakeEvent, {
@@ -88,8 +90,8 @@ describe('Bookmarks IPC', () => {
       entries: [{ title: 'New Bookmark', url: 'https://new.example.com' }],
     });
 
-    expect(bookmarks.all.length).toBe(1);
-    expect(bookmarks.all[0].title).toBe('New Bookmark');
+    expect(browser.bookmarks.all.length).toBe(1);
+    expect(browser.bookmarks.all[0].title).toBe('New Bookmark');
     expect(invalidateSpy).toHaveBeenCalledTimes(1);
     expect(refreshSpy).toHaveBeenCalledTimes(1);
     expect(notificationSpy).toHaveBeenCalledWith('Bookmark Added', 'Bookmark added successfully');
@@ -102,14 +104,14 @@ describe('Bookmarks IPC', () => {
     invalidateSpy.mockClear();
 
     const newList: IBookmark[] = [makeUrlBookmark({ id: 'replaced-1', title: 'Replaced' })];
-    expect(bookmarks.all.length).toBe(0);
+    expect(browser.bookmarks.all.length).toBe(0);
 
     const handler = handlers.get('bookmarks:update')!;
     const result = await handler(fakeEvent, { bookmarksList: newList });
 
     expect(result).toBeUndefined();
-    expect(bookmarks.all.length).toBe(1);
-    expect(bookmarks.all[0].id).toBe('replaced-1');
+    expect(browser.bookmarks.all.length).toBe(1);
+    expect(browser.bookmarks.all[0].id).toBe('replaced-1');
     expect(invalidateSpy).toHaveBeenCalledTimes(1);
     expect(refreshSpy).toHaveBeenCalledTimes(1);
     expect(notificationSpy).toHaveBeenCalledWith(
@@ -131,7 +133,7 @@ describe('Bookmarks IPC', () => {
     });
 
     expect(result).toBeUndefined();
-    expect(bookmarks.all.length).toBe(0);
+    expect(browser.bookmarks.all.length).toBe(0);
     expect(invalidateSpy).not.toHaveBeenCalled();
     expect(refreshSpy).not.toHaveBeenCalled();
     expect(notificationSpy).not.toHaveBeenCalled();
