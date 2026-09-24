@@ -109,7 +109,9 @@
     "noExtensions": "No s'ha trobat cap extensió",
     "noDescription": "Sense descripció",
     "id": "ID",
-    "version": "Versió"
+    "version": "Versió",
+    "bookmarksBar": "Barra de marcadors",
+    "otherBookmarks": "Altres marcadors"
   },
   "findInPage": {
     "placeholder": "Cerca a la pàgina...",

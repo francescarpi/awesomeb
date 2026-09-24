@@ -1,4 +1,4 @@
-import { Browser, bookmarks, notification, Window } from '@/core';
+import { Browser, notification, Window } from '@/core';
 import { t } from '~/i18n';
 import { createHandler, windowChecker, internalPageChecker, modalChecker } from '@/utils';
 import { IBookmark } from '~/types';
@@ -16,7 +16,7 @@ export function setupBookmarksIPC(browser: Browser) {
     browser,
     [windowChecker, modalChecker],
     async ({ parentFolderId, newFolderName, entries }) => {
-      bookmarks.add(parentFolderId, newFolderName, entries);
+      browser.bookmarks.add(parentFolderId, newFolderName, entries);
       notification(t('notifications:bookmarkAdded.title'), t('notifications:bookmarkAdded.body'));
       browser.invalidateBookmarksMenuCache();
       browser.refreshMainMenu();
@@ -41,7 +41,7 @@ export function setupBookmarksIPC(browser: Browser) {
     browser,
     [internalPageChecker.bind(null, ['bookmarks'])],
     async ({ bookmarksList }) => {
-      bookmarks.update(bookmarksList);
+      browser.bookmarks.update(bookmarksList);
       notification(
         t('notifications:bookmarksUpdated.title'),
         t('notifications:bookmarksUpdated.body'),
@@ -58,7 +58,7 @@ export function setupBookmarksIPC(browser: Browser) {
     browser,
     [internalPageChecker.bind(null, ['bookmarks'])],
     async ({ bookmarkId }) => {
-      const bookmark = bookmarks.find(bookmarkId);
+      const bookmark = browser.bookmarks.find(bookmarkId);
       if (bookmark) {
         browser.openURL(bookmark.url, { selectTab: true });
       }

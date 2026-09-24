@@ -6,7 +6,8 @@ import {
   ChromeCookies,
 } from './apis';
 import { Browser, Window } from '@/core';
-import { TExtensionId, TPartitionId } from '~/types';
+import { TExtensionId } from '~/types';
+import { sanitizeCallerUrl } from './helpers';
 
 import log from 'electron-log';
 const scopeLog = log.scope('Chrome');
@@ -32,11 +33,17 @@ export class Chrome {
 
   async dispatch(
     window: Window,
-    partitionId: TPartitionId,
     extensionId: TExtensionId,
     action: string,
     args: Record<string, unknown>,
+    callerUrl?: string,
   ): Promise<unknown> {
+    const extension = this._browser.extensions.getExtension(extensionId);
+    if (!extension) {
+      scopeLog.error(`Extension with id ${extensionId} does not exist`);
+      return;
+    }
+
     const actionParts = action.split('.');
     if (actionParts.length !== 2) {
       scopeLog.warn(`Invalid action format: ${action}`);
@@ -55,12 +62,14 @@ export class Chrome {
       return;
     }
 
+    const safeCallerUrl = sanitizeCallerUrl(callerUrl, extensionId);
+
     scopeLog.info(`Dispatching ${api}.${method} with args:`, args);
     const response = await (instance[method] as CallableFunction)(
       window,
-      partitionId,
-      extensionId,
+      extension,
       ...Object.values(args),
+      safeCallerUrl,
     );
 
     return response;
@@ -68,5 +77,25 @@ export class Chrome {
 
   get browser(): Browser {
     return this._browser;
+  }
+
+  get bookmarks(): ChromeBookmarks {
+    return this._apis.bookmarks;
+  }
+
+  get tabs(): ChromeTabs {
+    return this._apis.tabs;
+  }
+
+  get action(): ChromeAction {
+    return this._apis.action;
+  }
+
+  get permissions(): ChromePermissions {
+    return this._apis.permissions;
+  }
+
+  get cookies(): ChromeCookies {
+    return this._apis.cookies;
   }
 }

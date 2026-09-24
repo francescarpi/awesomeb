@@ -87,13 +87,23 @@ export function loadLatestExtensionManifests(rootDir: string): IExtension[] {
  * It checks for the default_icon field in the manifest's action property.
  * If it's an object, it tries to find the best available size (48, 32, 16).
  *
+ * When `callerUrl` is provided (chrome-extension://EXT_ID/path/to/file.html),
+ * relative icon paths are resolved against the caller's directory first,
+ * matching Chrome's semantics where `action.setIcon` paths are relative to
+ * the calling HTML file (popup, options page, etc.). Falls back to the
+ * extension root if the caller-relative resolution doesn't find a file.
+ *
  * @param manifestPath The path to the extension's manifest directory.
- * @param manifest The extension manifest object.
+ * @param icon The icon path (relative, absolute, or chrome-extension URL) or
+ *             a size->path dictionary.
+ * @param callerUrl Optional chrome-extension URL identifying the calling
+ *                  context (renderer window or service worker).
  * @returns A base64 data URL of the icon, or null if not found or on error.
  */
 export function loadIcon(
   manifestPath: string,
   icon: string | { [index: number]: string } | undefined,
+  callerUrl?: string,
 ): string | null {
   let iconPath: string | undefined;
   if (typeof icon === 'object') {
@@ -133,15 +143,35 @@ export function loadIcon(
       return null;
     }
   } else {
-    iconRelativePath = iconPath;
+    iconRelativePath = iconPath.replace(/^[/\\]+/, '');
   }
 
-  const fullPath = path.resolve(extensionRoot, iconRelativePath);
+  let fullPath = path.resolve(extensionRoot, iconRelativePath);
+
+  // Try resolving relative to the caller's directory first (Chrome's spec for
+  // action.setIcon says relative paths are relative to the calling HTML file).
+  // Only adopt the caller-relative candidate if it's inside extensionRoot AND
+  // exists on disk; otherwise fall back to the root-relative path above.
+  if (callerUrl) {
+    const callerBase = resolveCallerBase(extensionRoot, callerUrl);
+    if (callerBase) {
+      const candidate = path.resolve(callerBase, iconRelativePath);
+      if (
+        candidate !== extensionRoot &&
+        candidate.startsWith(`${extensionRoot}${path.sep}`) &&
+        fs.existsSync(candidate)
+      ) {
+        fullPath = candidate;
+      }
+    }
+  }
+
   if (fullPath !== extensionRoot && !fullPath.startsWith(`${extensionRoot}${path.sep}`)) {
     scopeLog.warn(`Icon path escapes extension directory: ${iconPath}`);
     return null;
   }
 
+  scopeLog.debug(`Icon path: ${fullPath}`);
   if (!fs.existsSync(fullPath)) {
     scopeLog.warn(`Icon file not found at ${fullPath}`);
     return null;
@@ -154,6 +184,67 @@ export function loadIcon(
   } catch (err) {
     scopeLog.error(`Error reading icon file at ${fullPath}`, err);
     return null;
+  }
+}
+
+/**
+ * Resolves the filesystem base directory for the caller identified by
+ * `callerUrl`. Returns `extensionRoot` unchanged when the caller lives at the
+ * extension root (e.g. a service worker like `/service-worker.js`), or a
+ * subdirectory under `extensionRoot` for callers in subfolders (e.g.
+ * `chrome-extension://EXT_ID/popup/menu.html` → `extensionRoot/popup`).
+ *
+ * Returns `null` if the URL is malformed, not a chrome-extension URL, or
+ * contains traversal segments that would escape extensionRoot.
+ */
+function resolveCallerBase(extensionRoot: string, callerUrl: string): string | null {
+  try {
+    const url = new URL(callerUrl);
+    if (url.protocol !== 'chrome-extension:') return null;
+
+    const pathname = decodeURIComponent(url.pathname); // e.g. "/popup/menu.html"
+    const segments = pathname.split('/').filter(Boolean); // ["popup", "menu.html"]
+
+    // Reject any traversal segments to prevent escaping extensionRoot via the caller URL.
+    if (segments.some((s) => s === '..' || s === '.')) return null;
+
+    if (segments.length <= 1) {
+      // Caller is at the extension root (e.g. /service-worker.js or /manifest.json).
+      return extensionRoot;
+    }
+
+    const callerDir = segments.slice(0, -1).join(path.sep); // "popup"
+    const resolved = path.resolve(extensionRoot, callerDir);
+    if (!resolved.startsWith(`${extensionRoot}${path.sep}`)) return null;
+    return resolved;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validates a `callerUrl` reported by the renderer/service-worker IPC payload.
+ * Returns the URL unchanged only if it's a well-formed `chrome-extension://` URL
+ * whose hostname matches the given extension ID. Returns `undefined` otherwise
+ * (missing, malformed, wrong scheme, or hostname mismatch). The result is safe
+ * to forward to extension API handlers — callers can treat `undefined` as
+ * "no caller context known" and fall back to extension-root-relative resolution.
+ */
+export function sanitizeCallerUrl(
+  callerUrl: string | undefined,
+  extensionId: TExtensionId,
+): string | undefined {
+  if (!callerUrl) return undefined;
+  try {
+    const url = new URL(callerUrl);
+    if (url.protocol !== 'chrome-extension:' || url.hostname !== extensionId) {
+      scopeLog.warn(`Rejecting callerUrl for ${extensionId}: ${callerUrl}`);
+      return undefined;
+    }
+    return callerUrl;
+  } catch {
+    scopeLog.warn(`Invalid callerUrl for ${extensionId}: ${callerUrl}`);
+    return undefined;
   }
 }
 

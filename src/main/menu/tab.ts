@@ -1,4 +1,4 @@
-import { Browser, bookmarks, Window, partitions } from '@/core';
+import { Browser, Window, partitions } from '@/core';
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
@@ -127,7 +127,15 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       icon: getIcon(EIcon.Bookmarks),
       enabled: !!tab.url && !tab.suspended,
       submenu: tab.url
-        ? bookmarkFolderOptions(browser, window, tab.title, tab.url, 'root', 'Root', bookmarks.all)
+        ? bookmarkFolderOptions(
+            browser,
+            window,
+            tab.title,
+            tab.url,
+            'root',
+            'Root',
+            browser.bookmarks.all,
+          )
         : [],
     },
     { type: 'separator' },

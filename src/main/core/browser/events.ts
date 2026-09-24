@@ -467,4 +467,13 @@ export function registerBrowserEvents(browser: Browser) {
       browser.toRenderer.refreshVersionAvailable(win, data);
     }
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('bookmarks:bookmarks-did-change', (payload) => {
+    try {
+      browser.extensions.notifyBookmarksChanged(payload);
+    } catch (err) {
+      scopeLog.warn('Failed to notify extensions of bookmarks change:', err);
+    }
+  });
 }
