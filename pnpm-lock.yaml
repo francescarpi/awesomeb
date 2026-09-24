@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  plist: 3.1.1
   '@xmldom/xmldom@>=0.7.0 <=0.8.13': '>=0.8.14'
   '@xmldom/xmldom@>=0.7.0 <=0.8.14': '>=0.8.15'
   baseline-browser-mapping@>=2.0.0 <2.11.0: '>=2.11.0'
@@ -3648,10 +3649,6 @@ packages:
     resolution: {integrity: sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA==}
     engines: {node: '>=12'}
 
-  plist@3.1.0:
-    resolution: {integrity: sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==}
-    engines: {node: '>=10.4.0'}
-
   plist@3.1.1:
     resolution: {integrity: sha512-ZIfcLJC+7E7FBFnDxm9MPmt7D+DidyQ26lewieO75AdhA2ayMtsJSES0iWzqJQbcVRSrTufQoy0DR94xHue0oA==}
     engines: {node: '>=10.4.0'}
@@ -6387,7 +6384,7 @@ snapshots:
       lazy-val: 1.0.5
       minimatch: 10.2.5
       pkijs: 3.4.0
-      plist: 3.1.0
+      plist: 3.1.1
       proper-lockfile: 4.1.2
       resedit: 1.7.2
       semver: 7.7.4
@@ -6435,7 +6432,7 @@ snapshots:
       lazy-val: 1.0.5
       minimatch: 10.2.5
       pkijs: 3.4.0
-      plist: 3.1.0
+      plist: 3.1.1
       proper-lockfile: 4.1.2
       resedit: 1.7.2
       semver: 7.7.4
@@ -8296,12 +8293,6 @@ snapshots:
   plimit-lit@1.6.1:
     dependencies:
       queue-lit: 1.5.2
-
-  plist@3.1.0:
-    dependencies:
-      '@xmldom/xmldom': 0.9.12
-      base64-js: 1.5.1
-      xmlbuilder: 15.1.1
 
   plist@3.1.1:
     dependencies:
