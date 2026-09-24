@@ -92,7 +92,7 @@ export class ChromeBookmarks {
             parentId: ROOT_ID,
             syncing: false,
             title: t('pages:extensions.otherBookmarks'),
-            children: this.buildTree(this.browser.bookmarks.all, ROOT_ID),
+            children: this.buildTree(this.browser.bookmarks.all, OTHER_ID),
           },
         ],
       },
@@ -140,14 +140,19 @@ export class ChromeBookmarks {
     const isFolder = url === undefined;
     const pId = [ROOT_ID, BOOKMARKS_BAR_ID, OTHER_ID].includes(parentId) ? 'root' : parentId;
 
-    const newBookmark = isFolder
+    const newBookmarks = isFolder
       ? this.browser.bookmarks.addFolder(pId, title)
       : this.browser.bookmarks.add(pId, null, [{ title, url }]);
 
     this.browser.invalidateBookmarksMenuCache();
     this.browser.refreshMainMenu();
 
-    return this.iBookmarkToTreeNode(newBookmark, pId);
+    const created = newBookmarks[0];
+    if (!created) {
+      return null;
+    }
+
+    return this.iBookmarkToTreeNode(created, parentId);
   }
 
   notifyChanged(payload: BookmarksChangePayload): void {

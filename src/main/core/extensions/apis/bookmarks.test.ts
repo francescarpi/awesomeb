@@ -521,3 +521,154 @@ describe('ChromeBookmarks.get', () => {
     expect(result).toEqual([]);
   });
 });
+
+describe('ChromeBookmarks.create', () => {
+  let browser: Browser;
+  let chromeBookmarks: ChromeBookmarks;
+  const fakeWindow = {} as Window;
+  const fakeExtension = {} as IExtension;
+
+  beforeEach(() => {
+    browser = new Browser();
+    chromeBookmarks = new ChromeBookmarks(browser);
+  });
+
+  test('returns a BookmarkTreeNode with the actual bookmark id (not undefined)', async () => {
+    const result = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: '2',
+      title: 'Test Bookmark',
+      url: 'https://test.com',
+    });
+
+    expect(result).not.toBeNull();
+    expect(typeof result!.id).toBe('string');
+    expect(result!.id.length).toBeGreaterThan(0);
+    expect(result!.title).toBe('Test Bookmark');
+    expect(result!.url).toBe('https://test.com');
+  });
+
+  test('returns the parentId passed by the caller (not the mapped one)', async () => {
+    const result = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: '2',
+      title: 'Test Bookmark',
+      url: 'https://test.com',
+    });
+
+    expect(result!.parentId).toBe('2');
+  });
+
+  test('returns the parentId for items nested in a user folder', async () => {
+    const folderResult = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: '2',
+      title: 'Folder 1',
+    });
+
+    expect(folderResult).not.toBeNull();
+    const folderId = folderResult!.id;
+
+    const urlResult = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: folderId,
+      title: 'Nested URL',
+      url: 'https://nested.com',
+    });
+
+    expect(urlResult).not.toBeNull();
+    expect(urlResult!.parentId).toBe(folderId);
+  });
+
+  test('returns null when parentId is missing', async () => {
+    const result = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      title: 'Test',
+      url: 'https://test.com',
+    });
+
+    expect(result).toBeNull();
+  });
+
+  test('returns null when title is missing', async () => {
+    const result = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: '2',
+      url: 'https://test.com',
+    });
+
+    expect(result).toBeNull();
+  });
+
+  test('returns the created folder with empty children', async () => {
+    const result = await chromeBookmarks.create(fakeWindow, fakeExtension, {
+      parentId: '2',
+      title: 'Empty Folder',
+    });
+
+    expect(result).not.toBeNull();
+    expect(result!.children).toEqual([]);
+  });
+});
+
+describe('ChromeBookmarks parentId mapping', () => {
+  let browser: Browser;
+  let chromeBookmarks: ChromeBookmarks;
+  const fakeWindow = {} as Window;
+  const fakeExtension = {} as IExtension;
+
+  beforeEach(() => {
+    browser = new Browser();
+    chromeBookmarks = new ChromeBookmarks(browser);
+
+    browser.bookmarks.update([
+      createTestUrlBookmark({ id: 'url-root', title: 'Top URL' }),
+      {
+        ...createTestFolderBookmark({
+          id: 'folder-x',
+          title: 'Folder X',
+          children: [createTestUrlBookmark({ id: 'url-nested', title: 'Nested URL' })],
+        }),
+      },
+    ]);
+  });
+
+  test('getTree() exposes items directly under root with parentId=OTHER_ID', async () => {
+    const tree = await chromeBookmarks.getTree(fakeWindow, fakeExtension);
+    const root = tree[0];
+    const other = root.children!.find((c) => c.id === '2')!;
+
+    const topUrl = other.children!.find((c) => c.id === 'url-root')!;
+    const folderX = other.children!.find((c) => c.id === 'folder-x')!;
+
+    expect(topUrl.parentId).toBe('2');
+    expect(folderX.parentId).toBe('2');
+  });
+
+  test('getTree() preserves folder hierarchy: nested items have parentId=folder id', async () => {
+    const tree = await chromeBookmarks.getTree(fakeWindow, fakeExtension);
+    const folderX = tree[0]
+      .children!.find((c) => c.id === '2')!
+      .children!.find((c) => c.id === 'folder-x')!;
+    const nested = folderX.children!.find((c) => c.id === 'url-nested')!;
+
+    expect(nested.parentId).toBe('folder-x');
+  });
+
+  test('getSubTree(OTHER_ID) returns items with parentId=OTHER_ID', async () => {
+    const subtree = await chromeBookmarks.getSubTree(fakeWindow, fakeExtension, '2');
+    const other = subtree[0];
+
+    const topUrl = other.children!.find((c) => c.id === 'url-root')!;
+    const folderX = other.children!.find((c) => c.id === 'folder-x')!;
+
+    expect(topUrl.parentId).toBe('2');
+    expect(folderX.parentId).toBe('2');
+  });
+
+  test('get() flattens the tree preserving the correct parentId for each node', async () => {
+    const flat = await chromeBookmarks.get(fakeWindow, fakeExtension);
+
+    const topUrl = flat.find((n) => n.id === 'url-root')!;
+    const folderX = flat.find((n) => n.id === 'folder-x')!;
+    const nested = flat.find((n) => n.id === 'url-nested')!;
+
+    expect(topUrl.parentId).toBe('2');
+    expect(folderX.parentId).toBe('2');
+    expect(nested.parentId).toBe('folder-x');
+  });
+});
