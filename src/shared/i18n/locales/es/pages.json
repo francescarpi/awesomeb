@@ -5,7 +5,8 @@
   },
   "about": {
     "developedBy": "Desarrollado por {{name}} <i>({{email}})</i>",
-    "version": "Versión {{version}}"
+    "version": "Versión {{version}}",
+    "chromeVersion": "Versión de Chrome: {{version}}"
   },
   "addBookmark": {
     "title": "Añadir marcador",
