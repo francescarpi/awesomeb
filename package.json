@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.14.9-alpha",
+  "version": "0.14.10-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -96,6 +96,7 @@
   },
   "pnpm": {
     "overrides": {
+      "plist": "3.1.1",
       "@xmldom/xmldom@>=0.7.0 <=0.8.13": ">=0.8.14",
       "@xmldom/xmldom@>=0.7.0 <=0.8.14": ">=0.8.15",
       "baseline-browser-mapping@>=2.0.0 <2.11.0": ">=2.11.0",
