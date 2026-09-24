@@ -5,7 +5,8 @@
   },
   "about": {
     "developedBy": "Desenvolupat per {{name}} <i>({{email}})</i>",
-    "version": "Versió {{version}}"
+    "version": "Versió {{version}}",
+    "chromeVersion": "Versió de Chrome: {{version}}"
   },
   "addBookmark": {
     "title": "Afegeix una adreça d'interès",
