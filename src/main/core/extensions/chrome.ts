@@ -78,4 +78,24 @@ export class Chrome {
   get browser(): Browser {
     return this._browser;
   }
+
+  get bookmarks(): ChromeBookmarks {
+    return this._apis.bookmarks;
+  }
+
+  get tabs(): ChromeTabs {
+    return this._apis.tabs;
+  }
+
+  get action(): ChromeAction {
+    return this._apis.action;
+  }
+
+  get permissions(): ChromePermissions {
+    return this._apis.permissions;
+  }
+
+  get cookies(): ChromeCookies {
+    return this._apis.cookies;
+  }
 }

@@ -4,6 +4,9 @@ import { EBookmarkType, IPlainBookmark, type IBookmark, type IBookmarkEntry } fr
 import { BookmarksStoreScheme, type IBookmarks } from './schemes';
 import { validateStore } from '@/core/validation';
 import { Browser } from '@/core';
+import type { BookmarksChangePayload } from './types';
+
+export type { BookmarksChangePayload };
 
 export class Bookmarks {
   private readonly _store: Store<IBookmarks>;
@@ -56,20 +59,27 @@ export class Bookmarks {
       ? [this._createFolder(newFolder, urlBookmarks)]
       : urlBookmarks;
 
-    this._persist(this._insertIntoTree(this.all, folderId, toAdd));
+    this._persist(this._insertIntoTree(this.all, folderId, toAdd), {
+      kind: 'created',
+      parentId: folderId,
+      items: toAdd,
+    });
     return toAdd;
   }
 
   addFolder(parentId: string, title: string): IBookmark[] {
     const folder = this._createFolder(title);
-    this._persist(this._insertIntoTree(this.all, parentId, [folder]));
+    this._persist(this._insertIntoTree(this.all, parentId, [folder]), {
+      kind: 'created',
+      parentId,
+      items: [folder],
+    });
     return [folder];
   }
 
   update(bookmarks: IBookmark[]) {
-    BookmarksStoreScheme.parse({ bookmarks });
-    this._store.set('bookmarks', bookmarks);
-    this.browser.eventsChannel.emit('bookmarks:bookmarks-did-change', this);
+    const previousTree = this.all;
+    this._persist(bookmarks, { kind: 'updated', tree: bookmarks, previousTree });
   }
 
   private _createUrlBookmark(entry: IBookmarkEntry): IBookmark {
@@ -119,10 +129,10 @@ export class Bookmarks {
     return insert(bookmarks);
   }
 
-  private _persist(updatedBookmarks: IBookmark[]): void {
+  private _persist(updatedBookmarks: IBookmark[], payload: BookmarksChangePayload): void {
     BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
     this._store.set('bookmarks', updatedBookmarks);
-    this.browser.eventsChannel.emit('bookmarks:bookmarks-did-change', this);
+    this.browser.eventsChannel.emit('bookmarks:bookmarks-did-change', payload);
   }
 
   private _generatePlainList(

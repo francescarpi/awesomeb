@@ -12,6 +12,7 @@ import log from 'electron-log';
 import { Browser, partitions, Partition, Window } from '@/core';
 import { ExtensionPopupOverlay, ExtensionPopup } from './popup';
 import { Chrome } from './chrome';
+import type { BookmarksChangePayload } from '@/core/bookmarks/types';
 import { validateStore } from '@/core/validation';
 
 const scopeLog = log.scope('Extensions');
@@ -194,5 +195,9 @@ export class Extensions {
         unloadExtensionFromSession(partition.ses, extension.id);
       }
     }
+  }
+
+  notifyBookmarksChanged(payload: BookmarksChangePayload): void {
+    this.chrome.bookmarks.notifyChanged(payload);
   }
 }

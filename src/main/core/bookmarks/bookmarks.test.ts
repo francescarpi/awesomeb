@@ -356,7 +356,41 @@ describe('Bookmarks', () => {
 
         bookmarks.add('root', null, [{ title: 'Test', url: 'https://test.com' }]);
 
-        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', bookmarks);
+        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', {
+          kind: 'created',
+          parentId: 'root',
+          items: expect.any(Array),
+        });
+      });
+
+      test('emits payload with kind:created, parentId and items for add()', () => {
+        const { browser, bookmarks } = setupBrowserWithBookmarks();
+        const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+
+        const result = bookmarks.add('root', null, [{ title: 'Test', url: 'https://test.com' }]);
+
+        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', {
+          kind: 'created',
+          parentId: 'root',
+          items: result,
+        });
+      });
+
+      test('emits payload with newFolder wrapped when newFolder is provided', () => {
+        const { browser, bookmarks } = setupBrowserWithBookmarks();
+        const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+
+        const result = bookmarks.add('root', 'My Folder', [
+          { title: 'Site', url: 'https://site.com' },
+        ]);
+
+        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', {
+          kind: 'created',
+          parentId: 'root',
+          items: result,
+        });
+        expect(result).toHaveLength(1);
+        expect(isFolderBookmark(result[0])).toBe(true);
       });
 
       test('persists to store before emitting event', () => {
@@ -511,7 +545,11 @@ describe('Bookmarks', () => {
 
         bookmarks.addFolder('root', 'New Folder');
 
-        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', bookmarks);
+        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', {
+          kind: 'created',
+          parentId: 'root',
+          items: expect.any(Array),
+        });
       });
 
       test('persists to store before emitting event', () => {
@@ -524,6 +562,52 @@ describe('Bookmarks', () => {
         const setOrder = setSpy.mock.invocationCallOrder[0];
         const emitOrder = emitSpy.mock.invocationCallOrder[0];
         expect(setOrder).toBeLessThan(emitOrder);
+      });
+    });
+  });
+
+  describe('update()', () => {
+    describe('event emission', () => {
+      test('emits payload with kind:updated, tree and previousTree', () => {
+        const { browser, bookmarks } = setupBrowserWithBookmarks();
+        const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+
+        const list = [createTestUrlBookmark({ id: 'url-1' })];
+        bookmarks.update(list);
+
+        expect(emitSpy).toHaveBeenCalledWith('bookmarks:bookmarks-did-change', {
+          kind: 'updated',
+          tree: list,
+          previousTree: expect.any(Array),
+        });
+      });
+
+      test('captures previousTree snapshot before persisting', () => {
+        const { browser, bookmarks } = setupBrowserWithBookmarks();
+        const emitSpy = vi.spyOn(browser.eventsChannel, 'emit');
+
+        const first = [createTestUrlBookmark({ id: 'url-1' })];
+        bookmarks.update(first);
+
+        const second = [
+          createTestUrlBookmark({ id: 'url-1' }),
+          createTestUrlBookmark({ id: 'url-2' }),
+        ];
+        bookmarks.update(second);
+
+        const updateCalls = emitSpy.mock.calls.filter(
+          (c) => c[0] === 'bookmarks:bookmarks-did-change',
+        );
+        expect(updateCalls).toHaveLength(2);
+
+        const secondCall = updateCalls[1][1] as {
+          kind: 'updated';
+          tree: IBookmark[];
+          previousTree: IBookmark[];
+        };
+        expect(secondCall.kind).toBe('updated');
+        expect(secondCall.tree).toEqual(second);
+        expect(secondCall.previousTree).toEqual(first);
       });
     });
   });
