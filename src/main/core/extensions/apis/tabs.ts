@@ -1,6 +1,6 @@
 import { Browser, Window } from '@/core';
 import { tabToChromeTab } from './helpers';
-import { TExtensionId, TPartitionId, TTabId } from '~/types';
+import type { TExtensionId, IExtension, TTabId } from '~/types';
 import { ITabUpdate } from './types';
 import log from 'electron-log';
 
@@ -15,12 +15,7 @@ const supportedTabURLProtocols = new Set([
   'chrome-extension:',
 ]);
 
-export function buildTabURL(
-  extensionId: TExtensionId,
-  url: string | undefined,
-  partitionId: TPartitionId,
-  windowId: number,
-): string | null {
+export function buildTabURL(extensionId: TExtensionId, url: string | undefined): string | null {
   const extensionURL = new URL(`chrome-extension://${extensionId}/`);
 
   let parsedURL: URL;
@@ -34,8 +29,6 @@ export function buildTabURL(
     return null;
   }
 
-  parsedURL.searchParams.set('partitionId', partitionId);
-  parsedURL.searchParams.set('winId', String(windowId));
   return parsedURL.toString();
 }
 
@@ -44,8 +37,7 @@ export class ChromeTabs {
 
   async query(
     window: Window,
-    _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     props: chrome.tabs.QueryInfo,
   ): Promise<chrome.tabs.Tab[]> {
     const tabs = props.currentWindow ? window.tabs : this._browser.tabs;
@@ -68,8 +60,7 @@ export class ChromeTabs {
 
   async create(
     window: Window,
-    partitionId: TPartitionId,
-    extensionId: TExtensionId,
+    extension: IExtension,
     props: chrome.tabs.CreateProperties,
   ): Promise<chrome.tabs.Tab | undefined> {
     const selectedTab = window.selectedTab;
@@ -78,14 +69,14 @@ export class ChromeTabs {
       return undefined;
     }
 
-    const url = buildTabURL(extensionId, props.url, partitionId, window.id);
+    const url = buildTabURL(extension.id, props.url);
     if (!url) {
       scopeLog.warn('Unsupported or invalid tab URL:', props.url);
       return undefined;
     }
 
     const response = await this._browser.openURL(url, {
-      partitionId,
+      partitionId: selectedTab.tab.partition.id,
       selectTab: true,
     });
 
@@ -104,12 +95,7 @@ export class ChromeTabs {
     );
   }
 
-  async update(
-    window: Window,
-    _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
-    props: ITabUpdate,
-  ) {
+  async update(window: Window, _extension: IExtension, props: ITabUpdate) {
     if (props.active) {
       this._browser.extensions.closePopup(window);
       window.selectTab(props.tabId);
@@ -118,8 +104,7 @@ export class ChromeTabs {
 
   async reload(
     window: Window,
-    _partitionId: TPartitionId,
-    _extensionId: TExtensionId,
+    _extension: IExtension,
     props: { tabData?: TTabId | chrome.tabs.ReloadProperties },
   ): Promise<void> {
     const tab =
@@ -133,5 +118,13 @@ export class ChromeTabs {
     }
 
     tab.tab.reload();
+  }
+
+  async getCurrent(): Promise<chrome.tabs.Tab | undefined> {
+    const selected = this._browser.selectedTab;
+    if (!selected) {
+      return undefined;
+    }
+    return tabToChromeTab(selected.window, selected, 0, true);
   }
 }
