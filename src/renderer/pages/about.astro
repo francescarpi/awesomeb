@@ -3,12 +3,12 @@ import Modal from '#/layouts/Modal.astro';
 import logo from '../assets/icon.png';
 ---
 
-<Modal width="400px" height="320px">
+<Modal width="400px" height="340px">
   <div class="flex flex-col items-center justify-center h-full gap-4 text-center">
     <img src={logo.src} alt="AwesomeB" width="64" height="64" class="mt-2" />
     <b>AwesomeB(rowser)</b>
     <p class="text-sm" id="developedBy"></p>
-    <div id="content" class="h-38"></div>
+    <div id="content" class="h-42"></div>
   </div>
 </Modal>
 
@@ -34,6 +34,12 @@ import logo from '../assets/icon.png';
         version: data.version,
       },
     },
+    {
+      key: 'pages:about.chromeVersion',
+      params: {
+        version: data.chromeVersion,
+      },
+    },
   ]);
 
   const developedBy = document.getElementById('developedBy') as HTMLParagraphElement;
@@ -52,15 +58,20 @@ import logo from '../assets/icon.png';
       { class: 'flex flex-col gap-4' },
       h(
         'div',
-        { class: 'flex items-center gap-2' },
-        h('p', { class: 'text-xs' }, t['pages:about.version']),
-        h('div', {
-          class: 'w-3.5 h-3.5 [&>svg]:w-full [&>svg]:h-full cursor-pointer hover:text-blue-700',
-          innerHTML: Copy,
-          onclick: () => {
-            abCommands.perform(winId, 'copy-version');
-          },
-        }),
+        { class: 'flex flex-col gap-1' },
+        h(
+          'div',
+          { class: 'flex items-center gap-2 justify-center' },
+          h('p', { class: 'text-xs' }, t['pages:about.version']),
+          h('div', {
+            class: 'w-3.5 h-3.5 [&>svg]:w-full [&>svg]:h-full cursor-pointer hover:text-blue-700',
+            innerHTML: Copy,
+            onclick: () => {
+              abCommands.perform(winId, 'copy-version');
+            },
+          }),
+        ),
+        h('p', { class: 'text-xs' }, t['pages:about.chromeVersion']),
       ),
       h(
         'a',

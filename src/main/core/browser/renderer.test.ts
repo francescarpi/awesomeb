@@ -1,4 +1,5 @@
 import { beforeAll, expect, test, describe, beforeEach, vi } from 'vitest';
+import { app } from 'electron';
 import { Browser, partitions, Window } from '@/core';
 import type { UIView } from '@/ui';
 import { initI18n } from '~/i18n';
@@ -348,6 +349,55 @@ describe('Renderer', () => {
       expect(reopenedTab).toBeDefined();
       expect(reopenedTab!.isClosed).toBe(false);
       expect(reopenedTab!.url).toBe('http://closed.com/');
+    });
+  });
+
+  describe('Renderer.about', () => {
+    test('returns version matching app.getVersion()', () => {
+      const versionSpy = vi.spyOn(app, 'getVersion').mockReturnValue('1.2.3-test');
+      try {
+        const result = browser.renderer.about();
+        expect(result.version).toBe('1.2.3-test');
+      } finally {
+        versionSpy.mockRestore();
+      }
+    });
+
+    test('returns chromeVersion matching process.versions.chrome', () => {
+      const originalChrome = process.versions.chrome;
+      Object.defineProperty(process.versions, 'chrome', {
+        value: '120.0.6099.291',
+        configurable: true,
+        writable: true,
+      });
+      try {
+        const result = browser.renderer.about();
+        expect(result.chromeVersion).toBe('120.0.6099.291');
+      } finally {
+        Object.defineProperty(process.versions, 'chrome', {
+          value: originalChrome,
+          configurable: true,
+          writable: true,
+        });
+      }
+    });
+
+    test('result matches IAbout shape exactly', () => {
+      const result = browser.renderer.about();
+      expect(Object.keys(result).sort()).toEqual(['chromeVersion', 'version'].sort());
+    });
+
+    test('chromeVersion is a non-empty string in production', () => {
+      // Sanity check: in a real Electron runtime process.versions.chrome is always populated.
+      // This guards against accidentally wiring chromeVersion to a constant or empty value.
+      Object.defineProperty(process.versions, 'chrome', {
+        value: '130.0.6723.116',
+        configurable: true,
+        writable: true,
+      });
+      const result = browser.renderer.about();
+      expect(typeof result.chromeVersion).toBe('string');
+      expect(result.chromeVersion.length).toBeGreaterThan(0);
     });
   });
 });

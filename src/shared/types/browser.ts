@@ -43,4 +43,5 @@ export interface IWinDes {
 
 export interface IAbout {
   version: string;
+  chromeVersion: string;
 }

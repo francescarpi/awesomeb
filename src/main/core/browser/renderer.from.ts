@@ -483,6 +483,7 @@ export class BrowserRenderer {
   about(): IAbout {
     return {
       version: app.getVersion(),
+      chromeVersion: process.versions.chrome,
     };
   }
 }
