@@ -8,10 +8,9 @@ import { Browser } from '@/core';
 export class Bookmarks {
   private readonly _store: Store<IBookmarks>;
 
-  constructor(_browser: Browser) {
+  constructor(private readonly browser: Browser) {
     const defaults: IBookmarks = { bookmarks: [] };
 
-    // Validate defaults before passing to electron-store
     BookmarksStoreScheme.parse(defaults);
 
     this._store = new Store<IBookmarks>({
@@ -20,7 +19,6 @@ export class Bookmarks {
       defaults,
     });
 
-    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
     this._store.store = validateStore(
       BookmarksStoreScheme,
       this._store.store,
@@ -31,7 +29,6 @@ export class Bookmarks {
 
   get all(): IBookmark[] {
     const data = this._store.get('bookmarks') || [];
-    // Validate the full store on read
     BookmarksStoreScheme.parse(this._store.store);
     return data;
   }
@@ -51,6 +48,81 @@ export class Bookmarks {
       }
     }
     return null;
+  }
+
+  add(folderId: string, newFolder: string | null, entries: IBookmarkEntry[]): IBookmark[] {
+    const urlBookmarks = entries.map((entry) => this._createUrlBookmark(entry));
+    const toAdd: IBookmark[] = newFolder
+      ? [this._createFolder(newFolder, urlBookmarks)]
+      : urlBookmarks;
+
+    this._persist(this._insertIntoTree(this.all, folderId, toAdd));
+    return toAdd;
+  }
+
+  addFolder(parentId: string, title: string): IBookmark[] {
+    const folder = this._createFolder(title);
+    this._persist(this._insertIntoTree(this.all, parentId, [folder]));
+    return [folder];
+  }
+
+  update(bookmarks: IBookmark[]) {
+    BookmarksStoreScheme.parse({ bookmarks });
+    this._store.set('bookmarks', bookmarks);
+    this.browser.eventsChannel.emit('bookmarks:bookmarks-did-change', this);
+  }
+
+  private _createUrlBookmark(entry: IBookmarkEntry): IBookmark {
+    return {
+      id: crypto.randomUUID(),
+      type: EBookmarkType.Url,
+      url: entry.url,
+      title: entry.title,
+      dateAdded: Date.now(),
+    };
+  }
+
+  private _createFolder(title: string, children: IBookmark[] = []): IBookmark {
+    return {
+      id: crypto.randomUUID(),
+      type: EBookmarkType.Folder,
+      title,
+      dateAdded: Date.now(),
+      children,
+    };
+  }
+
+  private _insertIntoTree(
+    bookmarks: IBookmark[],
+    parentId: string,
+    items: IBookmark[],
+  ): IBookmark[] {
+    if (parentId === 'root') {
+      return [...bookmarks, ...items];
+    }
+
+    if (this.find(parentId, bookmarks) === null) {
+      throw new Error(`Bookmark folder not found: ${parentId}`);
+    }
+
+    const insert = (nodes: IBookmark[]): IBookmark[] =>
+      nodes.map((node) => {
+        if (node.type === EBookmarkType.Folder) {
+          if (node.id === parentId) {
+            return { ...node, children: [...node.children, ...items] };
+          }
+          return { ...node, children: insert(node.children) };
+        }
+        return node;
+      });
+
+    return insert(bookmarks);
+  }
+
+  private _persist(updatedBookmarks: IBookmark[]): void {
+    BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
+    this._store.set('bookmarks', updatedBookmarks);
+    this.browser.eventsChannel.emit('bookmarks:bookmarks-did-change', this);
   }
 
   private _generatePlainList(
@@ -79,108 +151,5 @@ export class Bookmarks {
       }
     }
     return urls;
-  }
-
-  add(folderId: string, newFolder: string | null, entries: IBookmarkEntry[]): IBookmark {
-    const urlBookmarks: IBookmark[] = entries.map((entry) => ({
-      id: crypto.randomUUID(),
-      type: EBookmarkType.Url,
-      url: entry.url,
-      title: entry.title,
-      dateAdded: Date.now(),
-    }));
-
-    const toAdd: IBookmark[] = newFolder
-      ? [
-          {
-            id: crypto.randomUUID(),
-            type: EBookmarkType.Folder,
-            title: newFolder,
-            dateAdded: Date.now(),
-            children: urlBookmarks,
-          },
-        ]
-      : urlBookmarks;
-
-    if (folderId === 'root') {
-      const updatedBookmarks = [...this.all, ...toAdd];
-      BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
-      this._store.set('bookmarks', updatedBookmarks);
-      return toAdd;
-    }
-
-    const addBookmarkToFolder = (bookmarks: IBookmark[]): IBookmark[] => {
-      return bookmarks.map((bookmark) => {
-        if (bookmark.type === EBookmarkType.Folder) {
-          if (bookmark.id === folderId) {
-            return {
-              ...bookmark,
-              children: [...bookmark.children, ...toAdd],
-            };
-          } else {
-            return {
-              ...bookmark,
-              children: addBookmarkToFolder(bookmark.children),
-            };
-          }
-        }
-        return bookmark;
-      });
-    };
-
-    const updatedBookmarks = addBookmarkToFolder(this.all);
-    BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
-    this._store.set('bookmarks', updatedBookmarks);
-
-    return toAdd;
-  }
-
-  addFolder(parentId: string, title: string): IBookmark[] {
-    const toAdd: IBookmark[] = [
-      {
-        id: crypto.randomUUID(),
-        type: EBookmarkType.Folder,
-        title,
-        dateAdded: Date.now(),
-        children: [],
-      },
-    ];
-
-    if (parentId === 'root') {
-      const updatedBookmarks = [...this.all, ...toAdd];
-      BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
-      this._store.set('bookmarks', updatedBookmarks);
-      return toAdd;
-    }
-
-    const addBookmarkToFolder = (bookmarks: IBookmark[]): IBookmark[] => {
-      return bookmarks.map((bookmark) => {
-        if (bookmark.type === EBookmarkType.Folder) {
-          if (bookmark.id === parentId) {
-            return {
-              ...bookmark,
-              children: [...bookmark.children, ...toAdd],
-            };
-          } else {
-            return {
-              ...bookmark,
-              children: addBookmarkToFolder(bookmark.children),
-            };
-          }
-        }
-        return bookmark;
-      });
-    };
-
-    const updatedBookmarks = addBookmarkToFolder(this.all);
-    BookmarksStoreScheme.parse({ bookmarks: updatedBookmarks });
-    this._store.set('bookmarks', updatedBookmarks);
-
-    return toAdd;
-  }
-
-  update(bookmarks: IBookmark[]) {
-    BookmarksStoreScheme.parse({ bookmarks });
-    this._store.set('bookmarks', bookmarks);
   }
 }
