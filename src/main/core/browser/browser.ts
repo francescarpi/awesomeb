@@ -14,7 +14,7 @@ import {
   history,
   MediaManager,
   AppUpdater,
-  bookmarks,
+  Bookmarks,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -62,6 +62,7 @@ export class Browser {
   public readonly extensions = new Extensions(this);
   public readonly mediaManager = new MediaManager(this);
   public readonly appUpdater = new AppUpdater(this);
+  public readonly bookmarks = new Bookmarks(this);
 
   constructor() {
     registerBrowserEvents(this);
@@ -186,7 +187,7 @@ export class Browser {
     if (this._bookmarksMenuCache !== null) {
       return this._bookmarksMenuCache;
     }
-    const items = await bookmarkSubMenu(this, window, bookmarks.all);
+    const items = await bookmarkSubMenu(this, window, this.bookmarks.all);
     this._bookmarksMenuCache = items;
     return items;
   }

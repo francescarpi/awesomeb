@@ -3,11 +3,12 @@ import { userDataPath } from '@/paths';
 import { EBookmarkType, IPlainBookmark, type IBookmark, type IBookmarkEntry } from '~/types';
 import { BookmarksStoreScheme, type IBookmarks } from './schemes';
 import { validateStore } from '@/core/validation';
+import { Browser } from '@/core';
 
 export class Bookmarks {
   private readonly _store: Store<IBookmarks>;
 
-  constructor() {
+  constructor(_browser: Browser) {
     const defaults: IBookmarks = { bookmarks: [] };
 
     // Validate defaults before passing to electron-store

@@ -1,4 +1,4 @@
-import { Browser, bookmarks, Window } from '@/core';
+import { Browser, Window } from '@/core';
 import { EBookmarkType, type IBookmark, type IExtension } from '~/types';
 import { t } from '~/i18n';
 
@@ -7,7 +7,7 @@ const BOOKMARKS_BAR_ID = '1';
 const OTHER_ID = '2';
 
 export class ChromeBookmarks {
-  constructor(private readonly _browser: Browser) {}
+  constructor(private readonly browser: Browser) {}
 
   private findTreeNode(
     id: string,
@@ -87,7 +87,7 @@ export class ChromeBookmarks {
             parentId: ROOT_ID,
             syncing: false,
             title: t('pages:extensions.otherBookmarks'),
-            children: this.buildTree(bookmarks.all, ROOT_ID),
+            children: this.buildTree(this.browser.bookmarks.all, ROOT_ID),
           },
         ],
       },
@@ -132,11 +132,11 @@ export class ChromeBookmarks {
     const pId = [ROOT_ID, BOOKMARKS_BAR_ID, OTHER_ID].includes(parentId) ? 'root' : parentId;
 
     const newBookmark = isFolder
-      ? bookmarks.addFolder(pId, title)
-      : bookmarks.add(pId, null, [{ title, url }]);
+      ? this.browser.bookmarks.addFolder(pId, title)
+      : this.browser.bookmarks.add(pId, null, [{ title, url }]);
 
-    this._browser.invalidateBookmarksMenuCache();
-    this._browser.refreshMainMenu();
+    this.browser.invalidateBookmarksMenuCache();
+    this.browser.refreshMainMenu();
 
     return this.iBookmarkToTreeNode(newBookmark, pId);
   }

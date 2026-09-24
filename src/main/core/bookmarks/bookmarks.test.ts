@@ -5,6 +5,7 @@ import { userDataPath } from '@/paths';
 import fs from 'fs';
 import path from 'path';
 import type { IUrlBookmark, IFolderBookmark } from './schemes';
+import { Browser } from '@/core';
 
 // Helper to get the bookmarks file path (must match electron-store's naming)
 function getBookmarksFilePath() {
@@ -42,7 +43,10 @@ function createTestFolderBookmark(partial?: Partial<IFolderBookmark>): IFolderBo
 }
 
 describe('Bookmarks', () => {
+  let browser: Browser;
+
   beforeEach(() => {
+    browser = new Browser();
     cleanBookmarksFile();
   });
 
@@ -51,7 +55,7 @@ describe('Bookmarks', () => {
   });
 
   test('constructor with valid defaults succeeds', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     expect(bookmarks).toBeDefined();
     expect(bookmarks.all).toEqual([]);
   });
@@ -66,19 +70,19 @@ describe('Bookmarks', () => {
       }),
     );
 
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     expect(bookmarks).toBeDefined();
     expect(bookmarks.all).toEqual([]);
   });
 
   test('all getter validates on read', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const data = bookmarks.all;
     expect(data).toEqual([]);
   });
 
   test('add() adds valid bookmarks to root', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const result = bookmarks.add('root', null, [{ title: 'Test', url: 'https://test.com' }]);
     expect(result.length).toBe(1);
     expect(result[0].type).toBe('url');
@@ -90,7 +94,7 @@ describe('Bookmarks', () => {
   });
 
   test('add() adds valid bookmarks to folder', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const folder = createTestFolderBookmark({ id: 'folder-1' });
     bookmarks.update([folder]);
 
@@ -113,7 +117,7 @@ describe('Bookmarks', () => {
   });
 
   test('add() falls back to defaults when on-disk data is invalid', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     bookmarks.update([createTestUrlBookmark()]);
 
     const filePath = getBookmarksFilePath();
@@ -124,13 +128,13 @@ describe('Bookmarks', () => {
       }),
     );
 
-    const newBookmarks = new Bookmarks();
+    const newBookmarks = new Bookmarks(browser);
     expect(newBookmarks).toBeDefined();
     expect(newBookmarks.all).toEqual([]);
   });
 
   test('update() persists valid array', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const list = [createTestUrlBookmark()];
     bookmarks.update(list);
     expect(bookmarks.all.length).toBe(1);
@@ -138,7 +142,7 @@ describe('Bookmarks', () => {
   });
 
   test('update() rejects invalid array', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const invalid = [
       {
         id: 'bad',
@@ -152,7 +156,7 @@ describe('Bookmarks', () => {
   });
 
   test('find() locates bookmark by id', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const url = createTestUrlBookmark({ id: 'url-1' });
     bookmarks.update([url]);
     const found = bookmarks.find('url-1');
@@ -161,7 +165,7 @@ describe('Bookmarks', () => {
   });
 
   test('find() locates bookmark nested deep in folders', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const deepUrl = createTestUrlBookmark({ id: 'deep-url' });
     const innerFolder = createTestFolderBookmark({ id: 'inner', children: [deepUrl] });
     const outerFolder = createTestFolderBookmark({ id: 'outer', children: [innerFolder] });
@@ -173,7 +177,7 @@ describe('Bookmarks', () => {
   });
 
   test('plainList() returns flat list with correct paths', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const url1 = createTestUrlBookmark({ id: 'u1', title: 'A', url: 'https://a.com' });
     const url2 = createTestUrlBookmark({ id: 'u2', title: 'B', url: 'https://b.com' });
     const folder = createTestFolderBookmark({ id: 'f1', title: 'Work', children: [url2] });
@@ -192,7 +196,7 @@ describe('Bookmarks', () => {
   });
 
   test('add() creates folder when newFolder is provided', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     bookmarks.add('root', 'My Folder', [{ title: 'Site', url: 'https://site.com' }]);
 
     expect(bookmarks.all.length).toBe(1);
@@ -206,7 +210,7 @@ describe('Bookmarks', () => {
   });
 
   test('add() creates folder with multiple entries', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     bookmarks.add('root', 'My Folder', [
       { title: 'Site', url: 'https://site.com' },
       { title: 'Docs', url: 'https://docs.com' },
@@ -221,7 +225,7 @@ describe('Bookmarks', () => {
   });
 
   test('add() returns added bookmarks even when parent folder does not exist', () => {
-    const bookmarks = new Bookmarks();
+    const bookmarks = new Bookmarks(browser);
     const result = bookmarks.add('nonexistent', null, [{ title: 'Site', url: 'https://site.com' }]);
     expect(result.length).toBe(1);
     expect(bookmarks.all.length).toBe(0);
