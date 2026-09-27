@@ -16,14 +16,13 @@ export class Sidebar extends UIPageView {
 
     let width: number;
     if (window.areaMaximized) {
-      // Note: Minimum width should be '1' for app-region dragin.
-      width = window.sidebarCollapsed ? 1 : SIDEBAR_DEFAULT_WIDTH;
+      width = window.sidebarCollapsed ? 0 : SIDEBAR_DEFAULT_WIDTH;
     } else {
       width = window.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH;
     }
 
     if (window.fullScreen) {
-      width = 1;
+      width = 0;
     }
 
     this.webContentsView.setBounds({
@@ -32,6 +31,11 @@ export class Sidebar extends UIPageView {
       width,
       height: bounds.height,
     });
+  }
+
+  checkVisibility(window: Window) {
+    const visible = window.fullScreen ? false : true;
+    this.setVisible(visible);
   }
 
   loadPage(window: Window) {

@@ -17,8 +17,9 @@ export class URLBar extends UIPageView {
 
     let height = URLBAR_HEIGHT - MARGIN * 2;
     let y = MARGIN;
+
     if (window.areaMaximized || window.fullScreen) {
-      height = 1;
+      height = 0;
       y = 0;
     }
 
@@ -28,5 +29,10 @@ export class URLBar extends UIPageView {
       width: bounds.width - sidebar.width - MARGIN,
       height,
     });
+  }
+
+  checkVisibility(window: Window) {
+    const visible = window.areaMaximized || window.fullScreen ? false : true;
+    this.setVisible(visible);
   }
 }

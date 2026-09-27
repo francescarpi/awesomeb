@@ -121,7 +121,11 @@ export class BrowserToRenderer {
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
     };
+
     window.webContents.send('window:refresh-layout-data', data);
+
+    const sidebar = window.getView<Sidebar>('sidebar')!;
+    sidebar.webContents.send('window:refresh-layout-data', data);
   }
 
   refreshSidebarDrag(window: Window, dragable: boolean) {

@@ -39,26 +39,25 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
 <script>
   import { onClick, getSearchParams } from '#/scripts';
+  import type { ILayoutData } from '~/types';
 
   document.title = 'Sidebar';
 
-  const { winId, searchParams } = getSearchParams();
+  const { winId } = getSearchParams();
 
   const t = await abI18n.t({ winId }, [{ key: 'pages:sidebar.title' }]);
   document.title = t['pages:sidebar.title'];
 
-  const colorPrimary = searchParams.get('colorPrimary');
-  const colorSecondary = searchParams.get('colorSecondary');
-  const degrees = searchParams.get('degrees');
-
-  if (colorPrimary && colorSecondary && degrees) {
-    const sidebar = document.getElementById('sidebarContainer');
-    if (sidebar) {
-      const backgroundImage = `linear-gradient(${parseInt(degrees, 10)}deg, ${colorPrimary}, ${colorSecondary})`;
-      sidebar.style.backgroundImage = backgroundImage;
-      sidebar.style.borderRight = `1px solid rgba(255, 255, 255, 0.4)`;
+  abWindow.onRefreshLayoutData((_e, data: ILayoutData) => {
+    const sidebar = document.getElementById('sidebarContainer')!;
+    if (data.areaMaximized) {
+      sidebar.classList.add('bg-black/85');
+      sidebar.classList.remove('dragable');
+    } else {
+      sidebar.classList.remove('bg-black/85');
+      sidebar.classList.add('dragable');
     }
-  }
+  });
 
   onClick('sidebar', () => abCommands.perform(winId, 'toggle-sidebar'));
 
