@@ -32,7 +32,7 @@ export class URLBar extends UIPageView {
   }
 
   checkVisibility(window: Window) {
-    const visible = window.areaMaximized || window.fullScreen ? false : true;
-    this.setVisible(visible);
+    // const visible = window.areaMaximized || window.fullScreen ? false : true;
+    this.setVisible(false);
   }
 }

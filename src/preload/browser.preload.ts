@@ -10,7 +10,6 @@ import type {
   TFindInPageAction,
   IFindInPageResult,
   IBookmark,
-  ITabNavigation,
   IDownloads,
   ITabSwitcherTab,
   TMarksAction,
@@ -152,9 +151,6 @@ const abTabs = {
   tabPreviewAction: (tabId: TTabId, action: TTabPreviewAction) => {
     ipcRenderer.send('tabs:tab-preview-action', { tabId, action });
   },
-  onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => {
-    ipcRenderer.on('tab:has-split', callback);
-  },
   close: async (winId: TWindowId, tabIds: TTabId[]) => {
     return await ipcRenderer.invoke('tabs:close', { winId, tabIds });
   },
@@ -167,9 +163,6 @@ const abUrlBar = {
   },
   onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => {
     ipcRenderer.on('urlbar:refresh', callback);
-  },
-  onTabNavigationRefresh: (callback: (event: IpcRendererEvent, data: ITabNavigation) => void) => {
-    ipcRenderer.on('urlbar:refresh-tab-navigation', callback);
   },
 };
 

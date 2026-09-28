@@ -8,13 +8,15 @@ import Layout from '#/layouts/Base.astro';
 
 <script>
   import { getSearchParams, h, Renderer, c } from '#/scripts';
-  import type { ITheme, ILayoutData } from '~/types';
+  import type { ILayoutData, IURLTabData } from '~/types';
+  import {
+    type IWindowState,
+    renderUrlBar,
+    MARGIN,
+    URLBAR_HEIGHT,
+    BORDER_WIDTH,
+  } from '#/scripts/window';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
-
-  interface IWindowState extends ILayoutData {
-    theme: ITheme;
-    shortcuts: string[];
-  }
 
   const { winId, searchParams } = getSearchParams();
 
@@ -26,8 +28,6 @@ import Layout from '#/layouts/Base.astro';
 
   document.title = t['pages:window.title'];
 
-  const BORDER_WIDTH = 2;
-
   const renderer = new Renderer(h('div', {})).render('window-container');
   let state: IWindowState = {
     theme: { primary: '#2b7fff', secondary: '#1c398e', degrees: 238 },
@@ -37,6 +37,17 @@ import Layout from '#/layouts/Base.astro';
     selectedTabBounds: null,
     selectedTabPartitionColor: null,
     shortcuts: [],
+    extensions: [],
+    urlbar: {
+      canGoBack: false,
+      canGoForward: false,
+      loading: false,
+      hasURL: false,
+      tabId: -1,
+      safe: true,
+      url: '',
+      hasSplit: false,
+    },
   };
 
   abDesktops.getTheme(winId).then((theme) => {
@@ -55,6 +66,16 @@ import Layout from '#/layouts/Base.astro';
     renderContent();
   });
 
+  abUrlBar.onRefresh((_event, data: IURLTabData) => {
+    state.urlbar = data;
+    renderContent();
+  });
+
+  abExtensions.onRefresh((_event, extensions) => {
+    state.extensions = extensions;
+    renderContent();
+  });
+
   let shortcutsRequestVersion = 0;
 
   loadShortcuts();
@@ -63,8 +84,8 @@ import Layout from '#/layouts/Base.astro';
   });
 
   function renderContent() {
-    const left = state.areaMaximized ? 5 : state.sidebarCollapsed ? 40 : 254;
-    const top = state.areaMaximized ? 5 : state.sidebarCollapsed ? 34 : 34;
+    const left = state.areaMaximized ? MARGIN : state.sidebarCollapsed ? 40 : 254;
+    const top = state.areaMaximized ? MARGIN : state.sidebarCollapsed ? 34 : 34;
     const style = state.selectedTabBounds
       ? `left: ${state.selectedTabBounds.x - BORDER_WIDTH}px; top: ${state.selectedTabBounds.y - BORDER_WIDTH}px; width: ${state.selectedTabBounds.width + BORDER_WIDTH * 2}px; height: ${state.selectedTabBounds.height + BORDER_WIDTH * 2}px; border-color: ${state.selectedTabPartitionColor || 'yellow'};`
       : '';
@@ -87,6 +108,18 @@ import Layout from '#/layouts/Base.astro';
         ),
         style,
       }),
+      h(
+        'div',
+        {
+          class: 'absolute',
+          style: `left: ${left}px; top: ${MARGIN}px; right: ${MARGIN}px;`,
+        },
+        h(
+          'div',
+          { class: 'flex items-center gap-2 w-full h-full', style: `height: ${URLBAR_HEIGHT}px;` },
+          ...renderUrlBar(winId, state),
+        ),
+      ),
       h(
         'div',
         {

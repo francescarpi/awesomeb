@@ -12,7 +12,6 @@ import type {
   ITabContainerEntity,
   IBookmarkEntity,
   IBookmark,
-  ITabNavigation,
   IDownloads,
   ITabSwitcherTab,
   IExtensions,
@@ -21,6 +20,7 @@ import type {
   TWindowId,
   IAbout,
   IDebugTabIndex,
+  IDesConTab,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -236,24 +236,30 @@ export class BrowserRenderer {
     };
   }
 
-  urlBarData(tab: Tab | null): IURLTabData {
-    const data: IURLTabData = {
-      safe: true,
-      url: '',
-      loading: false,
-      tabId: -1,
-    };
-
-    if (!tab) {
-      return data;
+  urlBarData(tabData: IDesConTab | null): IURLTabData {
+    if (!tabData) {
+      return {
+        safe: true,
+        url: '',
+        loading: false,
+        tabId: -1,
+        canGoBack: false,
+        canGoForward: false,
+        hasURL: false,
+        hasSplit: false,
+      };
     }
 
-    data.safe = true; // TODO implement safe check
-    data.url = tab.url || '';
-    data.loading = tab.loading;
-    data.tabId = tab.id;
-
-    return data;
+    return {
+      safe: true,
+      url: tabData.tab.url || '',
+      loading: tabData.tab.loading,
+      tabId: tabData.tab.id,
+      canGoBack: tabData.tab.canGoBack,
+      canGoForward: tabData.tab.canGoForward,
+      hasURL: !!tabData.tab.url,
+      hasSplit: tabData.tabContainer.isSplit,
+    };
   }
 
   tabsEntities(window: Window): ITabEntity[] {
@@ -319,26 +325,6 @@ export class BrowserRenderer {
 
   bookmarks(): IBookmark[] {
     return this.browser.bookmarks.all;
-  }
-
-  tabNavigation(tab?: Tab): ITabNavigation {
-    if (!tab) {
-      return {
-        canGoBack: false,
-        canGoForward: false,
-        loading: false,
-        hasURL: false,
-        tabId: -1,
-      };
-    }
-
-    return {
-      canGoBack: tab.canGoBack,
-      canGoForward: tab.canGoForward,
-      loading: tab.loading,
-      hasURL: !!tab.url,
-      tabId: tab.id,
-    };
   }
 
   downloads(): IDownloads {

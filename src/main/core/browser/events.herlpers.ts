@@ -15,7 +15,7 @@ const scopeLog = log.scope('BrowserEventsHelpers');
  *
  * Design note (W1 of issue #355): only the single-tab path is coalesced here.
  * Structural refreshes (`refreshTabContainers`, `refreshDesktops`,
- * `refreshURLBar`, `refreshTabNavigation`, `refreshTabSwitcher`, `refreshMainMenu`)
+ * `refreshURLBar`, `refreshTabSwitcher`, `refreshMainMenu`)
  * stay synchronous on their respective structural events — coalescing them
  * would either drop ordering guarantees or require a much wider re-architecture
  * of the renderer state machine. The 4–6 full tree re-serializations per
@@ -112,8 +112,7 @@ function flushPendingRefreshes(browser: Browser) {
     }
 
     if (selectedTab && entry.tabIds.has(selectedTab.tab.id)) {
-      browser.toRenderer.refreshURLBar(window, selectedTab.tab);
-      browser.toRenderer.refreshTabNavigation(window, selectedTab.tab);
+      browser.toRenderer.refreshURLBar(window, { desktop: selectedDesktop, ...selectedTab });
       someChanged = true;
     }
 

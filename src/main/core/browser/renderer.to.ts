@@ -3,7 +3,14 @@ import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import type { ITheme, TFindInPageId, ILayoutData, IMediaSession, IAppUpdaterInfo } from '~/types';
+import type {
+  ITheme,
+  TFindInPageId,
+  ILayoutData,
+  IMediaSession,
+  IAppUpdaterInfo,
+  IDesConTab,
+} from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -51,9 +58,8 @@ export class BrowserToRenderer {
     );
   }
 
-  refreshURLBar(window: Window, tab: Tab | null) {
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));
+  refreshURLBar(window: Window, tabData: IDesConTab | null) {
+    window.webContents.send('urlbar:refresh', this._browser.renderer.urlBarData(tabData));
   }
 
   refreshTabFindInPageResult(tab: Tab, requestId: TFindInPageId) {
@@ -66,12 +72,6 @@ export class BrowserToRenderer {
       'tabs:refresh-find-in-page',
       this._browser.renderer.findInPageResult(tab, requestId),
     );
-  }
-
-  refreshTabNavigation(window: Window, tab?: Tab) {
-    const data = this._browser.renderer.tabNavigation(tab);
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('urlbar:refresh-tab-navigation', data);
   }
 
   refreshDownloads() {
@@ -134,28 +134,18 @@ export class BrowserToRenderer {
   }
 
   refreshExtensions(window: Window) {
-    const urlbar = window.getView<URLBar>('urlbar')!;
-
     const selectedTab = window.selectedTab;
     if (!selectedTab) {
-      urlbar.send('extensions:on-refresh', []);
+      window.webContents.send('extensions:on-refresh', []);
       return;
     }
 
     if (selectedTab.tab.partition.id === partitions.internal.id) {
-      urlbar.send('extensions:on-refresh', []);
+      window.webContents.send('extensions:on-refresh', []);
       return;
     }
 
-    urlbar.send('extensions:on-refresh', this._browser.extensions.active);
-  }
-
-  refreshShowSplitMenu(window: Window) {
-    const selectedTab = window.selectedTab;
-    const hasSplit = selectedTab ? selectedTab.tabContainer.isSplit : false;
-
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('tab:has-split', hasSplit);
+    window.webContents.send('extensions:on-refresh', this._browser.extensions.active);
   }
 
   refreshConfig() {

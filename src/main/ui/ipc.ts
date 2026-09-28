@@ -80,7 +80,7 @@ export function setupUIIPC(browser: Browser) {
       if (!tab) {
         return null;
       }
-      return browser.renderer.urlBarData(tab.tab);
+      return browser.renderer.urlBarData(tab);
     },
   );
 }

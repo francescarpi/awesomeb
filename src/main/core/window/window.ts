@@ -285,15 +285,15 @@ export class Window extends UIWindow {
 
       this.addView(tab);
       this.renderViews();
-      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-      this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
+      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, result);
+      this.browser.eventsChannel.emit('window:tab-did-resume', this, result);
 
       return;
     }
 
     this.renderViews();
 
-    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, result);
   }
 
   get tabs(): IDesConTab[] {

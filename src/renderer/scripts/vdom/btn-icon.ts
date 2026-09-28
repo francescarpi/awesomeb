@@ -11,17 +11,21 @@ export function btnIcon(
     size?: number;
     id?: string;
     dataAction?: string;
+    disabled?: boolean;
   },
 ): VNode {
-  const { onClick, classNames, doubleConfirmation, size, dataAction } = props || { size: 5.5 };
+  const { onClick, classNames, doubleConfirmation, size, dataAction, disabled } = props || {
+    size: 5.5,
+    disabled: false,
+  };
   let numClicks = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
   const buttonClass = c(
     'text-base-content',
-    'hover:bg-white/30',
-    'cursor-pointer',
-    'rounded',
+    'transition-colors',
+    'duration-300',
+    'rounded-full',
     'flex',
     'items-center',
     'justify-center',
@@ -29,6 +33,7 @@ export function btnIcon(
     '[&>svg]:h-full',
     `w-${size}`,
     `h-${size}`,
+    disabled ? 'opacity-40' : 'hover:bg-white/30 cursor-pointer',
     ...(classNames || []),
   );
 
@@ -56,8 +61,13 @@ export function btnIcon(
       class: buttonClass,
       id: props?.id,
       innerHTML: icon,
+      disabled: props?.disabled || false,
       onClick: (e: Event) => {
         e.stopPropagation();
+        if (disabled) {
+          return;
+        }
+
         if (doubleConfirmation) {
           if (numClicks === 0) {
             (e.target as SVGElement).classList.add('text-error');
