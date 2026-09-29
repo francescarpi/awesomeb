@@ -2,7 +2,7 @@ import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionSt
 import { Sidebar, TabSwitcher, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
-import { INTERNAL_PROTOCOL } from '~/constants';
+import { INTERNAL_PROTOCOL, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import type {
   ITheme,
   TFindInPageId,
@@ -120,17 +120,10 @@ export class BrowserToRenderer {
       hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
+      sidebarWidth: window.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH,
     };
 
     window.webContents.send('window:refresh-layout-data', data);
-
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.webContents.send('window:refresh-layout-data', data);
-  }
-
-  refreshSidebarDrag(window: Window, dragable: boolean) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('sidebar:change-drag', dragable);
   }
 
   refreshExtensions(window: Window) {
@@ -189,8 +182,7 @@ export class BrowserToRenderer {
   }
 
   refreshVersionAvailable(win: Window, data: IAppUpdaterInfo) {
-    const sidebar = win.getView<Sidebar>('sidebar')!;
-    sidebar.send('appupdater:version-available', data);
+    win.webContents.send('appupdater:version-available', data);
   }
 
   broadcast(channel: string, ...args: unknown[]) {

@@ -181,11 +181,6 @@ declare global {
   };
 
   //--------------------------------------------------------------------------------------
-  const abSidebar: {
-    onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
-  };
-
-  //--------------------------------------------------------------------------------------
   const abExtensions: {
     get: (winId?: TWindowId) => Promise<IExtensions>;
     active: (winId?: TWindowId) => Promise<IExtensions>;

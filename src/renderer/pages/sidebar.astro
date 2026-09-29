@@ -12,10 +12,10 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
 <Layout borderRadius="10px 0 0 10px">
   <div class="h-full flex flex-col gap-4 pt-0.5 dragable" id="sidebarContainer">
-    <section class="pl-2 pt-2 hidden sidebar:block">
+    <section class="pl-2 pt-2 hidden sidebar-opened:block">
       <WindowActions />
     </section>
-    <section class="px-2 mt-1 sidebar:mt-0 flex justify-between items-center">
+    <section class="px-2 mt-1 sidebar-opened:mt-0 flex justify-between items-center">
       <div class="flex gap-2">
         <ButtonIcon icon="sidebar" />
         <ButtonIcon icon="add-circle" />
@@ -23,14 +23,14 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
       </div>
       <AppUpdater />
     </section>
-    <section class="py-1 flex justify-center sidebar:block sidebar:px-2">
+    <section class="py-1 flex justify-center sidebar-opened:block sidebar-opened:px-2">
       <Desktops />
     </section>
     <section class="flex-1 mt-1 overflow-y-auto">
       <TabContainers />
     </section>
     <MediaSession />
-    <section class="py-2 flex flex-col gap-1 items-center sidebar:flex-row sidebar:justify-between sidebar:px-2">
+    <section class="py-2 flex flex-col gap-1 items-center sidebar-opened:flex-row sidebar-opened:justify-between sidebar-opened:px-2">
       <Downloads />
       <WindowId />
     </section>
@@ -65,12 +65,12 @@ import AppUpdater from '#/components/sidebar/AppUpdater.astro';
 
   onClick('command', () => abModal.open(winId, 'perform-command'));
 
-  abSidebar.onChangeDrag((_event, isDragable) => {
-    const sidebar = document.getElementById('sidebarContainer')!;
-    if (isDragable) {
-      sidebar.classList.add('dragable');
-    } else {
-      sidebar.classList.remove('dragable');
-    }
-  });
+  // abSidebar.onChangeDrag((_event, isDragable) => {
+  //   const sidebar = document.getElementById('sidebarContainer')!;
+  //   if (isDragable) {
+  //     sidebar.classList.add('dragable');
+  //   } else {
+  //     sidebar.classList.remove('dragable');
+  //   }
+  // });
 </script>

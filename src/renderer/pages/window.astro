@@ -9,8 +9,14 @@ import Layout from '#/layouts/Base.astro';
 <script>
   import { getSearchParams, h, Renderer, c } from '#/scripts';
   import type { ILayoutData, IURLTabData } from '~/types';
-  import { URLBAR_HEIGHT, LAYOUT_MARGIN } from '~/constants';
-  import { type IWindowState, renderUrlBar, BORDER_WIDTH } from '#/scripts/window';
+  import { SIDEBAR_DEFAULT_WIDTH } from '~/constants';
+  import {
+    type IWindowState,
+    renderUrlBar,
+    BORDER_WIDTH,
+    renderSidebar,
+    calculateBounds,
+  } from '#/scripts/window';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
   const { winId, searchParams } = getSearchParams();
@@ -19,6 +25,9 @@ import Layout from '#/layouts/Base.astro';
     { key: 'pages:window.newTabSuffix' },
     { key: 'pages:window.commandsSuffix' },
     { key: 'pages:window.title' },
+    { key: 'pages:window.updateAvailable' },
+    { key: 'pages:window.updateProgress' },
+    { key: 'pages:window.updateInstall' },
   ]);
 
   document.title = t['pages:window.title'];
@@ -31,8 +40,10 @@ import Layout from '#/layouts/Base.astro';
     hasVisibleTabs: false,
     selectedTabBounds: null,
     selectedTabPartitionColor: null,
+    sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
     shortcuts: [],
     extensions: [],
+    version: null,
     urlbar: {
       canGoBack: false,
       canGoForward: false,
@@ -71,6 +82,17 @@ import Layout from '#/layouts/Base.astro';
     renderContent();
   });
 
+  abAppUpdater.onRefreshVersionAvailable((_event, data) => {
+    state.version = data;
+    renderContent();
+  });
+
+  const data = await abAppUpdater.versionAvailable(winId);
+  if (data) {
+    state.version = data;
+    renderContent();
+  }
+
   let shortcutsRequestVersion = 0;
 
   loadShortcuts();
@@ -79,9 +101,9 @@ import Layout from '#/layouts/Base.astro';
   });
 
   function renderContent() {
-    const left = state.areaMaximized ? LAYOUT_MARGIN : state.sidebarCollapsed ? 40 : 254;
-    const top = state.areaMaximized ? LAYOUT_MARGIN : state.sidebarCollapsed ? 34 : 34;
-    const style = state.selectedTabBounds
+    const bounds = calculateBounds(state);
+
+    const activeTabStyle = state.selectedTabBounds
       ? `left: ${state.selectedTabBounds.x - BORDER_WIDTH}px; top: ${state.selectedTabBounds.y - BORDER_WIDTH}px; width: ${state.selectedTabBounds.width + BORDER_WIDTH * 2}px; height: ${state.selectedTabBounds.height + BORDER_WIDTH * 2}px; border-color: ${state.selectedTabPartitionColor || 'yellow'};`
       : '';
 
@@ -101,26 +123,30 @@ import Layout from '#/layouts/Base.astro';
           'rounded-[14px]',
           !state.selectedTabBounds && 'hidden',
         ),
-        style,
+        style: activeTabStyle,
       }),
       h(
         'div',
         {
           class: state.areaMaximized ? 'hidden' : 'absolute',
-          style: `left: ${left}px; top: ${LAYOUT_MARGIN}px; right: ${LAYOUT_MARGIN}px;`,
+          style: bounds.sidebar,
         },
-        h(
-          'div',
-          { class: 'flex items-center gap-2 w-full h-full', style: `height: ${URLBAR_HEIGHT}px;` },
-          ...renderUrlBar(winId, state),
-        ),
+        renderSidebar(winId, state, t),
+      ),
+      h(
+        'div',
+        {
+          class: state.areaMaximized ? 'hidden' : 'absolute',
+          style: bounds.urlbar,
+        },
+        renderUrlBar(winId, state),
       ),
       h(
         'div',
         {
           class:
             'bg-white/20 border border-white/30 rounded-xl text-white opacity-50 flex flex-col items-center justify-center absolute right-1 bottom-1 select-none text-right px-3 py-2 text-sm',
-          style: `left: ${left}px; top: ${top}px;`,
+          style: bounds.main,
         },
         ...state.shortcuts.map((s) => h('p', { class: c(state.hasVisibleTabs && 'hidden') }, s)),
       ),

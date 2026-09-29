@@ -62,3 +62,6 @@ export const LAYOUT_MARGIN = 5;
 export const EXTENSION_ICON_SIZE = 20;
 
 export const EXTENSION_POPUP_GAP = 16;
+
+export const SIDEBAR_DEFAULT_WIDTH = 255;
+export const SIDEBAR_MIN_WIDTH = 40;

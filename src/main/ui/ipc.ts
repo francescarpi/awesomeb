@@ -52,7 +52,7 @@ export function setupUIIPC(browser: Browser) {
     'modal:open-contextual',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker],
     async ({ win, page, params }) => {
       win.openContextualModal(page, params);
     },

@@ -107,7 +107,7 @@
               h(
                 'span', // Tab container shortcut (is a number between 1 and 9)
                 {
-                  class: 'text-xs pl-1 text-white/20 hidden sidebar:block w-1.5',
+                  class: 'text-xs pl-1 text-white/20 hidden sidebar-opened:block w-1.5',
                 },
                 tc.shortcut?.toString(),
               ),
@@ -130,7 +130,7 @@
                 'div',
                 {
                   key: tcc.id,
-                  class: c('ml-1', 'sidebar:ml-6', 'mr-1', tc.collapseChildren && 'hidden'),
+                  class: c('ml-1', 'sidebar-opened:ml-6', 'mr-1', tc.collapseChildren && 'hidden'),
                 },
                 ...tcc.tabs.map((tcct) => renderTab(tcct)),
               ),
@@ -139,7 +139,7 @@
               'div',
               {
                 class: c(
-                  !tc.collapseChildren ? 'hidden' : 'hidden sidebar:block',
+                  !tc.collapseChildren ? 'hidden' : 'hidden sidebar-opened:block',
                   'text-xs',
                   'ml-4',
                   'text-white/40',
@@ -224,9 +224,9 @@
           'items-start',
           'grid',
           'grid-cols-1',
-          'sidebar:grid-cols-[24px_auto_25px]',
-          'sidebar:rounded-tl',
-          'sidebar:rounded-bl',
+          'sidebar-opened:grid-cols-[24px_auto_25px]',
+          'sidebar-opened:rounded-tl',
+          'sidebar-opened:rounded-bl',
           'relative',
           !t.selected && 'hover:bg-white/10',
           t.suspended ? 'group/suspended opacity-50' : 'group/active',
@@ -258,8 +258,8 @@
             'loading-xs',
             'ml-auto',
             'mr-auto',
-            'sidebar:ml-1',
-            'sidebar:mr-0',
+            'sidebar-opened:ml-1',
+            'sidebar-opened:mr-0',
             'mt-0.5',
             t.loading ? 'block' : 'hidden',
           ),
@@ -276,13 +276,13 @@
             'z-10',
             'w-5',
             'h-5',
-            'sidebar:w-[16px]',
-            'sidebar:h-[16px]',
+            'sidebar-opened:w-[16px]',
+            'sidebar-opened:h-[16px]',
             'mt-0.5',
             'ml-auto',
             'mr-auto',
-            'sidebar:ml-1',
-            'sidebar:mr-0',
+            'sidebar-opened:ml-1',
+            'sidebar-opened:mr-0',
             'text-white',
             t.loading ? 'hidden' : 'block',
           ),
@@ -292,7 +292,7 @@
       h(
         'div', // Title + indicators container
         {
-          class: 'relative z-10 hidden sidebar:flex flex-col min-w-0',
+          class: 'relative z-10 hidden sidebar-opened:flex flex-col min-w-0',
         },
         h(
           'span', // Title
@@ -309,7 +309,7 @@
       ),
       h(
         'div', // Partition and actions container
-        { class: 'relative z-10 hidden sidebar:flex justify-end' },
+        { class: 'relative z-10 hidden sidebar-opened:flex justify-end' },
         h(
           'div', // Partition/Profile color
           {

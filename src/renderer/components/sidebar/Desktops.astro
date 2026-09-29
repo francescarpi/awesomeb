@@ -31,7 +31,7 @@
   function renderDesktops(desktops: IDesktop[]): VNode {
     return h(
       'div',
-      { class: 'grid grid-cols-1 sidebar:grid-cols-5 items-center gap-2' },
+      { class: 'grid grid-cols-1 sidebar-opened:grid-cols-5 items-center gap-2' },
       ...desktops.map((desktop) =>
         h(
           'div',
@@ -42,7 +42,7 @@
               'group',
               'relative',
               'hidden',
-              'sidebar:block',
+              'sidebar-opened:block',
               '[.selected]:block',
               desktop.selected && 'selected',
             ),
@@ -54,14 +54,14 @@
                 'border',
                 'rounded-full',
                 'relative',
-                'sidebar:w-9',
-                'sidebar:h-9',
-                'sidebar:text-sm',
+                'sidebar-opened:w-9',
+                'sidebar-opened:h-9',
+                'sidebar-opened:text-sm',
                 'w-7',
                 'h-7',
                 'text-xs',
                 'cursor-pointer',
-                'sidebar:flex',
+                'sidebar-opened:flex',
                 'items-center',
                 'justify-center',
                 'flex',
@@ -96,7 +96,7 @@
                     desktop.shortName.trim() !== '' &&
                     'hidden',
                   desktop.shortName && desktop.shortName.trim() !== ''
-                    ? 'sidebar:group-hover:hidden'
+                    ? 'sidebar-opened:group-hover:hidden'
                     : '',
                 ),
               },
@@ -124,14 +124,14 @@
               {
                 class: c(
                   'text-[8px]',
-                  'sidebar:text-[10px]',
+                  'sidebar-opened:text-[10px]',
                   'absolute',
                   'whitespace-nowrap',
                   'left-1/2',
                   '-translate-x-1/2',
-                  'sidebar:hidden',
+                  'sidebar-opened:hidden',
                   desktop.shortName && desktop.shortName.trim() !== ''
-                    ? 'sidebar:group-[.selected]:block sidebar:group-hover:block'
+                    ? 'sidebar-opened:group-[.selected]:block sidebar-opened:group-hover:block'
                     : '',
                 ),
               },

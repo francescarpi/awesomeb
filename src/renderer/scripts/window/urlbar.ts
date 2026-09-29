@@ -11,12 +11,14 @@ import BtnCopy from '#/icons/copy.svg?raw';
 import BtnSplit from '#/icons/split.svg?raw';
 import BtnMenu from '#/icons/menu.svg?raw';
 
-export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode[] {
+export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
   const { urlbar } = state;
   const showSafe = urlbar.hasURL && !urlbar.loading && urlbar.safe;
   const showUnsafe = urlbar.hasURL && !urlbar.loading && !urlbar.safe;
 
-  return [
+  return h(
+    'div',
+    { class: 'flex items-center gap-2 w-full h-full' },
     ////////////////////////////////////////////////////////////////////////////
     // Navigation butons
     h(
@@ -143,5 +145,5 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode[] {
       classNames: ['text-white'],
       onClick: () => abMenu.contextMenu(winId, 'main'),
     }),
-  ];
+  );
 }

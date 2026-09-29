@@ -371,7 +371,10 @@
   "window": {
     "newTabSuffix": "obrir una pestanya nova",
     "commandsSuffix": "obrir la paleta d'ordres",
-    "title": "Finestra"
+    "title": "Finestra",
+    "updateAvailable": "Actualització disponible",
+    "updateProgress": "Progrès {{percent}}%",
+    "updateInstall": "Sortir i instal·lar"
   },
   "tabSwitcher": {
     "noTabs": "Sense pestanyes...",

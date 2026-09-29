@@ -1,13 +1,14 @@
 import { TWindowId } from '~/types';
 import { Window } from '@/core';
 import { UIPageView } from '../view';
-import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '../constants';
+import { SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import { loadPage } from '../helpers';
 
 export class Sidebar extends UIPageView {
   constructor(windowId: TWindowId) {
     super('sidebar', {
       query: { winId: windowId.toString() },
+      visible: false,
     });
   }
 
@@ -31,11 +32,6 @@ export class Sidebar extends UIPageView {
       width,
       height: bounds.height,
     });
-  }
-
-  checkVisibility(window: Window) {
-    const visible = window.fullScreen ? false : true;
-    this.setVisible(visible);
   }
 
   loadPage(window: Window) {
