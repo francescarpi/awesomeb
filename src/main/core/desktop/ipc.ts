@@ -1,5 +1,5 @@
 import { Browser, Window } from '@/core';
-import { createHandler, windowChecker, viewChecker } from '@/utils';
+import { createHandler, windowChecker } from '@/utils';
 import { TDesktopId, ITheme } from '~/types';
 
 export function setupDesktopIPC(browser: Browser) {
@@ -8,7 +8,7 @@ export function setupDesktopIPC(browser: Browser) {
     'desktops:select',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker],
     async ({ win, desktopId }) => {
       win.selectDesktop(desktopId);
     },

@@ -44,6 +44,7 @@ import Layout from '#/layouts/Base.astro';
     shortcuts: [],
     extensions: [],
     version: null,
+    desktops: [],
     urlbar: {
       canGoBack: false,
       canGoForward: false,
@@ -93,9 +94,18 @@ import Layout from '#/layouts/Base.astro';
     renderContent();
   }
 
+  state.desktops = await abDesktops.all(winId);
+  renderContent();
+
+  abDesktops.onRefresh((_event, desktops) => {
+    state.desktops = desktops;
+    renderContent();
+  });
+
   let shortcutsRequestVersion = 0;
 
   loadShortcuts();
+
   abShortcuts.onChange(() => {
     loadShortcuts();
   });

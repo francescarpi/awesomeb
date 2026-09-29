@@ -7,6 +7,7 @@ import BtnMaximize from '#/icons/up.svg?raw';
 import BtnSidebar from '#/icons/sidebar.svg?raw';
 import BtnNewTab from '#/icons/add-circle.svg?raw';
 import BtnPerformCommand from '#/icons/command.svg?raw';
+import { renderDesktops } from './desktops';
 
 export function renderSidebar(
   winId: TWindowId,
@@ -64,6 +65,13 @@ export function renderSidebar(
         classNames: ['text-white', state.sidebarCollapsed ? 'hidden' : 'block'],
         onClick: () => abModal.open(winId, 'perform-command'),
       }),
+    ),
+    h(
+      'section',
+      {
+        class: c('py-1', 'justify-center', state.sidebarCollapsed ? 'flex' : 'block px-2'),
+      },
+      renderDesktops(state),
     ),
   );
 }

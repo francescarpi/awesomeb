@@ -18,9 +18,8 @@ export class BrowserToRenderer {
   constructor(private readonly _browser: Browser) {}
 
   refreshDesktops(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const desktops = this._browser.renderer.desktops(window);
-    sidebar.send('desktops:refresh-visible', desktops);
+    window.webContents.send('desktops:refresh-visible', desktops);
     scopeLog.info('Desktops refreshed in renderer');
   }
 

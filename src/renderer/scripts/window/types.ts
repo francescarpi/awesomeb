@@ -1,4 +1,11 @@
-import type { ITheme, ILayoutData, IURLTabData, IExtension, IAppUpdaterInfo } from '~/types';
+import type {
+  ITheme,
+  ILayoutData,
+  IURLTabData,
+  IExtension,
+  IAppUpdaterInfo,
+  IDesktop,
+} from '~/types';
 
 export interface IWindowState extends ILayoutData {
   theme: ITheme;
@@ -6,6 +13,7 @@ export interface IWindowState extends ILayoutData {
   extensions: IExtension[];
   urlbar: IURLTabData;
   version: IAppUpdaterInfo | null;
+  desktops: IDesktop[];
 }
 
 export interface IWindowBounds {
