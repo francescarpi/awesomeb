@@ -54,3 +54,11 @@ export const MAX_SPLIT_TABS = 3;
 export const MAX_TAB_NAME_LENGTH = 50;
 
 export const DEFAULT_SHORTCUTS_MAP = 'generic-ansi';
+
+export const URLBAR_HEIGHT = 24;
+
+export const LAYOUT_MARGIN = 5;
+
+export const EXTENSION_ICON_SIZE = 20;
+
+export const EXTENSION_POPUP_GAP = 16;

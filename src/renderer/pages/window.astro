@@ -9,13 +9,8 @@ import Layout from '#/layouts/Base.astro';
 <script>
   import { getSearchParams, h, Renderer, c } from '#/scripts';
   import type { ILayoutData, IURLTabData } from '~/types';
-  import {
-    type IWindowState,
-    renderUrlBar,
-    MARGIN,
-    URLBAR_HEIGHT,
-    BORDER_WIDTH,
-  } from '#/scripts/window';
+  import { URLBAR_HEIGHT, LAYOUT_MARGIN } from '~/constants';
+  import { type IWindowState, renderUrlBar, BORDER_WIDTH } from '#/scripts/window';
   import { acceleratorToDisplay, isMacPlatform } from '~/utils/shortcuts';
 
   const { winId, searchParams } = getSearchParams();
@@ -84,8 +79,8 @@ import Layout from '#/layouts/Base.astro';
   });
 
   function renderContent() {
-    const left = state.areaMaximized ? MARGIN : state.sidebarCollapsed ? 40 : 254;
-    const top = state.areaMaximized ? MARGIN : state.sidebarCollapsed ? 34 : 34;
+    const left = state.areaMaximized ? LAYOUT_MARGIN : state.sidebarCollapsed ? 40 : 254;
+    const top = state.areaMaximized ? LAYOUT_MARGIN : state.sidebarCollapsed ? 34 : 34;
     const style = state.selectedTabBounds
       ? `left: ${state.selectedTabBounds.x - BORDER_WIDTH}px; top: ${state.selectedTabBounds.y - BORDER_WIDTH}px; width: ${state.selectedTabBounds.width + BORDER_WIDTH * 2}px; height: ${state.selectedTabBounds.height + BORDER_WIDTH * 2}px; border-color: ${state.selectedTabPartitionColor || 'yellow'};`
       : '';
@@ -111,8 +106,8 @@ import Layout from '#/layouts/Base.astro';
       h(
         'div',
         {
-          class: 'absolute',
-          style: `left: ${left}px; top: ${MARGIN}px; right: ${MARGIN}px;`,
+          class: state.areaMaximized ? 'hidden' : 'absolute',
+          style: `left: ${left}px; top: ${LAYOUT_MARGIN}px; right: ${LAYOUT_MARGIN}px;`,
         },
         h(
           'div',

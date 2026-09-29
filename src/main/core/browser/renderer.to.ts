@@ -1,5 +1,5 @@
 import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionState } from '@/core';
-import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
+import { Sidebar, TabSwitcher, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';

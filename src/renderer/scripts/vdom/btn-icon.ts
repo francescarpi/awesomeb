@@ -14,10 +14,14 @@ export function btnIcon(
     disabled?: boolean;
   },
 ): VNode {
-  const { onClick, classNames, doubleConfirmation, size, dataAction, disabled } = props || {
-    size: 5.5,
-    disabled: false,
-  };
+  const {
+    onClick,
+    classNames,
+    doubleConfirmation,
+    size = 5.5,
+    dataAction,
+    disabled = false,
+  } = props || {};
   let numClicks = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -25,7 +29,7 @@ export function btnIcon(
     'text-base-content',
     'transition-colors',
     'duration-300',
-    'rounded-full',
+    'rounded',
     'flex',
     'items-center',
     'justify-center',

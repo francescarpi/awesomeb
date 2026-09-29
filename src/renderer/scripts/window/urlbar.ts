@@ -17,6 +17,8 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode[] {
   const showUnsafe = urlbar.hasURL && !urlbar.loading && !urlbar.safe;
 
   return [
+    ////////////////////////////////////////////////////////////////////////////
+    // Navigation butons
     h(
       'div',
       { class: 'flex items-center gap-2 h-full' },
@@ -45,9 +47,11 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode[] {
             }),
       ),
     ),
+    ////////////////////////////////////////////////////////////////////////////
+    // Url box
     h(
       'div',
-      { class: 'bg-white/10 rounded-lg w-full h-full pl-2 border border-white/15' },
+      { class: 'bg-white/10 rounded-lg flex-1 h-full pl-2 border border-white/15' },
       h(
         'div',
         { class: 'flex gap-2 items-center w-full h-full' },
@@ -97,37 +101,44 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode[] {
         }),
       ),
     ),
+    ////////////////////////////////////////////////////////////////////////////
+    // Copy url button
     btnIcon(BtnCopy, {
       classNames: ['text-white'],
       disabled: !urlbar.hasURL,
       onClick: () => abCommands.perform(winId, 'copy-url'),
     }),
+    ////////////////////////////////////////////////////////////////////////////
+    // Split menu button (if there is split view)
     btnIcon(BtnSplit, {
       classNames: ['text-white', urlbar.hasSplit ? '' : 'hidden'],
       disabled: !urlbar.hasURL,
       onClick: () => abMenu.contextMenu(winId, 'split'),
     }),
+    ////////////////////////////////////////////////////////////////////////////
+    // Extensions list
     state.extensions.length === 0
       ? h('div', {})
       : h(
           'div',
-          { class: 'flex gap-2 bg-red-500' },
+          { class: 'flex gap-2' },
           ...state.extensions.map((extension) =>
             h('img', {
               src: extension.icon,
-              class:
-                'w-4 h-4 rounded object-cover cursor-pointer p-0.5 border border-black/30 bg-white/80 hover:bg-white',
+              class: `w-5 h-5 rounded object-cover cursor-pointer p-0.5 border border-black/30 bg-white/80 hover:bg-white`,
               onclick: (e) => {
                 const img = e.target as HTMLImageElement;
                 const bounds = img.getBoundingClientRect();
 
-                const y = Math.round(bounds.top);
-                const x = Math.round(bounds.left);
+                const y = Math.round(bounds.y);
+                const x = Math.round(bounds.x);
                 abExtensions.openPopup(winId, extension.id, x, y);
               },
             }),
           ),
         ),
+    ////////////////////////////////////////////////////////////////////////////
+    // Main menu button
     btnIcon(BtnMenu, {
       classNames: ['text-white'],
       onClick: () => abMenu.contextMenu(winId, 'main'),

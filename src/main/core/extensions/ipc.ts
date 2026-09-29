@@ -52,7 +52,7 @@ export function setupExtensionsIPC(browser: Browser) {
     'extensions:open-popup',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['urlbar'])],
+    [windowChecker],
     async ({ win, winId, extensionId, x, y }) => {
       const selectedTab = win.selectedTab;
       if (!selectedTab) {

@@ -251,7 +251,7 @@ export class Window extends UIWindow {
 
     this.selectTab(tabData.tab.id);
 
-    this.browser.eventsChannel.emit('window:tab-did-resume', this, tabData.tab);
+    this.browser.eventsChannel.emit('window:tab-did-resume', this, tabData);
   }
 
   async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {

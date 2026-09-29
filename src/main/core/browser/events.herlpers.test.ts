@@ -258,7 +258,10 @@ describe('coalesced refresh', () => {
     vi.runAllTimers();
 
     expect(h.refreshURLBar).toHaveBeenCalledTimes(1);
-    expect(h.refreshURLBar).toHaveBeenCalledWith(window, { id: 10 });
+    expect(h.refreshURLBar).toHaveBeenCalledWith(
+      window,
+      expect.objectContaining({ tab: { id: 10 } }),
+    );
     expect(h.refreshOneTab).toHaveBeenCalledTimes(1);
   });
 
