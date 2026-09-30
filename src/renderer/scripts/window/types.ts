@@ -5,6 +5,7 @@ import type {
   IExtension,
   IAppUpdaterInfo,
   IDesktop,
+  ITabContainer,
 } from '~/types';
 
 export interface IWindowState extends ILayoutData {
@@ -14,6 +15,7 @@ export interface IWindowState extends ILayoutData {
   urlbar: IURLTabData;
   version: IAppUpdaterInfo | null;
   desktops: IDesktop[];
+  tabContainers: ITabContainer[];
 }
 
 export interface IWindowBounds {

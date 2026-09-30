@@ -33,6 +33,7 @@ import Layout from '#/layouts/Base.astro';
   document.title = t['pages:window.title'];
 
   const renderer = new Renderer(h('div', {})).render('window-container');
+
   let state: IWindowState = {
     theme: { primary: '#2b7fff', secondary: '#1c398e', degrees: 238 },
     areaMaximized: searchParams.get('areaMaximized') === 'true',
@@ -45,6 +46,7 @@ import Layout from '#/layouts/Base.astro';
     extensions: [],
     version: null,
     desktops: [],
+    tabContainers: [],
     urlbar: {
       canGoBack: false,
       canGoForward: false,
@@ -95,6 +97,7 @@ import Layout from '#/layouts/Base.astro';
   }
 
   state.desktops = await abDesktops.all(winId);
+  state.tabContainers = await abTabs.getTabContainers(winId);
   renderContent();
 
   abDesktops.onRefresh((_event, desktops) => {
@@ -110,7 +113,7 @@ import Layout from '#/layouts/Base.astro';
     loadShortcuts();
   });
 
-  function renderContent() {
+  async function renderContent() {
     const bounds = calculateBounds(state);
 
     const activeTabStyle = state.selectedTabBounds
@@ -141,7 +144,7 @@ import Layout from '#/layouts/Base.astro';
           class: state.areaMaximized ? 'hidden' : 'absolute',
           style: bounds.sidebar,
         },
-        renderSidebar(winId, state, t),
+        await renderSidebar(winId, state, t),
       ),
       h(
         'div',

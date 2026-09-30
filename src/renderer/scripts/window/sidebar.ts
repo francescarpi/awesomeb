@@ -8,12 +8,13 @@ import BtnSidebar from '#/icons/sidebar.svg?raw';
 import BtnNewTab from '#/icons/add-circle.svg?raw';
 import BtnPerformCommand from '#/icons/command.svg?raw';
 import { renderDesktops } from './desktops';
+// import { renderTabContainers } from './tabcontainers';
 
-export function renderSidebar(
+export async function renderSidebar(
   winId: TWindowId,
   state: IWindowState,
   t: Record<string, string>,
-): VNode {
+): Promise<VNode> {
   return h(
     'div',
     {
@@ -73,6 +74,7 @@ export function renderSidebar(
       },
       renderDesktops(state),
     ),
+    h('section', { class: 'flex-1 overflow-y-auto bg-black', id: 'sidebar-tabcontainers' }),
   );
 }
 
