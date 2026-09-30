@@ -23,8 +23,9 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderNavUrl,
     renderExtensions,
     renderMenuButton,
+    updateLayout,
   } from '#/scripts/window';
-  import type { IURLTabData } from '~/types';
+  import type { IURLTabData, ILayoutData } from '~/types';
 
   const { winId } = getSearchParams();
 
@@ -52,6 +53,8 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   );
 
   renderMenuButton(winId, menuBtnRenderer);
+
+  abWindow.onRefreshLayoutData((_e, data: ILayoutData) => updateLayout(data));
 
   // -------- DEPRECATED FROM HERE ------------------------------------------------------------
 

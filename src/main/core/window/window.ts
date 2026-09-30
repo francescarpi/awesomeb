@@ -2,7 +2,7 @@ import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
-import { MAX_SPLIT_TABS } from '~/constants';
+import { MAX_SPLIT_TABS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import {
   IContextualModalParams,
   IDesCon,
@@ -405,10 +405,7 @@ export class Window extends UIWindow {
     }
 
     for (const view of this.views) {
-      if (
-        !view.visible &&
-        !['tab-switcher', 'tab-marks', 'urlbar', 'sidebar'].includes(view.viewId)
-      ) {
+      if (!view.visible && !['tab-switcher', 'tab-marks', 'urlbar'].includes(view.viewId)) {
         continue;
       }
       view.refreshBounds(this);
@@ -417,11 +414,14 @@ export class Window extends UIWindow {
 
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
-    this.moveViewToTop('sidebar');
   }
 
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
+  }
+
+  get sidebarWidth(): number {
+    return this.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH;
   }
 
   showTabSwitcher() {

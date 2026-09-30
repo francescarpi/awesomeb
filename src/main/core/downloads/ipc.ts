@@ -17,7 +17,7 @@ export function setupDownloadsIPC(browser: Browser) {
     'downloads:open-page',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar', 'contextual-modal'])],
+    [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
     async ({ win }) => {
       win.closeContextualModal();
 

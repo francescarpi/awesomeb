@@ -19,7 +19,7 @@ export function setupCommandsIPC(browser: Browser) {
     [
       multiConditional(
         [[(args) => typeof args.winId === 'number', [windowChecker]]],
-        [modalChecker, viewChecker.bind(null, ['sidebar', 'tab-switcher'])],
+        [modalChecker, viewChecker.bind(null, ['tab-switcher'])],
       ),
     ],
     async ({ trigger, params, win, event }) => {

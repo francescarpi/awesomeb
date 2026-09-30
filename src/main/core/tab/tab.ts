@@ -8,7 +8,7 @@ import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
 import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
-import { Sidebar, UIView } from '@/ui';
+import { UIView } from '@/ui';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
 import { isViewSourceUrl } from './helpers';
 import { LAYOUT_MARGIN, URLBAR_HEIGHT } from '~/constants';
@@ -102,9 +102,7 @@ export class Tab extends UIView {
 
     this.webContentsView.setBorderRadius(12);
 
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-
-    let x = sidebar.left + sidebar.width;
+    let x = LAYOUT_MARGIN + window.sidebarWidth;
     let y = LAYOUT_MARGIN + URLBAR_HEIGHT + LAYOUT_MARGIN;
     let width = bounds.width - x - LAYOUT_MARGIN;
     let height = bounds.height - y - LAYOUT_MARGIN;
@@ -146,6 +144,7 @@ export class Tab extends UIView {
     }
 
     // Apply bounds
+    console.log(x, y, width, height);
     this.webContentsView.setBounds({
       x,
       y,

@@ -1,8 +1,8 @@
 import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionState } from '@/core';
-import { Sidebar, TabSwitcher, TabMarks } from '@/ui';
+import { TabSwitcher, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
-import { INTERNAL_PROTOCOL, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
+import { INTERNAL_PROTOCOL } from '~/constants';
 import type {
   ITheme,
   TFindInPageId,
@@ -25,8 +25,7 @@ export class BrowserToRenderer {
 
   refreshSelectedDesktop(window: Window) {
     const desktop = window.selectedDesktop;
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('desktops:refresh-selected', desktop.id);
+    window.webContents.send('desktops:refresh-selected', desktop.id);
   }
 
   refreshThemes(window: Window, desktop: Desktop) {
@@ -39,19 +38,17 @@ export class BrowserToRenderer {
   }
 
   refreshTabContainers(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
-    sidebar.send('tabs:refresh', tabContainers);
+    window.webContents.send('tabs:refresh', tabContainers);
   }
 
   refreshOneTab(window: Window, desktop: Desktop, tab: Tab) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const selectedTabContainer = desktop.selectedTabContainer;
     // No selected container → no `selected` flag to compute. Skip the IPC
     // rather than sending a refresh that would mark every other tab as
     // unselected for one tick (the next tabs:refresh will correct it).
     if (!selectedTabContainer) return;
-    sidebar.send(
+    window.webContents.send(
       'tabs:refresh-one',
       this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
     );
@@ -76,8 +73,7 @@ export class BrowserToRenderer {
   refreshDownloads() {
     const data = this._browser.renderer.downloads();
     for (const window of this._browser.windows) {
-      const sidebar = window.getView<Sidebar>('sidebar')!;
-      sidebar.send('downloads:refresh', data);
+      window.webContents.send('downloads:refresh', data);
 
       const contextualModal = window.getView<UIContextualModal>('contextual-modal');
       if (contextualModal) {
@@ -96,8 +92,7 @@ export class BrowserToRenderer {
 
   refreshDownloadCompleted() {
     for (const window of this._browser.windows) {
-      const sidebar = window.getView<Sidebar>('sidebar')!;
-      sidebar.send('downloads:completed');
+      window.webContents.send('downloads:completed');
     }
   }
 
@@ -119,7 +114,7 @@ export class BrowserToRenderer {
       hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
-      sidebarWidth: window.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH,
+      sidebarWidth: window.sidebarWidth,
     };
 
     window.webContents.send('window:refresh-layout-data', data);
@@ -172,12 +167,11 @@ export class BrowserToRenderer {
   refreshMediaSession(win: Window) {
     const selectedTab = win.selectedTab;
     const session = this._browser.mediaManager.lastSession;
-    const sidebar = win.getView<Sidebar>('sidebar')!;
     if (!session || !session.data || (selectedTab && selectedTab.tab.id === session.tabId)) {
-      sidebar.send('media:session-update', null);
+      win.webContents.send('media:session-update', null);
       return;
     }
-    sidebar.send('media:session-update', this.mediaSessionData(session));
+    win.webContents.send('media:session-update', this.mediaSessionData(session));
   }
 
   refreshVersionAvailable(win: Window, data: IAppUpdaterInfo) {

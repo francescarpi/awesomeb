@@ -5,7 +5,7 @@ import EventEmitter from 'events';
 import { partitions, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Sidebar, TabSwitcher, TabMarks } from './views';
+import { TabSwitcher, TabMarks } from './views';
 import log from 'electron-log';
 import type { TWindowId } from '~/types';
 
@@ -66,7 +66,6 @@ export class UIWindow {
   }
 
   private buildLayout() {
-    this.addView(new Sidebar(this.winId));
     this.addView(new TabSwitcher(this.winId));
     this.addView(new TabMarks(this.winId));
   }
