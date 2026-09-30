@@ -1,6 +1,5 @@
-import { type VNode, h, btnIcon, c } from '#/scripts';
-import type { IWindowState } from './types';
-import type { TWindowId } from '~/types';
+import { h, btnIcon, c, Renderer } from '#/scripts';
+import type { TWindowId, IURLTabData, IExtension } from '~/types';
 import BtnBack from '#/icons/back.svg?raw';
 import BtnForward from '#/icons/forward.svg?raw';
 import BtnReload from '#/icons/reload.svg?raw';
@@ -11,14 +10,24 @@ import BtnCopy from '#/icons/copy.svg?raw';
 import BtnSplit from '#/icons/split.svg?raw';
 import BtnMenu from '#/icons/menu.svg?raw';
 
-export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
-  const { urlbar } = state;
-  const showSafe = urlbar.hasURL && !urlbar.loading && urlbar.safe;
-  const showUnsafe = urlbar.hasURL && !urlbar.loading && !urlbar.safe;
+export function renderNavUrl(
+  winId: TWindowId,
+  renderer: Renderer,
+  data: IURLTabData = {
+    safe: false,
+    url: '',
+    loading: false,
+    tabId: -1,
+    canGoBack: false,
+    canGoForward: false,
+    hasURL: false,
+    hasSplit: false,
+  },
+) {
+  const showSafe = data.hasURL && !data.loading && data.safe;
+  const showUnsafe = data.hasURL && !data.loading && !data.safe;
 
-  return h(
-    'div',
-    { class: 'flex items-center gap-2 w-full h-full' },
+  renderer.update([
     ////////////////////////////////////////////////////////////////////////////
     // Navigation butons
     h(
@@ -29,22 +38,22 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
         { class: 'flex items-center gap-2' },
         btnIcon(BtnBack, {
           classNames: ['text-white'],
-          disabled: !urlbar.canGoBack,
+          disabled: !data.canGoBack,
           onClick: () => abCommands.perform(winId, 'go-back'),
         }),
         btnIcon(BtnForward, {
           classNames: ['text-white'],
-          disabled: !urlbar.canGoForward,
+          disabled: !data.canGoForward,
           onClick: () => abCommands.perform(winId, 'go-forward'),
         }),
-        urlbar.loading
+        data.loading
           ? btnIcon(BtnCancel, {
               classNames: ['text-white'],
               onClick: () => abCommands.perform(winId, 'stop-tab'),
             })
           : btnIcon(BtnReload, {
               classNames: ['text-white'],
-              disabled: !urlbar.hasURL,
+              disabled: !data.hasURL,
               onClick: () => abCommands.perform(winId, 'reload-tab'),
             }),
       ),
@@ -58,7 +67,7 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
         'div',
         { class: 'flex gap-2 items-center w-full h-full' },
         h('span', {
-          class: c('loading', 'loading-spinner', 'loading-xs', !urlbar.loading && 'hidden'),
+          class: c('loading', 'loading-spinner', 'loading-xs', !data.loading && 'hidden'),
         }),
         h('div', {
           innerHTML: SafeIcon,
@@ -73,7 +82,7 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
             !showSafe && 'hidden',
           ),
           onclick: () => {
-            if (urlbar.safe) {
+            if (data.safe) {
               abModal.open(winId, 'certificate-info');
             }
           },
@@ -91,10 +100,10 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
         }),
         h('input', {
           class: 'rounded-lg text-sm pr-2 cursor-pointer w-full outline-none',
-          value: urlbar.url,
+          value: data.url,
           readonly: true,
           onclick: () => {
-            if (urlbar.hasURL) {
+            if (data.hasURL) {
               abModal.open(winId, 'edit-url');
             } else {
               abModal.open(winId, 'new-tab');
@@ -107,40 +116,44 @@ export function renderUrlBar(winId: TWindowId, state: IWindowState): VNode {
     // Copy url button
     btnIcon(BtnCopy, {
       classNames: ['text-white'],
-      disabled: !urlbar.hasURL,
+      disabled: !data.hasURL,
       onClick: () => abCommands.perform(winId, 'copy-url'),
     }),
     ////////////////////////////////////////////////////////////////////////////
     // Split menu button (if there is split view)
     btnIcon(BtnSplit, {
-      classNames: ['text-white', urlbar.hasSplit ? '' : 'hidden'],
-      disabled: !urlbar.hasURL,
+      classNames: ['text-white', data.hasSplit ? '' : 'hidden'],
+      disabled: !data.hasURL,
       onClick: () => abMenu.contextMenu(winId, 'split'),
     }),
-    ////////////////////////////////////////////////////////////////////////////
-    // Extensions list
-    state.extensions.length === 0
-      ? h('div', {})
-      : h(
-          'div',
-          { class: 'flex gap-2' },
-          ...state.extensions.map((extension) =>
-            h('img', {
-              src: extension.icon,
-              class: `w-5 h-5 rounded object-cover cursor-pointer p-0.5 border border-black/30 bg-white/80 hover:bg-white`,
-              onclick: (e) => {
-                const img = e.target as HTMLImageElement;
-                const bounds = img.getBoundingClientRect();
+  ]);
+}
 
-                const y = Math.round(bounds.y);
-                const x = Math.round(bounds.x);
-                abExtensions.openPopup(winId, extension.id, x, y);
-              },
-            }),
-          ),
-        ),
-    ////////////////////////////////////////////////////////////////////////////
-    // Main menu button
+export function renderExtensions(
+  winId: TWindowId,
+  renderer: Renderer,
+  extensions: IExtension[] = [],
+) {
+  renderer.update(
+    extensions.map((extension) =>
+      h('img', {
+        src: extension.icon,
+        class: `w-5 h-5 rounded object-cover cursor-pointer p-0.5 border border-black/30 bg-white/80 hover:bg-white`,
+        onclick: (e) => {
+          const img = e.target as HTMLImageElement;
+          const bounds = img.getBoundingClientRect();
+
+          const y = Math.round(bounds.y);
+          const x = Math.round(bounds.x);
+          abExtensions.openPopup(winId, extension.id, x, y);
+        },
+      }),
+    ),
+  );
+}
+
+export function renderMenuButton(winId: TWindowId, renderer: Renderer) {
+  renderer.update(
     btnIcon(BtnMenu, {
       classNames: ['text-white'],
       onClick: () => abMenu.contextMenu(winId, 'main'),

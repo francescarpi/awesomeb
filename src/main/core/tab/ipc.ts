@@ -2,7 +2,6 @@ import { Browser, permissions, Window, FindInPage } from '@/core';
 import {
   createHandler,
   windowChecker,
-  viewChecker,
   findInPageChecker,
   tabChecker,
   certificateErrorChecker,
