@@ -26,6 +26,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     updateLayout,
     renderWindowButtons,
     renderActions,
+    renderDesktops,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
@@ -37,6 +38,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const menuBtnRenderer = new Renderer(h('div', {})).render('url-menu-btn-container');
   const windowBtnsRenderer = new Renderer(h('div', {})).render('sidebar-window-btns');
   const actionsRenderer = new Renderer(h('div', {})).render('sidebar-actions');
+  const desktopsRenderer = new Renderer(h('div', {})).render('sidebar-desktops');
 
   abDesktops.getTheme(winId).then((theme) => {
     applyTheme(theme);
@@ -59,6 +61,10 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   renderMenuButton(winId, menuBtnRenderer);
   renderWindowButtons(winId, windowBtnsRenderer);
   renderActions(winId, actionsRenderer);
+
+  const desktops = await abDesktops.all(winId);
+  renderDesktops(desktopsRenderer, desktops);
+  abDesktops.onRefresh((_event, desktops) => renderDesktops(desktopsRenderer, desktops));
 
   abWindow.onRefreshLayoutData((_e, data: ILayoutData) => updateLayout(data));
 
