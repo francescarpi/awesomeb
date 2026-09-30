@@ -12,6 +12,7 @@ export function btnIcon(
     id?: string;
     dataAction?: string;
     disabled?: boolean;
+    key?: string;
   },
 ): VNode {
   const {
@@ -21,6 +22,7 @@ export function btnIcon(
     size = 5.5,
     dataAction,
     disabled = false,
+    key,
   } = props || {};
   let numClicks = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -50,10 +52,12 @@ export function btnIcon(
       'div',
       {
         class: buttonClass,
+        style: 'app-region: no-drag',
         id: props?.id,
         'data-action': dataAction,
         innerHTML: icon,
         onClick,
+        key,
       },
       '',
     );
@@ -63,9 +67,11 @@ export function btnIcon(
     'div',
     {
       class: buttonClass,
+      style: 'app-region: no-drag',
       id: props?.id,
       innerHTML: icon,
       disabled: props?.disabled || false,
+      key,
       onClick: (e: Event) => {
         e.stopPropagation();
         if (disabled) {

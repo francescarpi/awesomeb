@@ -33,4 +33,10 @@ export function updateLayout(data: ILayoutData) {
   } else {
     tabSelected.classList.add('hidden');
   }
+
+  if (data.sidebarCollapsed) {
+    sidebarContainer.classList.add('collapsed');
+  } else {
+    sidebarContainer.classList.remove('collapsed');
+  }
 }
