@@ -11,11 +11,11 @@ export async function renderShortcuts(winId: TWindowId, renderer: Renderer) {
       shortcut?.key?.trim(),
     );
 
-    const result = shortcuts.map(
+    const shortcutsStringList = shortcuts.map(
       (shortcut) => `${acceleratorToDisplay(shortcut.key, platform)} ${shortcut.label}`,
     );
 
-    renderer.update(h('div', {}, ...result.map((s) => h('div', {}, s))));
+    renderer.update(shortcutsStringList.map((s) => h('div', { key: s }, s)));
   } catch (error) {
     console.error('Failed to load active shortcuts', error);
   }
