@@ -108,8 +108,10 @@ export class Tab extends UIView {
     let height = bounds.height - y - LAYOUT_MARGIN;
 
     if (window.areaMaximized) {
+      y = LAYOUT_MARGIN;
       x = LAYOUT_MARGIN;
       width = bounds.width - LAYOUT_MARGIN * 2;
+      height = bounds.height - LAYOUT_MARGIN * 2;
     }
 
     // Split tabs calculation
