@@ -3,15 +3,16 @@ import Base from '../../layouts/Base.astro';
 
 interface Props {
   width?: string;
+  height?: string;
 }
 
-const { width = 'w-87.5' } = Astro.props;
+const { width = 'w-87.5', height = '' } = Astro.props;
 ---
 
 <Base noDrag>
   <div class="fixed inset-0" id="overlay"></div>
   <div
-    class={`bg-base-200 text-base-content ${width} absolute rounded-lg p-2 hidden border border-base-content dropshadow-md`}
+    class={`bg-base-200 text-base-content ${width} ${height} absolute rounded-lg p-2 hidden border border-base-content dropshadow-md`}
     id="wrapper"
   >
     <div id="content" class="text-sm p-4">

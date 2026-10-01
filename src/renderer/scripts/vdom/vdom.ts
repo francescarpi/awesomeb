@@ -483,29 +483,99 @@ function firstSurviving(
   return null;
 }
 
-export class Renderer {
-  private el: HTMLElement | Text | null = null;
-  private currentVNode: VNode;
+/**
+ * Patch a container's children using a CHILDREN patch, treating the container
+ * itself as the parent. Mirrors the `CHILDREN` case of `patch()` but operates
+ * on the host container rather than on a single root element — this is how
+ * fragment-level (multi-root) updates are applied to the DOM.
+ */
+function patchRoots(container: HTMLElement, p: Patch): void {
+  if (p.type !== 'CHILDREN') return;
 
-  constructor(initialVNode: VNode) {
-    this.currentVNode = initialVNode;
+  // Model array = fixed-length snapshot of the ORIGINAL child list. All ops
+  // use old-space indices against it, so live-DOM drift is impossible.
+  const model = Array.from(container.childNodes) as (HTMLElement | Text | null)[];
+
+  // Phase 1 — remove ops end→start (removing from the live childNodes shifts
+  // later indices, so we must go from the highest index down).
+  const removes = p.ops
+    .filter((op): op is Extract<ChildrenOp, { op: 'remove' }> => op.op === 'remove')
+    .sort((a, b) => b.index - a.index);
+  for (const op of removes) {
+    const node = model[op.index];
+    if (node) container.removeChild(node);
+    model[op.index] = null;
+  }
+
+  // Phase 2 — patch + insert ops ascending (order-independent: anchors
+  // reference surviving original-space nodes).
+  const phase2 = p.ops.filter((op) => op.op !== 'remove').sort((a, b) => a.index - b.index);
+  for (const op of phase2) {
+    if (op.op === 'patch') {
+      const node = model[op.index];
+      if (node) {
+        // REPLACE returns the new node — write it back so later inserts
+        // anchor to the *replaced* node, not the stale original.
+        model[op.index] = patch(node, op.patch) as HTMLElement | Text;
+      } else if (process.env.NODE_ENV !== 'production') {
+        // A patch op whose index was already nulled by a prior remove.
+        // diff() never emits this combination in normal use; warn loudly
+        // in dev so a future refactor that does is caught immediately.
+        console.warn(
+          '[vdom] patch op at index',
+          op.index,
+          'was orphaned by a prior remove in the same patch',
+        );
+      }
+    } else {
+      // Insert: anchor = first surviving model entry at j >= index.
+      const anchor = firstSurviving(model, op.index);
+      container.insertBefore(render(op.vnode), anchor ?? null);
+    }
+  }
+}
+
+export class Renderer {
+  // Multi-root state — always normalized to arrays internally.
+  private els: (HTMLElement | Text)[] = [];
+  private currentVNodes: VNode[] = [];
+  private container: HTMLElement | null = null;
+
+  constructor(initialVNode: VNode | VNode[]) {
+    this.currentVNodes = Array.isArray(initialVNode) ? initialVNode : [initialVNode];
+  }
+
+  // Backwards-compat: existing single-root consumers read `renderer.el` and
+  // `renderer.currentVNode`. We expose the first root so their code keeps
+  // working unchanged when there's only one VNode.
+  get el(): HTMLElement | Text | null {
+    return this.els[0] ?? null;
+  }
+
+  get currentVNode(): VNode | null {
+    return this.currentVNodes[0] ?? null;
   }
 
   render(
     containerElementId: string,
     opts?: { onRendered?: () => void; replace?: boolean },
   ): Renderer {
-    this.el = render(this.currentVNode);
     const container = document.getElementById(containerElementId);
     if (!container) {
       throw new Error(`Container element with ID "${containerElementId}" not found`);
     }
+    this.container = container;
 
     if (opts?.replace) {
       container.innerHTML = '';
     }
 
-    container.appendChild(this.el);
+    this.els = [];
+    for (const vnode of this.currentVNodes) {
+      const el = render(vnode);
+      this.els.push(el);
+      container.appendChild(el);
+    }
 
     if (opts?.onRendered) {
       opts.onRendered();
@@ -514,14 +584,23 @@ export class Renderer {
     return this;
   }
 
-  update(newVNode: VNode, opts?: { onUpdated?: () => void }) {
-    if (!this.el) {
+  update(newVNode: VNode | VNode[], opts?: { onUpdated?: () => void }) {
+    if (!this.container) {
       throw new Error('Cannot patch before initial render');
     }
 
-    const domdiff = diff(this.currentVNode, newVNode);
-    this.el = patch(this.el, domdiff);
-    this.currentVNode = newVNode;
+    // Normalize at the boundary; internally we always diff array-vs-array.
+    const next = Array.isArray(newVNode) ? newVNode : [newVNode];
+    // diffChildren reuses the full keyed + unkeyed path against the root list;
+    // for the single→single case it produces a single CHILDREN {patch} op,
+    // which patchRoots applies against the container's childNodes — same
+    // observable result as the old single-root `patch(el, diff(...))` flow.
+    const domdiff = diffChildren(this.currentVNodes, next);
+    patchRoots(this.container, domdiff);
+    this.currentVNodes = next;
+    // Re-sync `els` from the live container so `renderer.el` reflects the
+    // (possibly REPLACEd) first root, and any future reads stay correct.
+    this.els = Array.from(this.container.childNodes) as (HTMLElement | Text)[];
 
     if (opts?.onUpdated) {
       opts.onUpdated();

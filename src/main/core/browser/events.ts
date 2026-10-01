@@ -1,4 +1,4 @@
-import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo } from '~/types';
+import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo, IDesConTab } from '~/types';
 import { Browser, Window, Desktop, Tab, TabContainer, notification, isViewSourceUrl } from '@/core';
 import { t } from '~/i18n';
 import log from 'electron-log';
@@ -33,14 +33,13 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'window:selected-desktop-did-change',
     async (window: Window, desktop: Desktop) => {
-      const selectedTab = desktop.selectedTab;
+      const selectedTab = window.selectedTab?.desktop.id === desktop.id ? window.selectedTab : null;
 
       browser.toRenderer.refreshDesktops(window);
       browser.toRenderer.refreshSelectedDesktop(window);
       browser.toRenderer.refreshThemes(window, desktop);
       browser.toRenderer.refreshTabContainers(window);
-      browser.toRenderer.refreshURLBar(window, selectedTab?.tab || null);
-      browser.toRenderer.refreshTabNavigation(window, selectedTab?.tab || undefined);
+      browser.toRenderer.refreshURLBar(window, selectedTab);
       browser.toRenderer.refreshExtensions(window);
       browser.toRenderer.refreshMediaSession(window);
       browser.toRenderer.refreshTabSwitcher(window);
@@ -66,12 +65,13 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'window:desktop-did-create',
     async (window: Window, desktop: Desktop) => {
+      const selectedTab = window.selectedTab?.desktop.id === desktop.id ? window.selectedTab : null;
+
       browser.toRenderer.refreshDesktops(window);
       browser.toRenderer.refreshSelectedDesktop(window);
       browser.toRenderer.refreshThemes(window, desktop);
       browser.toRenderer.refreshTabContainers(window);
-      browser.toRenderer.refreshURLBar(window, desktop.selectedTab?.tab || null);
-      browser.toRenderer.refreshTabNavigation(window, desktop.selectedTab?.tab || undefined);
+      browser.toRenderer.refreshURLBar(window, selectedTab);
       browser.toRenderer.refreshExtensions(window);
       browser.toRenderer.refreshLayoutData(window);
 
@@ -103,39 +103,37 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:selected-tab-did-change', async (window: Window, tab: Tab) => {
-    browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainers(window);
-    browser.toRenderer.refreshURLBar(window, tab);
-    browser.toRenderer.refreshDesktops(window);
-    browser.toRenderer.refreshSelectedDesktop(window);
-    browser.toRenderer.refreshExtensions(window);
-    browser.toRenderer.refreshShowSplitMenu(window);
-    browser.toRenderer.refreshLayoutData(window);
-    browser.toRenderer.refreshTabNavigation(window, tab);
-    browser.toRenderer.refreshMediaSession(window);
+  browser.eventsChannel.on(
+    'window:selected-tab-did-change',
+    async (window: Window, tabData: IDesConTab) => {
+      browser.toRenderer.refreshTabSwitcher(window);
+      browser.toRenderer.refreshTabContainers(window);
+      browser.toRenderer.refreshURLBar(window, tabData);
+      browser.toRenderer.refreshDesktops(window);
+      browser.toRenderer.refreshSelectedDesktop(window);
+      browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshLayoutData(window);
+      browser.toRenderer.refreshMediaSession(window);
+      browser.toRenderer.refreshThemes(window, tabData.desktop);
 
-    const result = browser.getTab(tab.id)!;
-    browser.toRenderer.refreshThemes(window, result.desktop);
-
-    browser.refreshMainMenu();
-  });
+      browser.refreshMainMenu();
+    },
+  );
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tab: Tab) => {
+  browser.eventsChannel.on('window:tab-did-resume', async (window: Window, tabData: IDesConTab) => {
     const refreshIfSelected = () => {
-      if (window.selectedTab?.tab.id === tab.id) {
-        browser.toRenderer.refreshShowSplitMenu(window);
-        browser.toRenderer.refreshTabNavigation(window, tab);
-        browser.toRenderer.refreshURLBar(window, tab);
+      const { selectedTab } = window;
+      if (selectedTab?.tab.id === tabData.tab.id) {
+        browser.toRenderer.refreshURLBar(window, selectedTab);
       }
     };
 
-    if (isViewSourceUrl(tab.url)) {
-      tab.loadURL(tab.url!).then(refreshIfSelected);
+    if (isViewSourceUrl(tabData.tab.url)) {
+      tabData.tab.loadURL(tabData.tab.url!).then(refreshIfSelected);
     }
 
-    tab.loadHistoryOrURL().then(refreshIfSelected);
+    tabData.tab.loadHistoryOrURL().then(refreshIfSelected);
   });
 
   //--------------------------------------------------------------------------------------
@@ -144,7 +142,6 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
-    browser.toRenderer.refreshTabNavigation(window);
     browser.toRenderer.refreshExtensions(window);
     browser.toRenderer.refreshLayoutData(window);
     browser.refreshMainMenu();
@@ -170,7 +167,6 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshTabContainers(window);
     browser.toRenderer.refreshURLBar(window, null);
     browser.toRenderer.refreshDesktops(window);
-    browser.toRenderer.refreshTabNavigation(window);
     browser.toRenderer.refreshExtensions(window);
     browser.toRenderer.refreshLayoutData(window);
     browser.toRenderer.refreshTabSwitcher(window);
@@ -185,21 +181,22 @@ export function registerBrowserEvents(browser: Browser) {
     browser.toRenderer.refreshDesktops(window);
     browser.toRenderer.refreshExtensions(window);
     browser.toRenderer.refreshLayoutData(window);
-    browser.toRenderer.refreshShowSplitMenu(window);
     browser.refreshMainMenu();
   });
 
   // A profile change replaces a tab without going through the close/open flow.
-  browser.eventsChannel.on('browser:tab-did-replace', async (window: Window, tab: Tab) => {
-    browser.toRenderer.refreshTabSwitcher(window);
-    browser.toRenderer.refreshTabContainers(window);
-    browser.toRenderer.refreshURLBar(window, window.selectedTab?.tab || null);
-    browser.toRenderer.refreshDesktops(window);
-    browser.toRenderer.refreshExtensions(window);
-    browser.toRenderer.refreshLayoutData(window);
-    browser.toRenderer.refreshTabNavigation(window, tab);
-    browser.refreshMainMenu();
-  });
+  browser.eventsChannel.on(
+    'browser:tab-did-replace',
+    async (window: Window, tabData: IDesConTab) => {
+      browser.toRenderer.refreshTabSwitcher(window);
+      browser.toRenderer.refreshTabContainers(window);
+      browser.toRenderer.refreshURLBar(window, tabData);
+      browser.toRenderer.refreshDesktops(window);
+      browser.toRenderer.refreshExtensions(window);
+      browser.toRenderer.refreshLayoutData(window);
+      browser.refreshMainMenu();
+    },
+  );
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on(
@@ -287,7 +284,6 @@ export function registerBrowserEvents(browser: Browser) {
         browser.toRenderer.refreshDesktops(win);
         browser.toRenderer.refreshTabContainers(win);
         browser.toRenderer.refreshURLBar(win, null);
-        browser.toRenderer.refreshShowSplitMenu(win);
         browser.toRenderer.refreshLayoutData(win);
       }
       await browser.refreshMainMenu();
@@ -359,20 +355,19 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('tabpreview:split', async (window: Window, tab: Tab) => {
+  browser.eventsChannel.on('tabpreview:split', async (window: Window, tabData: IDesConTab) => {
     browser.toRenderer.refreshTabSwitcher(window);
     browser.toRenderer.refreshTabContainers(window);
-    browser.toRenderer.refreshURLBar(window, tab);
+    browser.toRenderer.refreshURLBar(window, tabData);
     browser.toRenderer.refreshDesktops(window);
-    browser.toRenderer.refreshShowSplitMenu(window);
     browser.refreshMainMenu();
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('tabpreview:accepted', async (window: Window, tab: Tab) => {
+  browser.eventsChannel.on('tabpreview:accepted', async (window: Window, tabData: IDesConTab) => {
     browser.toRenderer.refreshTabSwitcher(window);
     browser.toRenderer.refreshTabContainers(window);
-    browser.toRenderer.refreshURLBar(window, tab);
+    browser.toRenderer.refreshURLBar(window, tabData);
     browser.toRenderer.refreshDesktops(window);
     browser.refreshMainMenu();
   });
@@ -426,7 +421,6 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on('tabcontainer:did-unsplit', async (win: Window, _desktop: Desktop) => {
     browser.toRenderer.refreshTabContainers(win);
     browser.toRenderer.refreshTabSwitcher(win);
-    browser.toRenderer.refreshShowSplitMenu(win);
   });
 
   //--------------------------------------------------------------------------------------

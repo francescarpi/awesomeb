@@ -1,9 +1,10 @@
-import { UIPageView, UIView, Sidebar, loadPage } from '@/ui';
+import { UIPageView, UIView, loadPage } from '@/ui';
 import { Window, Partition, windowOpenHadler, Browser } from '@/core';
 import { TWindowId } from '~/types';
 import { type HandlerDetails } from 'electron';
 import { MAX_PREFERRED_SIZE_CHANGES, PREFERRED_SIZE_BURST_QUIET_PERIOD } from './constants';
 import type { PopupPreferredSizeGuard } from './types';
+import { EXTENSION_ICON_SIZE, EXTENSION_POPUP_GAP } from '~/constants';
 
 export class ExtensionPopupOverlay extends UIPageView {
   constructor(winId: TWindowId) {
@@ -106,11 +107,10 @@ export class ExtensionPopup extends UIView {
     this.preferredSizeGuard = undefined;
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(_window: Window) {
     const bounds = this.webContentsView.getBounds();
-    const sidebar = window.getView<Sidebar>('sidebar')!;
 
-    const x = this.x + sidebar.bounds.width - bounds.width + 16;
+    const x = this.x + EXTENSION_ICON_SIZE + EXTENSION_POPUP_GAP - bounds.width;
     const y = this.y + 30;
 
     this.webContentsView.setBounds({

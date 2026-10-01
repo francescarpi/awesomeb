@@ -685,7 +685,7 @@ describe('Window Selecdt Tab', () => {
 
     await window.selectTab(tab.id);
 
-    expect(eventSpy).toHaveBeenCalledWith(window, tab);
+    expect(eventSpy).toHaveBeenCalledWith(window, expect.objectContaining({ tab }));
   });
 
   test('should do nothing when selecting non-existent tab', async () => {
@@ -1326,7 +1326,7 @@ describe('Window Open Closed Tab', () => {
 
     window.openClosedTab(tab.id);
 
-    expect(eventSpy).toHaveBeenCalledWith(window, tab);
+    expect(eventSpy).toHaveBeenCalledWith(window, expect.objectContaining({ tab }));
   });
 
   test('should return silently when reopening a non-existent tab', async () => {
@@ -1455,7 +1455,7 @@ describe('Window Open Closed Tab', () => {
     window.openClosedTab(third!.tab.id);
 
     expect(third!.tab.isClosed).toBe(false);
-    expect(eventSpy).toHaveBeenCalledWith(window, third!.tab);
+    expect(eventSpy).toHaveBeenCalledWith(window, expect.objectContaining({ tab: third!.tab }));
     expect(container.activeTabsLength).toBe(MAX_SPLIT_TABS);
 
     const viewsForReopenedTab = window.views.filter((v) =>

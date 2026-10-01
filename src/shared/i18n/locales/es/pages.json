@@ -371,7 +371,10 @@
   "window": {
     "newTabSuffix": "abrir una nueva pestaña",
     "commandsSuffix": "abrir la paleta de comandos",
-    "title": "Ventana"
+    "title": "Ventana",
+    "updateAvailable": "Actualización disponible",
+    "updateProgress": "Progreso {{percent}}%",
+    "updateInstall": "Salir e instalare"
   },
   "tabSwitcher": {
     "noTabs": "Sin pestañas...",

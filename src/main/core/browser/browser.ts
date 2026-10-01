@@ -295,7 +295,12 @@ export class Browser {
       desktop.selectTabContainer(tabContainer.id);
     }
 
-    this.eventsChannel.emit('browser:tab-did-replace', window, replacement);
+    this.eventsChannel.emit('browser:tab-did-replace', window, {
+      desktop,
+      tabContainer,
+      tab: replacement,
+    });
+
     replacement.loadURL(replacement.url!);
 
     return { window, desktop, tabContainer, tab: replacement };
@@ -659,7 +664,11 @@ export class Browser {
 
     parentTabData.window.renderViews();
 
-    this.eventsChannel.emit('tabpreview:accepted', parentTabData.window, tabPreview.tab);
+    this.eventsChannel.emit('tabpreview:accepted', parentTabData.window, {
+      desktop: parentTabData.desktop,
+      tabContainer: parentTabData.tabContainer,
+      tab: tabPreview.tab,
+    });
   }
 
   splitTabPreview(tabId: TTabId) {
@@ -695,7 +704,11 @@ export class Browser {
 
     parentTabData.window.renderViews();
 
-    this.eventsChannel.emit('tabpreview:split', parentTabData.window, tabPreview.tab);
+    this.eventsChannel.emit('tabpreview:split', parentTabData.window, {
+      desktop: parentTabData.desktop,
+      tabContainer: parentTabData.tabContainer,
+      tab: tabPreview.tab,
+    });
   }
 
   permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {

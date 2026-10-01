@@ -1,9 +1,10 @@
 import EventEmitter from 'events';
 import { TFindInPageAction, TFindInPageId, IFindInPageSearch } from '~/types';
 import type { Result } from 'electron';
-import { MARGIN, UIPageView } from '@/ui';
+import { UIPageView } from '@/ui';
 import { Window, Tab } from '@/core';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
+import { LAYOUT_MARGIN } from '~/constants';
 
 export class FindInPage extends UIPageView {
   private readonly _searches: Map<TFindInPageId, IFindInPageSearch> = new Map();
@@ -61,7 +62,7 @@ export class FindInPage extends UIPageView {
   refreshBounds(_window: Window) {
     this.webContentsView.setBounds({
       x: this.tab.left,
-      y: this.tab.top + this.tab.height + MARGIN,
+      y: this.tab.top + this.tab.height + LAYOUT_MARGIN,
       width: this.tab.width,
       height: FIND_IN_PAGE_VIEW_HEIGHT,
     });

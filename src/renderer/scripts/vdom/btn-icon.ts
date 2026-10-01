@@ -5,22 +5,32 @@ import { c } from './classnames';
 export function btnIcon(
   icon: string,
   props?: {
-    onClick?: () => void;
+    onClick?: (e: Event) => void;
     classNames?: string[];
     doubleConfirmation?: boolean;
     size?: number;
     id?: string;
     dataAction?: string;
+    disabled?: boolean;
+    key?: string;
   },
 ): VNode {
-  const { onClick, classNames, doubleConfirmation, size, dataAction } = props || { size: 5.5 };
+  const {
+    onClick,
+    classNames,
+    doubleConfirmation,
+    size = 5.5,
+    dataAction,
+    disabled = false,
+    key,
+  } = props || {};
   let numClicks = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
   const buttonClass = c(
     'text-base-content',
-    'hover:bg-white/30',
-    'cursor-pointer',
+    'transition-colors',
+    'duration-300',
     'rounded',
     'flex',
     'items-center',
@@ -29,6 +39,7 @@ export function btnIcon(
     '[&>svg]:h-full',
     `w-${size}`,
     `h-${size}`,
+    disabled ? 'opacity-40' : 'hover:bg-white/30 cursor-pointer',
     ...(classNames || []),
   );
 
@@ -41,10 +52,12 @@ export function btnIcon(
       'div',
       {
         class: buttonClass,
+        style: 'app-region: no-drag',
         id: props?.id,
         'data-action': dataAction,
         innerHTML: icon,
         onClick,
+        key,
       },
       '',
     );
@@ -54,10 +67,17 @@ export function btnIcon(
     'div',
     {
       class: buttonClass,
+      style: 'app-region: no-drag',
       id: props?.id,
       innerHTML: icon,
+      disabled: props?.disabled || false,
+      key,
       onClick: (e: Event) => {
         e.stopPropagation();
+        if (disabled) {
+          return;
+        }
+
         if (doubleConfirmation) {
           if (numClicks === 0) {
             (e.target as SVGElement).classList.add('text-error');
@@ -69,10 +89,10 @@ export function btnIcon(
             }, 3000);
           } else if (onClick) {
             if (timeout) clearTimeout(timeout);
-            onClick();
+            onClick(e);
           }
         } else if (onClick) {
-          onClick();
+          onClick(e);
         }
       },
     },

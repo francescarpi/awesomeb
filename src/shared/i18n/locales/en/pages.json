@@ -371,7 +371,10 @@
   "window": {
     "newTabSuffix": "open a new tab",
     "commandsSuffix": "open the commands palette",
-    "title": "Window"
+    "title": "Window",
+    "updateAvailable": "Update available",
+    "updateProgress": "Progress {{percent}}%",
+    "updateInstall": "Quit & Install"
   },
   "tabSwitcher": {
     "noTabs": "No tabs...",

@@ -8,4 +8,5 @@ export interface ILayoutData {
   hasVisibleTabs: boolean;
   selectedTabBounds: Rectangle | null;
   selectedTabPartitionColor: string | null;
+  sidebarWidth: number;
 }

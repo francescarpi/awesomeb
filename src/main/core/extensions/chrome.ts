@@ -64,7 +64,7 @@ export class Chrome {
 
     const safeCallerUrl = sanitizeCallerUrl(callerUrl, extensionId);
 
-    scopeLog.info(`Dispatching ${api}.${method} with args:`, args);
+    scopeLog.info(`Dispatching ${api}.${method} with args:`, JSON.stringify(args));
     const response = await (instance[method] as CallableFunction)(
       window,
       extension,

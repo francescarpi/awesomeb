@@ -42,8 +42,6 @@ import * as tabMove from './tab-move';
 import * as tabDevtools from './tab-devtools';
 import * as tabContainerMoveUp from './tabcontainer-move-up';
 import * as tabContainerMoveDown from './tabcontainer-move-down';
-import * as devtoolsSidebar from './devtools-sidebar';
-import * as devtoolsUrlbar from './devtools-urlbar';
 import * as tabCloseBelow from './tab-close-below';
 import * as tabChangeProfile from './tab-change-profile';
 import * as tabCertificateInfo from './tab-certificate-info';
@@ -120,8 +118,6 @@ const COMMANDS = {
   [tabDevtools.TRIGGER]: tabDevtools.Command,
   [tabContainerMoveUp.TRIGGER]: tabContainerMoveUp.Command,
   [tabContainerMoveDown.TRIGGER]: tabContainerMoveDown.Command,
-  [devtoolsSidebar.TRIGGER]: devtoolsSidebar.Command,
-  [devtoolsUrlbar.TRIGGER]: devtoolsUrlbar.Command,
   [tabCloseBelow.TRIGGER]: tabCloseBelow.Command,
   [tabChangeProfile.TRIGGER]: tabChangeProfile.Command,
   [tabCertificateInfo.TRIGGER]: tabCertificateInfo.Command,
