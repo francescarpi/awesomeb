@@ -5,7 +5,7 @@ import { c } from './classnames';
 export function btnIcon(
   icon: string,
   props?: {
-    onClick?: () => void;
+    onClick?: (e: Event) => void;
     classNames?: string[];
     doubleConfirmation?: boolean;
     size?: number;
@@ -89,10 +89,10 @@ export function btnIcon(
             }, 3000);
           } else if (onClick) {
             if (timeout) clearTimeout(timeout);
-            onClick();
+            onClick(e);
           }
         } else if (onClick) {
-          onClick();
+          onClick(e);
         }
       },
     },

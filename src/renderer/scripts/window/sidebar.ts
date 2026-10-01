@@ -35,7 +35,7 @@ export function renderActions(winId: TWindowId, renderer: Renderer) {
     btnIcon(BtnSidebar, {
       classNames: [
         'text-white',
-        'group-[.collapsed]/sidebar:mt-0.4',
+        'group-[.collapsed]/sidebar:mt-0.5',
         'group-[.collapsed]/sidebar:ml-2',
       ],
       onClick: () => abCommands.perform(winId, 'toggle-sidebar'),

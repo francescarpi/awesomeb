@@ -1,4 +1,4 @@
-import type { ITheme, ILayoutData } from '~/types';
+import type { ITheme, ILayoutData, TDesktopId } from '~/types';
 import { LAYOUT_MARGIN, BORDER_WIDTH } from '~/constants';
 
 export function applyTheme(theme: ITheme) {
@@ -39,4 +39,13 @@ export function updateLayout(data: ILayoutData) {
   } else {
     sidebarContainer.classList.remove('collapsed');
   }
+}
+
+export function updateSelectedDesktopClass(desktopId: TDesktopId) {
+  const sidebarTabs = document.getElementById('sidebar-tabs') as HTMLDivElement;
+  const className = sidebarTabs.className
+    .split(' ')
+    .filter((c) => !c.startsWith('desktop'))
+    .join(' ');
+  sidebarTabs.className = `${className} desktop${desktopId}`;
 }
