@@ -48,14 +48,10 @@ export interface IURLTabData {
   url: string;
   loading: boolean;
   tabId: TTabId;
-}
-
-export interface ITabNavigation {
   canGoBack: boolean;
   canGoForward: boolean;
-  loading: boolean;
   hasURL: boolean;
-  tabId: TTabId;
+  hasSplit: boolean;
 }
 
 export interface ITabSwitcherTab {

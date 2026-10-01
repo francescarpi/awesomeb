@@ -35,7 +35,7 @@ export function createHandler<T extends object>(
   ipcMethod(channel, async (event: IpcMainInvokeEvent, rawArgs: Record<string, unknown>) => {
     scopeLog.debug(
       `[${channel}] received from "${event.sender?.getURL?.()}" with props: `,
-      rawArgs,
+      JSON.stringify(rawArgs),
     );
 
     const args = { ...rawArgs, event } as T;

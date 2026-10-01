@@ -223,7 +223,7 @@ function windowMenu(
       {
         label: toggleSidebar.label,
         accelerator: toggleSidebar.key,
-        enabled: !!window,
+        enabled: !!window && !window.areaMaximized,
         icon: getIcon(EIcon.Sidebar),
         click: async () => {
           if (window) {

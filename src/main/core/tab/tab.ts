@@ -8,9 +8,10 @@ import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
 import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
-import { MARGIN, Sidebar, UIView, URLBar } from '@/ui';
+import { UIView } from '@/ui';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
 import { isViewSourceUrl } from './helpers';
+import { LAYOUT_MARGIN, URLBAR_HEIGHT } from '~/constants';
 
 const scopeLog = log.scope('Tab');
 
@@ -101,17 +102,16 @@ export class Tab extends UIView {
 
     this.webContentsView.setBorderRadius(12);
 
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    const urlbar = window.getView<URLBar>('urlbar')!;
-
-    let x = sidebar.left + sidebar.width;
-    let y = urlbar.top + urlbar.height + MARGIN;
-    let width = bounds.width - x - MARGIN;
-    let height = bounds.height - y - MARGIN;
+    let x = LAYOUT_MARGIN + window.sidebarWidth;
+    let y = LAYOUT_MARGIN + URLBAR_HEIGHT + LAYOUT_MARGIN;
+    let width = bounds.width - x - LAYOUT_MARGIN;
+    let height = bounds.height - y - LAYOUT_MARGIN;
 
     if (window.areaMaximized) {
-      x = MARGIN;
-      width = bounds.width - MARGIN * 2;
+      y = LAYOUT_MARGIN;
+      x = LAYOUT_MARGIN;
+      width = bounds.width - LAYOUT_MARGIN * 2;
+      height = bounds.height - LAYOUT_MARGIN * 2;
     }
 
     // Split tabs calculation
@@ -134,7 +134,7 @@ export class Tab extends UIView {
     }
 
     if (this.findInPage) {
-      height -= FIND_IN_PAGE_VIEW_HEIGHT + MARGIN;
+      height -= FIND_IN_PAGE_VIEW_HEIGHT + LAYOUT_MARGIN;
     }
 
     if (this.isTabPreview) {

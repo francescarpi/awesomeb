@@ -1,9 +1,16 @@
 import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionState } from '@/core';
-import { Sidebar, TabSwitcher, URLBar, TabMarks } from '@/ui';
+import { TabSwitcher, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
 import { INTERNAL_PROTOCOL } from '~/constants';
-import type { ITheme, TFindInPageId, ILayoutData, IMediaSession, IAppUpdaterInfo } from '~/types';
+import type {
+  ITheme,
+  TFindInPageId,
+  ILayoutData,
+  IMediaSession,
+  IAppUpdaterInfo,
+  IDesConTab,
+} from '~/types';
 
 const scopeLog = log.scope('BrowserRendererEmmiter');
 
@@ -11,16 +18,14 @@ export class BrowserToRenderer {
   constructor(private readonly _browser: Browser) {}
 
   refreshDesktops(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const desktops = this._browser.renderer.desktops(window);
-    sidebar.send('desktops:refresh-visible', desktops);
+    window.webContents.send('desktops:refresh-visible', desktops);
     scopeLog.info('Desktops refreshed in renderer');
   }
 
   refreshSelectedDesktop(window: Window) {
     const desktop = window.selectedDesktop;
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('desktops:refresh-selected', desktop.id);
+    window.webContents.send('desktops:refresh-selected', desktop.id);
   }
 
   refreshThemes(window: Window, desktop: Desktop) {
@@ -33,27 +38,24 @@ export class BrowserToRenderer {
   }
 
   refreshTabContainers(window: Window) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const tabContainers = this._browser.renderer.tabContainers(window);
-    sidebar.send('tabs:refresh', tabContainers);
+    window.webContents.send('tabs:refresh', tabContainers);
   }
 
   refreshOneTab(window: Window, desktop: Desktop, tab: Tab) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
     const selectedTabContainer = desktop.selectedTabContainer;
     // No selected container → no `selected` flag to compute. Skip the IPC
     // rather than sending a refresh that would mark every other tab as
     // unselected for one tick (the next tabs:refresh will correct it).
     if (!selectedTabContainer) return;
-    sidebar.send(
+    window.webContents.send(
       'tabs:refresh-one',
       this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
     );
   }
 
-  refreshURLBar(window: Window, tab: Tab | null) {
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('urlbar:refresh', this._browser.renderer.urlBarData(tab));
+  refreshURLBar(window: Window, tabData: IDesConTab | null) {
+    window.webContents.send('urlbar:refresh', this._browser.renderer.urlBarData(tabData));
   }
 
   refreshTabFindInPageResult(tab: Tab, requestId: TFindInPageId) {
@@ -68,17 +70,10 @@ export class BrowserToRenderer {
     );
   }
 
-  refreshTabNavigation(window: Window, tab?: Tab) {
-    const data = this._browser.renderer.tabNavigation(tab);
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('urlbar:refresh-tab-navigation', data);
-  }
-
   refreshDownloads() {
     const data = this._browser.renderer.downloads();
     for (const window of this._browser.windows) {
-      const sidebar = window.getView<Sidebar>('sidebar')!;
-      sidebar.send('downloads:refresh', data);
+      window.webContents.send('downloads:refresh', data);
 
       const contextualModal = window.getView<UIContextualModal>('contextual-modal');
       if (contextualModal) {
@@ -97,8 +92,7 @@ export class BrowserToRenderer {
 
   refreshDownloadCompleted() {
     for (const window of this._browser.windows) {
-      const sidebar = window.getView<Sidebar>('sidebar')!;
-      sidebar.send('downloads:completed');
+      window.webContents.send('downloads:completed');
     }
   }
 
@@ -120,38 +114,25 @@ export class BrowserToRenderer {
       hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
+      sidebarWidth: window.sidebarWidth,
     };
+
     window.webContents.send('window:refresh-layout-data', data);
   }
 
-  refreshSidebarDrag(window: Window, dragable: boolean) {
-    const sidebar = window.getView<Sidebar>('sidebar')!;
-    sidebar.send('sidebar:change-drag', dragable);
-  }
-
   refreshExtensions(window: Window) {
-    const urlbar = window.getView<URLBar>('urlbar')!;
-
     const selectedTab = window.selectedTab;
     if (!selectedTab) {
-      urlbar.send('extensions:on-refresh', []);
+      window.webContents.send('extensions:on-refresh', []);
       return;
     }
 
     if (selectedTab.tab.partition.id === partitions.internal.id) {
-      urlbar.send('extensions:on-refresh', []);
+      window.webContents.send('extensions:on-refresh', []);
       return;
     }
 
-    urlbar.send('extensions:on-refresh', this._browser.extensions.active);
-  }
-
-  refreshShowSplitMenu(window: Window) {
-    const selectedTab = window.selectedTab;
-    const hasSplit = selectedTab ? selectedTab.tabContainer.isSplit : false;
-
-    const urlbar = window.getView<URLBar>('urlbar')!;
-    urlbar.send('tab:has-split', hasSplit);
+    window.webContents.send('extensions:on-refresh', this._browser.extensions.active);
   }
 
   refreshConfig() {
@@ -186,17 +167,15 @@ export class BrowserToRenderer {
   refreshMediaSession(win: Window) {
     const selectedTab = win.selectedTab;
     const session = this._browser.mediaManager.lastSession;
-    const sidebar = win.getView<Sidebar>('sidebar')!;
     if (!session || !session.data || (selectedTab && selectedTab.tab.id === session.tabId)) {
-      sidebar.send('media:session-update', null);
+      win.webContents.send('media:session-update', null);
       return;
     }
-    sidebar.send('media:session-update', this.mediaSessionData(session));
+    win.webContents.send('media:session-update', this.mediaSessionData(session));
   }
 
   refreshVersionAvailable(win: Window, data: IAppUpdaterInfo) {
-    const sidebar = win.getView<Sidebar>('sidebar')!;
-    sidebar.send('appupdater:version-available', data);
+    win.webContents.send('appupdater:version-available', data);
   }
 
   broadcast(channel: string, ...args: unknown[]) {

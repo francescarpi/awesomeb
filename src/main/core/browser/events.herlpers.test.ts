@@ -43,7 +43,6 @@ function createMockWindow(id: TWindowId, desktop: MockDesktop): MockWindow {
 function createHarness() {
   const refreshDesktops = vi.fn();
   const refreshURLBar = vi.fn();
-  const refreshTabNavigation = vi.fn();
   const refreshOneTab = vi.fn();
   const refreshMainMenu = vi.fn();
 
@@ -59,7 +58,6 @@ function createHarness() {
     toRenderer: {
       refreshDesktops,
       refreshURLBar,
-      refreshTabNavigation,
       refreshOneTab,
     },
     refreshMainMenu,
@@ -67,7 +65,6 @@ function createHarness() {
     toRenderer: {
       refreshDesktops: ReturnType<typeof vi.fn>;
       refreshURLBar: ReturnType<typeof vi.fn>;
-      refreshTabNavigation: ReturnType<typeof vi.fn>;
       refreshOneTab: ReturnType<typeof vi.fn>;
     };
     refreshMainMenu: ReturnType<typeof vi.fn>;
@@ -99,7 +96,6 @@ function createHarness() {
     browser,
     refreshDesktops,
     refreshURLBar,
-    refreshTabNavigation,
     refreshOneTab,
     refreshMainMenu,
     addWindow,
@@ -262,9 +258,10 @@ describe('coalesced refresh', () => {
     vi.runAllTimers();
 
     expect(h.refreshURLBar).toHaveBeenCalledTimes(1);
-    expect(h.refreshURLBar).toHaveBeenCalledWith(window, { id: 10 });
-    expect(h.refreshTabNavigation).toHaveBeenCalledTimes(1);
-    expect(h.refreshTabNavigation).toHaveBeenCalledWith(window, { id: 10 });
+    expect(h.refreshURLBar).toHaveBeenCalledWith(
+      window,
+      expect.objectContaining({ tab: { id: 10 } }),
+    );
     expect(h.refreshOneTab).toHaveBeenCalledTimes(1);
   });
 
@@ -284,7 +281,6 @@ describe('coalesced refresh', () => {
     vi.runAllTimers();
 
     expect(h.refreshURLBar).not.toHaveBeenCalled();
-    expect(h.refreshTabNavigation).not.toHaveBeenCalled();
     expect(h.refreshOneTab).toHaveBeenCalledTimes(2);
   });
 

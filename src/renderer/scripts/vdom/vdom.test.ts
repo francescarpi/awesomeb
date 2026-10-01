@@ -1224,3 +1224,191 @@ describe('CHILDREN patch drift warnings (L3 vdom)', () => {
     warnSpy.mockRestore();
   });
 });
+
+describe('Renderer — fragment (multi-root) support', () => {
+  let container: HTMLElement;
+
+  beforeEach(() => {
+    container = document.getElementById('root')!;
+    container.innerHTML = '';
+  });
+
+  afterEach(() => {
+    container.innerHTML = '';
+  });
+
+  test('constructor accepts VNode[] and renders each as a direct child of container', () => {
+    const r = new Renderer([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+    r.render('root');
+
+    expect(container.children).toHaveLength(2);
+    expect(container.children[0].className).toBe('a');
+    expect(container.children[1].className).toBe('b');
+    expect(container.children[0].textContent).toBe('A');
+    expect(container.children[1].textContent).toBe('B');
+  });
+
+  test('constructor still accepts a single VNode (backwards compat)', () => {
+    const r = new Renderer(h('p', null, 'solo'));
+    r.render('root');
+
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].tagName).toBe('P');
+    expect(container.children[0].textContent).toBe('solo');
+  });
+
+  test('update(VNode[]) inserts a new root after the existing one', () => {
+    const r = new Renderer(h('div', { class: 'a' }, 'A'));
+    r.render('root');
+
+    r.update([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+
+    expect(container.children).toHaveLength(2);
+    expect(container.children[0].className).toBe('a');
+    expect(container.children[1].className).toBe('b');
+  });
+
+  test('update(VNode[]) removes an existing root', () => {
+    const r = new Renderer([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+    r.render('root');
+
+    r.update([h('div', { class: 'a' }, 'A')]);
+
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].className).toBe('a');
+  });
+
+  test('update([]) empties the container', () => {
+    const r = new Renderer([h('div', null, 'A'), h('div', null, 'B')]);
+    r.render('root');
+
+    r.update([]);
+
+    expect(container.children).toHaveLength(0);
+  });
+
+  test('update([v]) from [] inserts the single root', () => {
+    const r = new Renderer([] as VNode[]);
+    r.render('root');
+
+    r.update(h('div', { class: 'a' }, 'A'));
+
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].className).toBe('a');
+  });
+
+  test('cardinality transition single → array renders extra root', () => {
+    const r = new Renderer(h('div', { class: 'a' }, 'A'));
+    r.render('root');
+
+    r.update([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+
+    expect(container.children).toHaveLength(2);
+  });
+
+  test('cardinality transition array → single removes the extra roots', () => {
+    const r = new Renderer([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+    r.render('root');
+
+    r.update(h('div', { class: 'a' }, 'A'));
+
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].className).toBe('a');
+  });
+
+  test('keyed root reorder preserves DOM identity (same nodes, new text)', () => {
+    // The pre-existing diff algorithm falls back to positional on reorder
+    // (see preScanStrictlyIncreasing), so DOM nodes stay put and only their
+    // text content changes — same observable behavior as a single-root
+    // reorder via patch().
+    const r = new Renderer([h('div', { key: 'a' }, 'A'), h('div', { key: 'b' }, 'B')]);
+    r.render('root');
+    const firstA = container.children[0];
+    const firstB = container.children[1];
+
+    r.update([h('div', { key: 'b' }, 'B2'), h('div', { key: 'a' }, 'A2')]);
+
+    expect(container.children).toHaveLength(2);
+    // Same DOM nodes reused, slots unchanged.
+    expect(container.children[0]).toBe(firstA);
+    expect(container.children[1]).toBe(firstB);
+    expect(container.children[0].textContent).toBe('B2');
+    expect(container.children[1].textContent).toBe('A2');
+  });
+
+  test('replace: true still clears the container before re-appending roots', () => {
+    const r = new Renderer([h('div', null, 'A')]);
+    r.render('root');
+    container.appendChild(render(h('div', null, 'INTRUDER')));
+
+    r.render('root', { replace: true });
+
+    expect(container.children).toHaveLength(1);
+    expect(container.children[0].textContent).toBe('A');
+  });
+
+  test('render with VNode[] and replace: true clears, then appends all', () => {
+    const r = new Renderer([h('div', null, 'A'), h('div', null, 'B')]);
+    r.render('root');
+    container.appendChild(render(h('div', null, 'INTRUDER')));
+
+    r.render('root', { replace: true });
+
+    expect(container.children).toHaveLength(2);
+    expect(container.children[0].textContent).toBe('A');
+    expect(container.children[1].textContent).toBe('B');
+  });
+
+  test('backwards-compat getters: `el` and `currentVNode` expose the first root', () => {
+    const v1 = h('div', { class: 'a' }, 'A');
+    const v2 = h('div', { class: 'b' }, 'B');
+    const r = new Renderer([v1, v2]);
+    r.render('root');
+
+    expect(r.el).toBe(container.children[0]);
+    expect(r.currentVNode).toBe(v1);
+    expect((r.el as HTMLElement).className).toBe('a');
+  });
+
+  test('backwards-compat getters return null when no roots', () => {
+    const r = new Renderer([] as VNode[]);
+    r.render('root');
+
+    expect(r.el).toBeNull();
+    expect(r.currentVNode).toBeNull();
+  });
+
+  test('after update, `el` reflects the (possibly replaced) first root', () => {
+    const r = new Renderer([h('div', { class: 'a' }, 'A'), h('div', { class: 'b' }, 'B')]);
+    r.render('root');
+
+    // Replace the first root's tag — `el` should track the new node.
+    r.update([h('section', { class: 'a' }, 'A2'), h('div', { class: 'b' }, 'B')]);
+
+    expect(r.el).toBe(container.children[0]);
+    expect((r.el as HTMLElement).tagName).toBe('SECTION');
+    expect((r.el as HTMLElement).textContent).toBe('A2');
+  });
+
+  test('update(VNode[]) calls onUpdated once', () => {
+    const onUpdated = vi.fn();
+    const r = new Renderer([h('div', null, 'A')]);
+    r.render('root');
+
+    r.update([h('div', null, 'A'), h('div', null, 'B')], { onUpdated });
+
+    expect(onUpdated).toHaveBeenCalledTimes(1);
+  });
+
+  test('update still throws when called before render', () => {
+    const r = new Renderer([h('div', null, 'A')]);
+    expect(() => r.update([h('div', null, 'A')])).toThrow('Cannot patch before initial render');
+  });
+
+  test('render still throws when container element not found', () => {
+    const r = new Renderer([h('div', null, 'A')]);
+    expect(() => r.render('nonexistent')).toThrow(
+      'Container element with ID "nonexistent" not found',
+    );
+  });
+});

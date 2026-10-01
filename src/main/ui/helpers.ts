@@ -32,6 +32,6 @@ export async function loadPage(wc: WebContents, page: string, query: Record<stri
 export function openDevTools(wc: WebContents, expectedTarget: string) {
   const target = process.env.AB_DEVTOOLS;
   if (target === expectedTarget) {
-    wc.openDevTools();
+    wc.openDevTools({ mode: 'detach' });
   }
 }

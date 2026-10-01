@@ -1,5 +1,5 @@
 import { Browser, type Window } from '@/core';
-import { createHandler, tabChecker, windowChecker, viewChecker } from '@/utils';
+import { createHandler, tabChecker, windowChecker } from '@/utils';
 import type { IWinDesConTab, TTabId, TMediaAction } from '~/types';
 
 export function setupMediaIPC(browser: Browser) {
@@ -25,7 +25,7 @@ export function setupMediaIPC(browser: Browser) {
     'media:get',
     'handle',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker],
     async ({ win }) => {
       const session = browser.mediaManager.lastSession;
       if (!session) return null;
@@ -40,7 +40,7 @@ export function setupMediaIPC(browser: Browser) {
     'media:action',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker],
     async ({ tabId, action }) => {
       const session = browser.mediaManager.getSession(tabId);
       if (!session) {

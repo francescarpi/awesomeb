@@ -1,5 +1,5 @@
 import { Browser, Window } from '@/core';
-import { createHandler, windowChecker, viewChecker } from '@/utils';
+import { createHandler, windowChecker } from '@/utils';
 import { TMenuType, TDesktopId, TTabId } from '~/types';
 import log from 'electron-log';
 import { desktopMenu } from './desktop';
@@ -15,7 +15,7 @@ export function setupMenuIPC(browser: Browser) {
     'menu:context-menu',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar', 'urlbar'])],
+    [windowChecker],
     async ({ win, type, params }) => {
       switch (type) {
         case 'desktop': {

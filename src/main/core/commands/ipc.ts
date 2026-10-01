@@ -1,7 +1,7 @@
 import { Browser, getCommand, TCommandTrigger, Window } from '@/core';
 import { type IpcMainInvokeEvent } from 'electron';
 import log from 'electron-log';
-import { createHandler, windowChecker, modalChecker, viewChecker } from '@/utils';
+import { createHandler, windowChecker, modalChecker, viewChecker, multiConditional } from '@/utils';
 
 const scopeLog = log.scope('IPCCommands');
 
@@ -16,7 +16,12 @@ export function setupCommandsIPC(browser: Browser) {
     'commands:perform',
     'handle',
     browser,
-    [windowChecker, [modalChecker, viewChecker.bind(null, ['sidebar', 'urlbar', 'tab-switcher'])]],
+    [
+      multiConditional(
+        [[(args) => typeof args.winId === 'number', [windowChecker]]],
+        [modalChecker, viewChecker.bind(null, ['tab-switcher'])],
+      ),
+    ],
     async ({ trigger, params, win, event }) => {
       const command = getCommand(trigger);
       if (!command) {

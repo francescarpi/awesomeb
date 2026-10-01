@@ -5,7 +5,7 @@ import EventEmitter from 'events';
 import { partitions, Window } from '@/core';
 import { UIView } from './view';
 import { TViewId } from './types';
-import { Sidebar, URLBar, TabSwitcher, TabMarks } from './views';
+import { TabSwitcher, TabMarks } from './views';
 import log from 'electron-log';
 import type { TWindowId } from '~/types';
 
@@ -66,8 +66,6 @@ export class UIWindow {
   }
 
   private buildLayout() {
-    this.addView(new Sidebar(this.winId));
-    this.addView(new URLBar(this.winId));
     this.addView(new TabSwitcher(this.winId));
     this.addView(new TabMarks(this.winId));
   }
@@ -162,9 +160,6 @@ export class UIWindow {
   toggleSidebar(window: Window) {
     this._sidebarCollapsed = !this._sidebarCollapsed;
 
-    // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
-    this.reloadSidebar(window);
-
     this.eventsChannel.emit('window:layout-did-change', window);
   }
 
@@ -176,15 +171,7 @@ export class UIWindow {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
 
-    // Sidebar is loaded to send the theme parameters when the sidebar is toggled, so we need to load it again to apply the changes.
-    this.reloadSidebar(window);
-
     this.eventsChannel.emit('window:layout-did-change', window);
-  }
-
-  reloadSidebar(window: Window) {
-    const sidebar = this.getView<Sidebar>('sidebar')!;
-    sidebar.loadPage(window);
   }
 
   get areaMaximized(): boolean {

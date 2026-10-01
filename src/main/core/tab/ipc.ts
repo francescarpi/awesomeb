@@ -2,7 +2,6 @@ import { Browser, permissions, Window, FindInPage } from '@/core';
 import {
   createHandler,
   windowChecker,
-  viewChecker,
   findInPageChecker,
   tabChecker,
   certificateErrorChecker,
@@ -21,7 +20,7 @@ export function setupTabIPC(browser: Browser) {
     'tabs:get-tab-containers',
     'handle',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
+    [windowChecker],
     async ({ win }) => {
       return browser.renderer.tabContainers(win);
     },

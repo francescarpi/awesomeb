@@ -5,6 +5,7 @@ import {
   viewChecker,
   modalChecker,
   internalPageChecker,
+  multiConditional,
 } from '@/utils';
 import type { TEntityType } from '~/types';
 
@@ -14,7 +15,12 @@ export function setupBrowserIPC(browser: Browser) {
     'entities:fetch',
     'handle',
     browser,
-    [windowChecker, [modalChecker, viewChecker.bind(null, ['sidebar', 'tab-switcher'])]],
+    [
+      multiConditional(
+        [[(args) => typeof args.winId === 'number', [windowChecker]]],
+        [modalChecker, viewChecker.bind(null, ['tab-switcher'])],
+      ),
+    ],
     async ({ win, entity }) => {
       switch (entity) {
         case 'commands':

@@ -101,7 +101,6 @@ declare global {
     trustCertificateError: (tabId: TTabId) => void;
     grantPermission: (winId: TWindowId, tabId: TTabId, value: boolean) => void;
     tabPreviewAction: (parentTabId: TTabId, action: TTabPreviewAction) => void;
-    onRefreshShowSplitMenu: (callback: (event: IpcRendererEvent, value: boolean) => void) => void;
     close: (winId: TWindowId, tabIds: TTabId[]) => Promise<void>;
   };
 
@@ -109,9 +108,6 @@ declare global {
   const abUrlBar: {
     get: (winId: TWindowId) => Promise<IURLTabData | null>;
     onRefresh: (callback: (event: IpcRendererEvent, urlInfo: IURLTabData) => void) => void;
-    onTabNavigationRefresh: (
-      callback: (event: IpcRendererEvent, data: ITabNavigation) => void,
-    ) => void;
   };
 
   //--------------------------------------------------------------------------------------
@@ -182,11 +178,6 @@ declare global {
     save: (config: IConfig) => Promise<IConfig>;
     selectDownloadFolder: () => Promise<string | null>;
     refresh: (callback: (event: IpcRendererEvent, config: IConfig) => void) => void;
-  };
-
-  //--------------------------------------------------------------------------------------
-  const abSidebar: {
-    onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
   };
 
   //--------------------------------------------------------------------------------------
