@@ -34,6 +34,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderDownloadsButton,
     downloadCompleted,
     renderWindowId,
+    renderVersionAvailable,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
@@ -50,6 +51,13 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const mediaSessionRenderer = new Renderer(h('div', {})).render('sidebar-media');
   const downloadsRenderer = new Renderer(h('div', {})).render('sidebar-downloads');
   const winIdRenderer = new Renderer(h('div', {})).render('sidebar-win-id');
+  const updaterRenderer = new Renderer(h('div', {})).render('sidebar-updater');
+
+  const t = await abI18n.t({ winId }, [
+    { key: 'pages:window.updateAvailable' },
+    { key: 'pages:window.updateProgress' },
+    { key: 'pages:window.updateInstall' },
+  ]);
 
   abDesktops.getTheme(winId).then((theme) => {
     applyTheme(theme);
@@ -111,4 +119,10 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   abDownloads.onCompleted(() => downloadCompleted());
 
   renderWindowId(winId, winIdRenderer);
+
+  const versionData = await abAppUpdater.versionAvailable(winId);
+  renderVersionAvailable(winId, updaterRenderer, versionData, t);
+  abAppUpdater.onRefreshVersionAvailable((_event, versionData) =>
+    renderVersionAvailable(winId, updaterRenderer, versionData, t),
+  );
 </script>
