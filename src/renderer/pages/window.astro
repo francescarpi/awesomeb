@@ -31,6 +31,8 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     updateSelectedDesktopClass,
     updateTabInContainers,
     renderMediaSession,
+    renderDownloadsButton,
+    downloadCompleted,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
@@ -45,6 +47,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const desktopsRenderer = new Renderer(h('div', {})).render('sidebar-desktops');
   const tabContainersRenderer = new Renderer(h('div', {})).render('sidebar-tabs');
   const mediaSessionRenderer = new Renderer(h('div', {})).render('sidebar-media');
+  const downloadsRenderer = new Renderer(h('div', {})).render('sidebar-downloads');
 
   abDesktops.getTheme(winId).then((theme) => {
     applyTheme(theme);
@@ -100,4 +103,8 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const mediaData = await abMedia.get(winId);
   renderMediaSession(winId, mediaSessionRenderer, mediaData);
   abMedia.onRefresh((_event, data) => renderMediaSession(winId, mediaSessionRenderer, data));
+
+  renderDownloadsButton(winId, downloadsRenderer);
+  abDownloads.onRefresh((_event, data) => renderDownloadsButton(winId, downloadsRenderer, data));
+  abDownloads.onCompleted(() => downloadCompleted());
 </script>

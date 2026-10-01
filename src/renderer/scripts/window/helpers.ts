@@ -1,6 +1,8 @@
 import type { ITheme, ILayoutData, TDesktopId } from '~/types';
 import { LAYOUT_MARGIN, BORDER_WIDTH } from '~/constants';
 
+let completedFlashTimer: ReturnType<typeof setTimeout> | undefined;
+
 export function applyTheme(theme: ITheme) {
   const mainContainer = document.getElementById('main-container') as HTMLDivElement;
   mainContainer.style =
@@ -48,4 +50,20 @@ export function updateSelectedDesktopClass(desktopId: TDesktopId) {
     .filter((c) => !c.startsWith('desktop'))
     .join(' ');
   sidebarTabs.className = `${className} desktop${desktopId}`;
+}
+
+export function downloadCompleted() {
+  const iconEl = document.getElementById('downloads-icon');
+  if (!iconEl) return;
+  iconEl.classList.remove('icon-bounce');
+  void iconEl.offsetWidth;
+  iconEl.classList.add('icon-bounce');
+
+  clearTimeout(completedFlashTimer);
+  completedFlashTimer = setTimeout(() => {
+    const iconEl = document.getElementById('downloads-icon');
+    if (iconEl) {
+      iconEl.classList.remove('icon-bounce');
+    }
+  }, 1600);
 }

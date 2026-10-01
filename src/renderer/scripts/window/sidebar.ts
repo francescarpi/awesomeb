@@ -1,4 +1,4 @@
-import type { TWindowId, IDesktop } from '~/types';
+import type { TWindowId, IDesktop, IDownloads } from '~/types';
 import { btnIcon, Renderer, c, h, selectDesktopFromEvent, desktopMenuFromEvent } from '#/scripts';
 import BtnClose from '#/icons/close.svg?raw';
 import BtnMinimize from '#/icons/down.svg?raw';
@@ -6,6 +6,8 @@ import BtnMaximize from '#/icons/up.svg?raw';
 import BtnSidebar from '#/icons/sidebar.svg?raw';
 import BtnNewTab from '#/icons/add-circle.svg?raw';
 import BtnPerformCommand from '#/icons/command.svg?raw';
+import IdleIcon from '#/icons/downloads.svg?raw';
+import AnimatedIcon from '#/icons/downloads-animated.svg?raw';
 
 export function renderWindowButtons(winId: TWindowId, renderer: Renderer) {
   renderer.update([
@@ -166,5 +168,59 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
         ),
       );
     }),
+  );
+}
+
+export function renderDownloadsButton(winId: TWindowId, renderer: Renderer, data?: IDownloads) {
+  // const icon = completedFlash ? CompletedIcon : downloading ? AnimatedIcon : IdleIcon;
+  const icon = data?.downloading ? AnimatedIcon : IdleIcon;
+  renderer.update(
+    h(
+      'div',
+      {
+        style: 'app-region: no-drag;',
+        class: 'relative select-none',
+      },
+      h(
+        'span',
+        {
+          class: c(
+            !data?.activeCount && 'hidden',
+            'bg-error',
+            'text-error-content',
+            'w-3',
+            'h-3',
+            'text-[9px]',
+            'rounded-full',
+            'flex',
+            'items-center',
+            'justify-center',
+            'absolute',
+            '-top-2',
+            '-right-1.5',
+          ),
+        },
+        data?.activeCount,
+      ),
+      btnIcon(icon, {
+        classNames: ['text-white' /*completedFlash && 'icon-bounce'*/],
+        size: 5,
+        id: 'downloads-icon',
+        onClick: () => {
+          const bounds = (
+            document.getElementById('downloads-icon') as HTMLButtonElement
+          ).getBoundingClientRect();
+          abModal.openContextual(winId, 'contextual-downloads-modal', {
+            bounds: {
+              x: bounds.x,
+              y: bounds.y,
+              width: bounds.width,
+              height: bounds.height,
+            },
+            anchor: 'bottom-left',
+          });
+        },
+      }),
+    ),
   );
 }
