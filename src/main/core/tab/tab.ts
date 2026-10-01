@@ -146,7 +146,6 @@ export class Tab extends UIView {
     }
 
     // Apply bounds
-    console.log(x, y, width, height);
     this.webContentsView.setBounds({
       x,
       y,

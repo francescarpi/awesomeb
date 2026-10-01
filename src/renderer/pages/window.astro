@@ -30,6 +30,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderTabContainers,
     updateSelectedDesktopClass,
     updateTabInContainers,
+    renderMediaSession,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
@@ -43,6 +44,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const actionsRenderer = new Renderer(h('div', {})).render('sidebar-actions');
   const desktopsRenderer = new Renderer(h('div', {})).render('sidebar-desktops');
   const tabContainersRenderer = new Renderer(h('div', {})).render('sidebar-tabs');
+  const mediaSessionRenderer = new Renderer(h('div', {})).render('sidebar-media');
 
   abDesktops.getTheme(winId).then((theme) => {
     applyTheme(theme);
@@ -94,4 +96,8 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     currentTabContainers = tabContainers;
     renderTabContainers(winId, tabContainersRenderer, currentTabContainers);
   });
+
+  const mediaData = await abMedia.get(winId);
+  renderMediaSession(winId, mediaSessionRenderer, mediaData);
+  abMedia.onRefresh((_event, data) => renderMediaSession(winId, mediaSessionRenderer, data));
 </script>
