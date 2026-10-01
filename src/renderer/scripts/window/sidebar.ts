@@ -33,17 +33,21 @@ export function renderWindowButtons(winId: TWindowId, renderer: Renderer) {
 export function renderActions(winId: TWindowId, renderer: Renderer) {
   renderer.update([
     btnIcon(BtnSidebar, {
-      classNames: ['text-white', 'group-[.collapsed]:mt-0.4', 'group-[.collapsed]:ml-2'],
+      classNames: [
+        'text-white',
+        'group-[.collapsed]/sidebar:mt-0.4',
+        'group-[.collapsed]/sidebar:ml-2',
+      ],
       onClick: () => abCommands.perform(winId, 'toggle-sidebar'),
       key: 'toggle',
     }),
     btnIcon(BtnNewTab, {
-      classNames: ['text-white', 'group-[.collapsed]:hidden'],
+      classNames: ['text-white', 'group-[.collapsed]/sidebar:hidden'],
       onClick: () => abModal.open(winId, 'new-tab'),
       key: 'new-tab',
     }),
     btnIcon(BtnPerformCommand, {
-      classNames: ['text-white', 'group-[.collapsed]:hidden'],
+      classNames: ['text-white', 'group-[.collapsed]/sidebar:hidden'],
       onClick: () => abModal.open(winId, 'perform-command'),
       key: 'perform',
     }),
@@ -52,13 +56,23 @@ export function renderActions(winId: TWindowId, renderer: Renderer) {
 
 export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
   renderer.update(
-    desktops.map((desktop) =>
-      h(
+    desktops.map((desktop) => {
+      const shortName =
+        desktop.shortName && desktop.shortName.trim() !== '' ? desktop.shortName : '';
+
+      const hasActiveTabs = desktop.hasTabs && desktop.hasActiveTabs;
+      const hasNoActiveTabs = desktop.hasTabs && !desktop.hasActiveTabs;
+
+      return h(
         'div',
         {
           key: desktop.id,
           'data-desktop-id': String(desktop.id),
-          class: c('group', 'relative', '[.selected]:block', desktop.selected && 'selected'),
+          class: c(
+            'group/desktop',
+            'relative',
+            desktop.selected ? 'selected' : `group-[.collapsed]/sidebar:hidden`,
+          ),
         },
         h(
           'div',
@@ -76,9 +90,10 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
               'w-9',
               'h-9',
               'text-sm',
-              'group-[.collapsed]:w-8.5',
-              'group-[.collapsed]:h-8.5',
-              'group-[.collapsed]:text-xs',
+              'group-[.collapsed]/sidebar:text-xs',
+              'group-[.collapsed]/sidebar:w-8',
+              'group-[.collapsed]/sidebar:h-8',
+              'mx-auto',
               desktop.requireAttention && 'bg-red-500/20 border-error',
             ),
             style: 'app-region: no-drag;',
@@ -103,13 +118,8 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
             'span',
             {
               class: c(
-                desktop.selected &&
-                  desktop.shortName &&
-                  desktop.shortName.trim() !== '' &&
-                  'hidden',
-                desktop.shortName && desktop.shortName.trim() !== ''
-                  ? 'sidebar-opened:group-hover:hidden'
-                  : '',
+                desktop.selected && shortName && 'hidden',
+                shortName && 'group-hover/desktop:opacity-0',
               ),
             },
             desktop.id,
@@ -125,8 +135,8 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
                 'bottom-1',
                 'left-1/2',
                 '-translate-x-1/2',
-                desktop.hasTabs && desktop.hasActiveTabs && 'bg-white',
-                desktop.hasTabs && !desktop.hasActiveTabs && 'bg-white/20',
+                hasActiveTabs && 'bg-white',
+                hasNoActiveTabs && 'bg-white/20',
               ),
             },
             '',
@@ -135,22 +145,26 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
             'div',
             {
               class: c(
-                'group-[.collapsed]:text-[8px]',
+                'group-[.collapsed]/sidebar:text-[8px]',
                 'text-[10px]',
-                'absolute',
                 'whitespace-nowrap',
                 'left-1/2',
                 '-translate-x-1/2',
-                'sidebar-opened:hidden',
-                desktop.shortName && desktop.shortName.trim() !== ''
-                  ? 'sidebar-opened:group-[.selected]:block sidebar-opened:group-hover:block'
-                  : '',
+                'absolute',
+                'opacity-0',
+                'transition-opacity',
+                'duration-200',
+                'ease-out',
+                'motion-reduce:transition-none',
+                shortName
+                  ? `group-[.selected]/desktop:opacity-100 group-hover/desktop:opacity-100`
+                  : 'opacity-0',
               ),
             },
-            desktop.shortName || '',
+            shortName,
           ),
         ),
-      ),
-    ),
+      );
+    }),
   );
 }
