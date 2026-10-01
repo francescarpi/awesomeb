@@ -180,7 +180,7 @@ export function renderDownloadsButton(winId: TWindowId, renderer: Renderer, data
       'div',
       {
         style: 'app-region: no-drag;',
-        class: 'relative select-none',
+        class: 'relative select-none group-[.collapsed]/sidebar:ml-1',
       },
       h(
         'span',
@@ -227,5 +227,5 @@ export function renderDownloadsButton(winId: TWindowId, renderer: Renderer, data
 }
 
 export function renderWindowId(winId: TWindowId, renderer: Renderer) {
-  renderer.update(h('div', { class: 'text-xs' }, `ID: ${winId}`));
+  renderer.update(h('div', { class: 'text-xs group-[.collapsed]/sidebar:hidden' }, `ID: ${winId}`));
 }
