@@ -73,6 +73,7 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
           class: c(
             'group/desktop',
             'relative',
+            'mb-2',
             desktop.selected ? 'selected' : `group-[.collapsed]/sidebar:hidden`,
           ),
         },
@@ -223,4 +224,8 @@ export function renderDownloadsButton(winId: TWindowId, renderer: Renderer, data
       }),
     ),
   );
+}
+
+export function renderWindowId(winId: TWindowId, renderer: Renderer) {
+  renderer.update(h('div', { class: 'text-xs' }, `ID: ${winId}`));
 }

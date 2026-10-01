@@ -68,7 +68,6 @@ export async function renderTabContainers(
                 class: c(
                   'group-[.collapsed]/sidebar:ml-1',
                   'ml-6',
-                  'mr-1',
                   tc.collapseChildren && 'hidden',
                 ),
               },
