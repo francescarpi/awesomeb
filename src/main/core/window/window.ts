@@ -2,7 +2,7 @@ import { UIWindow } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
-import { MAX_SPLIT_TABS } from '~/constants';
+import { MAX_SPLIT_TABS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import {
   IContextualModalParams,
   IDesCon,
@@ -251,7 +251,7 @@ export class Window extends UIWindow {
 
     this.selectTab(tabData.tab.id);
 
-    this.browser.eventsChannel.emit('window:tab-did-resume', this, tabData.tab);
+    this.browser.eventsChannel.emit('window:tab-did-resume', this, tabData);
   }
 
   async selectTab(target: 'next' | 'prev' | TTabId, opts?: ISelectTabProps) {
@@ -285,15 +285,15 @@ export class Window extends UIWindow {
 
       this.addView(tab);
       this.renderViews();
-      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
-      this.browser.eventsChannel.emit('window:tab-did-resume', this, tab);
+      this.browser.eventsChannel.emit('window:selected-tab-did-change', this, result);
+      this.browser.eventsChannel.emit('window:tab-did-resume', this, result);
 
       return;
     }
 
     this.renderViews();
 
-    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, tab);
+    this.browser.eventsChannel.emit('window:selected-tab-did-change', this, result);
   }
 
   get tabs(): IDesConTab[] {
@@ -405,7 +405,7 @@ export class Window extends UIWindow {
     }
 
     for (const view of this.views) {
-      if (!view.visible && !['tab-switcher', 'tab-marks'].includes(view.viewId)) {
+      if (!view.visible && !['tab-switcher', 'tab-marks', 'urlbar'].includes(view.viewId)) {
         continue;
       }
       view.refreshBounds(this);
@@ -414,11 +414,14 @@ export class Window extends UIWindow {
 
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
-    this.moveViewToTop('sidebar');
   }
 
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
+  }
+
+  get sidebarWidth(): number {
+    return this.sidebarCollapsed ? SIDEBAR_MIN_WIDTH : SIDEBAR_DEFAULT_WIDTH;
   }
 
   showTabSwitcher() {
@@ -453,13 +456,11 @@ export class Window extends UIWindow {
 
   openContextualModal(page: TPage, params: IContextualModalParams) {
     this.modal.openContextual(page, params);
-    this.browser.toRenderer.refreshSidebarDrag(this, false);
     this.renderViews();
   }
 
   closeContextualModal() {
     this.modal.closeContextual();
-    this.browser.toRenderer.refreshSidebarDrag(this, true);
     this.renderViews();
   }
 

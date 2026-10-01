@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --breakpoint-sidebar: 100px;
+  --breakpoint-sidebar-opened: 100px;
 }
 
 @plugin "daisyui" {
@@ -12,21 +12,20 @@
   background: transparent;
 }
 
-#sidebarContainer.dragable {
-  app-region: drag;
-}
-
 @keyframes downloads-bounce {
   0%,
   100% {
     transform: translateY(0);
   }
+
   30% {
     transform: translateY(-6px);
   }
+
   50% {
     transform: translateY(0);
   }
+
   70% {
     transform: translateY(-2px);
   }

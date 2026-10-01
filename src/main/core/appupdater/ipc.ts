@@ -1,5 +1,5 @@
 import { Browser, Window } from '@/core';
-import { createHandler, windowChecker, viewChecker } from '@/utils';
+import { createHandler, windowChecker } from '@/utils';
 
 export function setupAppUpdaterIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -7,29 +7,23 @@ export function setupAppUpdaterIPC(browser: Browser) {
     'appupdater:version-available',
     'handle',
     browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar', 'contextual-modal'])],
+    [windowChecker],
     async ({}) => {
       return browser.appUpdater.versionAvailable;
     },
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{}>(
-    'appupdater:install',
-    'on',
-    browser,
-    [windowChecker, viewChecker.bind(null, ['sidebar'])],
-    async ({}) => {
-      browser.appUpdater.quitAndInstall();
-    },
-  );
+  createHandler<{}>('appupdater:install', 'on', browser, [windowChecker], async ({}) => {
+    browser.appUpdater.quitAndInstall();
+  });
 
   //--------------------------------------------------------------------------------------
   createHandler<{ win: Window }>(
     'appupdater:download',
     'on',
     browser,
-    [windowChecker, viewChecker.bind(null, ['contextual-modal'])],
+    [windowChecker],
     async ({ win }) => {
       win.closeContextualModal();
       if (browser.appUpdater.versionAvailable) {
