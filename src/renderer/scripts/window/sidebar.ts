@@ -1,4 +1,4 @@
-import type { TWindowId, IDesktop, IDownloads } from '~/types';
+import type { TWindowId, IDesktop, IDownloads, IAppUpdaterInfo } from '~/types';
 import { btnIcon, Renderer, c, h, selectDesktopFromEvent, desktopMenuFromEvent } from '#/scripts';
 import BtnClose from '#/icons/close.svg?raw';
 import BtnMinimize from '#/icons/down.svg?raw';
@@ -228,4 +228,100 @@ export function renderDownloadsButton(winId: TWindowId, renderer: Renderer, data
 
 export function renderWindowId(winId: TWindowId, renderer: Renderer) {
   renderer.update(h('div', { class: 'text-xs group-[.collapsed]/sidebar:hidden' }, `ID: ${winId}`));
+}
+
+export function renderVersionAvailable(
+  winId: TWindowId,
+  renderer: Renderer,
+  data: IAppUpdaterInfo | null,
+  t: Record<string, string>,
+) {
+  if (!data) {
+    renderer.update(h('div', {}));
+    return;
+  }
+
+  switch (data.status) {
+    case 'available': {
+      renderer.update(
+        h(
+          'button',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              'bg-white',
+              'border-white',
+              'text-black',
+              'inline-flex',
+              'w-full',
+            ),
+            style: 'app-region: no-drag;',
+            id: 'appupdater-info-btn',
+            onclick: (e) => {
+              const bounds = (e.target as HTMLButtonElement).getBoundingClientRect();
+              abModal.openContextual(winId, 'contextual-app-updater', {
+                bounds: {
+                  x: bounds.x,
+                  y: bounds.y,
+                  width: bounds.width,
+                  height: bounds.height,
+                },
+                anchor: 'top-left',
+              });
+            },
+          },
+          t['pages:window.updateAvailable'],
+        ),
+      );
+      break;
+    }
+    case 'downloading': {
+      renderer.update(
+        h(
+          'span',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              'bg-white',
+              'border-white',
+              'text-black',
+              'inline-flex',
+              'w-full',
+            ),
+          },
+          t['pages:window.updateProgress'].replace('{{percent}}', data.progress.toFixed(0)),
+        ),
+      );
+      break;
+    }
+    case 'downloaded': {
+      renderer.update(
+        h(
+          'button',
+          {
+            class: c(
+              'btn',
+              'btn-xs',
+              'btn-outline',
+              'bg-white',
+              'border-white',
+              'text-black',
+              'inline-flex',
+              'w-full',
+            ),
+            style: 'app-region: no-drag;',
+            onclick: () => {
+              abAppUpdater.install(winId);
+            },
+          },
+          t['pages:window.updateInstall'],
+        ),
+      );
+      break;
+    }
+  }
 }
