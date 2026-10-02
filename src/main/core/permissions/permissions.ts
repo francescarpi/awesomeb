@@ -9,6 +9,8 @@ const scopeLog = log.scope('Permissions');
 
 export class Permissions {
   private readonly _store: Store<IPermissionsStore>;
+  private _cache: Map<THost, Record<string, boolean>> = new Map();
+  private _allCache: IPermissionsStore['permissions'] | null = null;
 
   constructor() {
     const defaults: IPermissionsStore = {
@@ -31,10 +33,36 @@ export class Permissions {
       'Permissions',
       defaults,
     );
+
+    this._buildCache();
+  }
+
+  private _buildCache(): void {
+    const permissions = this._store.get('permissions') || {};
+    this._cache = new Map<THost, Record<string, boolean>>();
+    for (const host of Object.keys(permissions)) {
+      const perms = permissions[host] || {};
+      this._cache.set(host, { ...perms });
+    }
+    // Shallow copy of the whole object tree for all()
+    this._allCache = JSON.parse(JSON.stringify(permissions)) as IPermissionsStore['permissions'];
+  }
+
+  private _invalidateCache(): void {
+    this._cache.clear();
+    this._allCache = null;
+  }
+
+  peek(host: THost, permission: TPermission): boolean | null {
+    const hostPerms = this._cache.get(host);
+    if (hostPerms && Object.prototype.hasOwnProperty.call(hostPerms, permission)) {
+      return hostPerms[permission];
+    }
+    return null;
   }
 
   get(host: THost, permission: TPermission): boolean | null {
-    // Validate the full store on read
+    // Validate the full store on read (defensive)
     PermissionsStoreScheme.parse(this._store.store);
 
     const permissions = this._store.get('permissions') || {};
@@ -58,12 +86,18 @@ export class Permissions {
     // Validate before persisting
     PermissionsStoreScheme.parse({ permissions });
     this._store.set('permissions', permissions);
+    this._invalidateCache();
   }
 
   get all(): IPermissionsStore['permissions'] {
-    // Validate the full store on read
+    // Validate the full store on read (defensive)
     PermissionsStoreScheme.parse(this._store.store);
-    return this._store.get('permissions') || {};
+    if (this._allCache) {
+      return this._allCache;
+    }
+    const allPerms = this._store.get('permissions') || {};
+    this._allCache = JSON.parse(JSON.stringify(allPerms)) as IPermissionsStore['permissions'];
+    return this._allCache;
   }
 
   deleteHost(host: THost) {
@@ -77,6 +111,7 @@ export class Permissions {
     // Validate before persisting
     PermissionsStoreScheme.parse({ permissions });
     this._store.set('permissions', permissions);
+    this._invalidateCache();
   }
 
   saveAll(permissions: IPermissionsStore['permissions']): void {
@@ -85,5 +120,6 @@ export class Permissions {
     // Validate before persisting
     PermissionsStoreScheme.parse({ permissions });
     this._store.set('permissions', permissions);
+    this._invalidateCache();
   }
 }
