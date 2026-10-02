@@ -103,7 +103,7 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
   });
 
   // ----------------------------------------------------------------------------------------------- //
-  ses.setPermissionRequestHandler(async (webContents, permission, callback) => {
+  ses.setPermissionRequestHandler(async (webContents, permission, callback, details) => {
     if (config.isStandardPermissions && ALLOWED_PERMISSIONS.includes(permission)) {
       scopeLog.info(`Automatically granting standard permission: ${permission}`);
       callback(true);
@@ -119,23 +119,24 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
       return;
     }
 
-    const url = webContents.getURL();
-    if (!url) {
+    const urlCandidate = requestFrameUrl(details) ?? webContents.getURL?.();
+
+    if (!urlCandidate) {
       scopeLog.error('URL not found for WebContents during permission request.');
       callback(false);
       return;
     }
 
     let host: string;
-
     try {
-      host = new URL(url).host;
+      host = new URL(urlCandidate).host;
     } catch {
-      scopeLog.error(`Invalid URL "${url}" for permission request.`);
+      scopeLog.error(`Invalid URL "${urlCandidate}" for permission request.`);
       callback(false);
       return;
     }
 
+    const topLevelUrl = webContents.getURL() || urlCandidate;
     const permissionValue = permissions.get(host, permission);
 
     scopeLog.info(
@@ -153,7 +154,7 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
     }
 
     const hasPendingRequest = tabResult.tab.requestPermission !== null;
-    tabResult.tab.addPermissionRequest([permission, host, url, callback]);
+    tabResult.tab.addPermissionRequest([permission, host, topLevelUrl, callback]);
 
     if (hasPendingRequest) {
       return;
@@ -163,9 +164,59 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
       query: {
         permission,
         host,
-        url,
+        url: topLevelUrl,
         tabId: tabResult.tab.id.toString(),
       },
     });
   });
+
+  // ----------------------------------------------------------------------------------------------- //
+  ses.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    const hostCandidate =
+      details?.securityOrigin ??
+      details?.requestingUrl ??
+      requestingOrigin ??
+      webContents?.getURL?.();
+
+    if (!hostCandidate) {
+      scopeLog.error('Permission check: could not determine host');
+      return false;
+    }
+
+    let host: string;
+    try {
+      host = new URL(hostCandidate).host;
+    } catch {
+      scopeLog.error(`Permission check: invalid host URL "${hostCandidate}"`);
+      return false;
+    }
+
+    if (config.isStandardPermissions && ALLOWED_PERMISSIONS.includes(permission)) {
+      scopeLog.info(`Permission check: auto-grant standard ${permission} for ${host}`);
+      return true;
+    }
+
+    const stored = permissions.peek(host, permission);
+    if (stored !== null) {
+      scopeLog.info(`Permission check: stored ${stored} for ${host}/${permission}`);
+      return stored;
+    }
+
+    return false;
+  });
+}
+
+function requestFrameUrl(
+  details:
+    | Electron.PermissionRequest
+    | Electron.FilesystemPermissionRequest
+    | Electron.MediaAccessPermissionRequest
+    | Electron.OpenExternalPermissionRequest
+    | undefined,
+): string | undefined {
+  if (!details) return undefined;
+  if ('securityOrigin' in details && details.securityOrigin) {
+    return details.securityOrigin;
+  }
+  return details.requestingUrl;
 }
