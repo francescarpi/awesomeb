@@ -1,4 +1,7 @@
 export const ALLOWED_PERMISSIONS: string[] = [
+  // Storage
+  'storage-access',
+
   // Pasive sensors
   'sensors',
   'accelerometer',
