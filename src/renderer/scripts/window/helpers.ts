@@ -76,3 +76,12 @@ export function showShortcuts(visible: boolean) {
     el.classList.add('hidden');
   }
 }
+
+export function setSidebarDragable(value: boolean) {
+  const el = document.getElementById('sidebar-container') as HTMLDivElement;
+  if (value) {
+    el.classList.add('dragable');
+  } else {
+    el.classList.remove('dragable');
+  }
+}

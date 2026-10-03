@@ -254,4 +254,9 @@ declare global {
       keys: { key: string; params?: Record<string, unknown> }[],
     ) => Promise<Record<string, string>>;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abSidebar: {
+    onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
+  };
 }

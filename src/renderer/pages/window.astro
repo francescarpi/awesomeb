@@ -36,6 +36,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderWindowId,
     renderVersionAvailable,
     showShortcuts,
+    setSidebarDragable,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
@@ -128,4 +129,8 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   abAppUpdater.onRefreshVersionAvailable((_event, versionData) =>
     renderVersionAvailable(winId, updaterRenderer, versionData, t),
   );
+
+  abSidebar.onChangeDrag((_event, isDragable) => {
+    setSidebarDragable(isDragable);
+  });
 </script>

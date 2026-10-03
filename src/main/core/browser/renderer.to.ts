@@ -183,4 +183,8 @@ export class BrowserToRenderer {
       window.webContents.send(channel, ...args);
     }
   }
+
+  refreshSidebarDrag(window: Window, dragable: boolean) {
+    window.webContents.send('sidebar:change-drag', dragable);
+  }
 }

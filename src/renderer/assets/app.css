@@ -34,3 +34,7 @@
 .icon-bounce {
   animation: downloads-bounce 0.8s ease;
 }
+
+#sidebar-container.dragable {
+  app-region: drag;
+}
