@@ -35,12 +35,13 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     downloadCompleted,
     renderWindowId,
     renderVersionAvailable,
+    showShortcuts,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
 
   const { winId } = getSearchParams();
 
-  const shortcutsRenderer = new Renderer(h('div', {})).render('tab-container');
+  const shortcutsRenderer = new Renderer(h('div', {})).render('tab-container-shortcuts');
   const urlNavUrlRenderer = new Renderer(h('div', {})).render('url-nav-url-container');
   const extensionsRenderer = new Renderer(h('div', {})).render('url-extensions-container');
   const menuBtnRenderer = new Renderer(h('div', {})).render('url-menu-btn-container');
@@ -63,7 +64,6 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     applyTheme(theme);
     abWindow.readyToShow(winId);
   });
-
   abDesktops.onThemeRefresh((_e, theme) => applyTheme(theme));
 
   renderShortcuts(winId, shortcutsRenderer);
@@ -85,7 +85,10 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   renderDesktops(desktopsRenderer, desktops);
   abDesktops.onRefresh((_event, desktops) => renderDesktops(desktopsRenderer, desktops));
 
-  abWindow.onRefreshLayoutData((_e, data: ILayoutData) => updateLayout(data));
+  abWindow.onRefreshLayoutData((_e, data: ILayoutData) => {
+    showShortcuts(!data.hasVisibleTabs);
+    updateLayout(data);
+  });
 
   const selectedDesktopId = desktops.find((d) => d.selected)!.id;
   updateSelectedDesktopClass(selectedDesktopId);
