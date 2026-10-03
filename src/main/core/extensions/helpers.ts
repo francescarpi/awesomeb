@@ -267,9 +267,16 @@ export async function loadExtensionToSession(ses: Session, extension: IExtension
     return;
   }
 
-  const loadedExtension = await ses.extensions.loadExtension(extension.manifestPath);
-  if (!loadedExtension) {
-    scopeLog.error(`Failed to load extension ${extension.id} from path ${extension.manifestPath}`);
+  try {
+    const loadedExtension = await ses.extensions.loadExtension(extension.manifestPath);
+    if (!loadedExtension) {
+      scopeLog.error(
+        `Failed to load extension ${extension.id} from path ${extension.manifestPath}`,
+      );
+      return;
+    }
+  } catch {
+    scopeLog.error(`Failed to load extension ${extension.id} from path ${extension.manifestPath}.`);
     return;
   }
 
