@@ -85,9 +85,9 @@ export class Desktop {
   }
 
   get hasActiveTabs(): boolean {
-    for (const tabContainer of this._tabContainers.values()) {
+    for (const tabContainer of this.tabContainers) {
       for (const tab of tabContainer.tabs) {
-        if (!tab.suspended) {
+        if (!tab.suspended && !tab.isClosed) {
           return true;
         }
       }
