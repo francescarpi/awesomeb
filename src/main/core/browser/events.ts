@@ -404,6 +404,7 @@ export function registerBrowserEvents(browser: Browser) {
     }
 
     selectedTab.window.renderViews();
+    browser.toRenderer.refreshLayoutData(selectedTab.window);
   });
 
   //--------------------------------------------------------------------------------------
@@ -415,6 +416,7 @@ export function registerBrowserEvents(browser: Browser) {
     selectedTab.window.renderViews();
     browser.toRenderer.refreshTabContainers(selectedTab.window);
     browser.toRenderer.refreshTabSwitcher(selectedTab.window);
+    browser.toRenderer.refreshLayoutData(selectedTab.window);
   });
 
   //--------------------------------------------------------------------------------------
