@@ -67,3 +67,12 @@ export function downloadCompleted() {
     }
   }, 1600);
 }
+
+export function showShortcuts(visible: boolean) {
+  const el = document.getElementById('tab-container-shortcuts') as HTMLDivElement;
+  if (visible) {
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
+}
