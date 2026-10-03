@@ -457,11 +457,13 @@ export class Window extends UIWindow {
   openContextualModal(page: TPage, params: IContextualModalParams) {
     this.modal.openContextual(page, params);
     this.renderViews();
+    this.browser.eventsChannel.emit('window:contextual-menu-opened', this);
   }
 
   closeContextualModal() {
     this.modal.closeContextual();
     this.renderViews();
+    this.browser.eventsChannel.emit('window:contextual-menu-closed', this);
   }
 
   get whoInitiateRequireAttention(): TTabId | null {

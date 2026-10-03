@@ -610,6 +610,13 @@ const abI18n = {
 };
 
 //--------------------------------------------------------------------------------------
+const abSidebar = {
+  onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => {
+    ipcRenderer.on('sidebar:change-drag', callback);
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -636,3 +643,4 @@ contextBridge.exposeInMainWorld('abWelcome', abWelcome);
 contextBridge.exposeInMainWorld('abMedia', abMedia);
 contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
 contextBridge.exposeInMainWorld('abI18n', abI18n);
+contextBridge.exposeInMainWorld('abSidebar', abSidebar);

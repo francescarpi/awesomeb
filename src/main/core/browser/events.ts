@@ -472,4 +472,14 @@ export function registerBrowserEvents(browser: Browser) {
       scopeLog.warn('Failed to notify extensions of bookmarks change:', err);
     }
   });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:contextual-menu-opened', (win: Window) => {
+    browser.toRenderer.refreshSidebarDrag(win, false);
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('window:contextual-menu-closed', (win: Window) => {
+    browser.toRenderer.refreshSidebarDrag(win, true);
+  });
 }
