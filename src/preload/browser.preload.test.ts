@@ -69,7 +69,12 @@ function makeBundle(locale = 'en'): {
 }
 
 describe('preload i18n glue (abI18n.t)', () => {
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(async () => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     storage.clear();
     vi.stubGlobal('window', {
       location: { search: '?i18nLocale=en&i18nHash=test-hash' },
@@ -79,6 +84,8 @@ describe('preload i18n glue (abI18n.t)', () => {
   });
 
   afterEach(() => {
+    consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
@@ -177,11 +184,13 @@ describe('preload i18n glue (abI18n.t)', () => {
     await abI18n().t({}, [{ key: 'menu:app.about' }]);
     await abI18n().t({}, [{ key: 'menu:app.about' }]);
     expect(bundleCalls).toBe(3);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
 
     // 4th call: breaker is open, no bundle IPC, all keys go to i18n:t.
     const result = await abI18n().t({}, [{ key: 'menu:app.about' }]);
     expect(bundleCalls).toBe(3);
     expect(result['menu:app.about']).toBe('from-fallback');
+    expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
   });
 
   it('short key (no namespace) resolves from the common namespace via the bundle', async () => {
