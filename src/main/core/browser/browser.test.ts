@@ -123,6 +123,82 @@ describe('Browser', () => {
     });
   });
 
+  describe('Browser.moveTab remove-from-parent', () => {
+    test('detaches a child from its parent and promotes it to top-level of the same desktop', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childId = child!.tabContainer.id;
+
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([parent!.tabContainer.id]);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent');
+
+      expect(child!.tabContainer.parent).toBeNull();
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([]);
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([
+        parent!.tabContainer.id,
+        childId,
+      ]);
+    });
+
+    test('promoted container keeps its own children (grandchildren travel with it)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const grandchild = await browser.openURL('http://grandchild.com', {
+        parentTabContainer: child!.tabContainer,
+        selectTab: true,
+      });
+
+      expect(grandchild!.tabContainer.parent?.id).toBe(child!.tabContainer.id);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent');
+
+      expect(child!.tabContainer.parent).toBeNull();
+      expect(grandchild!.tabContainer.parent?.id).toBe(child!.tabContainer.id);
+      expect(child!.tabContainer.children.map((c) => c.id)).toEqual([grandchild!.tabContainer.id]);
+    });
+
+    test('remove-from-parent on a top-level container is a no-op', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const top = await browser.openURL('http://top.com', { selectTab: true });
+
+      browser.moveTab(top!.tab.id, 'remove-from-parent');
+
+      expect(top!.tabContainer.parent).toBeNull();
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([top!.tabContainer.id]);
+    });
+
+    test('remove-from-parent with selectTab selects the promoted container and tab', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      const desktop = w.getDesktop(1)!;
+
+      expect(desktop.selectedTabContainer?.id).toBe(parent!.tabContainer.id);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent', { selectTab: true });
+
+      expect(desktop.selectedTabContainer?.id).toBe(child!.tabContainer.id);
+      expect(child!.tabContainer.selectedTab?.id).toBe(child!.tab.id);
+    });
+  });
+
   describe('Browser.duplicateTab (parent/children regression)', () => {
     test('duplicating a child tab to another desktop does NOT touch parent.children', async () => {
       const w = browser.createWindow(1, { withDesktops: true });

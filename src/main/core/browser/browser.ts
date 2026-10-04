@@ -369,6 +369,29 @@ export class Browser {
       return;
     }
 
+    if (targetId === 'remove-from-parent') {
+      const { tabContainer, window, desktop, tab } = sourceData;
+
+      if (!tabContainer.parent) {
+        scopeLog.warn(`Tab container with id ${tabContainer.id} has no parent to detach from`);
+        return;
+      }
+
+      tabContainer.parent.removeChild(tabContainer.id);
+      tabContainer.setParent(null);
+      desktop.addTabContainer(tabContainer);
+
+      if (props?.selectTab) {
+        desktop.selectTabContainer(tabContainer.id);
+        window.selectTab(tab.id);
+      }
+
+      window.renderViews();
+
+      this.eventsChannel.emit('browser:tab-did-move', tab.id, window, desktop, window, desktop);
+      return;
+    }
+
     const targetData = parseTarget(this, {
       targetId: targetId,
       partitionId: sourceData.tab.partition.id,

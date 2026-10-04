@@ -4,6 +4,7 @@ title: Child tabs
 
 import { getMenuItems } from '../../../../scripts/i18n';
 export const menu = await getMenuItems('en', 'contextTab.openTargetBlankAsChild')
+export const move = await getMenuItems('en', 'contextTab.move')
 
 Imagine the following scenario.
 
@@ -28,3 +29,5 @@ You can also use the context menu to close all children or collapse them.
 When collapsed, you'll see an indicator:
 
 ![Collapsed children](../../../assets/tab-child-4.png)
+
+If you want to detach a child from its parent and turn it into a regular top-level tab container, open the context menu on the child, choose **{move[0]}** and then *Move to top level*. The child keeps its own tabs and any children it has.

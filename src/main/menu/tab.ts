@@ -55,12 +55,17 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     {
       label: t('menu:contextTab.move'),
       icon: getIcon(EIcon.Move),
-      submenu: browser.renderer.targetsEntities(window, { action: 'move' }).map((target) => ({
-        label: target.label,
-        click: async () => {
-          await browser.performCommand(window, 'move-tab', { tabId: tab.id, targetId: target.id });
-        },
-      })),
+      submenu: browser.renderer
+        .targetsEntities(window, { action: 'move', conextMenuOfTab: { tab, tabContainer } })
+        .map((target) => ({
+          label: target.label,
+          click: async () => {
+            await browser.performCommand(window, 'move-tab', {
+              tabId: tab.id,
+              targetId: target.id,
+            });
+          },
+        })),
     },
     {
       label: t('menu:contextTab.duplicate'),

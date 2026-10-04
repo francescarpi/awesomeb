@@ -8,7 +8,8 @@
     "newFollowingTab": "New following tab",
     "splitIntoSelectedTab": "Split into selected tab",
     "window": "Window {{id}}",
-    "desktop": "Desktop: \"{{label}}\""
+    "desktop": "Desktop: \"{{label}}\"",
+    "removeFromParent": "Move to top level"
   },
   "ok": "OK",
   "cancel": "Cancel",

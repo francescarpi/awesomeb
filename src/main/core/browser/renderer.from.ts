@@ -21,6 +21,7 @@ import type {
   IAbout,
   IDebugTabIndex,
   IDesConTab,
+  IConTab,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -107,7 +108,7 @@ export class BrowserRenderer {
 
   targetsEntities(
     window: Window,
-    props?: { action?: 'newWindow' | 'move' | 'duplicate' },
+    props?: { action?: 'newWindow' | 'move' | 'duplicate'; conextMenuOfTab?: IConTab },
   ): IEntity[] {
     const selectedTab = window.selectedTab;
     const selectedDesktop = window.selectedDesktop;
@@ -119,6 +120,10 @@ export class BrowserRenderer {
     const TARGET_CURRENT_TAB = { id: 'current-tab', label: t('targets.currentTab') };
     const TARGET_AFTER_CURRENT = { id: 'after-current', label: t('targets.newFollowingTab') };
     const TARGET_SPLIT_TAB = { id: 'split-tab', label: t('targets.splitIntoSelectedTab') };
+    const TARGET_REMOVE_FROM_PARENT = {
+      id: 'remove-from-parent',
+      label: t('targets.removeFromParent'),
+    };
     const TARGET_WINDOWS = this.browser.windows
       .filter((win) => win.id !== window.id)
       .map((win) => ({
@@ -143,6 +148,14 @@ export class BrowserRenderer {
     }
 
     if (props?.action === 'move') {
+      if (props?.conextMenuOfTab?.tabContainer.parent) {
+        return [
+          TARGET_REMOVE_FROM_PARENT,
+          ...newWindowOption,
+          ...TARGET_WINDOWS,
+          ...TARGET_DESKTOPS,
+        ];
+      }
       return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
     }
 
