@@ -5,6 +5,7 @@ title: Pestanyes filles
 
 import { getMenuItems } from '../../../../../scripts/i18n';
 export const menu = await getMenuItems('ca', 'contextTab.openTargetBlankAsChild')
+export const move = await getMenuItems('ca', 'contextTab.move')
 
 Imagina't el següent escenari.
 
@@ -29,3 +30,5 @@ A banda, també a través del menú contextual, tindràs l'opció de tancar tots
 Si estan col·lapsats, ho veuràs amb un indicador:
 
 ![Fills col·lapsats](../../../../assets/tab-child-4.png)
+
+Si vols desvincular una pestanya filla del seu pare i convertir-la en un contenidor de pestanyes normal de nivell superior, obre el menú contextual sobre la pestanya filla, tria **{move[0]}** i tot seguit *Mou al nivell superior*. La pestanya filla conserva les seves pròpies pestanyes i qualsevol filla seva.

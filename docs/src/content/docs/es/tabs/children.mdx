@@ -4,6 +4,7 @@ title: Pestañas hijas
 
 import { getMenuItems } from '../../../../../scripts/i18n';
 export const menu = await getMenuItems('es', 'contextTab.openTargetBlankAsChild')
+export const move = await getMenuItems('es', 'contextTab.move')
 
 Imagina el siguiente escenario.
 
@@ -28,3 +29,5 @@ Además, también a través del menú contextual, tendrás la opción de cerrar 
 Si están colapsadas, lo verás con un indicador:
 
 ![Hijas colapsadas](../../../../assets/tab-child-4.png)
+
+Si quieres desvincular una pestaña hija de su padre y convertirla en un contenedor de pestañas normal de nivel superior, abre el menú contextual sobre la pestaña hija, elige **{move[0]}** y luego *Mover al nivel superior*. La pestaña hija conserva sus propias pestañas y cualquier hija suya.

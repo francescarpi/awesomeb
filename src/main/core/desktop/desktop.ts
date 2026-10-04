@@ -81,7 +81,14 @@ export class Desktop {
   }
 
   get hasTabs(): boolean {
-    return this._tabContainers.size > 0;
+    for (const tabContainer of this.tabContainers) {
+      for (const tab of tabContainer.tabs) {
+        if (!tab.isClosed) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   get hasActiveTabs(): boolean {
