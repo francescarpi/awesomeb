@@ -4,7 +4,7 @@
     "newWindowLeft": "New left window",
     "newWindowRight": "New right window",
     "newTab": "New tab",
-    "currentTab": "Current tab",
+    "currentTab": "Replace current tab",
     "newFollowingTab": "New following tab",
     "splitIntoSelectedTab": "Split into selected tab",
     "window": "Window {{id}}",

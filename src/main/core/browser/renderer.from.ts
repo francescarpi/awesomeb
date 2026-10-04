@@ -105,69 +105,58 @@ export class BrowserRenderer {
     }));
   }
 
-  targetsEntities(window: Window, props?: { onlyNewWindow?: boolean }): IEntity[] {
-    const onlyNewWindow = props?.onlyNewWindow ?? false;
+  targetsEntities(
+    window: Window,
+    props?: { action?: 'newWindow' | 'move' | 'duplicate' },
+  ): IEntity[] {
     const selectedTab = window.selectedTab;
+    const selectedDesktop = window.selectedDesktop;
 
-    const newWindowOption = [
-      {
-        id: 'new-window',
-        label: t('targets.newWindow'),
-      },
-      {
-        id: 'new-window-left',
-        label: t('targets.newWindowLeft'),
-      },
-      {
-        id: 'new-window-right',
-        label: t('targets.newWindowRight'),
-      },
-    ];
+    const TARGET_NEW_WINDOW = { id: 'new-window', label: t('targets.newWindow') };
+    const TARGET_NEW_WINDOW_LEFT = { id: 'new-window-left', label: t('targets.newWindowLeft') };
+    const TARGET_NEW_WINDOW_RIGHT = { id: 'new-window-right', label: t('targets.newWindowRight') };
+    const TARGET_CURRENT_DESK_WIN = { id: 'current-desktop-window', label: t('targets.newTab') };
+    const TARGET_CURRENT_TAB = { id: 'current-tab', label: t('targets.currentTab') };
+    const TARGET_AFTER_CURRENT = { id: 'after-current', label: t('targets.newFollowingTab') };
+    const TARGET_SPLIT_TAB = { id: 'split-tab', label: t('targets.splitIntoSelectedTab') };
+    const TARGET_WINDOWS = this.browser.windows
+      .filter((win) => win.id !== window.id)
+      .map((win) => ({
+        id: `window-${win.id}`,
+        label: t('targets.window', { id: win.id }),
+      }));
+    const TARGET_DESKTOPS = window.desktops
+      .filter((desk) => desk.id !== selectedDesktop.id)
+      .map((desk) => ({
+        id: `desktop-${desk.id}`,
+        label: t('targets.desktop', { label: desk.label }),
+      }));
+    const TARGET_ALL_DESKTOPS = window.desktops.map((desk) => ({
+      id: `desktop-${desk.id}`,
+      label: t('targets.desktop', { label: desk.label }),
+    }));
 
-    if (onlyNewWindow) {
+    const newWindowOption = [TARGET_NEW_WINDOW, TARGET_NEW_WINDOW_LEFT, TARGET_NEW_WINDOW_RIGHT];
+
+    if (props?.action === 'newWindow') {
       return newWindowOption;
     }
 
-    let result: IEntity[] = [
-      {
-        id: 'current-desktop-window',
-        label: t('targets.newTab'),
-      },
-    ];
+    if (props?.action === 'move') {
+      return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
+    }
+
+    if (props?.action === 'duplicate') {
+      return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_ALL_DESKTOPS];
+    }
+
+    let result: IEntity[] = [TARGET_CURRENT_DESK_WIN];
 
     if (selectedTab) {
-      result.push({
-        id: 'current-tab',
-        label: t('targets.currentTab'),
-      });
+      result = [...result, TARGET_CURRENT_TAB, TARGET_AFTER_CURRENT, TARGET_SPLIT_TAB];
     }
 
-    result = [
-      ...result,
-      {
-        id: 'after-current',
-        label: t('targets.newFollowingTab'),
-      },
-      {
-        id: 'split-tab',
-        label: t('targets.splitIntoSelectedTab'),
-      },
-      ...newWindowOption,
-    ];
-
-    for (const win of this.browser.windows) {
-      result.push({
-        id: `window-${win.id}`,
-        label: t('targets.window', { id: win.id }),
-      });
-    }
-
-    for (const desk of window.desktops) {
-      result.push({
-        id: `desktop-${desk.id}`,
-        label: t('targets.desktop', { label: desk.label }),
-      });
-    }
+    result = [...result, ...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
 
     return result;
   }

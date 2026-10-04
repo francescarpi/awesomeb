@@ -4,7 +4,7 @@
     "newWindowLeft": "Nova finestra esquerra",
     "newWindowRight": "Nova finestra dreta",
     "newTab": "Nova pestanya",
-    "currentTab": "Pestanya actual",
+    "currentTab": "Substituir pestanya actual",
     "newFollowingTab": "Nova pestanya següent",
     "splitIntoSelectedTab": "Dividir en pestanya seleccionada",
     "window": "Finestra {{id}}",

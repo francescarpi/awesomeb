@@ -349,6 +349,7 @@ export class Browser {
     if (props?.selectTab) {
       tabContainer.selectTab(tab.id);
       desktop.selectTabContainer(tabContainer.id);
+      window.selectDesktop(desktop.id);
     }
 
     window.addView(tab);
