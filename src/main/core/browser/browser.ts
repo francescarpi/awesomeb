@@ -349,6 +349,7 @@ export class Browser {
     if (props?.selectTab) {
       tabContainer.selectTab(tab.id);
       desktop.selectTabContainer(tabContainer.id);
+      window.selectDesktop(desktop.id);
     }
 
     window.addView(tab);
@@ -365,6 +366,29 @@ export class Browser {
     const sourceData = this.getTab(tabId);
     if (!sourceData) {
       scopeLog.error(`Tab with id ${tabId} not found`);
+      return;
+    }
+
+    if (targetId === 'remove-from-parent') {
+      const { tabContainer, window, desktop, tab } = sourceData;
+
+      if (!tabContainer.parent) {
+        scopeLog.warn(`Tab container with id ${tabContainer.id} has no parent to detach from`);
+        return;
+      }
+
+      tabContainer.parent.removeChild(tabContainer.id);
+      tabContainer.setParent(null);
+      desktop.addTabContainer(tabContainer);
+
+      if (props?.selectTab) {
+        desktop.selectTabContainer(tabContainer.id);
+        window.selectTab(tab.id);
+      }
+
+      window.renderViews();
+
+      this.eventsChannel.emit('browser:tab-did-move', tab.id, window, desktop, window, desktop);
       return;
     }
 

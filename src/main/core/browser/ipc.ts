@@ -36,7 +36,7 @@ export function setupBrowserIPC(browser: Browser) {
         case 'targets':
           return browser.renderer.targetsEntities(win);
         case 'newWindowtargets':
-          return browser.renderer.targetsEntities(win, { onlyNewWindow: true });
+          return browser.renderer.targetsEntities(win, { action: 'newWindow' });
         case 'tabs':
           return browser.renderer.tabsEntities(win);
         case 'tabContainers':

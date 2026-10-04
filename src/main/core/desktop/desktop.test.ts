@@ -282,6 +282,64 @@ describe('Desktop', () => {
   });
 });
 
+describe('Desktop.hasTabs', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('returns false on a freshly created desktop with no tabContainers', () => {
+    expect(window.selectedDesktop.hasTabs).toBe(false);
+  });
+
+  test('returns true when a tabContainer has an open tab', async () => {
+    const opened = await browser.openURL('https://example.com');
+    expect(opened).not.toBeNull();
+
+    expect(window.selectedDesktop.hasTabs).toBe(true);
+  });
+
+  test('returns false when all tabs in the only tabContainer are closed (regression for the old bug)', async () => {
+    const opened = await browser.openURL('https://example.com');
+    expect(opened).not.toBeNull();
+
+    const tabId = window.selectedDesktop.tabContainers[0].tabs[0].id;
+    const closed = await browser.closeTab(tabId);
+    expect(closed).toBe(true);
+
+    expect(window.selectedDesktop.hasTabs).toBe(false);
+  });
+
+  test('returns true when at least one tab is open even if others are closed', async () => {
+    const a = await browser.openURL('https://a.com');
+    const b = await browser.openURL('https://b.com');
+    expect(a).not.toBeNull();
+    expect(b).not.toBeNull();
+
+    const closed = await browser.closeTab(a!.tab.id);
+    expect(closed).toBe(true);
+
+    expect(window.selectedDesktop.hasTabs).toBe(true);
+  });
+
+  test('returns true if one container has an open tab and another has only closed tabs', async () => {
+    const a = await browser.openURL('https://a.com');
+    const b = await browser.openURL('https://b.com');
+    expect(a).not.toBeNull();
+    expect(b).not.toBeNull();
+
+    const closed = await browser.closeTab(b!.tab.id);
+    expect(closed).toBe(true);
+
+    expect(window.selectedDesktop.hasTabs).toBe(true);
+  });
+});
+
 describe('Desktop.selectTabContainer (children reachable)', () => {
   let browser: Browser;
   let window: Window;

@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
-import { Browser, partitions, windowOpenHadler } from '@/core';
+import { Browser, partitions, Window, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
 import { type HandlerDetails } from 'electron';
 import fs from 'fs';
@@ -120,6 +120,82 @@ describe('Browser', () => {
       expect(top!.tabContainer.parent).toBeNull();
       expect(w.getDesktop(1)?.tabContainers.length).toBe(0);
       expect(w.getDesktop(2)?.tabContainers.map((tc) => tc.id)).toEqual([top!.tabContainer.id]);
+    });
+  });
+
+  describe('Browser.moveTab remove-from-parent', () => {
+    test('detaches a child from its parent and promotes it to top-level of the same desktop', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const childId = child!.tabContainer.id;
+
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([childId]);
+      expect(child!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([parent!.tabContainer.id]);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent');
+
+      expect(child!.tabContainer.parent).toBeNull();
+      expect(parent!.tabContainer.children.map((c) => c.id)).toEqual([]);
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([
+        parent!.tabContainer.id,
+        childId,
+      ]);
+    });
+
+    test('promoted container keeps its own children (grandchildren travel with it)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+        selectTab: true,
+      });
+      const grandchild = await browser.openURL('http://grandchild.com', {
+        parentTabContainer: child!.tabContainer,
+        selectTab: true,
+      });
+
+      expect(grandchild!.tabContainer.parent?.id).toBe(child!.tabContainer.id);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent');
+
+      expect(child!.tabContainer.parent).toBeNull();
+      expect(grandchild!.tabContainer.parent?.id).toBe(child!.tabContainer.id);
+      expect(child!.tabContainer.children.map((c) => c.id)).toEqual([grandchild!.tabContainer.id]);
+    });
+
+    test('remove-from-parent on a top-level container is a no-op', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const top = await browser.openURL('http://top.com', { selectTab: true });
+
+      browser.moveTab(top!.tab.id, 'remove-from-parent');
+
+      expect(top!.tabContainer.parent).toBeNull();
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([top!.tabContainer.id]);
+    });
+
+    test('remove-from-parent with selectTab selects the promoted container and tab', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      const desktop = w.getDesktop(1)!;
+
+      expect(desktop.selectedTabContainer?.id).toBe(parent!.tabContainer.id);
+
+      browser.moveTab(child!.tab.id, 'remove-from-parent', { selectTab: true });
+
+      expect(desktop.selectedTabContainer?.id).toBe(child!.tabContainer.id);
+      expect(child!.tabContainer.selectedTab?.id).toBe(child!.tab.id);
     });
   });
 
@@ -757,6 +833,61 @@ describe('Browser', () => {
       expect(closed).toBe(true);
       expect(child!.tab.isClosed).toBe(true);
       expect(parent!.tabContainer.children).toContain(child!.tabContainer);
+    });
+  });
+
+  describe('Browser.openURL selectDesktop side-effect', () => {
+    let browser: Browser;
+    let window: Window;
+
+    beforeEach(() => {
+      browser = new Browser();
+      partitions.init();
+      window = browser.createWindow(1, { withDesktops: true });
+    });
+
+    test('selectTab: true on the current desktop leaves window.selectedDesktop unchanged', async () => {
+      expect(window.selectedDesktop.id).toBe(1);
+
+      const opened = await browser.openURL('http://example.com', {
+        selectTab: true,
+        targetId: 'desktop-1',
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
+    });
+
+    test("selectTab: true with targetId: 'desktop-2' switches the window's selectedDesktop to desktop 2", async () => {
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'desktop-2',
+        selectTab: true,
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(2);
+    });
+
+    test("selectTab: true with targetId: 'window-2' (when window 2 exists) does NOT change window 1's selectedDesktop", async () => {
+      const window2 = browser.createWindow(2, { withDesktops: true });
+      expect(window2.id).toBe(2);
+
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'window-2',
+        selectTab: true,
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
+    });
+
+    test("selectTab NOT set with targetId: 'desktop-2' does NOT switch the window's selectedDesktop", async () => {
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'desktop-2',
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
     });
   });
 
