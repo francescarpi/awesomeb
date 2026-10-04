@@ -352,6 +352,147 @@ describe('Renderer', () => {
     });
   });
 
+  describe('Renderer.targetsEntities', () => {
+    let browser: Browser;
+    let window: Window;
+
+    beforeEach(() => {
+      browser = new Browser();
+      partitions.init();
+      window = browser.createWindow(1);
+      window.createDefaultDesktops();
+    });
+
+    test('default behavior (no action, no selectedTab) returns current-desktop-window + 3 new-window + 4 other desktops', () => {
+      const result = browser.renderer.targetsEntities(window, {});
+      const ids = result.map((e) => e.id);
+
+      expect(result.length).toBe(8);
+      expect(ids).toContain('current-desktop-window');
+      expect(ids).toContain('new-window');
+      expect(ids).toContain('new-window-left');
+      expect(ids).toContain('new-window-right');
+      expect(ids).toContain('desktop-2');
+      expect(ids).toContain('desktop-3');
+      expect(ids).toContain('desktop-4');
+      expect(ids).toContain('desktop-5');
+      expect(ids).not.toContain('desktop-1');
+      expect(ids).not.toContain('current-tab');
+      expect(ids).not.toContain('after-current');
+      expect(ids).not.toContain('split-tab');
+      expect(ids.some((id) => id.startsWith('window-'))).toBe(false);
+    });
+
+    test('default behavior with selectedTab adds current-tab, after-current, split-tab', async () => {
+      const opened = await browser.openURL('http://example.com', { selectTab: true });
+      expect(opened).not.toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {});
+      const ids = result.map((e) => e.id);
+
+      expect(ids).toContain('current-desktop-window');
+      expect(ids).toContain('current-tab');
+      expect(ids).toContain('after-current');
+      expect(ids).toContain('split-tab');
+      expect(ids).toContain('new-window');
+      expect(ids).toContain('new-window-left');
+      expect(ids).toContain('new-window-right');
+      expect(ids).toContain('desktop-2');
+      expect(ids).toContain('desktop-3');
+      expect(ids).toContain('desktop-4');
+      expect(ids).toContain('desktop-5');
+      expect(ids).not.toContain('desktop-1');
+    });
+
+    test("action: 'newWindow' returns exactly 3 entries", () => {
+      const result = browser.renderer.targetsEntities(window, { action: 'newWindow' });
+
+      expect(result.length).toBe(3);
+      expect(result.map((e) => e.id)).toEqual([
+        'new-window',
+        'new-window-left',
+        'new-window-right',
+      ]);
+      const ids = result.map((e) => e.id);
+      expect(ids).not.toContain('current-desktop-window');
+      expect(ids).not.toContain('current-tab');
+      expect(ids).not.toContain('after-current');
+      expect(ids).not.toContain('split-tab');
+      expect(ids.some((id) => id.startsWith('desktop-'))).toBe(false);
+      expect(ids.some((id) => id.startsWith('window-'))).toBe(false);
+    });
+
+    test("action: 'move' returns 3 new-window + 0 other windows + 4 non-current desktops", () => {
+      const result = browser.renderer.targetsEntities(window, { action: 'move' });
+
+      expect(result.length).toBe(7);
+      const ids = result.map((e) => e.id);
+      expect(ids).toContain('new-window');
+      expect(ids).toContain('new-window-left');
+      expect(ids).toContain('new-window-right');
+      expect(ids).toContain('desktop-2');
+      expect(ids).toContain('desktop-3');
+      expect(ids).toContain('desktop-4');
+      expect(ids).toContain('desktop-5');
+      expect(ids).not.toContain('desktop-1');
+      expect(ids).not.toContain('current-desktop-window');
+      expect(ids).not.toContain('current-tab');
+      expect(ids).not.toContain('after-current');
+      expect(ids).not.toContain('split-tab');
+      expect(ids.some((id) => id.startsWith('window-'))).toBe(false);
+    });
+
+    test("action: 'duplicate' returns 3 new-window + 0 other windows + 5 desktops including current", () => {
+      const result = browser.renderer.targetsEntities(window, { action: 'duplicate' });
+
+      expect(result.length).toBe(8);
+      const ids = result.map((e) => e.id);
+      expect(ids).toContain('new-window');
+      expect(ids).toContain('new-window-left');
+      expect(ids).toContain('new-window-right');
+      expect(ids).toContain('desktop-1');
+      expect(ids).toContain('desktop-2');
+      expect(ids).toContain('desktop-3');
+      expect(ids).toContain('desktop-4');
+      expect(ids).toContain('desktop-5');
+      expect(ids).not.toContain('current-desktop-window');
+      expect(ids).not.toContain('current-tab');
+      expect(ids).not.toContain('after-current');
+      expect(ids).not.toContain('split-tab');
+      expect(ids.some((id) => id.startsWith('window-'))).toBe(false);
+    });
+
+    test('cross-action shape: duplicate has 1 more entry than move', () => {
+      const moveResult = browser.renderer.targetsEntities(window, { action: 'move' });
+      const duplicateResult = browser.renderer.targetsEntities(window, { action: 'duplicate' });
+
+      expect(duplicateResult.length).toBe(moveResult.length + 1);
+    });
+
+    test('multi-window: action move and duplicate contain window-2 but not window-1', () => {
+      const window2 = browser.createWindow(2);
+      window2.createDefaultDesktops();
+
+      const moveResult = browser.renderer.targetsEntities(window, { action: 'move' });
+      const moveIds = moveResult.map((e) => e.id);
+      expect(moveIds).toContain('window-2');
+      expect(moveIds).not.toContain('window-1');
+
+      const duplicateResult = browser.renderer.targetsEntities(window, { action: 'duplicate' });
+      const duplicateIds = duplicateResult.map((e) => e.id);
+      expect(duplicateIds).toContain('window-2');
+      expect(duplicateIds).not.toContain('window-1');
+
+      const newWindowResult = browser.renderer.targetsEntities(window, { action: 'newWindow' });
+      expect(newWindowResult.length).toBe(3);
+      expect(newWindowResult.map((e) => e.id)).toEqual([
+        'new-window',
+        'new-window-left',
+        'new-window-right',
+      ]);
+    });
+  });
+
   describe('Renderer.about', () => {
     test('returns version matching app.getVersion()', () => {
       const versionSpy = vi.spyOn(app, 'getVersion').mockReturnValue('1.2.3-test');

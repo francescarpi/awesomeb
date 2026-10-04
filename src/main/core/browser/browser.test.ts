@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
-import { Browser, partitions, windowOpenHadler } from '@/core';
+import { Browser, partitions, Window, windowOpenHadler } from '@/core';
 import { Layouts } from '../tab/layouts';
 import { type HandlerDetails } from 'electron';
 import fs from 'fs';
@@ -757,6 +757,61 @@ describe('Browser', () => {
       expect(closed).toBe(true);
       expect(child!.tab.isClosed).toBe(true);
       expect(parent!.tabContainer.children).toContain(child!.tabContainer);
+    });
+  });
+
+  describe('Browser.openURL selectDesktop side-effect', () => {
+    let browser: Browser;
+    let window: Window;
+
+    beforeEach(() => {
+      browser = new Browser();
+      partitions.init();
+      window = browser.createWindow(1, { withDesktops: true });
+    });
+
+    test('selectTab: true on the current desktop leaves window.selectedDesktop unchanged', async () => {
+      expect(window.selectedDesktop.id).toBe(1);
+
+      const opened = await browser.openURL('http://example.com', {
+        selectTab: true,
+        targetId: 'desktop-1',
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
+    });
+
+    test("selectTab: true with targetId: 'desktop-2' switches the window's selectedDesktop to desktop 2", async () => {
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'desktop-2',
+        selectTab: true,
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(2);
+    });
+
+    test("selectTab: true with targetId: 'window-2' (when window 2 exists) does NOT change window 1's selectedDesktop", async () => {
+      const window2 = browser.createWindow(2, { withDesktops: true });
+      expect(window2.id).toBe(2);
+
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'window-2',
+        selectTab: true,
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
+    });
+
+    test("selectTab NOT set with targetId: 'desktop-2' does NOT switch the window's selectedDesktop", async () => {
+      const opened = await browser.openURL('http://example.com', {
+        targetId: 'desktop-2',
+      });
+      expect(opened).not.toBeNull();
+
+      expect(window.selectedDesktop.id).toBe(1);
     });
   });
 
