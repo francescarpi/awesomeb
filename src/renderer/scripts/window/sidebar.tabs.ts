@@ -20,8 +20,12 @@ export async function renderTabContainers(
         const openCount = tc.children.filter((t) => !t.isClosed).length;
         const r = await abI18n.t({ winId }, [
           { key: 'pages:tabContainers.collapsedTabs', params: { count: openCount } },
+          { key: 'pages:tabContainers.collapse' },
         ]);
-        const collapsedText = r['pages:tabContainers.collapsedTabs'];
+
+        const collapsedText = tc.collapseChildren
+          ? r['pages:tabContainers.collapsedTabs']
+          : r['pages:tabContainers.collapse'];
 
         return h(
           'div', // Tab Container
@@ -79,11 +83,20 @@ export async function renderTabContainers(
             'div',
             {
               class: c(
-                !tc.collapseChildren ? 'hidden' : 'group-[.collapsed]/sidebar:hidden block',
+                openCount === 0 ? 'hidden' : 'group-[.collapsed]/sidebar:hidden block',
+                !tc.collapseChildren && 'pl-3',
                 'text-xs',
                 'ml-4',
-                'text-white/40',
+                'text-white',
+                'opacity-40',
+                'cursor-pointer',
+                'hover:opacity-100',
+                'transition-opacity',
+                'duration-200',
               ),
+              onclick: () => {
+                abCommands.perform(winId, 'toggle-collapse-children', { tabContainerId: tc.id });
+              },
             },
             collapsedText,
           ),
