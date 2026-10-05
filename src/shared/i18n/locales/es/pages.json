@@ -411,7 +411,8 @@
   },
   "tabContainers": {
     "collapsedTabs_one": "({{count}} pestaña colapsada)",
-    "collapsedTabs_other": "({{count}} pestañas colapsadas)"
+    "collapsedTabs_other": "({{count}} pestañas colapsadas)",
+    "collapse": "(pliega)"
   },
   "bookmarksDesktopToBookmarks": {
     "title": "Guardar en marcadores",
