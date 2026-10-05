@@ -411,7 +411,8 @@
   },
   "tabContainers": {
     "collapsedTabs_one": "({{count}} tab collapsed)",
-    "collapsedTabs_other": "({{count}} tabs collapsed)"
+    "collapsedTabs_other": "({{count}} tabs collapsed)",
+    "collapse": "(collapse)"
   },
   "bookmarksDesktopToBookmarks": {
     "title": "Save to bookmarks",
