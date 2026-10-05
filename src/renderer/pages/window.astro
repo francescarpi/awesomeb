@@ -35,7 +35,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     downloadCompleted,
     renderWindowId,
     renderVersionAvailable,
-    showShortcuts,
+    showTabContainer,
     setSidebarDragable,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
@@ -87,7 +87,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   abDesktops.onRefresh((_event, desktops) => renderDesktops(desktopsRenderer, desktops));
 
   abWindow.onRefreshLayoutData((_e, data: ILayoutData) => {
-    showShortcuts(!data.hasVisibleTabs);
+    showTabContainer(!data.hasVisibleTabs);
     updateLayout(data);
   });
 
