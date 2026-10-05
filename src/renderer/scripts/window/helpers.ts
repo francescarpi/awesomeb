@@ -68,8 +68,8 @@ export function downloadCompleted() {
   }, 1600);
 }
 
-export function showShortcuts(visible: boolean) {
-  const el = document.getElementById('tab-container-shortcuts') as HTMLDivElement;
+export function showTabContainer(visible: boolean) {
+  const el = document.getElementById('tab-container') as HTMLDivElement;
   if (visible) {
     el.classList.remove('hidden');
   } else {
