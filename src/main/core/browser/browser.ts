@@ -15,6 +15,7 @@ import {
   MediaManager,
   AppUpdater,
   Bookmarks,
+  Favicons,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -63,6 +64,7 @@ export class Browser {
   public readonly mediaManager = new MediaManager(this);
   public readonly appUpdater = new AppUpdater(this);
   public readonly bookmarks = new Bookmarks(this);
+  public readonly favicons = new Favicons();
 
   constructor() {
     registerBrowserEvents(this);

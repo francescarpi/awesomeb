@@ -128,13 +128,8 @@ export async function getCachedFavicon(
   return null;
 }
 
-export async function parseFavicon(
-  _wc: WebContents,
-  url: string,
-  callback: (dataImage: string) => void,
-) {
-  const dataImage = await fetchFaviconUsingNet(url);
-  callback(dataImage);
+export async function parseFavicon(_wc: WebContents, url: string) {
+  return await fetchFaviconUsingNet(url);
 }
 
 async function fetchFaviconUsingNet(url: string): Promise<string> {
