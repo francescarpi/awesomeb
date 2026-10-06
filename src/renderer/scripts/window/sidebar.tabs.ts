@@ -20,7 +20,7 @@ export async function renderTabContainers(
         const openCount = tc.children.filter((t) => !t.isClosed).length;
         const r = await abI18n.t({ winId }, [
           { key: 'pages:tabContainers.collapsedTabs', params: { count: openCount } },
-          { key: 'pages:tabContainers.collapse' },
+          { key: 'pages:tabContainers.collapse', params: { count: openCount } },
         ]);
 
         const collapsedText = tc.collapseChildren
@@ -137,7 +137,8 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       'data-tab-id': String(t.id),
       key: t.id,
       class: c(
-        'py-1.5',
+        'py-1',
+        'my-px',
         'cursor-pointer',
         'gap-1',
         'items-start',
