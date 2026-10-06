@@ -412,7 +412,8 @@
   "tabContainers": {
     "collapsedTabs_one": "({{count}} pestanya col·lapsada)",
     "collapsedTabs_other": "({{count}} pestanyes col·lapsades)",
-    "collapse": "(replega)"
+    "collapse_one": "(replega la pestanya)",
+    "collapse_other": "(replega les {{count}} pestanyes)"
   },
   "bookmarksDesktopToBookmarks": {
     "title": "Desa als marcadors",
