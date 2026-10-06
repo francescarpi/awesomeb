@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.14.19-alpha",
+  "version": "0.14.20-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -67,8 +67,8 @@
     "tailwindcss": "4.3.3",
     "tsc-alias": "1.9.7",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.0",
-    "vite": "8.3.2",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.3",
     "vite-plugin-static-copy": "4.1.1",
     "vitest": "5.0.3"
   },
