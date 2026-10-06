@@ -412,7 +412,8 @@
   "tabContainers": {
     "collapsedTabs_one": "({{count}} tab collapsed)",
     "collapsedTabs_other": "({{count}} tabs collapsed)",
-    "collapse": "(collapse)"
+    "collapse_one": "(collapse tab)",
+    "collapse_other": "(collapse {{count}} tabs)"
   },
   "bookmarksDesktopToBookmarks": {
     "title": "Save to bookmarks",
