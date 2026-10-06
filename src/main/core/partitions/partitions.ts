@@ -1,6 +1,6 @@
 import { Partition } from './partition';
 import { config } from '@/core';
-import { TAB_PRELOAD, BROWSER_PRELOAD, EXTENSION_PRELOAD } from '@/paths';
+import { TAB_PRELOAD, BROWSER_PRELOAD, EXTENSION_PRELOAD, EXTENSION_STORE_PRELOAD } from '@/paths';
 import { TPartitionId } from '~/types';
 
 export class Partitions {
@@ -14,6 +14,7 @@ export class Partitions {
     this._default.registerPreloadScript(TAB_PRELOAD);
     this._default.registerPreloadScript(EXTENSION_PRELOAD);
     this._default.registerPreloadScript(EXTENSION_PRELOAD, 'service-worker');
+    this._default.registerPreloadScript(EXTENSION_STORE_PRELOAD);
 
     this._private = new Partition('Private', '#000000', true);
     this._private.registerPreloadScript(TAB_PRELOAD);
@@ -26,6 +27,7 @@ export class Partitions {
       partition.registerPreloadScript(TAB_PRELOAD);
       partition.registerPreloadScript(EXTENSION_PRELOAD);
       partition.registerPreloadScript(EXTENSION_PRELOAD, 'service-worker');
+      partition.registerPreloadScript(EXTENSION_STORE_PRELOAD);
       this._customPartitions.set(partition.id, partition);
     }
   }

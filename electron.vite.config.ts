@@ -75,6 +75,7 @@ export default defineConfig({
           'browser.preload': resolve('src/preload/browser.preload.ts'),
           'tab.preload': resolve('src/preload/tab.preload.ts'),
           'extension.preload': resolve('src/preload/extension.preload.ts'),
+          'extension.store.preload': resolve('src/preload/extension.store.preload.ts'),
         },
       },
     },
