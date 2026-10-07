@@ -19,13 +19,13 @@ export class BrowserToRenderer {
 
   refreshDesktops(window: Window) {
     const desktops = this._browser.renderer.desktops(window);
-    window.webContents.send('desktops:refresh-visible', desktops);
+    window.sendMessage('desktops:refresh-visible', desktops);
     scopeLog.info('Desktops refreshed in renderer');
   }
 
   refreshSelectedDesktop(window: Window) {
     const desktop = window.selectedDesktop;
-    window.webContents.send('desktops:refresh-selected', desktop.id);
+    window.sendMessage('desktops:refresh-selected', desktop.id);
   }
 
   refreshThemes(window: Window, desktop: Desktop) {
@@ -34,12 +34,12 @@ export class BrowserToRenderer {
       secondary: desktop.theme.secondary,
       degrees: desktop.theme.degrees,
     };
-    window.webContents.send('desktop:theme-refresh', result);
+    window.sendMessage('desktop:theme-refresh', result);
   }
 
   refreshTabContainers(window: Window) {
     const tabContainers = this._browser.renderer.tabContainers(window);
-    window.webContents.send('tabs:refresh', tabContainers);
+    window.sendMessage('tabs:refresh', tabContainers);
   }
 
   refreshOneTab(window: Window, desktop: Desktop, tab: Tab) {
@@ -48,14 +48,14 @@ export class BrowserToRenderer {
     // rather than sending a refresh that would mark every other tab as
     // unselected for one tick (the next tabs:refresh will correct it).
     if (!selectedTabContainer) return;
-    window.webContents.send(
+    window.sendMessage(
       'tabs:refresh-one',
       this._browser.renderer.tab(window, desktop, selectedTabContainer, tab),
     );
   }
 
   refreshURLBar(window: Window, tabData: IDesConTab | null) {
-    window.webContents.send('urlbar:refresh', this._browser.renderer.urlBarData(tabData));
+    window.sendMessage('urlbar:refresh', this._browser.renderer.urlBarData(tabData));
   }
 
   refreshTabFindInPageResult(tab: Tab, requestId: TFindInPageId) {
@@ -73,7 +73,7 @@ export class BrowserToRenderer {
   refreshDownloads() {
     const data = this._browser.renderer.downloads();
     for (const window of this._browser.windows) {
-      window.webContents.send('downloads:refresh', data);
+      window.sendMessage('downloads:refresh', data);
 
       const contextualModal = window.getView<UIContextualModal>('contextual-modal');
       if (contextualModal) {
@@ -92,7 +92,7 @@ export class BrowserToRenderer {
 
   refreshDownloadCompleted() {
     for (const window of this._browser.windows) {
-      window.webContents.send('downloads:completed');
+      window.sendMessage('downloads:completed');
     }
   }
 
@@ -117,27 +117,27 @@ export class BrowserToRenderer {
       sidebarWidth: window.sidebarWidth,
     };
 
-    window.webContents.send('window:refresh-layout-data', data);
+    window.sendMessage('window:refresh-layout-data', data);
   }
 
   refreshExtensions(window: Window) {
     const selectedTab = window.selectedTab;
     if (!selectedTab) {
-      window.webContents.send('extensions:on-refresh', []);
+      window.sendMessage('extensions:on-refresh', []);
       return;
     }
 
     if (selectedTab.tab.partition.id === partitions.internal.id) {
-      window.webContents.send('extensions:on-refresh', []);
+      window.sendMessage('extensions:on-refresh', []);
       return;
     }
 
-    window.webContents.send('extensions:on-refresh', this._browser.extensions.active);
+    window.sendMessage('extensions:on-refresh', this._browser.extensions.active);
   }
 
   refreshConfig() {
     for (const window of this._browser.windows) {
-      window.webContents.send('config:refresh', config.config);
+      window.sendMessage('config:refresh', config.config);
 
       const tabSwitcher = window.getView<TabSwitcher>('tab-switcher')!;
       tabSwitcher.webContents.send('config:refresh', config.config);
@@ -180,11 +180,11 @@ export class BrowserToRenderer {
 
   broadcast(channel: string, ...args: unknown[]) {
     for (const window of this._browser.windows) {
-      window.webContents.send(channel, ...args);
+      window.sendMessage(channel, ...args);
     }
   }
 
   refreshSidebarDrag(window: Window, dragable: boolean) {
-    window.webContents.send('sidebar:change-drag', dragable);
+    window.sendMessage('sidebar:change-drag', dragable);
   }
 }
