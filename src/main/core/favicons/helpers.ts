@@ -1,4 +1,4 @@
-import { type NativeImage, WebContents, nativeImage, net } from 'electron';
+import { type NativeImage, nativeImage, net } from 'electron';
 import fs from 'fs';
 import slugify from 'slugify';
 import { faviconsPath } from '@/paths';
@@ -128,11 +128,7 @@ export async function getCachedFavicon(
   return null;
 }
 
-export async function parseFavicon(_wc: WebContents, url: string) {
-  return await fetchFaviconUsingNet(url);
-}
-
-async function fetchFaviconUsingNet(url: string): Promise<string> {
+export async function fetchFaviconUsingNet(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = net.request(url);
     const chunks: Buffer[] = [];

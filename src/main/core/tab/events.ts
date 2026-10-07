@@ -115,7 +115,7 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('page-favicon-updated', async (_event, favicons) => {
     if (favicons && favicons.length > 0) {
-      const faviconData = await browser.favicons.parseFavicon(tab.webContents, tab.id, favicons[0]);
+      const faviconData = await browser.favicons.parseFavicon(tab.id, favicons[0]);
       if (!faviconData) {
         return;
       }
@@ -123,14 +123,6 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
       if (hasChanged) {
         checkIfRequireAttention(browser, tab);
       }
-
-      // TODO remove this commented code
-      // await parseFavicon(tab.webContents, favicons[0], (dataImage: string) => {
-      //   const hasChanged = tab.setFavicon(dataImage);
-      //   if (hasChanged) {
-      //     checkIfRequireAttention(browser, tab);
-      //   }
-      // });
     }
   });
 

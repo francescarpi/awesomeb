@@ -9,8 +9,13 @@ import { userDataPath } from '@/paths';
 import { validateStore } from '@/core/validation';
 import type { TTabId } from '~/types';
 import { createHash } from 'crypto';
-import { parseFavicon } from '@/core';
-import { WebContents } from 'electron';
+import { fetchFaviconUsingNet } from '@/core';
+import { FAVICON_DAYS_EXPIRATION } from './constants';
+import log from 'electron-log';
+
+const scopeLog = log.scope('Favicons');
+
+// TODO delete favicon when tab is permanently closed
 
 export class Favicons extends Store<TFaviconsStore> {
   constructor() {
@@ -26,37 +31,57 @@ export class Favicons extends Store<TFaviconsStore> {
     this.store = validateStore(FaviconsStoreScheme, this.store, 'Favicons', defaults);
   }
 
-  async parseFavicon(wc: WebContents, tabId: TTabId, url: string): Promise<TFaviconData | null> {
+  async parseFavicon(tabId: TTabId, url: string): Promise<TFaviconData | null> {
     const hash = this.makeHash(url);
-    const favicon = this.store.favicons[tabId]?.[hash];
+    const favicon = this.get(`favicons.${tabId}.favicons.${hash}`);
 
     if (favicon && !this.isExpired(favicon)) {
       return favicon.data;
     }
 
-    const data = await parseFavicon(wc, url);
+    const faviconData = await fetchFaviconUsingNet(url);
+    if (!faviconData) {
+      return null;
+    }
 
-    console.log('CESC', hash, favicon, data);
-    // TODO create object or update data in store
+    const faviconStore: IFavicon = {
+      tabId,
+      data: faviconData,
+      created: Date.now(),
+    };
 
-    // - make url hash
-    // - check if we already have this favicon in the store: tabid->hash->metadata
-    //  - if yes: ignore
-    //  - if not or expired: update
-    return null;
+    this.set(`favicons.${tabId}.favicons.${hash}`, faviconStore);
+    this.set(`favicons.${tabId}.latest`, hash);
+
+    return faviconData;
   }
 
-  getFavicon(_tabId: TTabId): TFaviconData | null {
-    // TODO implement
-    return null;
+  getLastFavicon(tabId: TTabId): TFaviconData | null {
+    const lastHash = this.get(`favicons.${tabId}.latest`);
+    if (!lastHash) {
+      return null;
+    }
+
+    const lastFavicon = this.get(`favicons.${tabId}.favicons.${lastHash}`);
+    if (!lastFavicon) {
+      scopeLog.error(
+        `There is an inconsistency. Tab id ${tabId} has latest has favicon but not the data`,
+      );
+      return null;
+    }
+
+    return lastFavicon.data;
+  }
+
+  deleteFavicon(tabId: TTabId) {
+    this.delete(`favicons.${tabId}`);
   }
 
   private makeHash(url: string): string {
     return createHash('sha256').update(url).digest('hex');
   }
 
-  private isExpired(_favicon: IFavicon): boolean {
-    // TODO implement
-    return false;
+  private isExpired(favicon: IFavicon): boolean {
+    return Date.now() - favicon.created > FAVICON_DAYS_EXPIRATION;
   }
 }

@@ -4,3 +4,5 @@ const dataUrl =
 const base64Data = dataUrl.split(',')[1];
 
 export const DEFAULT_FAVICON = Buffer.from(base64Data, 'base64');
+
+export const FAVICON_DAYS_EXPIRATION = 90 * 24 * 60 * 60 * 1000;

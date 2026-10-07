@@ -545,9 +545,9 @@ export class Browser {
       title: tabStore.title,
       customTitle: tabStore.customTitle,
       url: tabStore.url,
-      favicon: tabStore.favicon,
       closedAt: tabStore.closedAt,
       openTabsAsChild: tabStore.openTabsAsChild,
+      favicon: this.favicons.getLastFavicon(tabStore.id),
     });
 
     this._indexTab(newWindow, desktop, tabContainer, tab);
@@ -740,6 +740,7 @@ export class Browser {
   permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
     this._unindexTab(tabId);
     tabContainer.deleteTab(tabId);
+    this.favicons.deleteFavicon(tabId);
     history.delete(tabId);
 
     if (tabContainer.tabs.length === 0) {

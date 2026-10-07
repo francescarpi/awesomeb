@@ -3,12 +3,17 @@ import { z } from 'zod';
 export const FaviconScheme = z.object({
   tabId: z.number(),
   data: z.string(),
-  expires: z.number(),
+  created: z.number(),
+});
+
+export const FaviconTabScheme = z.object({
+  latest: z.string(),
+  favicons: z.record(z.string(), FaviconScheme),
 });
 
 export const FaviconsStoreScheme = z
   .object({
-    favicons: z.record(z.string(), z.record(z.string(), FaviconScheme)),
+    favicons: z.record(z.string(), FaviconTabScheme),
   })
   .strict();
 

@@ -1,3 +1,3 @@
-export { getCachedFavicon, parseFavicon } from './helpers';
+export { getCachedFavicon, fetchFaviconUsingNet } from './helpers';
 export { setupFaviconsIpc } from './ipc';
 export { Favicons } from './favicons';
