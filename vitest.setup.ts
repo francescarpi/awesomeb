@@ -215,41 +215,11 @@ const mockElectron = vi.hoisted(() => {
       has: async (): Promise<boolean> => false,
     },
     nativeImage: {
-      createEmpty: (): unknown => ({
-        toPNG: (): Buffer => Buffer.from(''),
-        toDataURL: (): string => '',
-        toBitmap: (): Buffer => Buffer.from(''),
-        getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
-        isEmpty: (): boolean => true,
-      }),
-      createFromPath: (): unknown => ({
-        toPNG: (): Buffer => Buffer.from(''),
-        toDataURL: (): string => '',
-        toBitmap: (): Buffer => Buffer.from(''),
-        getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
-        isEmpty: (): boolean => true,
-      }),
-      createFromBuffer: (): unknown => ({
-        toPNG: (): Buffer => Buffer.from(''),
-        toDataURL: (): string => '',
-        toBitmap: (): Buffer => Buffer.from(''),
-        getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
-        isEmpty: (): boolean => true,
-      }),
-      createFromDataURL: (): unknown => ({
-        toPNG: (): Buffer => Buffer.from(''),
-        toDataURL: (): string => '',
-        toBitmap: (): Buffer => Buffer.from(''),
-        getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
-        isEmpty: (): boolean => true,
-      }),
-      createFromBitmap: (): unknown => ({
-        toPNG: (): Buffer => Buffer.from(''),
-        toDataURL: (): string => '',
-        toBitmap: (): Buffer => Buffer.from(''),
-        getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
-        isEmpty: (): boolean => true,
-      }),
+      createEmpty: (): unknown => mockImage(),
+      createFromPath: (): unknown => mockImage(),
+      createFromBuffer: (): unknown => mockImage(),
+      createFromDataURL: (): unknown => mockImage(),
+      createFromBitmap: (): unknown => mockImage(),
     },
     net: {
       request: (): unknown => ({
@@ -375,6 +345,17 @@ const mockElectron = vi.hoisted(() => {
       }),
     },
   };
+
+  function mockImage(): unknown {
+    return {
+      resize: vi.fn().mockReturnThis(),
+      toPNG: (): Buffer => Buffer.from(''),
+      toDataURL: (): string => '',
+      toBitmap: (): Buffer => Buffer.from(''),
+      getSize: (): { width: number; height: number } => ({ width: 0, height: 0 }),
+      isEmpty: (): boolean => true,
+    };
+  }
 });
 
 const mockElectronLog = vi.hoisted(() => {

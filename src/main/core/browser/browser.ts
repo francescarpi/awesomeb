@@ -547,7 +547,7 @@ export class Browser {
       url: tabStore.url,
       closedAt: tabStore.closedAt,
       openTabsAsChild: tabStore.openTabsAsChild,
-      favicon: this.favicons.getLastFavicon(tabStore.id),
+      favicon: this.favicons.getLastTabFavicon(tabStore.id),
     });
 
     this._indexTab(newWindow, desktop, tabContainer, tab);

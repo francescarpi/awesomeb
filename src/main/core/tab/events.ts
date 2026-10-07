@@ -115,7 +115,12 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('page-favicon-updated', async (_event, favicons) => {
     if (favicons && favicons.length > 0) {
-      const faviconData = await browser.favicons.parseFavicon(tab.id, favicons[0]);
+      const faviconData = await browser.favicons.parseFavicon(
+        tab.id,
+        favicons[0],
+        tab.url as string,
+      );
+
       if (!faviconData) {
         return;
       }
