@@ -84,7 +84,7 @@ export class Favicons extends Store<TFaviconsStore> {
   }
 
   deleteFavicon(tabId: TTabId) {
-    this.delete(`favicons.${tabId}`);
+    this.delete(`byTab.${tabId}`);
   }
 
   getFaviconByUrl(url: string, opts?: { size?: number }): NativeImage {
