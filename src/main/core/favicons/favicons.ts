@@ -40,27 +40,29 @@ export class Favicons extends Store<TFaviconsStore> {
     const faviconUrlHash = this.makeHash(faviconUrl);
     const favicon = this.get(`favicons.${faviconUrlHash}`);
 
-    if (favicon && !this.isExpired(favicon)) {
-      return favicon.imgData;
-    }
-
-    const normalizedTabUrl = this.makeUrlHash(tabUrl);
-
     let faviconImgData: TFaviconData | null;
-    try {
-      faviconImgData = await fetchFaviconUsingNet(faviconUrl);
-    } catch (err) {
-      scopeLog.warn(`Failed to fetch favicon from ${faviconUrl}:`, err);
-      return null;
-    }
-    if (!faviconImgData) {
-      return null;
-    }
 
-    const faviconStore: IFavicon = {
-      created: Date.now(),
-      imgData: faviconImgData,
-    };
+    if (favicon && !this.isExpired(favicon)) {
+      faviconImgData = favicon.imgData;
+    } else {
+      try {
+        faviconImgData = await fetchFaviconUsingNet(faviconUrl);
+      } catch (err) {
+        scopeLog.warn(`Failed to fetch favicon from ${faviconUrl}:`, err);
+        return null;
+      }
+
+      if (!faviconImgData) {
+        return null;
+      }
+
+      const faviconStore: IFavicon = {
+        created: Date.now(),
+        imgData: faviconImgData,
+      };
+
+      this.set(`favicons.${faviconUrlHash}`, faviconStore);
+    }
 
     const existingByTab = this.get(`byTab.${tabId}`) || { latest: faviconUrlHash, favicons: [] };
     if (!existingByTab.favicons.includes(faviconUrlHash)) {
@@ -68,9 +70,9 @@ export class Favicons extends Store<TFaviconsStore> {
     }
     existingByTab.latest = faviconUrlHash;
 
-    this.set(`favicons.${faviconUrlHash}`, faviconStore);
     this.set(`byTab.${tabId}`, existingByTab);
 
+    const normalizedTabUrl = this.makeUrlHash(tabUrl);
     if (!this.get(`byUrl.${normalizedTabUrl}`)) {
       this.set(`byUrl.${normalizedTabUrl}`, faviconUrlHash);
     }
