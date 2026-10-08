@@ -16,7 +16,7 @@ export const SessionTabScheme = z
     title: z.string().nullable(),
     customTitle: z.string().nullable(),
     url: z.string().nullable(),
-    favicon: z.string().nullable(),
+    favicon: z.string().nullable().optional(), // DEPRECATED
     closedAt: z.number().nullable(),
     openTabsAsChild: z.boolean().default(false),
   })

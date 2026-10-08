@@ -31,7 +31,6 @@ function serializeTabContainer(tc: TabContainer): ISessionTabContainer {
         title: tab.title,
         customTitle: tab.customTitle,
         url: tab.url,
-        favicon: tab.favicon,
         closedAt: tab.closedAt,
         openTabsAsChild: tab.openTabsAsChild,
       })),
