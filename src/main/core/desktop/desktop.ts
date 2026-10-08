@@ -81,25 +81,11 @@ export class Desktop {
   }
 
   get hasTabs(): boolean {
-    for (const tabContainer of this.tabContainers) {
-      for (const tab of tabContainer.tabs) {
-        if (!tab.isClosed) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.tabs.some(({ tab }) => !tab.isClosed);
   }
 
   get hasActiveTabs(): boolean {
-    for (const tabContainer of this.tabContainers) {
-      for (const tab of tabContainer.tabs) {
-        if (!tab.suspended && !tab.isClosed) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return this.tabs.some(({ tab }) => !tab.suspended && !tab.isClosed);
   }
 
   get theme(): Theme {
