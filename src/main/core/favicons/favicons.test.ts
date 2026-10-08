@@ -230,11 +230,12 @@ describe('Favicons.parseFavicon', () => {
     expect(favicons.get(`byUrl.${urlHash}`)).toBe(faviconHash);
   });
 
-  test('cache hit (not expired): does not fetch and returns the cached imgData', async () => {
+  test('cache hit (not expired): does not fetch, returns cached imgData, and registers byTab/byUrl', async () => {
     const tabId: TTabId = 2;
     const faviconUrl = 'https://example.com/favicon.ico';
     const tabUrl = 'https://example.com/page';
     const faviconHash = createHash('sha256').update(faviconUrl).digest('hex');
+    const urlHash = favicons.makeUrlHash(tabUrl);
     const cached = 'data:image/png;base64,CACHED';
     favicons.set(`favicons.${faviconHash}`, { created: Date.now(), imgData: cached });
 
@@ -242,6 +243,11 @@ describe('Favicons.parseFavicon', () => {
 
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(result).toBe(cached);
+
+    const byTab = favicons.get(`byTab.${tabId}`) as { latest: string; favicons: string[] };
+    expect(byTab.latest).toBe(faviconHash);
+    expect(byTab.favicons).toEqual([faviconHash]);
+    expect(favicons.get(`byUrl.${urlHash}`)).toBe(faviconHash);
   });
 
   test('cache hit but expired: refetches and updates the entry', async () => {
