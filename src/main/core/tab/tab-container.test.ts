@@ -560,6 +560,25 @@ describe('TabContainer.ownAndChildTabs', () => {
   test('empty container with no tabs or children returns empty array', () => {
     expect(tc.ownAndChildTabs).toEqual([]);
   });
+
+  test('returns all descendant tabs recursively (grandchildren included)', () => {
+    const ownTab = tc.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://own.com',
+    });
+    const child = tc.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const grandchild = child.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const grandchildTab = grandchild.createTab(browser.idGenerator.nextTabId, {
+      partition: partitions.default,
+      url: 'http://grandchild.com',
+    });
+
+    const result = tc.ownAndChildTabs;
+
+    expect(result.map((e) => e.tab.id)).toEqual([ownTab.id, grandchildTab.id]);
+    const grandchildEntry = result.find((e) => e.tab.id === grandchildTab.id);
+    expect(grandchildEntry?.tabContainer.id).toBe(grandchild.id);
+  });
 });
 
 describe('TabContainer.activeTabsLength', () => {
