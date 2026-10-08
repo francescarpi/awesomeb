@@ -211,9 +211,7 @@ export class TabContainer {
       entries.push({ tabContainer: this, tab });
     }
     for (const child of this.children) {
-      for (const tab of child.tabs) {
-        entries.push({ tabContainer: child, tab });
-      }
+      entries.push(...child.ownAndChildTabs);
     }
     return entries;
   }

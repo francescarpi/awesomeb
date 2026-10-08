@@ -338,6 +338,122 @@ describe('Desktop.hasTabs', () => {
 
     expect(window.selectedDesktop.hasTabs).toBe(true);
   });
+
+  test('returns true when only a direct child has an open tab (regression for shallow walk bug)', async () => {
+    const d = window.selectedDesktop;
+    // Parent TC is created empty (no own tabs) so the only open tab is the child
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent,
+    });
+
+    expect(d.hasTabs).toBe(true);
+
+    // Sanity: the only non-closed tab is the child
+    const openEntries = d.tabs.filter(({ tab }) => !tab.isClosed);
+    expect(openEntries.map((e) => e.tab.id)).toEqual([child!.tab.id]);
+    expect(parent.tabs.length).toBe(0);
+  });
+
+  test('returns true when only a grandchild (3-level tree) has an open tab', async () => {
+    const d = window.selectedDesktop;
+    const root = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const mid = root.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const leaf = await browser.openURL('http://leaf.com', {
+      parentTabContainer: mid,
+    });
+
+    expect(d.hasTabs).toBe(true);
+
+    const openEntries = d.tabs.filter(({ tab }) => !tab.isClosed);
+    expect(openEntries.map((e) => e.tab.id)).toEqual([leaf!.tab.id]);
+    expect(root.tabs.length).toBe(0);
+    expect(mid.tabs.length).toBe(0);
+  });
+
+  test('returns false when the only child tab is closed and parent has no tabs', async () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent,
+    });
+
+    await browser.closeTab(child!.tab.id);
+
+    expect(d.hasTabs).toBe(false);
+  });
+});
+
+describe('Desktop.hasActiveTabs', () => {
+  let browser: Browser;
+  let window: Window;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    window = browser.createWindow(1);
+    window.createDefaultDesktops();
+  });
+
+  test('returns false on a freshly created desktop with no tabContainers', () => {
+    expect(window.selectedDesktop.hasActiveTabs).toBe(false);
+  });
+
+  test('returns true when only a direct child has an active tab (parent TC is empty)', async () => {
+    const d = window.selectedDesktop;
+    // Parent TC is empty: no own active tabs. Only the child has an active tab.
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent,
+    });
+
+    expect(d.hasActiveTabs).toBe(true);
+
+    // Sanity: the only active tab IS the child
+    const activeEntries = d.tabs.filter(({ tab }) => !tab.suspended && !tab.isClosed);
+    expect(activeEntries.map((e) => e.tab.id)).toEqual([child!.tab.id]);
+  });
+
+  test('returns true when only a grandchild (3-level tree) has an active tab', async () => {
+    const d = window.selectedDesktop;
+    const root = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const mid = root.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+    const leaf = await browser.openURL('http://leaf.com', {
+      parentTabContainer: mid,
+    });
+
+    expect(d.hasActiveTabs).toBe(true);
+
+    const activeEntries = d.tabs.filter(({ tab }) => !tab.suspended && !tab.isClosed);
+    expect(activeEntries.map((e) => e.tab.id)).toEqual([leaf!.tab.id]);
+  });
+
+  test('returns true when an empty parent TC has a child with an active tab and a sibling TC has all closed tabs', async () => {
+    const d = window.selectedDesktop;
+    // Sibling 1: empty parent with a child that has an active tab
+    const parentWithChild = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    await browser.openURL('http://child.com', {
+      parentTabContainer: parentWithChild,
+    });
+    // Sibling 2: top-level TC with one tab that will be closed
+    const lonely = await browser.openURL('http://lonely.com');
+    await browser.closeTab(lonely!.tab.id);
+
+    // The only active tab is the child — sibling has nothing active
+    expect(d.hasActiveTabs).toBe(true);
+  });
+
+  test('returns false when the only child tab is closed (parent TC is empty)', async () => {
+    const d = window.selectedDesktop;
+    const parent = d.createTabContainer(browser.idGenerator.nextTabContainerId);
+    const child = await browser.openURL('http://child.com', {
+      parentTabContainer: parent,
+    });
+
+    await browser.closeTab(child!.tab.id);
+
+    expect(d.hasActiveTabs).toBe(false);
+  });
 });
 
 describe('Desktop.selectTabContainer (children reachable)', () => {
