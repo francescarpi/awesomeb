@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { EventEmitter } from 'events';
 import { net } from 'electron';
-import { normalizeToPng, fetchFaviconUsingNet } from './helpers';
+import { bufferToDataUrl, normalizeToPng, fetchFaviconUsingNet } from './helpers';
 
 interface IcoImage {
   width: number;
@@ -443,5 +443,20 @@ describe('fetchFaviconUsingNet', () => {
     const url = await promise;
     expect(sharpMockState.sharpCalls).toBe(1);
     expectNormalizedToPng(url);
+  });
+});
+
+describe('bufferToDataUrl', () => {
+  test('generates the correct data URL for a PNG buffer', () => {
+    const buffer = Buffer.from([0xaa, 0xbb]);
+    const url = bufferToDataUrl('image/png', buffer);
+    expect(url).toBe(`data:image/png;base64,${buffer.toString('base64')}`);
+  });
+
+  test('uses the provided content type verbatim in the prefix', () => {
+    const buffer = Buffer.from('<svg></svg>');
+    const url = bufferToDataUrl('image/svg+xml', buffer);
+    expect(url.startsWith('data:image/svg+xml;base64,')).toBe(true);
+    expect(url).toBe(`data:image/svg+xml;base64,${buffer.toString('base64')}`);
   });
 });

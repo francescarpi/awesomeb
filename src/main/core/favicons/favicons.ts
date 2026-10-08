@@ -24,9 +24,11 @@ export class Favicons extends Store<TFaviconsStore> {
       name: 'favicons',
       cwd: userDataPath(),
       defaults,
+      // Lets electron-store recover on its own when favicons.json is corrupted
+      // (invalid JSON or schema mismatch) instead of throwing during construction.
+      clearInvalidConfig: true,
     });
 
-    // Validate what electron-store loaded from disk, fall back to defaults if corrupted
     this.store = validateStore(FaviconsStoreScheme, this.store, 'Favicons', defaults);
   }
 
@@ -43,7 +45,14 @@ export class Favicons extends Store<TFaviconsStore> {
     }
 
     const normalizedTabUrl = this.makeUrlHash(tabUrl);
-    const faviconImgData = await fetchFaviconUsingNet(faviconUrl);
+
+    let faviconImgData: TFaviconData | null;
+    try {
+      faviconImgData = await fetchFaviconUsingNet(faviconUrl);
+    } catch (err) {
+      scopeLog.warn(`Failed to fetch favicon from ${faviconUrl}:`, err);
+      return null;
+    }
     if (!faviconImgData) {
       return null;
     }
@@ -54,7 +63,10 @@ export class Favicons extends Store<TFaviconsStore> {
     };
 
     const existingByTab = this.get(`byTab.${tabId}`) || { latest: faviconUrlHash, favicons: [] };
-    existingByTab.favicons.push(faviconUrlHash);
+    if (!existingByTab.favicons.includes(faviconUrlHash)) {
+      existingByTab.favicons.push(faviconUrlHash);
+    }
+    existingByTab.latest = faviconUrlHash;
 
     this.set(`favicons.${faviconUrlHash}`, faviconStore);
     this.set(`byTab.${tabId}`, existingByTab);
