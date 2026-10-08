@@ -2,7 +2,7 @@ import { type VNode, btnIcon, Renderer, c, h } from '#/scripts';
 import type { ITabContainer, TWindowId, ITab } from '~/types';
 import TabPreview from '#/icons/tab-preview.svg?raw';
 import Muted from '#/icons/muted.svg?raw';
-import Favicon from '#/icons/favicon.white.svg';
+import Favicon from '#/icons/favicon.svg';
 import Minus from '#/icons/minus.svg?raw';
 import Close from '#/icons/close.svg?raw';
 import Warning from '#/icons/warning.svg?raw';
