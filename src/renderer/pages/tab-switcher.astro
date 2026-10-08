@@ -9,6 +9,7 @@ import Base from '../layouts/Base.astro';
 <script>
   import { Renderer, h, c, getSearchParams, type VNode } from '#/scripts';
   import type { ITabSwitcherTab } from '~/types';
+  import Favicon from '#/icons/favicon.svg';
 
   document.title = 'Tab Switcher';
 
@@ -137,7 +138,7 @@ import Base from '../layouts/Base.astro';
       if (favicon && img) {
         img.src = favicon;
       } else if (img) {
-        img.src = '';
+        img.src = Favicon.src;
       }
     }
   }
