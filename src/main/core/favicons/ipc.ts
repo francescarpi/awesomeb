@@ -24,7 +24,10 @@ export function setupFaviconsIpc(browser: Browser) {
       }
 
       if (tabData.tab.url) {
-        return browser.favicons.getFaviconByUrl(tabData.tab.url);
+        const favicon = browser.favicons.getFaviconByUrl(tabData.tab.url);
+        if (favicon) {
+          return favicon.toDataURL();
+        }
       }
 
       return null;

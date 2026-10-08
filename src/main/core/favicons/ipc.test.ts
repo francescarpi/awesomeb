@@ -9,7 +9,10 @@ const handlers = new Map<string, InvokeHandler>();
 const fakeEvent = { sender: { id: 1 } } as unknown as IpcMainInvokeEvent;
 
 function makeFakeImage(): unknown {
-  return { resize: vi.fn().mockReturnThis() };
+  return {
+    resize: vi.fn().mockReturnThis(),
+    toDataURL: vi.fn().mockReturnValue('data:image/png;base64,FAKE'),
+  };
 }
 
 describe('Favicons IPC', () => {
@@ -68,7 +71,10 @@ describe('Favicons IPC', () => {
     expect(opened!.tab.favicon).toBeFalsy();
     expect(opened!.tab.url).toBe('https://tab-no-favicon.example.com/');
 
-    const fakeImage = makeFakeImage();
+    const fakeImage = makeFakeImage() as {
+      resize: ReturnType<typeof vi.fn>;
+      toDataURL: ReturnType<typeof vi.fn>;
+    };
     getFaviconByUrlSpy.mockReturnValue(fakeImage as never);
 
     const handler = handlers.get('favicons:get')!;
@@ -78,7 +84,8 @@ describe('Favicons IPC', () => {
     });
 
     expect(getFaviconByUrlSpy).toHaveBeenCalledWith('https://tab-no-favicon.example.com/');
-    expect(result).toBe(fakeImage);
+    expect(fakeImage.toDataURL).toHaveBeenCalled();
+    expect(result).toBe('data:image/png;base64,FAKE');
   });
 
   test('returns null when the tab has no favicon and no URL', async () => {
