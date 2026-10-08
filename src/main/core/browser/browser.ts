@@ -15,6 +15,7 @@ import {
   MediaManager,
   AppUpdater,
   Bookmarks,
+  Favicons,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -63,6 +64,7 @@ export class Browser {
   public readonly mediaManager = new MediaManager(this);
   public readonly appUpdater = new AppUpdater(this);
   public readonly bookmarks = new Bookmarks(this);
+  public readonly favicons = new Favicons();
 
   constructor() {
     registerBrowserEvents(this);
@@ -543,9 +545,9 @@ export class Browser {
       title: tabStore.title,
       customTitle: tabStore.customTitle,
       url: tabStore.url,
-      favicon: tabStore.favicon,
       closedAt: tabStore.closedAt,
       openTabsAsChild: tabStore.openTabsAsChild,
+      favicon: this.favicons.getLastTabFavicon(tabStore.id),
     });
 
     this._indexTab(newWindow, desktop, tabContainer, tab);
@@ -738,6 +740,7 @@ export class Browser {
   permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
     this._unindexTab(tabId);
     tabContainer.deleteTab(tabId);
+    this.favicons.deleteFavicon(tabId);
     history.delete(tabId);
 
     if (tabContainer.tabs.length === 0) {

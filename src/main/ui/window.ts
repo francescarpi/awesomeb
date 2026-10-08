@@ -127,7 +127,7 @@ export class UIWindow {
   }
 
   focus() {
-    if (this.bw.isDestroyed()) {
+    if (this.isDestroyed) {
       return;
     }
 
@@ -150,8 +150,12 @@ export class UIWindow {
     return this._modalManager;
   }
 
+  get isDestroyed(): boolean {
+    return this.bw.isDestroyed();
+  }
+
   get bounds(): Rectangle {
-    if (this.bw.isDestroyed()) {
+    if (this.isDestroyed) {
       return { x: 0, y: 0, width: 0, height: 0 };
     }
     return this.bw.getBounds();
@@ -231,5 +235,11 @@ export class UIWindow {
   get isTabMarksVisible(): boolean {
     const view = this.getView<TabMarks>('tab-marks')!;
     return view.visible;
+  }
+
+  sendMessage(channel: string, ...args: any[]) {
+    if (!this.isDestroyed) {
+      this.webContents.send(channel, ...args);
+    }
   }
 }

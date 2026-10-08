@@ -3,7 +3,7 @@ import { Tab } from './tab';
 import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { HandlerDetails, WebContents, Certificate } from 'electron';
-import { windowOpenHadler, Browser, parseFavicon, TabContainer } from '@/core';
+import { windowOpenHadler, Browser, TabContainer } from '@/core';
 import type { IWinDesConTab } from '~/types';
 
 const scopeLog = log.scope('TabEvents');
@@ -115,12 +115,19 @@ export function registerTabEvents(browser: Browser, tab: Tab) {
   // ----------------------------------------------------------------------------------------------- //
   tab.webContents.on('page-favicon-updated', async (_event, favicons) => {
     if (favicons && favicons.length > 0) {
-      await parseFavicon(tab.webContents, favicons[0], (dataImage: string) => {
-        const hasChanged = tab.setFavicon(dataImage);
-        if (hasChanged) {
-          checkIfRequireAttention(browser, tab);
-        }
-      });
+      const faviconData = await browser.favicons.parseFavicon(
+        tab.id,
+        favicons[0],
+        tab.url as string,
+      );
+
+      if (!faviconData) {
+        return;
+      }
+      const hasChanged = tab.setFavicon(faviconData);
+      if (hasChanged) {
+        checkIfRequireAttention(browser, tab);
+      }
     }
   });
 
