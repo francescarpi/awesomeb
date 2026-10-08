@@ -1,4 +1,4 @@
-import { Browser, getCachedFavicon, Window } from '@/core';
+import { Browser, Window } from '@/core';
 import { TTabId } from '~/types';
 import { createHandler, windowChecker, viewChecker } from '@/utils';
 import log from 'electron-log';
@@ -24,7 +24,7 @@ export function setupFaviconsIpc(browser: Browser) {
       }
 
       if (tabData.tab.url) {
-        return await getCachedFavicon(tabData.tab.url);
+        return browser.favicons.getFaviconByUrl(tabData.tab.url);
       }
 
       return null;

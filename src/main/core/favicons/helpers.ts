@@ -1,143 +1,69 @@
-import { type NativeImage, WebContents, nativeImage, net } from 'electron';
-import fs from 'fs';
-import slugify from 'slugify';
-import { faviconsPath } from '@/paths';
-import path from 'path';
-import { DEFAULT_FAVICON } from './constants';
-
+import { net } from 'electron';
+import sharp, { type Raw } from 'sharp';
+import decodeIco from 'decode-ico';
 import log from 'electron-log';
-const scopeLog = log.scope('FaviconsHelper');
+import { ICO_MIME_TYPES, NORMALIZED_SIZE } from './constants';
 
-const MEMORY_CACHE: Map<string, Buffer> = new Map();
+const scopeLog = log.scope('FaviconsHelpers');
 
-function normalizeUrl(url: string): string {
-  try {
-    const urlObj = new URL(url);
-    return `${urlObj.protocol}//${urlObj.hostname}`;
-  } catch {
-    scopeLog.warn(`Invalid URL: ${url}`);
-    return 'http://localhost';
-  }
+export function bufferToDataUrl(contentType: string, buffer: Buffer): string {
+  return `data:${contentType};base64,${buffer.toString('base64')}`;
 }
 
-function gennerateCacheKey(url: string): string {
-  const slug = slugify(url, { lower: true, strict: true });
-  return slug;
-}
-
-function getCachedFaviconFromMemory(url: string, _dontCacheOnDisk?: boolean): Buffer | null {
-  const cacheKey = gennerateCacheKey(url);
-  return MEMORY_CACHE.get(cacheKey) || null;
-}
-
-function getCachedFaviconFromDisk(url: string, _dontCacheOnDisk?: boolean): Buffer | null {
-  const folder = faviconsPath();
-  const cacheKey = gennerateCacheKey(url);
-  const filePath = path.join(folder, `${cacheKey}.png`);
-
-  if (fs.existsSync(filePath)) {
-    try {
-      const imageBuffer = fs.readFileSync(filePath);
-
-      // Cache in memory for faster access next time
-      MEMORY_CACHE.set(cacheKey, imageBuffer);
-
-      return imageBuffer;
-    } catch (err) {
-      scopeLog.error(`Error reading favicon file at ${filePath}`, err);
-      return null;
+function pickLargestImage<T extends { width: number; height: number }>(images: T[]): T {
+  let best = images[0];
+  let bestArea = best.width * best.height;
+  for (const img of images) {
+    const area = img.width * img.height;
+    if (area > bestArea) {
+      best = img;
+      bestArea = area;
     }
   }
-
-  return null;
+  return best;
 }
 
-async function fetchFromUrlAndCache(
-  url: string,
-  dontCacheOnDisk?: boolean,
-): Promise<Buffer | null> {
-  const source = `https://www.google.com/s2/favicons?domain=${url}&sz=32`;
-  try {
-    const response = await fetch(source);
+const RESIZE_OPTIONS = {
+  fit: 'contain' as const,
+  background: { r: 0, g: 0, b: 0, alpha: 0 },
+};
 
-    let imageBuffer: Buffer;
+async function rasterizeToPng(buffer: Buffer, raw?: Raw): Promise<string> {
+  const png = await sharp(buffer, raw ? { raw } : undefined)
+    .resize(NORMALIZED_SIZE, NORMALIZED_SIZE, RESIZE_OPTIONS)
+    .png()
+    .toBuffer();
+  return bufferToDataUrl('image/png', png);
+}
 
-    if (response.ok) {
-      const arrayBuffer = await response.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-
-      imageBuffer = Buffer.from(bytes);
-    } else {
-      imageBuffer = DEFAULT_FAVICON;
-    }
-
-    // Cache in memory
-    const cacheKey = gennerateCacheKey(url);
-    MEMORY_CACHE.set(cacheKey, imageBuffer);
-
-    // Cache on disk
-    if (!dontCacheOnDisk) {
-      const folder = faviconsPath();
-      const filePath = path.join(folder, `${cacheKey}.png`);
-      fs.writeFile(filePath, imageBuffer, (err) => {
-        if (err) {
-          scopeLog.error(`Error writing favicon file at ${filePath}`, err);
-        }
-      });
-    }
-
-    return imageBuffer;
-  } catch (err) {
-    scopeLog.error(`Error fetching favicon from ${source}`, err);
+async function decodeIcoToPng(buffer: Buffer): Promise<string> {
+  const images = decodeIco(buffer);
+  if (!images.length) {
+    throw new Error('ICO contains no images');
   }
 
-  return null;
-}
+  const largest = pickLargestImage(images);
+  const data = Buffer.from(largest.data);
 
-export async function getCachedFavicon(
-  url: string,
-  opts?: { format?: 'buffer' | 'data' | 'native' | 'native12'; dontCacheOnDisk?: boolean },
-): Promise<string | Buffer | NativeImage | null> {
-  const normalized = normalizeUrl(url);
-  const { format, dontCacheOnDisk } = opts || {};
-
-  for (const fetcher of [
-    getCachedFaviconFromMemory,
-    getCachedFaviconFromDisk,
-    fetchFromUrlAndCache,
-  ]) {
-    const cachedImage = await fetcher(normalized, dontCacheOnDisk);
-    if (cachedImage) {
-      switch (format || 'data') {
-        case 'native':
-          return nativeImage.createFromBuffer(cachedImage);
-        case 'native12':
-          return nativeImage.createFromBuffer(cachedImage).resize({ width: 12, height: 12 });
-        case 'buffer':
-          return cachedImage;
-        case 'data':
-          return `data:image/png;base64,${cachedImage.toString('base64')}`;
-      }
-    }
+  if (largest.type === 'png') {
+    return rasterizeToPng(data);
   }
 
-  return null;
+  return rasterizeToPng(data, {
+    width: largest.width,
+    height: largest.height,
+    channels: 4,
+  });
 }
 
-export async function parseFavicon(
-  _wc: WebContents,
-  url: string,
-  callback: (dataImage: string) => void,
-) {
-  const dataImage = await fetchFaviconUsingNet(url);
-  callback(dataImage);
+export async function normalizeToPng(contentType: string, buffer: Buffer): Promise<string> {
+  if (ICO_MIME_TYPES.has(contentType)) {
+    return decodeIcoToPng(buffer);
+  }
+  return rasterizeToPng(buffer);
 }
 
-async function fetchFaviconUsingNet(url: string): Promise<string> {
+export async function fetchFaviconUsingNet(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = net.request(url);
     const chunks: Buffer[] = [];
@@ -147,16 +73,22 @@ async function fetchFaviconUsingNet(url: string): Promise<string> {
 
       if (['text/html'].includes(contentType)) {
         reject();
+        return;
       }
 
       response.on('data', (chunk) => {
         chunks.push(chunk);
       });
 
-      response.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        const base64 = buffer.toString('base64');
-        resolve(`data:${contentType};base64,${base64}`);
+      response.on('end', async () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const dataUrl = await normalizeToPng(contentType, buffer);
+          resolve(dataUrl);
+        } catch (err) {
+          scopeLog.warn(`Failed to normalize favicon from ${url}:`, err);
+          reject();
+        }
       });
 
       response.on('error', reject);
