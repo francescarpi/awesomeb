@@ -111,7 +111,7 @@ export class BrowserToRenderer {
     const data: ILayoutData = {
       sidebarCollapsed: window.sidebarCollapsed,
       areaMaximized: window.areaMaximized,
-      hasVisibleTabs: window.tabs.some((tab) => tab.tab.visible),
+      hasVisibleTabs: window.hasTabsVisible,
       selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
       sidebarWidth: window.sidebarWidth,
