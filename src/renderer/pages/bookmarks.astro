@@ -240,9 +240,18 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
       },
     ];
 
+    const previouslySelectedId = state.folderSelected?.id;
     originalBookmarks = bookmarksWithRoot;
 
-    selectFirstFolder();
+    const preserved = previouslySelectedId
+      ? findFolderById(originalBookmarks, previouslySelectedId)
+      : null;
+
+    if (preserved) {
+      state.folderSelected = preserved;
+    } else {
+      selectFirstFolder();
+    }
 
     refresh();
   }
@@ -260,6 +269,19 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     if (folders.length) {
       state.folderSelected = folders[0];
     }
+  }
+
+  function findFolderById(bookmarks: IBookmark[], id: string): IFolderBookmark | null {
+    for (const bookmark of bookmarks) {
+      if (bookmark.id === id && bookmark.type === EBookmarkType.Folder) {
+        return bookmark as IFolderBookmark;
+      }
+      if (bookmark.type === EBookmarkType.Folder) {
+        const found = findFolderById(bookmark.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   function deleteBookmarkInList(bookmarks: IBookmark[], id: string): IBookmark[] {
