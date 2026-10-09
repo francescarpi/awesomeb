@@ -84,7 +84,7 @@ export async function renderTabContainers(
             {
               class: c(
                 openCount === 0 ? 'hidden' : 'group-[.collapsed]/sidebar:hidden block',
-                !tc.collapseChildren && 'pl-3',
+                tc.collapseChildren ? 'pl-7' : 'pl-9',
                 'text-xs',
                 'ml-4',
                 'text-white',

@@ -4,7 +4,7 @@ export function box(title: string, desc: string, ...content: VNode[]): VNode {
   return h(
     'div',
     {
-      class: 'border rounded-[var(--radius-box)] p-2 relative mb-6 w-full',
+      class: 'border rounded-xl p-2 relative mb-6 w-full',
     },
     h(
       'span',
