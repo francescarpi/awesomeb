@@ -48,7 +48,10 @@ import Layout from '#/layouts/Base.astro';
           class: 'w-30 h-30 text-error [&>svg]:w-full [&>svg]:h-full',
         }),
         h('h6', { class: 'font-bold' }, t['pages:tabFailLoad.title']),
-        h('p', { class: 'w-full truncate text-center px-10' }, t['pages:tabFailLoad.message']),
+        h('p', {
+          class: 'w-full truncate text-center px-10',
+          innerHTML: t['pages:tabFailLoad.message'],
+        }),
         h(
           'div',
           {
