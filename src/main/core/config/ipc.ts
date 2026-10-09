@@ -35,6 +35,7 @@ export function setupConfigIPC(browser: Browser) {
         [
           internalPageChecker.bind(null, ['settings']),
           internalPageChecker.bind(null, ['bookmarks']),
+          internalPageChecker.bind(null, ['history']),
           welcomeWindowChecker,
         ],
       ),
