@@ -3,7 +3,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 ---
 
 <BlackBgWithTitle title="pages:bookmarks.title">
-  <div id="content" class="h-full"></div>
+  <div id="content" class="fixed inset-0 mt-20 mb-4 mx-4"></div>
 </BlackBgWithTitle>
 
 <script>
@@ -60,107 +60,119 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
     renderer.update(
       h(
         'div',
-        { class: 'grid grid-cols-[290px_2fr] gap-2 h-full' },
-        h('div', { class: 'bg-white/40 p-2 rounded' }, ...renderFolders(filterFolders(bookmarks))),
-        h('div', { class: 'min-w-0' }, renderContent()),
+        { class: 'max-w-6xl mx-auto relative h-full' },
+        h(
+          'ul',
+          {
+            class: `absolute left-0 top-0 bottom-0 m-0 w-70 border p-2 rounded-xl menu overflow-auto flex-nowrap`,
+          },
+          ...renderFolders(filterFolders(bookmarks)),
+        ),
+        h(
+          'div',
+          { class: 'absolute left-74 top-0 bottom-0 right-0 border rounded-xl overflow-auto' },
+          renderContent(),
+        ),
       ),
     );
   }
 
   function renderContent(): VNode {
     if (!state.folderSelected || state.folderSelected.children.length === 0) {
-      return h(
-        'div',
-        { class: 'mx-auto flex flex-col gap-2 bg-white/40 rounded p-2' },
-        t['pages:bookmarks.noBookmarks'],
-      );
+      return h('div', { class: 'flex flex-col gap-2  p-2' }, t['pages:bookmarks.noBookmarks']);
     }
 
     return h(
-      'div',
+      'ul',
       {
-        class: 'mx-auto w-full min-w-0 flex flex-col gap-2 bg-white/40 rounded p-2',
+        class: 'w-full menu',
       },
       ...state.folderSelected.children.map((child: IBookmark) =>
         h(
-          'div',
-          { class: 'flex flex-col w-full min-w-0 p-2 hover:bg-white/50' },
+          'li',
+          {},
           h(
             'div',
-            { class: 'flex gap-2 items-center justify-between' },
+            { class: 'flex flex-col w-full p-2 items-start' },
             h(
               'div',
-              { class: 'flex items-center gap-2' },
+              { class: 'flex gap-2 items-center justify-between w-full' },
               h(
                 'div',
-                {},
-                icon(child.type === EBookmarkType.Folder ? Folder : Link, 'text-black', '4'),
+                { class: 'flex items-center gap-2' },
+                h(
+                  'div',
+                  {},
+                  icon(
+                    child.type === EBookmarkType.Folder ? Folder : Link,
+                    'text-base-content',
+                    '4',
+                  ),
+                ),
+                h('div', {}, child.title),
               ),
-              h('div', {}, child.title),
+              h(
+                'div',
+                { class: 'flex gap-1' },
+                btnIcon(Edit, {
+                  size: 4,
+                  onClick: async () => {
+                    await editBookmark(child, async (result) => {
+                      child.title = result.title;
+                      if (child.type === EBookmarkType.Url && result.url) {
+                        child.url = result.url;
+                      }
+                      await updateBookmarks(originalBookmarks);
+                      refresh();
+                    });
+                  },
+                }),
+                btnIcon(Move, {
+                  size: 4,
+                  onClick: async () => {
+                    const options = bookmarksToOptions(originalBookmarks, child.id, 1);
+                    await dialogWithSelect(t['pages:bookmarks.selectNewParent'], options, {
+                      onAccept: async (selectedFolderId: string) => {
+                        let newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+
+                        if (selectedFolderId === 'root') {
+                          newBookmarks.push(child);
+                        } else {
+                          newBookmarks = addBookmarkToParent(newBookmarks, selectedFolderId, child);
+                        }
+
+                        await updateBookmarks(newBookmarks);
+                        reload();
+                      },
+                    });
+                  },
+                }),
+                btnIcon(Delete, {
+                  size: 4,
+                  onClick: async () => {
+                    await dialogConfirm(t['pages:bookmarks.deleteConfirm'], {
+                      onAccept: async () => {
+                        const newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
+                        await updateBookmarks(newBookmarks);
+                        reload();
+                      },
+                    });
+                  },
+                }),
+              ),
             ),
             h(
-              'div',
-              { class: 'flex gap-1' },
-              btnIcon(Edit, {
-                size: 4,
-                classNames: ['hover:bg-white!'],
-                onClick: async () => {
-                  await editBookmark(child, async (result) => {
-                    child.title = result.title;
-                    if (child.type === EBookmarkType.Url && result.url) {
-                      child.url = result.url;
-                    }
-                    await updateBookmarks(originalBookmarks);
-                    refresh();
-                  });
+              'a',
+              {
+                class:
+                  'block w-full ml-6.5 opacity-50 truncate cursor-pointer text-sm pr-16 max-w-2xl',
+                title: child.url,
+                onclick: () => {
+                  abBookmarks.open(child.id);
                 },
-              }),
-              btnIcon(Move, {
-                size: 4,
-                classNames: ['hover:bg-white!'],
-                onClick: async () => {
-                  const options = bookmarksToOptions(originalBookmarks, child.id, 1);
-                  await dialogWithSelect(t['pages:bookmarks.selectNewParent'], options, {
-                    onAccept: async (selectedFolderId: string) => {
-                      let newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
-
-                      if (selectedFolderId === 'root') {
-                        newBookmarks.push(child);
-                      } else {
-                        newBookmarks = addBookmarkToParent(newBookmarks, selectedFolderId, child);
-                      }
-
-                      await updateBookmarks(newBookmarks);
-                      reload();
-                    },
-                  });
-                },
-              }),
-              btnIcon(Delete, {
-                size: 4,
-                classNames: ['hover:bg-white!'],
-                onClick: async () => {
-                  await dialogConfirm(t['pages:bookmarks.deleteConfirm'], {
-                    onAccept: async () => {
-                      const newBookmarks = deleteBookmarkInList(originalBookmarks, child.id);
-                      await updateBookmarks(newBookmarks);
-                      reload();
-                    },
-                  });
-                },
-              }),
-            ),
-          ),
-          h(
-            'a',
-            {
-              class: 'block w-full ml-6.5 opacity-50 truncate cursor-pointer text-sm pr-16',
-              title: child.url,
-              onclick: () => {
-                abBookmarks.open(child.id);
               },
-            },
-            child.url,
+              child.url,
+            ),
           ),
         ),
       ),
@@ -177,32 +189,36 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
 
       response.push(
         h(
-          'div',
-          {
-            class: c(
-              'mb-1',
-              'flex',
-              'items-center',
-              'gap-1',
-              'cursor-pointer',
-              'rounded',
-              'select-none',
-              selected ? 'bg-primary text-primary-content' : 'hover:bg-black/10',
-            ),
-            onclick: () => {
-              state.folderSelected = folder;
-              refresh();
-            },
-          },
+          'li',
+          {},
           h(
             'div',
             {
-              class: c(!hasChildren && 'invisible', `ml-[${level}rem]`),
+              class: c(
+                'mb-1',
+                'flex',
+                'items-center',
+                'gap-1',
+                'cursor-pointer',
+                'rounded',
+                'select-none',
+                selected && 'menu-active',
+              ),
+              onclick: () => {
+                state.folderSelected = folder;
+                refresh();
+              },
             },
-            icon(ArrowDown, 'text-black', '7'),
+            h(
+              'div',
+              {
+                class: c(!hasChildren && 'invisible', `ml-[${level}rem]`),
+              },
+              icon(ArrowDown, 'text-base-content', '7'),
+            ),
+            h('div', {}, icon(Folder, 'text-base-content', '4')),
+            h('div', {}, folder.title),
           ),
-          h('div', {}, icon(Folder, 'text-black', '4')),
-          h('div', {}, folder.title),
         ),
       );
 
