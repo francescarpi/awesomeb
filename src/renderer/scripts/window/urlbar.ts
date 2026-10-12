@@ -22,9 +22,10 @@ export function renderNavUrl(
     canGoForward: false,
     hasURL: false,
     hasSplit: false,
+    isInternal: false,
   },
 ) {
-  const showSafe = data.hasURL && !data.loading && data.safe;
+  const showSafe = data.hasURL && !data.loading && data.safe && !data.isInternal;
   const showUnsafe = data.hasURL && !data.loading && !data.safe;
 
   renderer.update([
@@ -87,6 +88,21 @@ export function renderNavUrl(
             }
           },
         }),
+        h(
+          'div',
+          {
+            class: c(
+              !data.isInternal && 'hidden',
+              'text-xs',
+              'bg-white/20',
+              'px-1',
+              'rounded-full',
+              '-mx-1',
+              'cursor-default',
+            ),
+          },
+          'AwesomeB',
+        ),
         h('div', {
           innerHTML: UnsafeIcon,
           class: c(
