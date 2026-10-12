@@ -169,41 +169,6 @@ export function registerSessionEvents(browser: Browser, ses: Session) {
       },
     });
   });
-
-  // ----------------------------------------------------------------------------------------------- //
-  ses.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-    const hostCandidate =
-      details?.securityOrigin ??
-      details?.requestingUrl ??
-      requestingOrigin ??
-      webContents?.getURL?.();
-
-    if (!hostCandidate) {
-      scopeLog.error('Permission check: could not determine host');
-      return false;
-    }
-
-    let host: string;
-    try {
-      host = new URL(hostCandidate).host;
-    } catch {
-      scopeLog.error(`Permission check: invalid host URL "${hostCandidate}"`);
-      return false;
-    }
-
-    if (config.isStandardPermissions && ALLOWED_PERMISSIONS.includes(permission)) {
-      scopeLog.info(`Permission check: auto-grant standard ${permission} for ${host}`);
-      return true;
-    }
-
-    const stored = permissions.peek(host, permission);
-    if (stored !== null) {
-      scopeLog.info(`Permission check: stored ${stored} for ${host}/${permission}`);
-      return stored;
-    }
-
-    return false;
-  });
 }
 
 function requestFrameUrl(
