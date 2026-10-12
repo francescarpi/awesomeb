@@ -52,6 +52,7 @@ export interface IURLTabData {
   canGoForward: boolean;
   hasURL: boolean;
   hasSplit: boolean;
+  isInternal: boolean;
 }
 
 export interface ITabSwitcherTab {

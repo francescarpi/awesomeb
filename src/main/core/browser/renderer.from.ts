@@ -249,6 +249,7 @@ export class BrowserRenderer {
         canGoForward: false,
         hasURL: false,
         hasSplit: false,
+        isInternal: false,
       };
     }
 
@@ -261,6 +262,7 @@ export class BrowserRenderer {
       canGoForward: tabData.tab.canGoForward,
       hasURL: !!tabData.tab.url,
       hasSplit: tabData.tabContainer.isSplit,
+      isInternal: tabData.tab.isInternal,
     };
   }
 

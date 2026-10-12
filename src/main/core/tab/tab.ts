@@ -1,4 +1,4 @@
-import { Partition, history, Browser, Window } from '@/core';
+import { Partition, history, Browser, Window, partitions } from '@/core';
 import { ITabProps, TBasicAuthCallback, TCertificateCallback, TPermissionRequest } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
@@ -562,5 +562,9 @@ export class Tab extends UIView {
 
   get isExtension(): boolean {
     return this.webContents?.getURL().startsWith('chrome-extension://');
+  }
+
+  get isInternal(): boolean {
+    return this.partition.id === partitions.internal.id;
   }
 }
