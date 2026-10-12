@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.14.27-alpha",
+  "version": "0.14.28-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -67,10 +67,10 @@
     "tailwindcss": "4.3.3",
     "tsc-alias": "1.9.7",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1",
+    "typescript-eslint": "8.71.2",
     "vite": "8.3.4",
     "vite-plugin-static-copy": "4.1.1",
-    "vitest": "5.0.3"
+    "vitest": "5.0.4"
   },
   "dependencies": {
     "@electron-webauthn/macos": "1.3.1",
@@ -80,16 +80,16 @@
     "electron-context-menu": "5.1.0",
     "electron-dl": "5.0.0",
     "electron-log": "5.4.4",
-    "electron-store": "11.0.2",
+    "electron-store": "12.0.0",
     "electron-updater": "6.8.9",
     "electron-webauthn": "1.3.1",
-    "i18next": "26.4.3",
+    "i18next": "26.4.4",
     "i18next-fs-backend": "2.6.8",
     "mime-types": "3.0.2",
     "sharp": "0.35.5",
     "slugify": "1.6.9",
     "tldts": "7.4.18",
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   },
   "engines": {
     "node": ">=24",
