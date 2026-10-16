@@ -113,6 +113,10 @@ export class UIView {
     this._webContentsView.setVisible(visible);
   }
 
+  setBounds(bounds: Rectangle) {
+    this._webContentsView.setBounds(bounds);
+  }
+
   send(channel: string, ...args: any[]) {
     this.webContents.send(channel, ...args);
   }

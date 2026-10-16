@@ -131,6 +131,16 @@ function renderTab(winId: TWindowId, t: ITab): VNode {
 }
 
 function buildTabVNode(winId: TWindowId, t: ITab): VNode {
+  let tooltip = `<b>${t.title}</b>`;
+  if (t.url) {
+    try {
+      const parsed = new URL(t.url);
+      tooltip += `<span>${parsed.hostname}</span>`;
+    } catch {
+      // Nothing
+    }
+  }
+
   return h(
     'div', // Tab
     {
@@ -207,6 +217,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
           'text-white',
           t.loading ? 'hidden' : 'block',
         ),
+        'data-tooltip': tooltip,
       },
       '',
     ),
@@ -217,7 +228,10 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       },
       h(
         'span', // Title
-        { class: 'text-sm overflow-hidden text-ellipsis text-nowrap' },
+        {
+          class: 'text-sm overflow-hidden text-ellipsis text-nowrap',
+          'data-tooltip': tooltip,
+        },
         t.title,
       ),
       h(
