@@ -617,6 +617,16 @@ const abSidebar = {
 };
 
 //--------------------------------------------------------------------------------------
+const abTooltip = {
+  show: (winId: TWindowId, tooltip: string, x: number, y: number) => {
+    ipcRenderer.send('tooltip:show', { winId, tooltip, x, y });
+  },
+  hide: (winId: TWindowId) => {
+    ipcRenderer.send('tooltip:hide', { winId });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 contextBridge.exposeInMainWorld('abModal', abModal);
 contextBridge.exposeInMainWorld('abEntities', abEntities);
 contextBridge.exposeInMainWorld('abCommands', abCommands);
@@ -644,3 +654,4 @@ contextBridge.exposeInMainWorld('abMedia', abMedia);
 contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
 contextBridge.exposeInMainWorld('abI18n', abI18n);
 contextBridge.exposeInMainWorld('abSidebar', abSidebar);
+contextBridge.exposeInMainWorld('abTooltip', abTooltip);

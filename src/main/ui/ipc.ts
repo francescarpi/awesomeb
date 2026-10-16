@@ -83,4 +83,26 @@ export function setupUIIPC(browser: Browser) {
       return browser.renderer.urlBarData(tab);
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window; tooltip: string; x: number; y: number }>(
+    'tooltip:show',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win, tooltip, x, y }) => {
+      win.showTooltip(tooltip, x, y);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window }>(
+    'tooltip:hide',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      win.hideTooltip();
+    },
+  );
 }

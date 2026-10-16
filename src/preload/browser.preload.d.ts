@@ -259,4 +259,10 @@ declare global {
   const abSidebar: {
     onChangeDrag: (callback: (event: IpcRendererEvent, isDragable: boolean) => void) => void;
   };
+
+  //--------------------------------------------------------------------------------------
+  const abTooltip: {
+    show: (winId: TWindowId, tooltip: string, x: number, y: number) => void;
+    hide: (winId: TWindowId) => void;
+  };
 }

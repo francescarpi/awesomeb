@@ -1,4 +1,4 @@
-import { UIWindow } from '@/ui';
+import { UIWindow, UITooltip } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
@@ -452,6 +452,20 @@ export class Window extends UIWindow {
     }
 
     return null;
+  }
+
+  showTooltip(tooltip: string, x: number, y: number) {
+    this.hideTooltip();
+
+    const view = new UITooltip(this.id, tooltip, x, y);
+    this.addView(view);
+  }
+
+  hideTooltip() {
+    const view = this.getView<UITooltip>('tooltip');
+    if (view) {
+      this.removeView('tooltip');
+    }
   }
 
   openContextualModal(page: TPage, params: IContextualModalParams) {
