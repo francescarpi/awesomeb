@@ -25,6 +25,7 @@ export class Tooltip {
       return;
     }
 
+    const tooltipPosition = el.getAttribute('data-tooltip-position');
     const tooltip = el.getAttribute('data-tooltip');
     if (!tooltip) {
       this.scheduleHide();
@@ -44,10 +45,24 @@ export class Tooltip {
     this.currentTooltip = tooltip;
 
     this.showTimer = window.setTimeout(() => {
-      this.show(el, tooltip, e.clientX, e.clientY);
+      const x = this.tooltipPosition(tooltipPosition, e.clientX + 20);
+      this.show(el, tooltip, x, el.getBoundingClientRect().y);
       this.visible = true;
       this.showTimer = null;
     }, this.SHOW_DELAY);
+  };
+
+  private tooltipPosition = (position: string | null, defaultValue: number): number => {
+    switch (position) {
+      case 'sidebar-end': {
+        const el = document.getElementById('sidebar-tabs');
+        if (el) {
+          return (el as HTMLDivElement).getBoundingClientRect().right + 5;
+        }
+        break;
+      }
+    }
+    return defaultValue;
   };
 
   private onMouseOut = (e: MouseEvent) => {
@@ -88,7 +103,7 @@ export class Tooltip {
   };
 
   private show = (_el: HTMLElement, text: string, x: number, y: number) => {
-    abTooltip.show(this.winId, text, Math.round(x) + 20, Math.round(y));
+    abTooltip.show(this.winId, text, Math.round(x), Math.round(y));
   };
 
   private hide = () => {
