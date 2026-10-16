@@ -217,7 +217,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       },
       h(
         'span', // Title
-        { class: 'text-sm overflow-hidden text-ellipsis text-nowrap' },
+        { class: 'text-sm overflow-hidden text-ellipsis text-nowrap', 'data-tooltip': t.title },
         t.title,
       ),
       h(
