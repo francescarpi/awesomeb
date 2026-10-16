@@ -262,7 +262,7 @@ declare global {
 
   //--------------------------------------------------------------------------------------
   const abTooltip: {
-    show: (winId: TWindowId, tooltip: string) => void;
+    show: (winId: TWindowId, tooltip: string, x: number, y: number) => void;
     hide: (winId: TWindowId) => void;
   };
 }

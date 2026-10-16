@@ -6,7 +6,7 @@ export class Tooltip {
   private hideTimer: number | null = null;
   private currentTooltip: string | null = null;
   private visible: boolean = false;
-  private readonly SHOW_DELAY = 1000;
+  private readonly SHOW_DELAY = 600;
   private readonly HIDE_DELAY = 100;
 
   constructor(private readonly winId: TWindowId) {}
@@ -44,7 +44,7 @@ export class Tooltip {
     this.currentTooltip = tooltip;
 
     this.showTimer = window.setTimeout(() => {
-      this.show(el, tooltip);
+      this.show(el, tooltip, e.clientX, e.clientY);
       this.visible = true;
       this.showTimer = null;
     }, this.SHOW_DELAY);
@@ -87,8 +87,8 @@ export class Tooltip {
     }
   };
 
-  private show = (_el: HTMLElement, text: string) => {
-    abTooltip.show(this.winId, text);
+  private show = (_el: HTMLElement, text: string, x: number, y: number) => {
+    abTooltip.show(this.winId, text, Math.round(x) + 20, Math.round(y));
   };
 
   private hide = () => {

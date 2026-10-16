@@ -85,18 +85,24 @@ export function setupUIIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{ win: Window; tooltip: string }>(
+  createHandler<{ win: Window; tooltip: string; x: number; y: number }>(
     'tooltip:show',
     'on',
     browser,
     [windowChecker],
-    async ({ tooltip }) => {
-      console.log('show', tooltip);
+    async ({ win, tooltip, x, y }) => {
+      win.showTooltip(tooltip, x, y);
     },
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{ win: Window }>('tooltip:hide', 'on', browser, [windowChecker], async ({}) => {
-    console.log('hide');
-  });
+  createHandler<{ win: Window }>(
+    'tooltip:hide',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win }) => {
+      win.hideTooltip();
+    },
+  );
 }

@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base noDrag>
+  <div
+    class="bg-base-200 text-base-content text-sm p-2 rounded flex-col gap-2 hidden"
+    id="tooltip"
+  ></div>
+</Base>
+
+<script>
+  import { getSearchParams } from '#/scripts';
+  const { searchParams } = getSearchParams();
+  const el = document.getElementById('tooltip') as HTMLDivElement;
+  el.innerHTML = searchParams.get('tooltip') || 'No tooltip';
+  el.classList.replace('hidden', 'flex');
+</script>

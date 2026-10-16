@@ -618,8 +618,8 @@ const abSidebar = {
 
 //--------------------------------------------------------------------------------------
 const abTooltip = {
-  show: (winId: TWindowId, tooltip: string) => {
-    ipcRenderer.send('tooltip:show', { winId, tooltip });
+  show: (winId: TWindowId, tooltip: string, x: number, y: number) => {
+    ipcRenderer.send('tooltip:show', { winId, tooltip, x, y });
   },
   hide: (winId: TWindowId) => {
     ipcRenderer.send('tooltip:hide', { winId });
