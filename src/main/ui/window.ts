@@ -101,7 +101,9 @@ export class UIWindow {
       view.webContentsView.webContents.close();
     }
 
-    this.bw.contentView.removeChildView(view.webContentsView);
+    if (!this.bw.isDestroyed()) {
+      this.bw.contentView.removeChildView(view.webContentsView);
+    }
 
     this._views.delete(id);
   }
