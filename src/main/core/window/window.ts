@@ -414,10 +414,12 @@ export class Window extends UIWindow {
 
   toggleSidebar(window: Window) {
     super.toggleSidebar(window);
+    this.hideTooltip();
   }
 
   toggleMaximizeArea(window: Window) {
     super.toggleMaximizeArea(window);
+    this.hideTooltip();
   }
 
   get sidebarWidth(): number {
