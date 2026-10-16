@@ -218,6 +218,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
           t.loading ? 'hidden' : 'block',
         ),
         'data-tooltip': tooltip,
+        'data-tooltip-position': 'sidebar-end',
       },
       '',
     ),
@@ -231,6 +232,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
         {
           class: 'text-sm overflow-hidden text-ellipsis text-nowrap',
           'data-tooltip': tooltip,
+          'data-tooltip-position': 'sidebar-end',
         },
         t.title,
       ),

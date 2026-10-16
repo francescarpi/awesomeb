@@ -539,7 +539,10 @@ export class Renderer {
   // Multi-root state — always normalized to arrays internally.
   private els: (HTMLElement | Text)[] = [];
   private currentVNodes: VNode[] = [];
-  private container: HTMLElement | null = null;
+  private _container: HTMLElement | null = null;
+  public get container(): HTMLElement | null {
+    return this._container;
+  }
 
   constructor(initialVNode: VNode | VNode[]) {
     this.currentVNodes = Array.isArray(initialVNode) ? initialVNode : [initialVNode];
@@ -564,7 +567,7 @@ export class Renderer {
     if (!container) {
       throw new Error(`Container element with ID "${containerElementId}" not found`);
     }
-    this.container = container;
+    this._container = container;
 
     if (opts?.replace) {
       container.innerHTML = '';
