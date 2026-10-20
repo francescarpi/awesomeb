@@ -38,7 +38,7 @@ export function renderActions(winId: TWindowId, renderer: Renderer) {
       classNames: [
         'text-white',
         'group-[.collapsed]/sidebar:mt-0.5',
-        'group-[.collapsed]/sidebar:ml-2',
+        'group-[.collapsed]/sidebar:ml-1.5',
       ],
       onClick: () => abCommands.perform(winId, 'toggle-sidebar'),
       key: 'toggle',
