@@ -9,7 +9,8 @@
     "splitIntoSelectedTab": "Dividir en pestanya seleccionada",
     "window": "Finestra {{id}}",
     "desktop": "Escriptori: \"{{label}}\"",
-    "removeFromParent": "Mou al nivell superior"
+    "removeFromParent": "Mou al nivell superior",
+    "moveAsChild": "Mou com a fill del seleccionat"
   },
   "ok": "D'acord",
   "cancel": "Cancel·la",

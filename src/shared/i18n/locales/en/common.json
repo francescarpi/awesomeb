@@ -9,7 +9,8 @@
     "splitIntoSelectedTab": "Split into selected tab",
     "window": "Window {{id}}",
     "desktop": "Desktop: \"{{label}}\"",
-    "removeFromParent": "Move to top level"
+    "removeFromParent": "Move to top level",
+    "moveAsChild": "Move as a child of selected"
   },
   "ok": "OK",
   "cancel": "Cancel",

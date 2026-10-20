@@ -199,6 +199,192 @@ describe('Browser', () => {
     });
   });
 
+  describe('Browser.moveTab move-as-child', () => {
+    test('moves a tab into a brand-new child of the requested parent container', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      // Parent lives in its own top-level container.
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const parentTc = parent!.tabContainer;
+      // Source tab lives in a different top-level container.
+      const source = await browser.openURL('http://source.com', { selectTab: true });
+      const sourceTc = source!.tabContainer;
+
+      expect(parentTc.id).not.toBe(sourceTc.id);
+      expect(parentTc.children).toHaveLength(0);
+      expect(sourceTc.parent).toBeNull();
+
+      browser.moveTab(source!.tab.id, 'move-as-child', { parentTabContainer: parentTc });
+
+      // The source tab now lives in a child of parentTc.
+      const moved = browser.getTab(source!.tab.id);
+      expect(moved).not.toBeNull();
+      expect(moved!.tabContainer.parent?.id).toBe(parentTc.id);
+      expect(parentTc.children.map((c) => c.id)).toContain(moved!.tabContainer.id);
+      expect(moved!.tabContainer.tabs.map((t) => t.id)).toEqual([source!.tab.id]);
+
+      // The old source container had only one tab, so it's gone from the desktop.
+      // (Its id may be recycled for the new child, so we don't assert via getTabContainer.)
+      expect(w.getDesktop(1)?.tabContainers.map((tc) => tc.id)).toEqual([parentTc.id]);
+      // The source container is no longer in the tree (no parent, not in desktop).
+      expect(sourceTc.parent).toBeNull();
+      expect(w.getDesktop(1)?.tabContainers).not.toContain(sourceTc);
+    });
+
+    test('keeps the source container alive when it still holds other tabs', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const parentTc = parent!.tabContainer;
+
+      // Source container will hold two tabs (we'll move only the second one).
+      // We use split-tab so both tabs land in the same container.
+      const first = await browser.openURL('http://first.com', { selectTab: true });
+      const second = await browser.openURL('http://second.com', { targetId: 'split-tab' });
+      const sourceTc = first!.tabContainer;
+
+      expect(sourceTc.id).toBe(second!.tabContainer.id);
+      expect(sourceTc.tabs.map((t) => t.id).sort()).toEqual([first!.tab.id, second!.tab.id].sort());
+
+      browser.moveTab(second!.tab.id, 'move-as-child', { parentTabContainer: parentTc });
+
+      // The source container survives with the remaining tab.
+      expect(browser.getTabContainer(sourceTc.id)).not.toBeNull();
+      expect(sourceTc.tabs.map((t) => t.id)).toEqual([first!.tab.id]);
+
+      // The moved tab lives under a new child of parentTc.
+      const moved = browser.getTab(second!.tab.id);
+      expect(moved).not.toBeNull();
+      expect(moved!.tabContainer.parent?.id).toBe(parentTc.id);
+      expect(moved!.tabContainer.tabs.map((t) => t.id)).toEqual([second!.tab.id]);
+    });
+
+    test('detaches the source container from its own parent when it empties out', async () => {
+      browser.createWindow(1, { withDesktops: true });
+
+      const root = await browser.openURL('http://root.com', { selectTab: true });
+      const rootTc = root!.tabContainer;
+
+      const parent = await browser.openURL('http://parent.com', {
+        parentTabContainer: rootTc,
+        selectTab: true,
+      });
+      const parentTc = parent!.tabContainer;
+      // Target for move-as-child is the root container.
+      const source = await browser.openURL('http://source.com', {
+        parentTabContainer: parentTc,
+        selectTab: true,
+      });
+
+      expect(source!.tabContainer.parent?.id).toBe(parentTc.id);
+      expect(parentTc.children.map((c) => c.id)).toContain(source!.tabContainer.id);
+
+      browser.moveTab(source!.tab.id, 'move-as-child', { parentTabContainer: rootTc });
+
+      // The empty source container is detached from parentTc and removed from the tree.
+      // (Its id may be recycled for the new child, so we don't assert via getTabContainer.)
+      expect(parentTc.children).toHaveLength(0);
+      expect(source!.tabContainer.parent).toBeNull();
+
+      // The moved tab is now inside a new child of rootTc.
+      const moved = browser.getTab(source!.tab.id);
+      expect(moved).not.toBeNull();
+      expect(moved!.tabContainer.parent?.id).toBe(rootTc.id);
+      expect(rootTc.children.map((c) => c.id)).toContain(moved!.tabContainer.id);
+    });
+
+    test('with selectTab keeps the parent container selected at the desktop level', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const parentTc = parent!.tabContainer;
+      // Open source WITHOUT selectTab so the parent stays as the selectedTabContainer.
+      const source = await browser.openURL('http://source.com');
+
+      const desktop = w.getDesktop(1)!;
+      // Sanity: the desktop still points at the parent's container, not source's.
+      expect(desktop.selectedTabContainer?.id).toBe(parentTc.id);
+
+      browser.moveTab(source!.tab.id, 'move-as-child', {
+        parentTabContainer: parentTc,
+        selectTab: true,
+      });
+
+      // Desktop selection stays on the parent's tc so the root view doesn't jump.
+      expect(desktop.selectedTabContainer?.id).toBe(parentTc.id);
+      // The moved tab is selected inside its new child.
+      const moved = browser.getTab(source!.tab.id);
+      expect(moved!.tabContainer.selectedTab?.id).toBe(source!.tab.id);
+    });
+
+    test('moves the tab across windows and reindexes it under the target window/desktop', async () => {
+      const w1 = browser.createWindow(1, { withDesktops: true });
+      // Source tab lives in window 1 (created while it's the active window).
+      const source = await browser.openURL('http://source.com', { selectTab: true });
+      expect(source!.window.id).toBe(1);
+
+      // Create window 2 — this makes it the active window.
+      const w2 = browser.createWindow(2, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      expect(parent!.window.id).toBe(2);
+
+      browser.moveTab(source!.tab.id, 'move-as-child', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      const moved = browser.getTab(source!.tab.id);
+      expect(moved).not.toBeNull();
+      expect(moved!.window.id).toBe(2);
+      expect(moved!.desktop.id).toBe(parent!.desktop.id);
+      expect(moved!.tabContainer.parent?.id).toBe(parent!.tabContainer.id);
+
+      // The source window no longer has the tab in its index.
+      expect(w1.getDesktop(1)!.tabContainers).toHaveLength(0);
+      // The target window's desktop now contains the new child under parent.
+      expect(w2.getDesktop(parent!.desktop.id)!.tabContainers.map((tc) => tc.id)).toContain(
+        parent!.tabContainer.id,
+      );
+      expect(parent!.tabContainer.children.map((c) => c.id)).toContain(moved!.tabContainer.id);
+    });
+
+    test('guard: missing parentTabContainer is a no-op', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      const source = await browser.openURL('http://source.com', { selectTab: true });
+
+      const sourceTc = source!.tabContainer;
+      const parentTc = parent!.tabContainer;
+
+      browser.moveTab(source!.tab.id, 'move-as-child', { selectTab: true });
+
+      // Tab stayed where it was.
+      const stillThere = browser.getTab(source!.tab.id);
+      expect(stillThere!.tabContainer.id).toBe(sourceTc.id);
+      expect(parentTc.children).toHaveLength(0);
+    });
+
+    test('guard: parentTabContainer equal to the source container is a no-op', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      // Both tabs end up in the same container via split-tab so parentTc === sourceTc.
+      const a = await browser.openURL('http://a.com', { selectTab: true });
+      const b = await browser.openURL('http://b.com', { targetId: 'split-tab' });
+
+      const tc = a!.tabContainer;
+      expect(tc.id).toBe(b!.tabContainer.id);
+
+      browser.moveTab(b!.tab.id, 'move-as-child', {
+        parentTabContainer: tc,
+        selectTab: true,
+      });
+
+      // b is still in its original container; tc has no children yet.
+      const stillThere = browser.getTab(b!.tab.id);
+      expect(stillThere!.tabContainer.id).toBe(b!.tabContainer.id);
+      expect(tc.children).toHaveLength(0);
+      expect(tc.tabs.map((t) => t.id)).toEqual([a!.tab.id, b!.tab.id]);
+    });
+  });
+
   describe('Browser.duplicateTab (parent/children regression)', () => {
     test('duplicating a child tab to another desktop does NOT touch parent.children', async () => {
       const w = browser.createWindow(1, { withDesktops: true });
