@@ -108,7 +108,7 @@ export class BrowserRenderer {
 
   targetsEntities(
     window: Window,
-    props?: { action?: 'newWindow' | 'move' | 'duplicate'; conextMenuOfTab?: IConTab },
+    props?: { action?: 'newWindow' | 'move' | 'duplicate'; contextMenuOfTab?: IConTab },
   ): IEntity[] {
     const selectedTab = window.selectedTab;
     const selectedDesktop = window.selectedDesktop;
@@ -148,15 +148,21 @@ export class BrowserRenderer {
     }
 
     if (props?.action === 'move') {
-      if (props?.conextMenuOfTab?.tabContainer.parent) {
-        return [
-          TARGET_REMOVE_FROM_PARENT,
-          ...newWindowOption,
-          ...TARGET_WINDOWS,
-          ...TARGET_DESKTOPS,
-        ];
+      let result: IEntity[] = [];
+      if (props?.contextMenuOfTab?.tabContainer.parent) {
+        result.push(TARGET_REMOVE_FROM_PARENT);
       }
-      return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
+
+      if (
+        selectedTab &&
+        props?.contextMenuOfTab &&
+        selectedTab.tab.id !== props.contextMenuOfTab.tab.id
+      ) {
+        result.push(TARGET_SPLIT_TAB);
+      }
+
+      result = [...result, ...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
+      return result;
     }
 
     if (props?.action === 'duplicate') {

@@ -390,7 +390,15 @@ export class Browser {
 
       window.renderViews();
 
-      this.eventsChannel.emit('browser:tab-did-move', tab.id, window, desktop, window, desktop);
+      this.eventsChannel.emit(
+        'browser:tab-did-move',
+        tabContainer,
+        tab,
+        window,
+        desktop,
+        window,
+        desktop,
+      );
       return;
     }
 
@@ -423,6 +431,7 @@ export class Browser {
         targetData.tabContainer,
         sourceData.tab,
       );
+
       if (props?.selectTab) {
         targetData.tabContainer.selectTab(sourceData.tab.id);
       }
@@ -433,7 +442,8 @@ export class Browser {
 
       this.eventsChannel.emit(
         'browser:tab-did-move',
-        sourceData.tab.id,
+        targetData.tabContainer,
+        sourceData.tab,
         sourceData.window,
         sourceData.desktop,
         targetData.window,
@@ -480,7 +490,8 @@ export class Browser {
 
     this.eventsChannel.emit(
       'browser:tab-did-move',
-      sourceData.tab.id,
+      sourceData.tabContainer,
+      sourceData.tab,
       sourceData.window,
       sourceData.desktop,
       targetData.window,
