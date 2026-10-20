@@ -17,6 +17,8 @@ export function setupMenuIPC(browser: Browser) {
     browser,
     [windowChecker],
     async ({ win, type, params }) => {
+      win.hideTooltip();
+
       switch (type) {
         case 'desktop': {
           if (!params || !params['desktopId']) {

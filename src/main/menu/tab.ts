@@ -56,7 +56,7 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
       label: t('menu:contextTab.move'),
       icon: getIcon(EIcon.Move),
       submenu: browser.renderer
-        .targetsEntities(window, { action: 'move', conextMenuOfTab: { tab, tabContainer } })
+        .targetsEntities(window, { action: 'move', contextMenuOfTab: { tab, tabContainer } })
         .map((target) => ({
           label: target.label,
           click: async () => {

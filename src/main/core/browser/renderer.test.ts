@@ -491,6 +491,156 @@ describe('Renderer', () => {
         'new-window-right',
       ]);
     });
+
+    // ----- Tests for contextMenuOfTab ("Move to split" entry in the tab context menu) -----
+
+    test("action: 'move' + contextMenuOfTab(tab B, selected=A) includes 'split-tab' between remove-from-parent and new-window", async () => {
+      // Tab A is the selected tab. Tab B is the right-clicked tab (different id).
+      // B is a top-level tab (no parent).
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+      const tabB = await browser.openURL('http://b.com');
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: tabB!.tab, tabContainer: tabB!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids).toContain('split-tab');
+      expect(ids).not.toContain('remove-from-parent');
+      expect(ids).not.toContain('current-tab');
+      expect(ids).not.toContain('after-current');
+      // Order: [split-tab, new-window, new-window-left, new-window-right, window-*, desktop-*]
+      const splitIdx = ids.indexOf('split-tab');
+      const newWinIdx = ids.indexOf('new-window');
+      expect(splitIdx).toBeGreaterThanOrEqual(0);
+      expect(newWinIdx).toBeGreaterThan(splitIdx);
+      // After the 4 base targets we still have window-* (none in this single-window test) and 4 desktops.
+      expect(result.length).toBe(8); // 1 split-tab + 3 new-window + 0 window-* + 4 desktop-*
+    });
+
+    test("action: 'move' + contextMenuOfTab(tab A, selected=A) does NOT include 'split-tab' (cannot move a tab into itself)", async () => {
+      // Single selected tab. Right-clicking on the active tab must not offer "Move to split"
+      // because moving the active tab into a split with itself is nonsensical.
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: tabA!.tab, tabContainer: tabA!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids).not.toContain('split-tab');
+      // Same length as the no-context case (selectedTab suppressed, no context branch entered).
+      // 0 special + 3 new-window + 0 window-* + 4 desktops = 7
+      expect(result.length).toBe(7);
+    });
+
+    test("action: 'move' + contextMenuOfTab with no selectedTab does NOT include 'split-tab'", async () => {
+      // Right-clicking on a tab when nothing is selected: no active tab to split INTO.
+      const tabA = await browser.openURL('http://a.com');
+      expect(tabA).not.toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: tabA!.tab, tabContainer: tabA!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids).not.toContain('split-tab');
+      expect(result.length).toBe(7); // 3 new-window + 4 desktops
+    });
+
+    test("action: 'move' + contextMenuOfTab on a child tab includes 'remove-from-parent' at index 0", async () => {
+      // A top-level selected tab + a child tab under a parent container.
+      // Right-clicking the child (which has tabContainer.parent !== null) → must offer
+      // "Move to top level".
+      const parent = await browser.openURL('http://parent.com', { selectTab: true });
+      expect(parent).not.toBeNull();
+      const child = await browser.openURL('http://child.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      expect(child).not.toBeNull();
+      expect(child!.tabContainer.parent).not.toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: child!.tab, tabContainer: child!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids[0]).toBe('remove-from-parent');
+      // Order: [remove-from-parent, split-tab, new-window*, ...] — child is different from selected.
+      expect(ids[1]).toBe('split-tab');
+      expect(ids).toContain('remove-from-parent');
+      // Length: 1 remove + 1 split + 3 new-window + 0 windows + 4 desktops = 9
+      expect(result.length).toBe(9);
+    });
+
+    test("action: 'move' + contextMenuOfTab on a top-level tab does NOT include 'remove-from-parent'", async () => {
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+      const tabB = await browser.openURL('http://b.com');
+      expect(tabB).not.toBeNull();
+      expect(tabB!.tabContainer.parent).toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: tabB!.tab, tabContainer: tabB!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids).not.toContain('remove-from-parent');
+      expect(ids).toContain('split-tab');
+      expect(result.length).toBe(8); // 1 split + 3 new-window + 4 desktops
+    });
+
+    test("action: 'move' with both contexts (parent + other selectedTab) preserves order: remove-from-parent, split-tab, then new-window*", async () => {
+      // 3 tabs: A (selected, top-level), B (top-level, not selected), child(B) (under B as parent).
+      // Right-click on child-of-B. Both branches fire.
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+      const tabB = await browser.openURL('http://b.com', { selectTab: true });
+      expect(tabB).not.toBeNull();
+      const childOfB = await browser.openURL('http://child-of-b.com', {
+        parentTabContainer: tabB!.tabContainer,
+      });
+      expect(childOfB).not.toBeNull();
+      expect(childOfB!.tabContainer.parent).not.toBeNull();
+
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: childOfB!.tab, tabContainer: childOfB!.tabContainer },
+      });
+      const ids = result.map((e) => e.id);
+
+      const removeIdx = ids.indexOf('remove-from-parent');
+      const splitIdx = ids.indexOf('split-tab');
+      const newWinIdx = ids.indexOf('new-window');
+      expect(removeIdx).toBe(0);
+      expect(splitIdx).toBe(1);
+      expect(newWinIdx).toBe(2);
+    });
+
+    test("action: 'move' + contextMenuOfTab includes other windows (window-N) in multi-window setups", () => {
+      const window2 = browser.createWindow(2);
+      window2.createDefaultDesktops();
+      // Even without any selected/right-clicked tab, the base move shape includes windows.
+      const result = browser.renderer.targetsEntities(window, {
+        action: 'move',
+        contextMenuOfTab: { tab: { id: -1 } as never, tabContainer: { parent: null } as never },
+      });
+      const ids = result.map((e) => e.id);
+
+      expect(ids).toContain('window-2');
+      expect(ids).not.toContain('window-1');
+      // No selectedTab → split-tab is suppressed.
+      expect(ids).not.toContain('split-tab');
+      // No parent → remove-from-parent is suppressed.
+      expect(ids).not.toContain('remove-from-parent');
+    });
   });
 
   describe('Renderer.about', () => {

@@ -17,3 +17,7 @@ Also, you can move a tab to a new desktop or window.
 <FeatureAccess entity="move a tab to a target" command="moveTab" contextMenu="contextTab.move" />
 
 *Targets* are explained [here](/tabs/new/#target-selection).
+
+If the right-clicked tab is **not** the currently focused tab, the *Move...* submenu will also show *Split into selected tab*, which turns that tab into a [split sibling](/tabs/split/) of the active one without opening a duplicate.
+
+If the right-clicked tab is a [child of another tab container](/tabs/children/), the *Move...* submenu will also show *Move to top level* at the top, which detaches the child from its parent (the child keeps its own tabs and any children it had).

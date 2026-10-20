@@ -2000,4 +2000,95 @@ describe('Browser', () => {
       expect(r2).not.toBe(r3);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // split-tab move: 'browser:tab-did-move' event payload + side effects
+  // ---------------------------------------------------------------------------
+  describe('browser:tab-did-move event', () => {
+    test('moveTab(split-tab) emits the event with the full (tabContainer, tab, source, source, target, target) signature', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+      const tabB = await browser.openURL('http://b.com', { selectTab: true });
+      expect(tabB).not.toBeNull();
+
+      const captured: unknown[][] = [];
+      browser.eventsChannel.on('browser:tab-did-move', (...args: unknown[]) => {
+        captured.push(args);
+      });
+      // Prevent the real Electron Menu.setApplicationMenu call.
+      vi.spyOn(browser, 'refreshMainMenu').mockResolvedValue(undefined);
+
+      browser.moveTab(tabA!.tab.id, 'split-tab');
+
+      // Flush microtasks so the async event listener can run.
+      await new Promise<void>((resolve) => setImmediate(resolve));
+
+      expect(captured.length).toBe(1);
+      const [tabContainer, tab, sourceWindow, sourceDesktop, targetWindow, targetDesktop] =
+        captured[0];
+      // The tab should now live in tabB's container (the target of the split move).
+      expect(tabContainer).toBe(tabB!.tabContainer);
+      expect(tab).toBe(tabA!.tab);
+      // Single-window test → source and target are the same window/desktop.
+      expect(sourceWindow).toBe(targetWindow);
+      expect(sourceDesktop).toBe(targetDesktop);
+    });
+
+    test('moveTab(split-tab) refreshes the URL bar with { desktop, tabContainer, tab } (NOT null) for the moved tab', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const tabA = await browser.openURL('http://a.com', { selectTab: true });
+      expect(tabA).not.toBeNull();
+      const tabB = await browser.openURL('http://b.com', { selectTab: true });
+      expect(tabB).not.toBeNull();
+
+      vi.spyOn(browser, 'refreshMainMenu').mockResolvedValue(undefined);
+      const refreshURLBar = vi.spyOn(browser.toRenderer, 'refreshURLBar');
+
+      browser.moveTab(tabA!.tab.id, 'split-tab');
+
+      // Flush microtasks so the async event listener can run.
+      await new Promise<void>((resolve) => setImmediate(resolve));
+
+      // The listener calls refreshURLBar once per window. With one window we get one call.
+      expect(refreshURLBar).toHaveBeenCalledTimes(1);
+      const [winArg, dataArg] = refreshURLBar.mock.calls[0]!;
+      expect(winArg).toBe(browser.activeWindow);
+      expect(dataArg).not.toBeNull();
+      // The payload shape is { desktop, tabContainer, tab } — must NOT be null.
+      expect(dataArg).toMatchObject({
+        desktop: expect.anything(),
+        tabContainer: expect.anything(),
+        tab: expect.anything(),
+      });
+      // The tab in the payload is the moved tab (A), not the target tab (B).
+      expect(dataArg!.tab).toBe(tabA!.tab);
+    });
+
+    test('moveTab(desktop-X) also emits the event with the new (tabContainer, tab, ...) signature (no regression)', async () => {
+      browser.createWindow(1, { withDesktops: true });
+      const result = await browser.openURL('http://example.com', { selectTab: true });
+      expect(result).not.toBeNull();
+
+      const captured: unknown[][] = [];
+      browser.eventsChannel.on('browser:tab-did-move', (...args: unknown[]) => {
+        captured.push(args);
+      });
+      vi.spyOn(browser, 'refreshMainMenu').mockResolvedValue(undefined);
+
+      browser.moveTab(result!.tab.id, 'desktop-2');
+
+      await new Promise<void>((resolve) => setImmediate(resolve));
+
+      expect(captured.length).toBe(1);
+      // Old contract emitted (tabId, sourceWin, sourceDesk, targetWin, targetDesk).
+      // New contract emits (tabContainer, tab, sourceWin, sourceDesk, targetWin, targetDesk).
+      // The first two arguments must now be objects (tabContainer, tab), not a number (tabId).
+      const [first, second] = captured[0];
+      expect(typeof first).not.toBe('number');
+      expect(typeof second).not.toBe('number');
+      expect(first).toBe(result!.tabContainer);
+      expect(second).toBe(result!.tab);
+    });
+  });
 });
