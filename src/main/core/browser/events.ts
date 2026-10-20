@@ -274,16 +274,17 @@ export function registerBrowserEvents(browser: Browser) {
   browser.eventsChannel.on(
     'browser:tab-did-move',
     async (
-      _tabId: TTabId,
+      tabContainer: TabContainer,
+      tab: Tab,
       _sourceWindow: Window,
       _sourceDesktop: Desktop,
       _targetWindow: Window,
-      _targetDesktop: Desktop,
+      targetDesktop: Desktop,
     ) => {
       for (const win of browser.windows) {
         browser.toRenderer.refreshDesktops(win);
         browser.toRenderer.refreshTabContainers(win);
-        browser.toRenderer.refreshURLBar(win, null);
+        browser.toRenderer.refreshURLBar(win, { desktop: targetDesktop, tabContainer, tab });
         browser.toRenderer.refreshLayoutData(win);
       }
       await browser.refreshMainMenu();
