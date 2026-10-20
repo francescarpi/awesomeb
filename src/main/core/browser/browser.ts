@@ -42,6 +42,7 @@ import { parseQuery, parseTarget } from './helpers';
 import { IdGenerator } from './idgenerator';
 import type { ISessionTab, ISessionTabContainer } from '@/core/session/schemes';
 import { INTERNAL_PROTOCOL } from '~/constants';
+import { moveAsChild, moveToTarget, removeFromParent } from './helpers.move';
 
 const scopeLog = log.scope('Browser');
 
@@ -135,7 +136,7 @@ export class Browser {
       for (const tabContainer of desktop.tabContainers) {
         this._tabContainerIndex.delete(tabContainer.id);
         for (const tab of tabContainer.tabs) {
-          this._unindexTab(tab.id);
+          this.unindexTab(tab.id);
         }
       }
     }
@@ -288,7 +289,7 @@ export class Browser {
     this._disposeTabResources(oldTab, window, true);
     history.delete(oldTab.id);
 
-    this._indexTab(window, desktop, tabContainer, replacement);
+    this.indexTab(window, desktop, tabContainer, replacement);
     window.addView(replacement);
     window.renderViews();
 
@@ -336,7 +337,7 @@ export class Browser {
 
     const { window, desktop, tabContainer, partition } = result;
 
-    this._indexTabContainer(window, desktop, tabContainer);
+    this.indexTabContainer(window, desktop, tabContainer);
 
     const intPartition = url.startsWith(`${INTERNAL_PROTOCOL}://`) ? partitions.internal : null;
 
@@ -346,7 +347,7 @@ export class Browser {
       url,
     });
 
-    this._indexTab(window, desktop, tabContainer, tab);
+    this.indexTab(window, desktop, tabContainer, tab);
 
     if (props?.selectTab) {
       tabContainer.selectTab(tab.id);
@@ -372,141 +373,33 @@ export class Browser {
     }
 
     if (targetId === 'remove-from-parent') {
-      const { tabContainer, window, desktop, tab } = sourceData;
-
-      if (!tabContainer.parent) {
-        scopeLog.warn(`Tab container with id ${tabContainer.id} has no parent to detach from`);
-        return;
-      }
-
-      tabContainer.parent.removeChild(tabContainer.id);
-      tabContainer.setParent(null);
-      desktop.addTabContainer(tabContainer);
-
-      if (props?.selectTab) {
-        desktop.selectTabContainer(tabContainer.id);
-        window.selectTab(tab.id);
-      }
-
-      window.renderViews();
-
-      this.eventsChannel.emit(
-        'browser:tab-did-move',
-        tabContainer,
-        tab,
-        window,
-        desktop,
-        window,
-        desktop,
-      );
+      removeFromParent(this, sourceData, props);
       return;
     }
 
-    const targetData = parseTarget(this, {
-      targetId: targetId,
-      partitionId: sourceData.tab.partition.id,
-      tabContainer: sourceData.tabContainer,
-    });
-
-    if (!targetData) {
-      scopeLog.error(`Invalid targetId provided for moving tab: ${targetId}`);
+    if (targetId === 'move-as-child') {
+      moveAsChild(this, sourceData, props);
       return;
     }
 
-    this._indexTabContainer(targetData.window, targetData.desktop, targetData.tabContainer);
-
-    // If the source tabContainer is a child of another container, detach it
-    // before moving it. Otherwise the old parent keeps a stale reference in
-    // its children map and the child still claims the old parent.
-    if (sourceData.tabContainer.parent) {
-      sourceData.tabContainer.parent.removeChild(sourceData.tabContainer.id);
-      sourceData.tabContainer.setParent(null);
-    }
-
-    if (targetId === 'split-tab') {
-      targetData.tabContainer.addTab(sourceData.tab);
-      this._indexTab(
-        targetData.window,
-        targetData.desktop,
-        targetData.tabContainer,
-        sourceData.tab,
-      );
-
-      if (props?.selectTab) {
-        targetData.tabContainer.selectTab(sourceData.tab.id);
-      }
-
-      this._unindexTabContainer(sourceData.tabContainer.id);
-      sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
-      sourceData.window.renderViews();
-
-      this.eventsChannel.emit(
-        'browser:tab-did-move',
-        targetData.tabContainer,
-        sourceData.tab,
-        sourceData.window,
-        sourceData.desktop,
-        targetData.window,
-        targetData.desktop,
-      );
-      return;
-    }
-
-    if (
-      sourceData.window.id == targetData.window.id &&
-      sourceData.desktop.id == targetData.desktop.id
-    ) {
-      scopeLog.warn('Tab is already in the target desktop/window');
-      return;
-    }
-
-    this._unindexTabContainer(sourceData.tabContainer.id);
-
-    sourceData.desktop.deleteTabContainer(sourceData.tabContainer.id);
-    targetData.desktop.addTabContainer(sourceData.tabContainer);
-
-    this._indexTabContainer(targetData.window, targetData.desktop, sourceData.tabContainer);
-
-    for (const tab of sourceData.tabContainer.tabs) {
-      this._indexTab(targetData.window, targetData.desktop, sourceData.tabContainer, tab);
-    }
-
-    if (sourceData.window.id !== targetData.window.id) {
-      scopeLog.info(
-        'Source window is different to target',
-        sourceData.window.id,
-        targetData.window.id,
-      );
-      sourceData.window.removeView(sourceData.tab.viewId, false);
-      targetData.window.addView(sourceData.tab);
-      targetData.window.renderViews();
-    }
-
-    sourceData.window.renderViews();
-
-    if (props?.selectTab) {
-      targetData.window.selectTab(sourceData.tab.id);
-    }
-
-    this.eventsChannel.emit(
-      'browser:tab-did-move',
-      sourceData.tabContainer,
-      sourceData.tab,
-      sourceData.window,
-      sourceData.desktop,
-      targetData.window,
-      targetData.desktop,
-    );
+    moveToTarget(this, sourceData, targetId, props);
   }
 
-  private _indexTab(window: Window, desktop: Desktop, tabContainer: TabContainer, tab: Tab): void {
+  /**
+   * Adds a tab to the internal lookup tables so `getTab` and
+   * `getTabByWebContentsId` can find it. Used by core flows and by the
+   * `helpers.move` module after moving a tab between containers. Not part of
+   * the public API — meant for internal callers within the `browser` package.
+   */
+  indexTab(window: Window, desktop: Desktop, tabContainer: TabContainer, tab: Tab): void {
     this._tabIndex.set(tab.id, { window, desktop, tabContainer, tab });
     if (!tab.isDestroyed) {
       this._webContentsIndex.set(tab.webContentsId, tab.id);
     }
   }
 
-  private _unindexTab(tabId: TTabId): void {
+  /** @see {@link Browser.indexTab} */
+  unindexTab(tabId: TTabId): void {
     const entry = this._tabIndex.get(tabId);
     if (entry) {
       if (!entry.tab.isDestroyed) {
@@ -518,7 +411,7 @@ export class Browser {
 
   private _disposeTabResources(tab: Tab, window: Window, removeFromIndex = false): void {
     if (removeFromIndex) {
-      this._unindexTab(tab.id);
+      this.unindexTab(tab.id);
     }
     tab.clearFailLoad();
     tab.eventsRegistered = false;
@@ -532,11 +425,13 @@ export class Browser {
     this.mediaManager.removeSession(tab.id);
   }
 
-  private _indexTabContainer(window: Window, desktop: Desktop, tabContainer: TabContainer): void {
+  /** @see {@link Browser.indexTab} */
+  indexTabContainer(window: Window, desktop: Desktop, tabContainer: TabContainer): void {
     this._tabContainerIndex.set(tabContainer.id, { window, desktop, tabContainer });
   }
 
-  private _unindexTabContainer(tabContainerId: TTabContainerId): void {
+  /** @see {@link Browser.indexTab} */
+  unindexTabContainer(tabContainerId: TTabContainerId): void {
     this._tabContainerIndex.delete(tabContainerId);
   }
 
@@ -561,7 +456,7 @@ export class Browser {
       favicon: this.favicons.getLastTabFavicon(tabStore.id),
     });
 
-    this._indexTab(newWindow, desktop, tabContainer, tab);
+    this.indexTab(newWindow, desktop, tabContainer, tab);
   }
 
   private _loadTabContainer(
@@ -581,7 +476,7 @@ export class Browser {
             childrenCollapsed: tcStore.childrenCollapsed,
           });
 
-    this._indexTabContainer(newWindow, desktop, tabContainer);
+    this.indexTabContainer(newWindow, desktop, tabContainer);
 
     for (const tabStore of tcStore.tabs) {
       this._loadTabIntoContainer(newWindow, desktop, tabContainer, tabStore);
@@ -684,10 +579,10 @@ export class Browser {
     const tabContainer = parentTabData.desktop.createTabContainer(
       this.idGenerator.nextTabContainerId,
     );
-    this._indexTabContainer(parentTabData.window, parentTabData.desktop, tabContainer);
+    this.indexTabContainer(parentTabData.window, parentTabData.desktop, tabContainer);
 
     tabContainer.addTab(tabPreview.tab);
-    this._indexTab(parentTabData.window, parentTabData.desktop, tabContainer, tabPreview.tab);
+    this.indexTab(parentTabData.window, parentTabData.desktop, tabContainer, tabPreview.tab);
     tabContainer.selectTab(tabPreview.tab.id);
     parentTabData.desktop.selectTabContainer(tabContainer.id);
 
@@ -722,7 +617,7 @@ export class Browser {
     }
 
     parentTabData.tabContainer.addTab(tabPreview.tab);
-    this._indexTab(
+    this.indexTab(
       parentTabData.window,
       parentTabData.desktop,
       parentTabData.tabContainer,
@@ -749,13 +644,13 @@ export class Browser {
   }
 
   permanentlyCloseTab(desktop: Desktop, tabContainer: TabContainer, tabId: TTabId) {
-    this._unindexTab(tabId);
+    this.unindexTab(tabId);
     tabContainer.deleteTab(tabId);
     this.favicons.deleteFavicon(tabId);
     history.delete(tabId);
 
     if (tabContainer.tabs.length === 0) {
-      this._unindexTabContainer(tabContainer.id);
+      this.unindexTabContainer(tabContainer.id);
       desktop.deleteTabContainer(tabContainer.id);
       if (desktop.selectedTabContainer?.id === tabContainer.id) {
         desktop.selectTabContainer(null);
@@ -835,15 +730,15 @@ export class Browser {
       return;
     }
 
-    this._unindexTab(lastTab.id);
+    this.unindexTab(lastTab.id);
 
     const newTabContainer = desktop.createTabContainer(this.idGenerator.nextTabContainerId, {
       justAfter: tabContainer.id,
     });
-    this._indexTabContainer(window, desktop, newTabContainer);
+    this.indexTabContainer(window, desktop, newTabContainer);
 
     newTabContainer.addTab(lastTab);
-    this._indexTab(window, desktop, newTabContainer, lastTab);
+    this.indexTab(window, desktop, newTabContainer, lastTab);
 
     window.renderViews();
     window.selectTab(lastTab.id);

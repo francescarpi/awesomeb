@@ -124,6 +124,10 @@ export class BrowserRenderer {
       id: 'remove-from-parent',
       label: t('targets.removeFromParent'),
     };
+    const TARGET_MOVE_AS_CHILD = {
+      id: 'move-as-child',
+      label: t('targets.moveAsChild'),
+    };
     const TARGET_WINDOWS = this.browser.windows
       .filter((win) => win.id !== window.id)
       .map((win) => ({
@@ -143,30 +147,39 @@ export class BrowserRenderer {
 
     const newWindowOption = [TARGET_NEW_WINDOW, TARGET_NEW_WINDOW_LEFT, TARGET_NEW_WINDOW_RIGHT];
 
-    if (props?.action === 'newWindow') {
-      return newWindowOption;
-    }
-
-    if (props?.action === 'move') {
-      let result: IEntity[] = [];
-      if (props?.contextMenuOfTab?.tabContainer.parent) {
-        result.push(TARGET_REMOVE_FROM_PARENT);
+    switch (props?.action) {
+      case 'newWindow': {
+        return newWindowOption;
       }
+      case 'move': {
+        let result: IEntity[] = [];
+        if (props?.contextMenuOfTab?.tabContainer.parent) {
+          result.push(TARGET_REMOVE_FROM_PARENT);
+        }
 
-      if (
-        selectedTab &&
-        props?.contextMenuOfTab &&
-        selectedTab.tab.id !== props.contextMenuOfTab.tab.id
-      ) {
-        result.push(TARGET_SPLIT_TAB);
+        if (
+          selectedTab &&
+          props?.contextMenuOfTab &&
+          selectedTab.tab.id !== props.contextMenuOfTab.tab.id
+        ) {
+          result.push(TARGET_SPLIT_TAB);
+        }
+
+        if (
+          selectedTab &&
+          selectedTab.tab.openTabsAsChild &&
+          props?.contextMenuOfTab &&
+          selectedTab.tab.id !== props.contextMenuOfTab.tab.id
+        ) {
+          result.push(TARGET_MOVE_AS_CHILD);
+        }
+
+        result = [...result, ...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
+        return result;
       }
-
-      result = [...result, ...newWindowOption, ...TARGET_WINDOWS, ...TARGET_DESKTOPS];
-      return result;
-    }
-
-    if (props?.action === 'duplicate') {
-      return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_ALL_DESKTOPS];
+      case 'duplicate': {
+        return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_ALL_DESKTOPS];
+      }
     }
 
     let result: IEntity[] = [TARGET_CURRENT_DESK_WIN];
