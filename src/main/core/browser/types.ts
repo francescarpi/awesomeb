@@ -11,4 +11,10 @@ export interface IOpenUrlProps {
 
 export interface IMoveTabProps {
   selectTab?: boolean;
+  /**
+   * Destination parent tab container for `'move-as-child'` targetId.
+   * When provided, the moved tab is placed inside a brand-new child of the
+   * given container instead of being moved at the top level of the target.
+   */
+  parentTabContainer?: TabContainer;
 }

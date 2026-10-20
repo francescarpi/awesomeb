@@ -60,9 +60,19 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         .map((target) => ({
           label: target.label,
           click: async () => {
+            // For 'move-as-child' the destination is the selectedTab's
+            // tabContainer (the parent we attach a new child to). The renderer
+            // hides this target unless a selectedTab with openTabsAsChild
+            // exists, so window.selectedTab is guaranteed here.
+            const parentTabContainer =
+              target.id === 'move-as-child' && window.selectedTab
+                ? window.selectedTab.tabContainer
+                : undefined;
+
             await browser.performCommand(window, 'move-tab', {
               tabId: tab.id,
               targetId: target.id,
+              ...(parentTabContainer ? { parentTabContainer } : {}),
             });
           },
         })),

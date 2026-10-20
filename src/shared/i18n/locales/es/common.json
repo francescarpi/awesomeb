@@ -9,7 +9,8 @@
     "splitIntoSelectedTab": "Dividir en pestaña seleccionada",
     "window": "Ventana {{id}}",
     "desktop": "Escritorio: \"{{label}}\"",
-    "removeFromParent": "Mover al nivel superior"
+    "removeFromParent": "Mover al nivel superior",
+    "moveAsChild": "Mueve como hijo del seleccionado"
   },
   "ok": "Aceptar",
   "cancel": "Cancelar",

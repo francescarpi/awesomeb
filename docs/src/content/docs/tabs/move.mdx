@@ -18,6 +18,8 @@ Also, you can move a tab to a new desktop or window.
 
 *Targets* are explained [here](/tabs/new/#target-selection).
 
-If the right-clicked tab is **not** the currently focused tab, the *Move...* submenu will also show *Split into selected tab*, which turns that tab into a [split sibling](/tabs/split/) of the active one without opening a duplicate.
+Depending on the context, the *Move...* submenu may also show additional entries:
 
-If the right-clicked tab is a [child of another tab container](/tabs/children/), the *Move...* submenu will also show *Move to top level* at the top, which detaches the child from its parent (the child keeps its own tabs and any children it had).
+* *Split into selected tab* — shown when the right-clicked tab is **not** the currently focused tab. It turns that tab into a [split sibling](/tabs/split/) of the active one without opening a duplicate.
+* *Move as a child of selected* — shown when the active tab has the *Open tabs as child* option enabled (see [child tabs](/tabs/children/)). Choosing it moves the right-clicked tab into a brand-new child container under the active tab, attaching it the same way tabs opened from that parent are attached.
+* *Move to top level* — shown at the top when the right-clicked tab is a [child of another tab container](/tabs/children/). It detaches the child from its parent (the child keeps its own tabs and any children it had).
