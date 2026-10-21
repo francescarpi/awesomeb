@@ -10,7 +10,9 @@
     "window": "Window {{id}}",
     "desktop": "Desktop: \"{{label}}\"",
     "removeFromParent": "Move to top level",
-    "moveAsChild": "Move as a child of selected"
+    "moveAsChild": "Move as a child of selected",
+    "atEnd": "At end",
+    "justAfter": "Just after"
   },
   "ok": "OK",
   "cancel": "Cancel",

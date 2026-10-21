@@ -10,7 +10,9 @@
     "window": "Finestra {{id}}",
     "desktop": "Escriptori: \"{{label}}\"",
     "removeFromParent": "Mou al nivell superior",
-    "moveAsChild": "Mou com a fill del seleccionat"
+    "moveAsChild": "Mou com a fill del seleccionat",
+    "atEnd": "Al final",
+    "justAfter": "Just després"
   },
   "ok": "D'acord",
   "cancel": "Cancel·la",

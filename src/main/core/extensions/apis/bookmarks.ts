@@ -240,7 +240,7 @@ export class ChromeBookmarks {
   private _findParentId(tree: IBookmark[], id: string): string | null {
     for (const node of tree) {
       if (node.type === EBookmarkType.Folder) {
-        if (node.children.some((c) => c.id === id)) {
+        if (node.children.some((c: IBookmark) => c.id === id)) {
           return node.id;
         }
         const found = this._findParentId(node.children, id);
