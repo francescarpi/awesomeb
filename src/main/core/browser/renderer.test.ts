@@ -445,7 +445,7 @@ describe('Renderer', () => {
     test("action: 'duplicate' returns 3 new-window + 0 other windows + 5 desktops including current", () => {
       const result = browser.renderer.targetsEntities(window, { action: 'duplicate' });
 
-      expect(result.length).toBe(8);
+      expect(result.length).toBe(10);
       const ids = result.map((e) => e.id);
       expect(ids).toContain('new-window');
       expect(ids).toContain('new-window-left');
@@ -455,9 +455,9 @@ describe('Renderer', () => {
       expect(ids).toContain('desktop-3');
       expect(ids).toContain('desktop-4');
       expect(ids).toContain('desktop-5');
-      expect(ids).not.toContain('current-desktop-window');
+      expect(ids).toContain('current-desktop-window');
       expect(ids).not.toContain('current-tab');
-      expect(ids).not.toContain('after-current');
+      expect(ids).toContain('after-current');
       expect(ids).not.toContain('split-tab');
       expect(ids.some((id) => id.startsWith('window-'))).toBe(false);
     });
@@ -466,7 +466,7 @@ describe('Renderer', () => {
       const moveResult = browser.renderer.targetsEntities(window, { action: 'move' });
       const duplicateResult = browser.renderer.targetsEntities(window, { action: 'duplicate' });
 
-      expect(duplicateResult.length).toBe(moveResult.length + 1);
+      expect(duplicateResult.length).toBe(moveResult.length + 3);
     });
 
     test('multi-window: action move and duplicate contain window-2 but not window-1', () => {

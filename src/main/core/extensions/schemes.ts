@@ -10,7 +10,7 @@ export const ExtensionActionScheme = z
     default_title: z.string().optional(),
     browser_style: z.boolean().optional(),
   })
-  .passthrough();
+  .loose();
 
 export const ExtensionManifestScheme = z
   .object({
@@ -27,7 +27,7 @@ export const ExtensionManifestScheme = z
     update_url: z.string().optional(),
     version: z.string(),
   })
-  .passthrough();
+  .loose();
 
 export const ExtensionScheme = z
   .object({
