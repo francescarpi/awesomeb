@@ -120,6 +120,8 @@ export class BrowserRenderer {
     const TARGET_CURRENT_TAB = { id: 'current-tab', label: t('targets.currentTab') };
     const TARGET_AFTER_CURRENT = { id: 'after-current', label: t('targets.newFollowingTab') };
     const TARGET_SPLIT_TAB = { id: 'split-tab', label: t('targets.splitIntoSelectedTab') };
+    const TARGET_AT_END = { id: 'current-desktop-window', label: t('targets.atEnd') };
+    const TARGET_JUST_AFTER = { id: 'after-current', label: t('targets.justAfter') };
     const TARGET_REMOVE_FROM_PARENT = {
       id: 'remove-from-parent',
       label: t('targets.removeFromParent'),
@@ -178,7 +180,13 @@ export class BrowserRenderer {
         return result;
       }
       case 'duplicate': {
-        return [...newWindowOption, ...TARGET_WINDOWS, ...TARGET_ALL_DESKTOPS];
+        return [
+          TARGET_AT_END,
+          TARGET_JUST_AFTER,
+          ...newWindowOption,
+          ...TARGET_WINDOWS,
+          ...TARGET_ALL_DESKTOPS,
+        ];
       }
     }
 

@@ -10,7 +10,9 @@
     "window": "Ventana {{id}}",
     "desktop": "Escritorio: \"{{label}}\"",
     "removeFromParent": "Mover al nivel superior",
-    "moveAsChild": "Mueve como hijo del seleccionado"
+    "moveAsChild": "Mueve como hijo del seleccionado",
+    "atEnd": "Al final",
+    "justAfter": "Justo después"
   },
   "ok": "Aceptar",
   "cancel": "Cancelar",

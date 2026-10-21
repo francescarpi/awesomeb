@@ -1,11 +1,11 @@
-import { ZodSchema } from 'zod';
+import type { ZodType } from 'zod';
 import { dialog } from 'electron';
 import log from 'electron-log';
 
 const scopeLog = log.scope('Validation');
 
 export function validateStore<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   data: unknown,
   storeName: string,
   defaults: T,

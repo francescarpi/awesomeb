@@ -70,7 +70,7 @@ describe('setupMenuIPC', () => {
     const handler = handlers.get('menu:context-menu')!;
 
     // Trigger with type='main' (the simplest path that does NOT depend on extra lookup).
-    await handler(fakeEvent, {
+    handler(fakeEvent, {
       winId: 1,
       type: 'main',
       params: {},
@@ -85,7 +85,7 @@ describe('setupMenuIPC', () => {
 
     const handler = handlers.get('menu:context-menu')!;
 
-    await handler(fakeEvent, {
+    handler(fakeEvent, {
       winId: 1,
       type: 'desktop',
       params: { desktopId: 1 },
@@ -102,7 +102,7 @@ describe('setupMenuIPC', () => {
 
     // desktop type with no desktopId param — the handler logs a warning and returns,
     // but hideTooltip MUST have already been invoked (the issue we are guarding against).
-    await handler(fakeEvent, {
+    handler(fakeEvent, {
       winId: 1,
       type: 'desktop',
       params: {},
@@ -119,7 +119,7 @@ describe('setupMenuIPC', () => {
 
     // windowChecker returns null for a missing winId, which short-circuits BEFORE
     // hideTooltip runs. This guards the order of operations.
-    await handler(fakeEvent, { type: 'main', params: {} });
+    handler(fakeEvent, { type: 'main', params: {} });
 
     expect(hideTooltip).not.toHaveBeenCalled();
   });
