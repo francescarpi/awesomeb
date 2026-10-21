@@ -24,7 +24,7 @@
     "src/**/*.{ts,astro,js}": [
       "pnpm astro check",
       "bash -c 'pnpm tscheck'",
-      "bash -c 'pnpm test run'",
+      "bash -c 'pnpm test run --run'",
       "pnpm lint"
     ],
     "src/**/*.{ts,js,json,css,md,astro}": [

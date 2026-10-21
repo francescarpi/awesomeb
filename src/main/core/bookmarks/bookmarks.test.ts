@@ -209,7 +209,7 @@ describe('Bookmarks', () => {
         expect(folder.type).toBe('folder');
         if (isFolderBookmark(folder)) {
           expect(folder.children.length).toBe(2);
-          expect(folder.children.map((c) => c.title)).toEqual(['Site', 'Docs']);
+          expect(folder.children.map((c: IBookmark) => c.title)).toEqual(['Site', 'Docs']);
         }
       });
 
