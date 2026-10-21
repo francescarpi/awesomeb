@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.15.4-alpha",
+  "version": "0.15.5-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -129,7 +129,8 @@
       "undici@<6.28.0": ">=6.28.0",
       "undici@>=7.0.0 <7.29.0": ">=7.29.0",
       "yaml@>=2.0.0 <2.8.3": ">=2.8.3",
-      "devalue@<5.9.1": ">=5.9.2"
+      "devalue@<5.9.1": ">=5.9.2",
+      "node-abi": "^4.39.0"
     }
   }
 }
