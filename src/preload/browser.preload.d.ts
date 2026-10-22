@@ -121,6 +121,7 @@ declare global {
     get: () => Promise<IBookmark[]>;
     update: (bookmarks: IBookmark[]) => Promise<void>;
     open: (bookmarkId: string) => Promise<void>;
+    copyToClipboard: (bookmarkId: string) => Promise<void>;
   };
 
   //--------------------------------------------------------------------------------------
