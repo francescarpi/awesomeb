@@ -190,6 +190,9 @@ const abBookmarks = {
   open: async (bookmarkId: string) => {
     ipcRenderer.send('bookmarks:open', { bookmarkId });
   },
+  copyToClipboard: async (bookmarkId: string) => {
+    ipcRenderer.send('bookmarks:copy-to-clipboard', { bookmarkId });
+  },
 };
 
 //--------------------------------------------------------------------------------------

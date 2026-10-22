@@ -2,6 +2,7 @@ import { Browser, notification, Window } from '@/core';
 import { t } from '~/i18n';
 import { createHandler, windowChecker, internalPageChecker, modalChecker } from '@/utils';
 import { IBookmark } from '~/types';
+import { clipboard } from 'electron';
 
 export function setupBookmarksIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -61,6 +62,21 @@ export function setupBookmarksIPC(browser: Browser) {
       const bookmark = browser.bookmarks.find(bookmarkId);
       if (bookmark) {
         browser.openURL(bookmark.url, { selectTab: true });
+      }
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ bookmarkId: string }>(
+    'bookmarks:copy-to-clipboard',
+    'on',
+    browser,
+    [internalPageChecker.bind(null, ['bookmarks'])],
+    async ({ bookmarkId }) => {
+      const bookmark = browser.bookmarks.find(bookmarkId);
+      if (bookmark) {
+        await clipboard.writeText(bookmark.url);
+        notification(t('notifications:urlCopied.title'), bookmark.url);
       }
     },
   );
