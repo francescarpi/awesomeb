@@ -164,7 +164,14 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             ),
             h(
               'div',
-              { class: 'flex gap-2 items-center' },
+              {
+                class: c(
+                  'flex',
+                  'gap-2',
+                  'items-center',
+                  child.type === EBookmarkType.Folder && 'hidden',
+                ),
+              },
               btnIcon(Copy, {
                 size: 4,
                 classNames: ['ml-6'],
