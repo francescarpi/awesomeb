@@ -165,17 +165,18 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
             h(
               'div',
               { class: 'flex gap-2 items-center' },
-              btnIcon(Copy, {
-                size: 4,
-                classNames: ['ml-6'],
-                onClick: async () => {
-                  abBookmarks.copyToClipboard(child.id);
-                },
-              }),
+              child.type === EBookmarkType.Url &&
+                btnIcon(Copy, {
+                  size: 4,
+                  classNames: ['ml-6'],
+                  onClick: async () => {
+                    await abBookmarks.copyToClipboard(child.id);
+                  },
+                }),
               h(
                 'a',
                 {
-                  class: 'block w-full  opacity-50 truncate cursor-pointer text-sm pr-16 max-w-2xl',
+                  class: 'block w-full ml-6 opacity-50 truncate cursor-pointer text-sm pr-16 max-w-2xl',
                   title: child.url,
                   onclick: () => {
                     abBookmarks.open(child.id);
