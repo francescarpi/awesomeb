@@ -26,6 +26,7 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
   import Edit from '#/icons/edit.svg?raw';
   import Delete from '#/icons/delete.svg?raw';
   import Move from '#/icons/move.svg?raw';
+  import Copy from '#/icons/copy.svg?raw';
 
   const t = await abI18n.t({}, [
     { key: 'save' },
@@ -162,16 +163,26 @@ import BlackBgWithTitle from '#/layouts/BlackBgWithTitle.astro';
               ),
             ),
             h(
-              'a',
-              {
-                class:
-                  'block w-full ml-6.5 opacity-50 truncate cursor-pointer text-sm pr-16 max-w-2xl',
-                title: child.url,
-                onclick: () => {
-                  abBookmarks.open(child.id);
+              'div',
+              { class: 'flex gap-2 items-center' },
+              btnIcon(Copy, {
+                size: 4,
+                classNames: ['ml-6'],
+                onClick: async () => {
+                  abBookmarks.copyToClipboard(child.id);
                 },
-              },
-              child.url,
+              }),
+              h(
+                'a',
+                {
+                  class: 'block w-full  opacity-50 truncate cursor-pointer text-sm pr-16 max-w-2xl',
+                  title: child.url,
+                  onclick: () => {
+                    abBookmarks.open(child.id);
+                  },
+                },
+                child.url,
+              ),
             ),
           ),
         ),
