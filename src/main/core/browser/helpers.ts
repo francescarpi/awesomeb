@@ -161,7 +161,7 @@ export function parseTarget(
   let partition: Partition;
   if (partitionId) {
     partition = partitions.get(partitionId) || partitions.default;
-  } else if (selectedTab) {
+  } else if (selectedTab && !selectedTab.tab.isInternal) {
     partition = selectedTab.tab.partition;
   } else {
     partition = partitions.default;
