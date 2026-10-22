@@ -1,4 +1,4 @@
-import type { TPartitionId, TSearchEngineCode } from '~/types';
+import type { TPartitionId, TSearchEngineCode, TTabContainerId } from '~/types';
 import { TabContainer } from '@/core';
 
 export interface IOpenUrlProps {
@@ -7,6 +7,7 @@ export interface IOpenUrlProps {
   targetId?: string;
   selectTab?: boolean;
   parentTabContainer?: TabContainer;
+  activeTabContainerId?: TTabContainerId;
 }
 
 export interface IMoveTabProps {
