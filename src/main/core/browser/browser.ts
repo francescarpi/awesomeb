@@ -251,7 +251,10 @@ export class Browser {
       return null;
     }
 
-    return this.openURL(tabResult.tab.url, props);
+    return this.openURL(tabResult.tab.url, {
+      ...props,
+      activeTabContainerId: tabResult.tabContainer.id,
+    });
   }
 
   async replaceTab(tabId: TTabId, partitionId: TPartitionId): Promise<IWinDesConTab | null> {
@@ -328,6 +331,7 @@ export class Browser {
       targetId: props?.targetId,
       partitionId: props?.partitionId,
       parentTabContainer: props?.parentTabContainer,
+      activeTabContainerId: props?.activeTabContainerId,
     });
 
     if (!result) {

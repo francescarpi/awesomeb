@@ -98,6 +98,7 @@ export function parseTarget(
     partitionId?: TPartitionId;
     tabContainer?: TabContainer;
     parentTabContainer?: TabContainer;
+    activeTabContainerId?: TTabContainerId;
   },
 ): ITarget | null {
   const targetId = props?.targetId || 'current-desktop-window';
@@ -151,7 +152,10 @@ export function parseTarget(
         browser.idGenerator.nextTabContainerId,
       );
     } else {
-      const justAfter = computeJustAfterId(targetId, selectedTab?.tabContainer.id);
+      const justAfter = computeJustAfterId(
+        targetId,
+        props?.activeTabContainerId || selectedTab?.tabContainer.id,
+      );
       tabContainer = desktop.createTabContainer(browser.idGenerator.nextTabContainerId, {
         justAfter,
       });
