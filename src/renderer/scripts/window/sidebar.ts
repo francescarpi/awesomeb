@@ -256,6 +256,7 @@ export function renderVersionAvailable(
               'text-black',
               'inline-flex',
               'w-full',
+              'group-[.collapsed]/sidebar:hidden',
             ),
             style: 'app-region: no-drag;',
             id: 'appupdater-info-btn',
@@ -291,6 +292,7 @@ export function renderVersionAvailable(
               'text-black',
               'inline-flex',
               'w-full',
+              'group-[.collapsed]/sidebar:hidden',
             ),
           },
           t['pages:window.updateProgress'].replace('{{percent}}', data.progress.toFixed(0)),
@@ -312,6 +314,7 @@ export function renderVersionAvailable(
               'text-black',
               'inline-flex',
               'w-full',
+              'group-[.collapsed]/sidebar:hidden',
             ),
             style: 'app-region: no-drag;',
             onclick: () => {
