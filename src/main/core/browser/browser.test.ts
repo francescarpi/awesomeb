@@ -498,6 +498,84 @@ describe('Browser', () => {
     });
   });
 
+  describe('Browser.duplicateTab - after-current anchoring', () => {
+    // Regression: duplicateTab used to let parseTarget anchor "after-current" to the
+    // SELECTED tab container instead of the SOURCE one, so duplicating a background tab
+    // dropped the copy at the end of the desktop. silent ordering bug, no error thrown.
+
+    test("'after-current' anchors the duplicate to the source tab, not the selected one", async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+      const desktop = w.selectedDesktop;
+
+      const a = await browser.openURL('http://a.com', { selectTab: true });
+      const b = await browser.openURL('http://b.com', { selectTab: true });
+      const c = await browser.openURL('http://c.com', { selectTab: true });
+      expect(a && b && c).toBeTruthy();
+
+      // Duplicate A while C is the selected tab.
+      expect(desktop.selectedTabContainer?.id).toBe(c!.tabContainer.id);
+      const dup = await browser.duplicateTab(a!.tab.id, {
+        targetId: 'after-current',
+        selectTab: true,
+      });
+      expect(dup).not.toBeNull();
+
+      // The copy sits immediately after its source (A), not after the selected tab (C).
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        a!.tabContainer.id,
+        dup!.tabContainer.id,
+        b!.tabContainer.id,
+        c!.tabContainer.id,
+      ]);
+    });
+
+    test("'after-current' still anchors to the source when the source IS the selected tab", async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+      const desktop = w.selectedDesktop;
+
+      const a = await browser.openURL('http://a.com', { selectTab: true });
+      const b = await browser.openURL('http://b.com', { selectTab: true });
+      expect(a && b).toBeTruthy();
+
+      expect(desktop.selectedTabContainer?.id).toBe(b!.tabContainer.id);
+      const dup = await browser.duplicateTab(b!.tab.id, {
+        targetId: 'after-current',
+        selectTab: true,
+      });
+      expect(dup).not.toBeNull();
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([
+        a!.tabContainer.id,
+        b!.tabContainer.id,
+        dup!.tabContainer.id,
+      ]);
+    });
+
+    test('cross-desktop targets ignore the source anchor', async () => {
+      const w = browser.createWindow(1, { withDesktops: true });
+      const desktop1 = w.getDesktop(1)!;
+
+      const a = await browser.openURL('http://a.com', { selectTab: true });
+      const b = await browser.openURL('http://b.com', { selectTab: true });
+      const c = await browser.openURL('http://c.com', { selectTab: true });
+      expect(a && b && c).toBeTruthy();
+
+      const dup = await browser.duplicateTab(a!.tab.id, { targetId: 'desktop-2' });
+      expect(dup).not.toBeNull();
+
+      // Source desktop untouched — "justAfter" only applies to "after-current".
+      expect(desktop1.tabContainers.map((tc) => tc.id)).toEqual([
+        a!.tabContainer.id,
+        b!.tabContainer.id,
+        c!.tabContainer.id,
+      ]);
+
+      // Copy appended at the end of the target desktop.
+      const desktop2 = w.getDesktop(2)!;
+      expect(desktop2.tabContainers.map((tc) => tc.id)).toEqual([dup!.tabContainer.id]);
+    });
+  });
+
   test('duplicate a tab in the same desktop', async () => {
     const w = browser.createWindow(1, { withDesktops: true });
     const result = await browser.openURL('http://example.com');
