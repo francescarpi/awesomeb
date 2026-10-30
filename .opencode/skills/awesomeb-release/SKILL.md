@@ -3,7 +3,8 @@ name: awesomeb-release
 description: >
   Creates a new release for AwesomeB: bumps the version in package.json,
   updates outdated dependencies (explicitly skipping typescript to avoid the
-  TS 7 incompatibility), commits with the chore(release) convention, pushes
+  TS 7 incompatibility), fixes known security vulnerabilities with
+  `pnpm audit --fix`, commits with the chore(release) convention, pushes
   the branch, and opens a PR following the repo template.
   Trigger: When the user says "create a release", "new release", "bump version",
   "lanzar release", "nueva versión", "crear release", or any equivalent
@@ -46,6 +47,16 @@ allowed-tools: Bash, Read, Edit, Glob, Grep, question
 7. The PR title **MUST** be `Bump version to <version>` — uppercase `B`, no
    Conventional Commits prefix. The `lint-pr-title` job in
    `.github/workflows/pr-checks.yml` rejects anything else.
+8. **NEVER** run `pnpm audit fix` (the interactive/commercial-audit command)
+   and **NEVER** pass `--audit-level` or other audit flags that change the
+   registry. Only `pnpm audit` (read) and `pnpm audit --fix` (the local
+   `pnpm.overrides` fixer) are allowed. `pnpm audit fix` queries the paid
+   advisory database and can rewrite `package.json` in ways this repo does
+   not want.
+9. **NEVER** let `pnpm audit --fix` remove the protected `pnpm.overrides`
+   entries (`plist`, `devalue`, `node-abi`). They exist for build/runtime
+   compatibility, not for security, so `--fix` prunes them as "obsolete" —
+   and the build then breaks. See "Protected overrides" under Step 5.
 
 ### Version Bump Decision
 
@@ -71,6 +82,7 @@ release/version-bump PRs per the template's own comment. Always populate:
 
 - Bump version to <new-version>
 - Update outdated dependencies (excluding typescript)
+- Fix known security vulnerabilities with `pnpm audit --fix`
 
 ## Linked issue
 
@@ -207,7 +219,122 @@ manually — let the user decide.
 After bumping, re-run `pnpm outdated` to confirm everything that should have
 been bumped is now current (only `typescript` should remain, if applicable).
 
-### Step 5 — Commit
+### Step 5 — Fix Known Security Vulnerabilities
+
+Run the audit **after** the dependency bumps, so the report reflects the
+packages that will actually ship:
+
+```bash
+pnpm audit
+```
+
+Present the findings to the user. `pnpm audit` exits non-zero when
+vulnerabilities exist, so ignore the exit code — the output is what matters.
+
+```
+[release] Security vulnerabilities detected: N (X high, Y moderate, Z low)
+[release]   - tar <=7.5.20 → patched in 7.5.21  (GHSA-r292-9mhp-454m)
+[release]   - brace-expansion >=4.0.0 <5.0.12 → patched in 5.0.12
+[release]   ...
+
+Fix with `pnpm audit --fix` (adds pnpm.overrides entries)? [y/N]
+```
+
+If the user confirms (or the user already asked for the audit fix up front),
+apply it:
+
+```bash
+pnpm audit --fix
+pnpm install
+```
+
+Important notes:
+
+- `pnpm audit --fix` does **not** touch the lockfile by itself — it only adds
+  entries to `pnpm.overrides` in `package.json`. The subsequent `pnpm install`
+  is what actually applies them to `pnpm-lock.yaml`. **Both commands are
+  required**; skipping `pnpm install` leaves the vulnerabilities in place.
+- `pnpm audit --fix` adds `pnpm.overrides` entries; it does not bump the
+  declared version of any dependency in `package.json`. The `typescript` pin is
+  never affected by it (audit fixes are transitive-range overrides).
+- **ALWAYS review the `pnpm.overrides` diff after `--fix`.** `--fix` prunes
+  entries it considers obsolete, but it has no knowledge of *why* an override
+  exists. Overrides in this repo can be there for **compatibility**, not
+  security — and removing them breaks the build. See "Protected overrides"
+  below.
+- Verify the result:
+
+```bash
+pnpm audit
+```
+
+- If `pnpm audit --fix` or `pnpm install` fails, STOP and report the exact
+  error. Do not roll back manually — let the user decide.
+- Some vulnerabilities cannot be auto-fixed (the audit output marks them
+  `review` instead of `update`). Report the remaining count and the affected
+  package paths in the final report so the user knows what is still open.
+
+#### Protected overrides (never let `--fix` remove these)
+
+`pnpm audit --fix` removes these entries from `package.json` because it does
+not see an advisory against them. **They must be restored** — they are there
+for build/runtime compatibility, not for security.
+
+| Override | Why it exists | What breaks without it |
+|---|---|---|
+| `"plist": "3.1.1"` | `plist@3.1.0` calls `DOMParser.parseFromString(xml)` with no mimeType; `@xmldom/xmldom@0.9.12` (also overridden here) now requires the second argument. `plist@3.1.1` passes `"text/xml"`. | `pnpm build:mac` dies with `DOMParser.parseFromString: the provided mimeType "undefined" is not valid` during electron-builder packaging. Added by `fix(build): force plist 3.1.1 and APFS filesystem for macOS 26 (#366)`. |
+| `"devalue@<5.9.1": ">=5.9.2"` | Astro/astro-icon transitive dep. | Astro build may fail on the affected version. |
+| `"node-abi": "^4.39.0"` | Pins `node-abi` for native module rebuilds. | `@electron/rebuild` in electron-builder may pick an incompatible `node-abi` and fail the native rebuild step. Added by `fix(chore): update the node-abi version (#508)`. |
+
+Restore them with the `Edit` tool right after running `--fix`:
+
+```json
+"overrides": {
+  "plist": "3.1.1",
+  "devalue@<5.9.1": ">=5.9.2",
+  "node-abi": "^4.39.0",
+  ...
+}
+```
+
+Then re-run `pnpm install` to propagate the restored overrides to the lockfile.
+
+**Sanity check before committing** — confirm the protected overrides survived:
+
+```bash
+node -e "const o=require('./package.json').pnpm.overrides; console.log('plist:',o.plist,'devalue:',o['devalue@<5.9.1'],'node-abi:',o['node-abi'])"
+# → plist: 3.1.1 devalue: >=5.9.2 node-abi: ^4.39.0
+```
+
+If any of them is `undefined`, restore it before committing.
+
+### Step 5b — Verify the Build Still Works
+
+`pnpm audit --fix` changes transitive dependency versions, so the build can
+break even when the audit report looks clean. Run the platform build before
+committing:
+
+```bash
+pnpm build:mac    # or build:win / build:linux
+```
+
+Expected failures that are **NOT** caused by the dependency changes:
+
+- `corrupted Electron dist` — the Electron dist in `release/mac-arm64` was
+  extracted incompletely, usually because the disk was busy or the previous
+  build was interrupted. Delete `release/` and re-run. Not a dependency
+  problem.
+- `hdiutil detach ... Unable to detach device cleanly` / `dmgbuild process
+  failed 1` — the DMG volume could not be unmounted, typically because a
+  mounted volume or another build holds the device busy. The `.app` bundle and
+  the `.zip` target are already built at that point; only the DMG image is
+  missing. Re-run the build, or report it to the user as an environment
+  issue rather than a dependency problem.
+
+Any **other** build failure after the audit fix is a real regression. Report
+it to the user with the full error before committing.
+
+### Step 6 — Commit
 
 ```bash
 git add package.json pnpm-lock.yaml
@@ -222,7 +349,7 @@ git commit -m "chore(release): bump version to <new-version>"
 If lint-staged triggers (it won't, because we only staged `package.json` and
 `pnpm-lock.yaml` and lint-staged only watches `src/**/*`), let it run.
 
-### Step 6 — Push and Create PR
+### Step 7 — Push and Create PR
 
 ```bash
 git push -u origin chore/v<new-version>
@@ -240,6 +367,7 @@ gh pr create \
 
 - Bump version to <new-version>
 - Update outdated dependencies (excluding typescript)
+- Fix known security vulnerabilities with `pnpm audit --fix`
 
 ## Linked issue
 
@@ -255,7 +383,7 @@ EOF
 
 Print the resulting PR URL to the user.
 
-### Step 7 — Final Report
+### Step 8 — Final Report
 
 ```
 [release] ✅ Done.
@@ -264,6 +392,9 @@ Print the resulting PR URL to the user.
 [release]   PR:     <url>
 [release]   Bumped: <list of packages, or "no outdated packages">
 [release]   Skipped: typescript (per repo rule)
+[release]   Audit:  <N fixed via pnpm.overrides> / <M still open — list package paths>
+[release]   Overrides restored: plist, devalue, node-abi (protected)
+[release]   Build:  <platform build result, or "not run">
 ```
 
 ## STOP Conditions (summary)
@@ -276,6 +407,11 @@ STOP and ask the user if any of these occur:
   divergent history; user must resolve manually
 - The release branch already exists
 - `pnpm add` fails for any reason
+- `pnpm audit --fix` or `pnpm install` fails for any reason
+- A protected override (`plist`, `devalue`, `node-abi`) is missing from
+  `pnpm.overrides` after the audit fix and cannot be restored
+- The platform build fails with an error that is not a known environment
+  issue (`corrupted Electron dist`, `hdiutil detach`)
 - commitlint or any other husky hook rejects the commit
 - `gh pr create` fails
 
@@ -295,13 +431,31 @@ Never auto-resolve. Never bypass hooks.
   per template exception.`
 - **Running `awesomeb-docs-check`** — wastes time, no docs changes are needed
   for a version bump. Skip it.
+- **Forgetting `pnpm install` after `pnpm audit --fix`** — `--fix` only writes
+  `pnpm.overrides` into `package.json`; without the install the lockfile is
+  unchanged and the vulnerabilities remain. Always run both, in that order.
+- **Trusting `pnpm audit --fix` to preserve existing overrides** — it prunes
+  the `plist`, `devalue` and `node-abi` overrides as obsolete, and the mac
+  build then dies with `DOMParser.parseFromString: the provided mimeType
+  "undefined" is not valid`. Always review the `pnpm.overrides` diff and
+  restore the protected entries (see "Protected overrides").
+- **Using `pnpm audit fix` instead of `pnpm audit --fix`** — the former is a
+  different command that hits the paid advisory database. Only
+  `pnpm audit --fix` is allowed (see Hard Rules).
+- **Treating `pnpm audit`'s non-zero exit code as a failure** — it exits 1
+  whenever vulnerabilities exist. Read the report, don't gate on the exit code.
+- **Treating `corrupted Electron dist` or a `hdiutil detach` failure as a
+  dependency regression** — both are environment issues (interrupted build /
+  busy disk), not package problems. The `.app` bundle and `.zip` target are
+  already built when the DMG step fails.
 - **Letting lint-staged run `pnpm astro check` / `pnpm tscheck` on huge
   refactors** — not a concern here (we only stage `package.json` and the
   lockfile, both outside lint-staged's `src/**` glob).
 
 ## Resources
 
-- `package.json` — source of the current `version` field
+- `package.json` — source of the current `version` field, and the
+  `pnpm.overrides` block that `pnpm audit --fix` writes to
 - `.github/PULL_REQUEST_TEMPLATE.md` — PR body template
 - `AGENTS.md` (root) — commit/PR rules, hook policy
 - `.opencode/skills/awesomeb-docs-check/SKILL.md` — reference for what does
