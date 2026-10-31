@@ -250,10 +250,43 @@ pnpm install
 
 Important notes:
 
+- **This repo has TWO override sources.** `pnpm.overrides` in
+  `package.json` AND an `overrides:` block in `pnpm-workspace.yaml`. pnpm 10
+  merges both, and the effective set is what lands in `pnpm-lock.yaml`.
+  `pnpm audit --fix` only writes to `package.json`. Always check
+  `pnpm-workspace.yaml` too when reviewing or restoring overrides.
+- **Override keys are matched against the DECLARED range, not the resolved
+  version.** `app-builder-lib` declares `tar: ^7.5.7`, so a
+  `tar@<=7.5.20` override never applies to it — pnpm resolves `^7.5.7` to
+  the newest matching release (7.5.20), which stays vulnerable. To force a
+  transitive package past an advisory you need a **bare package name** key
+  (e.g. `"tar": ">=7.5.21"`), which overrides every range of that package.
+  Range-scoped keys only catch dependencies whose declared spec falls in
+  that range.
 - `pnpm audit --fix` does **not** touch the lockfile by itself — it only adds
   entries to `pnpm.overrides` in `package.json`. The subsequent `pnpm install`
   is what actually applies them to `pnpm-lock.yaml`. **Both commands are
   required**; skipping `pnpm install` leaves the vulnerabilities in place.
+- **If the audit still reports a vulnerability after `--fix` + `install`, the
+  lockfile is stale.** pnpm will not re-resolve an already-pinned transitive
+  dependency just because a new override was added. Force a targeted
+  re-resolution of just that package:
+
+  ```bash
+  pnpm update <package> --lockfile-only
+  pnpm install
+  ```
+
+  Verify afterwards with `pnpm audit` — it must report no known
+  vulnerabilities.
+
+  **Do NOT delete `pnpm-lock.yaml` to force a re-resolution.** A full
+  regeneration can drop optional peer dependencies that the build depends
+  on — in this repo it dropped `vite@8.3.5`'s optional peer `esbuild`, and
+  the build then died with
+  `Failed to load 'transformWithEsbuild' ... Cannot find package 'esbuild'`.
+  `pnpm update <package> --lockfile-only` re-resolves the one package and
+  leaves the rest of the lockfile intact.
 - `pnpm audit --fix` adds `pnpm.overrides` entries; it does not bump the
   declared version of any dependency in `package.json`. The `typescript` pin is
   never affected by it (audit fixes are transitive-range overrides).
@@ -334,20 +367,61 @@ Expected failures that are **NOT** caused by the dependency changes:
 Any **other** build failure after the audit fix is a real regression. Report
 it to the user with the full error before committing.
 
+### Step 5c — Verify the Checks Still Pass
+
+**Never commit a release without running the repo's check suite.** The
+release PR is validated by `.github/workflows/pr-checks.yml`, so anything
+that fails here will fail CI too. Bumping `electron`, `eslint` or any
+transitive dependency can break types, lint rules or tests even when the
+build succeeds.
+
+Run the same commands CI runs, in the same order:
+
+```bash
+pnpm astro check          # Astro / template type checking
+pnpm tscheck:node         # main + preload TypeScript
+pnpm tscheck:renderer     # renderer TypeScript
+pnpm test run             # Vitest (use `run`, not watch mode)
+pnpm lint                 # ESLint
+pnpm exec prettier --check src   # formatting
+```
+
+Notes:
+
+- Use `pnpm test run` — plain `pnpm test` starts Vitest in watch mode and
+  will hang the session.
+- `pnpm astro check` needs `node_modules` to be fully installed; run
+  `pnpm install` first if it was skipped.
+- These are the exact steps in `pr-checks.yml`. Keep them in sync if that
+  workflow changes.
+
+If **any** check fails, STOP and report it to the user with the full error
+before committing. Do not commit a release that breaks CI. The usual cause
+is a dependency bump that changed a type or a lint rule — report the failing
+package and the error, and let the user decide whether to pin the
+dependency or fix the code.
+
+Only run this suite when the release actually changed dependencies
+(Steps 4 or 5). For a pure version bump with no dependency changes, skip
+straight to Step 6 — there is nothing that could have broken.
+
 ### Step 6 — Commit
 
 ```bash
-git add package.json pnpm-lock.yaml
+git add package.json pnpm-lock.yaml pnpm-workspace.yaml
 git commit -m "chore(release): bump version to <new-version>"
 ```
 
+- Stage `pnpm-workspace.yaml` too when it was modified — it carries the
+  second `overrides:` source and must ship with the lockfile.
 - No commit body (matches the historical convention in `git log`).
 - Do NOT pass `--no-verify`. Let husky's commit-msg hook run commitlint.
 - If commitlint rejects the message: STOP, report the error, do not retry with
   a malformed message. The colon form must always be used.
 
-If lint-staged triggers (it won't, because we only staged `package.json` and
-`pnpm-lock.yaml` and lint-staged only watches `src/**/*`), let it run.
+If lint-staged triggers (it won't, because we only staged `package.json`,
+`pnpm-lock.yaml` and `pnpm-workspace.yaml`, and lint-staged only watches
+`src/**/*`), let it run.
 
 ### Step 7 — Push and Create PR
 
@@ -395,6 +469,7 @@ Print the resulting PR URL to the user.
 [release]   Audit:  <N fixed via pnpm.overrides> / <M still open — list package paths>
 [release]   Overrides restored: plist, devalue, node-abi (protected)
 [release]   Build:  <platform build result, or "not run">
+[release]   Checks: <astro check, tscheck, test, lint, prettier — all pass | failed | not run>
 ```
 
 ## STOP Conditions (summary)
@@ -412,6 +487,8 @@ STOP and ask the user if any of these occur:
   `pnpm.overrides` after the audit fix and cannot be restored
 - The platform build fails with an error that is not a known environment
   issue (`corrupted Electron dist`, `hdiutil detach`)
+- Any check in Step 5c fails (`astro check`, `tscheck:node`,
+  `tscheck:renderer`, `test run`, `lint`, `prettier --check`)
 - commitlint or any other husky hook rejects the commit
 - `gh pr create` fails
 
@@ -439,6 +516,22 @@ Never auto-resolve. Never bypass hooks.
   build then dies with `DOMParser.parseFromString: the provided mimeType
   "undefined" is not valid`. Always review the `pnpm.overrides` diff and
   restore the protected entries (see "Protected overrides").
+- **Assuming a range-scoped override fixes a transitive advisory** — pnpm
+  matches override keys against the dependency's **declared range**, not its
+  resolved version. `tar@<=7.5.20` does nothing for a package declaring
+  `tar: ^7.5.7`. Use a bare package-name key (`"tar": ">=7.5.21"`) to cover
+  every range.
+- **Trusting `pnpm install` to re-resolve a pinned transitive dependency** —
+  it will happily keep the locked (vulnerable) version even after a new
+  override is added, and the audit stays red. Use
+  `pnpm update <package> --lockfile-only` to re-resolve just that package.
+- **Deleting `pnpm-lock.yaml` to force a re-resolution** — it regenerates
+  the whole graph and can silently drop optional peer deps the build needs
+  (`vite` + `esbuild` broke `pnpm build:mac` this way). Always prefer a
+  targeted `pnpm update <package> --lockfile-only`.
+- **Only checking `package.json` for overrides** — this repo also has an
+  `overrides:` block in `pnpm-workspace.yaml`, and pnpm merges both. The
+  effective set is what ends up in `pnpm-lock.yaml`.
 - **Using `pnpm audit fix` instead of `pnpm audit --fix`** — the former is a
   different command that hits the paid advisory database. Only
   `pnpm audit --fix` is allowed (see Hard Rules).
@@ -449,13 +542,27 @@ Never auto-resolve. Never bypass hooks.
   busy disk), not package problems. The `.app` bundle and `.zip` target are
   already built when the DMG step fails.
 - **Letting lint-staged run `pnpm astro check` / `pnpm tscheck` on huge
-  refactors** — not a concern here (we only stage `package.json` and the
-  lockfile, both outside lint-staged's `src/**` glob).
+  refactors** — not a concern here (we only stage `package.json`,
+  `pnpm-lock.yaml` and `pnpm-workspace.yaml`, all outside lint-staged's
+  `src/**` glob).
+- **Committing without running the Step 5c checks** — lint-staged does NOT
+  cover this. It only watches `src/**/*`, so `package.json` and
+  `pnpm-lock.yaml` changes skip type checks, tests and lint entirely. A
+  dependency bump can break the build or the types and the commit would
+  still succeed locally — it only fails later in CI. Run the suite
+  explicitly before committing.
+- **Running `pnpm test` instead of `pnpm test run`** — the bare script starts
+  Vitest in watch mode and hangs the session.
 
 ## Resources
 
 - `package.json` — source of the current `version` field, and the
   `pnpm.overrides` block that `pnpm audit --fix` writes to
+- `pnpm-workspace.yaml` — **also holds an `overrides:` block**; pnpm reads
+  overrides from here as well as from `package.json`. When adding or
+  restoring an override, check both files, and keep them in sync
+- `.github/workflows/pr-checks.yml` — the exact check suite CI runs
+  (astro check, tscheck:node, tscheck:renderer, test, lint, prettier)
 - `.github/PULL_REQUEST_TEMPLATE.md` — PR body template
 - `AGENTS.md` (root) — commit/PR rules, hook policy
 - `.opencode/skills/awesomeb-docs-check/SKILL.md` — reference for what does
