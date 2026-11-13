@@ -8,7 +8,7 @@ import { t } from '~/i18n';
 export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   const { tab, window, tabContainer, desktop } = tabInfo;
 
-  let menu: MenuItemConstructorOptions[] = [
+  const menu1: MenuItemConstructorOptions[] = [
     {
       label: t('menu:contextTab.reload'),
       enabled: !tab.loading && !tab.suspended,
@@ -128,6 +128,22 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         await browser.performCommand(window, 'close-tabs-below', { tabId: tab.id });
       },
     },
+  ];
+
+  if (tabContainer.hasChildren) {
+    menu1.push({
+      label: t('menu:contextTab.closeChildren'),
+      icon: getIcon(EIcon.Close),
+      click: async () => {
+        await browser.performCommand(window, 'close-tab-children', {
+          tabContainerId: tabContainer.id,
+        });
+      },
+    });
+  }
+
+  const menu2: MenuItemConstructorOptions[] = [
+    ...menu1,
     { type: 'separator' },
     {
       label: tab.isMuted ? t('menu:contextTab.unmute') : t('menu:contextTab.mute'),
@@ -176,47 +192,29 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
   ];
 
   if (tabContainer.parent === null) {
-    menu = [
-      ...menu,
-      { type: 'separator' },
-      {
-        label: t('menu:contextTab.openTargetBlankAsChild'),
-        type: 'checkbox',
-        checked: tab.openTabsAsChild,
-        click: async () => {
-          await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
-        },
+    menu2.push({ type: 'separator' });
+    menu2.push({
+      label: t('menu:contextTab.openTargetBlankAsChild'),
+      type: 'checkbox',
+      checked: tab.openTabsAsChild,
+      click: async () => {
+        await browser.performCommand(window, 'toggle-open-tabs-as-child', { tabId: tab.id });
       },
-      {
-        label: t('menu:contextTab.collapseChildren'),
-        type: 'checkbox',
-        checked: tabContainer.childrenCollapsed,
-        visible: tabContainer.children.length > 0,
-        click: async () => {
-          await browser.performCommand(window, 'toggle-collapse-children', {
-            tabContainerId: tabContainer.id,
-          });
-        },
+    });
+    menu2.push({
+      label: t('menu:contextTab.collapseChildren'),
+      type: 'checkbox',
+      checked: tabContainer.childrenCollapsed,
+      visible: tabContainer.children.length > 0,
+      click: async () => {
+        await browser.performCommand(window, 'toggle-collapse-children', {
+          tabContainerId: tabContainer.id,
+        });
       },
-    ];
+    });
   }
 
-  if (tabContainer.hasChildren) {
-    menu = [
-      ...menu,
-      {
-        label: t('menu:contextTab.closeChildren'),
-        icon: getIcon(EIcon.Close),
-        click: async () => {
-          await browser.performCommand(window, 'close-tab-children', {
-            tabContainerId: tabContainer.id,
-          });
-        },
-      },
-    ];
-  }
-
-  return Menu.buildFromTemplate(menu);
+  return Menu.buildFromTemplate(menu2);
 }
 
 function bookmarkFolderOptions(

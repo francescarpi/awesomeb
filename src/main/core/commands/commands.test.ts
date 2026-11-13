@@ -23,6 +23,7 @@ import * as tabSuspend from './tab-suspend';
 import * as tabContainerSelectByIndex from './tabcontainer-select-by-index';
 import * as tabSelect from './tab-select';
 import * as tabClose from './tab-close';
+import * as tabCloseChildren from './tab-close-children';
 import * as tabDuplicate from './tab-duplicate';
 import * as tabReload from './tab-reload';
 import * as tabHistoryBack from './tab-history-back';
@@ -339,6 +340,35 @@ describe('Commands', () => {
 
       // Should not throw an error
       expect(true).toBe(true);
+    });
+
+    test('tab-close-children: should close child tabs and keep the parent selected', async () => {
+      const window = browser.activeWindow!;
+      const parent = await browser.openURL('https://parent.com', { selectTab: true });
+      const firstChild = await browser.openURL('https://child-1.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+      const secondChild = await browser.openURL('https://child-2.com', {
+        parentTabContainer: parent!.tabContainer,
+      });
+
+      await window.selectTab(parent!.tab.id);
+
+      const closeTabSpy = vi.spyOn(browser, 'closeTab');
+      const closeEventSpy = vi.fn();
+      browser.eventsChannel.on('window:tab-did-close', closeEventSpy);
+
+      await browser.performCommand(window, tabCloseChildren.TRIGGER, {
+        tabContainerId: parent!.tabContainer.id,
+      });
+
+      expect(closeTabSpy).toHaveBeenCalledWith(firstChild!.tab.id, { emit: false });
+      expect(closeTabSpy).toHaveBeenCalledWith(secondChild!.tab.id, { emit: false });
+      expect(firstChild!.tab.isClosed).toBe(true);
+      expect(secondChild!.tab.isClosed).toBe(true);
+      expect(window.selectedTab?.tab.id).toBe(parent!.tab.id);
+      expect(closeEventSpy).toHaveBeenCalledTimes(1);
+      expect(closeEventSpy).toHaveBeenCalledWith(window);
     });
 
     test('tab-duplicate: should forward partitionId to duplicateTab (issue #200)', async () => {
