@@ -572,7 +572,7 @@ const abI18n = {
     if (bundle !== null) {
       for (const entry of keys) {
         if (preloadI18n?.exists(entry.key, entry.params)) {
-          result[entry.key] = preloadI18n.t(entry.key, entry.params);
+          result[entry.key] = preloadI18n.t(entry.key, entry.params ?? {});
         } else {
           misses.push(entry);
         }
