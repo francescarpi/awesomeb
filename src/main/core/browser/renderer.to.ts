@@ -106,15 +106,18 @@ export class BrowserToRenderer {
     tabSwitcher.send('tabswitcher:refresh', this._browser.renderer.tabSwitcherData(window));
   }
 
-  refreshLayoutData(window: Window) {
+  refreshLayoutData(window: Window, options?: { animated?: boolean }) {
     const selectedTab = window.selectedTab;
     const data: ILayoutData = {
       sidebarCollapsed: window.sidebarCollapsed,
       areaMaximized: window.areaMaximized,
       hasVisibleTabs: window.hasTabsVisible,
-      selectedTabBounds: selectedTab ? selectedTab.tab.bounds : null,
+      // Use the target bounds: while an animation is running the view reports
+      // the intermediate geometry, which is not what the renderer needs.
+      selectedTabBounds: selectedTab ? selectedTab.tab.targetBounds : null,
       selectedTabPartitionColor: selectedTab ? selectedTab.tab.partition.color : null,
       sidebarWidth: window.sidebarWidth,
+      animated: !!options?.animated,
     };
 
     window.sendMessage('window:refresh-layout-data', data);

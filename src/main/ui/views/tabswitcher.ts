@@ -1,6 +1,6 @@
 import { TWindowId } from '~/types';
 import { Window } from '@/core';
-import { UIPageView } from '../view';
+import { UIPageView, type IViewBoundsOptions } from '../view';
 
 export class TabSwitcher extends UIPageView {
   constructor(winId: TWindowId) {
@@ -12,7 +12,7 @@ export class TabSwitcher extends UIPageView {
     this.preventLostFocusWhenVisible();
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(window: Window, _options?: IViewBoundsOptions) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({

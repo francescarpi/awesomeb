@@ -92,6 +92,15 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     updateLayout(data);
   });
 
+  // The main process cannot evaluate `prefers-reduced-motion` on its own, so
+  // we relay the media query result (and any change to it) to it.
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const reportReducedMotion = () => {
+    abWindow.setReducedMotion(winId, reducedMotionQuery.matches);
+  };
+  reducedMotionQuery.addEventListener('change', reportReducedMotion);
+  reportReducedMotion();
+
   const selectedDesktopId = desktops.find((d) => d.selected)!.id;
   updateSelectedDesktopClass(selectedDesktopId);
   abDesktops.onRefreshSelected((_event, selectedDesktopId) => {

@@ -67,3 +67,13 @@ export const SIDEBAR_DEFAULT_WIDTH = 255;
 export const SIDEBAR_MIN_WIDTH = 40;
 
 export const BORDER_WIDTH = 2;
+
+// Duration (ms) of the animated layout transitions (sidebar toggle, area
+// maximize). Shared between the main process (bounds interpolation) and the
+// renderer (CSS transition) so both stay in sync.
+export const LAYOUT_ANIMATION_DURATION = 200;
+
+// Easing used for the layout transitions, as a CSS timing function. The main
+// process uses the equivalent cubic bezier (see `easeInOut` in src/main/ui/view.ts)
+// so the interpolated bounds and the CSS transition follow the same curve.
+export const LAYOUT_ANIMATION_EASING = 'cubic-bezier(0.42, 0, 0.58, 1)';

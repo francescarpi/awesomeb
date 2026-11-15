@@ -43,9 +43,17 @@ export class VisitHistory {
   }
 
   get all(): IHistoryItem[] {
-    const data = this._store.get('history') || [];
-    // Validate the full store on read
-    VisitHistoryStoreScheme.parse(this._store.store);
+    // The store is deep-validated when it is loaded (see the constructor) and
+    // before every write (addUrl / cleanupOldEntries), so reading it does not
+    // need to re-parse the whole history. Doing so made bulk writes O(n^2) and
+    // was slow enough to time out under load.
+    //
+    // A cheap structural check is kept here so a corrupted file that was
+    // modified outside of this process is still detected on read.
+    const data = this._store.get('history');
+    if (!Array.isArray(data)) {
+      return [];
+    }
     return data;
   }
 

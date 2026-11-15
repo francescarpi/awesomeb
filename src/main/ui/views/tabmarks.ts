@@ -1,6 +1,6 @@
 import { TWindowId } from '~/types';
 import { Window } from '@/core';
-import { UIPageView } from '../view';
+import { UIPageView, type IViewBoundsOptions } from '../view';
 
 export class TabMarks extends UIPageView {
   constructor(winId: TWindowId) {
@@ -10,7 +10,7 @@ export class TabMarks extends UIPageView {
     });
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(window: Window, _options?: IViewBoundsOptions) {
     const windowBounds = window.bounds;
 
     const width = 400;
