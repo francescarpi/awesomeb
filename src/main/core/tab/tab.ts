@@ -8,7 +8,7 @@ import { FailLoad } from './fail-load';
 import { Certificate } from 'electron';
 import { CertificateError } from './certificate-error';
 import { TabPreview } from './tab-preview';
-import { UIView } from '@/ui';
+import { UIView, type IViewBoundsOptions } from '@/ui';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
 import { isViewSourceUrl } from './helpers';
 import { LAYOUT_MARGIN, URLBAR_HEIGHT } from '~/constants';
@@ -84,18 +84,21 @@ export class Tab extends UIView {
     this.setVisible(visibleTabs.includes(this.id));
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(window: Window, options?: IViewBoundsOptions) {
     const selectedTab = window.selectedTab;
 
     // Calculate bounds...
     const bounds = window.bounds;
     if (window.fullScreen) {
-      this.webContentsView.setBounds({
-        x: 0,
-        y: 0,
-        width: bounds.width,
-        height: bounds.height,
-      });
+      this.setBounds(
+        {
+          x: 0,
+          y: 0,
+          width: bounds.width,
+          height: bounds.height,
+        },
+        options,
+      );
       this.webContentsView.setBorderRadius(0);
       return;
     }
@@ -146,12 +149,15 @@ export class Tab extends UIView {
     }
 
     // Apply bounds
-    this.webContentsView.setBounds({
-      x,
-      y,
-      width,
-      height,
-    });
+    this.setBounds(
+      {
+        x,
+        y,
+        width,
+        height,
+      },
+      options,
+    );
   }
 
   get partition(): Partition {

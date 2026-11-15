@@ -1,7 +1,8 @@
 import type { ITheme, ILayoutData, TDesktopId } from '~/types';
-import { LAYOUT_MARGIN, BORDER_WIDTH } from '~/constants';
+import { LAYOUT_MARGIN, BORDER_WIDTH, LAYOUT_ANIMATION_DURATION } from '~/constants';
 
 let completedFlashTimer: ReturnType<typeof setTimeout> | undefined;
+let layoutAnimationTimer: ReturnType<typeof setTimeout> | undefined;
 
 export function applyTheme(theme: ITheme) {
   const mainContainer = document.getElementById('main-container') as HTMLDivElement;
@@ -25,6 +26,34 @@ export function updateLayout(data: ILayoutData) {
     urlContainer.classList.remove('hidden');
   }
 
+  // The overlay is positioned from the tab bounds. The main process reports the
+  // FINAL bounds (not the intermediate animation frames), so it can be placed
+  // right away. While the layout animates we keep it hidden and reveal it once
+  // the transition is over, so it does not appear to lag behind the view.
+  if (layoutAnimationTimer) {
+    clearTimeout(layoutAnimationTimer);
+    layoutAnimationTimer = undefined;
+  }
+
+  if (data.animated) {
+    tabSelected.style.opacity = '0';
+
+    layoutAnimationTimer = setTimeout(() => {
+      layoutAnimationTimer = undefined;
+      applySelectedTabOverlay(tabSelected, data);
+    }, LAYOUT_ANIMATION_DURATION);
+  } else {
+    applySelectedTabOverlay(tabSelected, data);
+  }
+
+  if (data.sidebarCollapsed) {
+    sidebarContainer.classList.add('collapsed');
+  } else {
+    sidebarContainer.classList.remove('collapsed');
+  }
+}
+
+function applySelectedTabOverlay(tabSelected: HTMLDivElement, data: ILayoutData) {
   if (data.selectedTabBounds && data.selectedTabPartitionColor) {
     tabSelected.classList.remove('hidden');
     tabSelected.style.left = `${data.selectedTabBounds.x - BORDER_WIDTH}px`;
@@ -32,14 +61,10 @@ export function updateLayout(data: ILayoutData) {
     tabSelected.style.width = `${data.selectedTabBounds.width + BORDER_WIDTH * 2}px`;
     tabSelected.style.height = `${data.selectedTabBounds.height + BORDER_WIDTH * 2}px`;
     tabSelected.style.borderColor = data.selectedTabPartitionColor;
+    tabSelected.style.opacity = '1';
   } else {
     tabSelected.classList.add('hidden');
-  }
-
-  if (data.sidebarCollapsed) {
-    sidebarContainer.classList.add('collapsed');
-  } else {
-    sidebarContainer.classList.remove('collapsed');
+    tabSelected.style.opacity = '1';
   }
 }
 

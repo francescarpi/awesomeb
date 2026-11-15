@@ -1,4 +1,4 @@
-import { UIPageView, UIView, loadPage } from '@/ui';
+import { UIPageView, UIView, loadPage, type IViewBoundsOptions } from '@/ui';
 import { Window, Partition, windowOpenHadler, Browser } from '@/core';
 import { TWindowId } from '~/types';
 import { type HandlerDetails } from 'electron';
@@ -13,7 +13,7 @@ export class ExtensionPopupOverlay extends UIPageView {
     });
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(window: Window, _options?: IViewBoundsOptions) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({
@@ -107,7 +107,7 @@ export class ExtensionPopup extends UIView {
     this.preferredSizeGuard = undefined;
   }
 
-  refreshBounds(_window: Window) {
+  refreshBounds(_window: Window, _options?: IViewBoundsOptions) {
     const bounds = this.webContentsView.getBounds();
 
     const x = this.x + EXTENSION_ICON_SIZE + EXTENSION_POPUP_GAP - bounds.width;

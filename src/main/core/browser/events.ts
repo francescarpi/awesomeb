@@ -320,10 +320,13 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
-  browser.eventsChannel.on('window:layout-did-change', async (window: Window) => {
-    window.renderViews();
-    browser.toRenderer.refreshLayoutData(window);
-  });
+  browser.eventsChannel.on(
+    'window:layout-did-change',
+    async (window: Window, options?: { animate?: boolean }) => {
+      window.renderViews({ animate: options?.animate });
+      browser.toRenderer.refreshLayoutData(window, { animated: !!options?.animate });
+    },
+  );
 
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on(

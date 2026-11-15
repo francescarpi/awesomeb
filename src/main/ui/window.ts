@@ -18,6 +18,7 @@ export class UIWindow {
   private _sidebarCollapsed = false;
   private _areaMaximized = false;
   private _fullScreen = false;
+  private _reducedMotion = false;
 
   constructor(
     public readonly winId: TWindowId,
@@ -166,7 +167,9 @@ export class UIWindow {
   toggleSidebar(window: Window) {
     this._sidebarCollapsed = !this._sidebarCollapsed;
 
-    this.eventsChannel.emit('window:layout-did-change', window);
+    this.eventsChannel.emit('window:layout-did-change', window, {
+      animate: !this._reducedMotion,
+    });
   }
 
   get sidebarCollapsed(): boolean {
@@ -177,7 +180,21 @@ export class UIWindow {
     this._areaMaximized = !this._areaMaximized;
     this._sidebarCollapsed = this._areaMaximized;
 
-    this.eventsChannel.emit('window:layout-did-change', window);
+    this.eventsChannel.emit('window:layout-did-change', window, {
+      animate: !this._reducedMotion,
+    });
+  }
+
+  /**
+   * Mirrors the renderer's `prefers-reduced-motion` media query. When true, the
+   * layout transitions are applied instantly instead of being animated.
+   */
+  get reducedMotion(): boolean {
+    return this._reducedMotion;
+  }
+
+  set reducedMotion(reduced: boolean) {
+    this._reducedMotion = reduced;
   }
 
   get areaMaximized(): boolean {

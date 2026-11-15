@@ -1,4 +1,4 @@
-import { UIPageView } from '@/ui';
+import { UIPageView, type IViewBoundsOptions } from '@/ui';
 import { Tab } from './tab';
 import { Window } from '@/core';
 
@@ -27,12 +27,19 @@ export class TabPreview extends UIPageView {
     }
   }
 
-  refreshBounds(_window: Window) {
-    this.webContentsView.setBounds({
-      x: this.parent.left,
-      y: this.parent.top,
-      width: this.parent.width,
-      height: this.parent.height,
-    });
+  refreshBounds(_window: Window, options?: IViewBoundsOptions) {
+    // Use the parent tab's TARGET bounds: while the tab is animating, its live
+    // bounds are the intermediate ones, and this preview has to match it.
+    const parentBounds = this.parent.targetBounds;
+
+    this.setBounds(
+      {
+        x: parentBounds.x,
+        y: parentBounds.y,
+        width: parentBounds.width,
+        height: parentBounds.height,
+      },
+      options,
+    );
   }
 }
