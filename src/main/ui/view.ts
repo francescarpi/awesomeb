@@ -3,11 +3,7 @@ import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools } from './helpers';
 import { partitions, Window } from '@/core';
 import { buildScopeLog } from '@/utils';
-import {
-  LAYOUT_ANIMATION_DURATION,
-  LAYOUT_ANIMATION_EASING,
-  BOUNDS_ANIMATION_FRAME_INTERVAL,
-} from '~/constants';
+import { LAYOUT_ANIMATION_DURATION, LAYOUT_ANIMATION_EASING } from '~/constants';
 
 const scopeLog = buildScopeLog('UIView', process.env.AB_LOG_UI === 'true');
 
@@ -18,28 +14,6 @@ export interface IViewBoundsOptions {
   animate?: boolean;
 }
 
-/**
- * Easing used when interpolating the bounds ourselves.
- *
- * This is the exact curve Electron's native animation uses for "ease-in-out"
- * (gfx::Tween::EASE_IN_OUT), so the shrink path and the native grow path
- * follow the same motion and the sidebar (CSS) and the web contents view stay
- * in lockstep:
- *
- *   t < 0.5   -> pow(t * 2, 2) / 2
- *   t >= 0.5  -> 1 - pow((t - 1) * 2, 2) / 2
- *
- * The renderer uses LAYOUT_ANIMATION_CSS_EASING, the closest CSS timing
- * function to this curve (~0.5% deviation).
- */
-function easeInOut(t: number): number {
-  if (t < 0.5) {
-    return (t * 2 * (t * 2)) / 2;
-  }
-  const f = (t - 1) * 2;
-  return 1 - (f * f) / 2;
-}
-
 export class UIView {
   protected _webContentsView: WebContentsView;
 
@@ -48,7 +22,6 @@ export class UIView {
   private readonly _preferredSizeMode: boolean;
 
   private _session: Session;
-  private _boundsAnimationTimer: ReturnType<typeof setTimeout> | undefined;
   private _targetBounds: Rectangle | undefined;
 
   constructor(
@@ -153,99 +126,16 @@ export class UIView {
     this._targetBounds = bounds;
 
     if (!options?.animate) {
-      this.cancelBoundsAnimation();
       this._webContentsView.setBounds(bounds);
       return;
     }
 
-    // Electron's native animation only handles GROWING properly:
-    //
-    // - Growing: it resizes the view to the larger size up front and animates
-    //   the layer clip rect. The page is laid out at the final width and
-    //   revealed progressively, which looks great and is cheap (the animation
-    //   runs entirely in the compositor).
-    //
-    // - Shrinking: the view is not resized, so the web contents surface keeps
-    //   its old (larger) size and the compositor clips it. The page stays laid
-    //   out at the old width and the text is cut off mid-word until the
-    //   animation ends.
-    //
-    // So we use the native animation when the view grows, and interpolate the
-    // bounds ourselves when it shrinks, which re-lays out the page on every
-    // frame and keeps the content readable.
-    const current = this.bounds;
-    const growing = bounds.width > current.width || bounds.height > current.height;
-
-    if (growing) {
-      this.cancelBoundsAnimation();
-      this._webContentsView.setBounds(bounds, {
-        animate: {
-          duration: LAYOUT_ANIMATION_DURATION,
-          easing: LAYOUT_ANIMATION_EASING,
-        },
-      });
-      return;
-    }
-
-    this.animateBounds(bounds);
-  }
-
-  /**
-   * Animates the bounds by interpolating them on a timer and applying the
-   * intermediate values with plain (non animated) `setBounds` calls, so the
-   * web contents is resized on every frame and the page is re-laid out to the
-   * current size instead of being clipped.
-   */
-  private animateBounds(target: Rectangle) {
-    this.cancelBoundsAnimation();
-
-    const from = this.bounds;
-    const start = Date.now();
-
-    // Nothing to animate.
-    if (
-      from.x === target.x &&
-      from.y === target.y &&
-      from.width === target.width &&
-      from.height === target.height
-    ) {
-      return;
-    }
-
-    const step = () => {
-      if (this.isDestroyed) {
-        this._boundsAnimationTimer = undefined;
-        return;
-      }
-
-      const elapsed = Date.now() - start;
-      const progress = Math.min(elapsed / LAYOUT_ANIMATION_DURATION, 1);
-      const eased = easeInOut(progress);
-
-      if (progress >= 1) {
-        this._boundsAnimationTimer = undefined;
-        this._webContentsView.setBounds(target);
-        return;
-      }
-
-      this._webContentsView.setBounds({
-        x: Math.round(from.x + (target.x - from.x) * eased),
-        y: Math.round(from.y + (target.y - from.y) * eased),
-        width: Math.round(from.width + (target.width - from.width) * eased),
-        height: Math.round(from.height + (target.height - from.height) * eased),
-      });
-
-      this._boundsAnimationTimer = setTimeout(step, BOUNDS_ANIMATION_FRAME_INTERVAL);
-    };
-
-    step();
-  }
-
-  private cancelBoundsAnimation() {
-    if (this._boundsAnimationTimer) {
-      clearTimeout(this._boundsAnimationTimer);
-      this._boundsAnimationTimer = undefined;
-    }
+    this._webContentsView.setBounds(bounds, {
+      animate: {
+        duration: LAYOUT_ANIMATION_DURATION,
+        easing: LAYOUT_ANIMATION_EASING,
+      },
+    });
   }
 
   /**

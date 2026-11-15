@@ -73,15 +73,10 @@ export const BORDER_WIDTH = 2;
 // and the renderer (CSS transition) so both stay in sync.
 export const LAYOUT_ANIMATION_DURATION = 200;
 
-// Target frame interval for the bounds interpolation (~60fps).
-export const BOUNDS_ANIMATION_FRAME_INTERVAL = 16;
-
 // Easing used for the layout transitions.
 //
 // The main process uses Electron's native `setBounds` animation, whose
-// "ease-in-out" maps to gfx::Tween::EASE_IN_OUT (a quadratic curve). The
-// bounds interpolation used when the view shrinks follows the same curve, so
-// both directions move identically.
+// "ease-in-out" maps to gfx::Tween::EASE_IN_OUT (a quadratic curve).
 //
 // This cubic-bezier is the closest CSS equivalent to that quadratic: it stays
 // within ~0.5% of it across the whole animation, so the sidebar and the web
