@@ -4,7 +4,7 @@ import { IContextualModalParams, TPage } from '~/types';
 import { loadPage, openDevTools } from '../helpers';
 import { IProps } from './types';
 import { partitions, Window } from '@/core';
-import { UIPageView } from '../view';
+import { UIPageView, type IViewBoundsOptions } from '../view';
 
 export class UIModal {
   public readonly bw: BrowserWindow;
@@ -102,7 +102,7 @@ export class UIContextualModal extends UIPageView {
     });
   }
 
-  refreshBounds(window: Window) {
+  refreshBounds(window: Window, _options?: IViewBoundsOptions) {
     const windowBounds = window.bounds;
 
     this.webContentsView.setBounds({

@@ -13,4 +13,17 @@ export function setupWindowIPC(browser: Browser) {
       win.focus();
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  // The renderer is the only process that can evaluate the
+  // `prefers-reduced-motion` media query, so it relays the result here.
+  createHandler<{ win: Window; reduced: boolean }>(
+    'window:set-reduced-motion',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win, reduced }) => {
+      win.reducedMotion = !!reduced;
+    },
+  );
 }

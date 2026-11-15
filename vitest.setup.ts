@@ -135,10 +135,13 @@ const mockElectron = vi.hoisted(() => {
     },
     WebContentsView: class {
       webContents = webContents;
-      setBounds = noopFn;
+      setBounds = (bounds: { x: number; y: number; width: number; height: number }): void => {
+        this._bounds = { ...this._bounds, ...bounds };
+      };
       getBounds() {
-        return { x: 0, y: 0, width: 400, height: 400 };
+        return { ...this._bounds };
       }
+      private _bounds = { x: 0, y: 0, width: 400, height: 400 };
       setBorderRadius = noopFn;
       setVisible = noopFn;
       getVisible() {

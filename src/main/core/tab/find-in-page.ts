@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { TFindInPageAction, TFindInPageId, IFindInPageSearch } from '~/types';
 import type { Result } from 'electron';
-import { UIPageView } from '@/ui';
+import { UIPageView, type IViewBoundsOptions } from '@/ui';
 import { Window, Tab } from '@/core';
 import { FIND_IN_PAGE_VIEW_HEIGHT } from './constants';
 import { LAYOUT_MARGIN } from '~/constants';
@@ -59,12 +59,20 @@ export class FindInPage extends UIPageView {
     this.setVisible(visibleTabs.includes(this.tab.id));
   }
 
-  refreshBounds(_window: Window) {
-    this.webContentsView.setBounds({
-      x: this.tab.left,
-      y: this.tab.top + this.tab.height + LAYOUT_MARGIN,
-      width: this.tab.width,
-      height: FIND_IN_PAGE_VIEW_HEIGHT,
-    });
+  refreshBounds(_window: Window, options?: IViewBoundsOptions) {
+    // Use the tab's TARGET bounds: while the tab is animating, its live bounds
+    // are the intermediate ones, and this bar has to end up exactly as wide as
+    // the tab (it sits right below it).
+    const tabBounds = this.tab.targetBounds;
+
+    this.setBounds(
+      {
+        x: tabBounds.x,
+        y: tabBounds.y + tabBounds.height + LAYOUT_MARGIN,
+        width: tabBounds.width,
+        height: FIND_IN_PAGE_VIEW_HEIGHT,
+      },
+      options,
+    );
   }
 }

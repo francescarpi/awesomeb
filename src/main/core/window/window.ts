@@ -1,6 +1,6 @@
-import { UIWindow, UITooltip } from '@/ui';
+import { UIWindow, UITooltip, type IViewBoundsOptions } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
-import { Desktop, IDesktopProps, Browser, PromptsManager, TabContainer } from '@/core';
+import { Desktop, IDesktopProps, Browser, PromptsManager, Tab, TabContainer } from '@/core';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 import { MAX_SPLIT_TABS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import {
@@ -399,16 +399,32 @@ export class Window extends UIWindow {
     return tabs[0];
   }
 
-  renderViews() {
+  renderViews(options?: IViewBoundsOptions) {
     for (const view of this.views) {
       view.checkVisibility(this);
+    }
+
+    // Tabs are refreshed first: the views attached to a tab (find-in-page bar,
+    // fail-load and certificate-error overlays, tab preview) are positioned
+    // relative to the tab, and they read its TARGET bounds. If a tab were
+    // refreshed after them, they would use the previous layout.
+    for (const view of this.views) {
+      if (!view.visible) {
+        continue;
+      }
+      if (view instanceof Tab) {
+        view.refreshBounds(this, options);
+      }
     }
 
     for (const view of this.views) {
       if (!view.visible && !['tab-switcher', 'tab-marks', 'urlbar'].includes(view.viewId)) {
         continue;
       }
-      view.refreshBounds(this);
+      if (view instanceof Tab) {
+        continue;
+      }
+      view.refreshBounds(this, options);
     }
   }
 

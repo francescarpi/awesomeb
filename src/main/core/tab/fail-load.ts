@@ -1,4 +1,4 @@
-import { UIPageView } from '@/ui';
+import { UIPageView, type IViewBoundsOptions } from '@/ui';
 import { Window, Tab } from '@/core';
 
 export class FailLoad extends UIPageView {
@@ -36,12 +36,19 @@ export class FailLoad extends UIPageView {
     this.setVisible(selectedTab?.tab.id === this.tab.id);
   }
 
-  refreshBounds(_window: Window) {
-    this.webContentsView.setBounds({
-      x: this.tab.left,
-      y: this.tab.top,
-      width: this.tab.width,
-      height: this.tab.height,
-    });
+  refreshBounds(_window: Window, options?: IViewBoundsOptions) {
+    // Use the tab's TARGET bounds: while the tab is animating, its live bounds
+    // are the intermediate ones, and this overlay has to match the tab exactly.
+    const tabBounds = this.tab.targetBounds;
+
+    this.setBounds(
+      {
+        x: tabBounds.x,
+        y: tabBounds.y,
+        width: tabBounds.width,
+        height: tabBounds.height,
+      },
+      options,
+    );
   }
 }

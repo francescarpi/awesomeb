@@ -100,6 +100,9 @@ const abWindow = {
   onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => {
     ipcRenderer.on('window:refresh-layout-data', callback);
   },
+  setReducedMotion: (winId: TWindowId, reduced: boolean) => {
+    ipcRenderer.send('window:set-reduced-motion', { winId, reduced });
+  },
 };
 
 //--------------------------------------------------------------------------------------

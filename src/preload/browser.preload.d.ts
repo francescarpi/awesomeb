@@ -72,6 +72,7 @@ declare global {
   const abWindow: {
     readyToShow: (winId: TWindowId) => void;
     onRefreshLayoutData: (callback: (event: IpcRendererEvent, data: ILayoutData) => void) => void;
+    setReducedMotion: (winId: TWindowId, reduced: boolean) => void;
   };
 
   //--------------------------------------------------------------------------------------
