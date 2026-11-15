@@ -3,12 +3,13 @@ import { IViewProps, IPageViewProps, TViewId } from './types';
 import { loadPage, openDevTools } from './helpers';
 import { partitions, Window } from '@/core';
 import { buildScopeLog } from '@/utils';
-import { LAYOUT_ANIMATION_DURATION } from '~/constants';
+import {
+  LAYOUT_ANIMATION_DURATION,
+  LAYOUT_ANIMATION_EASING,
+  BOUNDS_ANIMATION_FRAME_INTERVAL,
+} from '~/constants';
 
 const scopeLog = buildScopeLog('UIView', process.env.AB_LOG_UI === 'true');
-
-// Target frame interval for the bounds interpolation (~60fps).
-const BOUNDS_ANIMATION_FRAME_INTERVAL = 16;
 
 export interface IViewBoundsOptions {
   /**
@@ -18,15 +19,25 @@ export interface IViewBoundsOptions {
 }
 
 /**
- * Cubic bezier easing, matching the CSS `ease-in-out` keyword
- * (cubic-bezier(0.42, 0, 0.58, 1)).
+ * Easing used when interpolating the bounds ourselves.
+ *
+ * This is the exact curve Electron's native animation uses for "ease-in-out"
+ * (gfx::Tween::EASE_IN_OUT), so the shrink path and the native grow path
+ * follow the same motion and the sidebar (CSS) and the web contents view stay
+ * in lockstep:
+ *
+ *   t < 0.5   -> pow(t * 2, 2) / 2
+ *   t >= 0.5  -> 1 - pow((t - 1) * 2, 2) / 2
+ *
+ * The renderer uses LAYOUT_ANIMATION_CSS_EASING, the closest CSS timing
+ * function to this curve (~0.5% deviation).
  */
 function easeInOut(t: number): number {
   if (t < 0.5) {
-    return 4 * t * t * t;
+    return (t * 2 * (t * 2)) / 2;
   }
-  const f = -2 * t + 2;
-  return 1 - (f * f * f) / 2;
+  const f = (t - 1) * 2;
+  return 1 - (f * f) / 2;
 }
 
 export class UIView {
@@ -147,26 +158,43 @@ export class UIView {
       return;
     }
 
+    // Electron's native animation only handles GROWING properly:
+    //
+    // - Growing: it resizes the view to the larger size up front and animates
+    //   the layer clip rect. The page is laid out at the final width and
+    //   revealed progressively, which looks great and is cheap (the animation
+    //   runs entirely in the compositor).
+    //
+    // - Shrinking: the view is not resized, so the web contents surface keeps
+    //   its old (larger) size and the compositor clips it. The page stays laid
+    //   out at the old width and the text is cut off mid-word until the
+    //   animation ends.
+    //
+    // So we use the native animation when the view grows, and interpolate the
+    // bounds ourselves when it shrinks, which re-lays out the page on every
+    // frame and keeps the content readable.
+    const current = this.bounds;
+    const growing = bounds.width > current.width || bounds.height > current.height;
+
+    if (growing) {
+      this.cancelBoundsAnimation();
+      this._webContentsView.setBounds(bounds, {
+        animate: {
+          duration: LAYOUT_ANIMATION_DURATION,
+          easing: LAYOUT_ANIMATION_EASING,
+        },
+      });
+      return;
+    }
+
     this.animateBounds(bounds);
   }
 
   /**
    * Animates the bounds by interpolating them on a timer and applying the
-   * intermediate values with plain (non animated) `setBounds` calls.
-   *
-   * We do not use Electron's native `setBounds(bounds, { animate })` because it
-   * is asymmetric:
-   * - When GROWING, Electron resizes the view to the larger size up front and
-   *   animates the layer clip rect, so the page is laid out at the final size
-   *   and revealed progressively.
-   * - When SHRINKING, the view is not resized, so the web contents surface
-   *   keeps its old (larger) size and the compositor scales it into the
-   *   smaller box. The page looks stretched and is not re-laid out until the
-   *   animation ends.
-   *
-   * Interpolating ourselves keeps both directions identical: the view is
-   * resized on every frame, so the page is always laid out at the current
-   * size and never appears scaled.
+   * intermediate values with plain (non animated) `setBounds` calls, so the
+   * web contents is resized on every frame and the page is re-laid out to the
+   * current size instead of being clipped.
    */
   private animateBounds(target: Rectangle) {
     this.cancelBoundsAnimation();

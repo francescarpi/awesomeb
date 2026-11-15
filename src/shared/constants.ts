@@ -69,11 +69,24 @@ export const SIDEBAR_MIN_WIDTH = 40;
 export const BORDER_WIDTH = 2;
 
 // Duration (ms) of the animated layout transitions (sidebar toggle, area
-// maximize). Shared between the main process (bounds interpolation) and the
-// renderer (CSS transition) so both stay in sync.
+// maximize). Shared between the main process (native View.setBounds animation)
+// and the renderer (CSS transition) so both stay in sync.
 export const LAYOUT_ANIMATION_DURATION = 200;
 
-// Easing used for the layout transitions, as a CSS timing function. The main
-// process uses the equivalent cubic bezier (see `easeInOut` in src/main/ui/view.ts)
-// so the interpolated bounds and the CSS transition follow the same curve.
-export const LAYOUT_ANIMATION_EASING = 'cubic-bezier(0.42, 0, 0.58, 1)';
+// Target frame interval for the bounds interpolation (~60fps).
+export const BOUNDS_ANIMATION_FRAME_INTERVAL = 16;
+
+// Easing used for the layout transitions.
+//
+// The main process uses Electron's native `setBounds` animation, whose
+// "ease-in-out" maps to gfx::Tween::EASE_IN_OUT (a quadratic curve). The
+// bounds interpolation used when the view shrinks follows the same curve, so
+// both directions move identically.
+//
+// This cubic-bezier is the closest CSS equivalent to that quadratic: it stays
+// within ~0.5% of it across the whole animation, so the sidebar and the web
+// contents view move in lockstep.
+export const LAYOUT_ANIMATION_EASING = 'ease-in-out' as const;
+
+// The same curve expressed as a CSS timing function, for the renderer.
+export const LAYOUT_ANIMATION_CSS_EASING = 'cubic-bezier(0.45, 0, 0.55, 1)';

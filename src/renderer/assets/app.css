@@ -41,11 +41,12 @@
 
 /*
  * Animated layout transitions. The duration and easing mirror the main
- * process bounds interpolation (LAYOUT_ANIMATION_DURATION / the equivalent
- * cubic bezier) so the sidebar and the web contents view slide in lockstep.
+ * process native View.setBounds animation (LAYOUT_ANIMATION_DURATION /
+ * LAYOUT_ANIMATION_CSS_EASING) so the sidebar and the web contents view
+ * slide in lockstep.
  */
 #sidebar-container {
-  transition: width var(--layout-animation-duration, 200ms) cubic-bezier(0.42, 0, 0.58, 1);
+  transition: width var(--layout-animation-duration, 200ms) cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 /*
@@ -53,7 +54,7 @@
  * cannot follow the view while it slides, so it fades out and back in.
  */
 #tab-container-selected {
-  transition: opacity var(--layout-animation-duration, 200ms) cubic-bezier(0.42, 0, 0.58, 1);
+  transition: opacity var(--layout-animation-duration, 200ms) cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

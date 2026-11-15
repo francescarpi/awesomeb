@@ -1,7 +1,11 @@
 import { expect, test, describe, vi, beforeEach, afterEach } from 'vitest';
 import { Browser, partitions, Window } from '@/core';
 import type { UIView } from '@/ui';
-import { LAYOUT_ANIMATION_DURATION } from '~/constants';
+import {
+  LAYOUT_ANIMATION_DURATION,
+  LAYOUT_ANIMATION_EASING,
+  BOUNDS_ANIMATION_FRAME_INTERVAL,
+} from '~/constants';
 
 describe('Layout animation', () => {
   let browser: Browser;
@@ -76,47 +80,46 @@ describe('Layout animation', () => {
     expect(setBoundsSpy).toHaveBeenCalledWith({ x: 0, y: 0, width: 100, height: 100 });
   });
 
-  test('setBounds with animate interpolates through intermediate bounds', async () => {
+  test('setBounds with animate delegates to the native Electron animation when growing', () => {
     const view = window.getView<UIView>('tab-switcher')!;
-    const setBoundsSpy = vi.spyOn(view.webContentsView, 'setBounds');
 
     view.setBounds({ x: 0, y: 0, width: 100, height: 100 });
-    setBoundsSpy.mockClear();
 
+    const setBoundsSpy = vi.spyOn(view.webContentsView, 'setBounds');
+
+    // Growing -> native animation (clip wipe), the page is laid out at the
+    // final width and revealed progressively.
     view.setBounds({ x: 0, y: 0, width: 300, height: 100 }, { animate: true });
 
-    await vi.advanceTimersByTimeAsync(LAYOUT_ANIMATION_DURATION + 50);
-
-    const calls = setBoundsSpy.mock.calls.map((c) => c[0]);
-    expect(calls.length).toBeGreaterThan(1);
-
-    // Every intermediate call must be a plain setBounds (no native animate
-    // option) so the view is resized on every frame.
-    for (const call of setBoundsSpy.mock.calls) {
-      expect(call[1]).toBeUndefined();
-    }
-
-    // The last call must land exactly on the target.
-    expect(calls[calls.length - 1]).toEqual({ x: 0, y: 0, width: 300, height: 100 });
-
-    // Intermediate widths must be strictly between the start and the target.
-    const widths = calls.map((c: any) => c.width);
-    expect(widths.some((w: number) => w > 100 && w < 300)).toBe(true);
+    expect(setBoundsSpy).toHaveBeenCalledTimes(1);
+    expect(setBoundsSpy).toHaveBeenCalledWith(
+      { x: 0, y: 0, width: 300, height: 100 },
+      {
+        animate: {
+          duration: LAYOUT_ANIMATION_DURATION,
+          easing: LAYOUT_ANIMATION_EASING,
+        },
+      },
+    );
   });
 
-  test('an animated shrink also interpolates instead of snapping', async () => {
+  test('setBounds with animate interpolates the bounds when shrinking', async () => {
     const view = window.getView<UIView>('tab-switcher')!;
 
     // Start wide...
     view.setBounds({ x: 0, y: 0, width: 300, height: 100 });
 
-    // spyOn keeps the original implementation, so the mock keeps track of the
-    // bounds and the next animation starts from the right geometry.
     const setBoundsSpy = vi.spyOn(view.webContentsView, 'setBounds');
 
-    // ...then shrink. This is the direction that used to leave the view
-    // rendering at its old (wide) size.
+    // ...then shrink. Electron's native animation cannot do this properly: it
+    // keeps the old surface size and clips it, so the page stays laid out at
+    // the old width and the text is cut off mid-word. We interpolate instead.
     view.setBounds({ x: 0, y: 0, width: 100, height: 100 }, { animate: true });
+
+    // The native animation must NOT be used for the shrink.
+    for (const call of setBoundsSpy.mock.calls) {
+      expect(call[1]).toBeUndefined();
+    }
 
     await vi.advanceTimersByTimeAsync(LAYOUT_ANIMATION_DURATION + 50);
 
@@ -133,25 +136,44 @@ describe('Layout animation', () => {
     view.setBounds({ x: 40, y: 0, width: 300, height: 100 }, { animate: true });
 
     // The renderer must read the final geometry, not the intermediate one.
+    // Electron's native animation does not update getBounds() until it ends.
     expect(view.targetBounds).toEqual({ x: 40, y: 0, width: 300, height: 100 });
   });
 
-  test('starting a new animation cancels the previous one', async () => {
+  test('the interpolated easing matches the native Electron easing', async () => {
     const view = window.getView<UIView>('tab-switcher')!;
+
+    view.setBounds({ x: 0, y: 0, width: 300, height: 100 });
+
     const setBoundsSpy = vi.spyOn(view.webContentsView, 'setBounds');
 
-    view.setBounds({ x: 0, y: 0, width: 100, height: 100 });
-    setBoundsSpy.mockClear();
+    view.setBounds({ x: 0, y: 0, width: 100, height: 100 }, { animate: true });
 
-    view.setBounds({ x: 0, y: 0, width: 300, height: 100 }, { animate: true });
-    await vi.advanceTimersByTimeAsync(60);
-
-    // A new target replaces the running animation.
-    view.setBounds({ x: 0, y: 0, width: 500, height: 100 }, { animate: true });
     await vi.advanceTimersByTimeAsync(LAYOUT_ANIMATION_DURATION + 50);
 
-    const last = setBoundsSpy.mock.calls[setBoundsSpy.mock.calls.length - 1][0];
-    expect(last).toEqual({ x: 0, y: 0, width: 500, height: 100 });
+    const widths = setBoundsSpy.mock.calls.map((c: any) => c[0].width);
+
+    // gfx::Tween::EASE_IN_OUT, the curve Electron uses for "ease-in-out":
+    //   t < 0.5   -> pow(t * 2, 2) / 2
+    //   t >= 0.5  -> 1 - pow((t - 1) * 2, 2) / 2
+    // The shrink path must follow the very same curve, otherwise the sidebar
+    // (CSS) and the web contents view would desync.
+    const nativeEaseInOut = (t: number) =>
+      t < 0.5 ? Math.pow(t * 2, 2) / 2 : 1 - Math.pow((t - 1) * 2, 2) / 2;
+
+    const start = 300;
+    const end = 100;
+    const frames = widths.slice(0, -1); // the last call is the final bounds
+
+    frames.forEach((width: number, index: number) => {
+      // The progress of each frame, approximated from the elapsed time.
+      const progress = Math.min(
+        (index * BOUNDS_ANIMATION_FRAME_INTERVAL) / LAYOUT_ANIMATION_DURATION,
+        1,
+      );
+      const expected = Math.round(start + (end - start) * nativeEaseInOut(progress));
+      expect(Math.abs(width - expected)).toBeLessThanOrEqual(2);
+    });
   });
 
   test('the shared animation duration is the expected value', () => {
