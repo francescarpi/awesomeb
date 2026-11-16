@@ -10,7 +10,8 @@ export class UITooltip extends UIPageView {
     super('tooltip', {
       query: { winId: winId.toString(), tooltip },
     });
-    this.setBounds({ x, y, width: WIDTH, height: HEIGHT });
+    this.setBounds({ x: x - 20, y, width: WIDTH, height: HEIGHT });
+    this.setBounds({ x, y, width: WIDTH, height: HEIGHT }, { animate: true });
   }
 
   refreshBounds(_window: Window) {}
