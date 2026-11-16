@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 
 <Base noDrag>
   <div
-    class="bg-base-200 text-base-content border-base-content border text-sm p-2 rounded flex-col gap-2 hidden shadow-md mr-3"
+    class="tooltip-content bg-base-200 text-base-content border-base-content border text-sm p-2 rounded flex-col gap-2 hidden shadow-md mr-3"
     id="tooltip"
   ></div>
 </Base>
@@ -15,4 +15,27 @@ import Base from '../layouts/Base.astro';
   const el = document.getElementById('tooltip') as HTMLDivElement;
   el.innerHTML = searchParams.get('tooltip') || 'No tooltip';
   el.classList.replace('hidden', 'flex');
+  requestAnimationFrame(() => el.classList.add('tooltip-content-visible'));
 </script>
+
+<style>
+  .tooltip-content {
+    opacity: 0;
+    transform: translateY(3px) scale(0.98);
+    transition:
+      opacity 140ms ease-out,
+      transform 140ms ease-out;
+  }
+
+  .tooltip-content-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tooltip-content {
+      transform: none;
+      transition: opacity 80ms ease-out;
+    }
+  }
+</style>
