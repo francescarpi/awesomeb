@@ -14,9 +14,16 @@
  *   3. Spawn `electron-vite dev` (builds main+preloads, launches Electron)
  *      with ELECTRON_RENDERER_URL set in its env so the spawned Electron sees it
  *   4. On any exit, kill the other child
+ *
+ * Note: astro and electron-vite are invoked directly through their local
+ * entry points (node_modules/...) instead of via `npx`. `npx` spawns `npm`,
+ * which inherits the `npm_config_*` environment variables that pnpm injects
+ * into run scripts and then warns about every key it does not recognise
+ * ("npm warn Unknown env config ...").
  */
 import { spawn } from 'node:child_process';
 import { setTimeout as wait } from 'node:timers/promises';
+import { resolve } from 'node:path';
 
 const RENDERER_URL = process.env.ASTRO_URL ?? 'http://localhost:4321';
 const children = [];
@@ -83,7 +90,14 @@ process.on('SIGINT', () => shutdown(0));
 process.on('SIGTERM', () => shutdown(0));
 
 (async () => {
-  startChild('astro', 'npx', ['astro', 'dev']);
+  startChild('astro', process.execPath, [resolve('node_modules/astro/bin/astro.mjs'), 'dev'], {
+    // Astro 7 auto-backgrounds the dev server when it detects an AI agent
+    // (see `isRunByAgent` in astro/dist/cli/agent.js). The daemonised parent
+    // exits immediately, which would trip the exit handler below and kill the
+    // whole dev session before electron-vite even starts. Forcing it to stay
+    // in the foreground keeps it as a child we can supervise.
+    ASTRO_DEV_BACKGROUND: 'false',
+  });
 
   try {
     console.log(`[dev] waiting for astro at ${RENDERER_URL}...`);
@@ -95,8 +109,13 @@ process.on('SIGTERM', () => shutdown(0));
     return;
   }
 
-  startChild('electron-vite', 'npx', ['electron-vite', 'dev'], {
-    ELECTRON_RENDERER_URL: RENDERER_URL,
-    AB_INSTANCE_NAME: instanceName,
-  });
+  startChild(
+    'electron-vite',
+    process.execPath,
+    [resolve('node_modules/electron-vite/bin/electron-vite.js'), 'dev'],
+    {
+      ELECTRON_RENDERER_URL: RENDERER_URL,
+      AB_INSTANCE_NAME: instanceName,
+    },
+  );
 })();
