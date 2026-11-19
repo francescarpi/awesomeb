@@ -373,6 +373,8 @@ export class Tab extends UIView {
   startFindInPage() {
     if (this._findInPage) {
       this._findInPage.focus();
+      this.browser.eventsChannel.emit('tab:find-in-page-got-focus', this._findInPage);
+      scopeLog.debug('Find in page got focus');
       return;
     }
 

@@ -92,6 +92,7 @@ declare global {
     onRefreshFindInPage: (
       callback: (event: IpcRendererEvent, result: IFindInPageResult | null) => void,
     ) => void;
+    onFindInPageHasFocus: (callback: (event: IpcRendererEvent) => void) => void;
     retryFailed: (tabId: TTabId) => void;
     login: (
       winId: TWindowId,

@@ -1,5 +1,14 @@
 import { TFindInPageId, TTabId, TWindowId, IAppUpdaterInfo, IDesConTab } from '~/types';
-import { Browser, Window, Desktop, Tab, TabContainer, notification, isViewSourceUrl } from '@/core';
+import {
+  Browser,
+  Window,
+  Desktop,
+  Tab,
+  TabContainer,
+  notification,
+  isViewSourceUrl,
+  FindInPage,
+} from '@/core';
 import { t } from '~/i18n';
 import log from 'electron-log';
 import { refreshUrlBarOrTab, refreshTabAttentionState } from './events.herlpers';
@@ -485,5 +494,10 @@ export function registerBrowserEvents(browser: Browser) {
   //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('window:contextual-menu-closed', (win: Window) => {
     browser.toRenderer.refreshSidebarDrag(win, true);
+  });
+
+  //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:find-in-page-got-focus', (findInPageView: FindInPage) => {
+    browser.toRenderer.notifiesToFindInPageHasFocus(findInPageView);
   });
 }
