@@ -76,6 +76,7 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
             'mb-2',
             desktop.selected ? 'selected' : `group-[.collapsed]/sidebar:hidden`,
           ),
+          style: 'app-region: no-drag;',
         },
         h(
           'div',
@@ -97,11 +98,32 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
               'group-[.collapsed]/sidebar:w-8',
               'group-[.collapsed]/sidebar:h-8',
               'mx-auto',
+              'desktop',
               desktop.requireAttention && 'bg-red-500/20 border-error',
             ),
-            style: 'app-region: no-drag;',
             onclick: selectDesktopFromEvent,
             oncontextmenu: desktopMenuFromEvent,
+            draggable: 'true',
+            ondragenter: function (e: Event) {
+              e.preventDefault();
+              const target = e.target as HTMLElement;
+              if (
+                target.classList.contains('desktop') &&
+                !target.classList.contains('bg-yellow-500')
+              ) {
+                target.classList.add('bg-yellow-500');
+              }
+            },
+            ondragleave: function (e: Event) {
+              e.preventDefault();
+              const target = e.target as HTMLElement;
+              if (
+                target.classList.contains('desktop') &&
+                target.classList.contains('bg-yellow-500')
+              ) {
+                target.classList.remove('bg-yellow-500');
+              }
+            },
           },
           h('div', {
             class: c(
