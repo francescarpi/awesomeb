@@ -136,6 +136,9 @@ const abTabs = {
   ) => {
     ipcRenderer.on('tabs:refresh-find-in-page', callback);
   },
+  onFindInPageHasFocus: (callback: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('tab:find-in-page-has-focus', callback);
+  },
   retryFailed: (tabId: TTabId) => {
     ipcRenderer.send('tabs:retry-failed', { tabId });
   },

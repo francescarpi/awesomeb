@@ -1,4 +1,13 @@
-import { Browser, Window, Desktop, Tab, partitions, config, type IMediaSessionState } from '@/core';
+import {
+  Browser,
+  Window,
+  Desktop,
+  Tab,
+  partitions,
+  config,
+  type IMediaSessionState,
+  FindInPage,
+} from '@/core';
 import { TabSwitcher, TabMarks } from '@/ui';
 import { UIContextualModal } from '@/ui/modal/models';
 import log from 'electron-log';
@@ -68,6 +77,10 @@ export class BrowserToRenderer {
       'tabs:refresh-find-in-page',
       this._browser.renderer.findInPageResult(tab, requestId),
     );
+  }
+
+  notifiesToFindInPageHasFocus(findInPageView: FindInPage) {
+    findInPageView.send('tab:find-in-page-has-focus');
   }
 
   refreshDownloads() {

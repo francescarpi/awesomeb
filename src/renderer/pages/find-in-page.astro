@@ -28,6 +28,13 @@ import Layout from '#/layouts/Base.astro';
     renderer.update(await render(result));
   });
 
+  abTabs.onFindInPageHasFocus(async (_event) => {
+    const input = document.querySelector('input');
+    if (input) {
+      (input as HTMLInputElement).select();
+    }
+  });
+
   async function render(result?: IFindInPageResult | null): Promise<VNode> {
     const t = await abI18n.t({ tabId }, [
       { key: 'pages:findInPage.placeholder' },
