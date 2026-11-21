@@ -374,30 +374,35 @@ export class Window extends UIWindow {
     return true;
   }
 
-  private get tabsOrderedByLastAccessed(): IDesConTab[] {
-    const tabs = this.tabs.filter((t) => !t.tab.suspended && !t.tab.isClosed);
-    tabs.sort((a, b) => b.tab.lastAccessed - a.tab.lastAccessed);
-    return tabs;
-  }
-
   getLastAccessedTab(props?: { desktop?: Desktop; ignore?: TTabId[] }): IDesConTab | null {
-    let tabs = this.tabsOrderedByLastAccessed;
     const desktop = props?.desktop || null;
-    const ignore = props?.ignore || null;
+    const ignore = props?.ignore ? new Set(props.ignore) : null;
 
-    if (desktop) {
-      tabs = tabs.filter((conTab) => conTab.desktop.id === desktop.id);
-    }
+    const candidates = this.tabs.filter((conTab) => {
+      if (conTab.tab.suspended || conTab.tab.isClosed) {
+        return false;
+      }
+      if (desktop && conTab.desktop.id !== desktop.id) {
+        return false;
+      }
+      if (ignore && ignore.has(conTab.tab.id)) {
+        return false;
+      }
+      return true;
+    });
 
-    if (ignore) {
-      tabs = tabs.filter((t) => !ignore.includes(t.tab.id));
-    }
-
-    if (tabs.length === 0) {
+    if (candidates.length === 0) {
       return null;
     }
 
-    return tabs[0];
+    let best = candidates[0];
+    for (let i = 1; i < candidates.length; i++) {
+      if (candidates[i].tab.lastAccessed > best.tab.lastAccessed) {
+        best = candidates[i];
+      }
+    }
+
+    return best;
   }
 
   renderViews(options?: IViewBoundsOptions) {
