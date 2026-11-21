@@ -120,6 +120,59 @@ export class TabContainer {
     return true;
   }
 
+  moveTabToIndex(tabId: TTabId, index: number): boolean {
+    const tabs = this.tabs;
+    const currentIndex = tabs.findIndex((tab) => tab.id === tabId);
+    if (currentIndex === -1) {
+      return false;
+    }
+
+    const targetIndex = Math.max(0, Math.min(index, tabs.length - 1));
+    if (targetIndex === currentIndex) {
+      return false;
+    }
+
+    const [moved] = tabs.splice(currentIndex, 1);
+    tabs.splice(targetIndex, 0, moved);
+
+    this._tabs.clear();
+    for (const tab of tabs) {
+      this._tabs.set(tab.id, tab);
+    }
+
+    this.browser.eventsChannel.emit('tabcontainer:tabs-order-did-change', this);
+
+    return true;
+  }
+
+  takeTab(tabId: TTabId): Tab | null {
+    const tab = this._tabs.get(tabId);
+    if (!tab) {
+      return null;
+    }
+
+    this._tabs.delete(tabId);
+
+    if (this._selectedTabId === tabId) {
+      this._selectedTabId = null;
+    }
+
+    return tab;
+  }
+
+  insertTab(tab: Tab, index?: number): void {
+    const tabs = this.tabs;
+    const targetIndex =
+      index === undefined ? tabs.length : Math.max(0, Math.min(index, tabs.length));
+
+    tabs.splice(targetIndex, 0, tab);
+
+    this._tabs.clear();
+    for (const t of tabs) {
+      this._tabs.set(t.id, t);
+    }
+  }
+
   get layout(): LayoutBase {
     return this._layout;
   }
@@ -260,6 +313,29 @@ export class TabContainer {
 
   addChild(tabContainer: TabContainer) {
     this._children.set(tabContainer.id, tabContainer);
+  }
+
+  moveChildToIndex(id: TTabContainerId, index: number): boolean {
+    const children = this.children;
+    const currentIndex = children.findIndex((c) => c.id === id);
+    if (currentIndex === -1) {
+      return false;
+    }
+
+    const targetIndex = Math.max(0, Math.min(index, children.length - 1));
+    if (targetIndex === currentIndex) {
+      return false;
+    }
+
+    const [moved] = children.splice(currentIndex, 1);
+    children.splice(targetIndex, 0, moved);
+
+    this._children.clear();
+    for (const c of children) {
+      this._children.set(c.id, c);
+    }
+
+    return true;
   }
 
   createChildTabContainer(id: TTabContainerId, props?: ITabContainerProps): TabContainer {

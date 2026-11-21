@@ -39,6 +39,7 @@ import * as tabSelectRequireAttention from './tab-select-require-attention';
 import * as desktopSuspend from './desktop-suspend';
 import * as tabStop from './tab-stop';
 import * as tabMove from './tab-move';
+import * as tabMoveToPosition from './tab-move-to-position';
 import * as tabDevtools from './tab-devtools';
 import * as tabContainerMoveUp from './tabcontainer-move-up';
 import * as tabContainerMoveDown from './tabcontainer-move-down';
@@ -115,6 +116,7 @@ const COMMANDS = {
   [desktopSuspend.TRIGGER]: desktopSuspend.Command,
   [tabStop.TRIGGER]: tabStop.Command,
   [tabMove.TRIGGER]: tabMove.Command,
+  [tabMoveToPosition.TRIGGER]: tabMoveToPosition.Command,
   [tabDevtools.TRIGGER]: tabDevtools.Command,
   [tabContainerMoveUp.TRIGGER]: tabContainerMoveUp.Command,
   [tabContainerMoveDown.TRIGGER]: tabContainerMoveDown.Command,

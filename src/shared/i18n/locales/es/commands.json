@@ -135,6 +135,10 @@
     "name": "Mover pestaña",
     "description": "Mueve una pestaña a un destino"
   },
+  "moveTabToPosition": {
+    "name": "Mover pestaña a posición",
+    "description": "Mueve una pestaña a una posición absoluta de la barra lateral"
+  },
   "moveTabContainerDown": {
     "name": "Bajar contenedor de pestañas",
     "description": "Baja el contenedor de pestañas actual en la lista."

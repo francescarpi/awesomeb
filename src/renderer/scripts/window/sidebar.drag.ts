@@ -1,3 +1,5 @@
+import { getSearchParams } from '../url';
+
 export type DropTarget =
   | { kind: 'before-tab'; tabId: number }
   | { kind: 'after-tab'; tabId: number }
@@ -168,10 +170,31 @@ export function tabDrop(e: Event) {
     (target.kind === 'before-tab' || target.kind === 'after-tab') && target.tabId === draggedTabId;
 
   if (!isSelf) {
-    console.log('[sidebar.drag] move tab', { tabId: draggedTabId, to: target });
+    abCommands.perform(getSearchParams().winId, 'move-tab-to-position', {
+      tabId: draggedTabId,
+      position: toCommandPosition(target),
+    });
   }
 
   resetDragState();
+}
+
+function toCommandPosition(target: DropTarget) {
+  switch (target.kind) {
+    case 'before-tab':
+      return { kind: 'before-tab' as const, targetTabId: target.tabId };
+    case 'after-tab':
+      return { kind: 'after-tab' as const, targetTabId: target.tabId };
+    case 'as-child':
+      return { kind: 'as-child' as const, targetTabId: target.tabId };
+    case 'out-of-container':
+      return {
+        kind: 'out-of-container' as const,
+        targetTabContainerId: target.tabContainerId,
+      };
+    case 'desktop':
+      return { kind: 'desktop' as const };
+  }
 }
 
 export function tabDragEnd() {
