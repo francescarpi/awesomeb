@@ -1,5 +1,14 @@
 import type { TWindowId, IDesktop, IDownloads, IAppUpdaterInfo } from '~/types';
-import { btnIcon, Renderer, c, h, selectDesktopFromEvent, desktopMenuFromEvent } from '#/scripts';
+import {
+  btnIcon,
+  Renderer,
+  c,
+  h,
+  getSearchParams,
+  selectDesktopFromEvent,
+  desktopMenuFromEvent,
+  desktopIdFromEvent,
+} from '#/scripts';
 import BtnClose from '#/icons/close.svg?raw';
 import BtnMinimize from '#/icons/down.svg?raw';
 import BtnMaximize from '#/icons/up.svg?raw';
@@ -59,6 +68,7 @@ export function renderActions(winId: TWindowId, renderer: Renderer) {
 }
 
 let dragImage: HTMLDivElement | undefined;
+let draggedDesktopId: number | undefined;
 
 export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
   renderer.update(
@@ -127,6 +137,8 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
               if (!dragEvent.dataTransfer) return;
               dragEvent.stopPropagation();
               dragEvent.dataTransfer.effectAllowed = 'move';
+              dragEvent.dataTransfer.setData('text/plain', String(desktop.id));
+              draggedDesktopId = desktop.id;
 
               disposeDesktopDragImage(dragImage);
               dragImage = createDesktopDragImage(String(desktop.id));
@@ -137,9 +149,20 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
                 DRAG_IMAGE_SIZE / 2,
               );
             },
+            ondrop: function (e: Event) {
+              const dropEvent = e as DragEvent;
+              dropEvent.preventDefault();
+              dropEvent.stopPropagation();
+
+              const targetId = desktopIdFromEvent(dropEvent);
+              if (targetId !== null && targetId !== draggedDesktopId) {
+                abDesktops.swap(getSearchParams().winId, draggedDesktopId!, targetId);
+              }
+            },
             ondragend: function () {
               disposeDesktopDragImage(dragImage);
               dragImage = undefined;
+              draggedDesktopId = undefined;
               clearDragTargetBg();
             },
           },
