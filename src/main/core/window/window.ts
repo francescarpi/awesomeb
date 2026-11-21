@@ -132,21 +132,22 @@ export class Window extends UIWindow {
 
   moveDesktop(id: TDesktopId, direction: 'left' | 'right') {
     const neighborId = direction === 'left' ? id - 1 : id + 1;
+    this.swapDesktops(id, neighborId);
+  }
+
+  swapDesktops(id: TDesktopId, targetId: TDesktopId) {
+    if (id === targetId) return;
 
     const desktop = this._desktops.get(id);
-    const neighbor = this._desktops.get(neighborId);
+    const target = this._desktops.get(targetId);
 
-    if (!desktop || !neighbor) return;
+    if (!desktop || !target) return;
 
-    this._desktops.delete(id);
-    this._desktops.delete(neighborId);
-
-    desktop.setId(neighborId);
-    neighbor.setId(id);
+    desktop.setId(targetId);
+    target.setId(id);
 
     // Rebuild map sorted by ID to preserve iteration order
     const allDesktops = Array.from(this._desktops.values());
-    allDesktops.push(desktop, neighbor);
     allDesktops.sort((a, b) => a.id - b.id);
     this._desktops.clear();
     for (const d of allDesktops) {
@@ -154,8 +155,8 @@ export class Window extends UIWindow {
     }
 
     if (this._selectedDesktopId === id) {
-      this._selectedDesktopId = neighborId;
-    } else if (this._selectedDesktopId === neighborId) {
+      this._selectedDesktopId = targetId;
+    } else if (this._selectedDesktopId === targetId) {
       this._selectedDesktopId = id;
     }
 

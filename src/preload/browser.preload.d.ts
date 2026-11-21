@@ -66,6 +66,7 @@ declare global {
     getTheme: (winId: TWindowId) => Promise<ITheme>;
     onThemeRefresh: (callback: (event: IpcRendererEvent, theme: ITheme) => void) => void;
     all: (winId: TWindowId) => Promise<IDesktop[]>;
+    swap: (winId: TWindowId, desktopId: TDesktopId, targetDesktopId: TDesktopId) => void;
   };
 
   //--------------------------------------------------------------------------------------

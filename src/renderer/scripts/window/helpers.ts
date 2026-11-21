@@ -1,5 +1,6 @@
 import type { ITheme, ILayoutData, TDesktopId } from '~/types';
 import { LAYOUT_MARGIN, BORDER_WIDTH, LAYOUT_ANIMATION_DURATION } from '~/constants';
+import { DRAG_IMAGE_SIZE, DRAG_TARGET_BG } from './constants';
 
 let completedFlashTimer: ReturnType<typeof setTimeout> | undefined;
 let layoutAnimationTimer: ReturnType<typeof setTimeout> | undefined;
@@ -109,4 +110,43 @@ export function setSidebarDragable(value: boolean) {
   } else {
     el.classList.remove('dragable');
   }
+}
+
+export function createDesktopDragImage(label: string): HTMLDivElement {
+  const image = document.createElement('div');
+  image.style.cssText = [
+    `width:${DRAG_IMAGE_SIZE}px`,
+    `height:${DRAG_IMAGE_SIZE}px`,
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'box-sizing:border-box',
+    'border-radius:50%',
+    'border:1px solid #ffffff',
+    'background:#1f2937',
+    'color:#ffffff',
+    'font:13px system-ui, sans-serif',
+    'line-height:1',
+    'position:fixed',
+    'top:0',
+    'left:0',
+    'z-index:-1',
+    'pointer-events:none',
+    'opacity:0.01',
+  ].join(';');
+
+  image.textContent = label;
+  document.body.appendChild(image);
+
+  return image;
+}
+
+export function disposeDesktopDragImage(image: HTMLDivElement | undefined) {
+  image?.remove();
+}
+
+export function clearDragTargetBg() {
+  document
+    .querySelectorAll(`#sidebar-desktops .${DRAG_TARGET_BG}`)
+    .forEach((el) => el.classList.remove(DRAG_TARGET_BG));
 }

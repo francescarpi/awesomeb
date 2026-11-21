@@ -90,6 +90,9 @@ const abDesktops = {
   all: async (winId: TWindowId) => {
     return await ipcRenderer.invoke('desktops:all', { winId });
   },
+  swap: (winId: TWindowId, desktopId: TDesktopId, targetDesktopId: TDesktopId) => {
+    ipcRenderer.send('desktops:swap', { winId, desktopId, targetDesktopId });
+  },
 };
 
 //--------------------------------------------------------------------------------------
