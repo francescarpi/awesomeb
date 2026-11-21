@@ -41,4 +41,15 @@ export function setupDesktopIPC(browser: Browser) {
       return browser.renderer.desktops(win);
     },
   );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ win: Window; desktopId: TDesktopId; targetDesktopId: TDesktopId }>(
+    'desktops:swap',
+    'on',
+    browser,
+    [windowChecker],
+    async ({ win, desktopId, targetDesktopId }) => {
+      win.swapDesktops(desktopId, targetDesktopId);
+    },
+  );
 }
