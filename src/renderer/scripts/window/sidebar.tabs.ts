@@ -6,6 +6,7 @@ import Favicon from '#/icons/favicon.svg';
 import Minus from '#/icons/minus.svg?raw';
 import Close from '#/icons/close.svg?raw';
 import Warning from '#/icons/warning.svg?raw';
+import { tabDragStart, tabDragOver, tabDragLeave, tabDrop, tabDragEnd } from './sidebar.drag';
 
 const tabMemo = new WeakMap<ITab, VNode>();
 
@@ -31,11 +32,13 @@ export async function renderTabContainers(
           'div', // Tab Container
           {
             key: tc.id,
+            'data-tab-container-id': String(tc.id),
             class: c(
               'hidden',
               tc.isClosed ? 'hidden' : `group-[.desktop${tc.desktopId}]:flex`,
               tc.divider && 'border-b border-white/20 border-dashed pb-1.5',
               'flex-col',
+              'relative',
             ),
             style: 'app-region: no-drag',
           },
@@ -69,9 +72,11 @@ export async function renderTabContainers(
               'div',
               {
                 key: tcc.id,
+                'data-tab-container-id': String(tcc.id),
                 class: c(
                   'group-[.collapsed]/sidebar:ml-1',
                   'ml-6',
+                  'relative',
                   tc.collapseChildren && 'hidden',
                   tcc.isSplit && 'border border-white/20 border-dashed rounded-xl',
                 ),
@@ -145,6 +150,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
     'div', // Tab
     {
       'data-tab-id': String(t.id),
+      'data-open-tabs-as-child': t.openTabsAsChild ? 'true' : 'false',
       key: t.id,
       class: c(
         'py-1',
@@ -163,6 +169,12 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       ),
       onclick: selectTabFromEvent.bind(null, winId),
       oncontextmenu: openTabMenuFromEvent.bind(null, winId),
+      draggable: 'true',
+      ondragstart: tabDragStart,
+      ondragover: tabDragOver,
+      ondragleave: tabDragLeave,
+      ondrop: tabDrop,
+      ondragend: tabDragEnd,
     },
     h('div', {
       class: c(
