@@ -37,6 +37,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderVersionAvailable,
     showTabContainer,
     setSidebarDragable,
+    clearDragTargetBg,
     Tooltip,
   } from '#/scripts/window';
   import type { IURLTabData, ILayoutData } from '~/types';
@@ -86,6 +87,9 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   const desktops = await abDesktops.all(winId);
   renderDesktops(desktopsRenderer, desktops);
   abDesktops.onRefresh((_event, desktops) => renderDesktops(desktopsRenderer, desktops));
+
+  window.addEventListener('dragend', clearDragTargetBg);
+  window.addEventListener('dragleave', clearDragTargetBg);
 
   abWindow.onRefreshLayoutData((_e, data: ILayoutData) => {
     showTabContainer(!data.hasVisibleTabs);

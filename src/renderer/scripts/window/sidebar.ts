@@ -8,6 +8,8 @@ import BtnNewTab from '#/icons/add-circle.svg?raw';
 import BtnPerformCommand from '#/icons/command.svg?raw';
 import IdleIcon from '#/icons/downloads.svg?raw';
 import AnimatedIcon from '#/icons/downloads-animated.svg?raw';
+import { DRAG_IMAGE_SIZE, DRAG_TARGET_BG } from './constants';
+import { createDesktopDragImage, disposeDesktopDragImage, clearDragTargetBg } from './helpers';
 
 export function renderWindowButtons(winId: TWindowId, renderer: Renderer) {
   renderer.update([
@@ -55,6 +57,8 @@ export function renderActions(winId: TWindowId, renderer: Renderer) {
     }),
   ]);
 }
+
+let dragImage: HTMLDivElement | undefined;
 
 export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
   renderer.update(
@@ -104,25 +108,39 @@ export function renderDesktops(renderer: Renderer, desktops: IDesktop[]) {
             onclick: selectDesktopFromEvent,
             oncontextmenu: desktopMenuFromEvent,
             draggable: 'true',
-            ondragenter: function (e: Event) {
-              e.preventDefault();
-              const target = e.target as HTMLElement;
-              if (
-                target.classList.contains('desktop') &&
-                !target.classList.contains('bg-yellow-500')
-              ) {
-                target.classList.add('bg-yellow-500');
+            ondragover: function (e: Event) {
+              const dragEvent = e as DragEvent;
+              dragEvent.preventDefault();
+              if (dragEvent.dataTransfer) {
+                dragEvent.dataTransfer.dropEffect = 'move';
               }
+              (e.currentTarget as HTMLElement).classList.add(DRAG_TARGET_BG);
             },
             ondragleave: function (e: Event) {
-              e.preventDefault();
-              const target = e.target as HTMLElement;
-              if (
-                target.classList.contains('desktop') &&
-                target.classList.contains('bg-yellow-500')
-              ) {
-                target.classList.remove('bg-yellow-500');
-              }
+              const badge = e.currentTarget as HTMLElement;
+              const related = (e as DragEvent).relatedTarget as Node | null;
+              if (related && badge.contains(related)) return;
+              badge.classList.remove(DRAG_TARGET_BG);
+            },
+            ondragstart: function (e: Event) {
+              const dragEvent = e as DragEvent;
+              if (!dragEvent.dataTransfer) return;
+              dragEvent.stopPropagation();
+              dragEvent.dataTransfer.effectAllowed = 'move';
+
+              disposeDesktopDragImage(dragImage);
+              dragImage = createDesktopDragImage(String(desktop.id));
+
+              dragEvent.dataTransfer.setDragImage(
+                dragImage,
+                DRAG_IMAGE_SIZE / 2,
+                DRAG_IMAGE_SIZE / 2,
+              );
+            },
+            ondragend: function () {
+              disposeDesktopDragImage(dragImage);
+              dragImage = undefined;
+              clearDragTargetBg();
             },
           },
           h('div', {
