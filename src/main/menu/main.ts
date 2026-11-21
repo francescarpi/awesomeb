@@ -49,6 +49,16 @@ function appMenu(
           }
         },
       },
+      {
+        label: t('commands:checkForUpdates.name'),
+        icon: getIcon(EIcon.Reload),
+        enabled: !!window && !browser.appUpdater.isChecking,
+        click: async () => {
+          if (window) {
+            await browser.performCommand(window, 'check-for-updates');
+          }
+        },
+      },
       { type: 'separator' },
       {
         label: preferences.label,

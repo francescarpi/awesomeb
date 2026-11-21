@@ -28,7 +28,10 @@ describe('AppUpdater', () => {
       }) as ReturnType<typeof autoUpdater.checkForUpdates>,
     );
 
-    const browser = { eventsChannel: { emit: vi.fn() } } as never;
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
     const updater = new AppUpdater(browser);
 
     updater.checkForUpdates();
@@ -51,7 +54,10 @@ describe('AppUpdater', () => {
       }) as ReturnType<typeof autoUpdater.checkForUpdates>,
     );
 
-    const browser = { eventsChannel: { emit: vi.fn() } } as never;
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
     const updater = new AppUpdater(browser);
 
     updater.checkForUpdates();
@@ -68,7 +74,10 @@ describe('AppUpdater', () => {
 
   test('notifies when a manual update check finds no update', async () => {
     vi.mocked(autoUpdater.checkForUpdates).mockResolvedValue(null);
-    const browser = { eventsChannel: { emit: vi.fn() } } as never;
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
     const updater = new AppUpdater(browser);
 
     updater.checkForUpdates(true);
@@ -82,12 +91,30 @@ describe('AppUpdater', () => {
 
   test('does not notify when the startup update check finds no update', async () => {
     vi.mocked(autoUpdater.checkForUpdates).mockResolvedValue(null);
-    const browser = { eventsChannel: { emit: vi.fn() } } as never;
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
     new AppUpdater(browser);
 
     vi.advanceTimersByTime(3000);
     await Promise.resolve();
 
     expect(Notification).not.toHaveBeenCalled();
+  });
+
+  test('refreshes the main menu once a check settles', async () => {
+    vi.mocked(autoUpdater.checkForUpdates).mockResolvedValue(null);
+    const refreshMainMenu = vi.fn();
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu,
+    } as never;
+    const updater = new AppUpdater(browser);
+
+    updater.checkForUpdates(true);
+    await Promise.resolve();
+
+    expect(refreshMainMenu).toHaveBeenCalled();
   });
 });
