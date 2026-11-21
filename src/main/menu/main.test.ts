@@ -1,6 +1,6 @@
 import { Menu } from 'electron';
 import i18next from 'i18next';
-import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Browser, partitions } from '@/core';
 import { mainMenu } from './main';
 import { initI18n } from '~/i18n';
@@ -9,6 +9,8 @@ type TemplateItem = {
   label?: string;
   submenu?: TemplateItem[];
   accelerator?: string | undefined;
+  enabled?: boolean;
+  role?: string;
 };
 
 function findLabel(items: TemplateItem[] | undefined, label: string): TemplateItem | undefined {
@@ -17,6 +19,10 @@ function findLabel(items: TemplateItem[] | undefined, label: string): TemplateIt
 
 function hasMatchingLabel(items: TemplateItem[] | undefined, pattern: RegExp): boolean {
   return items?.some((item) => item.label !== undefined && pattern.test(item.label)) ?? false;
+}
+
+function findAppMenu(template: TemplateItem[]): TemplateItem | undefined {
+  return template.find((item) => item.role === 'appMenu');
 }
 
 let browser: Browser;
@@ -115,5 +121,55 @@ describe('mainMenu translations', () => {
     expect(new Set(topLevelCounts).size).toBe(1);
     expect(fileAccelerators[0]).toEqual(fileAccelerators[1]);
     expect(fileAccelerators[0]).toEqual(fileAccelerators[2]);
+  });
+});
+
+describe('appMenu check for updates', () => {
+  const originalPlatform = process.platform;
+
+  beforeEach(() => {
+    Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(process, 'platform', { value: originalPlatform, configurable: true });
+  });
+
+  test('renders the check for updates item in every locale', async () => {
+    const expected: Record<string, string> = {
+      en: 'Check for Updates',
+      es: 'Buscar actualizaciones',
+      ca: 'Comprova si hi ha actualitzacions',
+    };
+
+    for (const [lng, label] of Object.entries(expected)) {
+      await i18next.changeLanguage(lng);
+      const template = await buildTemplate();
+
+      const appMenu = findAppMenu(template);
+      expect(appMenu, `app menu should exist for "${lng}"`).toBeDefined();
+      expect(
+        findLabel(appMenu!.submenu, label),
+        `missing app menu item "${label}" for "${lng}"`,
+      ).toBeDefined();
+    }
+  });
+
+  test('disables the item while an update check is in progress', async () => {
+    await i18next.changeLanguage('en');
+
+    const template = await buildTemplate();
+    const appMenu = findAppMenu(template);
+    const item = findLabel(appMenu!.submenu, 'Check for Updates');
+    expect(item, 'check for updates item should exist').toBeDefined();
+    expect(item!.enabled, 'item should be enabled when no check is running').toBe(true);
+
+    vi.spyOn(browser.appUpdater, 'isChecking', 'get').mockReturnValue(true);
+
+    const checkingTemplate = await buildTemplate();
+    const checkingAppMenu = findAppMenu(checkingTemplate);
+    const checkingItem = findLabel(checkingAppMenu!.submenu, 'Check for Updates');
+    expect(checkingItem, 'check for updates item should exist').toBeDefined();
+    expect(checkingItem!.enabled, 'item should be disabled while checking').toBe(false);
   });
 });
