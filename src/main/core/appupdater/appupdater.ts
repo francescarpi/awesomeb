@@ -75,6 +75,7 @@ export class AppUpdater {
       void Promise.resolve(autoUpdater.checkForUpdates()).then(
         () => {
           this.checking = false;
+          void this.browser.refreshMainMenu();
           if (manual && !this.updateAvailableDuringCheck && !this.data) {
             notification(
               t('notifications:updatesCheckComplete.title'),
@@ -84,6 +85,7 @@ export class AppUpdater {
         },
         (error) => {
           this.checking = false;
+          void this.browser.refreshMainMenu();
           scopeLog.error('Failed to check for updates', error);
         },
       );
