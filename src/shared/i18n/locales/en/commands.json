@@ -135,6 +135,10 @@
     "name": "Move Tab",
     "description": "Move a tab to a target"
   },
+  "moveTabToPosition": {
+    "name": "Move Tab To Position",
+    "description": "Move a tab to an absolute position in the sidebar"
+  },
   "moveTabContainerDown": {
     "name": "Move Tab Container Down",
     "description": "Move the current tab container down in the list."

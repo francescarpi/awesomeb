@@ -262,6 +262,7 @@ export class BrowserRenderer {
       isMuted: tab.isMuted,
       favicon: tab.favicon,
       isClosed: tab.isClosed,
+      openTabsAsChild: tab.openTabsAsChild,
     };
   }
 

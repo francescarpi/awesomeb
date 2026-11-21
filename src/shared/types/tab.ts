@@ -35,6 +35,7 @@ export interface ITab {
   isMuted: boolean;
   favicon: string | null;
   isClosed: boolean;
+  openTabsAsChild: boolean;
 }
 
 export interface ITabPartition {

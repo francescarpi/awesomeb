@@ -4,6 +4,24 @@ title: Move a tab
 
 import FeatureAccess from '../../../components/FeatureAccess.astro'
 
+## Drag and drop
+
+You can reorder the tabs in the *sidebar* by dragging them.
+
+Press and hold a tab, then move the mouse. A line appears on the edge of the tab you're hovering, showing where the dragged tab will land. The top half of the row means *before* that tab, the bottom half means *after* it.
+
+The drop target depends on what you hover over:
+
+* **Another tab** — the dragged tab is inserted next to it.
+* **A tab with the *Open tabs as child* option enabled** — the dragged tab becomes a child of it (see [child tabs](/tabs/children/)).
+* **The body of a tab container** — the dragged tab leaves that container and goes up to its parent, or to the desktop root when the container is a top-level one.
+
+:::note
+A tab container holding a single tab travels as a whole: dragging that tab moves the container instead of dissolving it.
+:::
+
+## Move with the keyboard and the menu
+
 <FeatureAccess entity="move a tab up" shortcut="moveTabUp" command="moveTabContainerUp" menu="tabs.moveUp" />
 
 <FeatureAccess entity="move a tab down" shortcut="moveTabDown" command="moveTabContainerDown" menu="tabs.moveDown" />

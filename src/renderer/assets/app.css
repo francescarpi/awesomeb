@@ -62,3 +62,29 @@
     transition: none;
   }
 }
+
+.drag-drop-line-before::before,
+.drag-drop-line-after::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  height: 2px;
+  background: white;
+  border-radius: 1px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.drag-drop-line-before::before {
+  top: -1px;
+}
+
+.drag-drop-line-after::after {
+  bottom: -1px;
+}
+
+.drag-drop-highlight {
+  outline: 1px solid rgb(255 255 255 / 0.6);
+  outline-offset: -1px;
+}

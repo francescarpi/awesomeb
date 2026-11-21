@@ -4,6 +4,24 @@ title: Moure una pestanya
 
 import FeatureAccess from '../../../../components/FeatureAccess.astro'
 
+## Arrossegar i deixar anar
+
+Pots reordenar les pestanyes del *sidebar* arrossegent-les.
+
+Mantén premuda una pestanya i mou el ratolí. Apareixerà una línia al vora de la pestanya sobre la qual estàs, indicant on caurà la pestanya arrossegada. La meitat superior de la fila vol dir *abans* d'aquesta pestanya, la meitat inferior vol dir *després*.
+
+El destí depèn de sobre què passis el ratolí:
+
+* **Una altra pestanya** — la pestanya arrossegada s'insereix al seu costat.
+* **Una pestanya amb l'opció *Obre pestanyes com a filla* activada** — la pestanya arrossegada passa a ser la seva filla (consulta [pestanyes filles](/ca/tabs/children/)).
+* **El cos d'un contenidor de pestanyes** — la pestanya arrossegada surt d'aquest contenidor i puja al seu pare, o a l'arrel de l'escriptori quan el contenidor és de nivell superior.
+
+:::note
+Un contenidor de pestanyes que només conté una pestanya es mou sencer: arrossegar aquesta pestanya mou el contenidor en lloc de dissoldre'l.
+:::
+
+## Moure amb el teclat i amb el menú
+
 <FeatureAccess entity="moure una pestanya amunt" shortcut="moveTabUp" command="moveTabContainerUp" menu="tabs.moveUp" />
 
 <FeatureAccess entity="moure una pestanya avall" shortcut="moveTabDown" command="moveTabContainerDown" menu="tabs.moveDown" />
