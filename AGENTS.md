@@ -8,6 +8,19 @@ These rules apply to any AI coding assistant operating in this repository. Tool-
 
 Do **not** stage, commit, or push changes unless the user explicitly asks you to. The user reviews every commit manually before it lands in history. When the user asks for a code change, do the work, summarize it, and stop — wait for an explicit "commit" or "haz commit" before running `git add` / `git commit`. Pushing is never implicit; the user always says so.
 
+### No comments in code
+
+Do **not** add comments to the code you write. The codebase is self-explanatory through naming, structure, and types — comments restating what the code does are noise, and comments explaining *why* a change was made belong in the commit message, the PR description, or the issue, not in the source.
+
+Concretely:
+
+- No `//` or `/* */` comments explaining logic, intent, or rationale in new or modified code.
+- Do not add JSDoc blocks to new functions unless the surrounding module already documents them consistently (e.g. the public API of `src/main/core/browser/browser.ts`).
+- Do not add comments inside tests to narrate the steps — the test name and the assertions should be self-explanatory.
+- If a change genuinely needs explanation, put it in the PR body or the commit message.
+
+Existing comments in untouched code stay as they are — this rule applies to code you add or modify.
+
 ### Documentation check before commit
 
 **Before every commit**, load the `awesomeb-docs-check` skill and execute its workflow. This is mandatory and automatic — do not skip it, do not ask the user if they want to run it.

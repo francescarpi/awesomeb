@@ -342,6 +342,26 @@ describe('Commands', () => {
       expect(true).toBe(true);
     });
 
+    test('tab-close: should select the previous tab, not the closed one', async () => {
+      const window = browser.activeWindow!;
+      const first = await browser.openURL('https://first.com');
+      const second = await browser.openURL('https://second.com');
+
+      expect(first).not.toBeNull();
+      expect(second).not.toBeNull();
+
+      await window.selectTab(first!.tab.id);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      await window.selectTab(second!.tab.id);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      await browser.performCommand(window, tabClose.TRIGGER, {
+        tabId: second!.tab.id,
+      });
+
+      expect(window.selectedTab?.tab.id).toBe(first!.tab.id);
+    });
+
     test('tab-close-children: should close child tabs and keep the parent selected', async () => {
       const window = browser.activeWindow!;
       const parent = await browser.openURL('https://parent.com', { selectTab: true });
