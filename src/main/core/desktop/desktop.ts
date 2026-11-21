@@ -242,6 +242,32 @@ export class Desktop {
     }
   }
 
+  moveTabContainerToIndex(id: TTabContainerId, index: number): boolean {
+    const tc = this._findTabContainer(id);
+    if (!tc) return false;
+
+    if (tc.parent) {
+      return tc.parent.moveChildToIndex(id, index);
+    }
+
+    const tabContainers = this.tabContainers;
+    const currentIndex = tabContainers.findIndex((tc) => tc.id === id);
+    if (currentIndex === -1) return false;
+
+    const targetIndex = Math.max(0, Math.min(index, tabContainers.length - 1));
+    if (targetIndex === currentIndex) return false;
+
+    const [moved] = tabContainers.splice(currentIndex, 1);
+    tabContainers.splice(targetIndex, 0, moved);
+
+    this._tabContainers.clear();
+    for (const tc of tabContainers) {
+      this._tabContainers.set(tc.id, tc);
+    }
+
+    return true;
+  }
+
   private _moveTopLevelTabContainer(id: TTabContainerId, direction: 'up' | 'down'): boolean {
     const tabContainers = this.tabContainers;
     const index = tabContainers.findIndex((tc) => tc.id === id);

@@ -4,6 +4,24 @@ title: Mover una pestaña
 
 import FeatureAccess from '../../../../components/FeatureAccess.astro'
 
+## Arrastrar y soltar
+
+Puedes reordenar las pestañas del *sidebar* arrastrándolas.
+
+Mantén pulsada una pestaña y mueve el ratón. Aparecerá una línea en el borde de la pestaña sobre la que estás, indicando dónde caerá la pestaña arrastrada. La mitad superior de la fila significa *antes* de esa pestaña, la mitad inferior significa *después*.
+
+El destino depende de sobre qué pases el ratón:
+
+* **Otra pestaña** — la pestaña arrastrada se inserta junto a ella.
+* **Una pestaña con la opción *Abrir pestañas como hija* activada** — la pestaña arrastrada pasa a ser su hija (ver [pestañas hijas](/es/tabs/children/)).
+* **El cuerpo de un contenedor de pestañas** — la pestaña arrastrada sale de ese contenedor y sube a su padre, o a la raíz del escritorio cuando el contenedor es de nivel superior.
+
+:::note
+Un contenedor de pestañas que solo contiene una pestaña se mueve entero: arrastrar esa pestaña mueve el contenedor en lugar de deshacerlo.
+:::
+
+## Mover con el teclado y con el menú
+
 <FeatureAccess entity="mover una pestaña arriba" shortcut="moveTabUp" command="moveTabContainerUp" menu="tabs.moveUp" />
 
 <FeatureAccess entity="mover una pestaña abajo" shortcut="moveTabDown" command="moveTabContainerDown" menu="tabs.moveDown" />

@@ -43,6 +43,7 @@ import { IdGenerator } from './idgenerator';
 import type { ISessionTab, ISessionTabContainer } from '@/core/session/schemes';
 import { INTERNAL_PROTOCOL } from '~/constants';
 import { moveAsChild, moveToTarget, removeFromParent } from './helpers.move';
+import { moveTabToPosition, type TabMovePosition } from './helpers.move.position';
 
 const scopeLog = log.scope('Browser');
 
@@ -387,6 +388,16 @@ export class Browser {
     }
 
     moveToTarget(this, sourceData, targetId, props);
+  }
+
+  moveTabToPosition(tabId: TTabId, position: TabMovePosition) {
+    const sourceData = this.getTab(tabId);
+    if (!sourceData) {
+      scopeLog.error(`Tab with id ${tabId} not found`);
+      return;
+    }
+
+    moveTabToPosition(this, sourceData, position);
   }
 
   /**

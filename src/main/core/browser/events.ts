@@ -433,6 +433,20 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on(
+    'tabcontainer:tabs-order-did-change',
+    async (tabContainer: TabContainer) => {
+      const result = browser.getTabContainer(tabContainer.id);
+      if (!result) {
+        return;
+      }
+
+      browser.toRenderer.refreshTabContainers(result.window);
+      browser.toRenderer.refreshTabSwitcher(result.window);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
   browser.eventsChannel.on('tabcontainer:did-unsplit', async (win: Window, _desktop: Desktop) => {
     browser.toRenderer.refreshTabContainers(win);
     browser.toRenderer.refreshTabSwitcher(win);

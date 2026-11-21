@@ -135,6 +135,10 @@
     "name": "Mou la pestanya",
     "description": "Mou una pestanya a una destinació"
   },
+  "moveTabToPosition": {
+    "name": "Mou la pestanya a una posició",
+    "description": "Mou una pestanya a una posició absoluta de la barra lateral"
+  },
   "moveTabContainerDown": {
     "name": "Baixa el contenidor de pestanyes",
     "description": "Baixa el contenidor de pestanyes actual a la llista."
