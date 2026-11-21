@@ -31,19 +31,20 @@ export const Command: ICommand<ICommandParams> = {
       return;
     }
 
+    const desktop = tabData.desktop;
+
+    const fallback = window.getLastAccessedTab({ desktop, ignore: [tabToClose.id] });
+
     const success = await browser.closeTab(tabToClose.id);
     if (!success) {
       scopeLog.error(`Failed to close tab with id ${tabToClose.id}.`);
       return;
     }
 
-    const desktop = tabData.desktop;
-
-    const lastAccessed = window.getLastAccessedTab({ desktop });
-    if (!lastAccessed) {
+    if (!fallback) {
       return;
     }
 
-    window.selectTab(lastAccessed.tab.id);
+    window.selectTab(fallback.tab.id);
   },
 };
