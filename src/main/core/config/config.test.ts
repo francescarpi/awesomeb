@@ -19,15 +19,15 @@ function cleanConfigFile() {
   }
 }
 
+beforeEach(() => {
+  cleanConfigFile();
+});
+
+afterEach(() => {
+  cleanConfigFile();
+});
+
 describe('Config', () => {
-  beforeEach(() => {
-    cleanConfigFile();
-  });
-
-  afterEach(() => {
-    cleanConfigFile();
-  });
-
   test('constructor with valid defaults succeeds', () => {
     const config = new Config();
     expect(config).toBeDefined();
@@ -188,5 +188,93 @@ describe('Config', () => {
 
     expect(config.config.shortcutMap).toBe('generic-ansi');
     expect(config.getProperty('shortcutMap')).toBe('generic-ansi');
+  });
+});
+
+describe('Config.createTag', () => {
+  test('creates a tag and persists it', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+
+    expect(tag).toEqual({ color: '#ff0000', name: 'my-tag' });
+    expect(config.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+
+    const config2 = new Config();
+    expect(config2.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+  });
+
+  test('slugifies the given name', () => {
+    const config = new Config();
+
+    expect(config.createTag('My Tag', '#ff0000').name).toBe('my-tag');
+    expect(config.createTag('Ünïcödé Tag', '#ff0000').name).toBe('unicode-ta');
+    expect(config.createTag('  Spaces  ', '#ff0000').name).toBe('spaces');
+  });
+
+  test('cuts the slug to 10 characters', () => {
+    const config = new Config();
+
+    const tag = config.createTag('ThisIsAVeryLongTagName', '#ff0000');
+
+    expect(tag.name).toBe('thisisaver');
+    expect(tag.name.length).toBe(10);
+  });
+
+  test('throws when the slug is shorter than 3 characters', () => {
+    const config = new Config();
+
+    expect(() => config.createTag('a', '#ff0000')).toThrow();
+    expect(() => config.createTag('ab', '#ff0000')).toThrow();
+    expect(() => config.createTag('!!!', '#ff0000')).toThrow();
+    expect(() => config.createTag('   ', '#ff0000')).toThrow();
+
+    expect(config.getProperty('tags')).toEqual([]);
+  });
+
+  test('does not create a duplicate tag', () => {
+    const config = new Config();
+
+    config.createTag('My Tag', '#ff0000');
+    config.createTag('My Tag', '#ff0000');
+
+    expect(config.getProperty('tags')).toHaveLength(1);
+  });
+
+  test('returns the existing tag with its original color', () => {
+    const config = new Config();
+
+    const created = config.createTag('My Tag', '#ff0000');
+    const existing = config.createTag('My Tag', '#00ff00');
+
+    expect(existing).toEqual(created);
+    expect(existing.color).toBe('#ff0000');
+    expect(config.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+  });
+
+  test('works with a config file written by an older version, without tags', () => {
+    const configPath = getConfigFilePath();
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        searchEngines: [],
+        partitions: [],
+        downloadsFolder: '/tmp',
+        themes: [],
+        permissionsType: 'standard',
+        shortcutMap: 'generic-ansi',
+        shortcutsOverrides: {},
+      }),
+    );
+
+    const config = new Config();
+    expect(config.getProperty('tags')).toEqual([]);
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    expect(tag).toEqual({ color: '#ff0000', name: 'my-tag' });
+
+    const config2 = new Config();
+    expect(config2.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
   });
 });

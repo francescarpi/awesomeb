@@ -2,8 +2,14 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import path from 'path';
 import os from 'os';
+import slugify from 'slugify';
 import { EPermissionConfigType } from '~/types';
-import { ConfigScheme, type IConfig, type IConfigSearchEngine } from './schemes';
+import {
+  ConfigScheme,
+  type IConfig,
+  type IConfigSearchEngine,
+  type IConfigTag,
+} from './schemes';
 import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
 
@@ -16,6 +22,7 @@ export class Config extends Store<IConfig> {
       partitions: [],
       downloadsFolder: path.join(os.homedir(), 'Downloads'),
       themes: [],
+      tags: [],
       permissionsType: EPermissionConfigType.Standard,
       shortcutMap: DEFAULT_SHORTCUTS_MAP,
       shortcutsOverrides: {},
@@ -85,5 +92,26 @@ export class Config extends Store<IConfig> {
 
   get wasConfigured(): boolean {
     return this.getProperty('searchEngines').length > 0;
+  }
+
+  createTag(name: string, color: string): IConfigTag {
+    const slug = slugify(name, { lower: true, strict: true }).slice(0, 10);
+
+    if (slug.length < 3) {
+      throw new Error('Tag name must be at least 3 characters long');
+    }
+
+    const tags = this.getProperty('tags');
+    const existing = tags.find((tag) => tag.name === slug);
+
+    if (existing) {
+      return existing;
+    }
+
+    const tag: IConfigTag = { color, name: slug };
+
+    this.save({ ...this.config, tags: [...tags, tag] });
+
+    return tag;
   }
 }

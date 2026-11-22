@@ -26,12 +26,23 @@ export const ConfigThemeScheme = z
   })
   .strict();
 
+export const ConfigTagScheme = z
+  .object({
+    color: z.string(),
+    name: z.string(),
+  })
+  .strict();
+
 export const ConfigScheme = z
   .object({
     searchEngines: z.array(ConfigSearchEngineScheme),
     partitions: z.array(ConfigPartitionScheme),
     downloadsFolder: z.string(),
     themes: z.array(ConfigThemeScheme),
+    // Older versions of AwesomeB have no tags in their config.json, so the
+    // field is optional and defaults to an empty list. A required field would
+    // fail the validation of an old config and discard every other setting.
+    tags: z.array(ConfigTagScheme).default([]),
     permissionsType: z.enum(['standard', 'strict']),
     shortcutMap: z.string(),
     shortcutsOverrides: z.record(z.string(), z.string()),
@@ -49,3 +60,4 @@ export type IConfig = z.infer<typeof ConfigScheme>;
 export type IConfigSearchEngine = z.infer<typeof ConfigSearchEngineScheme>;
 export type IConfigPartition = z.infer<typeof ConfigPartitionScheme>;
 export type IConfigTheme = z.infer<typeof ConfigThemeScheme>;
+export type IConfigTag = z.infer<typeof ConfigTagScheme>;
