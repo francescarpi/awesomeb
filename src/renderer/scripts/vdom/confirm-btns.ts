@@ -4,6 +4,14 @@ import { h } from './vdom';
 import enter from '#/icons/return.svg?raw';
 import esc from '#/icons/escape.svg?raw';
 
+export interface IConfirmButtons {
+  vnode: VNode[];
+  registerEvents: () => () => void;
+  setLoading: (value: boolean) => void;
+  setConfirmEnabled: (value: boolean) => void;
+  setCancelEnabled: (value: boolean) => void;
+}
+
 export async function confirmButtons({
   winId,
   confirmText,
@@ -18,28 +26,60 @@ export async function confirmButtons({
   onCancel?: () => void;
   confirmDisabled?: boolean;
   cancelDisabled?: boolean;
-}): Promise<[VNode[], () => void, (value: boolean) => void]> {
+}): Promise<IConfirmButtons> {
   const t = await abI18n.t({ winId }, [{ key: 'ok' }, { key: 'cancel' }]);
   const confText = confirmText || t['ok'];
   const cancelText = t['cancel'];
 
+  let confirmEnabled = !confirmDisabled;
+  let cancelEnabled = !cancelDisabled;
+  let loading = false;
+
+  const confirmIsEnabled = () => confirmEnabled && !loading;
+  const cancelIsEnabled = () => cancelEnabled;
+
+  const findButton = (id: 'confirm' | 'cancel'): HTMLButtonElement | null =>
+    document.querySelector<HTMLButtonElement>(`button#${id}`);
+
+  const applyConfirmState = () => {
+    const btn = findButton('confirm');
+    if (btn) btn.disabled = !confirmIsEnabled();
+  };
+
+  const applyCancelState = () => {
+    const btn = findButton('cancel');
+    if (btn) btn.disabled = !cancelIsEnabled();
+  };
+
+  const applyLoadingState = () => {
+    const btn = findButton('confirm');
+    if (!btn) return;
+    const spinner = btn.querySelector('span.loading');
+    if (spinner) spinner.classList.toggle('hidden', !loading);
+  };
+
   const onKeydown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
-      onConfirm();
+      if (confirmIsEnabled()) onConfirm();
     } else if (e.key === 'Escape') {
       if (onCancel) {
-        onCancel();
-      } else {
+        if (cancelIsEnabled()) onCancel();
+      } else if (confirmIsEnabled()) {
         onConfirm();
       }
     }
   };
 
+  let unregister: (() => void) | null = null;
+
   const registerEvents = () => {
+    if (unregister) unregister();
     window.addEventListener('keydown', onKeydown);
-    return () => {
+    unregister = () => {
       window.removeEventListener('keydown', onKeydown);
+      unregister = null;
     };
+    return unregister;
   };
 
   const cancel = h(
@@ -76,20 +116,23 @@ export async function confirmButtons({
     ),
   );
 
-  const btns = onCancel ? [cancel, ok] : [ok];
+  const vnode = onCancel ? [cancel, ok] : [ok];
 
   const setLoading = (value: boolean) => {
-    const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
-    const loading = btn.querySelector('span.loading')!;
-
-    if (value) {
-      loading.classList.remove('hidden');
-      btn.disabled = true;
-    } else {
-      loading.classList.add('hidden');
-      btn.disabled = false;
-    }
+    loading = value;
+    applyLoadingState();
+    applyConfirmState();
   };
 
-  return [btns, registerEvents, setLoading];
+  const setConfirmEnabled = (value: boolean) => {
+    confirmEnabled = value;
+    applyConfirmState();
+  };
+
+  const setCancelEnabled = (value: boolean) => {
+    cancelEnabled = value;
+    applyCancelState();
+  };
+
+  return { vnode, registerEvents, setLoading, setConfirmEnabled, setCancelEnabled };
 }

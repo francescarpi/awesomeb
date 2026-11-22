@@ -8,12 +8,14 @@ import type {
   TMenuType,
   ITabContainer,
   TTabId,
+  TTabTagId,
   ITab,
   TPage,
   IDownloads,
   ITabMark,
   TMarksAction,
   IConfig,
+  IConfigTag,
   IExtension,
   TExtensionId,
   TTabPreviewAction,
@@ -170,6 +172,11 @@ declare global {
   };
 
   //--------------------------------------------------------------------------------------
+  const abTabTags: {
+    assign: (winId: TWindowId, tabId: TTabId, tagId: TTabTagId) => Promise<TTabTagId[]>;
+  };
+
+  //--------------------------------------------------------------------------------------
   const abCertificates: {
     info: (winId: TWindowId) => Promise<IPeerCertificate>;
   };
@@ -180,6 +187,9 @@ declare global {
     getConfigInfo: () => Promise<IConfigInfo>;
     openConfigFolder: () => Promise<void>;
     save: (config: IConfig) => Promise<IConfig>;
+    createTag: (winId: TWindowId, name: string, color: string) => Promise<IConfigTag | null>;
+    saveTags: (tags: { name: string; color: string }[]) => Promise<IConfig | null>;
+    deleteTag: (tagId: string) => Promise<IConfig>;
     selectDownloadFolder: () => Promise<string | null>;
     refresh: (callback: (event: IpcRendererEvent, config: IConfig) => void) => void;
   };

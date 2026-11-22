@@ -23,7 +23,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:clientCertificate.message', params: { url } },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => {
       const select = document.getElementById('cert-select') as HTMLSelectElement;

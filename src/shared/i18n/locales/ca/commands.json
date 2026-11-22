@@ -267,6 +267,10 @@
     "name": "Mostra/amaga el silenci",
     "description": "Alterna l'estat de silenci de la pestanya actual."
   },
+  "toggleTabTag": {
+    "name": "Alterna l'etiqueta",
+    "description": "Afegeix l'etiqueta a la pestanya, o la treu si ja la té."
+  },
   "toggleOpenTabsAsChild": {
     "name": "Mostra/amaga l'obertura de pestanyes com a filles",
     "description": "Alterna si les noves pestanyes obertes des d'aquesta pestanya es converteixen en les seves filles."

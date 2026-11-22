@@ -93,7 +93,9 @@
     "removeDivider": "Remove divider",
     "removeAllDividers": "Remove all dividers",
     "openTargetBlankAsChild": "Open target blank links as a child...",
-    "collapseChildren": "Collapse children"
+    "collapseChildren": "Collapse children",
+    "tags": "Tags",
+    "createTag": "Create tag"
   },
   "contextWebContents": {
     "back": "Back",

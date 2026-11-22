@@ -1,4 +1,4 @@
-import { Browser, Window, partitions } from '@/core';
+import { Browser, Window, partitions, config } from '@/core';
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
@@ -168,6 +168,39 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
             browser.bookmarks.all,
           )
         : [],
+    },
+    { type: 'separator' },
+    {
+      label: t('menu:contextTab.tags'),
+      icon: getIcon(EIcon.Tags),
+      submenu: [
+        {
+          label: t('menu:contextTab.createTag'),
+          icon: getIcon(EIcon.Add),
+          click: () => {
+            window.modal.open('create-tag', {
+              query: { tabId: tab.id.toString() },
+            });
+          },
+        },
+        ...(config.getProperty('tags').length > 0
+          ? [
+              { type: 'separator' } as MenuItemConstructorOptions,
+              ...config.getProperty('tags').map((tag) => ({
+                label: tag.name,
+                icon: createColorImage(tag.color),
+                type: 'checkbox' as const,
+                checked: browser.tabTags.get(tab.id).includes(tag.id),
+                click: async () => {
+                  await browser.performCommand(window, 'toggle-tab-tag', {
+                    tabId: tab.id,
+                    tagId: tag.id,
+                  });
+                },
+              })),
+            ]
+          : []),
+      ],
     },
     { type: 'separator' },
     {

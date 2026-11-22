@@ -45,7 +45,7 @@ import logo from '../assets/icon.png';
   const developedBy = document.getElementById('developedBy') as HTMLParagraphElement;
   developedBy.innerHTML = t['pages:about.developedBy'];
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => {
       abModal.close(winId);

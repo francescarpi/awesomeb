@@ -4,6 +4,7 @@ import {
   ConfigSearchEngineScheme,
   ConfigPartitionScheme,
   ConfigThemeScheme,
+  ConfigTagScheme,
 } from './schemes';
 import { ZodError } from 'zod';
 
@@ -12,6 +13,7 @@ const validConfig = {
   partitions: [{ name: 'personal', color: '#ff0000' }],
   downloadsFolder: '/home/user/Downloads',
   themes: [{ name: 'dark', primary: '#000000', secondary: '#ffffff', degrees: 45 }],
+  tags: [{ id: 'tag-1', color: '#ff0000', textColor: '#000000', name: 'work' }],
   permissionsType: 'standard' as const,
   shortcutMap: 'generic-iso',
   shortcutsOverrides: { 'tab-next': 'Ctrl+Tab' },
@@ -62,6 +64,45 @@ describe('ConfigScheme', () => {
     const config = { ...validConfig, themes: [] };
     const result = ConfigScheme.parse(config);
     expect(result.themes).toEqual([]);
+  });
+
+  test('missing tags is valid and defaults to an empty array', () => {
+    const config = { ...validConfig };
+    delete (config as Record<string, unknown>).tags;
+
+    const result = ConfigScheme.parse(config);
+    expect(result.tags).toEqual([]);
+  });
+
+  test('valid tags are parsed and kept', () => {
+    const config = {
+      ...validConfig,
+      tags: [
+        { id: 'tag-1', color: '#ff0000', textColor: '#000000', name: 'work' },
+        { id: 'tag-2', color: '#00ff00', textColor: '#000000', name: 'personal' },
+      ],
+    };
+
+    const result = ConfigScheme.parse(config);
+    expect(result.tags).toEqual(config.tags);
+  });
+
+  test('invalid tag throws ZodError', () => {
+    const invalid = {
+      ...validConfig,
+      tags: [{ id: 'tag-1', color: 123, textColor: '#000', name: 'bad' }],
+    };
+
+    expect(() => ConfigScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('extra property in tag throws ZodError', () => {
+    const invalid = {
+      ...validConfig,
+      tags: [{ id: 'tag-1', color: '#ff0000', textColor: '#000', name: 'work', extra: true }],
+    };
+
+    expect(() => ConfigScheme.parse(invalid)).toThrow(ZodError);
   });
 
   test('invalid type in searchEngine throws ZodError', () => {
@@ -137,5 +178,44 @@ describe('ConfigThemeScheme', () => {
   test('missing degrees throws ZodError', () => {
     const invalid = { name: 'No Degrees', primary: '#fff', secondary: '#000' };
     expect(() => ConfigThemeScheme.parse(invalid)).toThrow(ZodError);
+  });
+});
+
+describe('ConfigTagScheme', () => {
+  test('valid tag parses successfully', () => {
+    const tag = { id: 'tag-1', color: '#ff0000', textColor: '#000000', name: 'work' };
+    const result = ConfigTagScheme.parse(tag);
+    expect(result).toEqual(tag);
+  });
+
+  test('missing id throws ZodError', () => {
+    const invalid = { color: '#ff0000', textColor: '#000000', name: 'work' };
+    expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('missing color throws ZodError', () => {
+    const invalid = { id: 'tag-1', textColor: '#000000', name: 'No Color' };
+    expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('missing name throws ZodError', () => {
+    const invalid = { id: 'tag-1', color: '#ff0000', textColor: '#000000' };
+    expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('missing textColor throws ZodError', () => {
+    const invalid = { id: 'tag-1', color: '#ff0000', name: 'work' };
+    expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('extra property throws ZodError', () => {
+    const invalid = {
+      id: 'tag-1',
+      color: '#ff0000',
+      textColor: '#000000',
+      name: 'work',
+      extra: true,
+    };
+    expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
   });
 });

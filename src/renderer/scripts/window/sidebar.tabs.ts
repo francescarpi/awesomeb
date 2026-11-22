@@ -45,12 +45,13 @@ export async function renderTabContainers(
           h(
             'div',
             {
-              class: 'items-center gap-1 flex',
+              class: 'items-start gap-1 flex',
             },
             h(
               'span', // Tab container shortcut (is a number between 1 and 9)
               {
-                class: 'text-xs mx-0.5 text-white/20 group-[.collapsed]/sidebar:hidden w-1.5',
+                class:
+                  'text-xs mx-0.5 mt-1.5 text-white/20 group-[.collapsed]/sidebar:hidden w-1.5',
               },
               tc.shortcut?.toString(),
             ),
@@ -255,6 +256,24 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
         highlightIcon(Muted, t.isMuted, 'text-white'),
         highlightIcon(Warning, t.requireAttention, 'text-red-500'),
       ),
+      ...(t.tags.length > 0
+        ? [
+            h(
+              'div', // Tags container
+              { class: 'flex gap-1 items-center overflow-hidden' },
+              ...t.tags.map((tag) =>
+                h(
+                  'span', // Tag chip
+                  {
+                    class: 'text-xs px-1.5 py-0.5 rounded-full leading-none truncate',
+                    style: { backgroundColor: tag.color, color: tag.textColor },
+                  },
+                  tag.name,
+                ),
+              ),
+            ),
+          ]
+        : []),
     ),
     h(
       'div', // Partition and actions container

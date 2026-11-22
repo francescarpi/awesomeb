@@ -47,7 +47,12 @@ import Title from '#/components/common/Title.astro';
       [{ path: t['pages:bookmarks.root'], id: 'root' }],
     );
 
-  const [btns, registerBtnsEvents, setLoading] = await confirmButtons({
+  const {
+    vnode: btns,
+    registerEvents: registerBtnsEvents,
+    setLoading,
+    setConfirmEnabled,
+  } = await confirmButtons({
     winId,
     confirmDisabled: true,
     onConfirm: async () => {
@@ -254,7 +259,8 @@ import Title from '#/components/common/Title.astro';
   function checkConfirmButtonStatus() {
     const tabs = getSelectedTabs();
     const folder = getFolder();
-    const btn = document.querySelector<HTMLButtonElement>('button#confirm')!;
-    btn.disabled = tabs.length === 0 || (folder.createFolder && folder.newFolderName.length === 0);
+    setConfirmEnabled(
+      tabs.length !== 0 && !(folder.createFolder && folder.newFolderName.length === 0),
+    );
   }
 </script>

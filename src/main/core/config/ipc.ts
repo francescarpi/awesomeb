@@ -1,18 +1,22 @@
-import { Browser, config, notification, getTheme } from '@/core';
+import { Browser, Window, config, notification, getTheme } from '@/core';
 import { t } from '~/i18n';
 import {
   createHandler,
   internalPageChecker,
   viewChecker,
   windowChecker,
+  modalChecker,
   multiConditional,
   welcomeWindowChecker,
   findInPageChecker,
   tabChecker,
 } from '@/utils';
-import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
+import type { IConfig, IWinDesConTab, IConfigInfo, TTabTagId } from '~/types';
 import { dialog, app, shell } from 'electron';
 import { userDataPath, getRepoUrl } from '@/paths';
+import log from 'electron-log';
+
+const scopeLog = log.scope('ConfigIPC');
 
 export function setupConfigIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -66,6 +70,72 @@ export function setupConfigIPC(browser: Browser) {
       browser.refreshMainMenu();
 
       notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+
+      return config.config;
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ name: string; color: string; win: Window }>(
+    'config:create-tag',
+    'handle',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ name, color, win }) => {
+      try {
+        const tag = config.createTag(name, color);
+
+        browser.toRenderer.refreshTabContainers(win);
+
+        return tag;
+      } catch (error) {
+        scopeLog.error('Error creating tag:', error);
+        return null;
+      }
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tags: { name: string; color: string }[] }>(
+    'config:save-tags',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, ['settings'])],
+    async ({ tags }) => {
+      try {
+        config.saveTags(tags);
+      } catch (error) {
+        scopeLog.error('Error saving tags:', error);
+        notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+        return null;
+      }
+
+      browser.toRenderer.refreshConfig();
+
+      for (const window of browser.windows) {
+        browser.toRenderer.refreshTabContainers(window);
+      }
+
+      notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+
+      return config.config;
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tagId: TTabTagId }>(
+    'config:delete-tag',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, ['settings'])],
+    async ({ tagId }) => {
+      config.removeTag(tagId);
+
+      browser.toRenderer.refreshConfig();
+
+      for (const window of browser.windows) {
+        browser.toRenderer.refreshTabContainers(window);
+      }
 
       return config.config;
     },

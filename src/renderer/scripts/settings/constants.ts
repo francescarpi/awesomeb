@@ -3,6 +3,7 @@ import { renderProfilesPage } from './profiles';
 import { renderThemesPage } from './themes';
 import { renderPermissionsPage } from './permissions';
 import { renderShortcutsPage } from './shortcuts';
+import { renderTagsPage } from './tags';
 
 export const settingsMenuItems = [
   { nameKey: 'pages:settings.menu.general', hash: ['#/', ''], rendererFnc: renderGeneralPage },
@@ -22,6 +23,7 @@ export const settingsMenuItems = [
     hash: ['#/shortcuts'],
     rendererFnc: renderShortcutsPage,
   },
+  { nameKey: 'pages:settings.menu.tags', hash: ['#/tags'], rendererFnc: renderTagsPage },
 ];
 
 export const RETENTION_OPTIONS = [1, 2, 3, 7, 15, 30, 60, 90];
