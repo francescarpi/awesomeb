@@ -14,6 +14,7 @@ import type {
   ITabMark,
   TMarksAction,
   IConfig,
+  IConfigTag,
   IExtension,
   TExtensionId,
   TTabPreviewAction,
@@ -180,6 +181,7 @@ declare global {
     getConfigInfo: () => Promise<IConfigInfo>;
     openConfigFolder: () => Promise<void>;
     save: (config: IConfig) => Promise<IConfig>;
+    createTag: (name: string, color: string) => Promise<IConfigTag | null>;
     selectDownloadFolder: () => Promise<string | null>;
     refresh: (callback: (event: IpcRendererEvent, config: IConfig) => void) => void;
   };

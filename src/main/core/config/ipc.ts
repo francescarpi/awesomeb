@@ -5,6 +5,7 @@ import {
   internalPageChecker,
   viewChecker,
   windowChecker,
+  modalChecker,
   multiConditional,
   welcomeWindowChecker,
   findInPageChecker,
@@ -13,6 +14,9 @@ import {
 import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
 import { dialog, app, shell } from 'electron';
 import { userDataPath, getRepoUrl } from '@/paths';
+import log from 'electron-log';
+
+const scopeLog = log.scope('ConfigIPC');
 
 export function setupConfigIPC(browser: Browser) {
   //--------------------------------------------------------------------------------------
@@ -68,6 +72,22 @@ export function setupConfigIPC(browser: Browser) {
       notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
 
       return config.config;
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ name: string; color: string }>(
+    'config:create-tag',
+    'handle',
+    browser,
+    [windowChecker, modalChecker],
+    async ({ name, color }) => {
+      try {
+        return config.createTag(name, color);
+      } catch (error) {
+        scopeLog.error('Error creating tag:', error);
+        return null;
+      }
     },
   );
 

@@ -299,6 +299,9 @@ const abConfig = {
   save: (config: IConfig) => {
     return ipcRenderer.invoke('config:save', { config });
   },
+  createTag: (name: string, color: string) => {
+    return ipcRenderer.invoke('config:create-tag', { name, color });
+  },
   selectDownloadFolder: () => {
     return ipcRenderer.invoke('config:select-download-folder', {});
   },
