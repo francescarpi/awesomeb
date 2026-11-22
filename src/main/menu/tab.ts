@@ -191,6 +191,12 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
                 icon: createColorImage(tag.color),
                 type: 'checkbox' as const,
                 checked: browser.tabTags.get(tab.id).includes(tag.id),
+                click: async () => {
+                  await browser.performCommand(window, 'toggle-tab-tag', {
+                    tabId: tab.id,
+                    tagId: tag.id,
+                  });
+                },
               })),
             ]
           : []),

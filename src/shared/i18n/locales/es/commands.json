@@ -267,6 +267,10 @@
     "name": "Alternar silencio",
     "description": "Alterna el estado de silencio de la pestaña actual."
   },
+  "toggleTabTag": {
+    "name": "Alternar etiqueta",
+    "description": "Añade la etiqueta a la pestaña, o la quita si ya la tiene."
+  },
   "toggleOpenTabsAsChild": {
     "name": "Alternar abrir pestañas como hijas",
     "description": "Alterna si las nuevas pestañas abiertas desde esta pestaña se convierten en sus hijas."

@@ -50,6 +50,7 @@ import * as tabDuplicate from './tab-duplicate';
 import * as tabpreviewClose from './tabpreview-close';
 import * as tabpreviewAccept from './tabpreview-accept';
 import * as tabToggleMute from './tab-toggle-mute';
+import * as tabToggleTag from './tab-toggle-tag';
 import * as tabOpenClosed from './tab-open-closed';
 import * as tabPrint from './tab-print';
 import * as extensionsManage from './extensions-manage';
@@ -127,6 +128,7 @@ const COMMANDS = {
   [tabpreviewClose.TRIGGER]: tabpreviewClose.Command,
   [tabpreviewAccept.TRIGGER]: tabpreviewAccept.Command,
   [tabToggleMute.TRIGGER]: tabToggleMute.Command,
+  [tabToggleTag.TRIGGER]: tabToggleTag.Command,
   [tabOpenClosed.TRIGGER]: tabOpenClosed.Command,
   [tabPrint.TRIGGER]: tabPrint.Command,
   [extensionsManage.TRIGGER]: extensionsManage.Command,

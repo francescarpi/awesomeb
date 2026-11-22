@@ -4,7 +4,7 @@ import path from 'path';
 import os from 'os';
 import { randomUUID } from 'crypto';
 import slugify from 'slugify';
-import { EPermissionConfigType } from '~/types';
+import { EPermissionConfigType, type TTabTagId } from '~/types';
 import {
   ConfigScheme,
   type IConfig,
@@ -13,6 +13,7 @@ import {
 } from './schemes';
 import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
+import { tabTags } from '@/core/tab-tags';
 
 export class Config extends Store<IConfig> {
   private _validatedStore: IConfig | null = null;
@@ -114,5 +115,18 @@ export class Config extends Store<IConfig> {
     this.save({ ...this.config, tags: [...tags, tag] });
 
     return tag;
+  }
+
+  removeTag(tagId: TTabTagId): void {
+    const tags = this.getProperty('tags');
+    const remaining = tags.filter((tag) => tag.id !== tagId);
+
+    if (remaining.length === tags.length) {
+      return;
+    }
+
+    this.save({ ...this.config, tags: remaining });
+
+    tabTags.removeTag(tagId);
   }
 }

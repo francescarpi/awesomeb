@@ -25,6 +25,7 @@ import * as tabSelect from './tab-select';
 import * as tabClose from './tab-close';
 import * as tabCloseChildren from './tab-close-children';
 import * as tabDuplicate from './tab-duplicate';
+import * as tabToggleTag from './tab-toggle-tag';
 import * as tabReload from './tab-reload';
 import * as tabHistoryBack from './tab-history-back';
 import * as tabHistoryForward from './tab-history-forward';
@@ -463,6 +464,61 @@ describe('Commands', () => {
 
       // Should not throw an error
       expect(true).toBe(true);
+    });
+  });
+
+  describe('Tag Commands', () => {
+    test('toggle-tab-tag: should add the tag to the tab when it does not have it', async () => {
+      const window = browser.activeWindow!;
+      browser.openURL('https://example.com');
+      const desktop = window.selectedDesktop!;
+      const tab = desktop.tabContainers[0].tabs[0];
+
+      await browser.performCommand(window, tabToggleTag.TRIGGER, {
+        tabId: tab.id,
+        tagId: 'tag-1',
+      });
+
+      expect(browser.tabTags.get(tab.id)).toEqual(['tag-1']);
+    });
+
+    test('toggle-tab-tag: should remove the tag from the tab when it already has it', async () => {
+      const window = browser.activeWindow!;
+      browser.openURL('https://example.com');
+      const desktop = window.selectedDesktop!;
+      const tab = desktop.tabContainers[0].tabs[0];
+
+      browser.tabTags.assign(tab.id, 'tag-1');
+
+      await browser.performCommand(window, tabToggleTag.TRIGGER, {
+        tabId: tab.id,
+        tagId: 'tag-1',
+      });
+
+      expect(browser.tabTags.get(tab.id)).toEqual([]);
+    });
+
+    test('toggle-tab-tag: should do nothing without a tag id', async () => {
+      const window = browser.activeWindow!;
+      browser.openURL('https://example.com');
+      const desktop = window.selectedDesktop!;
+      const tab = desktop.tabContainers[0].tabs[0];
+
+      await browser.performCommand(window, tabToggleTag.TRIGGER, { tabId: tab.id });
+
+      expect(browser.tabTags.get(tab.id)).toEqual([]);
+    });
+
+    test('toggle-tab-tag: should not be listed in the command palette', () => {
+      expect(
+        tabToggleTag.Command.visible!({
+          browser,
+          window: null,
+          desktop: null,
+          tabContainer: null,
+          tab: null,
+        }),
+      ).toBe(false);
     });
   });
 

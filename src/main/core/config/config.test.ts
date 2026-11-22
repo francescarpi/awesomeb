@@ -3,6 +3,7 @@ import { Config } from './config';
 import { ConfigScheme } from './schemes';
 import { ZodError } from 'zod';
 import { userDataPath } from '@/paths';
+import { tabTags } from '@/core/tab-tags';
 import fs from 'fs';
 import path from 'path';
 
@@ -290,5 +291,66 @@ describe('Config.createTag', () => {
 
     const config2 = new Config();
     expect(config2.getProperty('tags')).toEqual([tag]);
+  });
+});
+
+describe('Config.removeTag', () => {
+  beforeEach(() => {
+    tabTags.removeTab(12);
+    tabTags.removeTab(13);
+  });
+
+  afterEach(() => {
+    tabTags.removeTab(12);
+    tabTags.removeTab(13);
+  });
+
+  test('removes the tag from the config', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    config.removeTag(tag.id);
+
+    expect(config.getProperty('tags')).toEqual([]);
+  });
+
+  test('removes the tag from the tabs that had it', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    tabTags.assign(12, tag.id);
+    tabTags.assign(13, tag.id);
+
+    config.removeTag(tag.id);
+
+    expect(tabTags.get(12)).toEqual([]);
+    expect(tabTags.get(13)).toEqual([]);
+  });
+
+  test('keeps the other tags and their assignments', () => {
+    const config = new Config();
+
+    const removed = config.createTag('My Tag', '#ff0000');
+    const kept = config.createTag('Other Tag', '#00ff00');
+
+    tabTags.assign(12, removed.id);
+    tabTags.assign(12, kept.id);
+
+    config.removeTag(removed.id);
+
+    expect(config.getProperty('tags')).toEqual([kept]);
+    expect(tabTags.get(12)).toEqual([kept.id]);
+  });
+
+  test('does nothing when the tag does not exist', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    tabTags.assign(12, tag.id);
+
+    config.removeTag('unknown-tag-id');
+
+    expect(config.getProperty('tags')).toEqual([tag]);
+    expect(tabTags.get(12)).toEqual([tag.id]);
   });
 });

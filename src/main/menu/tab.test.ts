@@ -329,6 +329,16 @@ describe('tabMenu - Tags submenu', () => {
     return tagsItem!.submenu as MenuItemConstructorOptions[];
   }
 
+  async function clickTagItem(label: string): Promise<void> {
+    const submenu = captureTagsSubmenu();
+    const tagItem = submenu.find((item) => item.label === label);
+    expect(tagItem).toBeDefined();
+
+    // The click of a menu item is typed as returning void, but ours is async.
+    const click = tagItem!.click as unknown as () => Promise<void>;
+    await click();
+  }
+
   test('shows only the create entry when there are no tags', () => {
     const submenu = captureTagsSubmenu();
 
@@ -378,5 +388,22 @@ describe('tabMenu - Tags submenu', () => {
     const tagItem = submenu.find((item) => item.label === 'my-tag');
 
     expect(tagItem!.icon).toBeDefined();
+  });
+
+  test('clicking a tag that the tab does not have assigns it', async () => {
+    const tag = config.createTag('My Tag', '#ff0000');
+
+    await clickTagItem('my-tag');
+
+    expect(browser.tabTags.get(tabInfo.tab.id)).toEqual([tag.id]);
+  });
+
+  test('clicking a tag that the tab already has removes it', async () => {
+    const tag = config.createTag('My Tag', '#ff0000');
+    browser.tabTags.assign(tabInfo.tab.id, tag.id);
+
+    await clickTagItem('my-tag');
+
+    expect(browser.tabTags.get(tabInfo.tab.id)).toEqual([]);
   });
 });
