@@ -81,8 +81,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       i18next-fs-backend:
-        specifier: 2.7.0
-        version: 2.7.0
+        specifier: 2.7.1
+        version: 2.7.1
       mime-types:
         specifier: 3.0.2
         version: 3.0.2
@@ -157,14 +157,14 @@ importers:
         specifier: 9.1.7
         version: 9.1.7
       i18next:
-        specifier: 27.2.3
-        version: 27.2.3(typescript@6.0.3)
+        specifier: 27.2.4
+        version: 27.2.4(typescript@6.0.3)
       jsdom:
         specifier: 31.0.1
         version: 31.0.1(@noble/hashes@2.4.0)
       lint-staged:
-        specifier: 17.6.1
-        version: 17.6.1
+        specifier: 17.6.2
+        version: 17.6.2
       prettier:
         specifier: 3.10.1
         version: 3.10.1
@@ -3019,11 +3019,11 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  i18next-fs-backend@2.7.0:
-    resolution: {integrity: sha512-CUfthmimGMcpLujpZXrVl3aF2Ra/cdYhoA0Ep+PckOk0N8jhwGGDNsrB2WM5CR4i66nYQPJoWR8YzsUrohuqKw==}
+  i18next-fs-backend@2.7.1:
+    resolution: {integrity: sha512-zJRUYdAggHqQNvDIb7byYjjiBpU1tVACvTD21Xkq+aiZFyKTdc4HJxXo/10nNjszdHCQHWWzbE0hTXmbpH8ErQ==}
 
-  i18next@27.2.3:
-    resolution: {integrity: sha512-14wcQLAu5Aykwk4scBGl8tosKYth4S2PQDcusbES/bUsQ7X7DbcPygMzCe298U/NcAvDpqr+CX6oygbQoyLBRA==}
+  i18next@27.2.4:
+    resolution: {integrity: sha512-Twhl6dx3IznvyQEv7rrYH2xBMAmOIjNuj/lPicevTa0d/fxg4Km315MlAI07SOWQcw2pypA4qf39RoMJgJ8WEQ==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -3304,8 +3304,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lint-staged@17.6.1:
-    resolution: {integrity: sha512-3MXgVN7BERDR/6CXZs2fDHGc+r0+hlvGAa9wqMlVbIS6RVRuaPOnb5SnN6wMXulwfEy9DXVkMVUN/8cUlpPDnw==}
+  lint-staged@17.6.2:
+    resolution: {integrity: sha512-c/JaXaXmleubmKUwwp4OAcq55RV9Z3HTUNdqdqPh2srtmP9Of3bcR6o00GoWDUye+9JhMuoYkhYqAVPIOZKcsw==}
     engines: {node: '>=22.22.1'}
     hasBin: true
 
@@ -7789,9 +7789,9 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next-fs-backend@2.7.0: {}
+  i18next-fs-backend@2.7.1: {}
 
-  i18next@27.2.3(typescript@6.0.3):
+  i18next@27.2.4(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -8012,7 +8012,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lint-staged@17.6.1:
+  lint-staged@17.6.2:
     dependencies:
       picomatch: 4.0.7
       string-argv: 0.4.0
