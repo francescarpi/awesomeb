@@ -259,6 +259,8 @@ import Title from '#/components/common/Title.astro';
   function checkConfirmButtonStatus() {
     const tabs = getSelectedTabs();
     const folder = getFolder();
-    setConfirmEnabled(tabs.length !== 0 && !(folder.createFolder && folder.newFolderName.length === 0));
+    setConfirmEnabled(
+      tabs.length !== 0 && !(folder.createFolder && folder.newFolderName.length === 0),
+    );
   }
 </script>

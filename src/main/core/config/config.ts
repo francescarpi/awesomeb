@@ -5,12 +5,7 @@ import os from 'os';
 import { randomUUID } from 'crypto';
 import slugify from 'slugify';
 import { EPermissionConfigType, type TTabTagId } from '~/types';
-import {
-  ConfigScheme,
-  type IConfig,
-  type IConfigSearchEngine,
-  type IConfigTag,
-} from './schemes';
+import { ConfigScheme, type IConfig, type IConfigSearchEngine, type IConfigTag } from './schemes';
 import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
 import { contrastingTextColor } from '@/utils';

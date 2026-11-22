@@ -222,10 +222,7 @@ function addTag(renderer: Renderer, config: IConfig, t: Translations) {
     return;
   }
 
-  const newTags = [
-    ...tags,
-    { id: `new-${newSeed}`, name: newSeed, color: '#ffffff' },
-  ];
+  const newTags = [...tags, { id: `new-${newSeed}`, name: newSeed, color: '#ffffff' }];
 
   renderer.update(
     buildTagsBody(

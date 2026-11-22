@@ -148,19 +148,15 @@ describe('VisitHistory', () => {
   // Writing 105 items one by one is slow on purpose: every write rewrites and
   // re-validates the whole history. It takes under a second on its own, but
   // close to the default timeout when the whole suite runs in parallel.
-  test(
-    'queryHistory() default maxResults = 100',
-    () => {
-      const vh = createVisitHistory();
-      for (let i = 0; i < 105; i++) {
-        vh.addUrl({ url: `https://site-${i}.com` });
-      }
+  test('queryHistory() default maxResults = 100', () => {
+    const vh = createVisitHistory();
+    for (let i = 0; i < 105; i++) {
+      vh.addUrl({ url: `https://site-${i}.com` });
+    }
 
-      const results = vh.queryHistory({});
-      expect(results.length).toBe(100);
-    },
-    15000,
-  );
+    const results = vh.queryHistory({});
+    expect(results.length).toBe(100);
+  }, 15000);
 
   test('getVisits() returns visits for URL sorted desc', () => {
     const vh = createVisitHistory();

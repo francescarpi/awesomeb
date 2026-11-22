@@ -88,7 +88,10 @@ describe('ConfigScheme', () => {
   });
 
   test('invalid tag throws ZodError', () => {
-    const invalid = { ...validConfig, tags: [{ id: 'tag-1', color: 123, textColor: '#000', name: 'bad' }] };
+    const invalid = {
+      ...validConfig,
+      tags: [{ id: 'tag-1', color: 123, textColor: '#000', name: 'bad' }],
+    };
 
     expect(() => ConfigScheme.parse(invalid)).toThrow(ZodError);
   });
@@ -206,7 +209,13 @@ describe('ConfigTagScheme', () => {
   });
 
   test('extra property throws ZodError', () => {
-    const invalid = { id: 'tag-1', color: '#ff0000', textColor: '#000000', name: 'work', extra: true };
+    const invalid = {
+      id: 'tag-1',
+      color: '#ff0000',
+      textColor: '#000000',
+      name: 'work',
+      extra: true,
+    };
     expect(() => ConfigTagScheme.parse(invalid)).toThrow(ZodError);
   });
 });
