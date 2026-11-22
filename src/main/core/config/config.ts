@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import path from 'path';
 import os from 'os';
+import { randomUUID } from 'crypto';
 import slugify from 'slugify';
 import { EPermissionConfigType } from '~/types';
 import {
@@ -108,7 +109,7 @@ export class Config extends Store<IConfig> {
       return existing;
     }
 
-    const tag: IConfigTag = { color, name: slug };
+    const tag: IConfigTag = { id: randomUUID(), color, name: slug };
 
     this.save({ ...this.config, tags: [...tags, tag] });
 

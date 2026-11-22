@@ -11,6 +11,7 @@ export * from './find-in-page';
 export * from './bookmarks';
 export * from './downloads';
 export * from './tab-marks';
+export * from './tab-tags';
 export * from './certificates';
 export * from './permissions';
 export * from './extensions';

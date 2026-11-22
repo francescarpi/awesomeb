@@ -197,11 +197,23 @@ describe('Config.createTag', () => {
 
     const tag = config.createTag('My Tag', '#ff0000');
 
-    expect(tag).toEqual({ color: '#ff0000', name: 'my-tag' });
-    expect(config.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+    expect(tag.name).toBe('my-tag');
+    expect(tag.color).toBe('#ff0000');
+    expect(tag.id).toBeTruthy();
+
+    expect(config.getProperty('tags')).toEqual([tag]);
 
     const config2 = new Config();
-    expect(config2.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+    expect(config2.getProperty('tags')).toEqual([tag]);
+  });
+
+  test('generates a different id for each tag', () => {
+    const config = new Config();
+
+    const first = config.createTag('My Tag', '#ff0000');
+    const second = config.createTag('Other Tag', '#00ff00');
+
+    expect(first.id).not.toBe(second.id);
   });
 
   test('slugifies the given name', () => {
@@ -249,7 +261,8 @@ describe('Config.createTag', () => {
 
     expect(existing).toEqual(created);
     expect(existing.color).toBe('#ff0000');
-    expect(config.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+    expect(existing.id).toBe(created.id);
+    expect(config.getProperty('tags')).toEqual([created]);
   });
 
   test('works with a config file written by an older version, without tags', () => {
@@ -272,9 +285,10 @@ describe('Config.createTag', () => {
     expect(config.getProperty('tags')).toEqual([]);
 
     const tag = config.createTag('My Tag', '#ff0000');
-    expect(tag).toEqual({ color: '#ff0000', name: 'my-tag' });
+    expect(tag.name).toBe('my-tag');
+    expect(tag.color).toBe('#ff0000');
 
     const config2 = new Config();
-    expect(config2.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+    expect(config2.getProperty('tags')).toEqual([tag]);
   });
 });

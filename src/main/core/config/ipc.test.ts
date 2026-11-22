@@ -64,8 +64,10 @@ describe('Config IPC', () => {
       color: '#ff0000',
     });
 
-    expect(result).toEqual({ color: '#ff0000', name: 'my-tag' });
-    expect(config.getProperty('tags')).toEqual([{ color: '#ff0000', name: 'my-tag' }]);
+    expect(result).toEqual({ id: expect.any(String), color: '#ff0000', name: 'my-tag' });
+    expect(config.getProperty('tags')).toEqual([
+      { id: expect.any(String), color: '#ff0000', name: 'my-tag' },
+    ]);
   });
 
   test('config:create-tag returns null and does not throw when the name is too short', async () => {
