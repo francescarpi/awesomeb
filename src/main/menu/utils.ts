@@ -1,6 +1,7 @@
 import path from 'path';
 
 export enum EIcon {
+  Add = 'add.png',
   Back = 'back.png',
   Bookmarks = 'bookmarks.png',
   Close = 'close.png',
@@ -33,6 +34,7 @@ export enum EIcon {
   Size = 'size.png',
   Suspend = 'suspend.png',
   Tab = 'tab.png',
+  Tags = 'tags.png',
   Theme = 'theme.png',
   Unmute = 'unmute.png',
   Unsplit = 'unsplit.png',

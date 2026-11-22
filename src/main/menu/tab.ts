@@ -171,6 +171,22 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
     },
     { type: 'separator' },
     {
+      label: t('menu:contextTab.tags'),
+      icon: getIcon(EIcon.Tags),
+      submenu: [
+        {
+          label: t('menu:contextTab.createTag'),
+          icon: getIcon(EIcon.Add),
+          click: () => {
+            window.modal.open('create-tag', {
+              query: { tabId: tab.id.toString() },
+            });
+          },
+        },
+      ],
+    },
+    { type: 'separator' },
+    {
       label: t('menu:contextTab.addDivider'),
       icon: getIcon(EIcon.Divider),
       click: () => {

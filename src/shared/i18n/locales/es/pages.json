@@ -422,5 +422,9 @@
     "createFolder": "Crear carpeta hija bajo el padre seleccionado",
     "folderName": "Nombre de la carpeta",
     "close": "Cerrar las pestañas después de guardarlas"
+  },
+  "createTag": {
+    "title": "Crear etiqueta",
+    "tag": "Etiqueta"
   }
 }

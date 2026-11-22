@@ -422,5 +422,9 @@
     "createFolder": "Create child folder under the selected parent",
     "folderName": "Folder name",
     "close": "Close the tabs after saving them"
+  },
+  "createTag": {
+    "title": "Create tag",
+    "tag": "Tag"
   }
 }

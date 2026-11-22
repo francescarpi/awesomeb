@@ -422,5 +422,9 @@
     "createFolder": "Crear carpeta filla sota el pare seleccionat",
     "folderName": "Nom de la carpeta",
     "close": "Tanca les pestanyes després de desar-les"
+  },
+  "createTag": {
+    "title": "Crear etiqueta",
+    "tag": "Etiqueta"
   }
 }
