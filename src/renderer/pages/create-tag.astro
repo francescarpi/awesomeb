@@ -1,0 +1,86 @@
+---
+import Modal from '#/layouts/Modal.astro';
+import Title from '#/components/common/Title.astro';
+import '@thednp/color-picker/color-picker.css';
+---
+
+<Modal>
+  <Title title="pages:createTag.title" />
+  <div id="content"></div>
+</Modal>
+
+<script>
+  import { getSearchParams, confirmButtons, Renderer, h, input } from '#/scripts';
+  import ColorPicker from '@thednp/color-picker';
+
+  const { winId, searchParams } = getSearchParams();
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
+  const { init, selector } = ColorPicker;
+
+  const t = await abI18n.t({ winId }, [{ key: 'pages:createTag.tag' }]);
+
+  const {
+    vnode: btns,
+    registerEvents: registerBtnsEvents,
+    setConfirmEnabled,
+  } = await confirmButtons({
+    winId,
+    onConfirm: async () => {
+      const nameInput = document.getElementById('tag') as HTMLInputElement;
+      const colorInput = document.querySelector(
+        'input[data-function="color-picker"]',
+      ) as HTMLInputElement;
+
+      const tag = await abConfig.createTag(winId, nameInput.value, colorInput.value);
+
+      if (tag) {
+        await abTabTags.assign(winId, tabId, tag.id);
+      }
+
+      abModal.close(winId);
+    },
+    onCancel: () => {
+      abModal.close(winId);
+    },
+    confirmDisabled: true,
+  });
+
+  new Renderer(
+    h(
+      'div',
+      { class: 'flex flex-col gap-2' },
+      h(
+        'div',
+        { class: 'flex gap-2 items-center' },
+        h(
+          'div',
+          { class: 'color-picker' },
+          h(
+            'input',
+            {
+              'data-function': 'color-picker',
+              'data-format': 'hex',
+              class: 'w-9 h-9 rounded-full text-transparent',
+              value: '#fff',
+            },
+            '',
+          ),
+        ),
+        input('tag', t['pages:createTag.tag'], '', {
+          maxLength: 10,
+          onInput: (value) => {
+            setConfirmEnabled(value.trim().length >= 3);
+          },
+        }),
+      ),
+      h('div', { class: 'flex justify-end gap-2 mt-4' }, ...btns),
+    ),
+  ).render('content', {
+    onRendered: () => {
+      registerBtnsEvents();
+      document.querySelectorAll(selector).forEach(init);
+      const input = document.getElementById('tag') as HTMLInputElement;
+      input.focus();
+    },
+  });
+</script>

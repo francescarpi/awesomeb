@@ -45,24 +45,34 @@ export class Tooltip {
     this.currentTooltip = tooltip;
 
     this.showTimer = window.setTimeout(() => {
-      const x = this.tooltipPosition(tooltipPosition, e.clientX + 20);
-      this.show(el, tooltip, x, el.getBoundingClientRect().y);
+      const position = this.tooltipPosition(tooltipPosition, e, el);
+      this.show(el, tooltip, position.x, position.y);
       this.visible = true;
       this.showTimer = null;
     }, this.SHOW_DELAY);
   };
 
-  private tooltipPosition = (position: string | null, defaultValue: number): number => {
+  private tooltipPosition = (
+    position: string | null,
+    e: MouseEvent,
+    el: HTMLElement,
+  ): { x: number; y: number } => {
     switch (position) {
+      case 'cursor': {
+        return { x: e.clientX + 20, y: e.clientY + 20 };
+      }
       case 'sidebar-end': {
-        const el = document.getElementById('sidebar-tabs');
-        if (el) {
-          return (el as HTMLDivElement).getBoundingClientRect().right + 5;
+        const sidebar = document.getElementById('sidebar-tabs');
+        if (sidebar) {
+          return {
+            x: (sidebar as HTMLDivElement).getBoundingClientRect().right + 5,
+            y: el.getBoundingClientRect().y,
+          };
         }
         break;
       }
     }
-    return defaultValue;
+    return { x: e.clientX + 20, y: e.clientY + 20 };
   };
 
   private onMouseOut = (e: MouseEvent) => {

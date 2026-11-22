@@ -46,7 +46,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:editURL.value' },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => {
       const fullURLEl = document.getElementById('fullURL') as HTMLInputElement;

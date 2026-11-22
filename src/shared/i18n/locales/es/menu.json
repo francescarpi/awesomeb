@@ -93,7 +93,9 @@
     "removeDivider": "Quitar separador",
     "removeAllDividers": "Quitar todos los separadores",
     "openTargetBlankAsChild": "Abrir enlaces target blank como hija…",
-    "collapseChildren": "Plegar hijas"
+    "collapseChildren": "Plegar hijas",
+    "tags": "Etiquetas",
+    "createTag": "Crear etiqueta"
   },
   "contextWebContents": {
     "back": "Atrás",

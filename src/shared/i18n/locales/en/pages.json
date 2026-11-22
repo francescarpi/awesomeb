@@ -257,7 +257,8 @@
       "profiles": "Profiles",
       "themes": "Themes",
       "permissions": "Permissions",
-      "shortcuts": "Shortcuts"
+      "shortcuts": "Shortcuts",
+      "tags": "Tags"
     },
     "general": {
       "saveChanges": "Save changes",
@@ -355,6 +356,15 @@
       "loading": "Loading...",
       "pressKey": "Press a key...",
       "conflictsWith": "Conflicts with: {{shortcuts}}"
+    },
+    "tags": {
+      "title": "Tags",
+      "desc": "Tags are labels you can put on your tabs to group them by context. You can assign them to a tab from its context menu.",
+      "name": "Name",
+      "color": "Color",
+      "add": "Add tag",
+      "saveChanges": "Save changes",
+      "newTag": "New tag"
     }
   },
   "welcome": {
@@ -422,5 +432,9 @@
     "createFolder": "Create child folder under the selected parent",
     "folderName": "Folder name",
     "close": "Close the tabs after saving them"
+  },
+  "createTag": {
+    "title": "Create tag",
+    "tag": "Tag"
   }
 }

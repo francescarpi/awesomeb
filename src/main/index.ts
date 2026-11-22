@@ -12,6 +12,7 @@ import {
   setupDownloadsIPC,
   setupFaviconsIpc,
   setupTabMarksIpc,
+  setupTabTagsIPC,
   setupCertificatesIPC,
   setupConfigIPC,
   setupExtensionsIPC,
@@ -92,6 +93,7 @@ if (!gotTheLock) {
     setupDownloadsIPC(browser);
     setupFaviconsIpc(browser);
     setupTabMarksIpc(browser);
+    setupTabTagsIPC(browser);
     setupCertificatesIPC(browser);
     setupConfigIPC(browser);
     setupPromptsIpc(browser);

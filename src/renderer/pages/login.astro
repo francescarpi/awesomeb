@@ -22,7 +22,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:login.password' },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => performLogin(),
     onCancel: () => performCancel(),

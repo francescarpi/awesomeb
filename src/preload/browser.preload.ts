@@ -7,6 +7,7 @@ import type {
   ITab,
   TPage,
   TTabId,
+  TTabTagId,
   TFindInPageAction,
   IFindInPageResult,
   IBookmark,
@@ -279,6 +280,13 @@ const abTabMarks = {
 };
 
 //--------------------------------------------------------------------------------------
+const abTabTags = {
+  assign: (winId: TWindowId, tabId: TTabId, tagId: TTabTagId) => {
+    return ipcRenderer.invoke('tabtags:assign', { winId, tabId, tagId });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 const abCertificates = {
   info: (winId: TWindowId) => {
     return ipcRenderer.invoke('certificates:info', { winId });
@@ -298,6 +306,15 @@ const abConfig = {
   },
   save: (config: IConfig) => {
     return ipcRenderer.invoke('config:save', { config });
+  },
+  createTag: (winId: TWindowId, name: string, color: string) => {
+    return ipcRenderer.invoke('config:create-tag', { winId, name, color });
+  },
+  saveTags: (tags: { name: string; color: string }[]) => {
+    return ipcRenderer.invoke('config:save-tags', { tags });
+  },
+  deleteTag: (tagId: string) => {
+    return ipcRenderer.invoke('config:delete-tag', { tagId });
   },
   selectDownloadFolder: () => {
     return ipcRenderer.invoke('config:select-download-folder', {});
@@ -653,6 +670,7 @@ contextBridge.exposeInMainWorld('abDownloads', abDownloads);
 contextBridge.exposeInMainWorld('abFavicons', abFavicons);
 contextBridge.exposeInMainWorld('abTabSwitcher', abTabSwitcher);
 contextBridge.exposeInMainWorld('abTabMarks', abTabMarks);
+contextBridge.exposeInMainWorld('abTabTags', abTabTags);
 contextBridge.exposeInMainWorld('abCertificates', abCertificates);
 contextBridge.exposeInMainWorld('abConfig', abConfig);
 contextBridge.exposeInMainWorld('abExtensions', abExtensions);

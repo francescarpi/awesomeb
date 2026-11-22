@@ -1,9 +1,9 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Menu } from 'electron';
 import type { ContextMenuParams, MenuItemConstructorOptions, WebContents } from 'electron';
 import type { Actions } from 'electron-context-menu';
 import i18next from 'i18next';
-import { Browser, partitions } from '@/core';
+import { Browser, partitions, config } from '@/core';
 import { tabMenu } from './tab';
 import { tabWebContentsMenu } from './tab.webcontents';
 import { IWinDesConTab } from '~/types';
@@ -287,5 +287,123 @@ describe('tabWebContentsMenu - Open link in split view availability', () => {
 
     expect(item).toBeDefined();
     expect(item!.enabled).toBe(true);
+  });
+});
+
+describe('tabMenu - Tags submenu', () => {
+  let browser: Browser;
+  let tabInfo: IWinDesConTab;
+
+  beforeEach(async () => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+
+    const result = await browser.openURL('http://example.com');
+    expect(result).not.toBeNull();
+    tabInfo = browser.getTab(result!.tab.id)!;
+
+    config.set('tags', []);
+    browser.tabTags.removeTab(tabInfo.tab.id);
+  });
+
+  afterEach(() => {
+    config.set('tags', []);
+    browser.tabTags.removeTab(tabInfo.tab.id);
+    vi.restoreAllMocks();
+  });
+
+  function captureTagsSubmenu(): MenuItemConstructorOptions[] {
+    const capturedTemplate: unknown[] = [];
+    vi.spyOn(Menu, 'buildFromTemplate').mockImplementation((template) => {
+      capturedTemplate.push(template);
+      return template as unknown as Menu;
+    });
+
+    tabMenu(browser, tabInfo);
+
+    const template = capturedTemplate[0] as MenuItemConstructorOptions[];
+    const tagsItem = template.find((item) => item.label === 'Tags');
+    expect(tagsItem).toBeDefined();
+
+    return tagsItem!.submenu as MenuItemConstructorOptions[];
+  }
+
+  async function clickTagItem(label: string): Promise<void> {
+    const submenu = captureTagsSubmenu();
+    const tagItem = submenu.find((item) => item.label === label);
+    expect(tagItem).toBeDefined();
+
+    // The click of a menu item is typed as returning void, but ours is async.
+    const click = tagItem!.click as unknown as () => Promise<void>;
+    await click();
+  }
+
+  test('shows only the create entry when there are no tags', () => {
+    const submenu = captureTagsSubmenu();
+
+    expect(submenu).toHaveLength(1);
+    expect(submenu[0].label).toBe('Create tag');
+    expect(submenu.some((item) => item.type === 'separator')).toBe(false);
+  });
+
+  test('lists every tag after a separator', () => {
+    config.createTag('My Tag', '#ff0000');
+    config.createTag('Other Tag', '#00ff00');
+
+    const submenu = captureTagsSubmenu();
+
+    expect(submenu).toHaveLength(4);
+    expect(submenu[0].label).toBe('Create tag');
+    expect(submenu[1].type).toBe('separator');
+    expect(submenu.map((item) => item.label)).toContain('my-tag');
+    expect(submenu.map((item) => item.label)).toContain('other-tag');
+  });
+
+  test('every tag is a checkbox with its name as label', () => {
+    config.createTag('My Tag', '#ff0000');
+
+    const submenu = captureTagsSubmenu();
+    const tagItem = submenu.find((item) => item.label === 'my-tag');
+
+    expect(tagItem).toBeDefined();
+    expect(tagItem!.type).toBe('checkbox');
+  });
+
+  test('checks only the tags assigned to the tab', () => {
+    const assigned = config.createTag('My Tag', '#ff0000');
+    config.createTag('Other Tag', '#00ff00');
+    browser.tabTags.assign(tabInfo.tab.id, assigned.id);
+
+    const submenu = captureTagsSubmenu();
+
+    expect(submenu.find((item) => item.label === 'my-tag')!.checked).toBe(true);
+    expect(submenu.find((item) => item.label === 'other-tag')!.checked).toBe(false);
+  });
+
+  test('every tag has an icon with its color', () => {
+    config.createTag('My Tag', '#ff0000');
+
+    const submenu = captureTagsSubmenu();
+    const tagItem = submenu.find((item) => item.label === 'my-tag');
+
+    expect(tagItem!.icon).toBeDefined();
+  });
+
+  test('clicking a tag that the tab does not have assigns it', async () => {
+    const tag = config.createTag('My Tag', '#ff0000');
+
+    await clickTagItem('my-tag');
+
+    expect(browser.tabTags.get(tabInfo.tab.id)).toEqual([tag.id]);
+  });
+
+  test('clicking a tag that the tab already has removes it', async () => {
+    const tag = config.createTag('My Tag', '#ff0000');
+    browser.tabTags.assign(tabInfo.tab.id, tag.id);
+
+    await clickTagItem('my-tag');
+
+    expect(browser.tabTags.get(tabInfo.tab.id)).toEqual([]);
   });
 });

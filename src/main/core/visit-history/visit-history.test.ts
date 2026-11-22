@@ -1,12 +1,19 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { VisitHistory } from './visit-history';
-import { userDataPath } from '@/paths';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
+
+// Every test gets its own directory for the store. The shared user data
+// folder is not enough: the visit-history hooks are registered by every
+// Browser, so a navigation in another test writes to the same file, and
+// that write is debounced by 750ms, which means it can land after this
+// test has cleaned the file up.
+let testDir: string;
 
 // Helper to get the visit-history file path (must match electron-store's naming)
 function getVisitHistoryFilePath() {
-  return path.join(userDataPath(), 'visit-history.json');
+  return path.join(testDir, 'visit-history.json');
 }
 
 // Helper to clean up visit-history file between tests
@@ -19,15 +26,18 @@ function cleanVisitHistoryFile() {
 
 describe('VisitHistory', () => {
   beforeEach(() => {
-    cleanVisitHistoryFile();
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'visit-history-test-'));
   });
 
   afterEach(() => {
     cleanVisitHistoryFile();
+    fs.rmSync(testDir, { recursive: true, force: true });
   });
 
+  const createVisitHistory = () => new VisitHistory(testDir);
+
   test('constructor with valid defaults succeeds', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     expect(vh).toBeDefined();
     expect(vh.getAll()).toEqual([]);
   });
@@ -42,13 +52,13 @@ describe('VisitHistory', () => {
       }),
     );
 
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     expect(vh).toBeDefined();
     expect(vh.getAll()).toEqual([]);
   });
 
   test('addUrl() creates new HistoryItem', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com', title: 'Example' });
 
     const all = vh.getAll();
@@ -60,7 +70,7 @@ describe('VisitHistory', () => {
   });
 
   test('addUrl() increments visitCount for existing URL', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
     vh.addUrl({ url: 'https://example.com' });
 
@@ -71,7 +81,7 @@ describe('VisitHistory', () => {
   });
 
   test('addUrl() updates title and lastVisitTime', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com', title: 'Old Title' });
 
     // Small delay to ensure time changes
@@ -86,7 +96,7 @@ describe('VisitHistory', () => {
   });
 
   test('search() full-text by url', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://github.com', title: 'GitHub' });
     vh.addUrl({ url: 'https://example.com', title: 'Example' });
 
@@ -96,7 +106,7 @@ describe('VisitHistory', () => {
   });
 
   test('queryHistory() full-text by title', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://github.com', title: 'GitHub' });
     vh.addUrl({ url: 'https://example.com', title: 'Example' });
 
@@ -106,7 +116,7 @@ describe('VisitHistory', () => {
   });
 
   test('queryHistory() with startTime/endTime filter', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const now = Date.now();
 
     vh.addUrl({ url: 'https://old.com' });
@@ -126,7 +136,7 @@ describe('VisitHistory', () => {
   });
 
   test('queryHistory() with maxResults limit', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://a.com' });
     vh.addUrl({ url: 'https://b.com' });
     vh.addUrl({ url: 'https://c.com' });
@@ -135,18 +145,21 @@ describe('VisitHistory', () => {
     expect(results.length).toBe(2);
   });
 
+  // Writing 105 items one by one is slow on purpose: every write rewrites and
+  // re-validates the whole history. It takes under a second on its own, but
+  // close to the default timeout when the whole suite runs in parallel.
   test('queryHistory() default maxResults = 100', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     for (let i = 0; i < 105; i++) {
       vh.addUrl({ url: `https://site-${i}.com` });
     }
 
     const results = vh.queryHistory({});
     expect(results.length).toBe(100);
-  });
+  }, 15000);
 
   test('getVisits() returns visits for URL sorted desc', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
 
     // Add second visit with delay
@@ -158,13 +171,13 @@ describe('VisitHistory', () => {
   });
 
   test('getVisits() returns empty array for unknown URL', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const visits = vh.getVisits({ url: 'https://unknown.com' });
     expect(visits).toEqual([]);
   });
 
   test('deleteUrl() removes HistoryItem', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
     vh.deleteUrl({ url: 'https://example.com' });
 
@@ -172,7 +185,7 @@ describe('VisitHistory', () => {
   });
 
   test('deleteRange() removes visits in range, removes empty HistoryItems', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const now = Date.now();
 
     vh.addUrl({ url: 'https://example.com' });
@@ -194,7 +207,7 @@ describe('VisitHistory', () => {
   });
 
   test('deleteUrls() removes multiple HistoryItems', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
     vh.addUrl({ url: 'https://other.com' });
     vh.addUrl({ url: 'https://third.com' });
@@ -207,7 +220,7 @@ describe('VisitHistory', () => {
   });
 
   test('deleteUrls() ignores non-existent URLs', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
 
     vh.deleteUrls(['https://nonexistent.com', 'https://example.com']);
@@ -216,7 +229,7 @@ describe('VisitHistory', () => {
   });
 
   test('deleteAll() clears everything', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
     vh.addUrl({ url: 'https://other.com' });
 
@@ -225,10 +238,10 @@ describe('VisitHistory', () => {
   });
 
   test('persistence: save with one instance, read with another', () => {
-    const vh1 = new VisitHistory();
+    const vh1 = createVisitHistory();
     vh1.addUrl({ url: 'https://example.com', title: 'Example' });
 
-    const vh2 = new VisitHistory();
+    const vh2 = createVisitHistory();
     const all = vh2.getAll();
     expect(all.length).toBe(1);
     expect(all[0].url).toBe('https://example.com');
@@ -236,7 +249,7 @@ describe('VisitHistory', () => {
   });
 
   test('invalid on-disk data falls back to defaults', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://example.com' });
 
     // Corrupt the file manually to simulate invalid write state
@@ -254,13 +267,13 @@ describe('VisitHistory', () => {
       }),
     );
 
-    const vh2 = new VisitHistory();
+    const vh2 = createVisitHistory();
     expect(vh2).toBeDefined();
     expect(vh2.getAll()).toEqual([]);
   });
 
   test('cleanup removes entries older than retention days', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const now = Date.now();
 
     // Add an entry with an old visit time
@@ -279,7 +292,7 @@ describe('VisitHistory', () => {
   });
 
   test('cleanup keeps entries within retention days', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const now = Date.now();
 
     // Add an entry with a visit time 6 days ago
@@ -299,7 +312,7 @@ describe('VisitHistory', () => {
   });
 
   test('cleanup respects custom retention days', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     const now = Date.now();
 
     // Add an entry 15 days old
@@ -320,7 +333,7 @@ describe('VisitHistory', () => {
   });
 
   test('autocompleteUrls() returns exact match with range', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://github.com', title: 'GitHub' });
 
     const results = vh.autocompleteUrls('github');
@@ -330,7 +343,7 @@ describe('VisitHistory', () => {
   });
 
   test('autocompleteUrls() supports wildcard patterns', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://foobar.com', title: 'Foo Bar' });
 
     const results = vh.autocompleteUrls('foo*bar');
@@ -339,7 +352,7 @@ describe('VisitHistory', () => {
   });
 
   test('autocompleteUrls() returns empty array for no matches', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://github.com', title: 'GitHub' });
 
     const results = vh.autocompleteUrls('nonexistent');
@@ -347,7 +360,7 @@ describe('VisitHistory', () => {
   });
 
   test('autocompleteUrls() respects limit', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://site-a.com' });
     vh.addUrl({ url: 'https://site-b.com' });
     vh.addUrl({ url: 'https://site-c.com' });
@@ -357,7 +370,7 @@ describe('VisitHistory', () => {
   });
 
   test('autocompleteUrls() returns empty array for empty query', () => {
-    const vh = new VisitHistory();
+    const vh = createVisitHistory();
     vh.addUrl({ url: 'https://github.com' });
 
     const results = vh.autocompleteUrls('');

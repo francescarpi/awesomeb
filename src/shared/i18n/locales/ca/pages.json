@@ -257,7 +257,8 @@
       "profiles": "Perfils",
       "themes": "Temes",
       "permissions": "Permisos",
-      "shortcuts": "Dreceres"
+      "shortcuts": "Dreceres",
+      "tags": "Etiquetes"
     },
     "general": {
       "saveChanges": "Desa els canvis",
@@ -355,6 +356,15 @@
       "loading": "Carregant...",
       "pressKey": "Prem una tecla...",
       "conflictsWith": "Entra en conflicte amb: {{shortcuts}}"
+    },
+    "tags": {
+      "title": "Etiquetes",
+      "desc": "Les etiquetes són etiquetes que pots posar a les pestanyes per agrupar-les per context. Les pots assignar a una pestanya des del seu menú contextual.",
+      "name": "Nom",
+      "color": "Color",
+      "add": "Afegeix etiqueta",
+      "saveChanges": "Desa els canvis",
+      "newTag": "Etiqueta nova"
     }
   },
   "welcome": {
@@ -422,5 +432,9 @@
     "createFolder": "Crear carpeta filla sota el pare seleccionat",
     "folderName": "Nom de la carpeta",
     "close": "Tanca les pestanyes després de desar-les"
+  },
+  "createTag": {
+    "title": "Crear etiqueta",
+    "tag": "Etiqueta"
   }
 }

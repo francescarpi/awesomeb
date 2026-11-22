@@ -267,6 +267,10 @@
     "name": "Toggle Mute",
     "description": "Toggles the mute state of the current tab."
   },
+  "toggleTabTag": {
+    "name": "Toggle Tag",
+    "description": "Adds the tag to the tab, or removes it if the tab already has it."
+  },
   "toggleOpenTabsAsChild": {
     "name": "Toggle Open Tabs As Child",
     "description": "Toggles whether new tabs opened from this tab become its children."

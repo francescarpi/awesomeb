@@ -19,7 +19,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:renameDesktop.longName' },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => {
       const shortNameField = document.getElementById('shortName') as HTMLInputElement;

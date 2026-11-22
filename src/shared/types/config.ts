@@ -4,6 +4,7 @@ export type {
   IConfig,
   IConfigPartition,
   IConfigSearchEngine,
+  IConfigTag,
   IConfigTheme,
   TSearchEngineCode,
 } from '@/core/config/schemes';

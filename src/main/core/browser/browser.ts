@@ -16,6 +16,7 @@ import {
   AppUpdater,
   Bookmarks,
   Favicons,
+  tabTags,
 } from '@/core';
 import { Desktop } from '@/core/desktop/desktop';
 import { TabContainer } from '@/core/tab/tab-container';
@@ -67,6 +68,7 @@ export class Browser {
   public readonly appUpdater = new AppUpdater(this);
   public readonly bookmarks = new Bookmarks(this);
   public readonly favicons = new Favicons();
+  public readonly tabTags = tabTags;
 
   constructor() {
     registerBrowserEvents(this);
@@ -663,6 +665,7 @@ export class Browser {
     tabContainer.deleteTab(tabId);
     this.favicons.deleteFavicon(tabId);
     history.delete(tabId);
+    this.tabTags.removeTab(tabId);
 
     if (tabContainer.tabs.length === 0) {
       this.unindexTabContainer(tabContainer.id);

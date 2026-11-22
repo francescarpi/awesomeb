@@ -2,10 +2,14 @@ import Store from 'electron-store';
 import { userDataPath } from '@/paths';
 import path from 'path';
 import os from 'os';
-import { EPermissionConfigType } from '~/types';
-import { ConfigScheme, type IConfig, type IConfigSearchEngine } from './schemes';
+import { randomUUID } from 'crypto';
+import slugify from 'slugify';
+import { EPermissionConfigType, type TTabTagId } from '~/types';
+import { ConfigScheme, type IConfig, type IConfigSearchEngine, type IConfigTag } from './schemes';
 import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
+import { contrastingTextColor } from '@/utils';
+import { tabTags } from '@/core/tab-tags';
 
 export class Config extends Store<IConfig> {
   private _validatedStore: IConfig | null = null;
@@ -16,6 +20,7 @@ export class Config extends Store<IConfig> {
       partitions: [],
       downloadsFolder: path.join(os.homedir(), 'Downloads'),
       themes: [],
+      tags: [],
       permissionsType: EPermissionConfigType.Standard,
       shortcutMap: DEFAULT_SHORTCUTS_MAP,
       shortcutsOverrides: {},
@@ -85,5 +90,80 @@ export class Config extends Store<IConfig> {
 
   get wasConfigured(): boolean {
     return this.getProperty('searchEngines').length > 0;
+  }
+
+  createTag(name: string, color: string): IConfigTag {
+    const slug = slugify(name, { lower: true, strict: true }).slice(0, 10);
+
+    if (slug.length < 3) {
+      throw new Error('Tag name must be at least 3 characters long');
+    }
+
+    const tags = this.getProperty('tags');
+    const existing = tags.find((tag) => tag.name === slug);
+
+    if (existing) {
+      return existing;
+    }
+
+    const tag: IConfigTag = {
+      id: randomUUID(),
+      color,
+      textColor: contrastingTextColor(color),
+      name: slug,
+    };
+
+    this.save({ ...this.config, tags: [...tags, tag] });
+
+    return tag;
+  }
+
+  removeTag(tagId: TTabTagId): void {
+    const tags = this.getProperty('tags');
+    const remaining = tags.filter((tag) => tag.id !== tagId);
+
+    if (remaining.length === tags.length) {
+      return;
+    }
+
+    this.save({ ...this.config, tags: remaining });
+
+    tabTags.removeTag(tagId);
+  }
+
+  saveTags(tags: { name: string; color: string }[]): void {
+    const current = this.getProperty('tags');
+    const result: IConfigTag[] = [];
+
+    for (const tag of tags) {
+      const slug = slugify(tag.name, { lower: true, strict: true }).slice(0, 10);
+
+      if (slug.length < 3) {
+        throw new Error('Tag name must be at least 3 characters long');
+      }
+
+      if (result.some((t) => t.name === slug)) {
+        throw new Error(`A tag named "${slug}" already exists`);
+      }
+
+      const existing = current.find((t) => t.name === slug);
+
+      result.push(
+        existing
+          ? { ...existing, color: tag.color, textColor: contrastingTextColor(tag.color) }
+          : {
+              id: randomUUID(),
+              color: tag.color,
+              textColor: contrastingTextColor(tag.color),
+              name: slug,
+            },
+      );
+    }
+
+    for (const removed of current.filter((t) => !result.some((r) => r.id === t.id))) {
+      tabTags.removeTag(removed.id);
+    }
+
+    this.save({ ...this.config, tags: result });
   }
 }

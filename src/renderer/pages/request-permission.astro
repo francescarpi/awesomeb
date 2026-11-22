@@ -19,7 +19,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:requestPermission.message', params: { host, permission } },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => {
       abTabs.grantPermission(winId, tabId, true);

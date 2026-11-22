@@ -93,7 +93,9 @@
     "removeDivider": "Treu el separador",
     "removeAllDividers": "Treu tots els separadors",
     "openTargetBlankAsChild": "Obre els enllaços target blank com a fills…",
-    "collapseChildren": "Replega les filles"
+    "collapseChildren": "Replega les filles",
+    "tags": "Etiquetes",
+    "createTag": "Crear etiqueta"
   },
   "contextWebContents": {
     "back": "Enrere",
