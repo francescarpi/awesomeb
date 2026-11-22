@@ -255,6 +255,26 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
         highlightIcon(Muted, t.isMuted, 'text-white'),
         highlightIcon(Warning, t.requireAttention, 'text-red-500'),
       ),
+      ...(t.tags.length > 0
+        ? [
+            h(
+              'div', // Tags container
+              { class: 'flex gap-1 items-center' },
+              ...t.tags.map((tag) =>
+                h(
+                  'div', // Tag color dot
+                  {
+                    class: 'w-1.5 h-1.5 rounded-full',
+                    style: { backgroundColor: tag.color },
+                    'data-tooltip': tag.name,
+                    'data-tooltip-position': 'cursor',
+                  },
+                  '',
+                ),
+              ),
+            ),
+          ]
+        : []),
     ),
     h(
       'div', // Partition and actions container

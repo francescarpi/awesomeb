@@ -1,4 +1,4 @@
-import { Browser, config, notification, getTheme } from '@/core';
+import { Browser, Window, config, notification, getTheme } from '@/core';
 import { t } from '~/i18n';
 import {
   createHandler,
@@ -76,14 +76,18 @@ export function setupConfigIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
-  createHandler<{ name: string; color: string }>(
+  createHandler<{ name: string; color: string; win: Window }>(
     'config:create-tag',
     'handle',
     browser,
     [windowChecker, modalChecker],
-    async ({ name, color }) => {
+    async ({ name, color, win }) => {
       try {
-        return config.createTag(name, color);
+        const tag = config.createTag(name, color);
+
+        browser.toRenderer.refreshTabContainers(win);
+
+        return tag;
       } catch (error) {
         scopeLog.error('Error creating tag:', error);
         return null;

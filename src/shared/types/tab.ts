@@ -36,6 +36,12 @@ export interface ITab {
   favicon: string | null;
   isClosed: boolean;
   openTabsAsChild: boolean;
+  tags: ITabTag[];
+}
+
+export interface ITabTag {
+  name: string;
+  color: string;
 }
 
 export interface ITabPartition {

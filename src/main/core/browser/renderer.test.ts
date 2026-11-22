@@ -1,6 +1,6 @@
-import { beforeAll, expect, test, describe, beforeEach, vi } from 'vitest';
+import { beforeAll, expect, test, describe, beforeEach, afterEach, vi } from 'vitest';
 import { app } from 'electron';
-import { Browser, partitions, Window } from '@/core';
+import { Browser, partitions, Window, config } from '@/core';
 import type { UIView } from '@/ui';
 import { initI18n } from '~/i18n';
 
@@ -257,6 +257,54 @@ describe('Renderer', () => {
       expect(typeof childTab.title).toBe('string');
       expect(childTab.desktopId).toBeDefined();
       expect(childTab.windowId).toBeDefined();
+    });
+  });
+
+  describe('tabContainers - tags', () => {
+    beforeEach(() => {
+      config.set('tags', []);
+    });
+
+    afterEach(() => {
+      config.set('tags', []);
+    });
+
+    test('a tab without tags is serialized with an empty tags array', async () => {
+      const opened = await browser.openURL('http://example.com');
+
+      const rendered = browser.renderer.tabContainers(window);
+      const tabContainer = rendered.find((t) => t.id === opened!.tabContainer.id);
+      const tab = tabContainer!.tabs.find((t) => t.id === opened!.tab.id);
+
+      expect(tab!.tags).toEqual([]);
+    });
+
+    test('a tab is serialized with the name and color of its tags', async () => {
+      const opened = await browser.openURL('http://example.com');
+
+      const tag = config.createTag('My Tag', '#ff0000');
+      browser.tabTags.assign(opened!.tab.id, tag.id);
+
+      const rendered = browser.renderer.tabContainers(window);
+      const tabContainer = rendered.find((t) => t.id === opened!.tabContainer.id);
+      const tab = tabContainer!.tabs.find((t) => t.id === opened!.tab.id);
+
+      expect(tab!.tags).toEqual([{ name: 'my-tag', color: '#ff0000' }]);
+    });
+
+    test('a tag that is no longer in the config is not serialized', async () => {
+      const opened = await browser.openURL('http://example.com');
+
+      const tag = config.createTag('My Tag', '#ff0000');
+      browser.tabTags.assign(opened!.tab.id, tag.id);
+
+      config.set('tags', []);
+
+      const rendered = browser.renderer.tabContainers(window);
+      const tabContainer = rendered.find((t) => t.id === opened!.tabContainer.id);
+      const tab = tabContainer!.tabs.find((t) => t.id === opened!.tab.id);
+
+      expect(tab!.tags).toEqual([]);
     });
   });
 

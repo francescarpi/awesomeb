@@ -38,5 +38,10 @@ export const Command: ICommand<ICommandParams> = {
     } else {
       browser.tabTags.assign(targetTab.id, tagId);
     }
+
+    const tabData = browser.getTab(targetTab.id);
+    if (tabData) {
+      browser.toRenderer.refreshTabContainers(tabData.window);
+    }
   },
 };

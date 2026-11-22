@@ -520,6 +520,24 @@ describe('Commands', () => {
         }),
       ).toBe(false);
     });
+
+    test('toggle-tab-tag: should refresh the tab containers', async () => {
+      const window = browser.activeWindow!;
+      browser.openURL('https://example.com');
+      const desktop = window.selectedDesktop!;
+      const tab = desktop.tabContainers[0].tabs[0];
+
+      const refreshSpy = vi
+        .spyOn(browser.toRenderer, 'refreshTabContainers')
+        .mockImplementation(() => {});
+
+      await browser.performCommand(window, tabToggleTag.TRIGGER, {
+        tabId: tab.id,
+        tagId: 'tag-1',
+      });
+
+      expect(refreshSpy).toHaveBeenCalledWith(window);
+    });
   });
 
   describe('Tab Container Commands', () => {

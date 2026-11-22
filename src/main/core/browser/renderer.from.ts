@@ -22,6 +22,7 @@ import type {
   IDebugTabIndex,
   IDesConTab,
   IConTab,
+  IConfigTag,
 } from '~/types';
 import { EDownloadStatus } from '~/types';
 import {
@@ -263,6 +264,11 @@ export class BrowserRenderer {
       favicon: tab.favicon,
       isClosed: tab.isClosed,
       openTabsAsChild: tab.openTabsAsChild,
+      tags: this.browser.tabTags
+        .get(tab.id)
+        .map((tagId) => config.getProperty('tags').find((t) => t.id === tagId))
+        .filter((t): t is IConfigTag => !!t)
+        .map((t) => ({ name: t.name, color: t.color })),
     };
   }
 
