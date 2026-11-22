@@ -11,7 +11,7 @@ import {
   findInPageChecker,
   tabChecker,
 } from '@/utils';
-import type { IConfig, IWinDesConTab, IConfigInfo } from '~/types';
+import type { IConfig, IWinDesConTab, IConfigInfo, TTabTagId } from '~/types';
 import { dialog, app, shell } from 'electron';
 import { userDataPath, getRepoUrl } from '@/paths';
 import log from 'electron-log';
@@ -92,6 +92,52 @@ export function setupConfigIPC(browser: Browser) {
         scopeLog.error('Error creating tag:', error);
         return null;
       }
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tags: { name: string; color: string }[] }>(
+    'config:save-tags',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, ['settings'])],
+    async ({ tags }) => {
+      try {
+        config.saveTags(tags);
+      } catch (error) {
+        scopeLog.error('Error saving tags:', error);
+        notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+        return null;
+      }
+
+      browser.toRenderer.refreshConfig();
+
+      for (const window of browser.windows) {
+        browser.toRenderer.refreshTabContainers(window);
+      }
+
+      notification(t('notifications:settingsSaved.title'), t('notifications:settingsSaved.body'));
+
+      return config.config;
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
+  createHandler<{ tagId: TTabTagId }>(
+    'config:delete-tag',
+    'handle',
+    browser,
+    [internalPageChecker.bind(null, ['settings'])],
+    async ({ tagId }) => {
+      config.removeTag(tagId);
+
+      browser.toRenderer.refreshConfig();
+
+      for (const window of browser.windows) {
+        browser.toRenderer.refreshTabContainers(window);
+      }
+
+      return config.config;
     },
   );
 

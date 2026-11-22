@@ -377,3 +377,96 @@ describe('Config.removeTag', () => {
     expect(tabTags.get(12)).toEqual([tag.id]);
   });
 });
+
+describe('Config.saveTags', () => {
+  beforeEach(() => {
+    tabTags.removeTab(12);
+    tabTags.removeTab(13);
+  });
+
+  afterEach(() => {
+    tabTags.removeTab(12);
+    tabTags.removeTab(13);
+  });
+
+  test('creates a tag with an id and a readable text color', () => {
+    const config = new Config();
+
+    config.saveTags([{ name: 'My Tag', color: '#ffffff' }]);
+
+    const tags = config.getProperty('tags');
+    expect(tags).toHaveLength(1);
+    expect(tags[0].id).toBeTruthy();
+    expect(tags[0].name).toBe('my-tag');
+    expect(tags[0].color).toBe('#ffffff');
+    expect(tags[0].textColor).toBe('#000000');
+  });
+
+  test('keeps the id of a tag that already existed', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    config.saveTags([{ name: 'My Tag', color: '#ff0000' }]);
+
+    expect(config.getProperty('tags')[0].id).toBe(tag.id);
+  });
+
+  test('updates the color and the text color of an existing tag', () => {
+    const config = new Config();
+
+    config.createTag('My Tag', '#ff0000');
+    config.saveTags([{ name: 'My Tag', color: '#000000' }]);
+
+    const tags = config.getProperty('tags');
+    expect(tags[0].color).toBe('#000000');
+    expect(tags[0].textColor).toBe('#ffffff');
+  });
+
+  test('slugifies the given name', () => {
+    const config = new Config();
+
+    config.saveTags([{ name: 'My Tag', color: '#ffffff' }]);
+
+    expect(config.getProperty('tags')[0].name).toBe('my-tag');
+  });
+
+  test('rejects a name that slugifies to less than 3 characters', () => {
+    const config = new Config();
+
+    expect(() => config.saveTags([{ name: 'ab', color: '#ffffff' }])).toThrow();
+  });
+
+  test('rejects two names that slugify to the same tag', () => {
+    const config = new Config();
+
+    expect(() =>
+      config.saveTags([
+        { name: 'My Tag', color: '#ffffff' },
+        { name: 'my-tag', color: '#000000' },
+      ]),
+    ).toThrow();
+  });
+
+  test('removes the tags that are not in the given list', () => {
+    const config = new Config();
+
+    config.createTag('My Tag', '#ff0000');
+    config.createTag('Other Tag', '#00ff00');
+
+    config.saveTags([{ name: 'My Tag', color: '#ff0000' }]);
+
+    expect(config.getProperty('tags')).toHaveLength(1);
+    expect(config.getProperty('tags')[0].name).toBe('my-tag');
+  });
+
+  test('removes the tags that are gone from the tabs that had them', () => {
+    const config = new Config();
+
+    const tag = config.createTag('My Tag', '#ff0000');
+    tabTags.assign(12, tag.id);
+
+    config.saveTags([]);
+
+    expect(tabTags.get(12)).toEqual([]);
+  });
+});

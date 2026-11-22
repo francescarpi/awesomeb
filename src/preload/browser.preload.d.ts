@@ -188,6 +188,8 @@ declare global {
     openConfigFolder: () => Promise<void>;
     save: (config: IConfig) => Promise<IConfig>;
     createTag: (winId: TWindowId, name: string, color: string) => Promise<IConfigTag | null>;
+    saveTags: (tags: { name: string; color: string }[]) => Promise<IConfig | null>;
+    deleteTag: (tagId: string) => Promise<IConfig>;
     selectDownloadFolder: () => Promise<string | null>;
     refresh: (callback: (event: IpcRendererEvent, config: IConfig) => void) => void;
   };

@@ -257,7 +257,8 @@
       "profiles": "Perfiles",
       "themes": "Temas",
       "permissions": "Permisos",
-      "shortcuts": "Atajos"
+      "shortcuts": "Atajos",
+      "tags": "Etiquetas"
     },
     "general": {
       "saveChanges": "Guardar cambios",
@@ -355,6 +356,15 @@
       "loading": "Cargando...",
       "pressKey": "Pulsa una tecla...",
       "conflictsWith": "Entra en conflicto con: {{shortcuts}}"
+    },
+    "tags": {
+      "title": "Etiquetas",
+      "desc": "Las etiquetas son etiquetas que puedes poner en tus pestañas para agruparlas por contexto. Puedes asignarlas a una pestaña desde su menú contextual.",
+      "name": "Nombre",
+      "color": "Color",
+      "add": "Añadir etiqueta",
+      "saveChanges": "Guardar cambios",
+      "newTag": "Nueva etiqueta"
     }
   },
   "welcome": {

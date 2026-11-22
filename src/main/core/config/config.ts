@@ -135,4 +135,40 @@ export class Config extends Store<IConfig> {
 
     tabTags.removeTag(tagId);
   }
+
+  saveTags(tags: { name: string; color: string }[]): void {
+    const current = this.getProperty('tags');
+    const result: IConfigTag[] = [];
+
+    for (const tag of tags) {
+      const slug = slugify(tag.name, { lower: true, strict: true }).slice(0, 10);
+
+      if (slug.length < 3) {
+        throw new Error('Tag name must be at least 3 characters long');
+      }
+
+      if (result.some((t) => t.name === slug)) {
+        throw new Error(`A tag named "${slug}" already exists`);
+      }
+
+      const existing = current.find((t) => t.name === slug);
+
+      result.push(
+        existing
+          ? { ...existing, color: tag.color, textColor: contrastingTextColor(tag.color) }
+          : {
+              id: randomUUID(),
+              color: tag.color,
+              textColor: contrastingTextColor(tag.color),
+              name: slug,
+            },
+      );
+    }
+
+    for (const removed of current.filter((t) => !result.some((r) => r.id === t.id))) {
+      tabTags.removeTag(removed.id);
+    }
+
+    this.save({ ...this.config, tags: result });
+  }
 }

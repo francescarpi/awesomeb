@@ -310,6 +310,12 @@ const abConfig = {
   createTag: (winId: TWindowId, name: string, color: string) => {
     return ipcRenderer.invoke('config:create-tag', { winId, name, color });
   },
+  saveTags: (tags: { name: string; color: string }[]) => {
+    return ipcRenderer.invoke('config:save-tags', { tags });
+  },
+  deleteTag: (tagId: string) => {
+    return ipcRenderer.invoke('config:delete-tag', { tagId });
+  },
   selectDownloadFolder: () => {
     return ipcRenderer.invoke('config:select-download-folder', {});
   },
