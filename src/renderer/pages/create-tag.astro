@@ -14,7 +14,7 @@ import '@thednp/color-picker/color-picker.css';
   import ColorPicker from '@thednp/color-picker';
 
   const { winId, searchParams } = getSearchParams();
-  const tabId = searchParams.get('tabId');
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
   const { init, selector } = ColorPicker;
 
   const t = await abI18n.t({ winId }, [{ key: 'pages:createTag.tag' }]);
@@ -31,7 +31,11 @@ import '@thednp/color-picker/color-picker.css';
         'input[data-function="color-picker"]',
       ) as HTMLInputElement;
 
-      await abConfig.createTag(nameInput.value, colorInput.value);
+      const tag = await abConfig.createTag(winId, nameInput.value, colorInput.value);
+
+      if (tag) {
+        await abTabTags.assign(winId, tabId, tag.id);
+      }
 
       abModal.close(winId);
     },

@@ -96,4 +96,18 @@ describe('Config IPC', () => {
     expect(result).toBeUndefined();
     expect(config.getProperty('tags')).toEqual([]);
   });
+
+  test('config:create-tag returns undefined without a window id', async () => {
+    const win = browser.getWindow(1)!;
+    win.modal.open('create-tag');
+
+    const handler = handlers.get('config:create-tag')!;
+    const result = await handler(fakeEvent, {
+      name: 'My Tag',
+      color: '#ff0000',
+    });
+
+    expect(result).toBeUndefined();
+    expect(config.getProperty('tags')).toEqual([]);
+  });
 });
