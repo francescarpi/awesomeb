@@ -81,6 +81,17 @@ describe('TabTags IPC', () => {
     expect(browser.tabTags.get(tabId)).toEqual(['tag-1', 'tag-2']);
   });
 
+  test('tabtags:assign refreshes the tab containers', async () => {
+    const refreshSpy = vi
+      .spyOn(browser.toRenderer, 'refreshTabContainers')
+      .mockImplementation(() => {});
+
+    const handler = handlers.get('tabtags:assign')!;
+    await handler(fakeEvent, { winId: 1, tabId, tagId: 'tag-1' });
+
+    expect(refreshSpy).toHaveBeenCalledWith(browser.getWindow(1));
+  });
+
   test('tabtags:assign returns undefined when the tab does not exist', async () => {
     const handler = handlers.get('tabtags:assign')!;
     const result = await handler(fakeEvent, {
