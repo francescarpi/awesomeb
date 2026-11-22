@@ -21,7 +21,7 @@ import { validateStore } from '@/core/validation';
 export class VisitHistory {
   private readonly _store: Store<IVisitHistory>;
 
-  constructor() {
+  constructor(cwd: string = userDataPath()) {
     const defaults: IVisitHistory = { history: [] };
 
     // Validate defaults before passing to electron-store
@@ -29,7 +29,7 @@ export class VisitHistory {
 
     this._store = new Store<IVisitHistory>({
       name: 'visit-history',
-      cwd: userDataPath(),
+      cwd,
       defaults,
     });
 
