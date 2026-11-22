@@ -14,7 +14,7 @@ import Modal from '#/layouts/Modal.astro';
   const message = searchParams.get('message') as string;
   const url = new URL(searchParams.get('url') as string);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => abPrompts.response(winId, true),
     onCancel: () => abPrompts.response(winId, false),

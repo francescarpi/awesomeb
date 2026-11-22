@@ -26,7 +26,7 @@ import Title from '#/components/common/Title.astro';
     { key: 'pages:addBookmark.folderName' },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: async () => {
       const folderNameInput = document.getElementById('folder-name') as HTMLInputElement;

@@ -24,7 +24,7 @@ import Layout from '#/layouts/Base.astro';
     { key: 'pages:tabFailLoad.retry' },
   ]);
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     confirmText: t['pages:tabFailLoad.retry'],
     onConfirm: () => {

@@ -11,7 +11,7 @@ import Modal from '#/layouts/Modal.astro';
 
   const { winId } = getSearchParams();
 
-  const [btns, registerBtnsEvents] = await confirmButtons({
+  const { vnode: btns, registerEvents: registerBtnsEvents } = await confirmButtons({
     winId,
     onConfirm: () => abCommands.perform(winId, 'clear-closed-tabs'),
     onCancel: () => abModal.close(winId),
