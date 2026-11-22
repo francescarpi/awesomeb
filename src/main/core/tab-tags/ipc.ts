@@ -1,4 +1,4 @@
-import { Browser, tabTags } from '@/core';
+import { Browser } from '@/core';
 import { createHandler, windowChecker, tabChecker } from '@/utils';
 import type { TTabId, TTabTagId } from '~/types';
 
@@ -10,9 +10,9 @@ export function setupTabTagsIPC(browser: Browser) {
     browser,
     [windowChecker, tabChecker],
     async ({ tabId, tagId }) => {
-      tabTags.assign(tabId, tagId);
+      browser.tabTags.assign(tabId, tagId);
 
-      return tabTags.get(tabId);
+      return browser.tabTags.get(tabId);
     },
   );
 }

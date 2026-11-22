@@ -1,4 +1,4 @@
-import { Browser, Window, partitions } from '@/core';
+import { Browser, Window, partitions, config } from '@/core';
 import { Menu, MenuItemConstructorOptions } from 'electron';
 import { EIcon, getIcon } from './utils';
 import { EBookmarkType, IBookmark, IWinDesConTab } from '~/types';
@@ -183,6 +183,17 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
             });
           },
         },
+        ...(config.getProperty('tags').length > 0
+          ? [
+              { type: 'separator' } as MenuItemConstructorOptions,
+              ...config.getProperty('tags').map((tag) => ({
+                label: tag.name,
+                icon: createColorImage(tag.color),
+                type: 'checkbox' as const,
+                checked: browser.tabTags.get(tab.id).includes(tag.id),
+              })),
+            ]
+          : []),
       ],
     },
     { type: 'separator' },

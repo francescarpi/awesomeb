@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
-import { Browser, partitions, tabTags } from '@/core';
+import { Browser, partitions } from '@/core';
 import { setupTabTagsIPC } from './ipc';
 import { userDataPath } from '@/paths';
 import fs from 'fs';
@@ -50,7 +50,7 @@ describe('TabTags IPC', () => {
   });
 
   afterEach(() => {
-    tabTags.removeTab(tabId);
+    browser.tabTags.removeTab(tabId);
     cleanTabTagsFile();
     vi.restoreAllMocks();
   });
@@ -68,7 +68,7 @@ describe('TabTags IPC', () => {
     });
 
     expect(result).toEqual(['tag-1']);
-    expect(tabTags.get(tabId)).toEqual(['tag-1']);
+    expect(browser.tabTags.get(tabId)).toEqual(['tag-1']);
   });
 
   test('tabtags:assign keeps the tags already assigned to the tab', async () => {
@@ -78,7 +78,7 @@ describe('TabTags IPC', () => {
     const result = await handler(fakeEvent, { winId: 1, tabId, tagId: 'tag-2' });
 
     expect(result).toEqual(['tag-1', 'tag-2']);
-    expect(tabTags.get(tabId)).toEqual(['tag-1', 'tag-2']);
+    expect(browser.tabTags.get(tabId)).toEqual(['tag-1', 'tag-2']);
   });
 
   test('tabtags:assign returns undefined when the tab does not exist', async () => {
@@ -90,6 +90,6 @@ describe('TabTags IPC', () => {
     });
 
     expect(result).toBeUndefined();
-    expect(tabTags.get(9999)).toEqual([]);
+    expect(browser.tabTags.get(9999)).toEqual([]);
   });
 });
