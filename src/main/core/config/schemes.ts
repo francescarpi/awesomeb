@@ -30,6 +30,7 @@ export const ConfigTagScheme = z
   .object({
     id: z.string(),
     color: z.string(),
+    textColor: z.string(),
     name: z.string(),
   })
   .strict();

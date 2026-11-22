@@ -64,9 +64,14 @@ describe('Config IPC', () => {
       color: '#ff0000',
     });
 
-    expect(result).toEqual({ id: expect.any(String), color: '#ff0000', name: 'my-tag' });
+    expect(result).toEqual({
+      id: expect.any(String),
+      color: '#ff0000',
+      textColor: '#000000',
+      name: 'my-tag',
+    });
     expect(config.getProperty('tags')).toEqual([
-      { id: expect.any(String), color: '#ff0000', name: 'my-tag' },
+      { id: expect.any(String), color: '#ff0000', textColor: '#000000', name: 'my-tag' },
     ]);
   });
 

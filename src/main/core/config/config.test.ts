@@ -217,6 +217,29 @@ describe('Config.createTag', () => {
     expect(first.id).not.toBe(second.id);
   });
 
+  test('picks a readable text color for a light background', () => {
+    const config = new Config();
+
+    expect(config.createTag('White', '#ffffff').textColor).toBe('#000000');
+    expect(config.createTag('Yellow', '#ffff00').textColor).toBe('#000000');
+    expect(config.createTag('Red', '#ff0000').textColor).toBe('#000000');
+  });
+
+  test('picks a readable text color for a dark background', () => {
+    const config = new Config();
+
+    expect(config.createTag('Black', '#000000').textColor).toBe('#ffffff');
+    expect(config.createTag('Blue', '#0000ff').textColor).toBe('#ffffff');
+    expect(config.createTag('Brown', '#8b4513').textColor).toBe('#ffffff');
+  });
+
+  test('picks a readable text color for a short hex color', () => {
+    const config = new Config();
+
+    expect(config.createTag('Light', '#fff').textColor).toBe('#000000');
+    expect(config.createTag('Dark', '#000').textColor).toBe('#ffffff');
+  });
+
   test('slugifies the given name', () => {
     const config = new Config();
 

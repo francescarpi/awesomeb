@@ -13,6 +13,7 @@ import {
 } from './schemes';
 import { DEFAULT_UI_THEME, DEFAULT_SHORTCUTS_MAP } from '~/constants';
 import { validateStore } from '@/core/validation';
+import { contrastingTextColor } from '@/utils';
 import { tabTags } from '@/core/tab-tags';
 
 export class Config extends Store<IConfig> {
@@ -110,7 +111,12 @@ export class Config extends Store<IConfig> {
       return existing;
     }
 
-    const tag: IConfigTag = { id: randomUUID(), color, name: slug };
+    const tag: IConfigTag = {
+      id: randomUUID(),
+      color,
+      textColor: contrastingTextColor(color),
+      name: slug,
+    };
 
     this.save({ ...this.config, tags: [...tags, tag] });
 

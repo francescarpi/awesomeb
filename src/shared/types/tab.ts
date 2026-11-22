@@ -42,6 +42,7 @@ export interface ITab {
 export interface ITabTag {
   name: string;
   color: string;
+  textColor: string;
 }
 
 export interface ITabPartition {

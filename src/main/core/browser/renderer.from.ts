@@ -268,7 +268,7 @@ export class BrowserRenderer {
         .get(tab.id)
         .map((tagId) => config.getProperty('tags').find((t) => t.id === tagId))
         .filter((t): t is IConfigTag => !!t)
-        .map((t) => ({ name: t.name, color: t.color })),
+        .map((t) => ({ name: t.name, color: t.color, textColor: t.textColor })),
     };
   }
 

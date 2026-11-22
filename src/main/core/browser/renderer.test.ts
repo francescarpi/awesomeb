@@ -289,7 +289,9 @@ describe('Renderer', () => {
       const tabContainer = rendered.find((t) => t.id === opened!.tabContainer.id);
       const tab = tabContainer!.tabs.find((t) => t.id === opened!.tab.id);
 
-      expect(tab!.tags).toEqual([{ name: 'my-tag', color: '#ff0000' }]);
+      expect(tab!.tags).toEqual([
+        { name: 'my-tag', color: '#ff0000', textColor: '#000000' },
+      ]);
     });
 
     test('a tag that is no longer in the config is not serialized', async () => {
