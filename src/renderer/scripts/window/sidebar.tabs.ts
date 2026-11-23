@@ -18,15 +18,7 @@ export async function renderTabContainers(
   renderer.update(
     await Promise.all(
       tabContainers.map(async (tc) => {
-        const openCount = tc.children.filter((t) => !t.isClosed).length;
-        const r = await abI18n.t({ winId }, [
-          { key: 'pages:tabContainers.collapsedTabs', params: { count: openCount } },
-          { key: 'pages:tabContainers.collapse', params: { count: openCount } },
-        ]);
-
-        const collapsedText = tc.collapseChildren
-          ? r['pages:tabContainers.collapsedTabs']
-          : r['pages:tabContainers.collapse'];
+        const childrenCount = tc.children.filter((t) => !t.isClosed).length;
 
         return h(
           'div', // Tab Container
@@ -68,44 +60,64 @@ export async function renderTabContainers(
               ...tc.tabs.map((t) => renderTab(winId, t)),
             ),
           ),
-          ...tc.children.map((tcc) =>
-            h(
-              'div',
-              {
-                key: tcc.id,
-                'data-tab-container-id': String(tcc.id),
-                class: c(
-                  'group-[.collapsed]/sidebar:ml-1',
-                  'ml-6',
-                  'relative',
-                  tc.collapseChildren && 'hidden',
-                  tcc.isSplit && 'border border-white/20 border-dashed rounded-xl',
+          ...(childrenCount === 0
+            ? []
+            : [
+                h(
+                  'div',
+                  {
+                    class: 'relative group/collapse',
+                  },
+                  h('div', {
+                    class: c(
+                      'absolute',
+                      'top-0',
+                      '-bottom-1',
+                      'right-2',
+                      'border-l-2',
+                      'border-b-2',
+                      !tc.collapseChildren && 'rounded-bl-lg',
+                      'border-white/50',
+                      'transition-all',
+                      'cursor-pointer',
+                      'hover:border-white',
+                      'hover:border-l-4',
+                      'hover:border-b-4',
+                      'before:absolute',
+                      'before:inset-0',
+                      'before:border-l-2',
+                      'before:border-b-2',
+                      'before:border-transparent',
+                      'before:pointer-events-auto',
+                      tc.collapseChildren ? 'left-4' : 'left-4.5',
+                      'group-[.collapsed]/sidebar:hidden',
+                    ),
+                    onclick: () => {
+                      abCommands.perform(winId, 'toggle-collapse-children', {
+                        tabContainerId: tc.id,
+                      });
+                    },
+                  }), //frame
+                  ...tc.children.map((tcc) =>
+                    h(
+                      'div',
+                      {
+                        key: tcc.id,
+                        'data-tab-container-id': String(tcc.id),
+                        class: c(
+                          'group-[.collapsed]/sidebar:ml-1',
+                          'ml-6',
+                          'relative',
+                          'z-10',
+                          tc.collapseChildren && 'hidden',
+                          tcc.isSplit && 'border border-white/20 border-dashed rounded-xl',
+                        ),
+                      },
+                      ...tcc.tabs.map((tcct) => renderTab(winId, tcct)),
+                    ),
+                  ),
                 ),
-              },
-              ...tcc.tabs.map((tcct) => renderTab(winId, tcct)),
-            ),
-          ),
-          h(
-            'div',
-            {
-              class: c(
-                openCount === 0 ? 'hidden' : 'group-[.collapsed]/sidebar:hidden block',
-                tc.collapseChildren ? 'pl-7' : 'pl-9',
-                'text-xs',
-                'ml-4',
-                'text-white',
-                'opacity-40',
-                'cursor-pointer',
-                'hover:opacity-100',
-                'transition-opacity',
-                'duration-200',
-              ),
-              onclick: () => {
-                abCommands.perform(winId, 'toggle-collapse-children', { tabContainerId: tc.id });
-              },
-            },
-            collapsedText,
-          ),
+              ]),
         );
       }),
     ),
