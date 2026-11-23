@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.17.0-alpha",
+  "version": "0.17.1-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -61,7 +61,7 @@
     "eslint-plugin-astro": "3.2.1",
     "globals": "17.14.0",
     "husky": "9.1.7",
-    "i18next": "27.2.4",
+    "i18next": "27.2.5",
     "jsdom": "31.0.1",
     "lint-staged": "17.6.2",
     "prettier": "3.10.1",
