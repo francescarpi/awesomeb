@@ -73,7 +73,7 @@ export async function renderTabContainers(
                       'absolute',
                       'top-0',
                       '-bottom-1',
-                      'right-2',
+                      'right-0',
                       'border-l-2',
                       'border-b-2',
                       !tc.collapseChildren && 'rounded-bl-lg',
