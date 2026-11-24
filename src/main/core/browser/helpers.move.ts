@@ -168,6 +168,15 @@ export function moveToTarget(
 
   browser.indexTabContainer(targetData.window, targetData.desktop, targetData.tabContainer);
 
+  if (
+    targetId !== 'split-tab' &&
+    sourceData.window.id == targetData.window.id &&
+    sourceData.desktop.id == targetData.desktop.id
+  ) {
+    scopeLog.warn('Tab is already in the target desktop/window');
+    return;
+  }
+
   // If the source tabContainer is a child of another container, detach it
   // before moving it. Otherwise the old parent keeps a stale reference in
   // its children map and the child still claims the old parent.
@@ -202,14 +211,6 @@ export function moveToTarget(
       targetData.window,
       targetData.desktop,
     );
-    return;
-  }
-
-  if (
-    sourceData.window.id == targetData.window.id &&
-    sourceData.desktop.id == targetData.desktop.id
-  ) {
-    scopeLog.warn('Tab is already in the target desktop/window');
     return;
   }
 

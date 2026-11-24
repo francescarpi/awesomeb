@@ -551,6 +551,10 @@ export class Browser {
     return this._tabContainerIndex.get(id) || null;
   }
 
+  getTabContainerIds(): TTabContainerId[] {
+    return Array.from(this._tabContainerIndex.keys());
+  }
+
   get tabs(): IWinDesConTab[] {
     return Array.from(this._tabIndex.values());
   }

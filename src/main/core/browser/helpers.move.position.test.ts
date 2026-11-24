@@ -22,6 +22,62 @@ describe('Browser.moveTabToPosition', () => {
     return tc.tabs.map((t) => t.id);
   }
 
+  function allTabIdsInTree(): number[] {
+    return desktop.tabContainers.flatMap((tc) => tc.ownAndChildTabs.map((e) => e.tab.id));
+  }
+
+  function duplicatedTabIds(): number[] {
+    const ids = allTabIdsInTree();
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  }
+
+  function sidebarTabIds(): number[] {
+    return browser.renderer
+      .tabContainers(window)
+      .flatMap((tc) => [
+        ...tc.tabs.map((t) => t.id),
+        ...tc.children.flatMap((c) => c.tabs.map((t) => t.id)),
+      ]);
+  }
+
+  function duplicatedSidebarTabIds(): number[] {
+    const ids = sidebarTabIds();
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  }
+
+  function containerIdsInTree(): number[] {
+    const ids: number[] = [];
+    const walk = (tc: TabContainer) => {
+      ids.push(tc.id);
+      tc.children.forEach(walk);
+    };
+    desktop.tabContainers.forEach(walk);
+    return ids;
+  }
+
+  function duplicatedContainerIds(): number[] {
+    const ids = containerIdsInTree();
+    return ids.filter((id, index) => ids.indexOf(id) !== index);
+  }
+
+  function containersBothRootAndChild(): number[] {
+    const rootIds = desktop.tabContainers.map((tc) => tc.id);
+    const childIds: number[] = [];
+    const walk = (tc: TabContainer) => {
+      tc.children.forEach((c) => {
+        childIds.push(c.id);
+        walk(c);
+      });
+    };
+    desktop.tabContainers.forEach(walk);
+    return rootIds.filter((id) => childIds.includes(id));
+  }
+
+  function orphanedContainerIds(): number[] {
+    const inTree = new Set(containerIdsInTree());
+    return [...browser.getTabContainerIds()].filter((id) => !inTree.has(id));
+  }
+
   describe('reordering inside the same container', () => {
     test('moves a tab before the target tab', async () => {
       const a = await openTab('http://a.com');
@@ -186,7 +242,7 @@ describe('Browser.moveTabToPosition', () => {
   });
 
   describe('as-child', () => {
-    test('places the tab inside a new child of the target root container', async () => {
+    test('places the tab inside a new child of the target tab container', async () => {
       const source = await openTab('http://source.com');
       const parent = await openTab('http://parent.com');
 
@@ -201,6 +257,25 @@ describe('Browser.moveTabToPosition', () => {
       expect(parent.tabContainer.children.map((c) => c.id)).toEqual([moved.tabContainer.id]);
     });
 
+    test('nests the tab under the target tab own container when the target is nested', async () => {
+      const source = await openTab('http://source.com');
+      const parent = await openTab('http://parent.com');
+      const nested = await openTab('http://nested.com', parent.tabContainer);
+
+      browser.moveTabToPosition(source.tab.id, {
+        kind: 'as-child',
+        targetTabId: nested.tab.id,
+      });
+
+      const moved = browser.getTab(source.tab.id)!;
+      expect(moved.tabContainer.parent?.id).toBe(nested.tabContainer.id);
+      expect(moved.tabContainer.tabs.map((t) => t.id)).toEqual([source.tab.id]);
+      expect(nested.tabContainer.children.map((c) => c.id)).toEqual([moved.tabContainer.id]);
+      expect(parent.tabContainer.children.map((c) => c.id)).not.toContain(moved.tabContainer.id);
+      expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([parent.tabContainer.id]);
+      expect(duplicatedTabIds()).toEqual([]);
+    });
+
     test('removes the source container when it ends up empty', async () => {
       const source = await openTab('http://source.com');
       const parent = await openTab('http://parent.com');
@@ -211,6 +286,127 @@ describe('Browser.moveTabToPosition', () => {
       });
 
       expect(desktop.tabContainers.map((tc) => tc.id)).toEqual([parent.tabContainer.id]);
+    });
+
+    test('never leaves duplicated tabs in the tree for any drop position', async () => {
+      const source = await openTab('http://source.com');
+      const sourceSibling = await browser.openURL('http://sibling.com', { targetId: 'split-tab' });
+      const parent = await openTab('http://parent.com');
+      const nested = await openTab('http://nested.com', parent.tabContainer);
+      const other = await openTab('http://other.com');
+
+      const positions = [
+        { kind: 'as-child' as const, targetTabId: parent.tab.id },
+        { kind: 'as-child' as const, targetTabId: nested.tab.id },
+        { kind: 'before-tab' as const, targetTabId: parent.tab.id },
+        { kind: 'after-tab' as const, targetTabId: other.tab.id },
+        { kind: 'out-of-container' as const, targetTabContainerId: nested.tabContainer.id },
+        { kind: 'desktop' as const },
+      ];
+
+      for (const position of positions) {
+        browser.moveTabToPosition(source.tab.id, position);
+
+        expect(duplicatedTabIds()).toEqual([]);
+        expect(duplicatedSidebarTabIds()).toEqual([]);
+      }
+
+      expect(allTabIdsInTree().sort((a, b) => a - b)).toEqual([
+        source.tab.id,
+        sourceSibling!.tab.id,
+        parent.tab.id,
+        nested.tab.id,
+        other.tab.id,
+      ]);
+    });
+
+    test('never shows the moved tab twice in the sidebar', async () => {
+      const source = await openTab('http://source.com');
+      const parent = await openTab('http://parent.com');
+      const nested = await openTab('http://nested.com', parent.tabContainer);
+
+      browser.moveTabToPosition(source.tab.id, {
+        kind: 'as-child',
+        targetTabId: nested.tab.id,
+      });
+
+      const ids = sidebarTabIds();
+
+      expect(ids.filter((id) => id === source.tab.id).length).toBeLessThanOrEqual(1);
+      expect(duplicatedSidebarTabIds()).toEqual([]);
+    });
+
+    test('drops the source root when the tab is dropped on a root target', async () => {
+      const parent = await openTab('http://parent.com');
+      parent.tab.setOpenTabsAsChild(true);
+      await openTab('http://child1.com', parent.tabContainer);
+      await openTab('http://child2.com', parent.tabContainer);
+      const source = await openTab('http://source.com');
+      const sourceContainerId = source.tabContainer.id;
+
+      browser.moveTabToPosition(source.tab.id, {
+        kind: 'as-child',
+        targetTabId: parent.tab.id,
+      });
+
+      expect(desktop.tabContainers.map((tc) => tc.id)).not.toContain(sourceContainerId);
+      expect(duplicatedSidebarTabIds()).toEqual([]);
+      expect(sidebarTabIds().filter((id) => id === source.tab.id)).toHaveLength(1);
+      expect(containersBothRootAndChild()).toEqual([]);
+    });
+  });
+
+  describe('tree integrity', () => {
+    test('never leaves a container both as a desktop root and as a child', async () => {
+      const parent = await openTab('http://parent.com');
+      parent.tab.setOpenTabsAsChild(true);
+      await openTab('http://child1.com', parent.tabContainer);
+      await openTab('http://child2.com', parent.tabContainer);
+      const source = await openTab('http://source.com');
+      const other = await openTab('http://other.com');
+
+      browser.moveTabToPosition(source.tab.id, {
+        kind: 'as-child',
+        targetTabId: parent.tab.id,
+      });
+      browser.moveTabToPosition(parent.tab.id, {
+        kind: 'after-tab',
+        targetTabId: source.tab.id,
+      });
+
+      expect(containersBothRootAndChild()).toEqual([]);
+      expect(duplicatedContainerIds()).toEqual([]);
+      expect(duplicatedTabIds()).toEqual([]);
+      expect(duplicatedSidebarTabIds()).toEqual([]);
+      expect(other.tabContainer.parent).toBeNull();
+    });
+
+    test('never leaves an orphaned container holding a tab', async () => {
+      const parent = await openTab('http://parent.com');
+      const nested = await openTab('http://nested.com', parent.tabContainer);
+      const other = await openTab('http://other.com');
+
+      browser.moveTab(nested.tab.id, 'desktop-1');
+
+      expect(orphanedContainerIds()).toEqual([]);
+      expect(nested.tabContainer.parent?.id).toBe(parent.tabContainer.id);
+      expect(browser.getTab(nested.tab.id)?.tabContainer.id).toBe(nested.tabContainer.id);
+      expect(other.tabContainer.id).not.toBe(nested.tabContainer.id);
+    });
+
+    test('keeps every container reachable from the desktop roots', async () => {
+      const parent = await openTab('http://parent.com');
+      const nested = await openTab('http://nested.com', parent.tabContainer);
+      const source = await openTab('http://source.com');
+
+      browser.moveTabToPosition(source.tab.id, {
+        kind: 'as-child',
+        targetTabId: nested.tab.id,
+      });
+
+      expect(orphanedContainerIds()).toEqual([]);
+      expect(duplicatedContainerIds()).toEqual([]);
+      expect(containersBothRootAndChild()).toEqual([]);
     });
   });
 
