@@ -129,6 +129,7 @@ function placeContainerAsSibling(
       container.parent?.removeChild(container.id);
       container.setParent(targetParent);
       targetParent.addChild(container);
+      desktop.deleteTabContainer(container.id);
     }
     targetParent.moveChildToIndex(container.id, index);
   } else {
@@ -209,8 +210,9 @@ export function moveTabToPosition(
         return;
       }
 
-      const root = rootContainerOf(target.container);
-      const newChild = root.createChildTabContainer(browser.idGenerator.nextTabContainerId);
+      const newChild = target.container.createChildTabContainer(
+        browser.idGenerator.nextTabContainerId,
+      );
       browser.indexTabContainer(window, desktop, newChild);
 
       sourceContainer.takeTab(tab.id);
@@ -300,12 +302,4 @@ export function moveTabToPosition(
       return;
     }
   }
-}
-
-function rootContainerOf(container: TabContainer): TabContainer {
-  let current: TabContainer = container;
-  while (current.parent !== null) {
-    current = current.parent;
-  }
-  return current;
 }
