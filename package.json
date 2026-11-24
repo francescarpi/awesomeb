@@ -1,6 +1,6 @@
 {
   "name": "AwesomeB",
-  "version": "0.17.2-alpha",
+  "version": "0.17.3-alpha",
   "description": "",
   "main": "dist-electron/main/index.js",
   "repository": "https://github.com/francescarpi/awesomeb.git",
@@ -61,7 +61,7 @@
     "eslint-plugin-astro": "3.2.1",
     "globals": "17.14.0",
     "husky": "9.1.7",
-    "i18next": "27.2.5",
+    "i18next": "27.2.6",
     "jsdom": "31.0.1",
     "lint-staged": "17.6.2",
     "prettier": "3.10.1",
@@ -70,7 +70,7 @@
     "tldts": "7.5.5",
     "tsc-alias": "1.9.10",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.73.0",
+    "typescript-eslint": "8.74.0",
     "vite": "8.3.8",
     "vite-plugin-static-copy": "4.1.1",
     "vitest": "5.1.1"
