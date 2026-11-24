@@ -6,6 +6,7 @@ export * from './desktop';
 export * from './session';
 export * from './config';
 export * from './partitions';
+export * from './adblocker';
 export * from './tab';
 export * from './history/';
 export * from './bookmarks';
