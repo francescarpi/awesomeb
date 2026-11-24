@@ -300,7 +300,12 @@
         "desc": "Número de días que se conserva el historial de pestañas cerradas."
       },
       "days_one": "{{count}} día",
-      "days_other": "{{count}} días"
+      "days_other": "{{count}} días",
+      "adBlock": {
+        "title": "Bloqueador de anuncios",
+        "desc": "Bloquea anuncios y rastreadores usando listas de filtros mantenidas por la comunidad.",
+        "restartNote": "* Se recomienda reiniciar para que el cambio se aplique por completo"
+      }
     },
     "profiles": {
       "title": "Perfiles",

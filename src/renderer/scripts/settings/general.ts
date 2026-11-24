@@ -36,6 +36,9 @@ const KEYS = [
   'pages:settings.general.historyRetention.manageHistory',
   'pages:settings.general.closedTabsRetention.title',
   'pages:settings.general.closedTabsRetention.desc',
+  'pages:settings.general.adBlock.title',
+  'pages:settings.general.adBlock.desc',
+  'pages:settings.general.adBlock.restartNote',
   'pages:settings.general.days_one',
   'pages:settings.general.days_other',
 ];
@@ -107,6 +110,7 @@ async function buildGeneralBody(
       renderHistoryRetention(config, t),
       renderClosedTabsRetention(config, t),
     ),
+    renderAdBlock(config, t),
     h(
       'div',
       { class: 'flex justify-end' },
@@ -403,6 +407,30 @@ function renderClosedTabsRetention(config: IConfig, t: Translations): VNode {
 }
 
 //-----------------------------------------------------------------------------
+function renderAdBlock(config: IConfig, t: Translations): VNode {
+  return box(
+    t['pages:settings.general.adBlock.title'],
+    t['pages:settings.general.adBlock.desc'],
+    h(
+      'div',
+      { class: 'flex flex-col gap-2' },
+      h(
+        'label',
+        { class: 'flex items-center gap-2 cursor-pointer' },
+        h('input', {
+          id: 'ad-block-enabled',
+          type: 'checkbox',
+          class: 'toggle toggle-primary',
+          checked: config.adBlockEnabled ?? true,
+        }),
+        h('span', { class: 'text-sm' }, t['pages:settings.general.adBlock.title']),
+      ),
+      h('small', {}, t['pages:settings.general.adBlock.restartNote']),
+    ),
+  );
+}
+
+//-----------------------------------------------------------------------------
 async function saveChanges(config: IConfig) {
   // Search engines
   const searchEngines = getTableSearchEngines();
@@ -425,6 +453,10 @@ async function saveChanges(config: IConfig) {
   const localeSelect = document.getElementById('app-locale') as HTMLSelectElement;
   const locale = localeSelect.value;
 
+  // Ad blocker
+  const adBlockCheckbox = document.getElementById('ad-block-enabled') as HTMLInputElement;
+  const adBlockEnabled = adBlockCheckbox.checked;
+
   const newConfig = {
     ...config,
     searchEngines,
@@ -432,6 +464,7 @@ async function saveChanges(config: IConfig) {
     historyRetentionDays,
     closedTabsRetentionDays,
     locale,
+    adBlockEnabled,
   };
   await abConfig.save(newConfig);
 }

@@ -30,6 +30,7 @@ export class Config extends Store<IConfig> {
       uiTheme: DEFAULT_UI_THEME,
       // locale is set on first run via initI18n() based on the OS locale
       locale: undefined,
+      adBlockEnabled: true,
     };
 
     // Validate defaults before passing to electron-store
@@ -71,6 +72,10 @@ export class Config extends Store<IConfig> {
 
   get isStandardPermissions() {
     return this.getProperty('permissionsType') === EPermissionConfigType.Standard;
+  }
+
+  get adBlockEnabled() {
+    return this.getProperty('adBlockEnabled');
   }
 
   get config(): IConfig {

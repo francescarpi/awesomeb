@@ -300,7 +300,12 @@
         "desc": "Number of days to keep closed tabs history."
       },
       "days_one": "{{count}} day",
-      "days_other": "{{count}} days"
+      "days_other": "{{count}} days",
+      "adBlock": {
+        "title": "Ad Blocker",
+        "desc": "Block ads and trackers using community-maintained filter lists.",
+        "restartNote": "* Restart is recommended for the change to fully apply"
+      }
     },
     "profiles": {
       "title": "Profiles",
