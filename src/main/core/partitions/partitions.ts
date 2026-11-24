@@ -1,5 +1,6 @@
 import { Partition } from './partition';
 import { config } from '@/core';
+import { adblocker } from '@/core/adblocker';
 import { TAB_PRELOAD, BROWSER_PRELOAD, EXTENSION_PRELOAD } from '@/paths';
 import { TPartitionId } from '~/types';
 
@@ -27,6 +28,10 @@ export class Partitions {
       partition.registerPreloadScript(EXTENSION_PRELOAD);
       partition.registerPreloadScript(EXTENSION_PRELOAD, 'service-worker');
       this._customPartitions.set(partition.id, partition);
+    }
+
+    if (config.adBlockEnabled) {
+      adblocker.init(this.allForExtensions.map((partition) => partition.ses));
     }
   }
 

@@ -1,4 +1,4 @@
-import { Browser, Window, config, notification, getTheme } from '@/core';
+import { Browser, Window, config, notification, getTheme, adblocker, partitions } from '@/core';
 import { t } from '~/i18n';
 import {
   createHandler,
@@ -56,7 +56,16 @@ export function setupConfigIPC(browser: Browser) {
     browser,
     [internalPageChecker.bind(null, ['settings'])],
     async ({ config: newConfig }) => {
+      const adBlockChanged = newConfig.adBlockEnabled !== config.adBlockEnabled;
+
       config.save(newConfig);
+
+      if (adBlockChanged) {
+        await adblocker.apply(
+          newConfig.adBlockEnabled,
+          partitions.allForExtensions.map((partition) => partition.ses),
+        );
+      }
 
       for (const window of browser.windows) {
         const desktop = window.selectedDesktop;

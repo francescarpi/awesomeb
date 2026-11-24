@@ -21,6 +21,7 @@ const validConfig = {
   closedTabsRetentionDays: 7,
   closedTabsMaxLength: 30,
   uiTheme: 'cupcake',
+  adBlockEnabled: true,
 };
 
 describe('ConfigScheme', () => {
@@ -137,6 +138,25 @@ describe('ConfigScheme', () => {
       ...validConfig,
       shortcutsOverrides: { 'tab-next': 123 },
     };
+
+    expect(() => ConfigScheme.parse(invalid)).toThrow(ZodError);
+  });
+
+  test('missing adBlockEnabled is valid and defaults to true', () => {
+    const config = { ...validConfig };
+    delete (config as Record<string, unknown>).adBlockEnabled;
+
+    const result = ConfigScheme.parse(config);
+    expect(result.adBlockEnabled).toBe(true);
+  });
+
+  test('adBlockEnabled can be explicitly disabled', () => {
+    const result = ConfigScheme.parse({ ...validConfig, adBlockEnabled: false });
+    expect(result.adBlockEnabled).toBe(false);
+  });
+
+  test('non-boolean adBlockEnabled throws ZodError', () => {
+    const invalid = { ...validConfig, adBlockEnabled: 'yes' };
 
     expect(() => ConfigScheme.parse(invalid)).toThrow(ZodError);
   });

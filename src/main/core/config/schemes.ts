@@ -53,6 +53,9 @@ export const ConfigScheme = z
     closedTabsMaxLength: z.number().int().min(1).default(30),
     uiTheme: z.enum(UI_THEMES).default(DEFAULT_UI_THEME),
     locale: z.enum(SUPPORTED_LOCALES as [string, ...string[]]).optional(),
+    // Optional so configs written before the ad blocker existed still validate;
+    // a required field would discard every other setting of an old config.
+    adBlockEnabled: z.boolean().default(true),
   })
   .strict();
 
