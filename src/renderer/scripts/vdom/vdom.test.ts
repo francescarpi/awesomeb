@@ -140,6 +140,16 @@ describe('render() — VNode to DOM', () => {
     expect(el.querySelector('span')?.textContent).toBe('inner');
   });
 
+  test('throws a clear error when a plain object is passed as a child', () => {
+    // Regression: an i18n lookup map was passed as a child instead of the
+    // resolved string. The vdom treated the object as a VNode and blew up
+    // with "node.children is not iterable" deep inside render().
+    const i18nMap = { 'pages:appUpdater.versionsSkipped': '4 versions skipped' };
+    const node = h('div', null, i18nMap as unknown as VNode);
+
+    expect(() => asEl(node)).toThrow(/not iterable|children/);
+  });
+
   test('handles multiple sibling children', () => {
     const node = h('div', null, 'a', 'b', 'c');
     const el = asEl(node);
