@@ -6,6 +6,7 @@
   "repository": "https://github.com/francescarpi/awesomeb.git",
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "dev:mcp": "REMOTE_DEBUGGING_PORT=9222 node scripts/dev.mjs",
     "postinstall": "node node_modules/electron/install.js",
     "build": "astro build && electron-vite build && electron-builder",
     "build:mac": "astro build && electron-vite build && electron-builder --mac",

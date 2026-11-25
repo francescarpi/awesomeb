@@ -1,6 +1,7 @@
 import { UIWindow, UITooltip, type IViewBoundsOptions } from '@/ui';
 import type { IProps, ISelectTabProps } from './types';
 import { Desktop, IDesktopProps, Browser, PromptsManager, Tab, TabContainer } from '@/core';
+import { isRemoteDebuggingEnabled } from '@/core/automation';
 import { MIN_DESKTOPS, MAX_DESKTOPS } from './constants';
 import { MAX_SPLIT_TABS, SIDEBAR_DEFAULT_WIDTH, SIDEBAR_MIN_WIDTH } from '~/constants';
 import {
@@ -358,7 +359,14 @@ export class Window extends UIWindow {
     tab.setVisible(false);
     tab.stopFindInPage();
 
-    this.removeAllTabViews(tab.id);
+    // With remote debugging enabled, keep the tab's view attached to the window
+    // (hidden, but not removed). A detached WebContentsView is not exposed as a
+    // controllable DevTools target, so the tab would be invisible to an AI agent
+    // even though its WebContents is still alive.
+    if (!isRemoteDebuggingEnabled()) {
+      this.removeAllTabViews(tab.id);
+    }
+
     this.renderViews();
 
     this.browser.mediaManager.removeSession(id);

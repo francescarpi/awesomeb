@@ -1,0 +1,98 @@
+---
+title: Automatització amb IA
+description: Deixa que un agent d'IA controli AwesomeB mitjançant el Chrome DevTools Protocol.
+---
+
+**AwesomeB** pot ser controlat per un agent d'IA a través del [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Arrenca l'app amb un port de debugging remot, apunta un servidor MCP de DevTools cap a aquest port i l'agent podrà llegir pàgines, navegar, fer clic i fer captures de pantalla dins les teves pestanyes reals.
+
+## Arrencar amb un port de debug
+
+Per a una build de desenvolupament:
+
+```bash
+pnpm dev:mcp
+```
+
+Això executa el servidor de dev de sempre i activa el debugging remot al port `9222`.
+
+Per a una build empaquetada, passa-li el flag al binari:
+
+```bash
+/Applications/AwesomeB.app/Contents/MacOS/AwesomeB --remote-debugging-port=9222
+```
+
+L'app ja queda accessible a `http://127.0.0.1:9222`. Ho pots comprovar:
+
+```bash
+curl http://127.0.0.1:9222/json/version
+```
+
+:::note
+El debugging remot dona control total sobre l'app, incloent cookies i dades de sessió. Activa'l només en una màquina i un perfil de confiança, i recorda apagar-lo quan acabis.
+:::
+
+## Connectar un servidor MCP
+
+El servidor [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) és l'opció habitual. Afegeix-lo a la configuració MCP del teu agent:
+
+```json
+{
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@1.13.0", "--browserUrl", "http://127.0.0.1:9222"],
+      "enabled": true
+    }
+  }
+}
+```
+
+Després reinicia el teu agent perquè prengui el servidor nou.
+
+## Manejar l'app
+
+Un cop connectat, l'agent veu cada pestanya com una pàgina. Un flux que funciona bé és aquest:
+
+1. Crida `list_pages` i busca la pàgina el path d'URL de la qual sigui `/window`. Aquesta és la finestra de l'app, i l'única que exposa l'API interna d'**AwesomeB**.
+2. Crida `evaluate_script` sobre aquesta pàgina per llegir l'estat real de l'app, o per obrir una pestanya nova.
+3. Torna a fer `list_pages` per obtenir el page id de la pestanya amb la qual vulguis treballar, i fes servir les eines normals sobre ella: `take_snapshot`, `take_screenshot`, `navigate_page`, `click`, `fill`, `type_text`.
+
+### L'API interna
+
+La pàgina `/window` exposa un objecte `abAutomation`:
+
+```js
+const context = await window.abAutomation.context(winId);
+const tabs = await window.abAutomation.listTabs(winId);
+await window.abAutomation.openTab(winId, 'https://example.com');
+await window.abAutomation.wakeTab(winId, tabId);
+```
+
+- `context` retorna l'id de la finestra i et diu si la pàgina actual és la finestra.
+- `listTabs` retorna totes les pestanyes amb el seu `url`, `title`, `suspended`, `selected` i `isInternal`.
+- `openTab` obre una URL en una pestanya nova i la selecciona.
+- `wakeTab` despierta una pestanya suspesa perquè torni a ser interactiva.
+
+El flag `isInternal` marca **les pàgines pròpies d'AwesomeB** (`/window`, `/tab-switcher`, `/tab-marks`) en front al contingut web real, així l'agent les pot distingir.
+
+També pots disparar qualsevol dels comandaments de l'app, els mateixos que hi ha darrere de la paleta de comandaments:
+
+```js
+await window.abCommands.perform(winId, 'next-tab');
+await window.abCommands.perform(winId, 'select-tab', { tabId: 5 });
+```
+
+## Pestanyes suspeses
+
+Quan suspens una pestanya, **AwesomeB** normalment la descarta per alliberar memòria. Amb el debugging remot actiu la manté viva, de manera que l'agent encara pot llegir la pàgina, fer un snapshot o una captura de pantalla d'una pestanya que no estàs mirant.
+
+Fes servir `wakeTab` quan vulguis que la pestanya torni a ser interactiva.
+
+## Limitacions conegudes
+
+Electron no implementa tota la part del DevTools Protocol, així que algunes eines no funcionen:
+
+- `new_page` falla amb `Target.createTarget: Not supported`. Fes servir `abAutomation.openTab` en el seu lloc.
+- `close_page` falla pel mateix motiu. Fes servir el comandament de tancament de l'app.
+
+ Els page ids són **posicionals**: canvien a mesura que s'obren i es tanquen pestanyes, així que no n'has de fixar cap a mà. Resol sempre des de `list_pages` just abans d'utilitzar-lo.

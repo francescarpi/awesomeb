@@ -23,4 +23,5 @@ export * from './visit-history';
 export * from './welcome';
 export * from './media';
 export * from './appupdater';
+export * from './automation';
 export { validateStore } from './validation';
