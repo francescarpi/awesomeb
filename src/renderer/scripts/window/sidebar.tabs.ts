@@ -66,7 +66,7 @@ export async function renderTabContainers(
                 h(
                   'div',
                   {
-                    class: 'relative group/collapse',
+                    class: 'relative group/collapse mb-1',
                   },
                   h('div', {
                     class: c(
@@ -263,7 +263,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       ),
       h(
         'div', // Indicators container
-        { class: 'flex gap-1' },
+        { class: 'flex gap-1 mt-0' },
         highlightIcon(TabPreview, t.hasTabPreview, 'text-white'),
         highlightIcon(Muted, t.isMuted, 'text-white'),
         highlightIcon(Warning, t.requireAttention, 'text-red-500'),
@@ -272,7 +272,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
         ? [
             h(
               'div', // Tags container
-              { class: 'flex gap-1 items-center overflow-hidden' },
+              { class: 'flex gap-1 items-center overflow-hidden mt-1' },
               ...t.tags.map((tag) =>
                 h(
                   'span', // Tag chip
