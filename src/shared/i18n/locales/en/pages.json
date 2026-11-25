@@ -33,7 +33,8 @@
   "appUpdater": {
     "current": "Current",
     "new": "New",
-    "failed": "Oops... something went wrong :("
+    "failed": "Oops... something went wrong :(",
+    "versionsSkipped": "{{count}} versions skipped"
   },
   "downloads": {
     "title": "Downloads",

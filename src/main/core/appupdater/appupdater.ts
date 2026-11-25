@@ -2,9 +2,9 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { app } from 'electron';
 import { Browser, notification } from '@/core';
-import { IAppUpdaterInfo } from '~/types';
+import { IAppUpdaterInfo, IAppUpdaterRelease } from '~/types';
 import { t } from '~/i18n';
-import { removeAllAnchors } from './helpers';
+import { cleanReleaseNotes } from './helpers';
 
 const scopeLog = log.scope('AppUpdater');
 
@@ -18,14 +18,14 @@ export class AppUpdater {
     autoUpdater.logger = scopeLog;
     autoUpdater.forceDevUpdateConfig = !app.isPackaged;
     autoUpdater.autoDownload = false;
+    autoUpdater.fullChangelog = true;
 
     autoUpdater.on('update-available', (info) => {
       this.updateAvailableDuringCheck = true;
       this.data = {
         version: info.version,
         current: app.getVersion(),
-        releaseNotes:
-          typeof info.releaseNotes === 'string' ? removeAllAnchors(info.releaseNotes) : '',
+        releaseNotes: this.buildReleaseNotes(info),
         status: 'available',
         progress: 0,
       };
@@ -53,6 +53,24 @@ export class AppUpdater {
 
   private emit() {
     this.browser.eventsChannel.emit('appupdater:version-available', this.data);
+  }
+
+  private buildReleaseNotes(info: {
+    version: string;
+    releaseNotes?: string | Array<{ version: string; note: string | null }> | null;
+  }): IAppUpdaterRelease[] {
+    if (Array.isArray(info.releaseNotes)) {
+      return info.releaseNotes.map((entry) => ({
+        version: entry.version,
+        notes: cleanReleaseNotes(entry.note ?? ''),
+      }));
+    }
+
+    if (typeof info.releaseNotes === 'string' && info.releaseNotes.trim().length > 0) {
+      return [{ version: info.version, notes: cleanReleaseNotes(info.releaseNotes) }];
+    }
+
+    return [];
   }
 
   get versionAvailable(): IAppUpdaterInfo | null {
