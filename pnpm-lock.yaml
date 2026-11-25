@@ -160,8 +160,8 @@ importers:
         specifier: 9.1.7
         version: 9.1.7
       i18next:
-        specifier: 27.2.7
-        version: 27.2.7(typescript@6.0.3)
+        specifier: 27.2.9
+        version: 27.2.9(typescript@6.0.3)
       jsdom:
         specifier: 31.0.1
         version: 31.0.1(@noble/hashes@2.4.0)
@@ -3065,8 +3065,8 @@ packages:
   i18next-fs-backend@2.7.3:
     resolution: {integrity: sha512-VEiKwfe4CYKh2LCOtdEWAIS63Z2Gyus22HDHzuiRzeTqArewBXNOJrX5G8WOZxm9qE1BNj0ejiqPirQoST8DtQ==}
 
-  i18next@27.2.7:
-    resolution: {integrity: sha512-q3XlM8YSo6Nmomd+MQ4JPGJGvhgHwfCRXNeFrM8l0F4TuIuoJBqhCxQrdGDHNMjObRuw5O0ReuU968ZeMVlfnw==}
+  i18next@27.2.9:
+    resolution: {integrity: sha512-GOWWofCGYPSPEzUKJnRLJSoHrSUDa/NzYWqAOJJDZUaM7faLPd9VABlbHDZ+jv8uadu/fq1wsHFfZP6+0tFPkg==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -7886,7 +7886,7 @@ snapshots:
 
   i18next-fs-backend@2.7.3: {}
 
-  i18next@27.2.7(typescript@6.0.3):
+  i18next@27.2.9(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
