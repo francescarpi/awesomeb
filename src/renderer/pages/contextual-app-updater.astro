@@ -2,7 +2,7 @@
 import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
-<ContextualModal width="w-[500px]" />
+<ContextualModal width="w-[600px]" />
 
 <script>
   import { getSearchParams, Renderer, h } from '#/scripts';
@@ -19,6 +19,17 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
   const data = await abAppUpdater.versionAvailable(winId);
   if (data) {
+    const releases = data.releaseNotes ?? [];
+    const skippedCount = Math.max(releases.length - 1, 0);
+
+    let skippedLabel: string | null = null;
+    if (skippedCount > 0) {
+      const skipped = await abI18n.t({ winId }, [
+        { key: 'pages:appUpdater.versionsSkipped', params: { count: skippedCount } },
+      ]);
+      skippedLabel = skipped['pages:appUpdater.versionsSkipped'];
+    }
+
     renderer.update(
       h(
         'div',
@@ -39,7 +50,19 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
             'Update now',
           ),
         ),
-        h('div', { class: 'h-90 overflow-y-auto', innerHTML: data.releaseNotes }),
+        skippedLabel ? h('div', { class: 'text-xs opacity-60 -mt-2 mb-3' }, skippedLabel) : null,
+        h(
+          'div',
+          { class: 'h-90 overflow-y-auto' },
+          releases.map((release) =>
+            h(
+              'div',
+              { class: 'mb-4' },
+              h('h2', { class: 'font-semibold' }, release.version),
+              h('div', { innerHTML: release.notes }),
+            ),
+          ),
+        ),
       ),
     );
   } else {

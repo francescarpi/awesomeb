@@ -33,7 +33,8 @@
   "appUpdater": {
     "current": "Actual",
     "new": "Nova",
-    "failed": "Ups... alguna cosa ha fallat :("
+    "failed": "Ups... alguna cosa ha fallat :(",
+    "versionsSkipped": "{{count}} versions omeses"
   },
   "downloads": {
     "title": "Baixades",

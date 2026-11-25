@@ -1,8 +1,20 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Notification } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import type { UpdateInfo } from 'electron-updater';
 import { initI18n } from '~/i18n';
 import { AppUpdater } from './appupdater';
+
+function buildUpdateInfo(releaseNotes: UpdateInfo['releaseNotes']): UpdateInfo {
+  return {
+    version: '0.18.0-alpha',
+    files: [],
+    path: '',
+    sha512: '',
+    releaseDate: '2026-11-25T07:02:44.000Z',
+    releaseNotes,
+  };
+}
 
 describe('AppUpdater', () => {
   beforeAll(async () => {
@@ -116,5 +128,61 @@ describe('AppUpdater', () => {
     await Promise.resolve();
 
     expect(refreshMainMenu).toHaveBeenCalled();
+  });
+
+  test('collects every release of a multi version changelog', () => {
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
+    const updater = new AppUpdater(browser);
+
+    autoUpdater.emit(
+      'update-available',
+      buildUpdateInfo([
+        {
+          version: '0.18.0-alpha',
+          note: '<ul><li>Add a built-in ad blocker by @francescarpi in #567</li></ul>',
+        },
+        {
+          version: '0.17.4-alpha',
+          note: '<ul><li>Fix tab title truncation by @francescarpi in #564</li></ul>',
+        },
+      ]),
+    );
+
+    expect(updater.versionAvailable?.releaseNotes).toEqual([
+      { version: '0.18.0-alpha', notes: '<ul><li>Add a built-in ad blocker</li></ul>' },
+      { version: '0.17.4-alpha', notes: '<ul><li>Fix tab title truncation</li></ul>' },
+    ]);
+  });
+
+  test('falls back to a single release when the updater reports plain notes', () => {
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
+    const updater = new AppUpdater(browser);
+
+    autoUpdater.emit(
+      'update-available',
+      buildUpdateInfo('<ul><li>Add a built-in ad blocker by @francescarpi in #567</li></ul>'),
+    );
+
+    expect(updater.versionAvailable?.releaseNotes).toEqual([
+      { version: '0.18.0-alpha', notes: '<ul><li>Add a built-in ad blocker</li></ul>' },
+    ]);
+  });
+
+  test('reports no releases when the updater provides no notes', () => {
+    const browser = {
+      eventsChannel: { emit: vi.fn() },
+      refreshMainMenu: vi.fn(),
+    } as never;
+    const updater = new AppUpdater(browser);
+
+    autoUpdater.emit('update-available', buildUpdateInfo(null));
+
+    expect(updater.versionAvailable?.releaseNotes).toEqual([]);
   });
 });
