@@ -264,6 +264,7 @@ export class BrowserRenderer {
       favicon: tab.favicon,
       isClosed: tab.isClosed,
       openTabsAsChild: tab.openTabsAsChild,
+      isInternal: tab.isInternal,
       tags: this.browser.tabTags
         .get(tab.id)
         .map((tagId) => config.getProperty('tags').find((t) => t.id === tagId))

@@ -48,6 +48,11 @@ function parseInstanceName(argv) {
 
 const instanceName = parseInstanceName(process.argv) ?? process.env.AB_INSTANCE_NAME ?? 'dev';
 
+// Remote debugging port, used by AI agents to drive the app over CDP.
+// `electron-vite` forwards REMOTE_DEBUGGING_PORT to Electron as
+// `--remote-debugging-port=<port>` (see its startElectron()).
+const remoteDebuggingPort = process.env.REMOTE_DEBUGGING_PORT?.trim() || null;
+
 function startChild(name, command, args, extraEnv = {}) {
   const child = spawn(command, args, {
     stdio: 'inherit',
@@ -116,6 +121,11 @@ process.on('SIGTERM', () => shutdown(0));
     {
       ELECTRON_RENDERER_URL: RENDERER_URL,
       AB_INSTANCE_NAME: instanceName,
+      ...(remoteDebuggingPort ? { REMOTE_DEBUGGING_PORT: remoteDebuggingPort } : {}),
     },
   );
+
+  if (remoteDebuggingPort) {
+    console.log(`[dev] remote debugging enabled on http://127.0.0.1:${remoteDebuggingPort}`);
+  }
 })();

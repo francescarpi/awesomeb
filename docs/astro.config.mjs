@@ -125,6 +125,7 @@ export default defineConfig({
           translations: { 'ca': 'Desenvolupadors', 'es': 'Desarrolladores' },
           items: [
             { label: 'Multiple instances', translations: { 'ca': 'Instàncies múltiples', 'es': 'Instancias múltiples' }, slug: 'instances' },
+            { label: 'AI automation', translations: { 'ca': 'Automatització amb IA', 'es': 'Automatización con IA' }, slug: 'ai-automation' },
           ],
         },
       ]

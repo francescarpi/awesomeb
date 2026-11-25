@@ -167,6 +167,22 @@ const abTabs = {
 };
 
 //--------------------------------------------------------------------------------------
+const abAutomation = {
+  context: (winId: TWindowId) => {
+    return ipcRenderer.invoke('automation:context', { winId });
+  },
+  listTabs: (winId: TWindowId) => {
+    return ipcRenderer.invoke('automation:list-tabs', { winId });
+  },
+  wakeTab: (winId: TWindowId, tabId: TTabId) => {
+    return ipcRenderer.invoke('automation:wake-tab', { winId, tabId });
+  },
+  openTab: (winId: TWindowId, url: string) => {
+    return ipcRenderer.invoke('automation:open-tab', { winId, url });
+  },
+};
+
+//--------------------------------------------------------------------------------------
 const abUrlBar = {
   get: (winId: TWindowId) => {
     return ipcRenderer.invoke('urlbar:get', { winId });
@@ -685,3 +701,4 @@ contextBridge.exposeInMainWorld('abAppUpdater', abAppUpdater);
 contextBridge.exposeInMainWorld('abI18n', abI18n);
 contextBridge.exposeInMainWorld('abSidebar', abSidebar);
 contextBridge.exposeInMainWorld('abTooltip', abTooltip);
+contextBridge.exposeInMainWorld('abAutomation', abAutomation);

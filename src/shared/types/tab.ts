@@ -37,6 +37,7 @@ export interface ITab {
   isClosed: boolean;
   openTabsAsChild: boolean;
   tags: ITabTag[];
+  isInternal: boolean;
 }
 
 export interface ITabTag {

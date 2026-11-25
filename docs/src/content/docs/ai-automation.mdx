@@ -1,0 +1,98 @@
+---
+title: AI automation
+description: Let an AI agent drive AwesomeB over the Chrome DevTools Protocol.
+---
+
+**AwesomeB** can be driven by an AI agent through the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Start the app with a remote debugging port, point a DevTools MCP server at it, and the agent can read pages, navigate, click and take screenshots inside your real tabs.
+
+## Starting with a debugging port
+
+For a development build:
+
+```bash
+pnpm dev:mcp
+```
+
+This runs the regular dev server and enables remote debugging on port `9222`.
+
+For a packaged build, pass the flag to the binary:
+
+```bash
+/Applications/AwesomeB.app/Contents/MacOS/AwesomeB --remote-debugging-port=9222
+```
+
+The app is now reachable at `http://127.0.0.1:9222`. You can confirm it:
+
+```bash
+curl http://127.0.0.1:9222/json/version
+```
+
+:::note
+Remote debugging gives full control over the app, including cookies and session data. Only enable it on a machine and profile you trust, and remember to stop it when you're done.
+:::
+
+## Connecting an MCP server
+
+The [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) server is the usual choice. Add it to your agent's MCP configuration:
+
+```json
+{
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@1.13.0", "--browserUrl", "http://127.0.0.1:9222"],
+      "enabled": true
+    }
+  }
+}
+```
+
+Restart your agent afterwards so it picks up the new server.
+
+## Driving the app
+
+Once connected, the agent sees every tab as a page. A reliable flow looks like this:
+
+1. Call `list_pages` and find the page whose URL path is `/window`. That's the app's own window, and the only one that exposes AwesomeB's internal API.
+2. Call `evaluate_script` on that page to read the real state of the app, or to open a new tab.
+3. Re-run `list_pages` to get the page id of the tab you want to work with, then use the normal tools on it: `take_snapshot`, `take_screenshot`, `navigate_page`, `click`, `fill`, `type_text`.
+
+### The internal API
+
+The `/window` page exposes an `abAutomation` object:
+
+```js
+const context = await window.abAutomation.context(winId);
+const tabs = await window.abAutomation.listTabs(winId);
+await window.abAutomation.openTab(winId, 'https://example.com');
+await window.abAutomation.wakeTab(winId, tabId);
+```
+
+- `context` returns the window id and tells you whether the current page is the window page.
+- `listTabs` returns every tab with its `url`, `title`, `suspended`, `selected` and `isInternal` flags.
+- `openTab` opens a URL in a new tab and selects it.
+- `wakeTab` wakes a suspended tab so it becomes interactive again.
+
+`isInternal` marks **AwesomeB's own pages** (`/window`, `/tab-switcher`, `/tab-marks`) as opposed to real web content, so the agent can tell them apart.
+
+You can also trigger any of the app's commands, the same ones behind the command palette:
+
+```js
+await window.abCommands.perform(winId, 'next-tab');
+await window.abCommands.perform(winId, 'select-tab', { tabId: 5 });
+```
+
+## Suspended tabs
+
+When you suspend a tab, **AwesomeB** normally discards it to free memory. With remote debugging enabled it keeps the tab alive instead, so the agent can still read the page, take a snapshot or grab a screenshot of a tab you are not looking at.
+
+Use `wakeTab` when you want the tab to become interactive again.
+
+## Known limitations
+
+Electron doesn't implement every part of the DevTools Protocol, so a few tools don't work:
+
+- `new_page` fails with `Target.createTarget: Not supported`. Use `abAutomation.openTab` instead.
+- `close_page` fails for the same reason. Use the app's own close command.
+
+Page ids are **positional**: they change as tabs open and close, so never hardcode one. Always resolve it from `list_pages` right before using it.
