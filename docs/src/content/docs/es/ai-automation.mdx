@@ -1,0 +1,98 @@
+---
+title: Automatización con IA
+description: Deja que un agente de IA controle AwesomeB mediante el Chrome DevTools Protocol.
+---
+
+**AwesomeB** puede ser controlado por un agente de IA a través del [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). Arrancá la app con un puerto de debugging remoto, apuntá un servidor MCP de DevTools hacia ese puerto y el agente va a poder leer páginas, navegar, hacer clic y sacar capturas dentro de tus pestañas reales.
+
+## Arrancar con un puerto de debug
+
+Para un build de desarrollo:
+
+```bash
+pnpm dev:mcp
+```
+
+Esto corre el servidor de dev de siempre y activa el debugging remoto en el puerto `9222`.
+
+Para un build empaquetado, pasale el flag al binario:
+
+```bash
+/Applications/AwesomeB.app/Contents/MacOS/AwesomeB --remote-debugging-port=9222
+```
+
+La app ya queda accesible en `http://127.0.0.1:9222`. Podés comprobarlo:
+
+```bash
+curl http://127.0.0.1:9222/json/version
+```
+
+:::note
+El debugging remoto da control total sobre la app, incluyendo cookies y datos de sesión. Activalo solo en una máquina y un perfil de los que te fíes, y acordate de apagarlo cuando termines.
+:::
+
+## Conectar un servidor MCP
+
+El servidor [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) es la opción habitual. Agregalo a la configuración MCP de tu agente:
+
+```json
+{
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@1.13.0", "--browserUrl", "http://127.0.0.1:9222"],
+      "enabled": true
+    }
+  }
+}
+```
+
+Después reiniciá tu agente para que tome el servidor nuevo.
+
+## Manejar la app
+
+Una vez conectado, el agente ve cada pestaña como una página. Un flujo que funciona bien es este:
+
+1. Llamá a `list_pages` y buscá la página cuyo path de URL sea `/window`. Esa es la ventana de la app, y la única que expone la API interna de **AwesomeB**.
+2. Llamá a `evaluate_script` sobre esa página para leer el estado real de la app, o para abrir una pestaña nueva.
+3. Volvé a correr `list_pages` para obtener el page id de la pestaña con la que quieras trabajar, y usá las herramientas normales sobre ella: `take_snapshot`, `take_screenshot`, `navigate_page`, `click`, `fill`, `type_text`.
+
+### La API interna
+
+La página `/window` expone un objeto `abAutomation`:
+
+```js
+const context = await window.abAutomation.context(winId);
+const tabs = await window.abAutomation.listTabs(winId);
+await window.abAutomation.openTab(winId, 'https://example.com');
+await window.abAutomation.wakeTab(winId, tabId);
+```
+
+- `context` devuelve el id de la ventana y te dice si la página actual es la ventana.
+- `listTabs` devuelve todas las pestañas con su `url`, `title`, `suspended`, `selected` y `isInternal`.
+- `openTab` abre una URL en una pestaña nueva y la selecciona.
+- `wakeTab` despierta una pestaña suspendida para que vuelva a ser interactiva.
+
+El flag `isInternal` marca **las páginas propias de AwesomeB** (`/window`, `/tab-switcher`, `/tab-marks`) frente al contenido web real, así el agente puede distinguirlas.
+
+También podés disparar cualquiera de los comandos de la app, los mismos que están detrás de la paleta de comandos:
+
+```js
+await window.abCommands.perform(winId, 'next-tab');
+await window.abCommands.perform(winId, 'select-tab', { tabId: 5 });
+```
+
+## Pestañas suspendidas
+
+Cuando suspendés una pestaña, **AwesomeB** normalmente la descarta para liberar memoria. Con el debugging remoto activo la mantiene viva, así el agente todavía puede leer la página, sacar un snapshot o una captura de una pestaña que no estás mirando.
+
+Usá `wakeTab` cuando quieras que la pestaña vuelva a ser interactiva.
+
+## Limitaciones conocidas
+
+Electron no implementa toda la parte del DevTools Protocol, así que algunas herramientas no funcionan:
+
+- `new_page` falla con `Target.createTarget: Not supported`. Usá `abAutomation.openTab` en su lugar.
+- `close_page` falla por el mismo motivo. Usá el comando de cierre de la app.
+
+Los page ids son **posicionales**: cambian a medida que se abren y cierran pestañas, así que nunca fijes uno a mano. Resolvelo siempre desde `list_pages` justo antes de usarlo.

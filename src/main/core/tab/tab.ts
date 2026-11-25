@@ -1,4 +1,5 @@
 import { Partition, history, Browser, Window, partitions } from '@/core';
+import { isRemoteDebuggingEnabled } from '@/core/automation';
 import { ITabProps, TBasicAuthCallback, TCertificateCallback, TPermissionRequest } from './types';
 import { TTabId } from '~/types';
 import log from 'electron-log';
@@ -349,7 +350,14 @@ export class Tab extends UIView {
 
     this._loading = false;
     this.clearFailLoad();
-    this.closeWebContents();
+
+    // With remote debugging enabled, keep the WebContents alive so the tab stays
+    // visible to an AI agent over CDP (with its real URL) and can be inspected
+    // without being woken first.
+    if (!isRemoteDebuggingEnabled()) {
+      this.closeWebContents();
+    }
+
     this._suspended = true;
     this._eventsRegistered = false;
   }

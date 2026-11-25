@@ -29,6 +29,7 @@ import {
   setupWelcomeIPC,
   setupMediaIPC,
   setupAppUpdaterIPC,
+  setupAutomationIPC,
 } from '@/core';
 import { setupUIIPC } from '@/ui';
 import { applyInstanceScope, resolveInstanceTag } from '@/instance';
@@ -104,6 +105,7 @@ if (!gotTheLock) {
     setupMediaIPC(browser);
     setupAppUpdaterIPC(browser);
     setupI18nIPC(browser);
+    setupAutomationIPC(browser);
 
     if (config.wasConfigured) {
       await browser.loadSession();
