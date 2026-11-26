@@ -19,6 +19,11 @@ export async function renderTabContainers(
     await Promise.all(
       tabContainers.map(async (tc) => {
         const childrenCount = tc.children.filter((t) => !t.isClosed).length;
+        const r = await abI18n.t({ winId }, [
+          { key: 'pages:tabContainers.collapsedTabs', params: { count: childrenCount } },
+        ]);
+
+        const collapsedText = r['pages:tabContainers.collapsedTabs'];
 
         return h(
           'div', // Tab Container
@@ -89,8 +94,9 @@ export async function renderTabContainers(
                       'before:border-b-2',
                       'before:border-transparent',
                       'before:pointer-events-auto',
-                      tc.collapseChildren ? 'left-4 right-2' : 'left-4.5',
+                      'left-4.5',
                       'group-[.collapsed]/sidebar:hidden',
+                      tc.collapseChildren && 'hidden',
                     ),
                     onclick: () => {
                       abCommands.perform(winId, 'toggle-collapse-children', {
@@ -118,6 +124,33 @@ export async function renderTabContainers(
                   ),
                 ),
               ]),
+          ...(tc.collapseChildren
+            ? [
+                h(
+                  'div',
+                  {
+                    class: c(
+                      childrenCount === 0 ? 'hidden' : 'group-[.collapsed]/sidebar:hidden block',
+                      'text-xs',
+                      '-mt-1.5',
+                      'ml-10',
+                      'text-white',
+                      'opacity-40',
+                      'cursor-pointer',
+                      'hover:opacity-100',
+                      'transition-opacity',
+                      'duration-200',
+                    ),
+                    onclick: () => {
+                      abCommands.perform(winId, 'toggle-collapse-children', {
+                        tabContainerId: tc.id,
+                      });
+                    },
+                  },
+                  collapsedText,
+                ),
+              ]
+            : []),
         );
       }),
     ),
