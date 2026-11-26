@@ -322,6 +322,7 @@ export class BrowserRenderer {
         isDimmed: item.tab.suspended,
         desktopId: item.desktop.id,
         windowId: window.id,
+        emoji: item.tab.emoji,
       }));
   }
 

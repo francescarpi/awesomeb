@@ -440,5 +440,8 @@
   "createTag": {
     "title": "Crear etiqueta",
     "tag": "Etiqueta"
+  },
+  "tabEmoji": {
+    "clear": "Quitar emoji"
   }
 }

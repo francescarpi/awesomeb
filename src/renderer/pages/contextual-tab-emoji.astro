@@ -3,15 +3,40 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
 <ContextualModal width="w-80" height="min-h-96">
-  <emoji-picker id="emoji-picker"></emoji-picker>
+  <div class="flex flex-col gap-2">
+    <div class="flex justify-end">
+      <button id="clear-emoji" class="btn btn-xs btn-ghost" type="button"></button>
+    </div>
+    <emoji-picker id="emoji-picker"></emoji-picker>
+  </div>
 </ContextualModal>
 
 <script>
   import 'emoji-picker-element';
-  import { getSearchParams } from '#/scripts';
+  import { getSearchParams, buttonManager } from '#/scripts';
+  import { ITabEntity } from '~/types';
 
   const { winId, searchParams } = getSearchParams();
   const tabId = parseInt(searchParams.get('tabId') as string, 10);
+
+  const t = await abI18n.t({ winId }, [{ key: 'pages:tabEmoji.clear' }]);
+
+  const tabsEntities = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
+  const tab = tabsEntities.find((entity) => entity.id === tabId.toString());
+
+  const clearButton = buttonManager('clear-emoji', {
+    handleClick: () => {
+      abTabs.setEmoji(tabId, null);
+      abModal.closeContextual(winId);
+    },
+  });
+
+  const clearButtonElement = document.getElementById('clear-emoji') as HTMLButtonElement;
+  clearButtonElement.textContent = t['pages:tabEmoji.clear'];
+
+  if (!tab?.emoji) {
+    clearButton.disable();
+  }
 
   const picker = document.getElementById('emoji-picker') as HTMLElement & {
     addEventListener: (type: string, listener: (event: CustomEvent) => void) => void;

@@ -111,6 +111,26 @@ describe('Renderer', () => {
     expect(tabEntry!.emoji).toBeNull();
   });
 
+  test('tabsEntities: exposes the emoji of the tab', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tabId = result!.tab.id.toString();
+    result!.tab.setEmoji('😀');
+
+    const entities = browser.renderer.tabsEntities(window);
+    const entity = entities.find((e) => e.id === tabId);
+    expect(entity).toBeDefined();
+    expect(entity!.emoji).toBe('😀');
+  });
+
+  test('tabsEntities: exposes a null emoji when the tab has none', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tabId = result!.tab.id.toString();
+
+    const entities = browser.renderer.tabsEntities(window);
+    const entity = entities.find((e) => e.id === tabId);
+    expect(entity!.emoji).toBeNull();
+  });
+
   describe('Renderer.refreshTabSwitcher gating', () => {
     test('refreshTabSwitcher is a no-op while the switcher view is hidden', () => {
       const tabSwitcher = window.getView<UIView>('tab-switcher')!;
