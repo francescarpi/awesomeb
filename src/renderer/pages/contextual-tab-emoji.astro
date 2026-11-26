@@ -2,7 +2,7 @@
 import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
-<ContextualModal width="auto" height="min-h-96">
+<ContextualModal width="auto" height="min-h-96" padding="p-1" arrow>
   <div class="flex flex-col gap-2">
     <div class="flex justify-end">
       <button id="clear-emoji" class="btn btn-xs btn-ghost" type="button"></button>
@@ -74,6 +74,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
     --border-color: transparent;
     --border-radius: 0;
     --border-size: 0;
+    --input-font-color: var(--color-base-content);
     height: 22rem;
     width: 100%;
   }
