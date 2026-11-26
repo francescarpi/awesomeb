@@ -91,6 +91,26 @@ describe('Renderer', () => {
     expect(tabEntry!.desktopName).toBe('My Work');
   });
 
+  test('tabSwitcherData: exposes the emoji of the tab', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tabId = result!.tab.id;
+    result!.tab.setEmoji('😀');
+
+    const data = browser.renderer.tabSwitcherData(window);
+    const tabEntry = data.find((t) => t.id === tabId);
+    expect(tabEntry).toBeDefined();
+    expect(tabEntry!.emoji).toBe('😀');
+  });
+
+  test('tabSwitcherData: exposes a null emoji when the tab has none', async () => {
+    const result = await browser.openURL('http://example.com');
+    const tabId = result!.tab.id;
+
+    const data = browser.renderer.tabSwitcherData(window);
+    const tabEntry = data.find((t) => t.id === tabId);
+    expect(tabEntry!.emoji).toBeNull();
+  });
+
   describe('Renderer.refreshTabSwitcher gating', () => {
     test('refreshTabSwitcher is a no-op while the switcher view is hidden', () => {
       const tabSwitcher = window.getView<UIView>('tab-switcher')!;

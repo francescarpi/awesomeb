@@ -254,32 +254,60 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
       },
       '',
     ),
-    h(
-      'img', // Favicon
-      {
-        src: t.favicon || Favicon.src,
-        onerror: `this.onerror=null;this.src="${Favicon.src}";`,
-        class: c(
-          'relative',
-          'z-10',
-          'w-[16px]',
-          'h-[16px]',
-          'group-[.collapsed]/sidebar:w-5.5',
-          'group-[.collapsed]/sidebar:h-5.5',
-          'mt-0.5',
-          'ml-1',
-          'mr-0',
-          'group-[.collapsed]/sidebar:ml-auto',
-          'group-[.collapsed]/sidebar:mr-auto',
-          'group-[.collapsed]/sidebar:mt-0',
-          'text-white',
-          t.loading ? 'hidden' : 'block',
+    t.emoji
+      ? h(
+          'span', // Emoji
+          {
+            class: c(
+              'relative',
+              'z-10',
+              'w-[16px]',
+              'h-[16px]',
+              'text-[16px]',
+              'leading-none',
+              'text-center',
+              'group-[.collapsed]/sidebar:w-5.5',
+              'group-[.collapsed]/sidebar:h-5.5',
+              'group-[.collapsed]/sidebar:text-[22px]',
+              'mt-0.5',
+              'ml-1',
+              'mr-0',
+              'group-[.collapsed]/sidebar:ml-auto',
+              'group-[.collapsed]/sidebar:mr-auto',
+              'group-[.collapsed]/sidebar:mt-0',
+              t.loading ? 'hidden' : 'block',
+            ),
+            'data-tooltip': tooltip,
+            'data-tooltip-position': 'sidebar-end',
+          },
+          t.emoji,
+        )
+      : h(
+          'img', // Favicon
+          {
+            src: t.favicon || Favicon.src,
+            onerror: `this.onerror=null;this.src="${Favicon.src}";`,
+            class: c(
+              'relative',
+              'z-10',
+              'w-[16px]',
+              'h-[16px]',
+              'group-[.collapsed]/sidebar:w-5.5',
+              'group-[.collapsed]/sidebar:h-5.5',
+              'mt-0.5',
+              'ml-1',
+              'mr-0',
+              'group-[.collapsed]/sidebar:ml-auto',
+              'group-[.collapsed]/sidebar:mr-auto',
+              'group-[.collapsed]/sidebar:mt-0',
+              'text-white',
+              t.loading ? 'hidden' : 'block',
+            ),
+            'data-tooltip': tooltip,
+            'data-tooltip-position': 'sidebar-end',
+          },
+          '',
         ),
-        'data-tooltip': tooltip,
-        'data-tooltip-position': 'sidebar-end',
-      },
-      '',
-    ),
     h(
       'div', // Title + indicators container
       {

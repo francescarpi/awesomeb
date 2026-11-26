@@ -70,6 +70,7 @@ export interface ITabSwitcherTab {
   title: string;
   partitionColor: string;
   desktopName: string | null;
+  emoji: string | null;
 }
 
 export type TTabPreviewAction = 'close' | 'accept' | 'split';

@@ -66,7 +66,16 @@ import Base from '../layouts/Base.astro';
                     idx === selectedIndex ? 'menu-active rounded' : '',
                   ),
                 },
-                h('img', { class: 'w-5 h-5' }, ''),
+                tab.emoji
+                  ? h(
+                      'span',
+                      {
+                        class:
+                          'w-5 h-5 text-[20px] leading-none text-center flex items-center justify-center',
+                      },
+                      tab.emoji,
+                    )
+                  : h('img', { class: 'w-5 h-5' }, ''),
                 h(
                   'div',
                   { class: 'flex flex-col w-full min-w-0 -mt-1.5' },
@@ -131,6 +140,10 @@ import Base from '../layouts/Base.astro';
 
   async function updateFavicons() {
     for (const tab of tabsList) {
+      if (tab.emoji) {
+        continue;
+      }
+
       const favicon = await abFavicons.get(winId, tab.id);
       const img = document.querySelector(
         `.ab-tab[data-tab-id="${tab.id}"] img`,

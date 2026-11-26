@@ -409,6 +409,7 @@ export class BrowserRenderer {
       title: tab.tab.title,
       partitionColor: tab.tab.partition.color,
       desktopName: tab.desktop.longName,
+      emoji: tab.tab.emoji,
     }));
   }
 
