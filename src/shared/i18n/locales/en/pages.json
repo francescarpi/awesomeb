@@ -425,6 +425,10 @@
     "validTo": "Valid until",
     "failed": "Failed to get the certificate info."
   },
+  "tabContainers": {
+    "collapsedTabs_one": "({{count}} tab collapsed)",
+    "collapsedTabs_other": "({{count}} tabs collapsed)"
+  },
   "bookmarksDesktopToBookmarks": {
     "title": "Save to bookmarks",
     "intro": "Select the tabs you want to save to bookmarks",

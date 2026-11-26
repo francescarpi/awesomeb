@@ -425,6 +425,10 @@
     "validTo": "Vàlid fins",
     "failed": "No s'ha pogut obtenir la informació del certificat."
   },
+  "tabContainers": {
+    "collapsedTabs_one": "({{count}} pestanya col·lapsada)",
+    "collapsedTabs_other": "({{count}} pestanyes col·lapsades)"
+  },
   "bookmarksDesktopToBookmarks": {
     "title": "Desa als marcadors",
     "intro": "Selecciona les pestanyes que vols desar als marcadors",

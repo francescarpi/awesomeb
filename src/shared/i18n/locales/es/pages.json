@@ -425,6 +425,10 @@
     "validTo": "Válido hasta",
     "failed": "No se pudo obtener la información del certificado."
   },
+  "tabContainers": {
+    "collapsedTabs_one": "({{count}} pestaña colapsada)",
+    "collapsedTabs_other": "({{count}} pestañas colapsadas)"
+  },
   "bookmarksDesktopToBookmarks": {
     "title": "Guardar en marcadores",
     "intro": "Selecciona las pestañas que quieres guardar en marcadores",
