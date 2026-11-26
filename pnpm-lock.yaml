@@ -84,10 +84,10 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       emoji-picker-element:
-        specifier: ^1.29.1
+        specifier: 1.29.1
         version: 1.29.1
       emoji-picker-element-data:
-        specifier: ^1.8.0
+        specifier: 1.8.0
         version: 1.8.0
       i18next-fs-backend:
         specifier: 2.7.3
