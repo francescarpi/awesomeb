@@ -4,17 +4,38 @@ import Base from '../../layouts/Base.astro';
 interface Props {
   width?: string;
   height?: string;
+  padding?: string;
+  arrow?: boolean;
 }
 
-const { width = 'w-87.5', height = '' } = Astro.props;
+const { width = 'w-87.5', height = '', padding = 'p-2', arrow } = Astro.props;
 ---
 
 <Base noDrag>
   <div class="fixed inset-0" id="overlay"></div>
   <div
-    class={`bg-base-200 text-base-content ${width} ${height} absolute rounded-lg p-2 hidden border border-base-content dropshadow-md`}
+    class={`bg-base-200 text-base-content ${width} ${height} absolute rounded-lg ${padding} hidden border border-base-content dropshadow-md`}
     id="wrapper"
   >
+    {arrow && (
+      <svg
+        id="arrow"
+        class="pointer-events-none absolute overflow-visible"
+        width="10"
+        height="14"
+        viewBox="0 0 10 14"
+        aria-hidden="true"
+      >
+        <polygon points="10,0 0,7 10,14" fill="var(--color-base-200)" stroke="none" />
+        <path
+          d="M 10,0 L 0,7 M 0,7 L 10,14"
+          fill="none"
+          stroke="var(--color-base-content)"
+          stroke-width="1"
+          stroke-linecap="round"
+        />
+      </svg>
+    )}
     <div id="content" class="text-sm p-4">
       <slot />
     </div>
@@ -32,31 +53,61 @@ const { width = 'w-87.5', height = '' } = Astro.props;
 
   function placeContent() {
     const wrapper = document.getElementById('wrapper')!;
+    const arrowEl = document.getElementById('arrow') as SVGElement | null;
 
     const x = parseFloat(searchParams.get('x')!);
     const y = parseFloat(searchParams.get('y')!);
     const width = parseFloat(searchParams.get('width')!);
+    const height = parseFloat(searchParams.get('height')!);
     const anchor = searchParams.get('anchor')!;
 
     switch (anchor) {
       case 'bottom-left': {
         wrapper.style.bottom = `${window.innerHeight - y + 7}px`;
         wrapper.style.left = `${x}px`;
+        placeArrow(arrowEl, 'bottom');
         break;
       }
       case 'top-left': {
         wrapper.style.top = `${y + 30}px`;
         wrapper.style.left = `${x}px`;
+        placeArrow(arrowEl, 'bottom');
         break;
       }
       case 'right': {
         wrapper.style.left = `${x + width + 7}px`;
         wrapper.style.top = `${y}px`;
+        placeArrow(arrowEl, 'left', height / 2);
         break;
       }
     }
 
     wrapper.classList.remove('hidden');
+  }
+
+  function placeArrow(arrowEl: SVGElement | null, side: 'left' | 'bottom', offset = 0) {
+    if (!arrowEl) {
+      return;
+    }
+
+    const width = 10;
+    const height = 14;
+
+    arrowEl.style.transform = '';
+    arrowEl.style.top = '';
+    arrowEl.style.bottom = '';
+    arrowEl.style.left = '';
+    arrowEl.style.right = '';
+
+    if (side === 'left') {
+      arrowEl.style.left = `${-width}px`;
+      arrowEl.style.top = `${offset - height / 2}px`;
+      return;
+    }
+
+    arrowEl.style.bottom = `${-height + 1}px`;
+    arrowEl.style.left = `${offset - width / 2}px`;
+    arrowEl.style.transform = 'rotate(90deg)';
   }
 
   placeContent();
