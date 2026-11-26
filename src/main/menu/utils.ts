@@ -11,6 +11,7 @@ export enum EIcon {
   Divider = 'divider.png',
   Down = 'down.png',
   Edit = 'edit.png',
+  Emoji = 'emoji.png',
   File = 'file.png',
   Folder = 'folder.png',
   Forward = 'forward.png',

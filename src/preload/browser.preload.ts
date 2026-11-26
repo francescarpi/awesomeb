@@ -129,6 +129,9 @@ const abTabs = {
   onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => {
     ipcRenderer.on('tabs:refresh-one', callback);
   },
+  onOpenEmojiPicker: (callback: (event: IpcRendererEvent, tabId: TTabId) => void) => {
+    ipcRenderer.on('tabs:open-emoji-picker', (_event, tabId) => callback(_event, tabId));
+  },
   closeFindInTab: (tabId: TTabId) => {
     ipcRenderer.send('tabs:close-find-in-tab', { tabId });
   },

@@ -43,6 +43,13 @@ export function tabMenu(browser: Browser, tabInfo: IWinDesConTab): Menu {
         });
       },
     },
+    {
+      label: t('menu:contextTab.setEmoji'),
+      icon: getIcon(EIcon.Emoji),
+      click: () => {
+        window.sendMessage('tabs:open-emoji-picker', tab.id);
+      },
+    },
     { type: 'separator' },
     {
       label: t('menu:contextTab.copyUrl'),

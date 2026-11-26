@@ -403,6 +403,25 @@ function highlightIcon(icon: string, visible: boolean, color: string): VNode {
   );
 }
 
+export function openEmojiPicker(winId: TWindowId, tabId: number) {
+  const row = document.querySelector(`[data-tab-id="${tabId}"]`) as HTMLElement | null;
+  if (!row) {
+    return;
+  }
+
+  const bounds = row.getBoundingClientRect();
+
+  abModal.openContextual(winId, 'contextual-tab-emoji', {
+    bounds: {
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.width,
+      height: bounds.height,
+    },
+    anchor: 'right',
+  });
+}
+
 export function updateTabInContainers(
   containers: ITabContainer[],
   tab: ITab,
