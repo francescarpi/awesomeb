@@ -2,6 +2,32 @@
 import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
-<ContextualModal width="w-72" height="min-h-30">
-  <div id="emoji-picker"></div>
+<ContextualModal width="w-80" height="min-h-96">
+  <emoji-picker id="emoji-picker"></emoji-picker>
 </ContextualModal>
+
+<script>
+  import 'emoji-picker-element';
+
+  const picker = document.getElementById('emoji-picker') as HTMLElement & {
+    addEventListener: (type: string, listener: (event: CustomEvent) => void) => void;
+  };
+
+  picker.addEventListener('emoji-click', (event) => {
+    console.log('[emoji] picked', event.detail?.unicode, event.detail?.emoji?.unicode);
+  });
+</script>
+
+<style>
+  emoji-picker {
+    --num-columns: 8;
+    --emoji-size: 1.25rem;
+    --emoji-padding: 0.25rem;
+    --background: transparent;
+    --border-color: transparent;
+    --border-radius: 0;
+    --border-size: 0;
+    height: 22rem;
+    width: 100%;
+  }
+</style>
