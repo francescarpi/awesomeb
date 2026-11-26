@@ -50,6 +50,7 @@ export interface ITabEntity extends IEntity {
   suspended: boolean;
   desktopId: TDesktopId;
   windowId: TWindowId;
+  emoji: string | null;
 }
 
 export interface ITabContainerEntity extends IEntity {}

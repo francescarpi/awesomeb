@@ -42,6 +42,7 @@ export class Tab extends UIView {
   private _closedAt: number | null = null;
   private _isTabPreview: boolean = false;
   private _openTabsAsChild: boolean = false;
+  private _emoji: string | null = null;
 
   constructor(
     public readonly browser: Browser,
@@ -64,6 +65,7 @@ export class Tab extends UIView {
     this._favicon = props.favicon ?? null;
     this._closedAt = props.closedAt ?? null;
     this._openTabsAsChild = props.openTabsAsChild ?? false;
+    this._emoji = props.emoji ?? null;
 
     registerTabEvents(browser, this);
   }
@@ -194,6 +196,20 @@ export class Tab extends UIView {
 
     this._favicon = favicon;
     this.browser.eventsChannel.emit('tab:favicon-did-change', this);
+    return true;
+  }
+
+  get emoji(): string | null {
+    return this._emoji;
+  }
+
+  setEmoji(emoji: string | null): boolean {
+    if (this._emoji === emoji) {
+      return false;
+    }
+
+    this._emoji = emoji;
+    this.browser.eventsChannel.emit('tab:emoji-did-change', this);
     return true;
   }
 

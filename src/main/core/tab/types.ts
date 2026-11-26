@@ -19,6 +19,7 @@ export interface ITabProps {
   favicon?: string | null;
   closedAt?: number | null;
   openTabsAsChild?: boolean;
+  emoji?: string | null;
 }
 
 export type TBasicAuthCallback = (username?: string, password?: string) => void;

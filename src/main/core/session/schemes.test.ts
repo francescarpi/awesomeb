@@ -86,6 +86,21 @@ describe('SessionTabScheme', () => {
     const invalid = { ...validSessionTab, extra: true };
     expect(() => SessionTabScheme.parse(invalid)).toThrow(ZodError);
   });
+
+  test('parses a tab with an emoji', () => {
+    const withEmoji = { ...validSessionTab, emoji: '😀' };
+    expect(SessionTabScheme.parse(withEmoji)).toEqual(withEmoji);
+  });
+
+  test('parses a tab with a null emoji', () => {
+    const withNullEmoji = { ...validSessionTab, emoji: null };
+    expect(SessionTabScheme.parse(withNullEmoji)).toEqual(withNullEmoji);
+  });
+
+  test('parses a tab without the emoji field, as stored by older sessions', () => {
+    const parsed = SessionTabScheme.parse(validSessionTab);
+    expect(parsed.emoji).toBeUndefined();
+  });
 });
 
 describe('SessionTabContainerScheme', () => {

@@ -30,6 +30,7 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
     renderTabContainers,
     updateSelectedDesktopClass,
     updateTabInContainers,
+    openEmojiPicker,
     renderMediaSession,
     renderDownloadsButton,
     downloadCompleted,
@@ -126,6 +127,10 @@ import SidebarContainer from '#/components/window/SidebarContainer.astro';
   abTabs.onRefreshTabContainers((_event, tabContainers) => {
     currentTabContainers = tabContainers;
     renderTabContainers(winId, tabContainersRenderer, currentTabContainers);
+  });
+
+  abTabs.onOpenEmojiPicker((_event, tabId) => {
+    openEmojiPicker(winId, tabId);
   });
 
   const mediaData = await abMedia.get(winId);

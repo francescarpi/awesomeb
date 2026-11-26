@@ -217,6 +217,88 @@ describe('Session', () => {
     });
   });
 
+  describe('emoji persistence', () => {
+    test('round-trips the emoji through save and reload', async () => {
+      const result = await browser.openURL('http://example.com');
+      result!.tab.setEmoji('😀');
+
+      const session = new Session(browser);
+      await session.save();
+
+      const persisted = JSON.parse(fs.readFileSync(getSessionFilePath(), 'utf-8'));
+      const tab = persisted.windows[0].desktops[0].tabContainers[0].tabs[0];
+      expect(tab.emoji).toBe('😀');
+    });
+
+    test('sessionToStore emits the emoji of the tab', async () => {
+      const result = await browser.openURL('http://example.com');
+      result!.tab.setEmoji('🚀');
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const tab = data[0].desktops[0].tabContainers[0].tabs[0];
+
+      expect(tab.emoji).toBe('🚀');
+    });
+
+    test('emits a null emoji when the tab has none', async () => {
+      await browser.openURL('http://example.com');
+
+      const session = new Session(browser);
+      const data = session.sessionToStore();
+      const tab = data[0].desktops[0].tabContainers[0].tabs[0];
+
+      expect(tab.emoji).toBeNull();
+    });
+
+    test('is missing when the field is not in session.json (legacy)', () => {
+      const filePath = getSessionFilePath();
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          windows: [
+            {
+              id: 1,
+              bounds: { x: 0, y: 0, width: 800, height: 600 },
+              selectedDesktopId: 1,
+              sidebarCollapsed: false,
+              areaMaximized: false,
+              desktops: [
+                {
+                  id: 1,
+                  shortName: null,
+                  longName: null,
+                  theme: 'blue',
+                  tabContainers: [
+                    {
+                      id: 1,
+                      divider: false,
+                      tabs: [
+                        {
+                          id: 1,
+                          partitionId: 'default',
+                          title: null,
+                          customTitle: null,
+                          url: 'http://example.com',
+                          closedAt: null,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      );
+
+      const session = new Session(browser);
+
+      expect(session.windows[0].desktops[0].tabContainers[0].tabs[0].emoji).toBeUndefined();
+    });
+  });
+
   describe('childrenCollapsed persistence', () => {
     test('round-trips true through save and reload', async () => {
       const result = await browser.openURL('http://example.com');

@@ -90,6 +90,8 @@ declare global {
       callback: (event: IpcRendererEvent, tabContainers: ITabContainer[]) => void,
     ) => void;
     onRefreshOne: (callback: (event: IpcRendererEvent, tab: ITab) => void) => void;
+    onOpenEmojiPicker: (callback: (event: IpcRendererEvent, tabId: TTabId) => void) => void;
+    setEmoji: (tabId: TTabId, emoji: string | null) => void;
     closeFindInTab: (tabId: TTabId) => void;
     findInPageAction: (tabId: TTabId, action: TFindInPageAction, query: string) => void;
     onRefreshFindInPage: (

@@ -103,6 +103,66 @@ describe('Tab permission requests', () => {
   });
 });
 
+describe('Tab.setEmoji', () => {
+  let browser: Browser;
+
+  beforeEach(() => {
+    browser = new Browser();
+    partitions.init();
+    browser.createWindow(1, { withDesktops: true });
+  });
+
+  async function openTab() {
+    const result = await browser.openURL('http://example.com');
+    return result!.tab;
+  }
+
+  test('a new tab has no emoji', async () => {
+    const tab = await openTab();
+    expect(tab.emoji).toBeNull();
+  });
+
+  test('stores the emoji', async () => {
+    const tab = await openTab();
+    tab.setEmoji('😀');
+    expect(tab.emoji).toBe('😀');
+  });
+
+  test('returns true and emits the event when the emoji changes', async () => {
+    const tab = await openTab();
+    const listener = vi.fn();
+    browser.eventsChannel.on('tab:emoji-did-change', listener);
+
+    expect(tab.setEmoji('😀')).toBe(true);
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(tab);
+  });
+
+  test('returns false and does not emit when the emoji is unchanged', async () => {
+    const tab = await openTab();
+    tab.setEmoji('😀');
+
+    const listener = vi.fn();
+    browser.eventsChannel.on('tab:emoji-did-change', listener);
+
+    expect(tab.setEmoji('😀')).toBe(false);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  test('clears the emoji when set to null', async () => {
+    const tab = await openTab();
+    tab.setEmoji('😀');
+    tab.setEmoji(null);
+    expect(tab.emoji).toBeNull();
+  });
+
+  test('accepts emoji sequences with several code points', async () => {
+    const tab = await openTab();
+    tab.setEmoji('👨‍👩‍👧');
+    expect(tab.emoji).toBe('👨‍👩‍👧');
+  });
+});
+
 describe('Tab.resume', () => {
   let browser: Browser;
 

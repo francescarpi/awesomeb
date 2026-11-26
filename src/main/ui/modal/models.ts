@@ -98,6 +98,7 @@ export class UIContextualModal extends UIPageView {
         width: props.bounds.width.toString(),
         height: props.bounds.height.toString(),
         anchor: props.anchor,
+        ...(props.query || {}),
       },
     });
   }

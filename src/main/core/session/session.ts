@@ -33,6 +33,7 @@ function serializeTabContainer(tc: TabContainer): ISessionTabContainer {
         url: tab.url,
         closedAt: tab.closedAt,
         openTabsAsChild: tab.openTabsAsChild,
+        emoji: tab.emoji,
       })),
     children: tc.children.filter(hasPersistedTabs).map(serializeTabContainer),
   };
