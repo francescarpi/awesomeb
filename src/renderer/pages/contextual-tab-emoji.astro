@@ -2,7 +2,7 @@
 import ContextualModal from '#/components/common/ContextualModal.astro';
 ---
 
-<ContextualModal width="w-80" height="min-h-96">
+<ContextualModal width="auto" height="min-h-96">
   <div class="flex flex-col gap-2">
     <div class="flex justify-end">
       <button id="clear-emoji" class="btn btn-xs btn-ghost" type="button"></button>
@@ -65,7 +65,7 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
   });
 </script>
 
-<style>
+<style is:global>
   emoji-picker {
     --num-columns: 8;
     --emoji-size: 1.25rem;
