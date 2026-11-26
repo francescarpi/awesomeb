@@ -8,13 +8,24 @@ import ContextualModal from '#/components/common/ContextualModal.astro';
 
 <script>
   import 'emoji-picker-element';
+  import { getSearchParams } from '#/scripts';
+
+  const { winId, searchParams } = getSearchParams();
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
 
   const picker = document.getElementById('emoji-picker') as HTMLElement & {
     addEventListener: (type: string, listener: (event: CustomEvent) => void) => void;
   };
 
   picker.addEventListener('emoji-click', (event) => {
-    console.log('[emoji] picked', event.detail?.unicode, event.detail?.emoji?.unicode);
+    const emoji = event.detail?.unicode;
+
+    if (!emoji) {
+      return;
+    }
+
+    abTabs.setEmoji(tabId, emoji);
+    abModal.closeContextual(winId);
   });
 </script>
 

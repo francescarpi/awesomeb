@@ -38,6 +38,7 @@ export interface ITab {
   openTabsAsChild: boolean;
   tags: ITabTag[];
   isInternal: boolean;
+  emoji: string | null;
 }
 
 export interface ITabTag {

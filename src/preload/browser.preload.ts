@@ -132,6 +132,9 @@ const abTabs = {
   onOpenEmojiPicker: (callback: (event: IpcRendererEvent, tabId: TTabId) => void) => {
     ipcRenderer.on('tabs:open-emoji-picker', (_event, tabId) => callback(_event, tabId));
   },
+  setEmoji: (tabId: TTabId, emoji: string | null) => {
+    ipcRenderer.send('tabs:set-emoji', { tabId, emoji });
+  },
   closeFindInTab: (tabId: TTabId) => {
     ipcRenderer.send('tabs:close-find-in-tab', { tabId });
   },

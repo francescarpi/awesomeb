@@ -73,6 +73,17 @@ export function setupTabIPC(browser: Browser) {
   );
 
   //--------------------------------------------------------------------------------------
+  createHandler<{ tab: IWinDesConTab; emoji: string | null }>(
+    'tabs:set-emoji',
+    'on',
+    browser,
+    [tabChecker],
+    async ({ tab, emoji }) => {
+      tab.tab.setEmoji(emoji);
+    },
+  );
+
+  //--------------------------------------------------------------------------------------
   createHandler<{ tab: IWinDesConTab }>(
     'tabs:retry-failed',
     'on',

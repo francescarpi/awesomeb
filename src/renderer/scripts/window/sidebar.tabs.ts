@@ -419,6 +419,9 @@ export function openEmojiPicker(winId: TWindowId, tabId: number) {
       height: bounds.height,
     },
     anchor: 'right',
+    query: {
+      tabId: tabId.toString(),
+    },
   });
 }
 
