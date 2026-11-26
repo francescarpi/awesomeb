@@ -4,5 +4,6 @@ export type TPage = string;
 
 export interface IContextualModalParams {
   bounds: Rectangle;
-  anchor: 'top-left' | 'bottom-left';
+  anchor: 'top-left' | 'bottom-left' | 'right';
+  query?: Record<string, string>;
 }

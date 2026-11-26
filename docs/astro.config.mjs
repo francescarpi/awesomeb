@@ -71,6 +71,7 @@ export default defineConfig({
             { label: 'Reopen', translations: { 'ca': 'Reobrir', 'es': 'Reabrir' }, slug: 'tabs/closed' },
             { label: 'Navigate', translations: { 'ca': 'Navegar', 'es': 'Navegar' }, slug: 'tabs/navigate' },
             { label: 'Rename', translations: { 'ca': 'Renombrar', 'es': 'Renombrar' }, slug: 'tabs/rename' },
+            { label: 'Emoji', translations: { 'ca': 'Emoji', 'es': 'Emoji' }, slug: 'tabs/emoji' },
             { label: 'Copy URL', translations: { 'ca': 'Copiar la URL', 'es': 'Copiar la URL' }, slug: 'tabs/copy-url' },
             { label: 'Edit URL', translations: { 'ca': 'Editar la URL', 'es': 'Editar la URL' }, slug: 'tabs/edit-url' },
             { label: 'View page source', translations: { 'ca': 'Veure el codi font de la pàgina', 'es': 'Ver el código fuente de la página' }, slug: 'tabs/view-source' },

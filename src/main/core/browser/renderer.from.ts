@@ -265,6 +265,7 @@ export class BrowserRenderer {
       isClosed: tab.isClosed,
       openTabsAsChild: tab.openTabsAsChild,
       isInternal: tab.isInternal,
+      emoji: tab.emoji,
       tags: this.browser.tabTags
         .get(tab.id)
         .map((tagId) => config.getProperty('tags').find((t) => t.id === tagId))
@@ -321,6 +322,7 @@ export class BrowserRenderer {
         isDimmed: item.tab.suspended,
         desktopId: item.desktop.id,
         windowId: window.id,
+        emoji: item.tab.emoji,
       }));
   }
 
@@ -408,6 +410,7 @@ export class BrowserRenderer {
       title: tab.tab.title,
       partitionColor: tab.tab.partition.color,
       desktopName: tab.desktop.longName,
+      emoji: tab.tab.emoji,
     }));
   }
 

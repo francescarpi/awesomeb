@@ -35,6 +35,7 @@ const { width = 'w-87.5', height = '' } = Astro.props;
 
     const x = parseFloat(searchParams.get('x')!);
     const y = parseFloat(searchParams.get('y')!);
+    const width = parseFloat(searchParams.get('width')!);
     const anchor = searchParams.get('anchor')!;
 
     switch (anchor) {
@@ -46,6 +47,11 @@ const { width = 'w-87.5', height = '' } = Astro.props;
       case 'top-left': {
         wrapper.style.top = `${y + 30}px`;
         wrapper.style.left = `${x}px`;
+        break;
+      }
+      case 'right': {
+        wrapper.style.left = `${x + width + 7}px`;
+        wrapper.style.top = `${y}px`;
         break;
       }
     }

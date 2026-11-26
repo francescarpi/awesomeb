@@ -1,0 +1,80 @@
+---
+import ContextualModal from '#/components/common/ContextualModal.astro';
+---
+
+<ContextualModal width="w-80" height="min-h-96">
+  <div class="flex flex-col gap-2">
+    <div class="flex justify-end">
+      <button id="clear-emoji" class="btn btn-xs btn-ghost" type="button"></button>
+    </div>
+    <div id="emoji-picker-container"></div>
+  </div>
+</ContextualModal>
+
+<script>
+  import 'emoji-picker-element';
+  import type { Picker } from 'emoji-picker-element';
+  import emojiData from 'emoji-picker-element-data/en/emojibase/data.json';
+  import { getSearchParams, buttonManager } from '#/scripts';
+  import { ITabEntity } from '~/types';
+
+  const { winId, searchParams } = getSearchParams();
+  const tabId = parseInt(searchParams.get('tabId') as string, 10);
+
+  const t = await abI18n.t({ winId }, [{ key: 'pages:tabEmoji.clear' }]);
+
+  // The picker fetches its dataset over HTTP, which is blocked on file:// pages.
+  // The dataset is bundled instead and handed over as a blob URL, which the
+  // picker can read from any origin.
+  const datasetUrl = URL.createObjectURL(
+    new Blob([JSON.stringify(emojiData)], { type: 'application/json' }),
+  );
+
+  const picker = document.createElement('emoji-picker') as Picker;
+  picker.id = 'emoji-picker';
+  picker.dataSource = datasetUrl;
+
+  document.getElementById('emoji-picker-container')!.appendChild(picker);
+
+  const tabsEntities = (await abEntities.fetch(winId, 'tabs')) as ITabEntity[];
+  const tab = tabsEntities.find((entity) => entity.id === tabId.toString());
+
+  const clearButton = buttonManager('clear-emoji', {
+    handleClick: () => {
+      abTabs.setEmoji(tabId, null);
+      abModal.closeContextual(winId);
+    },
+  });
+
+  const clearButtonElement = document.getElementById('clear-emoji') as HTMLButtonElement;
+  clearButtonElement.textContent = t['pages:tabEmoji.clear'];
+
+  if (!tab?.emoji) {
+    clearButton.disable();
+  }
+
+  picker.addEventListener('emoji-click', (event) => {
+    const emoji = event.detail?.unicode;
+
+    if (!emoji) {
+      return;
+    }
+
+    abTabs.setEmoji(tabId, emoji);
+    abModal.closeContextual(winId);
+  });
+</script>
+
+<style>
+  emoji-picker {
+    --num-columns: 8;
+    --emoji-size: 1.25rem;
+    --emoji-padding: 0.25rem;
+    --background: transparent;
+    --border-color: transparent;
+    --border-radius: 0;
+    --border-size: 0;
+    height: 22rem;
+    width: 100%;
+  }
+</style>

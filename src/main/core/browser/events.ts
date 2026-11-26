@@ -306,6 +306,11 @@ export function registerBrowserEvents(browser: Browser) {
   });
 
   //--------------------------------------------------------------------------------------
+  browser.eventsChannel.on('tab:emoji-did-change', async (tab: Tab) => {
+    refreshUrlBarOrTab(browser, tab);
+  });
+
+  //--------------------------------------------------------------------------------------
   browser.eventsChannel.on(
     'desktop:tabcontainers-order-did-change',
     async (window: Window, _desktop: Desktop) => {

@@ -285,6 +285,7 @@ export class Browser {
       url,
       customTitle: oldTab.customTitle,
       openTabsAsChild: oldTab.openTabsAsChild,
+      emoji: oldTab.emoji,
     });
 
     if (!tabContainer.replaceTab(oldTab.id, replacement)) {
@@ -470,6 +471,7 @@ export class Browser {
       url: tabStore.url,
       closedAt: tabStore.closedAt,
       openTabsAsChild: tabStore.openTabsAsChild,
+      emoji: tabStore.emoji,
       favicon: this.favicons.getLastTabFavicon(tabStore.id),
     });
 
