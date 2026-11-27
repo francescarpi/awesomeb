@@ -263,7 +263,7 @@ function buildTabVNode(winId: TWindowId, t: ITab): VNode {
               'z-10',
               'w-[16px]',
               'h-[16px]',
-              'text-[12px]',
+              'text-[16px]',
               'leading-none',
               'text-center',
               'group-[.collapsed]/sidebar:w-5.5',
